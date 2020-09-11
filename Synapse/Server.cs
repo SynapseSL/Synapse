@@ -1,5 +1,6 @@
 ﻿using Synapse.Api;
 using Synapse.Api.Events;
+using Synapse.Config;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,6 +18,9 @@ namespace Synapse
         public FileLocations Files { get; } = new FileLocations();
 
         public EventHandler Events { get; } = new EventHandler();
+
+        public ConfigHandler Configs { get; } = new ConfigHandler();
+
 
         //Server fields
         public ushort Port
