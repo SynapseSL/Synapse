@@ -1,0 +1,167 @@
+﻿using Synapse.Api;
+using Synapse.Api.Events;
+using Synapse.Config;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+
+namespace Synapse
+{
+    public class Server
+    {
+        //Synapse Api Objects
+        public Logger Logger { get; } = new Logger();
+
+        public Map Map { get; } = new Map();
+
+        public FileLocations Files { get; } = new FileLocations();
+
+        public EventHandler Events { get; } = new EventHandler();
+
+        public ConfigHandler Configs { get; } = new ConfigHandler();
+
+
+        //Server fields
+        public ushort Port
+        {
+            get => ServerStatic.ServerPort;
+            set => ServerStatic.ServerPort = value;
+        }
+
+        public string Name
+        {
+            get => ServerConsole._serverName;
+            set
+            {
+                ServerConsole._serverName = value;
+                ServerConsole.RefreshServerName();
+            }
+        }
+
+        public List<TObject> GetObjectsOf<TObject>() where TObject : UnityEngine.Object => UnityEngine.Object.FindObjectsOfType<TObject>().ToList();
+
+        public TObject GetObjectOf<TObject>() where TObject : UnityEngine.Object => UnityEngine.Object.FindObjectOfType<TObject>();
+
+
+        //Vanilla Objects
+        public ServerConsole ServerConsole => ServerConsole.singleton;
+
+        public GameCore.Console GameConsole => GameCore.Console.singleton;
+
+
+        public class FileLocations
+        {
+            //synapse
+            private string synapseDiretory;
+
+            //plugin
+            private string mainPluginDirectory;
+            private string pluginDirectory;
+            private string sharedpluginDirectory;
+
+            //config
+            private string mainConfigDirectory;
+            private string configDirectory;
+            private string sharedConfigDirectory;
+
+            //Synapse
+            public string SynapseDirectory
+            {
+                get
+                {
+                    if (!Directory.Exists(synapseDiretory))
+                        Directory.CreateDirectory(synapseDiretory);
+
+                    return synapseDiretory;
+                }
+                internal set => synapseDiretory = value;
+            }
+
+            //Plugin
+            public string MainPluginDirectory
+            {
+                get
+                {
+                    if (!Directory.Exists(mainPluginDirectory))
+                        Directory.CreateDirectory(mainPluginDirectory);
+
+                    return mainPluginDirectory;
+                }
+                internal set => mainPluginDirectory = value;
+            }
+            public string PluginDirectory
+            {
+                get
+                {
+                    if (!Directory.Exists(pluginDirectory))
+                        Directory.CreateDirectory(pluginDirectory);
+
+                    return pluginDirectory;
+                }
+                internal set => pluginDirectory = value;
+            }
+            public string SharedPluginDirectory
+            {
+                get
+                {
+                    if (!Directory.Exists(sharedpluginDirectory))
+                        Directory.CreateDirectory(sharedpluginDirectory);
+
+                    return sharedpluginDirectory;
+                }
+                internal set => sharedpluginDirectory = value;
+            }
+
+            //Config
+            public string MainConfigDirectory
+            {
+                get
+                {
+                    if (!Directory.Exists(mainConfigDirectory))
+                        Directory.CreateDirectory(mainConfigDirectory);
+
+                    return mainConfigDirectory;
+                }
+                internal set => mainConfigDirectory = value;
+            }
+            public string ConfigDirectory
+            {
+                get
+                {
+                    if (!Directory.Exists(configDirectory))
+                        Directory.CreateDirectory(configDirectory);
+
+                    return configDirectory;
+                }
+                internal set => configDirectory = value;
+            }
+            public string SharedConfigDirectory
+            {
+                get
+                {
+                    if (!Directory.Exists(sharedConfigDirectory))
+                        Directory.CreateDirectory(sharedConfigDirectory);
+
+                    return sharedConfigDirectory;
+                }
+                internal set => sharedConfigDirectory = value;
+            }
+
+
+            internal FileLocations() => Refresh();
+            public void Refresh()
+            {
+                SynapseDirectory = Assembly.GetCallingAssembly().Location.Replace("Synapse.dll", "");
+
+                MainPluginDirectory = Path.Combine(SynapseDirectory, "plugins");
+                PluginDirectory = Path.Combine(MainPluginDirectory, $"server-{SynapseController.Server.Port}");
+                SharedPluginDirectory = Path.Combine(MainPluginDirectory, "server-shared");
+
+                MainConfigDirectory = Path.Combine(SynapseDirectory, "configs");
+                ConfigDirectory = Path.Combine(MainConfigDirectory, $"server-{SynapseController.Server.Port}");
+                SharedConfigDirectory = Path.Combine(MainConfigDirectory, "server-shared");
+            }
+        }
+    }
+}
