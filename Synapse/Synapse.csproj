@@ -32,6 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Api\Components\Door.cs" />
     <Compile Include="Api\Components\Elevator.cs" />
     <Compile Include="Api\Components\Tesla.cs" />
     <Compile Include="Api\Components\Player.cs" />
@@ -40,6 +41,7 @@
     <Compile Include="Api\Logger.cs" />
     <Compile Include="Api\Plugin\PluginInformations.cs" />
     <Compile Include="Config\ConfigHandler.cs" />
+    <Compile Include="Patches\SynapsePatches\DoorStartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ElevatorStartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\RefreshTeslaPatch.cs" />
     <Compile Include="Server.cs" />

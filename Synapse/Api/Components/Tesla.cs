@@ -8,6 +8,8 @@ namespace Synapse.Api.Components
 
         private TeslaGate Gate;
 
+        public GameObject GameObject => Gate.gameObject;
+
         public bool Active { get; set; }
 
         public Vector3 Position { get => Gate.localPosition; }

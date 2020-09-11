@@ -1,10 +1,14 @@
-﻿namespace Synapse.Api.Components
+﻿using UnityEngine;
+
+namespace Synapse.Api.Components
 {
     public class Elevator
     {
         internal Elevator(Lift lift) => Lift = lift;
 
         private Lift Lift;
+
+        public GameObject GameObject => Lift.gameObject;
 
         public Lift.Status Status { get => Lift.status; set => Lift.SetStatus((byte)value); }
 
