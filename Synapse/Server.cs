@@ -23,7 +23,16 @@ namespace Synapse
 
         public ConfigHandler Configs { get; } = new ConfigHandler();
 
-        public Player Host => PlayerManager.localPlayer.GetComponent<Player>();
+        public Player Host
+        {
+            get
+            {
+                if (PlayerManager.localPlayer.GetComponent<Player>() == null)
+                    PlayerManager.localPlayer.AddComponent<Player>();
+
+                return PlayerManager.localPlayer.GetComponent<Player>();
+            }
+        }
 
         public List<Player> Players => PlayerManager.players.ToList().Select(x => x.GetComponent<Player>()).ToList();
 

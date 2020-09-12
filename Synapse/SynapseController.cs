@@ -54,7 +54,7 @@ public class SynapseController
 
         foreach(var pluginpath in paths)
         {
-            var assembly = Assembly.LoadFile(pluginpath);
+            var assembly = Assembly.Load(File.ReadAllBytes(pluginpath));
             foreach(var type in assembly.GetTypes())
             {
                 if (type.GetCustomAttribute<PluginInformations>() == null) continue;

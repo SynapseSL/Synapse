@@ -1,14 +1,13 @@
 ﻿using System;
-using GameCore;
 using Harmony;
 using Synapse.Api;
 
 namespace Synapse.Patches.SynapsePatches
 {
     [HarmonyPatch(typeof(ReferenceHub), nameof(ReferenceHub.LoadComponents))]
-    public static class ComponentsPatch
+    internal static class ComponentsPatch
     {
-        public static void Prefix(ReferenceHub __instance)
+        private static void Prefix(ReferenceHub __instance)
         {
             if (__instance.GetComponent<Player>() == null) 
                 __instance.gameObject.AddComponent<Player>();

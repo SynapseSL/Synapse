@@ -5,13 +5,11 @@ namespace Synapse.Api
 {
     public class Room
     {
-        internal Room(RoomManager.Room vroom) => VanillaRoom = vroom;
+        internal Room(GameObject gameObject) => GameObject = gameObject;
 
-        private RoomManager.Room VanillaRoom;
+        public GameObject GameObject { get; }
 
-        public GameObject GameObject => VanillaRoom.roomPrefab;
-
-        public Vector3 Position => VanillaRoom.roomOffset.position;
+        public Vector3 Position => GameObject.transform.position;
 
         public string RoomName => GameObject.name;
 
@@ -19,14 +17,27 @@ namespace Synapse.Api
         {
             get
             {
-                //TODO: Adding All Zones
-                if (Position.y > -10f && Position.y < 25f)
-                    return ZoneType.LCZ;
+                switch (Position.y)
+                {
+                    case 0f:
+                        return ZoneType.LCZ;
 
-                else if (Vector3.Distance(Vector3.up * -1998, Position) < 30f)
-                    return ZoneType.Pocket;
+                    case 1000f:
+                        return ZoneType.Surface;
 
-                else return ZoneType.None;
+                    case -1000f:
+                        if (RoomName.Contains("HCZ"))
+                            return ZoneType.HCZ;
+                        else
+                            return ZoneType.Entrance;
+
+
+                    case -2000f:
+                        return ZoneType.Pocket;
+
+                    default:
+                        return ZoneType.None;
+                }
             }
         }
 

@@ -9,6 +9,8 @@
         public ServerEvents Server { get; } = new ServerEvents();
         
         public PlayerEvents Player { get; } = new PlayerEvents();
+
+        public RoundEvents Round { get; } = new RoundEvents();
         
         public interface ISynapseEventArgs
         {
