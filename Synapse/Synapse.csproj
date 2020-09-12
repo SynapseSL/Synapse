@@ -32,6 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Api\MapPoint.cs" />
     <Compile Include="Api\Room.cs" />
     <Compile Include="Api\Door.cs" />
     <Compile Include="Api\Elevator.cs" />
@@ -73,10 +74,12 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\Synapse_Dependencies\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Synapse Plugins\Scp035\Scp035\bin\Release\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Patches\EventsPatches\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.
