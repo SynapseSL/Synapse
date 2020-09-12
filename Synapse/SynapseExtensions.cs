@@ -1,4 +1,4 @@
-﻿using Synapse.Api.Components;
+﻿using Synapse.Api;
 using UnityEngine;
 
 public static class SynapseExtensions

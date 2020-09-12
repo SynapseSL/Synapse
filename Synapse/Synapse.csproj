@@ -32,11 +32,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Api\Components\Room.cs" />
-    <Compile Include="Api\Components\Door.cs" />
-    <Compile Include="Api\Components\Elevator.cs" />
-    <Compile Include="Api\Components\Tesla.cs" />
-    <Compile Include="Api\Components\Player.cs" />
+    <Compile Include="Api\Room.cs" />
+    <Compile Include="Api\Door.cs" />
+    <Compile Include="Api\Elevator.cs" />
+    <Compile Include="Api\Tesla.cs" />
+    <Compile Include="Api\Player.cs" />
     <Compile Include="Api\Enum\ZoneType.cs" />
     <Compile Include="Api\Events\ServerEvents.cs" />
     <Compile Include="Api\Events\EventHandler.cs" />

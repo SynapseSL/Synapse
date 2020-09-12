@@ -1,5 +1,4 @@
 ﻿using Synapse.Api;
-using Synapse.Api.Components;
 using Synapse.Api.Events;
 using Synapse.Config;
 using System.Collections.Generic;
