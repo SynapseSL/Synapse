@@ -53,6 +53,7 @@
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDamagePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerLeavePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSpeakPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\ComponentPatch.cs" />
     <Compile Include="SynapseExtensions.cs" />
     <Compile Include="Config\ConfigHandler.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerJoinPatch.cs" />
