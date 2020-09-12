@@ -217,7 +217,7 @@ namespace Synapse
                 ConfigDirectory = Path.Combine(MainConfigDirectory, $"server-{ServerStatic.ServerPort}");
                 SharedConfigDirectory = Path.Combine(MainConfigDirectory, "server-shared");
 
-                ConfigFile = Path.Combine(MainConfigDirectory, "config.syml");
+                ConfigFile = Path.Combine(ConfigDirectory, "config.syml");
             }
             public string GetTranslationFile(string name)
             {

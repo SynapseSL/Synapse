@@ -23,6 +23,16 @@ namespace Synapse.Config
             SynapseController.Server.Logger.Warn(configuration.ToString());
         }
 
+        public T GetOrSetDefault<T>(string section, T defValue) where T : IConfigSection
+        {
+            return _syml.GetOrSetDefault(section, defValue);
+        }
+        
+        public object GetOrSetDefault(string section, object o)
+        {
+            return _syml.GetOrSetDefaultUnsafe(section, o);
+        }
+        
         public void UpdateSection<T>(string section, T replacement) where T : IConfigSection
         {
             var sec = new ConfigSection(section, "");

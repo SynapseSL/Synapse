@@ -43,6 +43,23 @@ namespace Synapse.Config
             }
         }
 
+        public object GetOrSetDefaultUnsafe(string section, object obj) 
+        {
+            if (Sections.ContainsKey(section))
+            {
+                return Sections[section].LoadAsType(obj.GetType());
+            }
+            else
+            {
+                ConfigSection cfgs = new ConfigSection(section, "");
+                cfgs.ImportUnsafe(obj);
+                Sections[section] = cfgs;
+                Store();
+                return obj;
+            }
+        }
+
+        
         public void Store()
         {
             var text = WriteSections(Sections);
@@ -128,12 +145,37 @@ namespace Synapse.Config
             }
         }
 
+        public object LoadAsType(Type type)
+        {
+            try
+            {
+                SynapseController.Server.Logger.Info($"Deserializing section {Section} unsafely with type {type.Name}");
+                var ret = new DeserializerBuilder().Build().Deserialize(Content, type);
+                SynapseController.Server.Logger.Info("Deserialization done");
+                return ret;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        
         public string Import<T>(T t) where T: IConfigSection
         {
             Content = new SerializerBuilder().Build().Serialize((object)t);
+
             return Content;
         }
 
+        public string ImportUnsafe(object obj)
+        {
+            Content = new SerializerBuilder().Build().Serialize(obj);
+            return Content;
+        }
+
+        
         public string Serialize()
         {
             return "::" + Section + "::" + "\n" + "{\n" + Content.Trim() + "\n}\n";
