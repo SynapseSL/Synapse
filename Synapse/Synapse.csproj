@@ -35,6 +35,7 @@
   <ItemGroup>
     <Compile Include="Api\Enum\RaCategory.cs" />
     <Compile Include="Api\MapPoint.cs" />
+    <Compile Include="Api\Plugin\PluginExtension.cs" />
     <Compile Include="Api\Room.cs" />
     <Compile Include="Api\Door.cs" />
     <Compile Include="Api\Elevator.cs" />
