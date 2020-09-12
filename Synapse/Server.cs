@@ -98,6 +98,7 @@ namespace Synapse
             private string configDirectory;
             private string sharedConfigDirectory;
 
+            private string configFile;
             //Synapse
             public string SynapseDirectory
             {
@@ -181,6 +182,18 @@ namespace Synapse
                 private set => sharedConfigDirectory = value;
             }
 
+            public string ConfigFile
+            {
+                get
+                {
+                    if (!File.Exists(configFile))
+                        File.Create(configFile);
+
+                    return configFile;
+                }
+                internal set => configFile = value;
+            }
+
 
             internal FileLocations() => Refresh();
             public void Refresh()
@@ -194,6 +207,8 @@ namespace Synapse
                 MainConfigDirectory = Path.Combine(SynapseDirectory, "configs");
                 ConfigDirectory = Path.Combine(MainConfigDirectory, $"server-{ServerStatic.ServerPort}");
                 SharedConfigDirectory = Path.Combine(MainConfigDirectory, "server-shared");
+
+                ConfigFile = Path.Combine(MainConfigDirectory, "config.syml");
             }
         }
     }
