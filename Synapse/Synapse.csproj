@@ -32,6 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Api\Enum\RaCategory.cs" />
     <Compile Include="Api\MapPoint.cs" />
     <Compile Include="Api\Room.cs" />
     <Compile Include="Api\Door.cs" />
@@ -64,6 +65,10 @@
     </Reference>
     <Reference Include="Assembly-CSharp-Synapse_publicised">
       <HintPath>..\..\Synapse_Dependencies\Assembly-CSharp-Synapse_publicised.dll</HintPath>
+    </Reference>
+    <Reference Include="CommandSystem.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Synapse_Dependencies\CommandSystem.Core.dll</HintPath>
     </Reference>
     <Reference Include="Mirror, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

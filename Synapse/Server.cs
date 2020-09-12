@@ -28,9 +28,31 @@ namespace Synapse
 
         public Player GetPlayer(string argument)
         {
-            //TODO: GetPlayer
-            return null;
+            var players = Players;
+
+            if (int.TryParse(argument, out var playerid))
+            {
+                var player = GetPlayer(playerid);
+                if (player == null)
+                    goto AA_001;
+
+                return player;
+            }
+
+            else if (argument.Contains("@"))
+            {
+                var player = players.FirstOrDefault(x => x.UserId.ToLower() == argument);
+                if (player == null)
+                    goto AA_001;
+
+                return player;
+            }
+
+            AA_001:
+            return players.FirstOrDefault(x => x.NickName.ToLower() == argument.ToLower());
         }
+
+        public Player GetPlayer(int playerid) => Players.FirstOrDefault(x => x.PlayerId == playerid);
 
         //Server fields
         public ushort Port
