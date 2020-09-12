@@ -9,8 +9,9 @@
         public ServerEvents Server { get; } = new ServerEvents();
 
 
-        public abstract class SynapseEventArgs
+        public interface SynapseEventArgs
         {
+            void LogInConsole();
         }
     }
 }
