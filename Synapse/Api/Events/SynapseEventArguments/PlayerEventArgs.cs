@@ -1,6 +1,4 @@
-﻿using Synapse.Api.Components;
-
-namespace Synapse.Api.Events.SynapseEventArguments
+﻿namespace Synapse.Api.Events.SynapseEventArguments
 {
     public class PlayerJoinEventArgs: EventHandler.SynapseEventArgs
     {

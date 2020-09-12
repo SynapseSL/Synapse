@@ -9,7 +9,7 @@ namespace Synapse.Patches.SynapsePatches
         {
             SynapseController.Server.Map.Rooms.Clear();
             foreach (var room in __instance.rooms)
-                SynapseController.Server.Map.Rooms.Add(new Api.Components.Room(room));
+                SynapseController.Server.Map.Rooms.Add(new Api.Room(room));
         }
     }
 }

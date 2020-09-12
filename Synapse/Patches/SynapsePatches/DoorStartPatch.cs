@@ -10,7 +10,7 @@ namespace Synapse.Patches.SynapsePatches
             while (SynapseController.Server.Map.Doors.Contains(null))
                 SynapseController.Server.Map.Doors.Remove(null);
 
-            SynapseController.Server.Map.Doors.Add(new Api.Components.Door(__instance));
+            SynapseController.Server.Map.Doors.Add(new Api.Door(__instance));
         }
     }
 }

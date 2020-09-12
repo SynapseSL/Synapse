@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Synapse.Api.Components;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse

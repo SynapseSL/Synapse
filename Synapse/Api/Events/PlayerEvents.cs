@@ -1,4 +1,4 @@
-﻿using Synapse.Api.Components;
+﻿using Synapse.Api;
 using Synapse.Api.Events.SynapseEventArguments;
 
 namespace Synapse.Api.Events
