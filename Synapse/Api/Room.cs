@@ -1,7 +1,7 @@
 ﻿using Synapse.Api.Enum;
 using UnityEngine;
 
-namespace Synapse.Api.Components
+namespace Synapse.Api
 {
     public class Room
     {

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Synapse.Api.Components
+namespace Synapse.Api
 {
     public class Player : MonoBehaviour
     {

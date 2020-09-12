@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Synapse.Api.Components;
-using UnityEngine;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse
@@ -24,6 +23,7 @@ namespace Synapse
 
         public ConfigHandler Configs { get; } = new ConfigHandler();
 
+        public List<Player> GetPlayers => PlayerManager.players.ToList().Select(x => x.GetComponent<Player>()).ToList();
 
         //Server fields
         public ushort Port

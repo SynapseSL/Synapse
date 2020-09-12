@@ -11,5 +11,6 @@ namespace Synapse.Api.Plugin
         public string Author;
         public string Description;
         public string Version;
+        public int LoadPriority;
     }
 }
