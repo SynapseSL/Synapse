@@ -51,6 +51,7 @@
     <Compile Include="Api\Map.cs" />
     <Compile Include="Api\Logger.cs" />
     <Compile Include="Api\Plugin\PluginInformations.cs" />
+    <Compile Include="Config\SYML.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerBanPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDamagePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerLeavePatch.cs" />
@@ -86,6 +87,9 @@
     <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Synapse_Dependencies\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="YamlDotNet">
+      <HintPath>..\..\Synapse_Dependencies\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup />
