@@ -15,7 +15,7 @@ namespace Synapse.Patches.SynapsePatches
 
             try
             {
-                //TODO: Events.InvokeLoadComponents(__instance.gameObject);
+                SynapseController.Server.Events.Player.InvokeLoadComponentsEvent(__instance.gameObject);
             }
             catch (Exception e)
             {
