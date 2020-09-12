@@ -17,7 +17,7 @@ namespace Synapse.Config
             this.path = path;
             if (!File.Exists(path))
             {
-                File.Create(path).Flush();
+                File.Create(path).Close();
             }
         }
 
