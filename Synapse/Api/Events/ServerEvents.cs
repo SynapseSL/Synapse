@@ -2,6 +2,5 @@
 {
     public class ServerEvents
     {
-        public event EventHandler.OnSynapseEvent<SynapseEventArguments.ExampleEventArgs> ExampleEvent;
     }
 }

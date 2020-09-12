@@ -43,7 +43,6 @@
     <Compile Include="Api\Events\PlayerEvents.cs" />
     <Compile Include="Api\Events\ServerEvents.cs" />
     <Compile Include="Api\Events\EventHandler.cs" />
-    <Compile Include="Api\Events\SynapseEventArguments\ExampleEventArgs.cs" />
     <Compile Include="Api\Events\SynapseEventArguments\PlayerEventArgs.cs" />
     <Compile Include="Api\Map.cs" />
     <Compile Include="Api\Logger.cs" />
