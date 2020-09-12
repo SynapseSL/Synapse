@@ -16,7 +16,7 @@ namespace Synapse.Config
         
         public void Init()
         {
-            _syml = new SYML(Path.Combine(SynapseController.Server.Files.ConfigDirectory, "config.syml"));
+            _syml = new SYML(SynapseController.Server.Files.ConfigFile);
             _syml.Load();
             SynapseConfiguration configuration = new SynapseConfiguration();
             configuration = _syml.GetOrSetDefault("Synapse", configuration);

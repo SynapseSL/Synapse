@@ -196,7 +196,7 @@ namespace Synapse
                 get
                 {
                     if (!File.Exists(configFile))
-                        File.Create(configFile);
+                        File.Create(configFile).Close();
 
                     return configFile;
                 }
