@@ -32,15 +32,29 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Api\Components\Door.cs" />
-    <Compile Include="Api\Components\Elevator.cs" />
-    <Compile Include="Api\Components\Tesla.cs" />
-    <Compile Include="Api\Components\Player.cs" />
+    <Compile Include="Api\Enum\RaCategory.cs" />
+    <Compile Include="Api\MapPoint.cs" />
+    <Compile Include="Api\Room.cs" />
+    <Compile Include="Api\Door.cs" />
+    <Compile Include="Api\Elevator.cs" />
+    <Compile Include="Api\Tesla.cs" />
+    <Compile Include="Api\Player.cs" />
+    <Compile Include="Api\Enum\ZoneType.cs" />
+    <Compile Include="Api\Events\PlayerEvents.cs" />
+    <Compile Include="Api\Events\ServerEvents.cs" />
     <Compile Include="Api\Events\EventHandler.cs" />
+    <Compile Include="Api\Events\SynapseEventArguments\ExampleEventArgs.cs" />
+    <Compile Include="Api\Events\SynapseEventArguments\PlayerEventArgs.cs" />
     <Compile Include="Api\Map.cs" />
     <Compile Include="Api\Logger.cs" />
     <Compile Include="Api\Plugin\PluginInformations.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerBanPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerLeavePatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSpeakPatch.cs" />
+    <Compile Include="SynapseExtensions.cs" />
     <Compile Include="Config\ConfigHandler.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerJoinPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\GenerateMapPatch.cs" />
     <Compile Include="Patches\SynapsePatches\DoorStartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ElevatorStartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\RefreshTeslaPatch.cs" />
@@ -54,6 +68,10 @@
     <Reference Include="Assembly-CSharp-Synapse_publicised">
       <HintPath>..\..\Synapse_Dependencies\Assembly-CSharp-Synapse_publicised.dll</HintPath>
     </Reference>
+    <Reference Include="CommandSystem.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Synapse_Dependencies\CommandSystem.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Mirror, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Synapse_Dependencies\Mirror.dll</HintPath>
@@ -61,10 +79,12 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\Synapse_Dependencies\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Synapse Plugins\Scp035\Scp035\bin\Release\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Patches\EventsPatches\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.

@@ -1,5 +1,5 @@
 ﻿using Harmony;
-using Synapse.Api.Components;
+using Synapse.Api;
 
 namespace Synapse.Patches.SynapsePatches
 {

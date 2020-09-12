@@ -5,12 +5,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Logger = Synapse.Api.Logger;
 
 namespace Synapse
 {
     public class Server
     {
-        //Synapse Api Objects
+        //Synapse Api
         public Logger Logger { get; } = new Logger();
 
         public Map Map { get; } = new Map();
@@ -21,6 +22,37 @@ namespace Synapse
 
         public ConfigHandler Configs { get; } = new ConfigHandler();
 
+        public Player Host => PlayerManager.localPlayer.GetComponent<Player>();
+
+        public List<Player> Players => PlayerManager.players.ToList().Select(x => x.GetComponent<Player>()).ToList();
+
+        public Player GetPlayer(string argument)
+        {
+            var players = Players;
+
+            if (int.TryParse(argument, out var playerid))
+            {
+                var player = GetPlayer(playerid);
+                if (player == null)
+                    goto AA_001;
+
+                return player;
+            }
+
+            else if (argument.Contains("@"))
+            {
+                var player = players.FirstOrDefault(x => x.UserId.ToLower() == argument);
+                if (player == null)
+                    goto AA_001;
+
+                return player;
+            }
+
+            AA_001:
+            return players.FirstOrDefault(x => x.NickName.ToLower() == argument.ToLower());
+        }
+
+        public Player GetPlayer(int playerid) => Players.FirstOrDefault(x => x.PlayerId == playerid);
 
         //Server fields
         public ushort Port
@@ -75,7 +107,7 @@ namespace Synapse
 
                     return synapseDiretory;
                 }
-                internal set => synapseDiretory = value;
+                private set => synapseDiretory = value;
             }
 
             //Plugin
@@ -88,7 +120,7 @@ namespace Synapse
 
                     return mainPluginDirectory;
                 }
-                internal set => mainPluginDirectory = value;
+                private set => mainPluginDirectory = value;
             }
             public string PluginDirectory
             {
@@ -99,7 +131,7 @@ namespace Synapse
 
                     return pluginDirectory;
                 }
-                internal set => pluginDirectory = value;
+                private set => pluginDirectory = value;
             }
             public string SharedPluginDirectory
             {
@@ -110,7 +142,7 @@ namespace Synapse
 
                     return sharedpluginDirectory;
                 }
-                internal set => sharedpluginDirectory = value;
+                private set => sharedpluginDirectory = value;
             }
 
             //Config
@@ -123,7 +155,7 @@ namespace Synapse
 
                     return mainConfigDirectory;
                 }
-                internal set => mainConfigDirectory = value;
+                private set => mainConfigDirectory = value;
             }
             public string ConfigDirectory
             {
@@ -134,7 +166,7 @@ namespace Synapse
 
                     return configDirectory;
                 }
-                internal set => configDirectory = value;
+                private set => configDirectory = value;
             }
             public string SharedConfigDirectory
             {
@@ -145,7 +177,7 @@ namespace Synapse
 
                     return sharedConfigDirectory;
                 }
-                internal set => sharedConfigDirectory = value;
+                private set => sharedConfigDirectory = value;
             }
 
 
