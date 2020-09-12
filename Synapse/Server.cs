@@ -34,6 +34,27 @@ namespace Synapse
             }
         }
 
+        //Server fields
+        public ushort Port
+        {
+            get => ServerStatic.ServerPort;
+            set => ServerStatic.ServerPort = value;
+        }
+
+        public string Name
+        {
+            get => ServerConsole._serverName;
+            set
+            {
+                ServerConsole._serverName = value;
+                ServerConsole.RefreshServerName();
+            }
+        }
+
+        public List<TObject> GetObjectsOf<TObject>() where TObject : UnityEngine.Object => UnityEngine.Object.FindObjectsOfType<TObject>().ToList();
+
+        public TObject GetObjectOf<TObject>() where TObject : UnityEngine.Object => UnityEngine.Object.FindObjectOfType<TObject>();
+
         public List<Player> Players => PlayerManager.players.ToList().Select(x => x.GetComponent<Player>()).ToList();
 
         public Player GetPlayer(string argument)
@@ -58,32 +79,11 @@ namespace Synapse
                 return player;
             }
 
-            AA_001:
+        AA_001:
             return players.FirstOrDefault(x => x.NickName.ToLower() == argument.ToLower());
         }
 
         public Player GetPlayer(int playerid) => Players.FirstOrDefault(x => x.PlayerId == playerid);
-
-        //Server fields
-        public ushort Port
-        {
-            get => ServerStatic.ServerPort;
-            set => ServerStatic.ServerPort = value;
-        }
-
-        public string Name
-        {
-            get => ServerConsole._serverName;
-            set
-            {
-                ServerConsole._serverName = value;
-                ServerConsole.RefreshServerName();
-            }
-        }
-
-        public List<TObject> GetObjectsOf<TObject>() where TObject : UnityEngine.Object => UnityEngine.Object.FindObjectsOfType<TObject>().ToList();
-
-        public TObject GetObjectOf<TObject>() where TObject : UnityEngine.Object => UnityEngine.Object.FindObjectOfType<TObject>();
 
 
         //Vanilla Objects
