@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Harmony;
+using Synapse.Api.Plugin;
 
 public class SynapseController
 {
@@ -33,7 +34,7 @@ public class SynapseController
         }
         catch(Exception e)
         {
-            Server.Logger.Error($"Harmony Patchin throw an Error:\n\n {e}");
+            Server.Logger.Error($"Harmony Patching throw an Error:\n\n {e}");
         }
     }
 
@@ -45,7 +46,12 @@ public class SynapseController
         foreach(var pluginpath in paths)
         {
             var assembly = Assembly.LoadFile(pluginpath);
+            foreach(var type in assembly.GetTypes())
+            {
+                if (type.GetCustomAttribute<PluginInformations>() == null) continue;
 
+                Activator.CreateInstance(type);
+            }
             
         }
     }

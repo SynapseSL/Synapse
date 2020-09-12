@@ -75,7 +75,7 @@ namespace Synapse
 
                     return synapseDiretory;
                 }
-                internal set => synapseDiretory = value;
+                private set => synapseDiretory = value;
             }
 
             //Plugin
@@ -88,7 +88,7 @@ namespace Synapse
 
                     return mainPluginDirectory;
                 }
-                internal set => mainPluginDirectory = value;
+                private set => mainPluginDirectory = value;
             }
             public string PluginDirectory
             {
@@ -99,7 +99,7 @@ namespace Synapse
 
                     return pluginDirectory;
                 }
-                internal set => pluginDirectory = value;
+                private set => pluginDirectory = value;
             }
             public string SharedPluginDirectory
             {
@@ -110,7 +110,7 @@ namespace Synapse
 
                     return sharedpluginDirectory;
                 }
-                internal set => sharedpluginDirectory = value;
+                private set => sharedpluginDirectory = value;
             }
 
             //Config
@@ -123,7 +123,7 @@ namespace Synapse
 
                     return mainConfigDirectory;
                 }
-                internal set => mainConfigDirectory = value;
+                private set => mainConfigDirectory = value;
             }
             public string ConfigDirectory
             {
@@ -134,7 +134,7 @@ namespace Synapse
 
                     return configDirectory;
                 }
-                internal set => configDirectory = value;
+                private set => configDirectory = value;
             }
             public string SharedConfigDirectory
             {
@@ -145,7 +145,7 @@ namespace Synapse
 
                     return sharedConfigDirectory;
                 }
-                internal set => sharedConfigDirectory = value;
+                private set => sharedConfigDirectory = value;
             }
 
 
