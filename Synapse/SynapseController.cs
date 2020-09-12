@@ -57,6 +57,9 @@ public class SynapseController
             }
         }
 
-        //dictionary.OrderBy(x => )
+        dictionary.OrderBy(x => x.Key.LoadPriority * -1);
+
+        foreach (var plugintype in dictionary.Values)
+            Activator.CreateInstance(plugintype);
     }
 }
