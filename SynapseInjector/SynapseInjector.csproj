@@ -5,7 +5,7 @@
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
         <ProjectGuid>{A6753236-E881-4DCF-A7F1-A98A0702E229}</ProjectGuid>
-        <OutputType>Library</OutputType>
+        <OutputType>Exe</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
         <RootNamespace>SynapseInjector</RootNamespace>
         <AssemblyName>SynapseInjector</AssemblyName>
@@ -32,24 +32,19 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Include="Loader.cs" />
       <Compile Include="Program.cs" />
     </ItemGroup>
     <ItemGroup>
-      <Reference Include="Mono.Cecil, Version=0.11.2.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
-        <HintPath>..\packages\Mono.Cecil.0.11.2\lib\net40\Mono.Cecil.dll</HintPath>
+      <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\Synapse_Dependencies\Assembly-CSharp-Synapse_publicised.dll</HintPath>
+      </Reference>
+      <Reference Include="dnlib, Version=3.3.2.0, Culture=neutral, PublicKeyToken=50e96378b6e77999">
+        <HintPath>..\packages\dnlib.3.3.2\lib\net45\dnlib.dll</HintPath>
         <Private>True</Private>
       </Reference>
-      <Reference Include="Mono.Cecil.Mdb, Version=0.11.2.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
-        <HintPath>..\packages\Mono.Cecil.0.11.2\lib\net40\Mono.Cecil.Mdb.dll</HintPath>
-        <Private>True</Private>
-      </Reference>
-      <Reference Include="Mono.Cecil.Pdb, Version=0.11.2.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
-        <HintPath>..\packages\Mono.Cecil.0.11.2\lib\net40\Mono.Cecil.Pdb.dll</HintPath>
-        <Private>True</Private>
-      </Reference>
-      <Reference Include="Mono.Cecil.Rocks, Version=0.11.2.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
-        <HintPath>..\packages\Mono.Cecil.0.11.2\lib\net40\Mono.Cecil.Rocks.dll</HintPath>
-        <Private>True</Private>
+      <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\Synapse_Dependencies\UnityEngine.CoreModule.dll</HintPath>
       </Reference>
     </ItemGroup>
     <ItemGroup>
