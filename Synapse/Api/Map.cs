@@ -12,5 +12,7 @@ namespace Synapse.Api
         public List<Elevator> Elevators { get; } = new List<Elevator>();
 
         public List<Components.Door> Doors { get; } = new List<Components.Door>();
+
+        public List<Room> Rooms { get; } = new List<Room>();
     }
 }
