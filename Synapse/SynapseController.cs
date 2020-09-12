@@ -64,7 +64,7 @@ public class SynapseController
         }
 
 
-        foreach (var plugintype in dictionary.OrderBy(x => x.Key.LoadPriority))
+        foreach (var plugintype in dictionary.OrderByDescending(x => x.Key.LoadPriority))
             try
             {
                 Server.Logger.Info($"Activating now {plugintype.Key.Name}");
