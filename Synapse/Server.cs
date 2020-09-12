@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Synapse.Api.Components;
+using UnityEngine;
+using Logger = Synapse.Api.Logger;
 
 namespace Synapse
 {
