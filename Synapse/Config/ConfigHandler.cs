@@ -6,7 +6,7 @@
 
         public void Reload()
         {
-            //Translation,Command,Configs,Permissions
+            //Translation,Command,Configs,Permissions Reload
         }
     }
 }

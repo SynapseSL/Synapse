@@ -1,17 +1,19 @@
 ﻿using Synapse.Api;
+using Synapse.Api.Components;
 using Synapse.Api.Events;
 using Synapse.Config;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using UnityEngine;
 
 namespace Synapse
 {
     public class Server
     {
         //Synapse Api Objects
-        public Logger Logger { get; } = new Logger();
+        public Api.Logger Logger { get; } = new Api.Logger();
 
         public Map Map { get; } = new Map();
 
@@ -21,6 +23,7 @@ namespace Synapse
 
         public ConfigHandler Configs { get; } = new ConfigHandler();
 
+        public List<Player> GetPlayers => PlayerManager.players.ToList().Select(x => x.GetComponent<Player>()).ToList();
 
         //Server fields
         public ushort Port
