@@ -42,8 +42,6 @@ namespace Synapse.Api
             }
         }
 
-        
-         // TODO: RoomTypes
         public ImageGenerator.RoomType RoomType
         {
             get
@@ -113,7 +111,8 @@ namespace Synapse.Api
                     "LCZ_012",
                     "HCZ_079",
                     "LCZ_372",
-                    "HCZ_457"
+                    "HCZ_457",
+                    "EZ_CollapsedTunnel"
                 };
 
                 if (straight.Any(x => RoomName.Contains(x)))
