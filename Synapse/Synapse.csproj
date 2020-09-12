@@ -49,6 +49,7 @@
     <Compile Include="Api\Logger.cs" />
     <Compile Include="Api\Plugin\PluginInformations.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerBanPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDamagePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerLeavePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSpeakPatch.cs" />
     <Compile Include="SynapseExtensions.cs" />
@@ -81,7 +82,7 @@
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Synapse Plugins\Scp035\Scp035\bin\Release\UnityEngine.PhysicsModule.dll</HintPath>
+      <HintPath>..\..\Synapse_Dependencies\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup />
