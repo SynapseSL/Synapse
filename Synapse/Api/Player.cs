@@ -4,6 +4,7 @@ using Hints;
 using Mirror;
 using RemoteAdmin;
 using Searching;
+using Synapse.Patches.EventsPatches.PlayerPatches;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -141,6 +142,12 @@ namespace Synapse.Api
         {
             get => ClassManager.CurClass;
             set => ClassManager.SetPlayersClass(value, gameObject);
+        }
+
+        public void ChangeRoleAtPosition(RoleType role)
+        {
+            RoleChangeClassIdPatch.ForceLite = true;
+            Hub.characterClassManager.SetClassIDAdv(role, true);
         }
 
         public Room Room
