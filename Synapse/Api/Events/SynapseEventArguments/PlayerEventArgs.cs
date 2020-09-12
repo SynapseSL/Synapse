@@ -1,20 +1,48 @@
-﻿namespace Synapse.Api.Events.SynapseEventArguments
+﻿using Assets._Scripts.Dissonance;
+
+namespace Synapse.Api.Events.SynapseEventArguments
 {
-    public class PlayerJoinEventArgs: EventHandler.SynapseEventArgs
+    public class PlayerJoinEventArgs: EventHandler.ISynapseEventArgs
     {
         public Player Player { internal set; get; }
         
         public string Nickname { set; get; }
-
-        public void LogInConsole() => SynapseController.Server.Logger.Info(
-            $"PlayerJoinEventArgs Current Args:\nValues: Player: {Player} | Nickname: {Nickname}");
     }
 
-    public class PlayerLeaveEventArgs : EventHandler.SynapseEventArgs
+    public class PlayerLeaveEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Player { get; internal set; }
+    }
 
-        public void LogInConsole() =>
-            SynapseController.Server.Logger.Info($"PlayerLeaveEventArgs Current Args:\nValues: Player {Player}");
+    public class PlayerBanEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public bool Allow { get; set; } = true;
+        
+        public Player BannedPlayer { get; internal set; }
+        
+        public Player Issuer { get; internal set; }
+        
+        public int Duration { get; set; }
+        
+        public string Reason { get; set; }
+    }
+
+    public class PlayerSpeakEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+        
+        public DissonanceUserSetup DissonanceUserSetup { get; internal set; }
+
+        public bool Scp939Talk { get; set; }
+        
+        public bool IntercomTalk { get; set; }
+        
+        public bool RadioTalk { get; set; }
+        
+        public bool ScpChat { get; set; }
+        
+        public bool SpectatorChat { get; set; }
+        
+        public bool Allow { get; set; }
     }
 }
