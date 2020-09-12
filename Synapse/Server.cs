@@ -23,7 +23,37 @@ namespace Synapse
 
         public ConfigHandler Configs { get; } = new ConfigHandler();
 
-        public Player Host => PlayerManager.localPlayer.GetComponent<Player>();
+        public Player Host
+        {
+            get
+            {
+                if (PlayerManager.localPlayer.GetComponent<Player>() == null)
+                    PlayerManager.localPlayer.AddComponent<Player>();
+
+                return PlayerManager.localPlayer.GetComponent<Player>();
+            }
+        }
+
+        //Server fields
+        public ushort Port
+        {
+            get => ServerStatic.ServerPort;
+            set => ServerStatic.ServerPort = value;
+        }
+
+        public string Name
+        {
+            get => ServerConsole._serverName;
+            set
+            {
+                ServerConsole._serverName = value;
+                ServerConsole.RefreshServerName();
+            }
+        }
+
+        public List<TObject> GetObjectsOf<TObject>() where TObject : UnityEngine.Object => UnityEngine.Object.FindObjectsOfType<TObject>().ToList();
+
+        public TObject GetObjectOf<TObject>() where TObject : UnityEngine.Object => UnityEngine.Object.FindObjectOfType<TObject>();
 
         public List<Player> Players => PlayerManager.players.ToList().Select(x => x.GetComponent<Player>()).ToList();
 
@@ -49,32 +79,11 @@ namespace Synapse
                 return player;
             }
 
-            AA_001:
+        AA_001:
             return players.FirstOrDefault(x => x.NickName.ToLower() == argument.ToLower());
         }
 
         public Player GetPlayer(int playerid) => Players.FirstOrDefault(x => x.PlayerId == playerid);
-
-        //Server fields
-        public ushort Port
-        {
-            get => ServerStatic.ServerPort;
-            set => ServerStatic.ServerPort = value;
-        }
-
-        public string Name
-        {
-            get => ServerConsole._serverName;
-            set
-            {
-                ServerConsole._serverName = value;
-                ServerConsole.RefreshServerName();
-            }
-        }
-
-        public List<TObject> GetObjectsOf<TObject>() where TObject : UnityEngine.Object => UnityEngine.Object.FindObjectsOfType<TObject>().ToList();
-
-        public TObject GetObjectOf<TObject>() where TObject : UnityEngine.Object => UnityEngine.Object.FindObjectOfType<TObject>();
 
 
         //Vanilla Objects
@@ -98,6 +107,7 @@ namespace Synapse
             private string configDirectory;
             private string sharedConfigDirectory;
 
+            private string configFile;
             //Synapse
             public string SynapseDirectory
             {
@@ -181,6 +191,18 @@ namespace Synapse
                 private set => sharedConfigDirectory = value;
             }
 
+            public string ConfigFile
+            {
+                get
+                {
+                    if (!File.Exists(configFile))
+                        File.Create(configFile);
+
+                    return configFile;
+                }
+                internal set => configFile = value;
+            }
+
 
             internal FileLocations() => Refresh();
             public void Refresh()
@@ -194,6 +216,18 @@ namespace Synapse
                 MainConfigDirectory = Path.Combine(SynapseDirectory, "configs");
                 ConfigDirectory = Path.Combine(MainConfigDirectory, $"server-{ServerStatic.ServerPort}");
                 SharedConfigDirectory = Path.Combine(MainConfigDirectory, "server-shared");
+
+                ConfigFile = Path.Combine(MainConfigDirectory, "config.syml");
+            }
+            public string GetTranslationFile(string name)
+            {
+                if (File.Exists(Path.Combine(SharedConfigDirectory, name + "-translation.txt")))
+                    return Path.Combine(SharedConfigDirectory, name + "-translation.txt");
+
+                if (!File.Exists(Path.Combine(MainConfigDirectory, name + "-translation.txt")))
+                    File.Create(Path.Combine(MainConfigDirectory, name + "-translation.txt"));
+
+                return Path.Combine(MainConfigDirectory, name + "-translation.txt");
             }
         }
     }

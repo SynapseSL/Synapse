@@ -163,8 +163,7 @@ namespace Synapse.Api
 
         public Player Cuffer
         {
-            //TODO: Player.GetCuffer
-            //get => GetPlayer(Handcuffs.CufferId);
+            get => SynapseController.Server.GetPlayer(Handcuffs.CufferId);
             set
             {
 

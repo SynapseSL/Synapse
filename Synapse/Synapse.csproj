@@ -34,7 +34,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Api\Enum\RaCategory.cs" />
+    <Compile Include="Api\Events\RoundEvents.cs" />
     <Compile Include="Api\MapPoint.cs" />
+    <Compile Include="Api\Plugin\Translation.cs" />
+    <Compile Include="Api\Plugin\PluginExtension.cs" />
     <Compile Include="Api\Room.cs" />
     <Compile Include="Api\Door.cs" />
     <Compile Include="Api\Elevator.cs" />
@@ -52,13 +55,13 @@
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDamagePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerLeavePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSpeakPatch.cs" />
+    <Compile Include="Patches\EventsPatches\RoundPatches\WaitingForPlayersPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\ComponentPatch.cs" />
     <Compile Include="SynapseExtensions.cs" />
     <Compile Include="Config\ConfigHandler.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerJoinPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\GenerateMapPatch.cs" />
     <Compile Include="Patches\SynapsePatches\DoorStartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ElevatorStartPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\RefreshTeslaPatch.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="SynapseController.cs" />
   </ItemGroup>

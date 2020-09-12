@@ -2,5 +2,6 @@
 {
     public class ServerEvents
     {
+        internal ServerEvents() { }
     }
 }

@@ -35,7 +35,7 @@ public class SynapseController
     {
         try
         {
-            var instance = HarmonyInstance.Create("Synapse.Patches");
+            var instance = HarmonyInstance.Create("Synapse.patches.1");
             instance.PatchAll();
             Server.Logger.Info("Harmony Patching was sucessfully!");
         }
@@ -54,7 +54,7 @@ public class SynapseController
 
         foreach(var pluginpath in paths)
         {
-            var assembly = Assembly.LoadFile(pluginpath);
+            var assembly = Assembly.Load(File.ReadAllBytes(pluginpath));
             foreach(var type in assembly.GetTypes())
             {
                 if (type.GetCustomAttribute<PluginInformations>() == null) continue;
@@ -63,17 +63,26 @@ public class SynapseController
             }
         }
 
-        dictionary.OrderBy(x => x.Key.LoadPriority);
 
-        foreach (var plugintype in dictionary)
+        foreach (var pluginInfoType in dictionary.OrderByDescending(x => x.Key.LoadPriority))
             try
             {
-                Server.Logger.Info($"Activating now {plugintype.Key.Name}");
-                Activator.CreateInstance(plugintype.Value);
+                Server.Logger.Info($"{pluginInfoType.Key.Name} will now be activated!");
+
+                switch (pluginInfoType.Value.GetConstructors().FirstOrDefault().GetParameters().Length)
+                {
+                    case 0:
+                        Activator.CreateInstance(pluginInfoType.Value);
+                        break;
+
+                    case 1:
+                        Activator.CreateInstance(pluginInfoType.Value, new object[] { new PluginExtension(pluginInfoType.Key)});
+                        break;
+                }
             }
             catch(Exception e)
             {
-                Server.Logger.Error($"Synapse-Controller: Activation of {plugintype.Value.Assembly.GetName().Name} failed!!\n{e}");
+                Server.Logger.Error($"Synapse-Controller: Activation of {pluginInfoType.Value.Assembly.GetName().Name} failed!!\n{e}");
             }
     }
 }

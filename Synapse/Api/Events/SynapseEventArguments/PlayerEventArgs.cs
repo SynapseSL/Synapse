@@ -1,4 +1,5 @@
 ﻿using Assets._Scripts.Dissonance;
+using UnityEngine;
 
 namespace Synapse.Api.Events.SynapseEventArguments
 {
@@ -62,5 +63,10 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Player Victim { get; internal set; }
         
         public PlayerStats.HitInfo HitInfo { get; set; }
+    }
+
+    public class LoadComponentEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public GameObject Player { get; internal set; }
     }
 }

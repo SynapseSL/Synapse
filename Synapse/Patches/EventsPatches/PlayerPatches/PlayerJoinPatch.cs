@@ -3,9 +3,9 @@ using Harmony;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
+    [HarmonyPatch(typeof(NicknameSync), nameof(NicknameSync.UpdateNickname))]
     internal static class PlayerJoinPatch
     {
-        [HarmonyPatch(typeof(NicknameSync), nameof(NicknameSync.UpdateNickname))]
         private static void Prefix(NicknameSync __instance, ref string n)
         {
             try

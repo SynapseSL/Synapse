@@ -1,6 +1,7 @@
 ﻿using Assets._Scripts.Dissonance;
 using Synapse.Api;
 using Synapse.Api.Events.SynapseEventArguments;
+using UnityEngine;
 
 namespace Synapse.Api.Events
 {
@@ -18,7 +19,9 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<PlayerDeathEventArgs> PlayerDeathEvent;
 
-        public event EventHandler.OnSynapseEvent<PlayerDamageEventArgs> PlayerDamageEvent; 
+        public event EventHandler.OnSynapseEvent<PlayerDamageEventArgs> PlayerDamageEvent;
+
+        public event EventHandler.OnSynapseEvent<LoadComponentEventArgs> LoadComponentsEvent;
 
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -75,6 +78,12 @@ namespace Synapse.Api.Events
             PlayerDamageEvent?.Invoke(ev);
 
             info = ev.HitInfo;
+        }
+
+        internal void InvokeLoadComponentsEvent(GameObject gameObject)
+        {
+            var ev = new LoadComponentEventArgs { Player = gameObject };
+            LoadComponentsEvent?.Invoke(ev);
         }
         #endregion
     }
