@@ -210,6 +210,16 @@ namespace Synapse
 
                 ConfigFile = Path.Combine(MainConfigDirectory, "config.syml");
             }
+            public string GetTranslationFile(string name)
+            {
+                if (File.Exists(Path.Combine(SharedConfigDirectory, name + "-translation.txt")))
+                    return Path.Combine(SharedConfigDirectory, name + "-translation.txt");
+
+                if (!File.Exists(Path.Combine(MainConfigDirectory, name + "-translation.txt")))
+                    File.Create(Path.Combine(MainConfigDirectory, name + "-translation.txt"));
+
+                return Path.Combine(MainConfigDirectory, name + "-translation.txt");
+            }
         }
     }
 }

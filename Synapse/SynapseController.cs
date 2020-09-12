@@ -67,7 +67,7 @@ public class SynapseController
         foreach (var pluginInfoType in dictionary.OrderByDescending(x => x.Key.LoadPriority))
             try
             {
-                Server.Logger.Info($"Activating now {pluginInfoType.Key.Name}");
+                Server.Logger.Info($"{pluginInfoType.Key.Name} will now be activated!");
 
                 switch (pluginInfoType.Value.GetConstructors().FirstOrDefault().GetParameters().Length)
                 {

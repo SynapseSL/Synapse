@@ -10,7 +10,8 @@ namespace Synapse.Patches.SynapsePatches
     {
         public static void Prefix(ReferenceHub __instance)
         {
-            if (__instance.GetComponent<Player>() == null) __instance.gameObject.AddComponent<Player>();
+            if (__instance.GetComponent<Player>() == null) 
+                __instance.gameObject.AddComponent<Player>();
 
             try
             {
