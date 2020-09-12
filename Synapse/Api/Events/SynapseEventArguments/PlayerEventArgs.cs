@@ -45,4 +45,13 @@ namespace Synapse.Api.Events.SynapseEventArguments
         
         public bool Allow { get; set; }
     }
+
+    public class PlayerDeathEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Victim { get; internal set; }
+        
+        public Player Killer { get; internal set; }
+        
+        public PlayerStats.HitInfo HitInfo { get; internal set; }
+    }
 }

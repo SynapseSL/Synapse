@@ -14,8 +14,11 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<PlayerBanEventArgs> PlayerBanEvent;
 
-        public event EventHandler.OnSynapseEvent<PlayerSpeakEventArgs> PlayerSpeakEvent; 
+        public event EventHandler.OnSynapseEvent<PlayerSpeakEventArgs> PlayerSpeakEvent;
 
+        public event EventHandler.OnSynapseEvent<PlayerDeathEventArgs> PlayerDeathEvent;
+
+        #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
         {
             var ev = new PlayerJoinEventArgs {Player = player, Nickname = nickname};
@@ -57,5 +60,12 @@ namespace Synapse.Api.Events
             specChat = ev.SpectatorChat;
             allow = ev.Allow;
         }
+
+        internal void InvokePlayerDeathEvent(Player victim, Player killer, PlayerStats.HitInfo info)
+        {
+            var ev = new PlayerDeathEventArgs {HitInfo = info, Killer = killer, Victim = victim};
+            PlayerDeathEvent?.Invoke(ev);
+        }
+        #endregion
     }
 }
