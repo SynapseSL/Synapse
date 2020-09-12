@@ -5,10 +5,6 @@ using System.Reflection;
 using System.Threading;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
-using dnlib.DotNet.Writer;
-using MethodAttributes = dnlib.DotNet.MethodAttributes;
-using OpCode = System.Reflection.Emit.OpCode;
-using TypeAttributes = dnlib.DotNet.TypeAttributes;
 
 namespace SynapseInjector
 {
@@ -41,39 +37,33 @@ namespace SynapseInjector
                 
             var loaderSource = sourceModule.Types.First(t => t.Name == "Loader");
             loaderSource.DeclaringType = null;
-            MethodDef loader = loaderSource.Methods.First(t => t.Name == "LoadSystem");
+            var loader = loaderSource.Methods.First(t => t.Name == "LoadSystem");
 
-            var loadModule = LoadAssemblyCSharp(path, true);
+            var loadModule = LoadAssemblyCSharp(path);
                 
-            SwapTypes(sourceModule,loadModule,loaderSource);
+            SwapTypes(sourceModule,loadModule, loaderSource);
                 
             InjectLoader(loadModule, loader);
             StoreModule(loadModule);
         }
 
-        private static ModuleDef LoadAssemblyCSharp(string path, bool initial)
+        private static ModuleDef LoadAssemblyCSharp(string path)
         {
-            var loadModule = ModuleDefMD.Load(path, new ModuleCreationOptions());
-            if (!initial) return loadModule; 
-            
-            loadModule.Context = ModuleDef.CreateModuleContext();
-            var resolver = (AssemblyResolver) loadModule.Context.AssemblyResolver;
-            resolver.AddToCache(loadModule);
-            return loadModule;
+            return ModuleDefMD.Load(path, new ModuleCreationOptions());
         }
         
         private static void StoreModule(ModuleDef def)
         {
-            var options = new ModuleWriterOptions(def) {MetadataOptions = {Flags = MetadataFlags.KeepOldMaxStack}};
-            def.Write("../Assembly-CSharp.dll", options);
-            Console.WriteLine("Wrote Assembly-CSharp.dll to parent directory");
+            if (!Directory.Exists(Path.Combine(Environment.CurrentDirectory + "/Delivery")))
+                Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory + "/Delivery"));
+            def.Write("./Delivery/Assembly-CSharp_Synapse.dll");
+            Console.WriteLine("Wrote Assembly-CSharp_Synapse.dll to Delivery directory");
         }
         
         private static void SwapTypes(ModuleDef a, ModuleDef b, TypeDef type)
         {
             a.Types.Remove(type);
             b.Types.Add(type);
-
         }
         
         private static void InjectLoader(ModuleDef moduleDef, MethodDef callable) {
@@ -83,14 +73,14 @@ namespace SynapseInjector
             {
                 foreach (var type in module.Types)
                 {
-                    if (type.Name == "ServerConsole")
+                    if (type.Name == "CustomNetworkManager")
                     {
-                        startMethod = type.Methods.First(t => t.Name == "Start");
+                        startMethod = type.Methods.First(t => t.Name == "CreateMatch");
                     }
                 }
             }
                 
-            startMethod.Body.Instructions.Insert(0, OpCodes.Call.ToInstruction(callable));
+            startMethod?.Body.Instructions.Insert(0, OpCodes.Call.ToInstruction(callable));
         }
         
     }
