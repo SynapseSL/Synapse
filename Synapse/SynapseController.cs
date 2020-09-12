@@ -63,7 +63,7 @@ public class SynapseController
             }
         }
 
-        dictionary.OrderBy(x => x.Key.LoadPriority * -1);
+        dictionary.OrderBy(x => x.Key.LoadPriority);
 
         foreach (var plugintype in dictionary)
             try
