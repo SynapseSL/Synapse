@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using GameCore;
 using Harmony;
 using Synapse.Api.Plugin;
 
@@ -21,10 +22,14 @@ public class SynapseController
 
     internal SynapseController()
     {
+        CustomNetworkManager.Modded = true;
         Server = new Synapse.Server();
 
         PatchMethods();
         ActivatePlugins();
+        Server.Configs.Init();
+
+        Server.Logger.Info("Synapse is now Ready!");
     }
 
     private void PatchMethods()
@@ -33,6 +38,7 @@ public class SynapseController
         {
             var instance = HarmonyInstance.Create("Synapse.Patches");
             instance.PatchAll();
+            Server.Logger.Info("Harmony Patching was sucessfully!");
         }
         catch(Exception e)
         {
@@ -61,6 +67,13 @@ public class SynapseController
         dictionary.OrderBy(x => x.Key.LoadPriority * -1);
 
         foreach (var plugintype in dictionary.Values)
-            Activator.CreateInstance(plugintype);
+            try
+            {
+                Activator.CreateInstance(plugintype);
+            }
+            catch(Exception e)
+            {
+                Server.Logger.Error($"Synapse-Controller: Activation of {plugintype.Assembly.GetName().Name} failed!!\n{e}");
+            }
     }
 }

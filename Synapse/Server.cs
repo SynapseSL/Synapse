@@ -1,11 +1,12 @@
 ﻿using Synapse.Api;
 using Synapse.Api.Events;
 using Synapse.Config;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using Logger = Synapse.Api.Logger;
+using EventHandler = Synapse.Api.Events.EventHandler;
 
 namespace Synapse
 {
@@ -184,14 +185,14 @@ namespace Synapse
             internal FileLocations() => Refresh();
             public void Refresh()
             {
-                SynapseDirectory = Assembly.GetCallingAssembly().Location.Replace("Synapse.dll", "");
+                SynapseDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Synapse");
 
                 MainPluginDirectory = Path.Combine(SynapseDirectory, "plugins");
-                PluginDirectory = Path.Combine(MainPluginDirectory, $"server-{SynapseController.Server.Port}");
+                PluginDirectory = Path.Combine(MainPluginDirectory, $"server-{ServerStatic.ServerPort}");
                 SharedPluginDirectory = Path.Combine(MainPluginDirectory, "server-shared");
 
                 MainConfigDirectory = Path.Combine(SynapseDirectory, "configs");
-                ConfigDirectory = Path.Combine(MainConfigDirectory, $"server-{SynapseController.Server.Port}");
+                ConfigDirectory = Path.Combine(MainConfigDirectory, $"server-{ServerStatic.ServerPort}");
                 SharedConfigDirectory = Path.Combine(MainConfigDirectory, "server-shared");
             }
         }

@@ -17,8 +17,10 @@ namespace SynapseInjector
 
             var synapse = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Synapse");
             if (!Directory.Exists(synapse)) Directory.CreateDirectory(synapse);
-            InvokeAssembly(Path.Combine(synapse, "Synapse.dll"));
+            foreach (var depend in Directory.GetFiles(Path.Combine(synapse, "dependencies")))
+                Assembly.LoadFile(depend);
 
+            InvokeAssembly(Path.Combine(synapse, "Synapse.dll"));
         }
 
         /// <summary>
