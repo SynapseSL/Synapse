@@ -11,7 +11,7 @@ namespace Synapse
 {
     public class Server
     {
-        //Synapse Api Objects
+        //Synapse Api
         public Logger Logger { get; } = new Logger();
 
         public Map Map { get; } = new Map();
@@ -23,6 +23,12 @@ namespace Synapse
         public ConfigHandler Configs { get; } = new ConfigHandler();
 
         public List<Player> GetPlayers => PlayerManager.players.ToList().Select(x => x.GetComponent<Player>()).ToList();
+
+        public Player GetPlayer(string argument)
+        {
+            //TODO: this shit
+            return null;
+        }
 
         //Server fields
         public ushort Port
