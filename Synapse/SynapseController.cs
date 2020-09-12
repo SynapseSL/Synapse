@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -43,6 +44,8 @@ public class SynapseController
         var paths = Directory.GetFiles(Server.Files.PluginDirectory, "*.dll").ToList();
         paths.AddRange(Directory.GetFiles(Server.Files.SharedPluginDirectory, "*.dll").ToList());
 
+        var dictionary = new Dictionary<PluginInformations, Type>();
+
         foreach(var pluginpath in paths)
         {
             var assembly = Assembly.LoadFile(pluginpath);
@@ -50,9 +53,10 @@ public class SynapseController
             {
                 if (type.GetCustomAttribute<PluginInformations>() == null) continue;
 
-                Activator.CreateInstance(type);
+                dictionary.Add(type.GetCustomAttribute<PluginInformations>(), type);
             }
-            
         }
+
+        //dictionary.OrderBy(x => )
     }
 }
