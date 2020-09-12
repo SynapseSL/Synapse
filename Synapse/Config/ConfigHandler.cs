@@ -1,14 +1,100 @@
-﻿namespace Synapse.Config
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Harmony;
+using Synapse.Api;
+using YamlDotNet.Serialization;
+
+namespace Synapse.Config
 {
     public class ConfigHandler
     {
         internal ConfigHandler() { }
 
-        public void Init() { }
+        private SYML _syml;
+        
+        public void Init()
+        {
+            _syml = new SYML(Path.Combine(SynapseController.Server.Files.ConfigDirectory, "config.syml"));
+            _syml.Load();
+            SynapseConfiguration configuration = new SynapseConfiguration();
+            configuration = _syml.GetOrSetDefault("Synapse", configuration);
+            SynapseController.Server.Logger.Warn(configuration.ToString());
+        }
 
+        public void UpdateSection<T>(string section, T replacement) where T : IConfigSection
+        {
+            var sec = new ConfigSection(section, "");
+            if (_syml.Sections.ContainsKey(section))
+            {
+                sec = _syml.Sections[section];
+            }
+
+            sec.Import(replacement);
+            _syml.Sections[section] = sec;
+            _syml.Store();
+        }
+        
         public void Reload()
         {
-            //Translation,Command,Configs,Permissions Reload
+            _syml.Load();
+        }
+        
+    }
+
+    public class SynapseConfiguration : IConfigSection
+    {
+        public string serverName { get; set; } = "A new awesome server";
+        public string joinBroadcast { get; set; } = "Welcome % player";
+
+        public string[] keycards { get; set; } = {"Scientist","MajorScientist"};
+
+        public SerializedMapPoint[] mapPoints = { new SerializedMapPoint("Test",0,10,0)};
+        
+        public override string ToString()
+        {
+            return $"SynapseConfiguration(serverName={serverName} joinBroadcast={joinBroadcast} keycards={keycards.Join(delimiter: ", ")} " +
+                   $"points={mapPoints.ToList().Select(f => f.ToString()).Join(delimiter:", ")})";
         }
     }
+
+    public class SerializedMapPoint
+    {
+        public SerializedMapPoint(string room, float x, float y, float z)
+        {
+            this.room = room;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+        
+        public SerializedMapPoint(MapPoint point)
+        {
+            room = point.Room.RoomName;
+            x = point.RelativePosition.x;
+            y = point.RelativePosition.y;
+            z = point.RelativePosition.z;
+        }
+        
+        public SerializedMapPoint()
+        {
+        }
+
+        public string room { get; set; }
+        public float x { get; set; }
+        public float y { get; set; }
+        public float z { get; set; }
+
+        public MapPoint parse()
+        {
+            return MapPoint.Parse(ToString());
+        }
+        
+        public override string ToString()
+        {
+            return $"{room}:{x.ToString()}:{y.ToString()}:{z.ToString()}";
+        }
+    }
+    
 }
