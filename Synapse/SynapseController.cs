@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using GameCore;
 using Harmony;
 using Synapse.Api.Plugin;
 
@@ -66,14 +65,15 @@ public class SynapseController
 
         dictionary.OrderBy(x => x.Key.LoadPriority * -1);
 
-        foreach (var plugintype in dictionary.Values)
+        foreach (var plugintype in dictionary)
             try
             {
-                Activator.CreateInstance(plugintype);
+                Server.Logger.Info($"Activating now {plugintype.Key.Name}");
+                Activator.CreateInstance(plugintype.Value);
             }
             catch(Exception e)
             {
-                Server.Logger.Error($"Synapse-Controller: Activation of {plugintype.Assembly.GetName().Name} failed!!\n{e}");
+                Server.Logger.Error($"Synapse-Controller: Activation of {plugintype.Value.Assembly.GetName().Name} failed!!\n{e}");
             }
     }
 }
