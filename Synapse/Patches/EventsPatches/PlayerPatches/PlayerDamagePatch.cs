@@ -21,7 +21,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 var player = go.GetPlayer();
                 
-                //TODO: Implement Player Hurt Event
+                SynapseController.Server.Events.Player.InvokePlayerDamageEvent(player, killer, ref info);
 
                 if (player.GodMode) return;
                 

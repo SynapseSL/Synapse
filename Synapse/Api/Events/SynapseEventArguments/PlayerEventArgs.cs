@@ -54,4 +54,13 @@ namespace Synapse.Api.Events.SynapseEventArguments
         
         public PlayerStats.HitInfo HitInfo { get; internal set; }
     }
+
+    public class PlayerDamageEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Killer { get; internal set; }
+        
+        public Player Victim { get; internal set; }
+        
+        public PlayerStats.HitInfo HitInfo { get; set; }
+    }
 }

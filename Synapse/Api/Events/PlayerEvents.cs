@@ -18,6 +18,8 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<PlayerDeathEventArgs> PlayerDeathEvent;
 
+        public event EventHandler.OnSynapseEvent<PlayerDamageEventArgs> PlayerDamageEvent; 
+
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
         {
@@ -65,6 +67,14 @@ namespace Synapse.Api.Events
         {
             var ev = new PlayerDeathEventArgs {HitInfo = info, Killer = killer, Victim = victim};
             PlayerDeathEvent?.Invoke(ev);
+        }
+
+        internal void InvokePlayerDamageEvent(Player victim, Player killer, ref PlayerStats.HitInfo info)
+        {
+            var ev = new PlayerDamageEventArgs {HitInfo = info, Killer = killer, Victim = victim};
+            PlayerDamageEvent?.Invoke(ev);
+
+            info = ev.HitInfo;
         }
         #endregion
     }
