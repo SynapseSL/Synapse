@@ -22,11 +22,13 @@ namespace Synapse
 
         public ConfigHandler Configs { get; } = new ConfigHandler();
 
-        public List<Player> GetPlayers => PlayerManager.players.ToList().Select(x => x.GetComponent<Player>()).ToList();
+        public Player Host => PlayerManager.localPlayer.GetComponent<Player>();
+
+        public List<Player> Players => PlayerManager.players.ToList().Select(x => x.GetComponent<Player>()).ToList();
 
         public Player GetPlayer(string argument)
         {
-            //TODO: this shit
+            //TODO: GetPlayer
             return null;
         }
 
