@@ -36,6 +36,7 @@
   <ItemGroup>
     <Compile Include="Api\Door.cs" />
     <Compile Include="Api\Elevator.cs" />
+    <Compile Include="Api\Enum\Class1.cs" />
     <Compile Include="Api\Enum\RaCategory.cs" />
     <Compile Include="Api\Enum\ZoneType.cs" />
     <Compile Include="Api\Events\EventHandler.cs" />

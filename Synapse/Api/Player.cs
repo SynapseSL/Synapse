@@ -2,8 +2,10 @@
 using System.Linq;
 using Hints;
 using Mirror;
+using Mirror.LiteNetLib4Mirror;
 using RemoteAdmin;
 using Searching;
+using Synapse.Api.Enums;
 using Synapse.Patches.EventsPatches.PlayerPatches;
 using UnityEngine;
 
@@ -16,10 +18,127 @@ namespace Synapse.Api
             Hub = GetComponent<ReferenceHub>();
         }
 
-        #region Special Stuff
+        #region Methods
+        public void Kick(string message) => ServerConsole.Disconnect(gameObject, message);
+
+        public void Ban(int duration, string reason, string issuer = "Plugin") => SynapseController.Server.GetObjectOf<BanPlayer>().BanUser(gameObject, duration, reason, issuer);
+
+        public void ChangeRoleAtPosition(RoleType role)
+        {
+            RoleChangeClassIdPatch.ForceLite = true;
+            Hub.characterClassManager.SetClassIDAdv(role, true);
+        }
+
+        public void Kill(DamageTypes.DamageType damageType = default) => PlayerStats.HurtPlayer(new PlayerStats.HitInfo(-1f, "WORLD", damageType, 0), gameObject);
+
+        public void GiveTextHint(string message, float duration = 5f)
+        {
+            Hub.hints.Show(new TextHint(message, new HintParameter[]
+                {
+                    new StringHintParameter("")
+                }, HintEffectPresets.FadeInAndOut(duration), duration));
+        }
+
+        public void ClearBroadcasts() => GetComponent<Broadcast>().TargetClearElements(Connection);
+
+        public void Broadcast(ushort time, string message) => GetComponent<Broadcast>().TargetAddElement(Connection, message, time, new Broadcast.BroadcastFlags());
+
+        public void InstantBroadcast(ushort time, string message)
+        {
+            ClearBroadcasts();
+            GetComponent<Broadcast>().TargetAddElement(Connection, message, time, new Broadcast.BroadcastFlags());
+        }
+
+        public void SendConsoleMessage(string message, string color = "red") => ClassManager.TargetConsolePrint(Connection, message, color);
+
+        public void SendRAConsoleMessage(string message, bool success = true, RaCategory type = RaCategory.None) => SynapseExtensions.RaMessage(CommandSender,message, success, type);
+
+        public void GiveItem(ItemType itemType, float duration = float.NegativeInfinity, int sight = 0, int barrel = 0, int other = 0) => Inventory.AddNewItem(itemType, duration, sight, barrel, other);
+
+        public void DropAllItems() => Inventory.ServerDropAll();
+
+        public void DropItem(Inventory.SyncItemInfo item)
+        {
+            Inventory.SetPickup(item.id, item.durability, Position, Inventory.camera.transform.rotation, item.modSight, item.modBarrel, item.modOther);
+            Items.Remove(item);
+        }
+
+        public void ClearInventory() => Inventory.Clear();
+
+        public void GiveEffect(Effect effect, byte intensity = 1, float duration = -1f) => PlayerEffectsController.ChangeByString(effect.ToString().ToLower(), intensity, duration);
+
+        public void RaLogin()
+        {
+            ServerRoles.RemoteAdmin = true;
+            ServerRoles.RemoteAdminMode = ServerRoles.AccessMode.PasswordOverride;
+            ServerRoles.TargetOpenRemoteAdmin(Connection, false);
+        }
+
+        public void RaLogout()
+        {
+            Hub.serverRoles.RemoteAdmin = false;
+            Hub.serverRoles.RemoteAdminMode = ServerRoles.AccessMode.LocalAccess;
+            Hub.serverRoles.TargetCloseRemoteAdmin(Connection);
+        }
+
+        public void Hurt(int amount, DamageTypes.DamageType damagetype = default, Player attacker = null) =>
+            PlayerStats.HurtPlayer(new PlayerStats.HitInfo(amount, attacker == null ? "WORLD" : attacker.NickName, damagetype, attacker == null ? PlayerId : attacker.PlayerId), attacker == null ? gameObject : attacker.gameObject);
+
+        public void SendToServer(ushort port)
+        {
+            var component = SynapseController.Server.Host.PlayerStats;
+            var writer = NetworkWriterPool.GetWriter();
+            writer.WriteSingle(1f);
+            writer.WriteUInt16(port);
+            var msg = new RpcMessage
+            {
+                netId = component.netId,
+                componentIndex = component.ComponentIndex,
+                functionHash = typeof(PlayerStats).FullName.GetStableHashCode() * 503 + "RpcRoundrestartRedirect".GetStableHashCode(),
+                payload = writer.ToArraySegment()
+            };
+            Connection.Send(msg);
+            NetworkWriterPool.Recycle(writer);
+        }
+
+        public void DimScreen()
+        {
+            var component = RoundSummary.singleton;
+            var writer = NetworkWriterPool.GetWriter();
+            var msg = new RpcMessage
+            {
+                netId = component.netId,
+                componentIndex = component.ComponentIndex,
+                functionHash = typeof(RoundSummary).FullName.GetStableHashCode() * 503 + "RpcDimScreen".GetStableHashCode(),
+                payload = writer.ToArraySegment()
+            };
+            Connection.Send(msg);
+            NetworkWriterPool.Recycle(writer);
+        }
+
+        public void ShakeScreen(bool achieve = false)
+        {
+            //TODO: Implement APi to get warhead once
+            var component = SynapseController.Server.GetObjectOf<AlphaWarheadController>();
+            var writer = NetworkWriterPool.GetWriter();
+            writer.WriteBoolean(achieve);
+            var msg = new RpcMessage
+            {
+                netId = component.netId,
+                componentIndex = component.ComponentIndex,
+                functionHash = typeof(AlphaWarheadController).FullName.GetStableHashCode() * 503 + "RpcShake".GetStableHashCode(),
+                payload = writer.ToArraySegment()
+            };
+            Connection.Send(msg);
+            NetworkWriterPool.Recycle(writer);
+        }
+
+
+        //TODO: Permission Check
         #endregion
 
         #region Synapse Api Objects
+        //TODO: Scp106/079 Controller + Jail
         #endregion
 
         #region Default Stuff
@@ -144,12 +263,6 @@ namespace Synapse.Api
             set => ClassManager.SetPlayersClass(value, gameObject);
         }
 
-        public void ChangeRoleAtPosition(RoleType role)
-        {
-            RoleChangeClassIdPatch.ForceLite = true;
-            Hub.characterClassManager.SetClassIDAdv(role, true);
-        }
-
         public Room Room
         {
             get => SynapseController.Server.Map.Rooms.OrderBy(x => Vector3.Distance(x.Position, Position)).FirstOrDefault();
@@ -217,7 +330,89 @@ namespace Synapse.Api
             set => AmmoBox.amount[2] = value; 
         }
 
+        public UserGroup Rank 
+        { 
+            get => ServerRoles.Group; 
+            set => ServerRoles.SetGroup(value, value != null && value.Permissions > 0UL, true); 
+        }
 
+        public string RankColor
+        {
+            get => Rank.BadgeColor;
+            set => ServerRoles.SetColor(value);
+        }
+
+        public string RankName
+        {
+            get => Rank.BadgeText;
+            set => ServerRoles.SetText(value);
+        }
+
+        public bool HideRank
+        {
+            get => string.IsNullOrEmpty(ServerRoles.HiddenBadge);
+            set
+            {
+                if (value)
+                    ClassManager.CmdRequestHideTag();
+                else
+                    ClassManager.CallCmdRequestShowTag(false);
+            }
+        }
+
+        public ulong Permission 
+        { 
+            get => ServerRoles.Permissions; 
+            set => ServerRoles.Permissions = value; 
+        }
+
+        public bool IsMuted 
+        { 
+            get => ClassManager.NetworkMuted; 
+            set => ClassManager.NetworkMuted = value; 
+        }
+
+        public bool IsIntercomMuted
+        { 
+            get => ClassManager.NetworkIntercomMuted; 
+            set => ClassManager.NetworkIntercomMuted = value; 
+        }
+
+        public string UnitName 
+        { 
+            get => ClassManager.NetworkCurUnitName; 
+            set => ClassManager.NetworkCurUnitName = value; 
+        }
+
+
+
+
+        public CommandSender CommandSender
+        {
+            get
+            {
+                if (this == SynapseController.Server.Host) return ServerConsole._scs;
+                return QueryProcessor._sender;
+            }
+        }
+
+        public bool DoNotTrack => ServerRoles.DoNotTrack;
+
+        public bool IsDead => Team == Team.RIP;
+
+        public bool IsZooming => Hub.weaponManager.ZoomInProgress();
+
+        public bool IsReloading => Hub.weaponManager.IsReloading();
+
+        public bool IsCuffed => Cuffer != null;
+
+        public float AliveTime => ClassManager.AliveTime;
+
+        public string AuthToken => ClassManager.AuthToken;
+
+        public int Ping => LiteNetLib4MirrorServer.Peers[Connection.connectionId].Ping;
+
+        public string GroupName => ServerStatic.PermissionsHandler._members[UserId];
 
         public string NickName => NicknameSync.Network_myNickSync;
 
