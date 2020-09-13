@@ -13,6 +13,8 @@ namespace Synapse
 {
     public class Server
     {
+        public static Server Get => SynapseController.Server;
+
         //Synapse Api
         public Logger Logger { get; } = new Logger();
 
@@ -246,6 +248,7 @@ namespace Synapse
 
             public string GetPluginDirectory(PluginInformations infos)
             {
+                
                 if (infos.shared)
                     return Path.Combine(SharedPluginDirectory, infos.Name);
                 return Path.Combine(PluginDirectory, infos.Name);
