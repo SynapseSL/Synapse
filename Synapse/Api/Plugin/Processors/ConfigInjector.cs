@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Synapse.Config;
+using System;
 using System.Reflection;
 
 namespace Synapse.Api.Plugin.Processors
@@ -16,8 +17,12 @@ namespace Synapse.Api.Plugin.Processors
                     var section = configAttribute.section;
                     if (section == null) section = context.Information.Name;
                     Type t = FieldInfo.GetFieldFromHandle(field.FieldHandle).FieldType;
-                    object typeObj = Activator.CreateInstance(t);
-                    object config = SynapseController.Server.Configs.GetOrSetDefault(section, typeObj);
+
+                    if (!typeof(IConfigSection).IsAssignableFrom(t))
+                        continue;
+
+                    IConfigSection typeObj = (IConfigSection)Activator.CreateInstance(t);
+                    IConfigSection config = SynapseController.Server.Configs.GetOrSetDefault(section, typeObj);
                     field.SetValue(context.Plugin,config);
                 }
             }
