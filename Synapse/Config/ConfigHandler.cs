@@ -46,7 +46,7 @@ namespace Synapse.Config
         {
             _syml.Load();
             SynapseController.PluginLoader.ReloadConfigs();
-            //TODO: Permission Reload
+            //TODO: Permission Reload + Automatic Plugin Config Reload
         }
         
     }

@@ -17,8 +17,8 @@ namespace Synapse.Api.Plugin
         
         internal void ActivatePlugins() 
         {
-            var paths = Directory.GetFiles(SynapseController.Server.Files.PluginDirectory, "*.dll").ToList();
-            paths.AddRange(Directory.GetFiles(SynapseController.Server.Files.SharedPluginDirectory, "*.dll").ToList());
+            var paths = Directory.GetFiles(SynapseController.Server.Files.SharedPluginDirectory, "*.dll").ToList();
+            paths.AddRange(Directory.GetFiles(SynapseController.Server.Files.PluginDirectory, "*.dll").ToList());
 
             var dictionary = new Dictionary<PluginInformations, Type>();
             
@@ -47,24 +47,24 @@ namespace Synapse.Api.Plugin
                 }
             }
         
-            foreach (var pluginInfoType in dictionary.OrderByDescending(x => x.Key.LoadPriority))
+            foreach (var infoTypePair in dictionary.OrderByDescending(x => x.Key.LoadPriority))
                 try
                 {
-                    SynapseController.Server.Logger.Info($"{pluginInfoType.Key.Name} will now be activated!");
+                    SynapseController.Server.Logger.Info($"{infoTypePair.Key.Name} will now be activated!");
 
-                    IPlugin plugin = (IPlugin)Activator.CreateInstance(pluginInfoType.Value);
-                    plugin.Informations = pluginInfoType.Key;
-                    plugin.Translation = SynapseController.Server.Files.GetTranslationFile(plugin.Informations.Name);
+                    IPlugin plugin = (IPlugin)Activator.CreateInstance(infoTypePair.Value);
+                    plugin.Informations = infoTypePair.Key;
+                    plugin.Translation = new Translation(plugin.Informations);
                     plugin.PluginDirectory = SynapseController.Server.Files.GetPluginDirectory(plugin.Informations);
 
 
-                    contexts.Add(new PluginLoadContext(plugin, pluginInfoType.Value, pluginInfoType.Key));
+                    contexts.Add(new PluginLoadContext(plugin, infoTypePair.Value, infoTypePair.Key));
                     plugins.Add(plugin);
-                    Plugins.Add(pluginInfoType.Key);
+                    Plugins.Add(infoTypePair.Key);
                 }
                 catch(Exception e) 
                 {
-                    SynapseController.Server.Logger.Error($"Synapse-Controller: Activation of {pluginInfoType.Value.Assembly.GetName().Name} failed!!\n{e}");
+                    SynapseController.Server.Logger.Error($"Synapse-Controller: Activation of {infoTypePair.Value.Assembly.GetName().Name} failed!!\n{e}");
                 }
 
             foreach (var context in contexts) 

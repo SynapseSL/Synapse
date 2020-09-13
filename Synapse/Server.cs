@@ -220,15 +220,12 @@ namespace Synapse
 
                 ConfigFile = Path.Combine(ConfigDirectory, "config.syml");
             }
-            public Translation GetTranslationFile(string name)
+            public string GetTranslationFile(PluginInformations infos)
             {
-                if (File.Exists(Path.Combine(SharedConfigDirectory, name + "-translation.txt")))
-                    return new Translation(Path.Combine(SharedConfigDirectory, name + "-translation.txt"));
+                if (File.Exists(Path.Combine(SharedConfigDirectory, infos.Name + "-translation.txt")))
+                    return Path.Combine(SharedConfigDirectory, infos.Name + "-translation.txt");
 
-                if (!File.Exists(Path.Combine(MainConfigDirectory, name + "-translation.txt")))
-                    File.Create(Path.Combine(MainConfigDirectory, name + "-translation.txt"));
-
-                return new Translation(Path.Combine(MainConfigDirectory, name + "-translation.txt"));
+                return Path.Combine(ConfigDirectory, infos.Name + "-translation.txt");
             }
 
             public string GetPluginDirectory(PluginInformations infos)
