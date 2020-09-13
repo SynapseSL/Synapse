@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -12,32 +13,40 @@ namespace SynapseInjector
         /// </summary>
         public static void LoadSystem()
         {
-            printBanner();
-
             var synapse = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Synapse");
             if (!Directory.Exists(synapse)) Directory.CreateDirectory(synapse);
+            
+            var dependencyAssemblies = new List<Assembly>();
             foreach (var depend in Directory.GetFiles(Path.Combine(synapse, "dependencies")))
-                Assembly.LoadFile(depend);
+            {
+                var assembly = Assembly.LoadFile(depend);
+                dependencyAssemblies.Add(assembly);
+            };
 
-            InvokeAssembly(Path.Combine(synapse, "Synapse.dll"));
+            var synapseAssembly = Assembly.Load(File.ReadAllBytes(Path.Combine(synapse, "Synapse.dll")));
+            
+            printBanner(synapseAssembly, dependencyAssemblies);
+            
+            InvokeAssembly(synapseAssembly);
         }
 
         /// <summary>
         /// Print Synapse Banner and Version Information
         /// </summary>
-        private static void printBanner()
+        private static void printBanner(Assembly syn, List<Assembly> dep)
         {
             ServerConsole.AddLog(
                 "\nLoading Synapse...\n" +
-                "-----------------------------------------------\n" +
+                "-------------------===Loader===-------------------\n" +
                 "  __                             \n" +
                 " (_       ._    _.  ._    _   _  \n" +
                 " __)  \\/  | |  (_|  |_)  _>  (/_ \n" +
-                "      /             |            \n" +
-                "\n" +
-                "LoaderVersion: " + Assembly.GetExecutingAssembly().GetName().Version + "\n" +
-                "RuntimeVersion: " + Assembly.GetExecutingAssembly().ImageRuntimeVersion + "\n" +
-                "-----------------------------------------------", ConsoleColor.Yellow);
+                "      /             |            \n\n" +
+                $"SynapseVersion {syn.GetName().Version}\n" +
+                $"LoaderVersion: {Assembly.GetExecutingAssembly().GetName().Version}\n" +
+                $"RuntimeVersion: {Assembly.GetExecutingAssembly().ImageRuntimeVersion}\n\n" +
+                string.Join("\n", dep.Select(assembly => $"{assembly.GetName().Name}: {assembly.GetName().Version}").ToList()) + "\n" +
+                "-------------------===Loader===-------------------", ConsoleColor.Yellow);
 
         }
 
@@ -46,11 +55,11 @@ namespace SynapseInjector
         /// and invoke the init method 
         /// </summary>
         /// <param name="path">The path of the assembly</param>
-        private static void InvokeAssembly(string path)
+        private static void InvokeAssembly(Assembly assembly)
         {
             try
             {
-                Assembly.Load(File.ReadAllBytes(path)).GetTypes()
+                assembly.GetTypes()
                     .First((Type t) => t.Name == "SynapseController").GetMethods()
                     .First((MethodInfo m) => m.Name == "Init")
                     .Invoke(null, null);

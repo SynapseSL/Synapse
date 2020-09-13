@@ -56,8 +56,8 @@ namespace SynapseInjector
         {
             if (!Directory.Exists(Path.Combine(Environment.CurrentDirectory + "/Delivery")))
                 Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory + "/Delivery"));
-            def.Write("./Delivery/Assembly-CSharp_Synapse.dll");
-            Console.WriteLine("Wrote Assembly-CSharp_Synapse.dll to Delivery directory");
+            def.Write("./Delivery/Assembly-CSharp.dll");
+            Console.WriteLine("Wrote Assembly-CSharp.dll to Delivery directory");
         }
         
         private static void SwapTypes(ModuleDef a, ModuleDef b, TypeDef type)
