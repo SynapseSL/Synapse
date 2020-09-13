@@ -18,6 +18,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 Task.Run(() =>
                 {
+                    if (!SynapseController.EnableDatabase) return;
                     if (!DatabaseManager.PlayerRepository.ExistGameId(player.UserId))
                     {
                         var dbo = new PlayerDbo()

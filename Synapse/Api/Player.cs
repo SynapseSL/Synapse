@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Linq;
 using Harmony;
 using Hints;
@@ -473,12 +474,14 @@ namespace Synapse.Api
 
         public string GetData(string key)
         {
+            DatabaseManager.CheckEnabledOrThrow();
             var dbo = DatabaseManager.PlayerRepository.FindByGameId(UserId);
             return dbo.Data.ContainsKey(key) ? dbo.Data[key] : null;
         }
 
         public void SetData(string key, string value)
         {
+            DatabaseManager.CheckEnabledOrThrow();
             var dbo = DatabaseManager.PlayerRepository.FindByGameId(UserId);
             dbo.Data[key] = value;
             if (value == null) dbo.Data.Remove(key);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -10,7 +11,13 @@ namespace Synapse.Database
     public class DatabaseManager
     {
 
-        public static LiteDatabase LiteDatabase => new LiteDatabase(Path.Combine(SynapseController.Server.Files.DatabaseDirectory, "database.db"));
+        public static LiteDatabase LiteDatabase => !SynapseController.EnableDatabase ? null : new LiteDatabase(Path.Combine(SynapseController.Server.Files.DatabaseDirectory, "database.db"));
+
+        public static void CheckEnabledOrThrow()
+        {
+            if (!SynapseController.EnableDatabase) throw new DataException("The Database has been disabled in the config. " +
+                                                                           "Please check SynapseController.EnableDatabase before accessing connected APIs");
+        }
         
         public static PlayerRepository PlayerRepository = new PlayerRepository();
 
@@ -43,26 +50,6 @@ namespace Synapse.Database
         {
             return Id;
         }
-    }
-    
-    public class TestRepository : Repository<TestPoco>
-    {
-        
-    }
-
-    public class TestPoco : IDatabaseEntity
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Surname { get; set; }
-        public int Age { get; set; }
-
-        public override string ToString()
-        {
-            return $"TestPoc(Id={Id} Name={Name} Surname={Surname} Age={Age})";
-        }
-
-        public int GetId() => Id;
     }
 
 }
