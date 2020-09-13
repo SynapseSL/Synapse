@@ -5,6 +5,8 @@ namespace Synapse.Api
 {
     public class Logger
     {
+        public static Logger Get => SynapseController.Server.Logger;
+        
         internal Logger() { }
 
         public void Info(string message)
