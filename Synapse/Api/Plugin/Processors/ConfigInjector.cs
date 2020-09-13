@@ -23,7 +23,7 @@ namespace Synapse.Api.Plugin.Processors
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                SynapseController.Server.Logger.Error($"Synapse-Injector: Injecting Config failed!!\n{e}");
                 throw;
             }
         }

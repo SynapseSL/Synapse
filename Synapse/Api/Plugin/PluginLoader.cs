@@ -9,10 +9,11 @@ namespace Synapse.Api.Plugin
 {
     public class PluginLoader
     {
-        
-        private static List<object> plugins = new List<object>();
-        
-        private static List<IContextProcessor> Processors = new List<IContextProcessor>{new ConfigInjector(), new ExtensionInjector()};
+        private List<IContextProcessor> Processors = new List<IContextProcessor> { new ConfigInjector() };
+
+        private List<IPlugin> plugins = new List<IPlugin>();
+
+        public List<PluginInformations> Plugins { get; } = new List<PluginInformations>(); 
         
         internal void ActivatePlugins() 
         {
@@ -28,71 +29,93 @@ namespace Synapse.Api.Plugin
                 var assembly = Assembly.Load(File.ReadAllBytes(pluginpath));
                 foreach(var type in assembly.GetTypes())
                 {
-                    if (type.GetCustomAttribute<PluginInformations>() == null) continue;
+                    if (!typeof(IPlugin).IsAssignableFrom(type))
+                        continue;
 
-                    dictionary.Add(type.GetCustomAttribute<PluginInformations>(), type);
+                    var infos = type.GetCustomAttribute<PluginInformations>();
+
+                    if (infos == null)
+                    {
+                        SynapseController.Server.Logger.Info($"The File {assembly.GetName().Name} has a class which inherit from IPlugin but has no PluginInformations ... Default Values will be added");
+                        infos = new PluginInformations();
+                    }
+
+                    if (pluginpath.Contains("server-shared"))
+                        infos.shared = true;
+
+                    dictionary.Add(infos, type);
                 }
             }
         
             foreach (var pluginInfoType in dictionary.OrderByDescending(x => x.Key.LoadPriority))
                 try
                 {
-                    var doesImplement = typeof(IPlugin).IsAssignableFrom(pluginInfoType.Value);
-
-                    if (!doesImplement)
-                    {
-                        SynapseController.Server.Logger.Error($"MainClass of {pluginInfoType.Key.Name} doesn't implement IPlugin or AbstractPlugin");
-                        continue;
-                    }
-                    
                     SynapseController.Server.Logger.Info($"{pluginInfoType.Key.Name} will now be activated!");
 
-                    object plugin = null;
-                    switch (pluginInfoType.Value.GetConstructors().FirstOrDefault().GetParameters().Length)
-                    {
-                        case 0:
-                            plugin = Activator.CreateInstance(pluginInfoType.Value);
-                            break;
+                    IPlugin plugin = (IPlugin)Activator.CreateInstance(pluginInfoType.Value);
+                    plugin.Informations = pluginInfoType.Key;
+                    plugin.Translation = SynapseController.Server.Files.GetTranslationFile(plugin.Informations.Name);
+                    plugin.PluginDirectory = SynapseController.Server.Files.GetPluginDirectory(plugin.Informations);
 
-                        case 1:
-                            plugin = Activator.CreateInstance(pluginInfoType.Value, new object[] { new PluginExtension(pluginInfoType.Key)});
-                            break;
-                    }
+
                     contexts.Add(new PluginLoadContext(plugin, pluginInfoType.Value, pluginInfoType.Key));
                     plugins.Add(plugin);
+                    Plugins.Add(pluginInfoType.Key);
                 }
                 catch(Exception e) 
                 {
                     SynapseController.Server.Logger.Error($"Synapse-Controller: Activation of {pluginInfoType.Value.Assembly.GetName().Name} failed!!\n{e}");
                 }
 
-            foreach (var context in contexts) foreach (var processor in Processors) processor.Process(context);
-            
-            try
-            {
-                foreach (var plugin in plugins) (plugin as IPlugin)?.Load();
-                foreach (var plugin in plugins) (plugin as IPlugin)?.Enable();
-            }
-            catch (Exception e)
-            {
-                SynapseController.Server.Logger.Error($"Failed Plugin Startup Logic!!\n{e}");
-                throw;
-            }
+            foreach (var context in contexts) 
+                foreach (var processor in Processors) 
+                    processor.Process(context);
+
+            LoadPlugins();
+        }
+
+        private void LoadPlugins()
+        {
+            foreach (var plugin in plugins)
+                try
+                {
+                    plugin.Load();
+                }
+                catch (Exception e)
+                {
+                    SynapseController.Server.Logger.Error($"Synapse-Loader: {plugin.Informations.Name} Loading failed!!\n{e}");
+                    throw;
+                }
+        }
+
+        internal void ReloadConfigs()
+        {
+            foreach (var plugin in plugins)
+                try
+                {
+                    plugin.Translation.ReloadTranslations();
+                    plugin.ReloadConfigs();
+                }
+                catch (Exception e)
+                {
+                    SynapseController.Server.Logger.Error($"Synapse-Loader: {plugin.Informations.Name} Reload Config failed!!\n{e}");
+                    throw;
+                }
         }
     }
 
     public class PluginLoadContext
     {
-        public PluginLoadContext(object plugin, Type pluginType, PluginInformations information)
+        internal PluginLoadContext(IPlugin plugin,Type type, PluginInformations pluginInformations)
         {
             Plugin = plugin;
-            PluginType = pluginType;
-            Information = information;
+            PluginType = type;
+            Information = pluginInformations;
         }
 
-        public object Plugin;
-        public Type PluginType;
-        public PluginInformations Information;
+        public readonly IPlugin Plugin;
+        public readonly Type PluginType;
+        public readonly PluginInformations Information;
     }
 
     public interface IContextProcessor

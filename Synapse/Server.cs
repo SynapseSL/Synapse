@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using Logger = Synapse.Api.Logger;
 using EventHandler = Synapse.Api.Events.EventHandler;
+using Synapse.Api.Plugin;
 
 namespace Synapse
 {
@@ -219,15 +220,22 @@ namespace Synapse
 
                 ConfigFile = Path.Combine(ConfigDirectory, "config.syml");
             }
-            public string GetTranslationFile(string name)
+            public Translation GetTranslationFile(string name)
             {
                 if (File.Exists(Path.Combine(SharedConfigDirectory, name + "-translation.txt")))
-                    return Path.Combine(SharedConfigDirectory, name + "-translation.txt");
+                    return new Translation(Path.Combine(SharedConfigDirectory, name + "-translation.txt"));
 
                 if (!File.Exists(Path.Combine(MainConfigDirectory, name + "-translation.txt")))
                     File.Create(Path.Combine(MainConfigDirectory, name + "-translation.txt"));
 
-                return Path.Combine(MainConfigDirectory, name + "-translation.txt");
+                return new Translation(Path.Combine(MainConfigDirectory, name + "-translation.txt"));
+            }
+
+            public string GetPluginDirectory(PluginInformations infos)
+            {
+                if (infos.shared)
+                    return Path.Combine(SharedPluginDirectory, infos.Name);
+                return Path.Combine(PluginDirectory, infos.Name);
             }
         }
     }

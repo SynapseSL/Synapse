@@ -3,6 +3,7 @@ using System.Reflection;
 
 namespace Synapse.Api.Plugin.Processors
 {
+    /*
     public class ExtensionInjector : IContextProcessor
 
     {
@@ -25,4 +26,5 @@ namespace Synapse.Api.Plugin.Processors
             }
         }
     }
+    */
 }

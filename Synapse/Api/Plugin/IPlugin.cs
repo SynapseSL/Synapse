@@ -1,36 +1,50 @@
-﻿namespace Synapse.Api.Plugin
+﻿using System.IO;
+
+namespace Synapse.Api.Plugin
 {
     public interface IPlugin
     {
+        PluginInformations Informations { get; set; }
+
+        Translation Translation { get; set; }
+
+        string PluginDirectory { get; set; }
 
         void Load();
-        void Enable();
-        void Reload();
-        void Disable();
-        
+
+        void ReloadConfigs();
     }
 
 
     public abstract class AbstractPlugin : IPlugin
     {
+        private string pluginDirectory;
+
         public virtual void Load()
-        {
-            
+        {  
         }
 
-        public virtual void Enable()
+        public virtual void ReloadConfigs()
         {
-            
         }
 
-        public virtual void Reload()
-        {
-            
-        }
+        public Translation Translation { get; set; }
 
-        public virtual void Disable()
+        public PluginInformations Informations { get; set; }
+
+        public string PluginDirectory
         {
-            
-        }
+            get
+            {
+                if (pluginDirectory == null)
+                    return null;
+
+                if (!Directory.Exists(pluginDirectory))
+                    Directory.CreateDirectory(pluginDirectory);
+
+                return pluginDirectory;
+            }
+            set => pluginDirectory = value;
+        } 
     }
 }

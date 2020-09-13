@@ -1,19 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using Harmony;
 using Synapse.Api.Plugin;
-using Synapse.Config;
 
 public class SynapseController
 {
     public static Synapse.Server Server { get; private set; }
 
+    public static PluginLoader PluginLoader = new PluginLoader();
+
     private static bool IsLoaded = false;
-    
-    public static PluginLoader PluginLoader = new PluginLoader(); 
     
     public static void Init()
     {

@@ -12,5 +12,7 @@ namespace Synapse.Api.Plugin
         public string Description = "Unknown";
         public string Version = "Unknown";
         public int LoadPriority = int.MaxValue;
+
+        internal bool shared = false;
     }
 }

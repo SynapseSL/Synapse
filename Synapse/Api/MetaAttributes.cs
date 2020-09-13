@@ -1,8 +1,6 @@
 ﻿using System;
-using Synapse.Api.Plugin;
-using UnityEngine;
 
-namespace Synapse.Api.Plugin
+namespace Synapse.Api
 {
     /// <summary>
     /// A Annotation the marks a class/method as injected.

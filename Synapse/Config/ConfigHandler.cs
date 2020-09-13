@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using Harmony;
 using Synapse.Api;
-using YamlDotNet.Serialization;
 
 namespace Synapse.Config
 {
@@ -49,6 +45,8 @@ namespace Synapse.Config
         public void Reload()
         {
             _syml.Load();
+            SynapseController.PluginLoader.ReloadConfigs();
+            //TODO: Permission Reload
         }
         
     }

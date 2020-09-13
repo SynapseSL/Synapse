@@ -5,22 +5,20 @@ using System.Linq;
 
 namespace Synapse.Api.Plugin
 {
-    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public class Translation
     {
-        internal Translation(string plname) => name = plname;
+        internal Translation(string path) => Path = path;
 
         private Dictionary<string, string> _rawtranslation;
         private Dictionary<string, string> _translation = new Dictionary<string, string>();
-        internal string name { private get; set; }
+        internal string Path { private get; set; }
 
         public void CreateTranslations(Dictionary<string, string> translations)
         {
             _rawtranslation = translations;
 
-            var translationPath = SynapseController.Server.Files.GetTranslationFile(name);
             var dictionary = new Dictionary<string, string>();
-            var lines = File.ReadAllLines(translationPath);
+            var lines = File.ReadAllLines(Path);
             var newlines = new List<string>();
             var position = 0;
 
@@ -46,7 +44,7 @@ namespace Synapse.Api.Plugin
                 }
 
                 position++;
-                File.WriteAllLines(translationPath, newlines.ToArray());
+                File.WriteAllLines(Path, newlines.ToArray());
             }
 
             _translation = dictionary;
