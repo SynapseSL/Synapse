@@ -1,5 +1,6 @@
-﻿using Assets._Scripts.Dissonance;
-using UnityEngine;
+﻿﻿using Assets._Scripts.Dissonance;
+ using Grenades;
+ using UnityEngine;
 
 namespace Synapse.Api.Events.SynapseEventArguments
 {
@@ -68,5 +69,48 @@ namespace Synapse.Api.Events.SynapseEventArguments
     public class LoadComponentEventArgs : EventHandler.ISynapseEventArgs
     {
         public GameObject Player { get; internal set; }
+    }
+    
+    public class PlayerItemUseEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+        
+        public ItemType Type { get; internal set; }
+        
+        public ItemUseState State { get; internal set; }
+        
+        public Inventory.SyncItemInfo CurrentItem { get; internal set; }
+        
+        public bool Allow { get; set; }
+    }
+
+    public class PlayerThrowGrenadeEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public Inventory.SyncItemInfo ItemInfo { get; set; }
+        
+        public GrenadeSettings Settings { get; set; }
+
+        public float ForceMultiplier { get; set; }
+        
+        public float Delay { get; set; }
+        
+        public bool Allow { get; set; }
+    }
+    
+    public enum ItemUseState
+    {
+        Initiating,
+        Finalizing
+    }
+
+    public class PlayerHealEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+        
+        public float Amount { get; set; }
+        
+        public bool Allow { get; set; }
     }
 }

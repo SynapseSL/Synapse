@@ -23,6 +23,12 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<LoadComponentEventArgs> LoadComponentsEvent;
 
+        public event EventHandler.OnSynapseEvent<PlayerItemUseEventArgs> PlayerItemUseEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerThrowGrenadeEventArgs> PlayerThrowGrenadeEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerHealEventArgs> PlayerHealEvent; 
+        
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
         {
@@ -85,6 +91,25 @@ namespace Synapse.Api.Events
             var ev = new LoadComponentEventArgs { Player = gameObject };
             LoadComponentsEvent?.Invoke(ev);
         }
+
+        internal void InvokePlayerItemUseEvent(Player player, ItemType type, ItemUseState state, ref bool allow)
+        {
+            var ev = new PlayerItemUseEventArgs { Player = player, Type = type, Allow = allow, CurrentItem = player.ItemInHand, State = state };
+            PlayerItemUseEvent?.Invoke(ev);
+        }
+        
+        internal void InvokePlayerThrowGrenadeEvent(Player player, Inventory.SyncItemInfo itemInfo, ref float force, ref float delay, ref bool allow)
+        {
+            var ev = new PlayerThrowGrenadeEventArgs() { Player = player, ForceMultiplier = force, Delay = delay, Allow = allow };
+            PlayerThrowGrenadeEvent?.Invoke(ev);
+        }
+
+        internal void InvokePlayerHealEvent(Player player, ref float amount, ref bool allow)
+        {
+            var ev = new PlayerHealEventArgs() { Player = player, Amount = amount, Allow = allow};
+            PlayerHealEvent?.Invoke(ev);
+        }
+        
         #endregion
     }
 }
