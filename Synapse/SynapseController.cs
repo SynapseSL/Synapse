@@ -1,6 +1,7 @@
 ﻿using System;
 using Harmony;
 using Synapse.Api.Plugin;
+using Synapse.Database;
 
 public class SynapseController
 {
@@ -8,6 +9,8 @@ public class SynapseController
 
     public static PluginLoader PluginLoader = new PluginLoader();
 
+    public static DatabaseManager Datatabase = new DatabaseManager();
+    
     private static bool IsLoaded = false;
     
     public static void Init()
@@ -20,6 +23,7 @@ public class SynapseController
 
     internal SynapseController()
     {
+
         CustomNetworkManager.Modded = true;
         Server = new Synapse.Server();
         

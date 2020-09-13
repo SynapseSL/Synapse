@@ -9,7 +9,7 @@ namespace Synapse.Api.Plugin
 {
     public class PluginLoader
     {
-        private List<IContextProcessor> Processors = new List<IContextProcessor> { new ConfigInjector() };
+        private List<IContextProcessor> Processors = new List<IContextProcessor> { new ConfigInjector(), new RepositoryInjector()};
 
         private List<IPlugin> plugins = new List<IPlugin>();
 

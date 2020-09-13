@@ -4,8 +4,9 @@ namespace Synapse.Api
 {
     /// <summary>
     /// A Annotation the marks a class/method as injected.
-    /// This Attribute is generally not used for
-    /// actual filtering but mostly for code readability
+    /// 
+    /// This Attribute is used by the injector to
+    /// find fields to inject into
     /// </summary>
     public class Injected : Attribute { }
     

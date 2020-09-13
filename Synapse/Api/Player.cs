@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
+using Harmony;
 using Hints;
 using Mirror;
 using Mirror.LiteNetLib4Mirror;
 using RemoteAdmin;
 using Searching;
 using Synapse.Api.Enums;
+using Synapse.Database;
 using Synapse.Patches.EventsPatches.PlayerPatches;
 using UnityEngine;
 
@@ -465,6 +467,24 @@ namespace Synapse.Api
         public CharacterClassManager ClassManager => Hub.characterClassManager;
         
         public ReferenceHub Hub { get; internal set; }
+        #endregion
+
+        #region Persistence
+
+        public string GetData(string key)
+        {
+            var dbo = DatabaseManager.PlayerRepository.FindByGameId(UserId);
+            return dbo.Data.ContainsKey(key) ? dbo.Data[key] : null;
+        }
+
+        public void SetData(string key, string value)
+        {
+            var dbo = DatabaseManager.PlayerRepository.FindByGameId(UserId);
+            dbo.Data[key] = value;
+            if (value == null) dbo.Data.Remove(key);
+            DatabaseManager.PlayerRepository.Save(dbo);
+        }
+        
         #endregion
 
         public override string ToString() => NickName;

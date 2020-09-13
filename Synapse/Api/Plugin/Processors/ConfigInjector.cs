@@ -21,8 +21,8 @@ namespace Synapse.Api.Plugin.Processors
                     if (!typeof(IConfigSection).IsAssignableFrom(t))
                         continue;
 
-                    IConfigSection typeObj = (IConfigSection)Activator.CreateInstance(t);
-                    IConfigSection config = SynapseController.Server.Configs.GetOrSetDefault(section, typeObj);
+                    object typeObj = Activator.CreateInstance(t);
+                    object config = SynapseController.Server.Configs.GetOrSetDefault(section, typeObj);
                     field.SetValue(context.Plugin,config);
                 }
             }

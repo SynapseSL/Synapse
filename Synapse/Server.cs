@@ -96,7 +96,10 @@ namespace Synapse
         public class FileLocations
         {
             //synapse
-            private string synapseDiretory;
+            private string synapseDirectory;
+            
+            //database
+            private string databaseDirectory;
 
             //plugin
             private string mainPluginDirectory;
@@ -114,14 +117,26 @@ namespace Synapse
             {
                 get
                 {
-                    if (!Directory.Exists(synapseDiretory))
-                        Directory.CreateDirectory(synapseDiretory);
+                    if (!Directory.Exists(synapseDirectory))
+                        Directory.CreateDirectory(synapseDirectory);
 
-                    return synapseDiretory;
+                    return synapseDirectory;
                 }
-                private set => synapseDiretory = value;
+                private set => synapseDirectory = value;
             }
+            
+            public string DatabaseDirectory
+            {
+                get
+                {
+                    if (!Directory.Exists(databaseDirectory))
+                        Directory.CreateDirectory(databaseDirectory);
 
+                    return databaseDirectory;
+                }
+                private set => databaseDirectory = value;
+            }
+            
             //Plugin
             public string MainPluginDirectory
             {
@@ -209,7 +224,8 @@ namespace Synapse
             public void Refresh()
             {
                 SynapseDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Synapse");
-
+                DatabaseDirectory = Path.Combine(SynapseDirectory, "database");
+                
                 MainPluginDirectory = Path.Combine(SynapseDirectory, "plugins");
                 PluginDirectory = Path.Combine(MainPluginDirectory, $"server-{ServerStatic.ServerPort}");
                 SharedPluginDirectory = Path.Combine(MainPluginDirectory, "server-shared");
