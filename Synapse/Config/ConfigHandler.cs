@@ -7,7 +7,11 @@ namespace Synapse.Config
 {
     public class ConfigHandler
     {
-        public static SynapseConfiguration SynapseConfiguration = new SynapseConfiguration();
+        public static SynapseConfiguration SynapseConfiguration
+        {
+            get;
+            internal set;
+        } = new SynapseConfiguration();
         
         internal ConfigHandler() { }
 
