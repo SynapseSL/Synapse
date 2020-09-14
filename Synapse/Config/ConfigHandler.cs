@@ -46,25 +46,9 @@ namespace Synapse.Config
         {
             _syml.Load();
             SynapseController.PluginLoader.ReloadConfigs();
-            //TODO: Permission Reload + Automatic Plugin Config Reload
+            //TODO: Permission Reload
         }
         
-    }
-
-    public class SynapseConfiguration : IConfigSection
-    {
-        public string serverName { get; set; } = "A new awesome server";
-        public string joinBroadcast { get; set; } = "Welcome % player";
-
-        public string[] keycards { get; set; } = {"Scientist","MajorScientist"};
-
-        public SerializedMapPoint[] mapPoints = { new SerializedMapPoint("Test",0,10,0)};
-        
-        public override string ToString()
-        {
-            return $"SynapseConfiguration(serverName={serverName} joinBroadcast={joinBroadcast} keycards={keycards.Join(delimiter: ", ")} " +
-                   $"points={mapPoints.ToList().Select(f => f.ToString()).Join(delimiter:", ")})";
-        }
     }
 
     public class SerializedMapPoint
