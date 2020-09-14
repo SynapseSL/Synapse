@@ -8,15 +8,17 @@ namespace Synapse.Config
     {
         internal ConfigHandler() { }
 
+        internal SynapseConfiguration SynapseConfiguration;
+
         private SYML _syml;
         
         public void Init()
         {
             _syml = new SYML(SynapseController.Server.Files.ConfigFile);
             _syml.Load();
-            SynapseConfiguration configuration = new SynapseConfiguration();
-            configuration = _syml.GetOrSetDefault("Synapse", configuration);
-            SynapseController.Server.Logger.Warn(configuration.ToString());
+            SynapseConfiguration = new SynapseConfiguration();
+            SynapseConfiguration = _syml.GetOrSetDefault("Synapse", SynapseConfiguration);
+            SynapseController.Server.Logger.Warn(SynapseConfiguration.ToString());
         }
 
         public T GetOrSetDefault<T>(string section, T defValue) where T : IConfigSection
