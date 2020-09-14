@@ -137,7 +137,7 @@ namespace Synapse.Api
         }
 
 
-        //TODO: Permission Check
+        //TODO: Permission Check Method
         #endregion
 
         #region Synapse Api Objects
