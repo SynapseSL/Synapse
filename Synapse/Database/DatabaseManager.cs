@@ -11,7 +11,7 @@ namespace Synapse.Database
     public class DatabaseManager
     {
 
-        public static LiteDatabase LiteDatabase => !SynapseController.EnableDatabase ? null : new LiteDatabase(Path.Combine(SynapseController.Server.Files.DatabaseDirectory, "database.db"));
+        public static LiteDatabase LiteDatabase => !SynapseController.EnableDatabase ? null : new LiteDatabase(Server.Get.Files.DatabaseFile);
 
         public static void CheckEnabledOrThrow()
         {

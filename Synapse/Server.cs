@@ -138,6 +138,7 @@ namespace Synapse
                 }
                 private set => databaseDirectory = value;
             }
+            public string DatabaseFile { get => Path.Combine(DatabaseDirectory, "database.db"); }
             
             //Plugin
             public string MainPluginDirectory
