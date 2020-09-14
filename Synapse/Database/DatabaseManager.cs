@@ -12,7 +12,7 @@ namespace Synapse.Database
     public class DatabaseManager
     {
 
-        public static LiteDatabase LiteDatabase => !SynapseController.Server.Configs.SynapseConfiguration.DatabaseEnabled ? null : new LiteDatabase(Path.Combine(SynapseController.Server.Files.DatabaseDirectory, "database.db"));
+        public static LiteDatabase LiteDatabase => !SynapseController.Server.Configs.SynapseConfiguration.DatabaseEnabled ? null : new LiteDatabase(Path.Combine(SynapseController.Server.Files.DatabaseDirectory, SynapseController.Server.Configs.SynapseConfiguration.DatabaseShared ? "database.db" : $"server-{ServerStatic.ServerPort}.db"));
 
         public static void CheckEnabledOrThrow()
         {
