@@ -65,6 +65,7 @@
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerBanPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerBasicItemUsePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDamagePatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerEscapePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerGrenadeThrowPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerHealPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerJoinPatch.cs" />

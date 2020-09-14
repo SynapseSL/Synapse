@@ -113,4 +113,17 @@ namespace Synapse.Api.Events.SynapseEventArguments
         
         public bool Allow { get; set; }
     }
+
+    public class PlayerEscapeEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+        
+        public RoleType SpawnRole { get; set; }
+        
+        public bool Allow { get; set; }
+        
+        public RoleType ChuffedRole { get; internal set; }
+        
+        public bool IsCuffed { get; internal set; }
+    }
 }

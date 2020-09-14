@@ -27,7 +27,9 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<PlayerThrowGrenadeEventArgs> PlayerThrowGrenadeEvent;
 
-        public event EventHandler.OnSynapseEvent<PlayerHealEventArgs> PlayerHealEvent; 
+        public event EventHandler.OnSynapseEvent<PlayerHealEventArgs> PlayerHealEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerEscapeEventArgs> PlayerEscapseEvent; 
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -109,7 +111,17 @@ namespace Synapse.Api.Events
             var ev = new PlayerHealEventArgs() { Player = player, Amount = amount, Allow = allow};
             PlayerHealEvent?.Invoke(ev);
         }
-        
+
+        internal void InvokePlayerEscapeEvent(Player player, ref RoleType spawnRoleType, RoleType cuffedRoleType,
+            ref bool allow, bool isCuffed)
+        {
+            var ev = new PlayerEscapeEventArgs
+            {
+                Allow = allow, Player = player, ChuffedRole = cuffedRoleType, IsCuffed = allow,
+                SpawnRole = spawnRoleType
+            };
+            PlayerEscapseEvent?.Invoke(ev);
+        }
         #endregion
     }
 }
