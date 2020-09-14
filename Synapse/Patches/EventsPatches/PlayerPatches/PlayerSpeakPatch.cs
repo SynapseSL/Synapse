@@ -1,6 +1,8 @@
 ﻿using System;
 using Assets._Scripts.Dissonance;
+using GameCore;
 using Harmony;
+using Synapse.Api;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
@@ -13,12 +15,12 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             {
                 var intercom = __instance.IntercomAsHuman;
                 var radio = __instance.RadioAsHuman;
-                var scp939 = __instance.MimicAs939;
+                var scp939 = Server.Get.Configs.SynapseConfiguration.SpeakingScps.Contains((int)__instance.GetPlayer().Role);
                 var scpChat = __instance.SCPChat;
                 var specChat = __instance.SpectatorChat;
                 var allow = true;
                 
-                //TODO: Insert Synapse-Speaking SCP's
+                
                 
                 SynapseController.Server.Events.Player.InvokePlayerSpeakEvent(__instance, ref intercom, ref radio, ref scp939, ref scpChat, ref specChat, ref allow);
 
@@ -27,6 +29,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 __instance.IntercomAsHuman = intercom;
 
                 if (scp939) __instance.MimicAs939 = value;
+                else __instance.MimicAs939 = false;
+
                 if (radio) __instance.RadioAsHuman = value;
 
                 return allow;

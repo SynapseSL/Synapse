@@ -4,9 +4,9 @@ namespace Synapse.Api.Plugin
 {
     public class PluginInformations : Attribute
     {
-        public int SynapseMajor = 2;
-        public int SynapseMinor = 0;
-        public int SynapsePatch = 0;
+        public int SynapseMajor = SynapseController.SynapseMajor;
+        public int SynapseMinor = SynapseController.SynapseMinor;
+        public int SynapsePatch = SynapseController.SynapsePatch;
         public string Name = "Unknown";
         public string Author = "Unknown";
         public string Description = "Unknown";
