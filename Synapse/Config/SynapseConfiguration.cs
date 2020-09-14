@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
+using Utf8Json.Internal.DoubleConversion;
 
 namespace Synapse.Config
 {
@@ -8,6 +9,7 @@ namespace Synapse.Config
         [Description("Enables or disables the embedded Database. Warning: Disabling this option can break plugins and is not recommended")]
         public bool DatabaseEnabled = true;
 
+        //TODO: Implement RemoteKeyCard
         [Description("Enables or disables if the Player needs to equip his keycard to open a door")]
         public bool RemoteKeyCard = false;
 

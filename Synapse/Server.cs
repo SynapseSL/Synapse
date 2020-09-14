@@ -13,6 +13,8 @@ namespace Synapse
 {
     public class Server
     {
+        internal Server() { }
+
         public static Server Get => SynapseController.Server;
 
         //Synapse Api

@@ -1,8 +1,13 @@
-﻿namespace Synapse.Api.Events
+﻿using Synapse.Config;
+
+namespace Synapse.Api.Events
 {
     public class EventHandler
     {
-        internal EventHandler() { }
+        internal EventHandler()
+        {
+            Player.PlayerJoinEvent += PlayerJoin;
+        }
 
         public delegate void OnSynapseEvent<TEvent>(TEvent ev) where TEvent : ISynapseEventArgs;
 
@@ -15,5 +20,15 @@
         public interface ISynapseEventArgs
         {
         }
+
+        #region HookedMethods
+        private SynapseConfiguration conf => SynapseController.Server.Configs.SynapseConfiguration;
+
+        private void PlayerJoin(SynapseEventArguments.PlayerJoinEventArgs ev)
+        {
+            ev.Player.Broadcast(conf.JoinMessagesDuration, conf.JoinBroadcast);
+            ev.Player.Broadcast(conf.JoinMessagesDuration, conf.JoinTextHint);
+        }
+        #endregion
     }
 }
