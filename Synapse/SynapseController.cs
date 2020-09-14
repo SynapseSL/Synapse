@@ -13,7 +13,7 @@ public class SynapseController
     
     private static bool IsLoaded = false;
     public static bool EnableDatabase = true;
-    
+
     public static void Init()
     {
         ServerConsole.AddLog("SynapseController has been invoked", ConsoleColor.Cyan);

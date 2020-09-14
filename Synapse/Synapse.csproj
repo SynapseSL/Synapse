@@ -54,13 +54,12 @@
     <Compile Include="Api\Plugin\PluginInformations.cs" />
     <Compile Include="Api\Plugin\PluginLoader.cs" />
     <Compile Include="Api\Plugin\Processors\ConfigInjector.cs" />
-    <Compile Include="Api\Plugin\Processors\ExtensionInjector.cs" />
-    <Compile Include="Api\Plugin\Processors\RepositoryInjector.cs" />
     <Compile Include="Api\Plugin\Translation.cs" />
     <Compile Include="Api\Room.cs" />
     <Compile Include="Api\Tesla.cs" />
     <Compile Include="Config\ConfigHandler.cs" />
     <Compile Include="Config\SYML.cs" />
+    <Compile Include="Config\SynapseConfiguration.cs" />
     <Compile Include="Database\DatabaseManager.cs" />
     <Compile Include="Database\Repository.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerBanPatch.cs" />
