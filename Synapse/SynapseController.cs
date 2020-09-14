@@ -12,7 +12,6 @@ public class SynapseController
     public static DatabaseManager Datatabase = new DatabaseManager();
     
     private static bool IsLoaded = false;
-    public static bool EnableDatabase = true;
     
     public static void Init()
     {

@@ -134,7 +134,7 @@ namespace Synapse.Config
 	    {
 		    SynapseController.Server.Configs.UpdateSection(GetType().FullName?.Replace(".", " "), this);
 	    }
-	    
+
     }
 
     public class ConfigSection

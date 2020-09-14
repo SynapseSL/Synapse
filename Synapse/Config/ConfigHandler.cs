@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Harmony;
 using Synapse.Api;
 
@@ -6,6 +7,8 @@ namespace Synapse.Config
 {
     public class ConfigHandler
     {
+        public static SynapseConfiguration SynapseConfiguration = new SynapseConfiguration();
+        
         internal ConfigHandler() { }
 
         private SYML _syml;
@@ -13,10 +16,9 @@ namespace Synapse.Config
         public void Init()
         {
             _syml = new SYML(SynapseController.Server.Files.ConfigFile);
-            _syml.Load();
-            SynapseConfiguration configuration = new SynapseConfiguration();
-            configuration = _syml.GetOrSetDefault("Synapse", configuration);
-            SynapseController.Server.Logger.Warn(configuration.ToString());
+            _syml.Load(); 
+            SynapseConfiguration = _syml.GetOrSetDefault("Synapse",SynapseConfiguration);
+            SynapseController.Server.Logger.Send(SynapseConfiguration.ToString(), ConsoleColor.Yellow);
         }
 
         public T GetOrSetDefault<T>(string section, T defValue) where T : IConfigSection
