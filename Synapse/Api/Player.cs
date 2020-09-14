@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Data;
 using System.Linq;
-using Harmony;
 using Hints;
 using Mirror;
 using Mirror.LiteNetLib4Mirror;
