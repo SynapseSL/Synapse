@@ -15,8 +15,8 @@ namespace Synapse.Api.Plugin.Processors
                     var configAttribute = field.GetCustomAttribute<Config>();
                     if (configAttribute == null) continue;
                     var section = configAttribute.section;
-                    if (section == null) section = context.Information.Name;
                     Type t = FieldInfo.GetFieldFromHandle(field.FieldHandle).FieldType;
+                    if (section == null) section = t.FullName?.Replace("."," ");
 
                     if (!typeof(IConfigSection).IsAssignableFrom(t))
                         continue;

@@ -9,10 +9,12 @@ namespace Synapse.Api.Plugin
 {
     public class PluginLoader
     {
-        private List<IContextProcessor> Processors = new List<IContextProcessor> { new ConfigInjector(), new RepositoryInjector()};
+        private List<IContextProcessor> Processors = new List<IContextProcessor> { new ConfigInjector()};
 
         private List<IPlugin> plugins = new List<IPlugin>();
 
+        private List<PluginLoadContext> Contexts = new List<PluginLoadContext>();
+        
         public List<PluginInformations> Plugins { get; } = new List<PluginInformations>(); 
         
         internal void ActivatePlugins() 
@@ -20,9 +22,9 @@ namespace Synapse.Api.Plugin
             var paths = Directory.GetFiles(SynapseController.Server.Files.SharedPluginDirectory, "*.dll").ToList();
             paths.AddRange(Directory.GetFiles(SynapseController.Server.Files.PluginDirectory, "*.dll").ToList());
 
-            var dictionary = new Dictionary<PluginInformations, Type>();
+            var dictionary = new Dictionary<PluginInformations, KeyValuePair<Type, List<Type>>>();
             
-            var contexts = new List<PluginLoadContext>();
+            Contexts.Clear();
 
             foreach(var pluginpath in paths)
             {
@@ -43,7 +45,10 @@ namespace Synapse.Api.Plugin
                     if (pluginpath.Contains("server-shared"))
                         infos.shared = true;
 
-                    dictionary.Add(infos, type);
+                    var allTypes = assembly.GetTypes().ToList();
+                    allTypes.Remove(type);
+                    dictionary.Add(infos, new KeyValuePair<Type, List<Type>>(type, allTypes));
+                    break;
                 }
             }
         
@@ -52,22 +57,20 @@ namespace Synapse.Api.Plugin
                 {
                     SynapseController.Server.Logger.Info($"{infoTypePair.Key.Name} will now be activated!");
 
-                    IPlugin plugin = (IPlugin)Activator.CreateInstance(infoTypePair.Value);
+                    IPlugin plugin = (IPlugin)Activator.CreateInstance(infoTypePair.Value.Key);
                     plugin.Informations = infoTypePair.Key;
                     plugin.Translation = new Translation(plugin.Informations);
                     plugin.PluginDirectory = SynapseController.Server.Files.GetPluginDirectory(plugin.Informations);
-
-
-                    contexts.Add(new PluginLoadContext(plugin, infoTypePair.Value, infoTypePair.Key));
+                    Contexts.Add(new PluginLoadContext(plugin, infoTypePair.Value.Key, infoTypePair.Key, infoTypePair.Value.Value));
                     plugins.Add(plugin);
                     Plugins.Add(infoTypePair.Key);
                 }
                 catch(Exception e) 
                 {
-                    SynapseController.Server.Logger.Error($"Synapse-Controller: Activation of {infoTypePair.Value.Assembly.GetName().Name} failed!!\n{e}");
+                    SynapseController.Server.Logger.Error($"Synapse-Controller: Activation of {infoTypePair.Value.Key.Assembly.GetName().Name} failed!!\n{e}");
                 }
 
-            foreach (var context in contexts) 
+            foreach (var context in Contexts) 
                 foreach (var processor in Processors) 
                     processor.Process(context);
 
@@ -90,6 +93,12 @@ namespace Synapse.Api.Plugin
 
         internal void ReloadConfigs()
         {
+            var injector = new ConfigInjector();
+            foreach (var context in Contexts)
+            {
+                injector.Process(context);
+            }
+
             foreach (var plugin in plugins)
                 try
                 {
@@ -106,15 +115,17 @@ namespace Synapse.Api.Plugin
 
     public class PluginLoadContext
     {
-        internal PluginLoadContext(IPlugin plugin,Type type, PluginInformations pluginInformations)
+        internal PluginLoadContext(IPlugin plugin, Type type, PluginInformations pluginInformations, List<Type> classes)
         {
             Plugin = plugin;
             PluginType = type;
             Information = pluginInformations;
+            Classes = classes;
         }
 
         public readonly IPlugin Plugin;
         public readonly Type PluginType;
+        public readonly List<Type> Classes;
         public readonly PluginInformations Information;
     }
 

@@ -3,13 +3,13 @@
 namespace Synapse.Api
 {
     /// <summary>
-    /// A Annotation the marks a class/method as injected.
+    /// A Annotation that marks a class/method as injected.
     /// 
     /// This Attribute is used by the injector to
     /// find fields to inject into
     /// </summary>
     public class Injected : Attribute { }
-    
+
     /// <summary>
     /// A Annotation that marks a class/method as unstable.
     /// This Attribute should generally be applied to something

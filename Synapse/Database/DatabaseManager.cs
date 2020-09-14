@@ -44,7 +44,7 @@ namespace Synapse.Database
         
         public string Name { get; set; }
         
-        public Dictionary<string,string> Data { get; set; }
+        public Dictionary<string,string> Data { get; set; } 
         
         public int GetId()
         {
