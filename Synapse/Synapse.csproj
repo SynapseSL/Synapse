@@ -34,6 +34,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Api\Scp079Controller.cs" />
+    <Compile Include="Api\Scp106Controller.cs" />
     <Compile Include="Api\Dummy.cs" />
     <Compile Include="Api\Door.cs" />
     <Compile Include="Api\Elevator.cs" />

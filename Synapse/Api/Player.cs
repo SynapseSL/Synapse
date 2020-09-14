@@ -17,6 +17,8 @@ namespace Synapse.Api
         internal Player()
         {
             Hub = GetComponent<ReferenceHub>();
+            Scp106Controller = new Scp106Controller(this);
+            Scp079Controller = new Scp079Controller(this);
         }
 
         #region Methods
@@ -139,7 +141,10 @@ namespace Synapse.Api
         #endregion
 
         #region Synapse Api Objects
-        //TODO: Scp106/079 Controller + Jail
+        //TODO:  Jail
+        public readonly Scp106Controller Scp106Controller;
+
+        public readonly Scp079Controller Scp079Controller;
         #endregion
 
         #region Default Stuff
@@ -464,8 +469,8 @@ namespace Synapse.Api
         public Inventory Inventory => Hub.inventory;
 
         public CharacterClassManager ClassManager => Hub.characterClassManager;
-        
-        public ReferenceHub Hub { get; internal set; }
+
+        public readonly ReferenceHub Hub;
         #endregion
 
         #region Persistence
