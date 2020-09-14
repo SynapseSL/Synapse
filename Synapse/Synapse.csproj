@@ -34,6 +34,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Api\Dummy.cs" />
     <Compile Include="Api\Door.cs" />
     <Compile Include="Api\Elevator.cs" />
     <Compile Include="Api\Enum\Effect.cs" />
