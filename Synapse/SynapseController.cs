@@ -13,8 +13,6 @@ public class SynapseController
 
     public static PluginLoader PluginLoader { get; } = new PluginLoader();
 
-    public static DatabaseManager Datatabase { get; } = new DatabaseManager();
-
     public static void Init()
     {
         ServerConsole.AddLog("SynapseController has been invoked", ConsoleColor.Cyan);

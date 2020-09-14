@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Harmony;
+using Synapse.Config;
 using Synapse.Database;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
@@ -18,7 +19,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 Task.Run(() =>
                 {
-                    if (!SynapseController.EnableDatabase) return;
+                    if (!SynapseController.Server.Configs.SynapseConfiguration.DatabaseEnabled) return;
                     if (!DatabaseManager.PlayerRepository.ExistGameId(player.UserId))
                     {
                         var dbo = new PlayerDbo()
