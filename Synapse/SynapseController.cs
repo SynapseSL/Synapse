@@ -5,14 +5,15 @@ using Synapse.Database;
 
 public class SynapseController
 {
-    public static Synapse.Server Server { get; private set; }
-
-    public static PluginLoader PluginLoader = new PluginLoader();
-
-    public static DatabaseManager Datatabase = new DatabaseManager();
-    
     private static bool IsLoaded = false;
+
     public static bool EnableDatabase = true;
+
+    public static Synapse.Server Server { get; } = new Synapse.Server();
+
+    public static PluginLoader PluginLoader { get; } = new PluginLoader();
+
+    public static DatabaseManager Datatabase { get; } = new DatabaseManager();
 
     public static void Init()
     {
@@ -26,7 +27,6 @@ public class SynapseController
     {
 
         CustomNetworkManager.Modded = true;
-        Server = new Synapse.Server();
         
         PatchMethods();
         Server.Configs.Init();
@@ -39,7 +39,7 @@ public class SynapseController
     {
         try
         {
-            var instance = HarmonyInstance.Create("Synapse.patches.1");
+            var instance = HarmonyInstance.Create("Synapse.patches");
             instance.PatchAll();
             Server.Logger.Info("Harmony Patching was sucessfully!");
         }
