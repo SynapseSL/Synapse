@@ -10,8 +10,7 @@ namespace Synapse.Command
         private readonly Dictionary<string, string> commandAliases = new Dictionary<string, string>();
 
         private readonly Dictionary<string, ICommand> commands = new Dictionary<string, ICommand>();
-
-        internal CommandHandler() => Reload();
+        
 
         public List<ICommand> Commands { get; }
 
@@ -38,13 +37,6 @@ namespace Synapse.Command
                         commandAliases.Add(alias, infos.Name);
 
             return true;
-        }
-
-        public void Reload()
-        {
-            commands.Clear();
-            commandAliases.Clear();
-            ReloadCommandHandlerEvent.Invoke(this);
         }
 
         public event Action<ICommandHandler> ReloadCommandHandlerEvent;

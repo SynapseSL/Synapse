@@ -13,5 +13,14 @@ namespace Synapse.Command
         public string Usage;
 
         public string Description;
+
+        public Platform[] Platforms;
+    }
+
+    public enum Platform
+    {
+        RemoteAdmin,
+        ClientConsole,
+        ServerConsole
     }
 }
