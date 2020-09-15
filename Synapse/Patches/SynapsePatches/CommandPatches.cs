@@ -16,7 +16,7 @@ namespace Synapse.Patches.SynapsePatches
             if (cmd.StartsWith(".") || cmd.StartsWith("/") || cmd.StartsWith("@"))
                 return true;
 
-            if(SynapseController.CommandHandlers.ClientCommandHandler.TryGetCommand(args[0],out var command))
+            if(SynapseController.CommandHandlers.ServerConsoleHandler.TryGetCommand(args[0],out var command))
             {
                 try
                 {

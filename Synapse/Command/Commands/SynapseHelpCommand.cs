@@ -15,11 +15,18 @@ namespace Synapse.Command.Commands
         Permission = "synapse.commands.help",
         Platforms = new[] {Platform.ClientConsole, Platform.RemoteAdmin, Platform.ServerConsole}
     )]
-    public class HelpCommand : ISynapseCommand
+    public class SynapseHelpCommand : ISynapseCommand
     {
         public CommandResult Execute(CommandContext context)
         {
-            throw new NotImplementedException();
+
+            var result = new CommandResult
+            {
+                State = CommandResultState.Ok,
+                Message = "Help Message!"
+            };
+
+            return result;
         }
     }
 }

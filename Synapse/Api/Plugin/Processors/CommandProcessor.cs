@@ -14,22 +14,7 @@ namespace Synapse.Api.Plugin.Processors
                 var inf = @class.GetCustomAttribute<CommandInformations>();
                 if (inf == null) continue;
                 var classObject = Activator.CreateInstance(@class);
-                var command = GeneratedCommand.FromSynapseCommand(classObject as ISynapseCommand);
-                foreach (var platform in command.Platforms)
-                {
-                    switch (platform)
-                    {
-                        case Platform.ClientConsole:
-                            SynapseController.CommandHandlers.ClientCommandHandler.RegisterCommand(command);
-                            break;
-                        case Platform.RemoteAdmin:
-                            SynapseController.CommandHandlers.RemoteAdminHandler.RegisterCommand(command);
-                            break;
-                        case Platform.ServerConsole:
-                            SynapseController.CommandHandlers.ServerConsoleHandler.RegisterCommand(command);
-                            break;
-                    }
-                }
+                Handlers.RegisterCommand(classObject as ISynapseCommand);
             }
         }
     }

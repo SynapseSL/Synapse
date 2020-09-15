@@ -3,6 +3,7 @@ using CommandSystem.Commands;
 using Harmony;
 using Synapse.Api.Plugin;
 using Synapse.Command;
+using Synapse.Command.Commands;
 
 public class SynapseController
 {
@@ -31,6 +32,9 @@ public class SynapseController
         
         PatchMethods();
         Server.Configs.Init();
+        
+        Handlers.RegisterCommand(new SynapseHelpCommand());
+        
         PluginLoader.ActivatePlugins();
 
         Server.Logger.Info("Synapse is now Ready!");

@@ -12,32 +12,27 @@ namespace Synapse.Command
         private readonly Dictionary<string, ICommand> commands = new Dictionary<string, ICommand>();
         
 
-        public List<ICommand> Commands { get; }
+        public List<ICommand> Commands { get; } = new List<ICommand>();
 
         public bool TryGetCommand(string name, out ICommand cmd)
         {
-            if (commandAliases.TryGetValue(name, out var alias))
-                name = alias;
+            if (commandAliases.TryGetValue(name.ToLower(), out var alias))
+                name = alias.ToLower();
 
-            return commands.TryGetValue(name, out cmd);
+            return commands.TryGetValue(name.ToLower(), out cmd);
         }
 
         public bool RegisterCommand(ICommand command)
         {
-            var infos = command.GetType().GetCustomAttribute<CommandInformations>();
-
-            if (infos == null) 
+            if (string.IsNullOrWhiteSpace(command.Name))
                 return false;
 
-            if (string.IsNullOrWhiteSpace(infos.Name))
-                return false;
+            commands.Add(command.Name.ToLower(), command);
 
-            commands.Add(infos.Name, command);
-
-            if (infos.Aliases != null)
-                foreach (var alias in infos.Aliases)
+            if (command.Aliases != null)
+                foreach (var alias in command.Aliases)
                     if (!string.IsNullOrWhiteSpace(alias))
-                        commandAliases.Add(alias, infos.Name);
+                        commandAliases.Add(alias.ToLower(), command.Name.ToLower());
 
             return true;
         }

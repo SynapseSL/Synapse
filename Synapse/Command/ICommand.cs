@@ -97,10 +97,10 @@ namespace Synapse.Command
                 OnCommand = command.Execute,
                 Name = cmdInf.Name,
                 Aliases = cmdInf.Aliases,
-                Permission = cmdInf.Permission,
+                Permission = cmdInf.Permission??"",
                 Usage = cmdInf.Usage,
-                Description = cmdInf.Description,
-                Platforms = cmdInf.Platforms
+                Description = cmdInf.Description??"",
+                Platforms = cmdInf.Platforms??new []{Platform.RemoteAdmin, Platform.ServerConsole}
             };
         }
     }
