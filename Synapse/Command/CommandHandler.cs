@@ -38,7 +38,5 @@ namespace Synapse.Command
 
             return true;
         }
-
-        public event Action<ICommandHandler> ReloadCommandHandlerEvent;
     }
 }

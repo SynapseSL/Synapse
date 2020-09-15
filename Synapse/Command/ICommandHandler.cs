@@ -10,7 +10,5 @@ namespace Synapse.Command
         bool TryGetCommand(string name, out ICommand cmd);
 
         bool RegisterCommand(ICommand command);
-
-        event Action<ICommandHandler> ReloadCommandHandlerEvent;
     }
 }
