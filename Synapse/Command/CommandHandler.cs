@@ -26,6 +26,9 @@ namespace Synapse.Command
         {
             var infos = command.GetType().GetCustomAttribute<CommandInformations>();
 
+            if (infos == null) 
+                return false;
+
             if (string.IsNullOrWhiteSpace(infos.Name))
                 return false;
 
