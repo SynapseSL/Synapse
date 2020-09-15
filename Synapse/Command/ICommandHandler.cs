@@ -11,8 +11,6 @@ namespace Synapse.Command
 
         bool RegisterCommand(ICommand command);
 
-        void Reload();
-
         event Action<ICommandHandler> ReloadCommandHandlerEvent;
     }
 }

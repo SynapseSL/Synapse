@@ -9,12 +9,6 @@
         public CommandHandler ClientCommandHandler { get; } = new CommandHandler();
 
         public CommandHandler ServerConsoleHandler { get; } = new CommandHandler();
-
-        public void ReloadAll()
-        {
-            RemoteAdminHandler.Reload();
-            ClientCommandHandler.Reload();
-            ServerConsoleHandler.Reload();
-        }
+        
     }
 }

@@ -38,6 +38,12 @@ namespace Synapse.Command
             get;
             set;
         }
+
+        Platform[] Platforms
+        {
+            get;
+            set;
+        }
     }
 
     public class CommandContext
@@ -79,6 +85,8 @@ namespace Synapse.Command
         public string Permission { get; set; }
         public string Usage { get; set; }
         public string Description { get; set; }
+        
+        public Platform[] Platforms { get; set; }
 
         public static GeneratedCommand FromSynapseCommand(ISynapseCommand command)
         {
@@ -91,7 +99,8 @@ namespace Synapse.Command
                 Aliases = cmdInf.Aliases,
                 Permission = cmdInf.Permission,
                 Usage = cmdInf.Usage,
-                Description = cmdInf.Description
+                Description = cmdInf.Description,
+                Platforms = cmdInf.Platforms
             };
         }
     }
