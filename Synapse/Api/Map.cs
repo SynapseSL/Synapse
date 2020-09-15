@@ -1,6 +1,4 @@
-﻿
-using Harmony;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -19,6 +17,22 @@ namespace Synapse.Api
         public List<Door> Doors { get; } = new List<Door>();
 
         public List<Room> Rooms { get; } = new List<Room>();
+
+        public string IntercomText
+        {
+            get => Server.Get.Host.GetComponent<Intercom>().CustomContent;
+            set
+            {
+                var component = Server.Get.Host.GetComponent<Intercom>();
+                if (string.IsNullOrEmpty(value))
+                {
+                    component.CustomContent = null;
+                    return;
+                }
+
+                component.CustomContent = value;
+            }
+        }
 
         public Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "") 
             => new Dummy(pos, rot, role, name, badgetext, badgecolor);

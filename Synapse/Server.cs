@@ -56,6 +56,14 @@ namespace Synapse
             }
         }
 
+        public bool FF
+        {
+            get => ServerConsole.FriendlyFire;
+            set => ServerConsole.FriendlyFire = value;
+        }
+
+
+
         public List<TObject> GetObjectsOf<TObject>() where TObject : UnityEngine.Object => UnityEngine.Object.FindObjectsOfType<TObject>().ToList();
 
         public TObject GetObjectOf<TObject>() where TObject : UnityEngine.Object => UnityEngine.Object.FindObjectOfType<TObject>();
