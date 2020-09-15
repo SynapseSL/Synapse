@@ -22,36 +22,30 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 //Event vars
                 var player = __instance.GetPlayer();
                 var spawnRole = player.Role;
-                var cuffedRole = RoleType.None;
+                var cufferRole = RoleType.None;
                 var allow = true;
                 var isCuffed = false;
 
                 //Cuff Check
                 var flag = false;
-                var component = __instance.GetComponent<Handcuffs>();
-                if (component.CufferId >= 0)
+                if (player.Cuffer != null)
                 {
-                    var component2 = component.GetCuffer(component.CufferId).GetComponent<CharacterClassManager>();
-
-                    cuffedRole = component2.NetworkCurClass;
+                    cufferRole = player.Cuffer.Role;
                     isCuffed = true;
 
                     if (ConfigFile.ServerConfig.GetBool("cuffed_escapee_change_team", true))
-                    {
                         switch (__instance.CurClass)
                         {
-                            case RoleType.Scientist when (component2.CurClass == RoleType.ChaosInsurgency || component2.CurClass == RoleType.ClassD):
-                            case RoleType.ClassD when (component2.CurRole.team == Team.MTF || component2.CurClass == RoleType.Scientist):
+                            case RoleType.Scientist when (cufferRole == RoleType.ChaosInsurgency || cufferRole == RoleType.ClassD):
+                            case RoleType.ClassD when (player.Cuffer.Team == Team.MTF || cufferRole == RoleType.Scientist):
                                 flag = true;
                                 break;
                         }
-                    }
                 }
 
                 //TeamCheck
                 var singleton = Respawning.RespawnTickets.Singleton;
-                var team = __instance.CurRole.team;
-                switch (team)
+                switch (player.Team)
                 {
                     case Team.CDP when flag:
                         spawnRole = RoleType.NtfCadet;
@@ -66,13 +60,13 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 }
 
                 //PlayerEscapeEvent
-                SynapseController.Server.Events.Player.InvokePlayerEscapeEvent(player, ref spawnRole, cuffedRole, ref allow, isCuffed);
+                SynapseController.Server.Events.Player.InvokePlayerEscapeEvent(player, ref spawnRole, cufferRole, ref allow, isCuffed);
 
                 if (!allow) return false;
 
-                if (spawnRole == RoleType.None || spawnRole == __instance.NetworkCurClass) return false;
-                __instance.SetPlayersClass(spawnRole, __instance.gameObject, false, true);
-                switch (__instance.CurRole.team)
+                if (spawnRole == RoleType.None || spawnRole == player.Role) return false;
+                player.ClassManager.SetPlayersClass(spawnRole, __instance.gameObject, false, true);
+                switch (player.Team)
                 {
                     case Team.MTF:
                         RoundSummary.escaped_scientists++;

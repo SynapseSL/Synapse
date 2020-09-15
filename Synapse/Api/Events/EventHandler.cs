@@ -29,6 +29,8 @@ namespace Synapse.Api.Events
             ev.Player.Broadcast(conf.JoinMessagesDuration, conf.JoinBroadcast);
             ev.Player.Broadcast(conf.JoinMessagesDuration, conf.JoinTextHint);
         }
+
+        //TODO: Invoke Sync Event to check other Roles for escaping
         #endregion
     }
 }
