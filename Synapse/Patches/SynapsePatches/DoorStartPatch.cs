@@ -1,4 +1,6 @@
 ﻿using Harmony;
+using Synapse.Api;
+using System.Linq;
 
 namespace Synapse.Patches.SynapsePatches
 {
@@ -7,8 +9,8 @@ namespace Synapse.Patches.SynapsePatches
     {
         private static void Postfix(Door __instance)
         {
-            while (SynapseController.Server.Map.Doors.Contains(null))
-                SynapseController.Server.Map.Doors.Remove(null);
+            while (Map.Get.Doors.Select(x => x.GameObject).Contains(null))
+                Map.Get.Doors.Remove(Map.Get.Doors.FirstOrDefault(x => x.GameObject == null));
 
             SynapseController.Server.Map.Doors.Add(new Api.Door(__instance));
         }
