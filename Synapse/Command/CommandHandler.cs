@@ -25,7 +25,7 @@ namespace Synapse.Command
 
         public bool RegisterCommand(ICommand command)
         {
-            var infos = System.Type.GetTypeArray(new object[] { command }).FirstOrDefault().GetCustomAttribute<CommandInformations>();
+            var infos = command.GetType().GetCustomAttribute<CommandInformations>();
 
             if (string.IsNullOrWhiteSpace(infos.Name))
                 return false;
