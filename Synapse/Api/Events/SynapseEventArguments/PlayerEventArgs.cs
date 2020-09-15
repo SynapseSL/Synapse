@@ -103,7 +103,8 @@ namespace Synapse.Api.Events.SynapseEventArguments
     public enum ItemUseState
     {
         Initiating,
-        Finalizing
+        Finalizing,
+        Stopping
     }
 
     public class PlayerHealEventArgs : EventHandler.ISynapseEventArgs

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using GameCore;
 using Harmony;
 using Synapse.Api.Events;
@@ -44,7 +45,14 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         [SuppressMessage("ReSharper", "InconsistentNaming")]
         public static void Postfix(ConsumableAndWearableItems __instance)
         {
-            PlayerBasicItemUsePatch.HealCache.Remove(__instance.GetPlayer().PlayerId);
+            
+            if (PlayerBasicItemUsePatch.HealCache.ContainsKey(__instance.GetPlayer().PlayerId))
+            {
+                var cached = PlayerBasicItemUsePatch.HealCache[__instance.GetPlayer().PlayerId];
+                var allow = true;
+                SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(__instance.GetPlayer(), __instance._hub.inventory.curItem, ItemUseState.Stopping, ref allow);
+                PlayerBasicItemUsePatch.HealCache.Remove(__instance.GetPlayer().PlayerId);
+            }
         }
     }
 }
