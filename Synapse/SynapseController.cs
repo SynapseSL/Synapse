@@ -1,4 +1,5 @@
 ﻿using System;
+using CommandSystem.Commands;
 using Harmony;
 using Synapse.Api.Plugin;
 using Synapse.Command;
@@ -26,6 +27,7 @@ public class SynapseController
     internal SynapseController()
     {
         CustomNetworkManager.Modded = true;
+        BuildInfoCommand.ModDescription = "A heavily modded server software using extensive runtime patching to make development faster and the usage more accessible to end-users";
         
         PatchMethods();
         Server.Configs.Init();

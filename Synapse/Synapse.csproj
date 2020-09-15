@@ -82,6 +82,7 @@
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerLeavePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSpeakPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\WaitingForPlayersPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\CommandPatches.cs" />
     <Compile Include="Patches\SynapsePatches\ComponentPatch.cs" />
     <Compile Include="Patches\SynapsePatches\DoorStartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ElevatorStartPatch.cs" />
