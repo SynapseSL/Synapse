@@ -34,7 +34,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     isCuffed = true;
 
                     if (ConfigFile.ServerConfig.GetBool("cuffed_escapee_change_team", true))
-                        switch (__instance.CurClass)
+                        switch (player.Role)
                         {
                             case RoleType.Scientist when (cufferRole == RoleType.ChaosInsurgency || cufferRole == RoleType.ClassD):
                             case RoleType.ClassD when (player.Cuffer.Team == Team.MTF || cufferRole == RoleType.Scientist):
@@ -65,7 +65,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 if (!allow) return false;
 
                 if (spawnRole == RoleType.None || spawnRole == player.Role) return false;
-                player.ClassManager.SetPlayersClass(spawnRole, __instance.gameObject, false, true);
+                player.ClassManager.SetPlayersClass(spawnRole, player.gameObject, false, true);
                 switch (player.Team)
                 {
                     case Team.MTF:

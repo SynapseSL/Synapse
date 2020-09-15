@@ -26,8 +26,6 @@ public static class SynapseExtensions
 
     public static List<Player> GetPlayers(this Fraction[] fractions) => SynapseController.Server.Players.Where(x => fractions.Any(y => x.Fraction == y)).ToList();
 
-    public static CommandSender CommandSender(this ICommandSender sender) => sender as CommandSender;
-
     public static void RaMessage(this CommandSender sender, string message, bool success = true,
             RaCategory type = RaCategory.None)
     {
