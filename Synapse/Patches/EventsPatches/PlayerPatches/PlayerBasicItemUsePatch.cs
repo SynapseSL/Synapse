@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using GameCore;
 using Harmony;
 using Synapse.Api.Events;
 using Synapse.Api.Events.SynapseEventArguments;
 
+// ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
     [HarmonyPatch(typeof(ConsumableAndWearableItems), nameof(ConsumableAndWearableItems.UseMedicalItem))]
@@ -39,6 +41,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     [HarmonyPatch(typeof(ConsumableAndWearableItems), nameof(ConsumableAndWearableItems.CallCmdCancelMedicalItem))]
     public class CancelBasicItemUse
     {
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
         public static void Postfix(ConsumableAndWearableItems __instance)
         {
             PlayerBasicItemUsePatch.HealCache.Remove(__instance.GetPlayer().PlayerId);

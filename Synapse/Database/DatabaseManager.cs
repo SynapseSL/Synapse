@@ -1,11 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
-using System.Threading;
 using LiteDB;
-using Synapse.Config;
 
 namespace Synapse.Database
 {
@@ -37,6 +34,8 @@ namespace Synapse.Database
         }
     }
 
+    [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class PlayerDbo : IDatabaseEntity
     {
         public int Id { get; set; } 

@@ -3,6 +3,7 @@ using GameCore;
 using Harmony;
 using UnityEngine;
 
+// ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
     [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.CallCmdRegisterEscape))]

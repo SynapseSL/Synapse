@@ -3,6 +3,7 @@ using Harmony;
 using Synapse.Api;
 using UnityEngine;
 
+// ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
     [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.HurtPlayer))]

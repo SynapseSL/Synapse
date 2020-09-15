@@ -3,6 +3,7 @@ using RemoteAdmin;
 using System;
 using Logger = Synapse.Api.Logger;
 
+// ReSharper disable All
 namespace Synapse.Patches.SynapsePatches
 {
     [HarmonyPatch(typeof(GameCore.Console),nameof(GameCore.Console.TypeCommand))]

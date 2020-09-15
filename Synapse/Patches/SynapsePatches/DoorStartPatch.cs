@@ -2,6 +2,7 @@
 using Synapse.Api;
 using System.Linq;
 
+// ReSharper disable All
 namespace Synapse.Patches.SynapsePatches
 {
     [HarmonyPatch(typeof(Door), nameof(Door.Start))]

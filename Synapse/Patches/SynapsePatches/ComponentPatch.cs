@@ -2,6 +2,7 @@
 using Harmony;
 using Synapse.Api;
 
+// ReSharper disable All
 namespace Synapse.Patches.SynapsePatches
 {
     [HarmonyPatch(typeof(ReferenceHub), nameof(ReferenceHub.LoadComponents))]

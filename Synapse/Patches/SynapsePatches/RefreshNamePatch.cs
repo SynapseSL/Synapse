@@ -1,5 +1,6 @@
 ﻿using Harmony;
 
+// ReSharper disable All
 namespace Synapse.Patches.SynapsePatches
 {
     [HarmonyPatch(typeof(ServerConsole), nameof(ServerConsole.ReloadServerName))]

@@ -4,6 +4,7 @@ using GameCore;
 using Harmony;
 using Synapse.Api;
 
+// ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
     [HarmonyPatch(typeof(DissonanceUserSetup), nameof(DissonanceUserSetup.CallCmdAltIsActive))]

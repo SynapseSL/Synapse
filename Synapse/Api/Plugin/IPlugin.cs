@@ -18,7 +18,7 @@ namespace Synapse.Api.Plugin
 
     public abstract class AbstractPlugin : IPlugin
     {
-        private string pluginDirectory;
+        private string _pluginDirectory;
 
         public virtual void Load()
         {  
@@ -36,15 +36,15 @@ namespace Synapse.Api.Plugin
         {
             get
             {
-                if (pluginDirectory == null)
+                if (_pluginDirectory == null)
                     return null;
 
-                if (!Directory.Exists(pluginDirectory))
-                    Directory.CreateDirectory(pluginDirectory);
+                if (!Directory.Exists(_pluginDirectory))
+                    Directory.CreateDirectory(_pluginDirectory);
 
-                return pluginDirectory;
+                return _pluginDirectory;
             }
-            set => pluginDirectory = value;
+            set => _pluginDirectory = value;
         } 
     }
 }

@@ -2,6 +2,7 @@
 using Synapse.Api;
 using System.Linq;
 
+// ReSharper disable All
 namespace Synapse.Patches.SynapsePatches
 {
     [HarmonyPatch(typeof(Lift), nameof(Lift.Start))]

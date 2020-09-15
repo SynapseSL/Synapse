@@ -9,6 +9,7 @@ using UnityEngine;
 using Console = System.Console;
 using Object = UnityEngine.Object;
 
+// ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
 

@@ -4,6 +4,7 @@ using Harmony;
 using Synapse.Api;
 using UnityEngine;
 
+// ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
     [HarmonyPatch(typeof(BanPlayer), nameof(BanPlayer.BanUser), typeof(GameObject), typeof(int), typeof(string), typeof(string), typeof(bool))]

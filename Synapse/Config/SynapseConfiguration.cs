@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using Utf8Json.Internal.DoubleConversion;
 
 namespace Synapse.Config
 {
+    [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
+    [SuppressMessage("ReSharper", "ConvertToConstant.Global")]
     public class SynapseConfiguration : AbstractConfigSection
     {
         [Description("Enables or disables the embedded Database. Warning: Disabling this option can break plugins and is not recommended")]

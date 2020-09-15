@@ -1,7 +1,5 @@
 ﻿using Synapse.Api;
 using System;
-using System.Reflection;
-using Synapse.Api.Plugin;
 
 namespace Synapse.Command
 {

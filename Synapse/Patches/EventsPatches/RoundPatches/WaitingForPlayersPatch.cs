@@ -1,6 +1,7 @@
 ﻿using System;
 using Harmony;
 
+// ReSharper disable All
 namespace Synapse.Patches.EventsPatches.RoundPatches
 {
 

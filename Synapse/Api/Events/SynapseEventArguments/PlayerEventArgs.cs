@@ -1,7 +1,8 @@
-﻿﻿using Assets._Scripts.Dissonance;
- using Grenades;
- using UnityEngine;
+﻿using Assets._Scripts.Dissonance;
+using Grenades;
+using UnityEngine;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Synapse.Api.Events.SynapseEventArguments
 {
     public class PlayerJoinEventArgs: EventHandler.ISynapseEventArgs
@@ -15,7 +16,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
     {
         public Player Player { get; internal set; }
     }
-
+    
     public class PlayerBanEventArgs : EventHandler.ISynapseEventArgs
     {
         public bool Allow { get; set; } = true;

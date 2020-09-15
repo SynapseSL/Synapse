@@ -6,6 +6,7 @@ using Harmony;
 using Synapse.Config;
 using Synapse.Database;
 
+// ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
     [HarmonyPatch(typeof(NicknameSync), nameof(NicknameSync.UpdateNickname))]

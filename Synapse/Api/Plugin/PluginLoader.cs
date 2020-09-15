@@ -9,13 +9,13 @@ namespace Synapse.Api.Plugin
 {
     public class PluginLoader
     {
-        private List<IContextProcessor> Processors = new List<IContextProcessor> { new ConfigInjector()};
+        private readonly List<IContextProcessor> _processors = new List<IContextProcessor> { new ConfigInjector()};
 
-        private List<IPlugin> plugins = new List<IPlugin>();
+        private readonly List<IPlugin> _plugins = new List<IPlugin>();
 
-        private List<PluginLoadContext> Contexts = new List<PluginLoadContext>();
-        
-        public List<PluginInformations> Plugins { get; } = new List<PluginInformations>(); 
+        private readonly List<PluginLoadContext> _contexts = new List<PluginLoadContext>();
+
+        public readonly List<PluginInformations> PluginInformation = new List<PluginInformations>(); 
         
         internal void ActivatePlugins() 
         {
@@ -24,7 +24,7 @@ namespace Synapse.Api.Plugin
 
             var dictionary = new Dictionary<PluginInformations, KeyValuePair<Type, List<Type>>>();
             
-            Contexts.Clear();
+            _contexts.Clear();
 
             foreach(var pluginpath in paths)
             {
@@ -61,17 +61,17 @@ namespace Synapse.Api.Plugin
                     plugin.Informations = infoTypePair.Key;
                     plugin.Translation = new Translation(plugin.Informations);
                     plugin.PluginDirectory = SynapseController.Server.Files.GetPluginDirectory(plugin.Informations);
-                    Contexts.Add(new PluginLoadContext(plugin, infoTypePair.Value.Key, infoTypePair.Key, infoTypePair.Value.Value));
-                    plugins.Add(plugin);
-                    Plugins.Add(infoTypePair.Key);
+                    _contexts.Add(new PluginLoadContext(plugin, infoTypePair.Value.Key, infoTypePair.Key, infoTypePair.Value.Value));
+                    _plugins.Add(plugin);
+                    PluginInformation.Add(infoTypePair.Key);
                 }
                 catch(Exception e) 
                 {
                     SynapseController.Server.Logger.Error($"Synapse-Controller: Activation of {infoTypePair.Value.Key.Assembly.GetName().Name} failed!!\n{e}");
                 }
 
-            foreach (var context in Contexts) 
-                foreach (var processor in Processors) 
+            foreach (var context in _contexts) 
+                foreach (var processor in _processors) 
                     processor.Process(context);
 
             LoadPlugins();
@@ -79,7 +79,7 @@ namespace Synapse.Api.Plugin
 
         private void LoadPlugins()
         {
-            foreach (var plugin in plugins)
+            foreach (var plugin in _plugins)
                 try
                 {
                     plugin.Load();
@@ -94,12 +94,12 @@ namespace Synapse.Api.Plugin
         internal void ReloadConfigs()
         {
             var injector = new ConfigInjector();
-            foreach (var context in Contexts)
+            foreach (var context in _contexts)
             {
                 injector.Process(context);
             }
 
-            foreach (var plugin in plugins)
+            foreach (var plugin in _plugins)
                 try
                 {
                     plugin.Translation.ReloadTranslations();

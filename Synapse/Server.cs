@@ -1,8 +1,8 @@
 ﻿using Synapse.Api;
-using Synapse.Api.Events;
 using Synapse.Config;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using Logger = Synapse.Api.Logger;
@@ -56,6 +56,8 @@ namespace Synapse
             }
         }
 
+        [SuppressMessage("ReSharper", "UnusedMember.Global")]
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
         public bool FF
         {
             get => ServerConsole.FriendlyFire;
@@ -110,45 +112,45 @@ namespace Synapse
         public class FileLocations
         {
             //synapse
-            private string synapseDirectory;
+            private string _synapseDirectory;
             
             //database
-            private string databaseDirectory;
+            private string _databaseDirectory;
 
             //plugin
-            private string mainPluginDirectory;
-            private string pluginDirectory;
-            private string sharedpluginDirectory;
+            private string _mainPluginDirectory;
+            private string _pluginDirectory;
+            private string _sharedPluginDirectory;
 
             //config
-            private string mainConfigDirectory;
-            private string configDirectory;
-            private string sharedConfigDirectory;
+            private string _mainConfigDirectory;
+            private string _configDirectory;
+            private string _sharedConfigDirectory;
 
-            private string configFile;
+            private string _configFile;
             //Synapse
             public string SynapseDirectory
             {
                 get
                 {
-                    if (!Directory.Exists(synapseDirectory))
-                        Directory.CreateDirectory(synapseDirectory);
+                    if (!Directory.Exists(_synapseDirectory))
+                        Directory.CreateDirectory(_synapseDirectory);
 
-                    return synapseDirectory;
+                    return _synapseDirectory;
                 }
-                private set => synapseDirectory = value;
+                private set => _synapseDirectory = value;
             }
             
             public string DatabaseDirectory
             {
                 get
                 {
-                    if (!Directory.Exists(databaseDirectory))
-                        Directory.CreateDirectory(databaseDirectory);
+                    if (!Directory.Exists(_databaseDirectory))
+                        Directory.CreateDirectory(_databaseDirectory);
 
-                    return databaseDirectory;
+                    return _databaseDirectory;
                 }
-                private set => databaseDirectory = value;
+                private set => _databaseDirectory = value;
             }
             public string DatabaseFile { get => Path.Combine(DatabaseDirectory, "database.db"); }
             
@@ -157,34 +159,34 @@ namespace Synapse
             {
                 get
                 {
-                    if (!Directory.Exists(mainPluginDirectory))
-                        Directory.CreateDirectory(mainPluginDirectory);
+                    if (!Directory.Exists(_mainPluginDirectory))
+                        Directory.CreateDirectory(_mainPluginDirectory);
 
-                    return mainPluginDirectory;
+                    return _mainPluginDirectory;
                 }
-                private set => mainPluginDirectory = value;
+                private set => _mainPluginDirectory = value;
             }
             public string PluginDirectory
             {
                 get
                 {
-                    if (!Directory.Exists(pluginDirectory))
-                        Directory.CreateDirectory(pluginDirectory);
+                    if (!Directory.Exists(_pluginDirectory))
+                        Directory.CreateDirectory(_pluginDirectory);
 
-                    return pluginDirectory;
+                    return _pluginDirectory;
                 }
-                private set => pluginDirectory = value;
+                private set => _pluginDirectory = value;
             }
             public string SharedPluginDirectory
             {
                 get
                 {
-                    if (!Directory.Exists(sharedpluginDirectory))
-                        Directory.CreateDirectory(sharedpluginDirectory);
+                    if (!Directory.Exists(_sharedPluginDirectory))
+                        Directory.CreateDirectory(_sharedPluginDirectory);
 
-                    return sharedpluginDirectory;
+                    return _sharedPluginDirectory;
                 }
-                private set => sharedpluginDirectory = value;
+                private set => _sharedPluginDirectory = value;
             }
 
             //Config
@@ -192,46 +194,46 @@ namespace Synapse
             {
                 get
                 {
-                    if (!Directory.Exists(mainConfigDirectory))
-                        Directory.CreateDirectory(mainConfigDirectory);
+                    if (!Directory.Exists(_mainConfigDirectory))
+                        Directory.CreateDirectory(_mainConfigDirectory);
 
-                    return mainConfigDirectory;
+                    return _mainConfigDirectory;
                 }
-                private set => mainConfigDirectory = value;
+                private set => _mainConfigDirectory = value;
             }
             public string ConfigDirectory
             {
                 get
                 {
-                    if (!Directory.Exists(configDirectory))
-                        Directory.CreateDirectory(configDirectory);
+                    if (!Directory.Exists(_configDirectory))
+                        Directory.CreateDirectory(_configDirectory);
 
-                    return configDirectory;
+                    return _configDirectory;
                 }
-                private set => configDirectory = value;
+                private set => _configDirectory = value;
             }
             public string SharedConfigDirectory
             {
                 get
                 {
-                    if (!Directory.Exists(sharedConfigDirectory))
-                        Directory.CreateDirectory(sharedConfigDirectory);
+                    if (!Directory.Exists(_sharedConfigDirectory))
+                        Directory.CreateDirectory(_sharedConfigDirectory);
 
-                    return sharedConfigDirectory;
+                    return _sharedConfigDirectory;
                 }
-                private set => sharedConfigDirectory = value;
+                private set => _sharedConfigDirectory = value;
             }
 
             public string ConfigFile
             {
                 get
                 {
-                    if (!File.Exists(configFile))
-                        File.Create(configFile).Close();
+                    if (!File.Exists(_configFile))
+                        File.Create(_configFile).Close();
 
-                    return configFile;
+                    return _configFile;
                 }
-                internal set => configFile = value;
+                internal set => _configFile = value;
             }
 
 

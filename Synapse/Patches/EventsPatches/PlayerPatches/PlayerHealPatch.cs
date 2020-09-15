@@ -2,6 +2,7 @@
 using Harmony;
 using Synapse.Api.Events.SynapseEventArguments;
 
+// ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
     [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.HealHPAmount))]

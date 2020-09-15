@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,13 +17,13 @@ namespace Synapse.Config
 {
     public class SYML
     {
-        private string path;
+        private readonly string _path;
 
         public Dictionary<string, ConfigSection> Sections = new Dictionary<string, ConfigSection>();
         
         public SYML(string path)
         {
-            this.path = path;
+            this._path = path;
             if (!File.Exists(path))
             {
                 File.Create(path).Close();
@@ -31,7 +32,7 @@ namespace Synapse.Config
 
         public void Load()
         {
-            var text = File.ReadAllText(path);
+            var text = File.ReadAllText(_path);
             Sections = ParseString(text);
         }
 
@@ -71,7 +72,7 @@ namespace Synapse.Config
         public void Store()
         {
             var text = WriteSections(Sections);
-            File.WriteAllText(path, text);
+            File.WriteAllText(_path, text);
         }
         
         private static Dictionary<string,ConfigSection> ParseString(string str)
@@ -187,7 +188,6 @@ namespace Synapse.Config
                 throw;
             }
         }
-
         
         public string Import<T>(T t) where T: IConfigSection
         {
@@ -224,7 +224,7 @@ namespace Synapse.Config
      */
 	public class CommentGatheringTypeInspector : TypeInspectorSkeleton
 	{
-		private readonly ITypeInspector innerTypeDescriptor;
+		private readonly ITypeInspector _innerTypeDescriptor;
 		
 		public CommentGatheringTypeInspector(ITypeInspector innerTypeDescriptor)
 		{
@@ -233,82 +233,83 @@ namespace Synapse.Config
 				throw new ArgumentNullException("innerTypeDescriptor");
 			}
 			
-			this.innerTypeDescriptor = innerTypeDescriptor;
+			this._innerTypeDescriptor = innerTypeDescriptor;
 		}
 		
 		public override IEnumerable<IPropertyDescriptor> GetProperties(Type type, object container)
 		{
-			return innerTypeDescriptor
+			return _innerTypeDescriptor
 				.GetProperties(type, container)
 				.Select(d => new CommentsPropertyDescriptor(d));
 		}
 		
 		private sealed class CommentsPropertyDescriptor : IPropertyDescriptor
 		{
-			private readonly IPropertyDescriptor baseDescriptor;
+			private readonly IPropertyDescriptor _baseDescriptor;
 			
 			public CommentsPropertyDescriptor(IPropertyDescriptor baseDescriptor)
 			{
-				this.baseDescriptor = baseDescriptor;
+				this._baseDescriptor = baseDescriptor;
 				Name = baseDescriptor.Name;
 			}
 			
 			public string Name { get; set; }
 			
-			public Type Type { get { return baseDescriptor.Type; } }
+			public Type Type { get { return _baseDescriptor.Type; } }
 			
 			public Type TypeOverride
 			{
-				get { return baseDescriptor.TypeOverride; }
-				set { baseDescriptor.TypeOverride = value; }
+				get { return _baseDescriptor.TypeOverride; }
+				set { _baseDescriptor.TypeOverride = value; }
 			}
 			
 			public int Order { get; set; }
 			
 			public ScalarStyle ScalarStyle
 			{
-				get { return baseDescriptor.ScalarStyle; }
-				set { baseDescriptor.ScalarStyle = value; }
+				get { return _baseDescriptor.ScalarStyle; }
+				set { _baseDescriptor.ScalarStyle = value; }
 			}
 			
-			public bool CanWrite { get { return baseDescriptor.CanWrite; } }
+			public bool CanWrite { get { return _baseDescriptor.CanWrite; } }
 			
 			public void Write(object target, object value)
 			{
-				baseDescriptor.Write(target, value);
+				_baseDescriptor.Write(target, value);
 			}
 			
 			public T GetCustomAttribute<T>() where T : Attribute
 			{
-				return baseDescriptor.GetCustomAttribute<T>();
+				return _baseDescriptor.GetCustomAttribute<T>();
 			}
 			
+			[SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
 			public IObjectDescriptor Read(object target)
 			{
-				var description = baseDescriptor.GetCustomAttribute<DescriptionAttribute>();
+				var description = _baseDescriptor.GetCustomAttribute<DescriptionAttribute>();
 				return description != null
-					? new CommentsObjectDescriptor(baseDescriptor.Read(target), description.Description)
-					: baseDescriptor.Read(target);
+					? new CommentsObjectDescriptor(_baseDescriptor.Read(target), description.Description)
+					: _baseDescriptor.Read(target);
 			}
 		}
 	}
 
 	public sealed class CommentsObjectDescriptor : IObjectDescriptor
 	{
-		private readonly IObjectDescriptor innerDescriptor;
+		private readonly IObjectDescriptor _innerDescriptor;
 		
 		public CommentsObjectDescriptor(IObjectDescriptor innerDescriptor, string comment)
 		{
-			this.innerDescriptor = innerDescriptor;
+			this._innerDescriptor = innerDescriptor;
 			this.Comment = comment;
 		}
 		
 		public string Comment { get; private set; }
 		
-		public object Value { get { return innerDescriptor.Value; } }
-		public Type Type { get { return innerDescriptor.Type; } }
-		public Type StaticType { get { return innerDescriptor.StaticType; } }
-		public ScalarStyle ScalarStyle { get { return innerDescriptor.ScalarStyle; } }
+		public object Value { get { return _innerDescriptor.Value; } }
+		public Type Type { get { return _innerDescriptor.Type; } }
+		public Type StaticType { get { return _innerDescriptor.StaticType; } }
+		public ScalarStyle ScalarStyle { get { return _innerDescriptor.ScalarStyle; } }
 	}
 
 	public class CommentsObjectGraphVisitor : ChainedObjectGraphVisitor
