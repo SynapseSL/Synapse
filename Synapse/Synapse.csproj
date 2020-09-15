@@ -46,7 +46,7 @@
     </Reference>
     <Reference Include="Assembly-CSharp-Synapse_publicised, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Synapse_Dependencies\Assembly-CSharp-Synapse_publicised.dll</HintPath>
+      <HintPath>..\..\Synapse_Dependencies\Assembly-CSharp-Publicised.dll</HintPath>
     </Reference>
     <Reference Include="CommandSystem.Core, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\Dependencies\CommandSystem.Core.dll</HintPath>
