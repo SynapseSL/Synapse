@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using FieldAttributes = dnlib.DotNet.FieldAttributes;
+using MethodAttributes = dnlib.DotNet.MethodAttributes;
+using TypeAttributes = dnlib.DotNet.TypeAttributes;
 
 namespace SynapseInjector
 {
@@ -25,7 +30,7 @@ namespace SynapseInjector
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                Thread.Sleep(10000);
+                Thread.Sleep(100000000);
             }
 
             Thread.Sleep(2000);
@@ -45,6 +50,29 @@ namespace SynapseInjector
                 
             InjectLoader(loadModule, loader);
             StoreModule(loadModule);
+            Publicise(loadModule);
+        }
+
+        private static void Publicise(ModuleDef md)
+        {
+            var types = md.Assembly.ManifestModule.Types.ToList();
+            var nested = new List<TypeDef>();
+            foreach (var type in types)
+            {
+                type.Attributes = type.IsNested ? TypeAttributes.NestedPublic : TypeAttributes.Public;
+                if (type.CustomAttributes.Find("System.Runtime.CompilerServices.CompilerGeneratedAttribute") != null) continue;
+                nested.AddRange(type.NestedTypes.ToList());
+            }
+            foreach (var def in nested)
+            {
+                if (def.CustomAttributes.Find("System.Runtime.CompilerServices.CompilerGeneratedAttribute") != null) continue;
+                def.Attributes = def.IsNested ? TypeAttributes.NestedPublic : TypeAttributes.Public;
+            }
+            types.AddRange(nested);
+            foreach (var def in types.SelectMany(t => t.Methods).Where(m => !m?.IsPublic ?? false)) def.Access = MethodAttributes.Public; 
+            foreach (var def in types.SelectMany(t => t.Fields).Where(f => !f?.IsPublic ?? false)) def.Access = FieldAttributes.Public;
+            md.Write("./Delivery/Assembly-CSharp-Publicized.dll");
+            Console.WriteLine("Wrote Assembly-CSharp-Publicized.dll to Delivery directory");
         }
 
         private static ModuleDef LoadAssemblyCSharp(string path)
