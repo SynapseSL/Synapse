@@ -28,7 +28,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 HealCache.Add(__instance.GetPlayer().PlayerId, t);
                 
                 var allow = true;
-                SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(__instance.GetPlayer(), __instance._hub.inventory.curItem, ItemUseState.Initiating, ref allow);
+                SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(__instance.GetPlayer(), __instance._hub.inventory.curItem, ItemInteractState.Initiating, ref allow);
                 return allow;
             }
             catch (Exception e)
@@ -50,7 +50,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             {
                 var cached = PlayerBasicItemUsePatch.HealCache[__instance.GetPlayer().PlayerId];
                 var allow = true;
-                SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(__instance.GetPlayer(), __instance._hub.inventory.curItem, ItemUseState.Stopping, ref allow);
+                SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(__instance.GetPlayer(), __instance._hub.inventory.curItem, ItemInteractState.Stopping, ref allow);
                 PlayerBasicItemUsePatch.HealCache.Remove(__instance.GetPlayer().PlayerId);
             }
         }

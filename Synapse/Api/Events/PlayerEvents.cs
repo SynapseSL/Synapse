@@ -23,7 +23,7 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<LoadComponentEventArgs> LoadComponentsEvent;
 
-        public event EventHandler.OnSynapseEvent<PlayerItemUseEventArgs> PlayerItemUseEvent;
+        public event EventHandler.OnSynapseEvent<PlayerItemInteractEventArgs> PlayerItemUseEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerThrowGrenadeEventArgs> PlayerThrowGrenadeEvent;
 
@@ -94,9 +94,9 @@ namespace Synapse.Api.Events
             LoadComponentsEvent?.Invoke(ev);
         }
 
-        internal void InvokePlayerItemUseEvent(Player player, ItemType type, ItemUseState state, ref bool allow)
+        internal void InvokePlayerItemUseEvent(Player player, ItemType type, ItemInteractState state, ref bool allow)
         {
-            var ev = new PlayerItemUseEventArgs { Player = player, Type = type, Allow = allow, CurrentItem = player.ItemInHand, State = state };
+            var ev = new PlayerItemInteractEventArgs { Player = player, Type = type, Allow = allow, CurrentItem = player.ItemInHand, State = state };
             PlayerItemUseEvent?.Invoke(ev);
         }
         
