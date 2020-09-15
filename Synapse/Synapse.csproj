@@ -34,60 +34,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Api\Door.cs" />
-    <Compile Include="Api\Dummy.cs" />
-    <Compile Include="Api\Elevator.cs" />
-    <Compile Include="Api\Enum\Effect.cs" />
-    <Compile Include="Api\Enum\RaCategory.cs" />
-    <Compile Include="Api\Enum\ZoneType.cs" />
-    <Compile Include="Api\Events\EventHandler.cs" />
-    <Compile Include="Api\Events\PlayerEvents.cs" />
-    <Compile Include="Api\Events\RoundEvents.cs" />
-    <Compile Include="Api\Events\ServerEvents.cs" />
-    <Compile Include="Api\Events\SynapseEventArguments\PlayerEventArgs.cs" />
-    <Compile Include="Api\Logger.cs" />
-    <Compile Include="Api\Map.cs" />
-    <Compile Include="Api\MapPoint.cs" />
-    <Compile Include="Api\MetaAttributes.cs" />
-    <Compile Include="Api\Player.cs" />
-    <Compile Include="Api\Plugin\Config.cs" />
-    <Compile Include="Api\Plugin\IPlugin.cs" />
-    <Compile Include="Api\Plugin\PluginInformations.cs" />
-    <Compile Include="Api\Plugin\PluginLoader.cs" />
-    <Compile Include="Api\Plugin\Processors\ConfigInjector.cs" />
-    <Compile Include="Api\Plugin\Translation.cs" />
-    <Compile Include="Api\Room.cs" />
-    <Compile Include="Api\Scp079Controller.cs" />
-    <Compile Include="Api\Scp106Controller.cs" />
-    <Compile Include="Api\Tesla.cs" />
-    <Compile Include="Command\CommandInformations.cs" />
-    <Compile Include="Command\Handlers.cs" />
-    <Compile Include="Command\CommandHandler.cs" />
-    <Compile Include="Command\ICommand.cs" />
-    <Compile Include="Command\ICommandHandler.cs" />
-    <Compile Include="Config\ConfigHandler.cs" />
-    <Compile Include="Config\SYML.cs" />
-    <Compile Include="Config\SynapseConfiguration.cs" />
-    <Compile Include="Database\DatabaseManager.cs" />
-    <Compile Include="Database\Repository.cs" />
-    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerBanPatch.cs" />
-    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerBasicItemUsePatch.cs" />
-    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDamagePatch.cs" />
-    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerEscapePatch.cs" />
-    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerGrenadeThrowPatch.cs" />
-    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerHealPatch.cs" />
-    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerJoinPatch.cs" />
-    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerLeavePatch.cs" />
-    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSpeakPatch.cs" />
-    <Compile Include="Patches\EventsPatches\RoundPatches\WaitingForPlayersPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\ComponentPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\DoorStartPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\ElevatorStartPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\RefreshNamePatch.cs" />
-    <Compile Include="Patches\SynapsePatches\RoleChangeClassIdPatch.cs" />
-    <Compile Include="Server.cs" />
-    <Compile Include="SynapseController.cs" />
-    <Compile Include="SynapseExtensions.cs" />
+    <Compile Include="**\*.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony, Version=1.2.0.1, Culture=neutral, PublicKeyToken=null">
@@ -96,8 +43,9 @@
     <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\Dependencies\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp-Publicized">
-      <HintPath>..\..\Synapse_Dependencies\Assembly-CSharp-Publicized.dll</HintPath>
+    <Reference Include="Assembly-CSharp-Synapse_publicised, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Synapse_Dependencies\Assembly-CSharp-Publicised.dll</HintPath>
     </Reference>
     <Reference Include="LiteDB, Version=5.0.9.0, Culture=neutral, PublicKeyToken=4ee40123013c9f27, processorArchitecture=MSIL">
       <HintPath>..\packages\LiteDB.5.0.9\lib\net45\LiteDB.dll</HintPath>
