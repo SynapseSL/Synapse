@@ -1,7 +1,7 @@
 ﻿using System;
 using Harmony;
 using Synapse.Api.Plugin;
-using Synapse.Database;
+using Synapse.Command;
 
 public class SynapseController
 {
@@ -13,6 +13,8 @@ public class SynapseController
 
     public static PluginLoader PluginLoader { get; } = new PluginLoader();
 
+    public static Handlers CommandHandlers { get; } = new Handlers();
+
     public static void Init()
     {
         ServerConsole.AddLog("SynapseController has been invoked", ConsoleColor.Cyan);
@@ -23,7 +25,6 @@ public class SynapseController
 
     internal SynapseController()
     {
-
         CustomNetworkManager.Modded = true;
         
         PatchMethods();

@@ -138,6 +138,10 @@ namespace Synapse.Api
 
 
         //TODO: Permission Check Method
+        public bool HasPermission(string permission)
+        {
+            return true;
+        }
         #endregion
 
         #region Synapse Api Objects

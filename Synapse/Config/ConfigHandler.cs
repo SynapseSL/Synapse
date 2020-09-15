@@ -48,6 +48,7 @@ namespace Synapse.Config
         {
             _syml.Load();
             SynapseController.PluginLoader.ReloadConfigs();
+            SynapseController.CommandHandlers.ReloadAll();
             //TODO: Permission Reload
         }
         

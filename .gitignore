@@ -6,3 +6,4 @@ riderModule.iml
 .vs/
 .idea/
 *.user
+/Synapse/Api/Events/SynapseEvents.cs
