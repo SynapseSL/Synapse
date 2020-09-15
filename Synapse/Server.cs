@@ -62,6 +62,8 @@ namespace Synapse
 
         public List<Player> Players => PlayerManager.players.ToList().Select(x => x.GetComponent<Player>()).ToList();
 
+        public List<Player> GetPlayers(Func<Player,bool> func) => Players.Where(func).ToList();
+
         public Player GetPlayer(string argument)
         {
             var players = Players;
