@@ -20,12 +20,10 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 
                 foreach(var player in SynapseController.Server.Players)
                 {
-                    bool trigger = true;
-
                     if (Vector3.Distance(Tesla.Position, player.Position) > Tesla.SizeOfTrigger || player.IsDead) 
                         continue;
 
-                    //TODO: Invoke Tesla Event Parameter: player,Tesla,trigger,hurtRange
+                    SynapseController.Server.Events.Map.InvokeTriggerTeslaEv(player, Tesla, hurtRange, out var trigger);
 
                     if (trigger) __result.Add(player.PlayerStats);
                 }
