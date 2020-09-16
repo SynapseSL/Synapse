@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 
 [assembly: AssemblyTitle("Synapse")]
-[assembly: AssemblyDescription("Der Synapse Loader")]
+[assembly: AssemblyDescription("Synapse-ModdingFramework")]
 [assembly: AssemblyCompany("Synapse-DevTeam")]
 [assembly: AssemblyProduct("Synapse")]
 [assembly: AssemblyCopyright("Copyright © Synapse-DevTeam 2020")]
