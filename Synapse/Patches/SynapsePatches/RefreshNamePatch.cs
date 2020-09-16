@@ -10,7 +10,7 @@ namespace Synapse.Patches.SynapsePatches
         {
             if (!Server.Get.Configs.SynapseConfiguration.NameTracking) return;
 
-            ServerConsole._serverName += $" <color=#00000000><size=1>Synapse-ModLoader {SynapseController.SynapseVersion}</size></color>";
+            ServerConsole._serverName += $" <color=#00000000><size=1>Synapse {SynapseController.SynapseVersion}</size></color>";
         }
     }
 }
