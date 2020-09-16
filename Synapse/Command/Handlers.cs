@@ -1,8 +1,12 @@
-﻿namespace Synapse.Command
+﻿using System.Collections.Generic;
+
+namespace Synapse.Command
 {
     public class Handlers
     {
         internal Handlers() { }
+
+        private static readonly List<ISynapseCommand> AwaitingFinalization = new List<ISynapseCommand>();
 
         public CommandHandler RemoteAdminHandler { get; } = new CommandHandler();
 
@@ -11,8 +15,14 @@
         public CommandHandler ServerConsoleHandler { get; } = new CommandHandler();
 
 
-        internal static void RegisterCommand(ISynapseCommand iSynapseCommand)
+        internal static void RegisterCommand(ISynapseCommand iSynapseCommand, bool awaitPluginInitialisation)
         {
+            if (awaitPluginInitialisation)
+            {
+                AwaitingFinalization.Add(iSynapseCommand);
+                return;
+            }
+            
             var command = GeneratedCommand.FromSynapseCommand(iSynapseCommand);
             foreach (var platform in command.Platforms)
             {
@@ -29,6 +39,30 @@
                         break;
                 }
             }
+        }
+        
+        internal static void FinalizePluginsCommands()
+        {
+            foreach (var iSynapseCommand in AwaitingFinalization)
+            {
+                var command = GeneratedCommand.FromSynapseCommand(iSynapseCommand);
+                foreach (var platform in command.Platforms)
+                {
+                    switch (platform)
+                    {
+                        case Platform.ClientConsole:
+                            SynapseController.CommandHandlers.ClientCommandHandler.RegisterCommand(command);
+                            break;
+                        case Platform.RemoteAdmin:
+                            SynapseController.CommandHandlers.RemoteAdminHandler.RegisterCommand(command);
+                            break;
+                        case Platform.ServerConsole:
+                            SynapseController.CommandHandlers.ServerConsoleHandler.RegisterCommand(command);
+                            break;
+                    }
+                }
+            }
+            AwaitingFinalization.Clear();
         }
     }
 }

@@ -44,6 +44,8 @@ namespace Synapse.Database
         
         public string Name { get; set; }
         
+        public bool DoNotTrack { get; set; }
+        
         public Dictionary<string,string> Data { get; set; } 
         
         public int GetId()

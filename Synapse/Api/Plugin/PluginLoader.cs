@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Synapse.Api.Plugin.Processors;
+using Synapse.Command;
 
 namespace Synapse.Api.Plugin
 {
@@ -75,6 +76,7 @@ namespace Synapse.Api.Plugin
                     processor.Process(context);
 
             LoadPlugins();
+            Handlers.FinalizePluginsCommands();
         }
 
         private void LoadPlugins()
