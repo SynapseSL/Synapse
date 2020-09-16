@@ -72,13 +72,13 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public GameObject Player { get; internal set; }
     }
     
-    public class PlayerItemUseEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerItemInteractEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Player { get; internal set; }
         
         public ItemType Type { get; internal set; }
         
-        public ItemUseState State { get; internal set; }
+        public ItemInteractState State { get; internal set; }
         
         public Inventory.SyncItemInfo CurrentItem { get; internal set; }
         
@@ -100,7 +100,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; }
     }
     
-    public enum ItemUseState
+    public enum ItemInteractState
     {
         Initiating,
         Finalizing,

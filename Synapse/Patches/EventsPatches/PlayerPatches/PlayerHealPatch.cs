@@ -21,7 +21,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     PlayerBasicItemUsePatch.HealCache.Remove(player.PlayerId);
                     
                     var ignoredAllow = true;
-                    SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(player, item, ItemUseState.Finalizing, ref ignoredAllow);
+                    SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(player, item, ItemInteractState.Finalizing, ref ignoredAllow);
 
                     if (item == ItemType.SCP268)
                     {
