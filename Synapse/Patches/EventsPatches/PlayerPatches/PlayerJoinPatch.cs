@@ -27,6 +27,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                         {
                             GameIdentifier = player.UserId,
                             Name = player.DisplayName,
+                            DoNotTrack = player.DoNotTrack,
                             Data = new Dictionary<string, string>()
                         };
                         DatabaseManager.PlayerRepository.Insert(dbo);
@@ -35,6 +36,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     {
                         var dbo = DatabaseManager.PlayerRepository.FindByGameId(player.UserId);
                         dbo.Name = player.DisplayName;
+                        dbo.DoNotTrack = player.DoNotTrack;
                         DatabaseManager.PlayerRepository.Save(dbo);
                     }
                 });

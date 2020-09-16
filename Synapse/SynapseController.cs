@@ -33,7 +33,7 @@ public class SynapseController
         PatchMethods();
         Server.Configs.Init();
         
-        Handlers.RegisterCommand(new SynapseHelpCommand());
+        Handlers.RegisterCommand(new SynapseHelpCommand(), false);
         
         PluginLoader.ActivatePlugins();
 

@@ -14,7 +14,7 @@ namespace Synapse.Api.Plugin.Processors
                 var inf = @class.GetCustomAttribute<CommandInformations>();
                 if (inf == null) continue;
                 var classObject = Activator.CreateInstance(@class);
-                Handlers.RegisterCommand(classObject as ISynapseCommand);
+                Handlers.RegisterCommand(classObject as ISynapseCommand, true);
             }
         }
     }
