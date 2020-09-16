@@ -41,10 +41,12 @@
     <Compile Include="Api\Enum\Effect.cs" />
     <Compile Include="Api\Enum\RaCategory.cs" />
     <Compile Include="Api\Enum\ZoneType.cs" />
+    <Compile Include="Api\Events\MapEvents.cs" />
     <Compile Include="Api\Events\EventHandler.cs" />
     <Compile Include="Api\Events\PlayerEvents.cs" />
     <Compile Include="Api\Events\RoundEvents.cs" />
     <Compile Include="Api\Events\ServerEvents.cs" />
+    <Compile Include="Api\Events\SynapseEventArguments\MapEventArgs.cs" />
     <Compile Include="Api\Events\SynapseEventArguments\PlayerEventArgs.cs" />
     <Compile Include="Api\Logger.cs" />
     <Compile Include="Api\Map.cs" />

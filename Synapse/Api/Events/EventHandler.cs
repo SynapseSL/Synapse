@@ -16,6 +16,8 @@ namespace Synapse.Api.Events
         public PlayerEvents Player { get; } = new PlayerEvents();
 
         public RoundEvents Round { get; } = new RoundEvents();
+
+        public MapEvents Map { get; } = new MapEvents();
         
         public interface ISynapseEventArgs
         {
