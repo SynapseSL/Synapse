@@ -46,6 +46,7 @@
     <Compile Include="Api\Events\RoundEvents.cs" />
     <Compile Include="Api\Events\ServerEvents.cs" />
     <Compile Include="Api\Events\SynapseEventArguments\PlayerEventArgs.cs" />
+    <Compile Include="Api\Events\SynapseEventArguments\ServerEventArgs.cs" />
     <Compile Include="Api\Logger.cs" />
     <Compile Include="Api\Map.cs" />
     <Compile Include="Api\MapPoint.cs" />
@@ -86,6 +87,7 @@
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerLeavePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSpeakPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\WaitingForPlayersPatch.cs" />
+    <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
     <Compile Include="Patches\SynapsePatches\CommandPatches.cs" />
     <Compile Include="Patches\SynapsePatches\ComponentPatch.cs" />
     <Compile Include="Patches\SynapsePatches\DoorStartPatch.cs" />
@@ -145,7 +147,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.
