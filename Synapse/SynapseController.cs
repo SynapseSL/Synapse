@@ -19,7 +19,7 @@ public class SynapseController
 
     public static void Init()
     {
-        ServerConsole.AddLog("SynapseController has been invoked", ConsoleColor.Cyan);
+        ServerConsole.AddLog("Welcome to Synapse! :)", ConsoleColor.Cyan);
         if (IsLoaded) return;
         IsLoaded = true;
         var synapse = new SynapseController();
