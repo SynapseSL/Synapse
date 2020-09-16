@@ -39,8 +39,6 @@ namespace Synapse.Api
 
         internal void RefreshObjects()
         {
-            SynapseController.Server.Logger.Info("Refresh Objects");
-
             Teslas.Clear();
             foreach (var tesla in SynapseController.Server.GetObjectsOf<TeslaGate>())
                 SynapseController.Server.Map.Teslas.Add(new Tesla(tesla));

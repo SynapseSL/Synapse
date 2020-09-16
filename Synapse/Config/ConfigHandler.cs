@@ -17,7 +17,6 @@ namespace Synapse.Config
             _syml.Load();
             SynapseConfiguration = new SynapseConfiguration();
             SynapseConfiguration = _syml.GetOrSetDefault("Synapse", SynapseConfiguration);
-            SynapseController.Server.Logger.Warn(SynapseConfiguration.ToString());
         }
 
         public T GetOrSetDefault<T>(string section, T defValue) where T : IConfigSection
