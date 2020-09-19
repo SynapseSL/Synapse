@@ -19,7 +19,7 @@ namespace SynapseInjector
             var dependencyAssemblies = new List<Assembly>();
             foreach (var depend in Directory.GetFiles(Path.Combine(synapse, "dependencies")))
             {
-                var assembly = Assembly.LoadFile(depend);
+                var assembly = Assembly.Load(File.ReadAllBytes(depend));
                 dependencyAssemblies.Add(assembly);
             };
 
