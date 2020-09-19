@@ -55,6 +55,9 @@ namespace Synapse.Api
                 set => Panel._leverStatus = value;
             }
 
+            //Is used by a Harmony Patch
+            public bool Locked { get; set; }
+
             public Transform Lever => Panel.lever;
         }
 
