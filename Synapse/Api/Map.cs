@@ -10,6 +10,12 @@ namespace Synapse.Api
 
         public static Map Get => Server.Get.Map;
 
+        public Nuke Nuke { get; } = new Nuke();
+
+        public Round Round { get; } = new Round();
+
+        public Decontamination Decontamination { get; } = new Decontamination();
+
         public List<Tesla> Teslas { get; } = new List<Tesla>();
 
         public List<Elevator> Elevators { get; } = new List<Elevator>();

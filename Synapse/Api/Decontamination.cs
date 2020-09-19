@@ -5,6 +5,8 @@ namespace Synapse.Api
 {
     public class Decontamination
     {
+        internal Decontamination() { }
+
         /// <summary>
         /// Gives you the Decontamination Controller
         /// </summary>

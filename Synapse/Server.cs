@@ -8,6 +8,7 @@ using System.Linq;
 using Logger = Synapse.Api.Logger;
 using EventHandler = Synapse.Api.Events.EventHandler;
 using Synapse.Api.Plugin;
+using GameCore;
 
 namespace Synapse
 {
