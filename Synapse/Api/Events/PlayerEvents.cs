@@ -29,7 +29,9 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<PlayerHealEventArgs> PlayerHealEvent;
 
-        public event EventHandler.OnSynapseEvent<PlayerEscapeEventArgs> PlayerEscapseEvent; 
+        public event EventHandler.OnSynapseEvent<PlayerEscapeEventArgs> PlayerEscapseEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerSyncDataEventArgs> PlayerSyncDataEvent;
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -121,6 +123,21 @@ namespace Synapse.Api.Events
                 SpawnRole = spawnRoleType
             };
             PlayerEscapseEvent?.Invoke(ev);
+        }
+
+        internal void InvokePlayerSyncDataEvent(Player player, out bool allow)
+        {
+            allow = true;
+            if (PlayerSyncDataEvent == null) return;
+
+            var ev = new PlayerSyncDataEventArgs
+            {
+                Player = player,
+            };
+
+            PlayerSyncDataEvent.Invoke(ev);
+
+            allow = ev.Allow;
         }
         #endregion
     }

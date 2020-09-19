@@ -81,7 +81,9 @@
     <Compile Include="Config\SynapseConfiguration.cs" />
     <Compile Include="Database\DatabaseManager.cs" />
     <Compile Include="Database\Repository.cs" />
+    <Compile Include="Patches\EventsPatches\MapPatches\DoorInteractPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\TriggerTeslaPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSyncDataPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerBanPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerBasicItemUsePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDamagePatch.cs" />

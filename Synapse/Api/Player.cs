@@ -19,6 +19,7 @@ namespace Synapse.Api
             Hub = GetComponent<ReferenceHub>();
             Scp106Controller = new Scp106Controller(this);
             Scp079Controller = new Scp079Controller(this);
+            Jail = new Jail(this);
         }
 
         #region Methods
@@ -121,8 +122,7 @@ namespace Synapse.Api
 
         public void ShakeScreen(bool achieve = false)
         {
-            //TODO: Implement APi to get warhead once
-            var component = SynapseController.Server.GetObjectOf<AlphaWarheadController>();
+            var component = AlphaWarheadController.Host;
             var writer = NetworkWriterPool.GetWriter();
             writer.WriteBoolean(achieve);
             var msg = new RpcMessage
@@ -145,7 +145,9 @@ namespace Synapse.Api
         #endregion
 
         #region Synapse Api Objects
-        //TODO:  Jail
+
+        public readonly Jail Jail;
+
         public readonly Scp106Controller Scp106Controller;
 
         public readonly Scp079Controller Scp079Controller;

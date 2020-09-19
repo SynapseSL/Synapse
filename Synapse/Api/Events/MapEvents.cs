@@ -8,6 +8,8 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<TriggerTeslaEventArgs> TriggerTeslaEvent;
 
+        public event EventHandler.OnSynapseEvent<DoorInteractEventArgs> DoorInteractEvent;
+
         #region Invoke
         internal void InvokeTriggerTeslaEv(Player player,Tesla tesla,bool hurtrange,out bool trigger)
         {
@@ -23,6 +25,22 @@ namespace Synapse.Api.Events
             TriggerTeslaEvent.Invoke(ev);
 
             trigger = ev.Trigger;
+        }
+
+        internal void InvokeDoorInteractEvent(Player player,Door door,ref bool allow)
+        {
+            if (DoorInteractEvent == null) return;
+
+            var ev = new DoorInteractEventArgs
+            {
+                Player = player,
+                Allow = allow,
+                Door = door
+            };
+
+            DoorInteractEvent.Invoke(ev);
+
+            allow = ev.Allow;
         }
         #endregion
     }

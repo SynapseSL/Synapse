@@ -128,4 +128,11 @@ namespace Synapse.Api.Events.SynapseEventArguments
         
         public bool IsCuffed { get; internal set; }
     }
+
+    public class PlayerSyncDataEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public bool Allow { get; set; } = true;
+    }
 }

@@ -15,7 +15,6 @@ namespace Synapse.Config
         [Description("Changes wether or not the instance should use a shared or a instance specific database")]
         public bool DatabaseShared = true;
         
-        //TODO: Implement RemoteKeyCard
         [Description("Enables or disables if the Player needs to equip his keycard to open a door")]
         public bool RemoteKeyCard = false;
 

@@ -10,4 +10,13 @@
 
         public bool Trigger { get; set; }
     }
+
+    public class DoorInteractEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public Door Door { get; internal set; }
+
+        public bool Allow { get; set; }
+    }
 }
