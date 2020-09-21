@@ -139,9 +139,18 @@ namespace Synapse.Api.Events.SynapseEventArguments
     public class PlayerReloadEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Player { get; internal set; }
-        
-        public bool Allow { get; set; }
+
+        public bool Allow { get; set; } = true;
         
         public Inventory.SyncItemInfo Item { get; internal set; }
+    }
+
+    public class PlayerEnterFemurEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public bool Allow { get; set; } = true;
+        
+        public bool CloseFemur { get; set; }
     }
 }

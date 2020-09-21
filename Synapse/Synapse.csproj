@@ -34,6 +34,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Api\Events\SynapseEventArguments\ScpEventArgs.cs" />
     <Compile Include="Api\Round.cs" />
     <Compile Include="Api\Jail.cs" />
     <Compile Include="Api\Nuke.cs" />
@@ -84,6 +85,7 @@
     <Compile Include="Patches\EventsPatches\MapPatches\DoorInteractPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\TriggerTeslaPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\WarheadDetonationPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerEnterFemurPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerReloadPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSyncDataPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerBanPatch.cs" />

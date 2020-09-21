@@ -33,7 +33,9 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<PlayerSyncDataEventArgs> PlayerSyncDataEvent;
 
-        public event EventHandler.OnSynapseEvent<PlayerReloadEventArgs> PlayerReloadEvent; 
+        public event EventHandler.OnSynapseEvent<PlayerReloadEventArgs> PlayerReloadEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerEnterFemurEventArgs> PlayerEnterFemurEvent; 
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -147,6 +149,15 @@ namespace Synapse.Api.Events
             PlayerReloadEvent?.Invoke(ev);
 
             allow = ev.Allow;
+        }
+
+        internal void InvokePlayerEnterFemurEvent(Player player, ref bool allow, ref bool closeFemur)
+        {
+            var ev = new PlayerEnterFemurEventArgs {Allow = allow, Player = player, CloseFemur = closeFemur};
+            PlayerEnterFemurEvent?.Invoke(ev);
+
+            allow = ev.Allow;
+            closeFemur = ev.CloseFemur;
         }
         #endregion
     }
