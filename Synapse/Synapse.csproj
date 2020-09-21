@@ -34,6 +34,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Api\Events\SynapseEventArguments\RoundEventArgs.cs" />
     <Compile Include="Api\Events\SynapseEventArguments\ScpEventArgs.cs" />
     <Compile Include="Api\Round.cs" />
     <Compile Include="Api\Jail.cs" />
@@ -97,6 +98,8 @@
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerJoinPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerLeavePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSpeakPatch.cs" />
+    <Compile Include="Patches\EventsPatches\RoundPatches\RoundCheckPatch.cs" />
+    <Compile Include="Patches\EventsPatches\RoundPatches\RoundStartPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\WaitingForPlayersPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\ConsoleCommandPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
