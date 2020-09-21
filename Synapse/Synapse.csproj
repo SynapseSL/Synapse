@@ -98,7 +98,9 @@
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerLeavePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSpeakPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\WaitingForPlayersPatch.cs" />
+    <Compile Include="Patches\EventsPatches\ServerPatches\ConsoleCommandPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
+    <Compile Include="Patches\EventsPatches\ServerPatches\RemoteAdminPatch.cs" />
     <Compile Include="Patches\SynapsePatches\NukeLockPatch.cs" />
     <Compile Include="Patches\SynapsePatches\CommandPatches.cs" />
     <Compile Include="Patches\SynapsePatches\ComponentPatch.cs" />
