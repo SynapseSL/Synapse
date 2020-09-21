@@ -32,6 +32,8 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<PlayerEscapeEventArgs> PlayerEscapseEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerSyncDataEventArgs> PlayerSyncDataEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerReloadEventArgs> PlayerReloadEvent; 
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -128,14 +130,21 @@ namespace Synapse.Api.Events
         internal void InvokePlayerSyncDataEvent(Player player, out bool allow)
         {
             allow = true;
-            if (PlayerSyncDataEvent == null) return;
 
             var ev = new PlayerSyncDataEventArgs
             {
                 Player = player,
             };
 
-            PlayerSyncDataEvent.Invoke(ev);
+            PlayerSyncDataEvent?.Invoke(ev);
+
+            allow = ev.Allow;
+        }
+
+        internal void InvokePlayerReloadEvent(Player player, ref bool allow, Inventory.SyncItemInfo syncItemInfo)
+        {
+            var ev = new PlayerReloadEventArgs {Allow = allow, Item = syncItemInfo,Player = player};
+            PlayerReloadEvent?.Invoke(ev);
 
             allow = ev.Allow;
         }

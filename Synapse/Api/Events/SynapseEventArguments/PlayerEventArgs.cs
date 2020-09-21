@@ -135,4 +135,13 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public bool Allow { get; set; } = true;
     }
+
+    public class PlayerReloadEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+        
+        public bool Allow { get; set; }
+        
+        public Inventory.SyncItemInfo Item { get; internal set; }
+    }
 }
