@@ -83,6 +83,7 @@
     <Compile Include="Database\Repository.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\DoorInteractPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\TriggerTeslaPatch.cs" />
+    <Compile Include="Patches\EventsPatches\MapPatches\WarheadDetonationPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSyncDataPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerBanPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerBasicItemUsePatch.cs" />
