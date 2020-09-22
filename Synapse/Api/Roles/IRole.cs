@@ -8,6 +8,8 @@ namespace Synapse.Api.Roles
 
         string GetRoleName();
 
+        int GetRoleID();
+
         Team GetTeam();
 
         List<Team> GetFriends();

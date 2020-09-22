@@ -21,7 +21,6 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 {
                     if (!(Vector3.Distance(player.Position, __instance._lureSpj.transform.position) <
                           1.97f)) continue;
-                    var component2 = gameObject.GetComponent<PlayerStats>();
                     if (player.RoleType == RoleType.Spectator || player.GodMode) continue;
                     var allow = player.Team != Team.SCP;
 

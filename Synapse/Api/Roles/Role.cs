@@ -4,9 +4,29 @@ namespace Synapse.Api.Roles
 {
     public abstract class Role : IRole
     {
-        public Player Player { get; set; }
+        private Player player;
+
+        public Player Player
+        {
+            get => player;
+            set
+            {
+                if (player == value)
+                    return;
+
+                if (player != null)
+                {
+                    player.CustomRole.DeSpawn();
+                    player.CustomRole = null;
+                }
+
+                player = value;
+            }
+        }
 
         public abstract string GetRoleName();
+
+        public abstract int GetRoleID();
 
         public abstract Team GetTeam();
 
