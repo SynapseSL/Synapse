@@ -9,6 +9,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     internal static class PlayerEnterFemurPatch
     {
         private static int FemurBrokePeople = 0;
+
         private static bool Prefix(CharacterClassManager __instance)
         {
             try
@@ -16,22 +17,20 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 if (!NetworkServer.active) return false;
                 if (!NonFacilityCompatibility.currentSceneSettings.enableStandardGamplayItems) return false;
 
-                foreach (var gameObject in PlayerManager.players)
+                foreach (var player in Server.Get.Players)
                 {
-                    if (!(Vector3.Distance(gameObject.transform.position, __instance._lureSpj.transform.position) <
+                    if (!(Vector3.Distance(player.Position, __instance._lureSpj.transform.position) <
                           1.97f)) continue;
-                    var component = gameObject.GetComponent<CharacterClassManager>();
                     var component2 = gameObject.GetComponent<PlayerStats>();
-                    if (component.CurClass == RoleType.Spectator || component.GodMode) continue;
-                    var allow = component.CurRole.team != Team.SCP;
+                    if (player.RoleType == RoleType.Spectator || player.GodMode) continue;
+                    var allow = player.Team != Team.SCP;
 
                     var closeFemur = FemurBrokePeople + 1 >= Server.Get.Configs.SynapseConfiguration.RequiredForFemur;
-                    var player = gameObject.GetPlayer();
 
                     SynapseController.Server.Events.Player.InvokePlayerEnterFemurEvent(player, ref allow, ref closeFemur);
 
                     if (!allow) return false;
-                    component2.HurtPlayer(new PlayerStats.HitInfo(10000f, "WORLD", DamageTypes.Lure, 0), gameObject);
+                    player.Hurt(10000, DamageTypes.Lure);
                     FemurBrokePeople++;
                     if (closeFemur) __instance._lureSpj.SetState(true);
                 }
