@@ -32,5 +32,8 @@ namespace Synapse.Config
 
         [Description("If Enabled your Server is marked as Synapse Server")]
         public bool NameTracking = true;
+
+        [Description("The Amount of pupils needed to contain Scp-106")]
+        public int RequiredForFemur = 1;
     }
 }
