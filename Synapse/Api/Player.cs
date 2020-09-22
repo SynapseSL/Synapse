@@ -6,6 +6,7 @@ using Mirror.LiteNetLib4Mirror;
 using RemoteAdmin;
 using Searching;
 using Synapse.Api.Enums;
+using Synapse.Api.Roles;
 using Synapse.Database;
 using Synapse.Patches.EventsPatches.PlayerPatches;
 using UnityEngine;
@@ -151,6 +152,22 @@ namespace Synapse.Api
         public readonly Scp106Controller Scp106Controller;
 
         public readonly Scp079Controller Scp079Controller;
+
+        private IRole role;
+
+        public IRole CustomRole
+        {
+            get => role;
+            set
+            {
+                role = value;
+                if (value == null)
+                    return;
+
+                role.Player = this;
+                role.Spawn();
+            }
+        }
         #endregion
 
         #region Default Stuff
@@ -269,7 +286,7 @@ namespace Synapse.Api
             set => PlayerStats.maxArtificialHealth = value;
         }
 
-        public RoleType Role
+        public RoleType RoleType
         {
             get => ClassManager.CurClass;
             set => ClassManager.SetPlayersClass(value, gameObject);
@@ -434,7 +451,7 @@ namespace Synapse.Api
 
         public Inventory.SyncItemInfo ItemInHand => Inventory.GetItemInHand();
 
-        public NetworkConnection Connection => QueryProcessor.connectionToClient;
+        public NetworkConnection Connection => ClassManager.Connection;
 
         public string IpAddress => QueryProcessor._ipAddress;
         #endregion

@@ -13,7 +13,7 @@
         private readonly Scp079PlayerScript script;
 
 
-        public bool Is079 => player.Role == RoleType.Scp079;
+        public bool Is079 => player.RoleType == RoleType.Scp079;
 
         public byte Level { get => script.Lvl; set => script.Lvl = value; }
 

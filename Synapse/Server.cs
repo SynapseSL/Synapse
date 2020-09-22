@@ -9,6 +9,7 @@ using Logger = Synapse.Api.Logger;
 using EventHandler = Synapse.Api.Events.EventHandler;
 using Synapse.Api.Plugin;
 using GameCore;
+using Synapse.Api.Roles;
 
 namespace Synapse
 {
@@ -22,6 +23,8 @@ namespace Synapse
         public Logger Logger { get; } = new Logger();
 
         public Map Map { get; } = new Map();
+
+        public RoleManager RoleManager { get; } = new RoleManager();
 
         public FileLocations Files { get; } = new FileLocations();
 

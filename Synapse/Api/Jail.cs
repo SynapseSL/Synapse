@@ -38,7 +38,7 @@ namespace Synapse.Api
             if (IsJailed) return;
 
             Admin = admin;
-            Role = Player.Role;
+            Role = Player.RoleType;
             Position = Player.Position;
 
             Items.Clear();
@@ -47,7 +47,7 @@ namespace Synapse.Api
 
             Health = Player.Health;
 
-            Player.Role = RoleType.Tutorial;
+            Player.RoleType = RoleType.Tutorial;
 
             IsJailed = true;
         }

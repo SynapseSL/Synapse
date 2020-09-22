@@ -40,8 +40,8 @@ namespace Synapse.Api.Events
 
         private void PlayerSyncData(SynapseEventArguments.PlayerSyncDataEventArgs ev)
         {
-            if (ev.Player.Role != RoleType.ClassD &&
-                ev.Player.Role != RoleType.Scientist &&
+            if (ev.Player.RoleType != RoleType.ClassD &&
+                ev.Player.RoleType != RoleType.Scientist &&
                 !(Vector3.Distance(ev.Player.Position, ev.Player.GetComponent<Escape>().worldPosition) >= Escape.radius))
                 ev.Player.ClassManager.CmdRegisterEscape();
         }

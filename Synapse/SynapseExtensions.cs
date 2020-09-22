@@ -14,13 +14,13 @@ public static class SynapseExtensions
 
     public static Player GetPlayer(this PlayableScps.PlayableScp scp) => scp.Hub.GetPlayer();
 
-    public static List<Player> GetPlayers(this RoleType role) => SynapseController.Server.Players.Where(x => x.Role == role).ToList();
+    public static List<Player> GetPlayers(this RoleType role) => SynapseController.Server.Players.Where(x => x.RoleType == role).ToList();
 
     public static List<Player> GetPlayers(this Team team) => SynapseController.Server.Players.Where(x => x.Team == team).ToList();
 
     public static List<Player> GetPlayers(this Fraction fraction) => SynapseController.Server.Players.Where(x => x.Fraction == fraction).ToList();
 
-    public static List<Player> GetPlayers(this RoleType[] roles) => SynapseController.Server.Players.Where(x => roles.Any(y => x.Role == y)).ToList();
+    public static List<Player> GetPlayers(this RoleType[] roles) => SynapseController.Server.Players.Where(x => roles.Any(y => x.RoleType == y)).ToList();
 
     public static List<Player> GetPlayers(this Team[] teams) => SynapseController.Server.Players.Where(x => teams.Any(y => x.Team == y)).ToList();
 

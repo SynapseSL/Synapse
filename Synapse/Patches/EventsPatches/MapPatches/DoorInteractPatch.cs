@@ -28,7 +28,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
                 if (doorId == null)
                     return false;
 
-                if (player.Role == RoleType.None || player.Role == RoleType.Spectator)
+                if (player.RoleType == RoleType.None || player.RoleType == RoleType.Spectator)
                     return false;
 
                 if (!doorId.TryGetComponent(out door))

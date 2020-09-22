@@ -34,6 +34,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Api\Items\Item.cs" />
+    <Compile Include="Api\Roles\RoleManager.cs" />
+    <Compile Include="Api\Roles\IRole.cs" />
+    <Compile Include="Api\Roles\Role.cs" />
     <Compile Include="Api\Round.cs" />
     <Compile Include="Api\Jail.cs" />
     <Compile Include="Api\Nuke.cs" />
@@ -152,6 +156,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.

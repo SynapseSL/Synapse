@@ -22,7 +22,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 //Event vars
                 var player = __instance.GetPlayer();
-                var spawnRole = player.Role;
+                var spawnRole = player.RoleType;
                 var cufferRole = RoleType.None;
                 var allow = true;
                 var isCuffed = false;
@@ -31,11 +31,11 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var flag = false;
                 if (player.Cuffer != null)
                 {
-                    cufferRole = player.Cuffer.Role;
+                    cufferRole = player.Cuffer.RoleType;
                     isCuffed = true;
 
                     if (ConfigFile.ServerConfig.GetBool("cuffed_escapee_change_team", true))
-                        switch (player.Role)
+                        switch (player.RoleType)
                         {
                             case RoleType.Scientist when (cufferRole == RoleType.ChaosInsurgency || cufferRole == RoleType.ClassD):
                             case RoleType.ClassD when (player.Cuffer.Team == Team.MTF || cufferRole == RoleType.Scientist):
@@ -65,7 +65,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 if (!allow) return false;
 
-                if (spawnRole == RoleType.None || spawnRole == player.Role) return false;
+                if (spawnRole == RoleType.None || spawnRole == player.RoleType) return false;
                 player.ClassManager.SetPlayersClass(spawnRole, player.gameObject, false, true);
                 switch (player.Team)
                 {
