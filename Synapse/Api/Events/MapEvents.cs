@@ -1,4 +1,5 @@
-﻿using Synapse.Api.Events.SynapseEventArguments;
+﻿using System;
+using Synapse.Api.Events.SynapseEventArguments;
 
 namespace Synapse.Api.Events
 {
@@ -7,6 +8,8 @@ namespace Synapse.Api.Events
         internal MapEvents() { }
 
         public event EventHandler.OnSynapseEvent<TriggerTeslaEventArgs> TriggerTeslaEvent;
+
+        public event Action WarheadDetonationEvent;
 
         public event EventHandler.OnSynapseEvent<DoorInteractEventArgs> DoorInteractEvent;
 
@@ -42,6 +45,9 @@ namespace Synapse.Api.Events
 
             allow = ev.Allow;
         }
+
+        internal void InvokeWarheadDetonationEvent() => WarheadDetonationEvent?.Invoke();
+
         #endregion
     }
 }

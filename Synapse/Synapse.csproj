@@ -38,6 +38,8 @@
     <Compile Include="Api\Roles\RoleManager.cs" />
     <Compile Include="Api\Roles\IRole.cs" />
     <Compile Include="Api\Roles\Role.cs" />
+    <Compile Include="Api\Events\SynapseEventArguments\RoundEventArgs.cs" />
+    <Compile Include="Api\Events\SynapseEventArguments\ScpEventArgs.cs" />
     <Compile Include="Api\Round.cs" />
     <Compile Include="Api\Jail.cs" />
     <Compile Include="Api\Nuke.cs" />
@@ -87,6 +89,9 @@
     <Compile Include="Database\Repository.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\DoorInteractPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\TriggerTeslaPatch.cs" />
+    <Compile Include="Patches\EventsPatches\MapPatches\WarheadDetonationPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerEnterFemurPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerReloadPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSyncDataPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerBanPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerBasicItemUsePatch.cs" />
@@ -97,8 +102,12 @@
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerJoinPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerLeavePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSpeakPatch.cs" />
+    <Compile Include="Patches\EventsPatches\RoundPatches\RoundCheckPatch.cs" />
+    <Compile Include="Patches\EventsPatches\RoundPatches\RoundStartPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\WaitingForPlayersPatch.cs" />
+    <Compile Include="Patches\EventsPatches\ServerPatches\ConsoleCommandPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
+    <Compile Include="Patches\EventsPatches\ServerPatches\RemoteAdminPatch.cs" />
     <Compile Include="Patches\SynapsePatches\NukeLockPatch.cs" />
     <Compile Include="Patches\SynapsePatches\CommandPatches.cs" />
     <Compile Include="Patches\SynapsePatches\ComponentPatch.cs" />

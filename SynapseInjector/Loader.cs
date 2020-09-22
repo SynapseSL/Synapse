@@ -54,7 +54,7 @@ namespace SynapseInjector
         /// Scan assembly for synapse main class
         /// and invoke the init method 
         /// </summary>
-        /// <param name="path">The path of the assembly</param>
+        /// <param name="assembly">The Assembly Object</param>
         private static void InvokeAssembly(Assembly assembly)
         {
             try
