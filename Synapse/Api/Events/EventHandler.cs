@@ -24,6 +24,8 @@ namespace Synapse.Api.Events
         public RoundEvents Round { get; } = new RoundEvents();
 
         public MapEvents Map { get; } = new MapEvents();
+
+        public ScpEvents Scp { get; } = new ScpEvents();
         
         public interface ISynapseEventArgs
         {

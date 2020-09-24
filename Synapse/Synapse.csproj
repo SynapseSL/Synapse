@@ -34,6 +34,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Api\Events\ScpEvents.cs" />
     <Compile Include="Api\Items\Item.cs" />
     <Compile Include="Api\Roles\RoleManager.cs" />
     <Compile Include="Api\Roles\IRole.cs" />
@@ -105,6 +106,7 @@
     <Compile Include="Patches\EventsPatches\RoundPatches\RoundCheckPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\RoundStartPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\WaitingForPlayersPatch.cs" />
+    <Compile Include="Patches\EventsPatches\ScpPatches\Scp096\Scp096TargetPatches.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\ConsoleCommandPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\RemoteAdminPatch.cs" />
