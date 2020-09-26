@@ -1,5 +1,4 @@
-﻿using Synapse.Patches.SynapsePatches;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,7 +6,9 @@ namespace Synapse.Api.Roles
 {
     public class RoleManager
     {
-        internal RoleManager()
+        internal RoleManager() { }
+
+        internal void Init()
         {
             //TODO: Generator,Scp106-Containment,PocketEnter,PocketLeave
             SynapseController.Server.Events.Player.PlayerEscapseEvent += OnEscape;

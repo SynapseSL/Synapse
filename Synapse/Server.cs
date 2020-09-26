@@ -24,11 +24,11 @@ namespace Synapse
 
         public Map Map { get; } = new Map();
 
-        public RoleManager RoleManager { get; } = new RoleManager();
-
         public FileLocations Files { get; } = new FileLocations();
 
         public EventHandler Events { get; } = new EventHandler();
+
+        public RoleManager RoleManager { get; } = new RoleManager();
 
         public ConfigHandler Configs { get; } = new ConfigHandler();
 
