@@ -1,5 +1,7 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using Synapse.Api;
+using Synapse.Api.Plugin;
 
 namespace Synapse.Config
 {
@@ -8,11 +10,20 @@ namespace Synapse.Config
         internal ConfigHandler() { }
 
         internal SynapseConfiguration SynapseConfiguration;
+        internal Translation SynapseTranslation;
 
         private SYML _syml;
         
         public void Init()
         {
+            SynapseTranslation = new Translation(new PluginInformations { Name = "Synapse" });
+            var trans = new Dictionary<string, string>
+            {
+                {"sameteam","You cant harm this Person" },
+                {"scpteam","As your current Role cant you harm an Scp"  }
+            };
+            SynapseTranslation.CreateTranslations(trans);
+
             _syml = new SYML(SynapseController.Server.Files.ConfigFile);
             _syml.Load();
             SynapseConfiguration = new SynapseConfiguration();
@@ -45,6 +56,7 @@ namespace Synapse.Config
         public void Reload()
         {
             _syml.Load();
+            SynapseTranslation.ReloadTranslations();
             SynapseController.PluginLoader.ReloadConfigs();
             //TODO: Permission Reload
         }

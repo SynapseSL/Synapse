@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Synapse.Config;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,7 +11,7 @@ namespace Synapse.Api.Roles
 
         internal void Init()
         {
-            //TODO: Generator,Scp106-Containment,PocketEnter,PocketLeave
+            //TODO: Scp106-Containment,PocketEnter,PocketLeave
             SynapseController.Server.Events.Player.PlayerEscapseEvent += OnEscape;
             SynapseController.Server.Events.Player.PlayerLeaveEvent += OnLeave;
             SynapseController.Server.Events.Player.PlayerDeathEvent += OnDeath;
@@ -19,6 +20,7 @@ namespace Synapse.Api.Roles
             SynapseController.Server.Events.Player.PlayerDamageEvent += OnDamage;
             SynapseController.Server.Events.Round.RoundCheckEvent += CheckEnd;
             SynapseController.Server.Events.Scp.Scp096.Scp096AddTargetEvent += On096Target;
+            SynapseController.Server.Events.Player.PlayerGeneratorInteractEvent += OnGenerator;
         }
 
         public Dictionary<Type, string> CustomRoles = new Dictionary<Type, string>();
@@ -28,6 +30,15 @@ namespace Synapse.Api.Roles
         public void RegisterCustomRole<TRole>(string rolename) where TRole : IRole => CustomRoles.Add(typeof(TRole), rolename);
 
         #region Events
+        private void OnGenerator(Events.SynapseEventArguments.PlayerGeneratorInteractEventArgs ev)
+        {
+            if(ev.Player.CustomRole != null && ev.Player.CustomRole.GetFriends().Any(x => x == Team.SCP))
+            {
+                ev.Allow = false;
+                ev.Player.InstantBroadcast(3, Server.Get.Configs.SynapseTranslation.GetTranslation("sameteam"));
+            }
+        }
+
         private void OnDamage(Events.SynapseEventArguments.PlayerDamageEventArgs ev)
         {
             var info = ev.HitInfo;
@@ -41,15 +52,13 @@ namespace Synapse.Api.Roles
             if (ev.Victim.CustomRole != null && ev.Victim.CustomRole.GetFriends().Any(x => x == ev.Killer.RealTeam))
             {
                 info.Amount = 0;
-                //TODO: Translation
-                //ev.Killer.InstantBroadcast(3, plugin.Translation.GetTranslation("sameteam"));
+                ev.Killer.InstantBroadcast(3, Server.Get.Configs.SynapseTranslation.GetTranslation("sameteam"));
             }
 
             if (ev.Killer.CustomRole != null && ev.Killer.CustomRole.GetFriends().Any(x => x == ev.Victim.RealTeam))
             {
                 info.Amount = 0;
-                //TODO: Translation
-                //ev.Killer.InstantBroadcast(3, plugin.Translation.GetTranslation("sameteam"));
+                ev.Killer.InstantBroadcast(3, Server.Get.Configs.SynapseTranslation.GetTranslation("sameteam"));
             }
 
             ev.HitInfo = info;
@@ -114,7 +123,7 @@ namespace Synapse.Api.Roles
                 {
                     ev.CloseFemur = false;
                     ev.Allow = false;
-                    //TODO: Message for Enter Femur => Create Translation File for Synapse
+                    ev.Player.Broadcast(3, Server.Get.Configs.SynapseTranslation.GetTranslation("scpteam"));
                 }
             }
         }
