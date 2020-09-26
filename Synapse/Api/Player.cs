@@ -153,6 +153,8 @@ namespace Synapse.Api
 
         public readonly Scp079Controller Scp079Controller;
 
+        //TODO: More Scp Controller
+
         private IRole role;
 
         public IRole CustomRole
@@ -446,6 +448,8 @@ namespace Synapse.Api
         public string NickName => NicknameSync.Network_myNickSync;
 
         public Team Team => ClassManager.CurRole.team;
+
+        public Team RealTeam => (CustomRole == null) ? Team : CustomRole.GetTeam();
 
         public Fraction Fraction => ClassManager.Fraction;
 

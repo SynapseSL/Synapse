@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using Utf8Json.Internal.DoubleConversion;
 
 namespace Synapse.Config
 {
@@ -35,5 +34,11 @@ namespace Synapse.Config
 
         [Description("The Amount of pupils needed to contain Scp-106")]
         public int RequiredForFemur = 1;
+
+        [Description("If disabled Chaos must kill all Scps to end the round")]
+        public bool ChaosScpEnd = true;
+
+        [Description("If enabled custom Scps like 035 can activate Scp096 rage state")]
+        public bool ScpTrigger096 = false;
     }
 }
