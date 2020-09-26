@@ -24,6 +24,10 @@ namespace Synapse.Api
 
         public List<Room> Rooms { get; } = new List<Room>();
 
+        public List<Generator> Generators { get; } = new List<Generator>();
+
+        public Generator MainGenerator { get; internal set; }
+
         public string IntercomText
         {
             get => Server.Get.Host.GetComponent<Intercom>().CustomContent;

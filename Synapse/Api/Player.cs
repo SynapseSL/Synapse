@@ -5,7 +5,7 @@ using Mirror;
 using Mirror.LiteNetLib4Mirror;
 using RemoteAdmin;
 using Searching;
-using Synapse.Api.Enums;
+using Synapse.Api.Enum;
 using Synapse.Api.Roles;
 using Synapse.Database;
 using Synapse.Patches.EventsPatches.PlayerPatches;

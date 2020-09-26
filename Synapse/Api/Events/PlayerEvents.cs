@@ -35,7 +35,9 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<PlayerReloadEventArgs> PlayerReloadEvent;
 
-        public event EventHandler.OnSynapseEvent<PlayerEnterFemurEventArgs> PlayerEnterFemurEvent; 
+        public event EventHandler.OnSynapseEvent<PlayerEnterFemurEventArgs> PlayerEnterFemurEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerGeneratorInteractEventArgs> PlayerGeneratorInteractEvent;
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -158,6 +160,23 @@ namespace Synapse.Api.Events
 
             allow = ev.Allow;
             closeFemur = ev.CloseFemur;
+        }
+
+        internal void InvokePlayerGeneratorInteractEvent(Player player,Generator generator,Enum.GeneratorInteraction interaction,ref bool allow)
+        {
+            if (PlayerGeneratorInteractEvent == null) return;
+
+            var ev = new PlayerGeneratorInteractEventArgs
+            {
+                Player = player,
+                Generator = generator,
+                GeneratorInteraction = interaction,
+                Allow = true
+            };
+
+            PlayerGeneratorInteractEvent.Invoke(ev);
+
+            allow = ev.Allow;
         }
         #endregion
     }

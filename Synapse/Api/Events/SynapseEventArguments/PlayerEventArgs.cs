@@ -153,4 +153,15 @@ namespace Synapse.Api.Events.SynapseEventArguments
         
         public bool CloseFemur { get; set; }
     }
+
+    public class PlayerGeneratorInteractEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public Generator Generator { get; internal set; }
+
+        public Enum.GeneratorInteraction GeneratorInteraction { get; internal set; }
+
+        public bool Allow { get; set; }
+    }
 }
