@@ -11,7 +11,6 @@ namespace Synapse.Patches.SynapsePatches
     {
         private static bool Prefix(string cmd, CommandSender sender = null)
         {
-            var player = sender == null ? Server.Get.Host : Server.Get.GetPlayer(sender.SenderId);
             var args = cmd.Split(' ');
 
             if (cmd.StartsWith(".") || cmd.StartsWith("/") || cmd.StartsWith("@"))
@@ -21,7 +20,7 @@ namespace Synapse.Patches.SynapsePatches
             {
                 try
                 {
-                    var flag = command.Execute(args.Segment(1), player, out var text);
+                    var flag = command.Execute(args.Segment(1), Server.Get.Host, Command.Platform.ServerConsole, out var text);
                     Logger.Get.Send(text, flag ? ConsoleColor.Green : ConsoleColor.Red);
                 }
                 catch(Exception e)
@@ -41,11 +40,12 @@ namespace Synapse.Patches.SynapsePatches
         {
             var player = __instance._sender.GetPlayer();
             var args = query.Split(' ');
+            Logger.Get.Info(query);
             if(SynapseController.CommandHandlers.ClientCommandHandler.TryGetCommand(args[0],out var command))
             {
                 try
                 {
-                    var flag = command.Execute(args.Segment(1), player, out var text);
+                    var flag = command.Execute(args.Segment(1), player, Command.Platform.ClientConsole, out var text);
                     player.SendConsoleMessage(text, flag ? "gray" : "red");
                 }
                 catch(Exception e)
@@ -73,7 +73,7 @@ namespace Synapse.Patches.SynapsePatches
             {
                 try
                 {
-                    var flag = command.Execute(args.Segment(1), player, out var text);
+                    var flag = command.Execute(args.Segment(1), player, Command.Platform.RemoteAdmin, out var text);
                     player.SendRAConsoleMessage(text, flag);
                 }
                 catch(Exception e)

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Synapse.Command
 {
@@ -7,9 +8,9 @@ namespace Synapse.Command
         private readonly Dictionary<string, string> commandAliases = new Dictionary<string, string>();
 
         private readonly Dictionary<string, ICommand> commands = new Dictionary<string, ICommand>();
-        
 
-        public List<ICommand> Commands { get; } = new List<ICommand>();
+
+        public List<ICommand> Commands => commands.Values.ToList();
 
         public bool TryGetCommand(string name, out ICommand cmd)
         {
