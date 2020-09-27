@@ -164,4 +164,11 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public bool Allow { get; set; }
     }
+
+    public class PlayerKeyPressEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public KeyCode KeyCode { get; internal set; }
+    }
 }

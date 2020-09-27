@@ -52,7 +52,7 @@ namespace Synapse.Command.Commands
 
                     try
                     {
-                        //TODO: KeyPressEvent
+                        Server.Get.Events.Player.InvokePlayerKeyPressEvent(context.Player, key2);
                     }
                     catch (Exception e)
                     {

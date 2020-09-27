@@ -38,6 +38,8 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<PlayerEnterFemurEventArgs> PlayerEnterFemurEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerGeneratorInteractEventArgs> PlayerGeneratorInteractEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerKeyPressEventArgs> PlayerKeyPressEvent;
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -178,6 +180,8 @@ namespace Synapse.Api.Events
 
             allow = ev.Allow;
         }
+
+        internal void InvokePlayerKeyPressEvent(Player player, KeyCode keyCode) => PlayerKeyPressEvent?.Invoke(new PlayerKeyPressEventArgs { Player = player, KeyCode = keyCode });
         #endregion
     }
 }
