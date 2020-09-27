@@ -1,5 +1,6 @@
 ﻿using Harmony;
 using RemoteAdmin;
+using Synapse.Command;
 using System;
 using Logger = Synapse.Api.Logger;
 
@@ -20,8 +21,22 @@ namespace Synapse.Patches.SynapsePatches
             {
                 try
                 {
-                    var flag = command.Execute(args.Segment(1), Server.Get.Host, Command.Platform.ServerConsole, out var text);
-                    Logger.Get.Send(text, flag ? ConsoleColor.Green : ConsoleColor.Red);
+                    var flag = command.Execute(new Command.CommandContext { Arguments = args.Segment(1), Player = Server.Get.Host, Platform = Command.Platform.ServerConsole});
+
+                    var color = ConsoleColor.DarkBlue;
+                    switch (flag.State)
+                    {
+                        case Command.CommandResultState.Ok:
+                            color = ConsoleColor.Gray;
+                            break;
+
+                        case Command.CommandResultState.Error:
+                            color = ConsoleColor.Red;
+                            break;
+
+                        //Since the Console Have Always all Permissions a Check for NoPermission is not needed!
+                    }
+                    Logger.Get.Send(flag.Message, color);
                 }
                 catch(Exception e)
                 {
@@ -45,8 +60,25 @@ namespace Synapse.Patches.SynapsePatches
             {
                 try
                 {
-                    var flag = command.Execute(args.Segment(1), player, Command.Platform.ClientConsole, out var text);
-                    player.SendConsoleMessage(text, flag ? "gray" : "red");
+                    var flag = command.Execute(new Command.CommandContext { Arguments = args.Segment(1), Player = player, Platform = Command.Platform.ClientConsole });
+
+                    var color = "blue";
+                    switch (flag.State)
+                    {
+                        case Command.CommandResultState.Ok:
+                            color = "gray";
+                            break;
+
+                        case Command.CommandResultState.Error:
+                            color = "red";
+                            break;
+
+                        case CommandResultState.NoPermission:
+                            color = "yellow";
+                            break;
+                    }
+
+                    player.SendConsoleMessage(flag.Message, color);
                 }
                 catch(Exception e)
                 {
@@ -73,8 +105,9 @@ namespace Synapse.Patches.SynapsePatches
             {
                 try
                 {
-                    var flag = command.Execute(args.Segment(1), player, Command.Platform.RemoteAdmin, out var text);
-                    player.SendRAConsoleMessage(text, flag);
+                    var flag = command.Execute(new Command.CommandContext { Arguments = args.Segment(1),Player = player, Platform = Command.Platform.RemoteAdmin});
+
+                    player.SendRAConsoleMessage(flag.Message, flag.State == CommandResultState.Ok);
                 }
                 catch(Exception e)
                 {
