@@ -1,5 +1,5 @@
-﻿using Synapse.Api.Enum;
-using System.Linq;
+﻿using System.Linq;
+using Synapse.Api.Enum;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -49,7 +49,7 @@ namespace Synapse.Api
                 if (RoomName.Contains("LCZ_ClassDSpawn"))
                     return ImageGenerator.RoomType.Prison;
 
-                string[] straight = new string[]
+                var straight = new[]
                 {
                     "HCZ_Servers",
                     "HCZ_Testroom",
@@ -70,14 +70,14 @@ namespace Synapse.Api
                     "EZ_upstairs"
                 };
 
-                string[] curve = new string[]
+                var curve = new[]
                 {
                     "LCZ_Curve",
                     "HCZ_Curve",
                     "EZ_Curve"
                 };
 
-                string[] cross = new string[]
+                var cross = new[]
                 {
                     "EZ_Crossing",
                     "LCZ_Crossing",
@@ -86,14 +86,14 @@ namespace Synapse.Api
                     "EZ_Intercom"
                 };
 
-                string[] t = new string[]
+                var t = new[]
                 {
                     "LCZ_TCross",
                     "HCZ_Room3ar",
                     "HCZ_Room3"
                 };
 
-                string[] end = new string[]
+                var end = new[]
                 {
                     "EZ_Endoof",
                     "LCZ_914",
@@ -118,20 +118,19 @@ namespace Synapse.Api
                 if (straight.Any(x => RoomName.Contains(x)))
                     return ImageGenerator.RoomType.Straight;
 
-                else if (curve.Any(x => RoomName.Contains(x)))
+                if (curve.Any(x => RoomName.Contains(x)))
                     return ImageGenerator.RoomType.Curve;
 
-                else if (cross.Any(x => RoomName.Contains(x)))
+                if (cross.Any(x => RoomName.Contains(x)))
                     return ImageGenerator.RoomType.Cross;
 
-                else if (t.Any(x => RoomName.Contains(x)))
+                if (t.Any(x => RoomName.Contains(x)))
                     return ImageGenerator.RoomType.RoomT;
 
-                else if (end.Any(x => RoomName.Contains(x)))
+                if (end.Any(x => RoomName.Contains(x)))
                     return ImageGenerator.RoomType.Endoff;
 
-                else
-                    return (ImageGenerator.RoomType)(-1);
+                return (ImageGenerator.RoomType)(-1);
             }
         }
         
