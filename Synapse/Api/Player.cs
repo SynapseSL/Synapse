@@ -155,19 +155,19 @@ namespace Synapse.Api
 
         //TODO: More Scp Controller
 
-        private IRole role;
+        private IRole _role;
 
         public IRole CustomRole
         {
-            get => role;
+            get => _role;
             set
             {
-                role = value;
+                _role = value;
                 if (value == null)
                     return;
 
-                role.Player = this;
-                role.Spawn();
+                _role.Player = this;
+                _role.Spawn();
             }
         }
         #endregion
