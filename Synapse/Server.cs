@@ -32,6 +32,8 @@ namespace Synapse
 
         public ConfigHandler Configs { get; } = new ConfigHandler();
 
+        public Synapse.Permission.PermissionHandler PermissionHandler { get; } = new Synapse.Permission.PermissionHandler();
+
         public Player Host
         {
             get
@@ -130,6 +132,7 @@ namespace Synapse
             private string _mainConfigDirectory;
             private string _configDirectory;
             private string _sharedConfigDirectory;
+            private string _permissionFile;
 
             private string _configFile;
             //Synapse
@@ -227,6 +230,17 @@ namespace Synapse
                 }
                 private set => _sharedConfigDirectory = value;
             }
+            public string PermissionFile
+            {
+                get
+                {
+                    if (!File.Exists(_permissionFile))
+                        File.Create(_permissionFile).Close();
+
+                    return _permissionFile;
+                }
+                set => _permissionFile = value;
+            }
 
             public string ConfigFile
             {
@@ -255,7 +269,19 @@ namespace Synapse
                 ConfigDirectory = Path.Combine(MainConfigDirectory, $"server-{ServerStatic.ServerPort}");
                 SharedConfigDirectory = Path.Combine(MainConfigDirectory, "server-shared");
 
-                ConfigFile = Path.Combine(ConfigDirectory, "config.syml");
+
+                var sharedconfigpath = Path.Combine(SharedConfigDirectory, "config.syml");
+                if (File.Exists(sharedconfigpath))
+                    ConfigFile = sharedconfigpath;
+                else
+                    ConfigFile = Path.Combine(ConfigDirectory, "config.syml");
+
+
+                var sharedpermissionpath = Path.Combine(SharedConfigDirectory, "permission.syml");
+                if (File.Exists(sharedpermissionpath))
+                    PermissionFile = sharedpermissionpath;
+                else
+                    PermissionFile = Path.Combine(ConfigDirectory, "permission.syml");
             }
             public string GetTranslationFile(PluginInformations infos)
             {

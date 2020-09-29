@@ -9,6 +9,7 @@ using Synapse.Api.Enum;
 using Synapse.Api.Roles;
 using Synapse.Database;
 using Synapse.Patches.EventsPatches.PlayerPatches;
+using Synapse.Permission;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -138,10 +139,10 @@ namespace Synapse.Api
         }
 
 
-        //TODO: Permission Check Method
+        //TODO: Permission Check with *
         public bool HasPermission(string permission)
         {
-            return true;
+            return SynapseGroup.Permissions.Any(x => x.ToLower() == permission.ToLower());
         }
         #endregion
 
@@ -170,6 +171,8 @@ namespace Synapse.Api
                 role.Spawn();
             }
         }
+
+        public SynapseGroup SynapseGroup => Server.Get.PermissionHandler.GetPlayerGroup(UserId);
         #endregion
 
         #region Default Stuff

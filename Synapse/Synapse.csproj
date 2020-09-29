@@ -124,6 +124,9 @@
     <Compile Include="Patches\SynapsePatches\ElevatorStartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\RefreshNamePatch.cs" />
     <Compile Include="Patches\SynapsePatches\RoleChangeClassIdPatch.cs" />
+    <Compile Include="Permission\SynapseGroup.cs" />
+    <Compile Include="Permission\ServerSection.cs" />
+    <Compile Include="Permission\PermissionHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="SynapseController.cs" />

@@ -1,4 +1,6 @@
 ﻿using Synapse.Config;
+using Synapse.Permission;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -98,14 +100,7 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha9:
-
-                    var msg = "All Generator:";
-                    foreach (var gen in Synapse.Api.Map.Get.Generators)
-                    {
-                        msg += $"\n{gen.Name}";
-                    }
-
-                    Logger.Get.Info(msg);
+                    Logger.Get.Info($"Synapse:{ev.Player.SynapseGroup.GetVanillaPermissionValue()} SCP:{ev.Player.Rank.Permissions}");
                     break;
             }
         }
