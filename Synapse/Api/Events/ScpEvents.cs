@@ -7,6 +7,8 @@ namespace Synapse.Api.Events
         internal ScpEvents() { }
 
         public Scp096Events Scp096 { get; } = new Scp096Events();
+        
+        public Scp106Events Scp106 { get; } = new Scp106Events();
 
         public class Scp096Events
         {
@@ -32,6 +34,24 @@ namespace Synapse.Api.Events
 
                 allow = ev.Allow;
             }
+            #endregion
+        }
+
+        public class Scp106Events
+        {
+            internal Scp106Events() { }
+
+            public event EventHandler.OnSynapseEvent<Scp106ContainmentEventArgs> Scp106ContaimentEvent;
+
+            #region Invoke106Events
+
+            internal void InvokeScp106ContainmentEvent(Player player, ref bool allow)
+            {
+                var ev = new Scp106ContainmentEventArgs {Allow = allow, Player = player};
+                Scp106ContaimentEvent?.Invoke(ev);
+                allow = ev.Allow;
+            }
+
             #endregion
         }
     }

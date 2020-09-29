@@ -10,4 +10,11 @@
 
         public bool Allow { get; set; }
     }
+
+    public class Scp106ContainmentEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+        
+        public bool Allow { get; set; }
+    }
 }
