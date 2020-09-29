@@ -27,9 +27,9 @@ namespace Synapse.Permission
 
         public byte RequiredKickPower = 1;
 
-        public List<string> Permissions = new List<string>();
+        public List<string> Permissions = new List<string> { };
 
-        public List<string> Members = new List<string>();
+        public List<string> Members = new List<string> { };
 
         /*public bool HasPermission(string Permission)
         {

