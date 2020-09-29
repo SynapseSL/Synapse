@@ -112,6 +112,7 @@
     <Compile Include="Patches\EventsPatches\RoundPatches\RoundStartPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\WaitingForPlayersPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp096\Scp096TargetPatches.cs" />
+    <Compile Include="Patches\EventsPatches\ScpPatches\Scp106\PocketDimensionPatches.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp106\Scp106ContainmentPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\ConsoleCommandPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />

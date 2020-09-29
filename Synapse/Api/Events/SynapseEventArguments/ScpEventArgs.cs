@@ -17,4 +17,22 @@
         
         public bool Allow { get; set; }
     }
+
+    public class PocketDimensionEnterEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+        
+        public Player Scp106 { get; internal set; }
+        
+        public bool Allow { get; set; }
+    }
+
+    public class PocketDimensionLeaveEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+        
+        public PocketDimensionTeleport.PDTeleportType TeleportType { get; set; }
+        
+        public bool Allow { get; set; }
+    }
 }

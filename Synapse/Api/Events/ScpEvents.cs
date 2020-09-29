@@ -1,4 +1,5 @@
 ﻿using Synapse.Api.Events.SynapseEventArguments;
+using Synapse.Patches.EventsPatches.ScpPatches.Scp106;
 
 namespace Synapse.Api.Events
 {
@@ -41,15 +42,38 @@ namespace Synapse.Api.Events
         {
             internal Scp106Events() { }
 
-            public event EventHandler.OnSynapseEvent<Scp106ContainmentEventArgs> Scp106ContaimentEvent;
+            public event EventHandler.OnSynapseEvent<Scp106ContainmentEventArgs> Scp106ContainmentEvent;
+
+            public event EventHandler.OnSynapseEvent<PocketDimensionEnterEventArgs> PocketDimensionEnterEvent;
+            
+            public event EventHandler.OnSynapseEvent<PocketDimensionLeaveEventArgs> PocketDimensionLeaveEvent;
 
             #region Invoke106Events
 
             internal void InvokeScp106ContainmentEvent(Player player, ref bool allow)
             {
                 var ev = new Scp106ContainmentEventArgs {Allow = allow, Player = player};
-                Scp106ContaimentEvent?.Invoke(ev);
+                Scp106ContainmentEvent?.Invoke(ev);
                 allow = ev.Allow;
+            }
+
+            internal void InvokePocketDimensionEnterEvent(Player player, Player scp106, ref bool allow)
+            {
+                var ev = new PocketDimensionEnterEventArgs
+                    {Allow = allow, Scp106 = scp106, Player = player};
+                PocketDimensionEnterEvent?.Invoke(ev);
+
+                allow = ev.Allow;
+            }
+            
+            internal void InvokePocketDimensionLeaveEvent(Player player, ref PocketDimensionTeleport.PDTeleportType teleportType, ref bool allow)
+            {
+                var ev = new PocketDimensionLeaveEventArgs
+                    {Allow = allow, TeleportType = teleportType, Player = player};
+                PocketDimensionLeaveEvent?.Invoke(ev);
+
+                allow = ev.Allow;
+                teleportType = ev.TeleportType;
             }
 
             #endregion

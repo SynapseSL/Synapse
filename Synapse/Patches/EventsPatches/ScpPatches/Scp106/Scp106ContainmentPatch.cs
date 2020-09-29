@@ -6,9 +6,9 @@ using EventHandler = Synapse.Api.Events.EventHandler;
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
 {
     [HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.CallCmdContain106))]
-    public class Scp106ContainmentPatch
+    internal class Scp106ContainmentPatch
     {
-        public static bool Prefix(PlayerInteract __instance)
+        private static bool Prefix(PlayerInteract __instance)
         {
             try
             {
@@ -18,7 +18,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
             }
             catch (Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: Scp096AddTargetEvent failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Event: Scp106Containment failed!!\n{e}");
                 return true;
             }
         }
