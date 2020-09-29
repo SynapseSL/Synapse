@@ -1,5 +1,5 @@
-﻿using Synapse.Api.Enum;
-using System.Linq;
+﻿using System.Linq;
+using Synapse.Api.Enum;
 using UnityEngine;
 
 namespace Synapse.Api
