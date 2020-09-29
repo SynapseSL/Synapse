@@ -89,7 +89,6 @@ namespace Synapse.Api.Plugin
                 catch (Exception e)
                 {
                     SynapseController.Server.Logger.Error($"Synapse-Loader: {plugin.Informations.Name} Loading failed!!\n{e}");
-                    throw;
                 }
         }
 
@@ -110,7 +109,6 @@ namespace Synapse.Api.Plugin
                 catch (Exception e)
                 {
                     SynapseController.Server.Logger.Error($"Synapse-Loader: {plugin.Informations.Name} Reload Config failed!!\n{e}");
-                    throw;
                 }
         }
     }
