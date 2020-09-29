@@ -1,12 +1,15 @@
-﻿using Synapse.Config;
+﻿using Synapse.Api;
+using Synapse.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using YamlDotNet.Serialization;
 
 namespace Synapse.Permission
 {
     public class SynapseGroup : IConfigSection
     {
+     
         public string Password = "NONE";
 
         public bool Default = false;
@@ -44,7 +47,7 @@ namespace Synapse.Permission
 
             List<PlayerPermissions> perms = new List<PlayerPermissions>();
             foreach(var perm in vanillaperms)
-                if (Enum.TryParse<PlayerPermissions>(perm, out var permenum))
+                if (Enum.TryParse<PlayerPermissions>(perm.Split('.')[1], out var permenum))
                     perms.Add(permenum);
 
             ulong Permission = 0;
