@@ -32,6 +32,7 @@ public class SynapseController
         
         PatchMethods();
         Server.Configs.Init();
+        Server.PermissionHandler.Init();
         Server.RoleManager.Init();
         CommandHandlers.RegisterSynapseCommands();
         

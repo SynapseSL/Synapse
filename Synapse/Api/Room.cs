@@ -49,8 +49,28 @@ namespace Synapse.Api
                 if (RoomName.Contains("LCZ_ClassDSpawn"))
                     return ImageGenerator.RoomType.Prison;
 
-                var straight = new[]
-                {
+                if (StraightRooms.Any(x => RoomName.Contains(x)))
+                    return ImageGenerator.RoomType.Straight;
+
+                else if (CurveRooms.Any(x => RoomName.Contains(x)))
+                    return ImageGenerator.RoomType.Curve;
+
+                else if (CrossRooms.Any(x => RoomName.Contains(x)))
+                    return ImageGenerator.RoomType.Cross;
+
+                else if (TRooms.Any(x => RoomName.Contains(x)))
+                    return ImageGenerator.RoomType.RoomT;
+
+                else if (EndRooms.Any(x => RoomName.Contains(x)))
+                    return ImageGenerator.RoomType.Endoff;
+
+                else
+                    return (ImageGenerator.RoomType)(-1);
+            }
+        }
+
+
+        public static readonly string[] StraightRooms = {
                     "HCZ_Servers",
                     "HCZ_Testroom",
                     "EZ_Smallrooms2",
@@ -70,31 +90,27 @@ namespace Synapse.Api
                     "EZ_upstairs"
                 };
 
-                var curve = new[]
-                {
+        public static readonly string[] CurveRooms = {
                     "LCZ_Curve",
                     "HCZ_Curve",
-                    "EZ_Curve"
+                    "EZ_Curve",
+                    "EZ_Intercom"
                 };
 
-                var cross = new[]
-                {
+        public static readonly string[] CrossRooms =  {
                     "EZ_Crossing",
                     "LCZ_Crossing",
                     "Root_*&*Outside Cams",
                     "PocketWorld",
-                    "EZ_Intercom"
                 };
 
-                var t = new[]
-                {
+        public static readonly string[] TRooms = {
                     "LCZ_TCross",
                     "HCZ_Room3ar",
                     "HCZ_Room3"
                 };
 
-                var end = new[]
-                {
+        public static readonly string[] EndRooms = {
                     "EZ_Endoof",
                     "LCZ_914",
                     "HCZ_106",
@@ -114,25 +130,5 @@ namespace Synapse.Api
                     "HCZ_457",
                     "EZ_CollapsedTunnel"
                 };
-
-                if (straight.Any(x => RoomName.Contains(x)))
-                    return ImageGenerator.RoomType.Straight;
-
-                if (curve.Any(x => RoomName.Contains(x)))
-                    return ImageGenerator.RoomType.Curve;
-
-                if (cross.Any(x => RoomName.Contains(x)))
-                    return ImageGenerator.RoomType.Cross;
-
-                if (t.Any(x => RoomName.Contains(x)))
-                    return ImageGenerator.RoomType.RoomT;
-
-                if (end.Any(x => RoomName.Contains(x)))
-                    return ImageGenerator.RoomType.Endoff;
-
-                return (ImageGenerator.RoomType)(-1);
-            }
-        }
-        
     }
 }

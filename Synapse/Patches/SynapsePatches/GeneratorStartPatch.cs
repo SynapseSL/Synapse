@@ -12,15 +12,13 @@ namespace Synapse.Patches.SynapsePatches
             while (Map.Get.Generators.Select(x => x.GameObject).Contains(null))
                 Map.Get.Doors.Remove(Map.Get.Doors.FirstOrDefault(x => x.GameObject == null));
 
-            var generator = new Api.Generator(__instance);
-
-            if (generator.Name.Contains("("))
+            if (!__instance.name.Contains("("))
             {
-                Map.Get.MainGenerator = generator;
+                Map.Get.MainGenerator = new Api.Generator(__instance,true);
                 return;
             }
 
-            Map.Get.Generators.Add(new Api.Generator(__instance));
+            Map.Get.Generators.Add(new Api.Generator(__instance,false));
         }
     }
 }

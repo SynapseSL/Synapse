@@ -108,6 +108,7 @@
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerJoinPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerLeavePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSpeakPatch.cs" />
+    <Compile Include="Patches\EventsPatches\RoundPatches\RoundRestartPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\RoundCheckPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\RoundStartPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\WaitingForPlayersPatch.cs" />
@@ -125,6 +126,9 @@
     <Compile Include="Patches\SynapsePatches\ElevatorStartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\RefreshNamePatch.cs" />
     <Compile Include="Patches\SynapsePatches\RoleChangeClassIdPatch.cs" />
+    <Compile Include="Permission\SynapseGroup.cs" />
+    <Compile Include="Permission\ServerSection.cs" />
+    <Compile Include="Permission\PermissionHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="SynapseController.cs" />

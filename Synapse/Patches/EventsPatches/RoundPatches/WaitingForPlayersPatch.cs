@@ -22,6 +22,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 				if (q == "Waiting for players...")
                 {
 					SynapseController.Server.Map.RefreshObjects();
+					SynapseController.Server.Map.Round.CurrentRound++;
 					SynapseController.Server.Events.Round.InvokeWaitingForPlayers();
                 }
 			}

@@ -5,11 +5,17 @@ namespace Synapse.Api
 {
     public class Generator
     {
-        internal Generator(Generator079 gen) => generator = gen;
+        internal Generator(Generator079 gen,bool main)
+        {
+            generator = gen;
+            MainGenerator = main;
+        }
 
         private Generator079 generator;
 
         public GameObject GameObject => generator.gameObject;
+
+        public readonly bool MainGenerator;
 
         public string Name => GameObject.name;
 
@@ -49,7 +55,7 @@ namespace Synapse.Api
         public float RemainingPowerUp
         {
             get => generator.remainingPowerup;
-            set => generator.NetworkremainingPowerup = value;
+            set => generator.SetTime(value);
         }
 
         public Room Room => Map.Get.Rooms.FirstOrDefault(x => x.RoomName.ToLower() == generator.CurRoom.ToLower());

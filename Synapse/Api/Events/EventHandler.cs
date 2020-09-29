@@ -1,4 +1,6 @@
 ﻿using Synapse.Config;
+using Synapse.Permission;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -11,6 +13,10 @@ namespace Synapse.Api.Events
             Player.PlayerJoinEvent += PlayerJoin;
             Player.PlayerSyncDataEvent += PlayerSyncData;
             Map.DoorInteractEvent += DoorInteract;
+
+#if DEBUG
+            Player.PlayerKeyPressEvent += OnKeyPress;
+#endif
         }
 
         public static EventHandler Get => SynapseController.Server.Events;
@@ -31,8 +37,73 @@ namespace Synapse.Api.Events
         {
         }
 
-        #region HookedEvents
+#region HookedEvents
         private SynapseConfiguration conf => SynapseController.Server.Configs.SynapseConfiguration;
+
+        private void OnKeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
+        {
+            switch (ev.KeyCode)
+            {
+                case KeyCode.Alpha0:
+                    var msg2 = "";
+
+                    foreach (var door in Synapse.Api.Map.Get.Doors)
+                        msg2 += $"\n{door.GameObject.name}";
+
+                    foreach (var elev in Synapse.Api.Map.Get.Elevators)
+                        msg2 += $"\n{elev.GameObject.name}";
+
+                    foreach (var gen in Synapse.Api.Map.Get.Generators)
+                        msg2 += $"\n{gen.GameObject.name}";
+
+                    Logger.Get.Info(msg2);
+                    break;
+
+                case KeyCode.Alpha1:
+                    foreach (var door in Synapse.Api.Map.Get.Doors)
+                        door.Open = true;
+                    break;
+
+                case KeyCode.Alpha2:
+                    foreach (var door in Synapse.Api.Map.Get.Doors)
+                        door.Locked = true;
+                    break;
+
+                case KeyCode.Alpha3:
+                    foreach (var elev in Synapse.Api.Map.Get.Elevators)
+                        elev.Status = Lift.Status.Moving;
+                    break;
+
+                case KeyCode.Alpha4:
+                    foreach (var elev in Synapse.Api.Map.Get.Elevators)
+                        elev.Locked = true;
+                    break;
+
+                case KeyCode.Alpha5:
+                    foreach (var elev in Synapse.Api.Map.Get.Elevators)
+                        elev.Use();
+                    break;
+
+                case KeyCode.Alpha6:
+                    foreach (var tes in Synapse.Api.Map.Get.Teslas)
+                        tes.Trigger();
+                    break;
+
+                case KeyCode.Alpha7:
+                    foreach (var tes in Synapse.Api.Map.Get.Teslas)
+                        tes.InstantTrigger();
+                    break;
+
+                case KeyCode.Alpha8:
+                    foreach (var tes in Synapse.Api.Map.Get.Teslas)
+                        tes.SizeOfTrigger = tes.SizeOfTrigger * 2;
+                    break;
+
+                case KeyCode.Alpha9:
+                    Logger.Get.Info($"Synapse:{ev.Player.SynapseGroup.GetVanillaPermissionValue()} SCP:{ev.Player.Rank.Permissions}");
+                    break;
+            }
+        }
 
         private void PlayerJoin(SynapseEventArguments.PlayerJoinEventArgs ev)
         {
@@ -61,6 +132,6 @@ namespace Synapse.Api.Events
                     ev.Door.PermissionLevels.HasPermission(flag));
             }
         }
-        #endregion
+#endregion
     }
 }

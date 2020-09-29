@@ -55,7 +55,6 @@ namespace Synapse.Patches.SynapsePatches
         {
             var player = __instance._sender.GetPlayer();
             var args = query.Split(' ');
-            Logger.Get.Info(query);
             if(SynapseController.CommandHandlers.ClientCommandHandler.TryGetCommand(args[0],out var command))
             {
                 try
