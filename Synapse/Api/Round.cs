@@ -10,6 +10,8 @@ namespace Synapse.Api
 
         private RoundSummary rs => RoundSummary.singleton;
 
+        public int CurrentRound { get; internal set; } = 0;
+
         public bool LobbyLock
         {
             get => RoundStart.LobbyLock;
