@@ -158,7 +158,7 @@ namespace Synapse.Config
                 SynapseController.Server.Logger.Info($"Deserializing section {Section}");
                 var ret = new DeserializerBuilder()
 	                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-	                .IgnoreUnmatchedProperties().IgnoreFields()
+	                .IgnoreUnmatchedProperties()
 	                .Build().Deserialize<T>(Content);
                 SynapseController.Server.Logger.Info("Deserialization done");
                 return ret;
@@ -177,7 +177,7 @@ namespace Synapse.Config
                 SynapseController.Server.Logger.Info($"Deserializing section {Section} unsafely with type {type.Name}");
                 var ret = new DeserializerBuilder()
 	                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-	                .IgnoreUnmatchedProperties().IgnoreFields()
+	                .IgnoreUnmatchedProperties()
 	                .Build().Deserialize(Content, type);
                 SynapseController.Server.Logger.Info("Deserialization done");
                 return ret;
