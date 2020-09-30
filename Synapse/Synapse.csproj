@@ -118,6 +118,7 @@
     <Compile Include="Patches\EventsPatches\ServerPatches\ConsoleCommandPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\RemoteAdminPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\PermissionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\GeneratorStartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\NukeLockPatch.cs" />
     <Compile Include="Patches\SynapsePatches\CommandPatches.cs" />

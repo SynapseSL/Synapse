@@ -53,10 +53,11 @@ namespace Synapse.Permission
 
                 AddServerGroup(group, "Owner");
             }
+        }
 
-            //TODO: fix bug and remove debug message
-            foreach (var members in Groups.Values.First().Members)
-                Logger.Get.Info(members);
+        public void Reload()
+        {
+
         }
 
         public void AddServerGroup(SynapseGroup group,string groupname)
@@ -67,6 +68,49 @@ namespace Synapse.Permission
 
         public SynapseGroup GetServerGroup(string groupname) => Groups.FirstOrDefault(x => x.Key.ToLower() == groupname.ToLower()).Value;
 
-        public SynapseGroup GetPlayerGroup(string UserID) => Groups.Values.FirstOrDefault(x => x.Members.Contains(UserID));
+        public SynapseGroup GetPlayerGroup(Player player)
+        {
+            var group = Groups.Values.FirstOrDefault(x => x.Members == null ? false : x.Members.Contains(player.UserId));
+
+            if (group != null)
+                return group;
+
+            var nwgroup = GetNorthwoodGroup();
+
+            if ((player.UserId.ToLower().Contains("@northwood") || player.SecondUserID == null ? false : player.SecondUserID.ToLower().Contains("@northwood") || player.ServerRoles.Staff) && nwgroup != null)
+                return nwgroup;
+
+            return GetDefaultGroup();
+        }
+
+        public SynapseGroup GetPlayerGroup(string UserID)
+        {
+            var group = Groups.Values.FirstOrDefault(x => x.Members == null ? false : x.Members.Contains(UserID));
+
+            if (group != null)
+                return group;
+
+            var nwgroup = GetNorthwoodGroup();
+
+            if (UserID.ToLower().Contains("@northwood") && nwgroup != null)
+                return nwgroup;
+
+            return GetDefaultGroup();
+        }
+
+        public SynapseGroup GetDefaultGroup()
+        {
+            var group = Groups.Values.FirstOrDefault(x => x.Default);
+
+            if (group != null)
+                return group;
+
+            return new SynapseGroup
+            {
+                Default = true,
+            };
+        }
+
+        public SynapseGroup GetNorthwoodGroup() => Groups.Values.FirstOrDefault(x => x.Northwood);
     }
 }

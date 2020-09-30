@@ -172,7 +172,10 @@ namespace Synapse.Api
             }
         }
 
-        public SynapseGroup SynapseGroup => Server.Get.PermissionHandler.GetPlayerGroup(UserId);
+        private SynapseGroup synapseGroup;
+
+        //TODO: This Permission Shit
+        public SynapseGroup SynapseGroup => Server.Get.PermissionHandler.GetPlayerGroup(this);
         #endregion
 
         #region Default Stuff

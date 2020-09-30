@@ -24,7 +24,7 @@
 
             try
             {
-                Server.Get.Configs.Reload();
+                Server.Get.Reload();
                 result.State = CommandResultState.Ok;
                 result.Message = "Reloading was succesfully";
             }

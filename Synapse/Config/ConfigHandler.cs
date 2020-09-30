@@ -57,8 +57,6 @@ namespace Synapse.Config
         {
             _syml.Load();
             SynapseTranslation.ReloadTranslations();
-            SynapseController.PluginLoader.ReloadConfigs();
-            //TODO: Permission Reload
         }
         
     }

@@ -72,6 +72,13 @@ namespace Synapse
 
 
 
+        public void Reload()
+        {
+            Configs.Reload();
+            PermissionHandler.Reload();
+            SynapseController.PluginLoader.ReloadConfigs();
+        }
+
         public List<TObject> GetObjectsOf<TObject>() where TObject : UnityEngine.Object => UnityEngine.Object.FindObjectsOfType<TObject>().ToList();
 
         public TObject GetObjectOf<TObject>() where TObject : UnityEngine.Object => UnityEngine.Object.FindObjectOfType<TObject>();

@@ -43,6 +43,9 @@ namespace Synapse.Permission
 
         public ulong GetVanillaPermissionValue()
         {
+            if (Permissions.Any(x => x == "*" || x == ".*" || x == $"{VanillaPrefix}.*"))
+                return FullVanillaPerms();
+
             var vanillaperms = Permissions.Where(x => x.Split('.')[0].ToLower() == VanillaPrefix);
 
             List<PlayerPermissions> perms = new List<PlayerPermissions>();
@@ -55,6 +58,15 @@ namespace Synapse.Permission
                 Permission += (ulong)perm;
 
             return Permission;
+        }
+
+        private ulong FullVanillaPerms()
+        {
+            ulong fullperm = 0;
+            foreach (var perm in (PlayerPermissions[])Enum.GetValues(typeof(PlayerPermissions)))
+                fullperm += (ulong)perm;
+
+            return fullperm;
         }
 
         private const string VanillaPrefix = "vanilla";
