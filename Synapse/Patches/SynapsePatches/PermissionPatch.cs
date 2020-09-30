@@ -12,36 +12,67 @@ namespace Synapse.Patches.SynapsePatches
         {
             try
             {
-                Player player = __instance.GetPlayer();
-                //Permission Stuff
-                var group = player.SynapseGroup;
-                if (player.ServerRoles.Group == null)
-                    Logger.Get.Info("Group null");
-                player.ServerRoles.Group.Permissions = group.GetVanillaPermissionValue();
-                player.ServerRoles.Permissions = group.GetVanillaPermissionValue();
-
-                player.ServerRoles.Group.Cover = group.Cover;
-
-                player.ServerRoles.Group.RequiredKickPower = group.RequiredKickPower;
-                player.ServerRoles.Group.KickPower = group.KickPower;
-
-
-                player.RankName = group.Badge.ToUpper() == "NONE" ? null : group.Badge;
-                player.RankColor = group.Color.ToUpper() == "NONE" ? null : group.Color;
-
-                player.ServerRoles.Group.HiddenByDefault = group.Hidden;
-                if (group.Hidden)
-                    player.HideRank = true;
-
-                if (group.RemoteAdmin)
-                    player.RaLogin();
-                else
-                    player.RaLogout();
+                Refresh(__instance.GetPlayer()) ;
             }
             catch(Exception e)
             {
                 Logger.Get.Error($"Synapse-Permission: PlayerSetGroup failed!!\n{e}");
             }
+        }
+
+        private static void Refresh(Player player)
+        {
+            var group = player.SynapseGroup;
+
+            if(player.ServerRoles.Group == null)
+            {
+                var vgroup = new UserGroup()
+                {
+                    Shared = false,
+                    BadgeColor = null,
+                    BadgeText = null,
+                    Cover = false,
+                    HiddenByDefault = false,
+                    KickPower = byte.MinValue,
+                    Permissions = byte.MinValue,
+                    RequiredKickPower = byte.MinValue,
+                };
+                player.ServerRoles.SetGroup(vgroup,false);
+                return;
+            }
+
+            player.ServerRoles.Group.Permissions = group.GetVanillaPermissionValue();
+            player.ServerRoles.Permissions = group.GetVanillaPermissionValue();
+
+            player.ServerRoles.Group.Cover = group.Cover;
+
+            player.ServerRoles.Group.RequiredKickPower = group.RequiredKickPower;
+            player.ServerRoles.Group.KickPower = group.KickPower;
+
+
+            player.RankName = group.Badge.ToUpper() == "NONE" ? null : group.Badge;
+            player.RankColor = group.Color.ToUpper() == "NONE" ? null : group.Color;
+
+            player.ServerRoles.Group.HiddenByDefault = group.Hidden;
+            if (group.Hidden)
+                player.HideRank = true;
+
+            if (group.RemoteAdmin)
+                player.RaLogin();
+            else
+                player.RaLogout();
+        }
+    }
+
+    [HarmonyPatch(typeof(ServerRoles), nameof(ServerRoles.RefreshPermissions))]
+    internal static class PermissionPatch2
+    {
+        private static bool Prefix(ServerRoles __instance)
+        {
+            Logger.Get.Info(__instance.GetPlayer().ToString());
+            if (__instance.GetPlayer().Rank == null)
+                __instance.SetGroup(null, false);
+            return false;
         }
     }
 }
