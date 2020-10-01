@@ -6,6 +6,6 @@ namespace Synapse.Permission
     {
         public bool UsePassword = false;
 
-        public bool GlobalAcces = true;
+        public bool GlobalAccess = true;
     }
 }
