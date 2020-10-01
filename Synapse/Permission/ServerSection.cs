@@ -6,10 +6,6 @@ namespace Synapse.Permission
     {
         public bool UsePassword = false;
 
-        public bool StaffAcces = true;
-
-        public bool ManagerAcces = true;
-
-        public bool BanTeamAcces = true;
+        public bool GlobalAcces = true;
     }
 }

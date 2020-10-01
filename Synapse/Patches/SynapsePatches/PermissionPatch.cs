@@ -40,6 +40,9 @@ namespace Synapse.Patches.SynapsePatches
                 return;
             }
 
+            if (Server.Get.PermissionHandler.ServerSection.GlobalAcces && player.ServerRoles.RemoteAdminMode == ServerRoles.AccessMode.GlobalAccess)
+                return;
+
             player.ServerRoles.Group.Permissions = group.GetVanillaPermissionValue();
             player.ServerRoles.Permissions = group.GetVanillaPermissionValue();
 
