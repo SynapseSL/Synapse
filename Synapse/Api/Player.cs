@@ -140,7 +140,7 @@ namespace Synapse.Api
 
 
         //TODO: Permission Check with *
-        public bool HasPermission(string permission) => SynapseGroup.HasPermission(permission);
+        public bool HasPermission(string permission) => this == Server.Get.Host ? true : SynapseGroup.HasPermission(permission);
         #endregion
 
         #region Synapse Api Objects
