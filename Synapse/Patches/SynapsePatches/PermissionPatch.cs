@@ -1,6 +1,5 @@
 ﻿using System;
 using Harmony;
-using MEC;
 using Synapse.Api;
 
 namespace Synapse.Patches.SynapsePatches
@@ -69,7 +68,6 @@ namespace Synapse.Patches.SynapsePatches
     {
         private static bool Prefix(ServerRoles __instance)
         {
-            Logger.Get.Info(__instance.GetPlayer().ToString());
             if (__instance.GetPlayer().Rank == null)
                 __instance.SetGroup(null, false);
             return false;

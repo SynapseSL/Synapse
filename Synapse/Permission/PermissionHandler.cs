@@ -18,25 +18,31 @@ namespace Synapse.Permission
         internal void Init()
         {
             _permissionSYML = new SYML(Server.Get.Files.PermissionFile);
+            Reload();
+        }
+
+        public void Reload()
+        {
             _permissionSYML.Load();
             ServerSection = new ServerSection();
             ServerSection = _permissionSYML.GetOrSetDefault("Server", ServerSection);
+            Groups.Clear();
 
-            foreach(var pair in _permissionSYML.Sections)
-                if(pair.Key.ToLower() != "server")
+            foreach (var pair in _permissionSYML.Sections)
+                if (pair.Key.ToLower() != "server")
                 {
                     try
                     {
                         var group = pair.Value.LoadAs<SynapseGroup>();
-                        Groups.Add(pair.Key,group);
+                        Groups.Add(pair.Key, group);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         Logger.Get.Error($"Synapse-Permission: Section {pair.Key} in permission.syml is no SynapseGroup or ServerGroup\n{e}");
                     }
                 }
 
-            if(Groups.Count == 0)
+            if (Groups.Count == 0)
             {
                 var group = new SynapseGroup()
                 {
@@ -53,11 +59,9 @@ namespace Synapse.Permission
 
                 AddServerGroup(group, "Owner");
             }
-        }
 
-        public void Reload()
-        {
-
+            foreach (var player in Server.Get.Players)
+                player.ServerRoles.SetGroup(null, false);
         }
 
         public void AddServerGroup(SynapseGroup group,string groupname)
@@ -112,5 +116,25 @@ namespace Synapse.Permission
         }
 
         public SynapseGroup GetNorthwoodGroup() => Groups.Values.FirstOrDefault(x => x.Northwood);
+
+        internal void EnterPassword(Player player,string passwort)
+        {
+            SynapseGroup synapseGroup = new SynapseGroup();
+
+            if (ServerStatic.PermissionsHandler.IsVerified)
+            {
+                if(synapseGroup.Password.Length < 8)
+                {
+                    Logger.Get.Info($"Override password for {"Place Group Name Here"} refused, because it's too short (requirement for verified servers only).");
+                    return;
+                }
+
+                if(synapseGroup.Password.ToLower() == synapseGroup.Password || synapseGroup.Password.ToUpper() == synapseGroup.Password)
+                {
+                    Logger.Get.Info($"Override password for {"Place Group Name Here"} refused, because it must contain mixed case chars (requirement for verified servers only).");
+                    return;
+                }
+            }
+        }
     }
 }
