@@ -49,7 +49,7 @@ namespace Synapse.Command.Commands
                     return result;
             }
 
-            commandlist = commandlist.Where(x => context.Player.HasPermission(x.Permission)).ToList();
+            commandlist = commandlist.Where(x => context.Player.HasPermission(x.Permission) || string.IsNullOrWhiteSpace(x.Permission) || x.Permission.ToUpper() == "NONE").ToList();
 
             if(context.Arguments.Count > 0)
             {

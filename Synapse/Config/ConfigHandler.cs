@@ -20,7 +20,9 @@ namespace Synapse.Config
             var trans = new Dictionary<string, string>
             {
                 {"sameteam","You cant harm this Person" },
-                {"scpteam","As your current Role cant you harm an Scp"  }
+                {"scpteam","As your current Role cant you harm an Scp"  },
+                {"groupgranted","Your have entered the Password for group: %group%" },
+                {"wrongpw", "You have entered a incorrect Password"}
             };
             SynapseTranslation.CreateTranslations(trans);
 

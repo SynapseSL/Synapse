@@ -144,7 +144,6 @@ namespace Synapse.Api
         #endregion
 
         #region Synapse Api Objects
-
         public readonly Jail Jail;
 
         public readonly Scp106Controller Scp106Controller;
@@ -171,8 +170,46 @@ namespace Synapse.Api
 
         private SynapseGroup synapseGroup;
 
-        //TODO: This Permission Shit
-        public SynapseGroup SynapseGroup => Server.Get.PermissionHandler.GetPlayerGroup(this);
+        public SynapseGroup SynapseGroup
+        {
+            get
+            {
+                if (synapseGroup == null)
+                    return Server.Get.PermissionHandler.GetPlayerGroup(this);
+                return synapseGroup;
+            }
+            set
+            {
+                if (value == null)
+                    return;
+
+                if (Server.Get.PermissionHandler.ServerSection.GlobalAccess && ServerRoles.RemoteAdminMode == ServerRoles.AccessMode.GlobalAccess)
+                    return;
+
+                ServerRoles.Group.Permissions = value.GetVanillaPermissionValue();
+                ServerRoles.Permissions = value.GetVanillaPermissionValue();
+
+                ServerRoles.Group.Cover = value.Cover;
+
+                ServerRoles.Group.RequiredKickPower = value.RequiredKickPower;
+                ServerRoles.Group.KickPower = value.KickPower;
+
+
+                RankName = value.Badge.ToUpper() == "NONE" ? null : value.Badge;
+                RankColor = value.Color.ToUpper() == "NONE" ? null : value.Color;
+
+                ServerRoles.Group.HiddenByDefault = value.Hidden;
+                if (value.Hidden)
+                    HideRank = true;
+
+                if (value.RemoteAdmin)
+                    RaLogin();
+                else
+                    RaLogout();
+
+                synapseGroup = value;
+            }
+        }
         #endregion
 
         #region Default Stuff

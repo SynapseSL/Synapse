@@ -81,7 +81,7 @@ namespace Synapse.Permission
 
             var nwgroup = GetNorthwoodGroup();
 
-            if ((player.UserId.ToLower().Contains("@northwood") || player.SecondUserID == null ? false : player.SecondUserID.ToLower().Contains("@northwood") || player.ServerRoles.Staff) && nwgroup != null)
+            if ((player.UserId.ToLower().Contains("@northwood") || player.SecondUserID == null ? false : player.SecondUserID.ToLower().Contains("@northwood") || player.ServerRoles.Staff || player.ServerRoles._globalPerms > 0) && nwgroup != null)
                 return nwgroup;
 
             return GetDefaultGroup();
@@ -116,25 +116,5 @@ namespace Synapse.Permission
         }
 
         public SynapseGroup GetNorthwoodGroup() => Groups.Values.FirstOrDefault(x => x.Northwood);
-
-        internal void EnterPassword(Player player,string passwort)
-        {
-            SynapseGroup synapseGroup = new SynapseGroup();
-
-            if (ServerStatic.PermissionsHandler.IsVerified)
-            {
-                if(synapseGroup.Password.Length < 8)
-                {
-                    Logger.Get.Info($"Override password for {"Place Group Name Here"} refused, because it's too short (requirement for verified servers only).");
-                    return;
-                }
-
-                if(synapseGroup.Password.ToLower() == synapseGroup.Password || synapseGroup.Password.ToUpper() == synapseGroup.Password)
-                {
-                    Logger.Get.Info($"Override password for {"Place Group Name Here"} refused, because it must contain mixed case chars (requirement for verified servers only).");
-                    return;
-                }
-            }
-        }
     }
 }

@@ -1,6 +1,14 @@
 ﻿using System;
+using System.Buffers;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Cryptography;
 using Harmony;
+using RemoteAdmin;
 using Synapse.Api;
+using UnityEngine.Assertions.Must;
 
 namespace Synapse.Patches.SynapsePatches
 {
@@ -21,7 +29,7 @@ namespace Synapse.Patches.SynapsePatches
 
         private static void Refresh(Player player)
         {
-            var group = player.SynapseGroup;
+            var group = Server.Get.PermissionHandler.GetPlayerGroup(player);
 
             if(player.ServerRoles.Group == null)
             {
@@ -40,29 +48,7 @@ namespace Synapse.Patches.SynapsePatches
                 return;
             }
 
-            if (Server.Get.PermissionHandler.ServerSection.GlobalAccess && player.ServerRoles.RemoteAdminMode == ServerRoles.AccessMode.GlobalAccess)
-                return;
-
-            player.ServerRoles.Group.Permissions = group.GetVanillaPermissionValue();
-            player.ServerRoles.Permissions = group.GetVanillaPermissionValue();
-
-            player.ServerRoles.Group.Cover = group.Cover;
-
-            player.ServerRoles.Group.RequiredKickPower = group.RequiredKickPower;
-            player.ServerRoles.Group.KickPower = group.KickPower;
-
-
-            player.RankName = group.Badge.ToUpper() == "NONE" ? null : group.Badge;
-            player.RankColor = group.Color.ToUpper() == "NONE" ? null : group.Color;
-
-            player.ServerRoles.Group.HiddenByDefault = group.Hidden;
-            if (group.Hidden)
-                player.HideRank = true;
-
-            if (group.RemoteAdmin)
-                player.RaLogin();
-            else
-                player.RaLogout();
+            player.SynapseGroup = group;
         }
     }
 

@@ -9,9 +9,6 @@ namespace Synapse.Permission
 {
     public class SynapseGroup : IConfigSection
     {
-     
-        public string Password = "NONE";
-
         public bool Default = false;
 
         public bool Northwood = false;
