@@ -140,10 +140,7 @@ namespace Synapse.Api
 
 
         //TODO: Permission Check with *
-        public bool HasPermission(string permission)
-        {
-            return SynapseGroup.Permissions.Any(x => x.ToLower() == permission.ToLower());
-        }
+        public bool HasPermission(string permission) => SynapseGroup.HasPermission(permission);
         #endregion
 
         #region Synapse Api Objects

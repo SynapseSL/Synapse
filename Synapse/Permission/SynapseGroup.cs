@@ -34,16 +34,41 @@ namespace Synapse.Permission
 
         public List<string> Members = new List<string> { };
 
-        /*public bool HasPermission(string Permission)
+        public bool HasPermission(string permission)
         {
+            if (permission == null || Permissions == null) return false;
 
-        }*/
+
+            foreach(var perm in Permissions)
+            {
+                if (perm == "*" || perm == "*.*" || perm == ".*") return true;
+
+                if (permission.ToUpper() == perm.ToUpper()) return true;
+
+                var args = permission.Split('.');
+                var args2 = perm.Split('.');
+
+                if (args.Length == 1 || args2.Length == 1) continue;
+
+                if (args2[0].ToUpper() == args[0].ToUpper())
+                    for (int i = 1; i < args.Length; i++)
+                    {
+                        if (args.Length < i + 1 || args2.Length < i + 1) break;
+
+                        if (args2[i] == "*") return true;
+
+                        if (args[i].ToUpper() != args2[i].ToUpper()) break;
+                    }
+            }
+
+            return false;
+        }
 
         public bool HasVanillaPermission(PlayerPermissions permission) => Permissions.Any(x => x.ToLower() == $"{VanillaPrefix}.{permission}".ToLower());
 
         public ulong GetVanillaPermissionValue()
         {
-            if (Permissions.Any(x => x == "*" || x == ".*" || x == $"{VanillaPrefix}.*"))
+            if (Permissions.Any(x => x == "*" || x == ".*" || x == "*.*" || x == $"{VanillaPrefix}.*"))
                 return FullVanillaPerms();
 
             var vanillaperms = Permissions.Where(x => x.Split('.')[0].ToLower() == VanillaPrefix);

@@ -100,7 +100,7 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha9:
-                    Logger.Get.Info($"Synapse:{ev.Player.SynapseGroup.GetVanillaPermissionValue()} SCP:{ev.Player.Rank.Permissions}");
+                    Logger.Get.Info(ev.Player.HasPermission("Test.Command.Plugin.Awesome.Test").ToString());
                     break;
             }
         }
