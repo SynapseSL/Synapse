@@ -81,7 +81,7 @@ namespace Synapse.Permission
 
             var nwgroup = GetNorthwoodGroup();
 
-            if ((player.UserId.ToLower().Contains("@northwood") || player.SecondUserID == null ? false : player.SecondUserID.ToLower().Contains("@northwood") || player.ServerRoles.Staff || player.ServerRoles._globalPerms > 0) && nwgroup != null)
+            if (player.GlobalBadge != Api.Enum.GlobalBadge.None && player.GlobalBadge != Api.Enum.GlobalBadge.Patreon && nwgroup != null)
                 return nwgroup;
 
             return GetDefaultGroup();
