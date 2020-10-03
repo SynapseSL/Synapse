@@ -205,18 +205,18 @@ namespace Synapse.Api
 
                 synapseGroup = value;
 
-                RefreshPermission();
+                RefreshPermission(HideRank);
             }
         }
 
         public bool HasPermission(string permission) => this == Server.Get.Host ? true : SynapseGroup.HasPermission(permission);
 
-        public void RefreshPermission()
+        public void RefreshPermission(bool disp)
         {
             var group = new UserGroup
             {
                 BadgeText = SynapseGroup.Badge.ToUpper() == "NONE" ? null : SynapseGroup.Badge,
-                BadgeColor = SynapseGroup.Color.ToUpper() == "NONE" ? ServerRoles.DefaultColor : SynapseGroup.Color,
+                BadgeColor = SynapseGroup.Color.ToLower(),
                 Cover = SynapseGroup.Cover,
                 HiddenByDefault = SynapseGroup.Hidden,
                 KickPower = SynapseGroup.KickPower,
@@ -247,10 +247,16 @@ namespace Synapse.Api
                         player.ServerRoles.TargetSetHiddenRole(Connection, player.ServerRoles.HiddenBadge);
                 }
 
-            if (SynapseGroup.Hidden)
+            if (group.BadgeColor == "none")
+                return;
+
+            if (ServerRoles._hideLocalBadge || (group.HiddenByDefault && !disp && !ServerRoles._neverHideLocalBadge))
             {
                 ServerRoles._badgeCover = false;
-                ServerRoles.NetworkMyText = "null";
+                if (!string.IsNullOrEmpty(RankName))
+                    return;
+
+                ServerRoles.NetworkMyText = null;
                 ServerRoles.NetworkMyColor = "default";
                 ServerRoles.HiddenBadge = group.BadgeText;
                 ServerRoles.RefreshHiddenTag();
