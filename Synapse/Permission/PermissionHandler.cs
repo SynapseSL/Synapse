@@ -61,7 +61,7 @@ namespace Synapse.Permission
             }
 
             foreach (var player in Server.Get.Players)
-                player.ServerRoles.SetGroup(null, false);
+                player.RefreshPermission();
         }
 
         public void AddServerGroup(SynapseGroup group,string groupname)

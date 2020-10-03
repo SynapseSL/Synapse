@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Hints;
 using Mirror;
@@ -76,12 +77,33 @@ namespace Synapse.Api
         public void RaLogin()
         {
             ServerRoles.RemoteAdmin = true;
-            ServerRoles.RemoteAdminMode = ServerRoles.AccessMode.PasswordOverride;
+            ServerRoles.Permissions = SynapseGroup.GetVanillaPermissionValue() | ServerRoles._globalPerms;
+            ServerRoles.RemoteAdminMode = ServerRoles._globalPerms > 0UL ? ServerRoles.AccessMode.GlobalAccess : ServerRoles.AccessMode.PasswordOverride;
+            if(!ServerRoles.AdminChatPerms)
+                ServerRoles.AdminChatPerms = SynapseGroup.HasVanillaPermission(PlayerPermissions.AdminChat);
             ServerRoles.TargetOpenRemoteAdmin(Connection, false);
         }
 
         public void RaLogout()
         {
+            if (GlobalBadge == GlobalBadge.GlobalBanning && Server.Get.PermissionHandler.ServerSection.GlobalBanTeamAccess)
+            {
+                RaLogin();
+                return;
+            }
+
+            if (GlobalBadge == GlobalBadge.Manager && Server.Get.PermissionHandler.ServerSection.ManagerAccess)
+            {
+                RaLogin();
+                return;
+            }
+
+            if (GlobalBadge == GlobalBadge.Staff && Server.Get.PermissionHandler.ServerSection.StaffAccess)
+            {
+                RaLogin();
+                return;
+            }
+
             Hub.serverRoles.RemoteAdmin = false;
             Hub.serverRoles.RemoteAdminMode = ServerRoles.AccessMode.LocalAccess;
             Hub.serverRoles.TargetCloseRemoteAdmin(Connection);
@@ -137,13 +159,9 @@ namespace Synapse.Api
             Connection.Send(msg);
             NetworkWriterPool.Recycle(writer);
         }
-
-
-        //TODO: Permission Check with *
-        public bool HasPermission(string permission) => this == Server.Get.Host ? true : SynapseGroup.HasPermission(permission);
         #endregion
 
-        #region Synapse Api Objects
+        #region Synapse Api 
         public readonly Jail Jail;
 
         public readonly Scp106Controller Scp106Controller;
@@ -168,6 +186,7 @@ namespace Synapse.Api
             }
         }
 
+        //Stuff for the Permission System
         private SynapseGroup synapseGroup;
 
         public SynapseGroup SynapseGroup
@@ -176,6 +195,7 @@ namespace Synapse.Api
             {
                 if (synapseGroup == null)
                     return Server.Get.PermissionHandler.GetPlayerGroup(this);
+
                 return synapseGroup;
             }
             set
@@ -183,33 +203,71 @@ namespace Synapse.Api
                 if (value == null)
                     return;
 
-                if (Server.Get.PermissionHandler.ServerSection.GlobalAccess && ServerRoles.RemoteAdminMode == ServerRoles.AccessMode.GlobalAccess)
-                    return;
-
-                ServerRoles.Group.Permissions = value.GetVanillaPermissionValue();
-                ServerRoles.Permissions = value.GetVanillaPermissionValue();
-
-                ServerRoles.Group.Cover = value.Cover;
-
-                ServerRoles.Group.RequiredKickPower = value.RequiredKickPower;
-                ServerRoles.Group.KickPower = value.KickPower;
-
-
-                RankName = value.Badge.ToUpper() == "NONE" ? null : value.Badge;
-                RankColor = value.Color.ToUpper() == "NONE" ? null : value.Color;
-
-                ServerRoles.Group.HiddenByDefault = value.Hidden;
-                if (value.Hidden)
-                    HideRank = true;
-
-                if (value.RemoteAdmin)
-                    RaLogin();
-                else
-                    RaLogout();
-
                 synapseGroup = value;
+
+                RefreshPermission();
             }
         }
+
+        public bool HasPermission(string permission) => this == Server.Get.Host ? true : SynapseGroup.HasPermission(permission);
+
+        public void RefreshPermission()
+        {
+            var group = new UserGroup
+            {
+                BadgeText = SynapseGroup.Badge.ToUpper() == "NONE" ? null : SynapseGroup.Badge,
+                BadgeColor = SynapseGroup.Color.ToUpper() == "NONE" ? ServerRoles.DefaultColor : SynapseGroup.Color,
+                Cover = SynapseGroup.Cover,
+                HiddenByDefault = SynapseGroup.Hidden,
+                KickPower = SynapseGroup.KickPower,
+                Permissions = SynapseGroup.GetVanillaPermissionValue(),
+                RequiredKickPower = SynapseGroup.RequiredKickPower,
+                Shared = false
+            };
+
+            ServerRoles.Group = group;
+
+            if (!ServerRoles.OverwatchPermitted && SynapseGroup.HasVanillaPermission(PlayerPermissions.Overwatch))
+                ServerRoles.OverwatchPermitted = true;
+
+            else if (SynapseGroup.RemoteAdmin)
+                RaLogin();
+            else
+                RaLogout();
+
+            ServerRoles.SendRealIds();
+
+            var flag = ServerRoles.Staff || SynapseGroup.HasVanillaPermission(PlayerPermissions.ViewHiddenBadges);
+            var flag2 = ServerRoles.Staff || SynapseGroup.HasVanillaPermission(PlayerPermissions.ViewHiddenGlobalBadges);
+
+            if(flag || flag2)
+                foreach(var player in Server.Get.Players)
+                {
+                    if (!string.IsNullOrEmpty(player.ServerRoles.HiddenBadge) && (!player.ServerRoles.GlobalHidden || flag2) && (player.ServerRoles.GlobalHidden || flag))
+                        player.ServerRoles.TargetSetHiddenRole(Connection, player.ServerRoles.HiddenBadge);
+                }
+
+            if (SynapseGroup.Hidden)
+            {
+                ServerRoles._badgeCover = false;
+                ServerRoles.NetworkMyText = "null";
+                ServerRoles.NetworkMyColor = "default";
+                ServerRoles.HiddenBadge = group.BadgeText;
+                ServerRoles.RefreshHiddenTag();
+                ServerRoles.TargetSetHiddenRole(Connection, group.BadgeText);
+            }
+            else
+            {
+                ServerRoles.HiddenBadge = null;
+                ServerRoles.RpcResetFixed();
+                ServerRoles.NetworkMyText = group.BadgeText;
+                ServerRoles.NetworkMyColor = group.BadgeColor;
+            }
+        }
+
+        public GlobalBadge GlobalBadge { get; internal set; }
+
+        internal Dictionary<string, string> globalBadgeRequest;
         #endregion
 
         #region Default Stuff
