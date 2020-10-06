@@ -29,8 +29,8 @@ namespace Synapse.Api
                     case -1000f:
                         if (RoomName.Contains("HCZ"))
                             return ZoneType.HCZ;
-                        else
-                            return ZoneType.Entrance;
+
+                        return ZoneType.Entrance;
 
 
                     case -2000f:
@@ -131,7 +131,8 @@ namespace Synapse.Api
                     "HCZ_079",
                     "LCZ_372",
                     "HCZ_457",
-                    "EZ_CollapsedTunnel"
+                    "EZ_CollapsedTunnel",
+                    "Start Positions"
                 };
     }
 }
