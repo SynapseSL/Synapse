@@ -37,6 +37,9 @@ namespace Synapse.Api
                         return ZoneType.Pocket;
 
                     default:
+                        if (RoomName == "Start Positions")
+                            return ZoneType.Lobby;
+
                         return ZoneType.None;
                 }
             }

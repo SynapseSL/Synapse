@@ -7,6 +7,7 @@
         HCZ,
         Entrance,
         Surface,
-        Pocket
+        Pocket,
+        Lobby
     }
 }

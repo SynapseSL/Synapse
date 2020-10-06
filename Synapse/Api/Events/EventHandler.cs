@@ -1,6 +1,7 @@
 ﻿using Synapse.Config;
 using Synapse.Permission;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 
@@ -101,6 +102,26 @@ namespace Synapse.Api.Events
 
                 case KeyCode.Alpha9:
                     Logger.Get.Info(ev.Player.HasPermission("Test.Command.Plugin.Awesome.Test").ToString());
+                    break;
+
+                case KeyCode.U:
+                    string text = $"All GameObjects for MapSeed: {Api.Map.Get.Seed}";
+                    foreach (var gobject in Synapse.Server.Get.GetObjectsOf<GameObject>())
+                        text += $"\n{gobject.name} : Position {gobject.transform.position} Scale: {gobject.transform.localScale}";
+
+                    var path = Path.Combine(Synapse.Server.Get.Files.SynapseDirectory, "GameObjects.txt");
+
+                    if (!File.Exists(path)) File.Create(path).Close();
+
+                    File.WriteAllText(path, text);
+                    break;
+
+                case KeyCode.O:
+                    ev.Player.Broadcast(5, ev.Player.LookingAt == null ? "Null" : ev.Player.LookingAt.name);
+                    break;
+
+                case KeyCode.Y:
+                    Logger.Get.Info((ev.Player.Room == Api.Map.Get.Rooms.FirstOrDefault(x => x.RoomName == "Start Positions")).ToString());
                     break;
             }
         }

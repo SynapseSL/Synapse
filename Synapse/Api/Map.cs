@@ -44,6 +44,8 @@ namespace Synapse.Api
             }
         }
 
+        public int Seed => RandomSeedSync.staticSeed;
+
         public Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "") 
             => new Dummy(pos, rot, role, name, badgetext, badgecolor);
 
@@ -52,7 +54,7 @@ namespace Synapse.Api
             foreach (var tesla in SynapseController.Server.GetObjectsOf<TeslaGate>())
                 SynapseController.Server.Map.Teslas.Add(new Tesla(tesla));
 
-            foreach (var room in SynapseController.Server.GetObjectsOf<Transform>().Where(x => x.CompareTag("Room") || x.name == "Root_*&*Outside Cams" || x.name == "PocketWorld"))
+            foreach (var room in SynapseController.Server.GetObjectsOf<Transform>().Where(x => x.CompareTag("Room") || x.name == "Root_*&*Outside Cams" || x.name == "PocketWorld" || x.name == "Start Positions"))
                 Rooms.Add(new Room(room.gameObject));
         }
     }
