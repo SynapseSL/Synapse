@@ -49,6 +49,12 @@ namespace Synapse.Api
         public Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "") 
             => new Dummy(pos, rot, role, name, badgetext, badgecolor);
 
+        public void SendBroadcast(ushort time,string message,bool instant)
+        {
+            foreach (var ply in Server.Get.Players)
+                ply.SendBroadcast(time, message, instant);
+        }
+
         internal void RefreshObjects()
         {
             foreach (var tesla in SynapseController.Server.GetObjectsOf<TeslaGate>())
