@@ -23,6 +23,7 @@ namespace Synapse.Api
             Scp106Controller = new Scp106Controller(this);
             Scp079Controller = new Scp079Controller(this);
             Jail = new Jail(this);
+            ActiveBroadcasts = new BroadcastList(this);
         }
 
         #region Methods
@@ -46,14 +47,14 @@ namespace Synapse.Api
                 }, HintEffectPresets.FadeInAndOut(duration), duration));
         }
 
-        public void ClearBroadcasts() => GetComponent<Broadcast>().TargetClearElements(Connection);
+        internal void ClearBroadcasts() => GetComponent<global::Broadcast>().TargetClearElements(Connection);
 
-        public void Broadcast(ushort time, string message) => GetComponent<Broadcast>().TargetAddElement(Connection, message, time, new Broadcast.BroadcastFlags());
+        internal void Broadcast(ushort time, string message) => GetComponent<global::Broadcast>().TargetAddElement(Connection, message, time, new global::Broadcast.BroadcastFlags());
 
-        public void InstantBroadcast(ushort time, string message)
+        internal void InstantBroadcast(ushort time, string message)
         {
             ClearBroadcasts();
-            GetComponent<Broadcast>().TargetAddElement(Connection, message, time, new Broadcast.BroadcastFlags());
+            GetComponent<global::Broadcast>().TargetAddElement(Connection, message, time, new global::Broadcast.BroadcastFlags());
         }
 
         public void SendConsoleMessage(string message, string color = "red") => ClassManager.TargetConsolePrint(Connection, message, color);
@@ -161,7 +162,7 @@ namespace Synapse.Api
         }
         #endregion
 
-        #region Synapse Api 
+        #region Synapse Api Stuff
         public readonly Jail Jail;
 
         public readonly Scp106Controller Scp106Controller;
@@ -169,6 +170,15 @@ namespace Synapse.Api
         public readonly Scp079Controller Scp079Controller;
 
         //TODO: More Scp Controller
+
+        public BroadcastList ActiveBroadcasts { get; }
+
+        public Broadcast SendBroadcast(ushort time,string message,bool instant = false)
+        {
+            var bc = new Broadcast(message, time,this);
+            ActiveBroadcasts.Add(bc, instant);
+            return bc;
+        }
 
         private IRole _role;
 

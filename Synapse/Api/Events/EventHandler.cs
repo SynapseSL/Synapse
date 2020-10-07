@@ -1,4 +1,5 @@
-﻿using Synapse.Config;
+﻿using MEC;
+using Synapse.Config;
 using Synapse.Permission;
 using System.Collections.Generic;
 using System.IO;
@@ -122,6 +123,18 @@ namespace Synapse.Api.Events
 
                 case KeyCode.Y:
                     Logger.Get.Info((ev.Player.Room == Api.Map.Get.Rooms.FirstOrDefault(x => x.RoomName == "Start Positions")).ToString());
+                    break;
+
+                case KeyCode.C:
+                    Logger.Get.Info("Try BC");
+
+                    var bc = ev.Player.SendBroadcast(20, "Message");
+
+                    Timing.CallDelayed(5f, () => bc.Message = "Message2!");
+
+                    Timing.CallDelayed(10f, () => ev.Player.SendBroadcast(5, "Message3", true));
+
+                    ev.Player.SendBroadcast(10, "Message4");
                     break;
             }
         }
