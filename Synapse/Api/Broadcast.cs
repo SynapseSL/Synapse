@@ -127,7 +127,14 @@ namespace Synapse.Api
             }
         }
 
-
+        public void Clear()
+        {
+            if (bcs.Count < 1)
+                return;
+            var activebc = bcs.FirstOrDefault();
+            bcs.Clear();
+            activebc.EndBc();
+        }
 
 
 
