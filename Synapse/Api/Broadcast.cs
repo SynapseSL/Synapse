@@ -58,9 +58,6 @@ namespace Synapse.Api
         public void Refresh()
         {
             var time = Time - (UnityEngine.Time.time - DisplayTime) + 1; //The one is there because by converting a float (14,99999) to a ushort the number becomes one smaller (14)
-            
-            Logger.Get.Info($"Jetzt: {UnityEngine.Time.time}, Start: {DisplayTime}, Sekunden dazwischen: {time}, Als Ushort{(ushort)time}");
-
             _player.InstantBroadcast((ushort)time, Message);
         }
 
