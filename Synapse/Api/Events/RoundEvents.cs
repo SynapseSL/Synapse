@@ -11,11 +11,14 @@ namespace Synapse.Api.Events
         
         public event Action RoundStartEvent;
 
+        public event Action RoundRestartEvent;
+
         public event EventHandler.OnSynapseEvent<RoundCheckEventArgs> RoundCheckEvent; 
 
         #region PlayerEventsInvoke
         internal void InvokeWaitingForPlayers() => WaitingForPlayersEvent?.Invoke();
         internal void InvokeRoundStartEvent() => RoundStartEvent?.Invoke();
+        internal void InvokeRoundRestartEvent() => RoundRestartEvent?.Invoke();
 
         internal void InvokeRoundCheckEvent(ref bool forceEnd, ref bool allow, ref RoundSummary.LeadingTeam team,
             ref bool teamChanged)

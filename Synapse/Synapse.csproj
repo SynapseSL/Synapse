@@ -89,6 +89,7 @@
     <Compile Include="Command\ICommand.cs" />
     <Compile Include="Command\ICommandHandler.cs" />
     <Compile Include="Command\ISynapseCommand.cs" />
+    <Compile Include="Config\SerializedObjects.cs" />
     <Compile Include="Config\ConfigHandler.cs" />
     <Compile Include="Config\SYML.cs" />
     <Compile Include="Config\SynapseConfiguration.cs" />
