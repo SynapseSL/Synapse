@@ -1,7 +1,10 @@
-﻿using Synapse.Api;
+﻿using Harmony;
+using Synapse.Api;
+using Synapse.Patches.EventsPatches.PlayerPatches;
 
 namespace Synapse.Patches.EventsPatches.RoundPatches
 {
+    [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.Roundrestart))]
     internal static class RoundRestartPatch
     {
         private static void Prefix()
@@ -12,6 +15,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
             map.Elevators.Clear();
             map.Rooms.Clear();
             map.Generators.Clear();
+            PlayerBasicItemUsePatch.HealCache.Clear();
 
             //TODO: RestartEvent
         }

@@ -10,15 +10,15 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     [HarmonyPatch(typeof(ConsumableAndWearableItems), nameof(ConsumableAndWearableItems.UseMedicalItem))]
     public class PlayerBasicItemUsePatch
     {
-        
-        //TODO: Clear on Round restart
         internal static Dictionary<int,ItemType> HealCache = new Dictionary<int, ItemType>();
         
         public static bool Prefix(ConsumableAndWearableItems __instance)
         {
             try
             {
-                SynapseController.Server.Logger.Info($"ItemUse: { __instance._hub.inventory.curItem.ToString()}");
+#if DEBUG
+                SynapseController.Server.Logger.Info($"ItemUse: { __instance._hub.inventory.curItem}");
+#endif
 
                 var t = __instance._hub.inventory.curItem;
 
