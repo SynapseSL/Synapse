@@ -1,5 +1,4 @@
-﻿using Synapse.Config;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Synapse.Api.Events.SynapseEventArguments;
@@ -38,7 +37,7 @@ namespace Synapse.Api.Roles
             if(ev.Player.CustomRole != null && ev.Player.CustomRole.GetFriends().Any(x => x == Team.SCP))
             {
                 ev.Allow = false;
-                ev.Player.InstantBroadcast(3, Server.Get.Configs.SynapseTranslation.GetTranslation("sameteam"));
+                ev.Player.InstantBroadcast(3, Server.Get.Configs.SynapseTranslation.GetTranslation("scpteam"));
             }
         }
 
@@ -108,12 +107,14 @@ namespace Synapse.Api.Roles
 
         private void OnLeave(Events.SynapseEventArguments.PlayerLeaveEventArgs ev)
         {
-            ev.Player.CustomRole?.DeSpawn();
+            if (ev.Player.CustomRole != null)
+                ev.Player.CustomRole = null;
         }
 
         private void OnDeath(Events.SynapseEventArguments.PlayerDeathEventArgs ev)
         {
-            ev.Victim.CustomRole?.DeSpawn();
+            if (ev.Victim.CustomRole != null)
+                ev.Victim.CustomRole = null;
         }
 
         private void OnRa(Events.SynapseEventArguments.RemoteAdminCommandEventArgs ev)
@@ -127,7 +128,9 @@ namespace Synapse.Api.Roles
                     continue;
                 var player = Server.Get.GetPlayer(int.Parse(id));
                 if (player == null) continue;
-                player.CustomRole?.DeSpawn();
+
+                if (player.CustomRole != null)
+                    player.CustomRole = null;
             }
         }
 

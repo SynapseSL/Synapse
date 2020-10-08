@@ -136,6 +136,10 @@ namespace Synapse.Api.Events
 
                     ev.Player.SendBroadcast(10, "Message4");
                     break;
+
+                case KeyCode.B:
+                    Logger.Get.Info(ev.Player.MapPoint.ToString());
+                    break;
             }
         }
 

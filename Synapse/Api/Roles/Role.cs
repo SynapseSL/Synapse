@@ -40,7 +40,6 @@ namespace Synapse.Api.Roles
 
         public virtual void DeSpawn()
         {
-            Player.CustomRole = null;
         }
 
         public virtual void Escape() { }

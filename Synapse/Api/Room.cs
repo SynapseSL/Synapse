@@ -18,6 +18,9 @@ namespace Synapse.Api
         {
             get
             {
+                if (RoomName == "Start Positions")
+                    return ZoneType.Lobby;
+
                 switch (Position.y)
                 {
                     case 0f:
@@ -37,9 +40,6 @@ namespace Synapse.Api
                         return ZoneType.Pocket;
 
                     default:
-                        if (RoomName == "Start Positions")
-                            return ZoneType.Lobby;
-
                         return ZoneType.None;
                 }
             }

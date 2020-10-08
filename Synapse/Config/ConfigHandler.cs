@@ -97,7 +97,7 @@ namespace Synapse.Config
         
         public override string ToString()
         {
-            return $"{Room}:{X.ToString(CultureInfo.InvariantCulture)}:{Y.ToString(CultureInfo.InvariantCulture)}:{Z.ToString(CultureInfo.InvariantCulture)}";
+            return $"{Room}:{X}:{Y}:{Z}";
         }
     }
     
