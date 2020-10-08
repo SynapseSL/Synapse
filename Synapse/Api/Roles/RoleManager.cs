@@ -25,11 +25,21 @@ namespace Synapse.Api.Roles
             SynapseController.Server.Events.Scp.Scp106.PocketDimensionLeaveEvent += Scp106OnPocketDimensionLeaveEvent;
         }
 
-        public Dictionary<Type, string> CustomRoles = new Dictionary<Type, string>();
+        public Dictionary<Type, KeyValuePair<string, int>> CustomRoles = new Dictionary<Type, KeyValuePair<string, int>>();
 
-        public IRole GetCustomRole(string name) => (IRole)Activator.CreateInstance(CustomRoles.Keys.FirstOrDefault(x => x.Name.ToLower() == name));
 
-        public void RegisterCustomRole<TRole>(string rolename) where TRole : IRole => CustomRoles.Add(typeof(TRole), rolename);
+        public IRole GetCustomRole(string name) => (IRole)Activator.CreateInstance(CustomRoles.FirstOrDefault(x => x.Value.Key.ToLower() == name.ToLower()).Key);
+
+        public IRole GetCustomRole(int id) => (IRole)Activator.CreateInstance(CustomRoles.FirstOrDefault(x => x.Value.Value == id).Key);
+
+        public void RegisterCustomRole<TRole>() where TRole : IRole
+        {
+            var role = (IRole)Activator.CreateInstance(typeof(TRole));
+
+            var pair = new KeyValuePair<string, int>(role.GetRoleName(), role.GetRoleID());
+
+            CustomRoles.Add(typeof(TRole), pair);
+        }
 
         #region Events
         private void OnGenerator(Events.SynapseEventArguments.PlayerGeneratorInteractEventArgs ev)
