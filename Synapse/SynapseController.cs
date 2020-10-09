@@ -9,8 +9,6 @@ public class SynapseController
 {
     private static bool IsLoaded = false;
 
-    public static bool EnableDatabase = true;
-
     public static Synapse.Server Server { get; } = new Synapse.Server();
 
     public static PluginLoader PluginLoader { get; } = new PluginLoader();

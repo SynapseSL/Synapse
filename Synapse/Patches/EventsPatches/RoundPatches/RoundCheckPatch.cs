@@ -98,6 +98,57 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 
                 try
                 {
+                    //TODO: Replace the Code from Nw completely
+
+                    //Code from Synapse for CustomRoles and ChaosScpEnd
+                    List<Team> teams = Server.Get.Players.Select(x => x.RealTeam).ToList();
+
+                    var teamAmounts = 0;
+                    if (teams.Contains(Team.MTF)) teamAmounts++;
+                    if (teams.Contains(Team.RSC)) teamAmounts++;
+                    if (teams.Contains(Team.CHI)) teamAmounts++;
+                    if (teams.Contains(Team.CDP)) teamAmounts++;
+                    if (teams.Contains(Team.SCP)) teamAmounts++;
+
+                    var roundEnd = teamAmounts < 2;
+                    if (teamAmounts == 2)
+                    {
+                        if (teams.Contains(Team.CHI) && teams.Contains(Team.SCP))
+                            roundEnd = Server.Get.Configs.SynapseConfiguration.ChaosScpEnd;
+
+                        if (teams.Contains(Team.CHI) && teams.Contains(Team.CDP))
+                            roundEnd = true;
+
+                        if (teams.Contains(Team.MTF) && teams.Contains(Team.RSC))
+                            roundEnd = true;
+                    }
+
+                    foreach (var role in Server.Get.GetPlayers(x => x.CustomRole != null).Select(x => x.CustomRole))
+                        if (role.GetEnemys().Any(t => teams.Contains(t)))
+                            roundEnd = false;
+
+                    if (!roundEnd) allow = false;
+                    else
+                    {
+                        forceEnd = true;
+
+                        if (RoundSummary.escaped_ds + teams.Count(x => x == Team.CDP) > 0)
+                        {
+                            if (!teams.Contains(Team.SCP) && !teams.Contains(Team.CHI))
+                                team = RoundSummary.LeadingTeam.Draw;
+                            else
+                                team = RoundSummary.LeadingTeam.ChaosInsurgency;
+                        }
+                        else
+                        {
+                            if (teams.Contains(Team.MTF) || teams.Contains(Team.RSC))
+                            {
+                                team = RoundSummary.escaped_scientists + teams.Count(x => x == Team.RSC) > 0 ? RoundSummary.LeadingTeam.FacilityForces : RoundSummary.LeadingTeam.Draw;
+                            }
+                            else team = RoundSummary.LeadingTeam.Anomalies;
+                        }
+                    }
+
                     SynapseController.Server.Events.Round.InvokeRoundCheckEvent(ref forceEnd, ref allow, ref team, ref teamChanged);
                 }
                 catch (Exception e)
