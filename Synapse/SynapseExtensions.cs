@@ -57,4 +57,8 @@ public static class SynapseExtensions
     public static Tesla GetTesla(this TeslaGate teslaGate) => Map.Get.Teslas.FirstOrDefault(x => x.GameObject == teslaGate.gameObject);
 
     public static Elevator GetElevator(this Lift lift) => Map.Get.Elevators.FirstOrDefault(x => x.GameObject == lift.gameObject);
+
+    public static Synapse.Api.Items.Item GetItem(this Inventory.SyncItemInfo info) => Map.Get.Items.FirstOrDefault(x => x.itemInfo == info);
+
+    public static Synapse.Api.Items.Item GetItem(this Pickup pickup) => Map.Get.Items.FirstOrDefault(x => x.pickup == pickup);
 }

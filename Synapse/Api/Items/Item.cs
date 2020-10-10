@@ -7,8 +7,8 @@ namespace Synapse.Api.Items
 {
     public class Item
     {
-        private Pickup pickup;
-        private Inventory.SyncItemInfo itemInfo;
+        internal Pickup pickup;
+        internal Inventory.SyncItemInfo itemInfo;
 
         public Item(int id, float durability, int sight, int barrel, int other)
         {
@@ -31,6 +31,8 @@ namespace Synapse.Api.Items
             Sight = sight;
             Barrel = barrel;
             Other = other;
+
+            Map.Get.Items.Add(this);
         }
 
         public Item(ItemType item, float durability, int sight, int barrel, int other)
@@ -43,6 +45,8 @@ namespace Synapse.Api.Items
             Sight = sight;
             Barrel = barrel;
             Other = other;
+
+            Map.Get.Items.Add(this);
         }
 
         public readonly int ID;
@@ -189,12 +193,31 @@ namespace Synapse.Api.Items
         {
             if (pickup != null) return;
 
-            pickup = Server.Get.Host.Inventory.SetPickup(ItemType, Durabillity, position, Quaternion.identity, Sight, Barrel, Other);
+            pickup = UnityEngine.Object.Instantiate(Server.Get.Host.Inventory.pickupPrefab).GetComponent<Pickup>();
+            pickup.transform.localScale = Scale;
+            NetworkServer.Spawn(pickup.gameObject);
+            pickup.SetupPickup(ItemType, Durabillity, ItemHolder == null ? Server.Get.Host.gameObject : ItemHolder.gameObject, new Pickup.WeaponModifiers(true, Sight, Barrel, Other), position, ItemHolder != null ? ItemHolder.Inventory.camera.transform.rotation : Quaternion.identity);
+
             if (ItemHolder != null)
                 ItemHolder.Items.Remove(itemInfo);
             ItemHolder = null;
         }
 
         public void Drop() => Drop(Position);
+
+        public void Despawn()
+        {
+            if(pickup != null)
+            {
+                pickup.Delete();
+                pickup = null;
+            }
+
+            if(ItemHolder != null)
+            {
+                ItemHolder.Items.Remove(itemInfo);
+                ItemHolder = null;
+            }
+        }
     }
 }

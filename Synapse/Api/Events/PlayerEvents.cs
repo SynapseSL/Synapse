@@ -40,6 +40,8 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<PlayerGeneratorInteractEventArgs> PlayerGeneratorInteractEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerKeyPressEventArgs> PlayerKeyPressEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerDropItemEventArgs> PlayerDropItemEvent;
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -182,6 +184,23 @@ namespace Synapse.Api.Events
         }
 
         internal void InvokePlayerKeyPressEvent(Player player, KeyCode keyCode) => PlayerKeyPressEvent?.Invoke(new PlayerKeyPressEventArgs { Player = player, KeyCode = keyCode });
+
+        internal void InvokePlayerDropItemPatch(Player player,Items.Item item,out bool allow)
+        {
+            allow = true;
+            if (PlayerDropItemEvent == null) return;
+
+            var ev = new PlayerDropItemEventArgs
+            {
+                Player = player,
+                Item = item,
+                Allow = true,
+            };
+
+            PlayerDropItemEvent.Invoke(ev);
+
+            allow = ev.Allow;
+        }
         #endregion
     }
 }

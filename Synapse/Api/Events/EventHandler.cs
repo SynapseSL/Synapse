@@ -174,8 +174,44 @@ namespace Synapse.Api.Events
                         
                     });
                     break;
+
+                case KeyCode.H:
+                    var item4 = new Items.Item(ItemType.Medkit, 0, 0, 0,0);
+                    item4.Scale = Vector3.one * 5;
+                    item4.Drop(ev.Player.Position);
+
+                    Timing.CallDelayed(10f, () =>
+                    {
+                        item4.PickUp(ev.Player);
+                        Timing.CallDelayed(5f, () => item4.Drop());
+                    });
+                    break;
+#if DEBUG
+                case KeyCode.G:
+                    if(testitem == null)
+                    {
+                        testitem = new Items.Item(ItemType.GunCOM15, 10, 0, 0, 0);
+                        testitem.Scale = Vector3.one * 3;
+                        testitem.PickUp(ev.Player);
+                    }
+                    else
+                    {
+                        testitem.Drop();
+                        Timing.CallDelayed(5f, () => testitem.PickUp(ev.Player));
+                    }
+                    break;
+
+                case KeyCode.Z:
+                    foreach (var item5 in SynapseController.Server.Map.Items)
+                        item5.Scale = item5.Scale * 2;
+                    break;
+#endif
             }
         }
+#if DEBUG
+        private Items.Item testitem;
+#endif
+
 
         private void PlayerJoin(SynapseEventArguments.PlayerJoinEventArgs ev)
         {

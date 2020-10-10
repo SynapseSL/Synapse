@@ -28,6 +28,8 @@ namespace Synapse.Api
 
         public Generator MainGenerator { get; internal set; }
 
+        public List<Items.Item> Items { get; } = new List<Items.Item>();
+
         public string IntercomText
         {
             get => Server.Get.Host.GetComponent<Intercom>().CustomContent;

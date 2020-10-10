@@ -171,4 +171,13 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public KeyCode KeyCode { get; internal set; }
     }
+
+    public class PlayerDropItemEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public Items.Item Item { get; internal set; }
+
+        public bool Allow { get; set; }
+    }
 }
