@@ -2,6 +2,7 @@
 using Synapse.Config;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using YamlDotNet.Serialization;
 
@@ -9,26 +10,37 @@ namespace Synapse.Permission
 {
     public class SynapseGroup : IConfigSection
     {
+        [Description("If Enabled this Group will be assigned to all players,which are in no other Group")]
         public bool Default = false;
 
+        [Description("If Enabled this Group will be assigned to Northwood staff players,which are in no other Group")]
         public bool Northwood = false;
 
+        [Description("If Enabled this Group has Acces to RemoteAdmin")]
         public bool RemoteAdmin = false;
 
+        [Description("The Badge which will be displayed in game")]
         public string Badge = "NONE";
 
+        [Description("The Color which the Badge has in game")]
         public string Color = "NONE";
 
+        [Description("If Enabled The Badge of this Group will be displayed instead of the global Badge")]
         public bool Cover = false;
 
+        [Description("If Enabled the Badge is Hidden by default")]
         public bool Hidden = false;
 
+        [Description("The KickPower the group has")]
         public byte KickPower = 0;
 
+        [Description("The KickPower which is required to kick the group")]
         public byte RequiredKickPower = 1;
 
+        [Description("The Permissions which the group has")]
         public List<string> Permissions = new List<string> { };
 
+        [Description("The UserID´s of the Players in the Group")]
         public List<string> Members = new List<string> { };
 
         public bool HasPermission(string permission)
