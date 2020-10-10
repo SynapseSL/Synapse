@@ -1,5 +1,6 @@
 ﻿using System;
 using Harmony;
+using Synapse.Api;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
@@ -17,11 +18,31 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
             var item = syncItemInfo.GetItem();
 
-            Server.Get.Events.Player.InvokePlayerDropItemPatch(__instance.GetPlayer(), item, out var allow);
+            bool allow = true;
+            try
+            {
+                Server.Get.Events.Player.InvokePlayerDropItemPatch(__instance.GetPlayer(), item, out allow);
+            }
+            catch(Exception e)
+            {
+                Logger.Get.Error($"Synapse-Event: DropItem failed!!\n{e}");
+            }
 
             if (!allow) return false;
 
-            item.Drop();
+            if(item != null)
+            {
+                item.Drop();
+            }
+            else
+            {
+                //TODO: Remove this after fully implementing Custom Items into Synapse
+                __instance.SetPickup(syncItemInfo.id, syncItemInfo.durability,
+                    __instance.transform.position, __instance.camera.transform.rotation, syncItemInfo.modSight,
+                    syncItemInfo.modBarrel, syncItemInfo.modOther);
+
+                __instance.items.RemoveAt(itemInventoryIndex);
+            }
 
             return false;
         }

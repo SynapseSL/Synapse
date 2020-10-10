@@ -1,12 +1,11 @@
 ﻿using Mirror;
-using System.Net.NetworkInformation;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace Synapse.Api.Items
 {
     public class Item
     {
+        private bool deactivated = false;
         internal Pickup pickup;
         internal Inventory.SyncItemInfo itemInfo;
 
@@ -168,9 +167,32 @@ namespace Synapse.Api.Items
 
         public void PickUp(Player player)
         {
+            if (deactivated) throw new System.Exception("Player tryied to Pickup a Destroyed Item??");
+
             if (ItemHolder != null) return;
 
-            if (player.Items.Count > 8) return;
+            if (player.Items.Count >= 8) return;
+
+            if(!IsCustomItem && (ItemType == ItemType.Ammo556 || ItemType == ItemType.Ammo762 || ItemType == ItemType.Ammo9mm))
+            {
+                switch (ItemType)
+                {
+                    case ItemType.Ammo556:
+                        player.Ammo5 += (uint)Durabillity;
+                        break;
+
+                    case ItemType.Ammo762:
+                        player.Ammo7 += (uint)Durabillity;
+                        break;
+
+                    case ItemType.Ammo9mm:
+                        player.Ammo9 += (uint)Durabillity;
+                        break;
+                }
+
+                Despawn();
+                return;
+            }
 
             Inventory._uniqId++;
             itemInfo = new Inventory.SyncItemInfo()
@@ -191,6 +213,8 @@ namespace Synapse.Api.Items
 
         public void Drop(Vector3 position)
         {
+            if (deactivated) throw new System.Exception("Something tryied to Drop a Destroyed Item??");
+
             if (pickup != null) return;
 
             pickup = UnityEngine.Object.Instantiate(Server.Get.Host.Inventory.pickupPrefab).GetComponent<Pickup>();
@@ -218,6 +242,9 @@ namespace Synapse.Api.Items
                 ItemHolder.Items.Remove(itemInfo);
                 ItemHolder = null;
             }
+
+            Map.Get.Items.Remove(this);
+            deactivated = true;
         }
     }
 }

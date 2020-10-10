@@ -42,6 +42,8 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<PlayerKeyPressEventArgs> PlayerKeyPressEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerDropItemEventArgs> PlayerDropItemEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerPickUpItemEventArgs> PlayerPickUpItemEvent;
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -198,6 +200,24 @@ namespace Synapse.Api.Events
             };
 
             PlayerDropItemEvent.Invoke(ev);
+
+            allow = ev.Allow;
+        }
+
+        internal void InvokePlayerPickUpEvent(Player player,Items.Item item,out bool allow)
+        {
+            allow = true;
+
+            if (PlayerPickUpItemEvent == null) return;
+
+            var ev = new PlayerPickUpItemEventArgs
+            {
+                Player = player,
+                Item = item,
+                Allow = true,
+            };
+
+            PlayerPickUpItemEvent.Invoke(ev);
 
             allow = ev.Allow;
         }

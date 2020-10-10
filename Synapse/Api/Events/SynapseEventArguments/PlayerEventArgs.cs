@@ -180,4 +180,13 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public bool Allow { get; set; }
     }
+
+    public class PlayerPickUpItemEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public Items.Item Item { get; internal set; }
+
+        public bool Allow { get; set; }
+    }
 }

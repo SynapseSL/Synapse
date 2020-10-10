@@ -102,6 +102,7 @@
     <Compile Include="Patches\EventsPatches\MapPatches\DoorInteractPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\TriggerTeslaPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\WarheadDetonationPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerPickUpPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDropItemPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerGeneratorInteract.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerEnterFemurPatch.cs" />
@@ -126,6 +127,9 @@
     <Compile Include="Patches\EventsPatches\ServerPatches\ConsoleCommandPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\RemoteAdminPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\Item Patches\RefreshDurabilityPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\Item Patches\CreateItemPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\Item Patches\DropAllPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Item Patches\ModifyPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Permission System\RefreshPermissionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Permission System\SignatureCompletePatch.cs" />

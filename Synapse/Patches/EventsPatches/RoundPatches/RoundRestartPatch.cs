@@ -16,6 +16,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
             map.Elevators.Clear();
             map.Rooms.Clear();
             map.Generators.Clear();
+            map.Items.Clear();
             PlayerBasicItemUsePatch.HealCache.Clear();
 
             try
