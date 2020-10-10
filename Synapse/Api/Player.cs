@@ -169,8 +169,6 @@ namespace Synapse.Api
 
         public readonly Scp079Controller Scp079Controller;
 
-        //TODO: More Scp Controller
-
         public BroadcastList ActiveBroadcasts { get; }
 
         public Broadcast SendBroadcast(ushort time,string message,bool instant = false)

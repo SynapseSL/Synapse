@@ -8,8 +8,8 @@ using System.Linq;
 using Logger = Synapse.Api.Logger;
 using EventHandler = Synapse.Api.Events.EventHandler;
 using Synapse.Api.Plugin;
-using GameCore;
 using Synapse.Api.Roles;
+using Synapse.Api.Items;
 
 namespace Synapse
 {
@@ -29,6 +29,8 @@ namespace Synapse
         public EventHandler Events { get; } = new EventHandler();
 
         public RoleManager RoleManager { get; } = new RoleManager();
+
+        public ItemManager ItemManager { get; } = new ItemManager();
 
         public ConfigHandler Configs { get; } = new ConfigHandler();
 

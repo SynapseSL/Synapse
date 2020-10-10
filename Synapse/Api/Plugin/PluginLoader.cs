@@ -16,7 +16,7 @@ namespace Synapse.Api.Plugin
 
         private readonly List<PluginLoadContext> _contexts = new List<PluginLoadContext>();
 
-        public readonly List<PluginInformations> PluginInformation = new List<PluginInformations>(); 
+        public readonly List<PluginInformations> Plugins = new List<PluginInformations>(); 
         
         internal void ActivatePlugins() 
         {
@@ -64,7 +64,7 @@ namespace Synapse.Api.Plugin
                     plugin.PluginDirectory = SynapseController.Server.Files.GetPluginDirectory(plugin.Informations);
                     _contexts.Add(new PluginLoadContext(plugin, infoTypePair.Value.Key, infoTypePair.Key, infoTypePair.Value.Value));
                     _plugins.Add(plugin);
-                    PluginInformation.Add(infoTypePair.Key);
+                    Plugins.Add(infoTypePair.Key);
                 }
                 catch(Exception e) 
                 {

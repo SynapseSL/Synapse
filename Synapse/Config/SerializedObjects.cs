@@ -1,4 +1,6 @@
 ﻿using Synapse.Api;
+using Synapse.Api.Items;
+using System.ComponentModel;
 
 namespace Synapse.Config
 {
@@ -29,7 +31,7 @@ namespace Synapse.Config
         public float Y { get; set; }
         public float Z { get; set; }
 
-        public MapPoint parse()
+        public MapPoint Parse()
         {
             return MapPoint.Parse(ToString());
         }
@@ -42,6 +44,29 @@ namespace Synapse.Config
 
     public class SerializedItem
     {
-        //TODO: Seriliazed Item class
+        int ID { get; set; }
+
+        float Durabillity { get; set; }
+
+        int Barrel { get; set; }
+
+        int Sight { get; set; }
+
+        int Other { get; set; }
+
+        public SerializedItem(Synapse.Api.Items.Item item) { }
+
+        public SerializedItem(int id, float durabillity,int barrel, int sight,int other)
+        {
+            ID = id;
+            Durabillity = durabillity;
+            Barrel = barrel;
+            Sight = sight;
+            Other = other;
+        }
+
+        public SerializedItem() { }
+
+        public Synapse.Api.Items.Item Parse() => new Api.Items.Item(ID, Durabillity, Sight, Barrel, Other);
     }
 }

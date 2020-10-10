@@ -140,6 +140,17 @@ namespace Synapse.Api.Events
                 case KeyCode.B:
                     Logger.Get.Info(ev.Player.MapPoint.ToString());
                     break;
+
+                case KeyCode.L:
+                    var item = new Items.Item(ItemType.Medkit, 0, 0, 0, 0);
+                    item.Drop(ev.Player.Position);
+                    Timing.CallDelayed(5f, () => item.PickUp(ev.Player));
+                    break;
+                case KeyCode.K:
+                    var item2 = new Items.Item(ItemType.Medkit, 0, 0, 0, 0);
+                    item2.PickUp(ev.Player);
+                    Timing.CallDelayed(5f, () => item2.Drop());
+                    break;
             }
         }
 

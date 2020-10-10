@@ -12,7 +12,7 @@ namespace Synapse.Permission
 
         private SYML _permissionSYML;
 
-        private Dictionary<string, SynapseGroup> Groups = new Dictionary<string, SynapseGroup>();
+        private readonly Dictionary<string, SynapseGroup> Groups = new Dictionary<string, SynapseGroup>();
         internal ServerSection ServerSection;
 
         internal void Init()

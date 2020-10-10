@@ -12,7 +12,6 @@ namespace Synapse.Command
         
         public List<ICommand> Commands => commands.Values.ToList();
 
-        //TODO: Fix bug that aliases cant be found if there are multiple for one command
         public bool TryGetCommand(string name, out ICommand cmd)
         {
             if (commandAliases.TryGetValue(name.ToLower(), out var alias))

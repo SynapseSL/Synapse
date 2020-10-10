@@ -39,6 +39,8 @@
     <Compile Include="Api\Generator.cs" />
     <Compile Include="Api\Enum\GeneratorInteraction.cs" />
     <Compile Include="Api\Events\ScpEvents.cs" />
+    <Compile Include="Api\Items\ItemManager.cs" />
+    <Compile Include="Api\Items\CustomItemInformations.cs" />
     <Compile Include="Api\Items\Item.cs" />
     <Compile Include="Api\Roles\RoleManager.cs" />
     <Compile Include="Api\Roles\IRole.cs" />
@@ -81,6 +83,8 @@
     <Compile Include="Api\Tesla.cs" />
     <Compile Include="Command\CommandHandler.cs" />
     <Compile Include="Command\CommandInformations.cs" />
+    <Compile Include="Command\Commands\SynapsePermissionCommand.cs" />
+    <Compile Include="Command\Commands\SynapsePluginCommand.cs" />
     <Compile Include="Command\Commands\SynapseKeyPressCommand.cs" />
     <Compile Include="Command\Commands\SynapseReloadCommand.cs" />
     <Compile Include="Command\Commands\SynapseHelpCommand.cs" />

@@ -98,8 +98,6 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 
                 try
                 {
-                    //TODO: Replace the Code from Nw completely
-
                     //Code from Synapse for CustomRoles and ChaosScpEnd
                     List<Team> teams = Server.Get.Players.Select(x => x.RealTeam).ToList();
 
