@@ -1,7 +1,6 @@
-﻿using MEC;
+﻿using System;
+using MEC;
 using Synapse.Config;
-using Synapse.Permission;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -142,14 +141,38 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.L:
-                    var item = new Items.Item(ItemType.Medkit, 0, 0, 0, 0);
+                    var item = new Items.Item(ItemType.GunCOM15, 0, 0, 0, 0);
                     item.Drop(ev.Player.Position);
-                    Timing.CallDelayed(5f, () => item.PickUp(ev.Player));
+                    Timing.CallDelayed(5f, () => {
+                        item.Position = ev.Player.Position;
+                        item.Scale = Vector3.one * 2;
+                        item.Barrel = 1;
+                        item.Other = 1;
+                    });
                     break;
                 case KeyCode.K:
                     var item2 = new Items.Item(ItemType.Medkit, 0, 0, 0, 0);
                     item2.PickUp(ev.Player);
                     Timing.CallDelayed(5f, () => item2.Drop());
+                    break;
+                case KeyCode.J:
+                    var item3 = new Items.Item(ItemType.GunCOM15, 10, 0, 0, 0);
+                    item3.PickUp(ev.Player);
+                    Timing.CallDelayed(5f, () =>
+                    {
+                        try
+                        {
+                            item3.Durabillity = 100;
+                            item3.Barrel = 1;
+                            item3.Other = 1;
+                            item3.Sight = 1;
+                        }
+                        catch(Exception e)
+                        {
+                            Logger.Get.Error(e.ToString());
+                        }
+                        
+                    });
                     break;
             }
         }

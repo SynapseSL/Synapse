@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using Mirror;
+using System.Net.NetworkInformation;
+using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Synapse.Api.Items
 {
@@ -35,6 +38,7 @@ namespace Synapse.Api.Items
             IsCustomItem = false;
             ID = (int)item;
             ItemType = item;
+            Name = ItemType.ToString();
             Durabillity = durability;
             Sight = sight;
             Barrel = barrel;
@@ -49,17 +53,62 @@ namespace Synapse.Api.Items
 
         public readonly string Name;
 
-        public float Durabillity { get; set; }
-
-        public int Barrel { get; set; }
-
-        public int Sight { get; set; }
-
-        public int Other { get; set; }
-
         public Player ItemHolder { get; private set; }
 
-        public Vector3 Scale { get; set; } = Vector3.one;
+        private float durabillity;
+        public float Durabillity
+        {
+            get => durabillity;
+            set
+            {
+                durabillity = value;
+                Refresh();
+            }
+        }
+
+        private int barrel;
+        public int Barrel
+        {
+            get => barrel;
+            set
+            {
+                barrel = value;
+                Refresh();
+            }
+        }
+
+        private int sight;
+        public int Sight
+        {
+            get => sight;
+            set
+            {
+                sight = value;
+                Refresh();
+            }
+        }
+
+        private int other;
+        public int Other
+        {
+            get => other;
+            set
+            {
+                other = value;
+                Refresh();
+            }
+        }
+
+        private Vector3 scale = Vector3.one;
+        public Vector3 Scale
+        {
+            get => scale;
+            set
+            {
+                scale = value;
+                Refresh();
+            }
+        }
 
         public Vector3 Position
         {
@@ -71,15 +120,45 @@ namespace Synapse.Api.Items
                 if (pickup != null)
                     return pickup.position;
 
-                return Vector3.one;
+                return Vector3.zero;
             }
             set
             {
                 if(pickup != null)
                 {
-                    pickup.Networkposition = value;
-                    pickup.UpdatePosition();
+                    pickup.SetupPickup(pickup.itemId, pickup.durability, pickup.ownerPlayer, pickup.weaponMods, value, pickup.rotation);
+                    Refresh();
                 }
+            }
+        }
+
+        private void Refresh()
+        {
+            if (pickup != null)
+            {
+                var qua = pickup.rotation;
+                var pos = Position;
+                var owner = pickup.ownerPlayer;
+                pickup.Delete();
+                pickup = null;
+
+                pickup = UnityEngine.Object.Instantiate(Server.Get.Host.Inventory.pickupPrefab).GetComponent<Pickup>();
+                pickup.transform.localScale = Scale;
+                NetworkServer.Spawn(pickup.gameObject);
+                pickup.SetupPickup(ItemType, Durabillity, owner, new Pickup.WeaponModifiers(true, Sight, Barrel, Other), pos, qua);
+                return;
+            }
+
+            if (ItemHolder != null)
+            {
+                var index = ItemHolder.Inventory.items.IndexOf(itemInfo);
+                var item = ItemHolder.Items[index];
+                item.durability = Durabillity;
+                item.modSight = Sight;
+                item.modBarrel = Barrel;
+                item.modOther = Other;
+                itemInfo = item;
+                ItemHolder.Items[index] = item;
             }
         }
 
