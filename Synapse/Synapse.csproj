@@ -127,6 +127,7 @@
     <Compile Include="Patches\EventsPatches\ServerPatches\ConsoleCommandPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\RemoteAdminPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\Item Patches\InventoryClearPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Item Patches\GeneratorEjectPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Item Patches\RefreshDurabilityPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Item Patches\CreateItemPatch.cs" />

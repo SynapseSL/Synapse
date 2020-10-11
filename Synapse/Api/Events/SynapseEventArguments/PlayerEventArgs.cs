@@ -80,7 +80,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         
         public ItemInteractState State { get; internal set; }
         
-        public Inventory.SyncItemInfo CurrentItem { get; internal set; }
+        public Items.Item CurrentItem { get; internal set; }
         
         public bool Allow { get; set; }
     }
@@ -89,7 +89,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
     {
         public Player Player { get; internal set; }
 
-        public Inventory.SyncItemInfo ItemInfo { get; set; }
+        public Items.Item Item { get; set; }
         
         public GrenadeSettings Settings { get; set; }
 
@@ -124,7 +124,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         
         public bool Allow { get; set; }
         
-        public RoleType ChuffedRole { get; internal set; }
+        public RoleType CuffedRole { get; internal set; }
         
         public bool IsCuffed { get; internal set; }
     }
@@ -142,7 +142,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public bool Allow { get; set; } = true;
         
-        public Inventory.SyncItemInfo Item { get; internal set; }
+        public Items.Item Item { get; internal set; }
     }
 
     public class PlayerEnterFemurEventArgs : EventHandler.ISynapseEventArgs

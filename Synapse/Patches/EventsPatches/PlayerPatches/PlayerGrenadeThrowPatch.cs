@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameCore;
 using Grenades;
 using Harmony;
 using Mirror;
@@ -14,10 +13,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
 
     [HarmonyPatch(typeof(GrenadeManager), nameof(GrenadeManager._ServerThrowGrenade))]
-    public class GrenadeThrowCompletePatch
+    internal static class GrenadeThrowCompletePatch
     {
-
-        public static bool Prefix(ref GrenadeManager __instance, ref IEnumerator<float> __result, ref GrenadeSettings settings, ref float forceMultiplier, ref int itemIndex, ref float delay)
+        private static bool Prefix(ref GrenadeManager __instance, ref IEnumerator<float> __result, ref GrenadeSettings settings, ref float forceMultiplier, ref int itemIndex, ref float delay)
         {
 	        try
 	        {

@@ -101,7 +101,7 @@ namespace Synapse.Events.Patches
 				//Unlock The Generator
 				var flag = player.Bypass;
 
-				if (player.ItemInHand.id > ItemType.KeycardJanitor)
+				if (player.Inventory.GetItemInHand().id > ItemType.KeycardJanitor)
 				{
 					var permissions = player.Inventory.GetItemByID(player.Inventory.curItem).permissions;
 

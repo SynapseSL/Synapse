@@ -131,7 +131,7 @@ namespace Synapse.Api.Events
         {
             var ev = new PlayerEscapeEventArgs
             {
-                Allow = allow, Player = player, ChuffedRole = cuffedRoleType, IsCuffed = allow,
+                Allow = allow, Player = player, CuffedRole = cuffedRoleType, IsCuffed = allow,
                 SpawnRole = spawnRoleType
             };
             PlayerEscapseEvent?.Invoke(ev);
@@ -151,7 +151,7 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void InvokePlayerReloadEvent(Player player, ref bool allow, Inventory.SyncItemInfo syncItemInfo)
+        internal void InvokePlayerReloadEvent(Player player, ref bool allow, Items.Item syncItemInfo)
         {
             var ev = new PlayerReloadEventArgs {Allow = allow, Item = syncItemInfo,Player = player};
             PlayerReloadEvent?.Invoke(ev);

@@ -15,10 +15,10 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 
                 var allow = true;
                 var itemIndex = __instance._hub.inventory.GetItemIndex();
-                var inventorySlot = __instance._hub.inventory.items[itemIndex];
+                var item = __instance._hub.inventory.items[itemIndex].GetItem();
                 var player = __instance._hub.GetPlayer();
 
-                SynapseController.Server.Events.Player.InvokePlayerReloadEvent(player, ref allow, inventorySlot);
+                SynapseController.Server.Events.Player.InvokePlayerReloadEvent(player, ref allow, item);
 
                 return allow;
             }

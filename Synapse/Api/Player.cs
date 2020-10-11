@@ -569,7 +569,7 @@ namespace Synapse.Api
 
         public Fraction Fraction => ClassManager.Fraction;
 
-        public Inventory.SyncItemInfo ItemInHand => Inventory.GetItemInHand();
+        public Items.Item ItemInHand => Inventory.GetItemInHand().GetItem();
 
         public NetworkConnection Connection => ClassManager.Connection;
 
