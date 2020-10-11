@@ -11,7 +11,7 @@ namespace Synapse.Patches.SynapsePatches.Item_Patches
         private static bool Prefix(Inventory __instance, ItemType id, float dur = -4.65664672E+11f, int s = 0, int b = 0, int o = 0)
         {
             var player = __instance.GetPlayer();
-            if (player.Items.Count >= 8) return false;
+            if (player.VanillaItems.Count >= 8) return false;
 
             var vanillaitem = new Item(__instance.GetItemByID(id));
 
@@ -44,8 +44,7 @@ namespace Synapse.Patches.SynapsePatches.Item_Patches
             try
             {
                 var item = new Synapse.Api.Items.Item(droppedItemId, dur, s, b, o);
-                item.Drop();
-                item.Position = pos;
+                item.Drop(pos);
                 __result = item.pickup;
                 return false;
             }

@@ -227,8 +227,8 @@ namespace Synapse.Api.Events
             if (!SynapseController.Server.Configs.SynapseConfiguration.RemoteKeyCard) return;
             if (ev.Allow) return;
 
-            if (!ev.Player.Items.Any()) return;
-            foreach (var gameItem in ev.Player.Items.Select(item => ev.Player.Inventory.GetItemByID(item.id)).Where(gameitem => gameitem.permissions != null && gameitem.permissions.Length != 0))
+            if (!ev.Player.VanillaItems.Any()) return;
+            foreach (var gameItem in ev.Player.VanillaItems.Select(item => ev.Player.VanillaInventory.GetItemByID(item.id)).Where(gameitem => gameitem.permissions != null && gameitem.permissions.Length != 0))
             {
                 ev.Allow = gameItem.permissions.Any(p =>
                     global::Door.backwardsCompatPermissions.TryGetValue(p, out var flag) &&

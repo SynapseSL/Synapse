@@ -7,6 +7,7 @@ using Mirror.LiteNetLib4Mirror;
 using RemoteAdmin;
 using Searching;
 using Synapse.Api.Enum;
+using Synapse.Api.Items;
 using Synapse.Api.Roles;
 using Synapse.Database;
 using Synapse.Patches.EventsPatches.PlayerPatches;
@@ -24,6 +25,7 @@ namespace Synapse.Api
             Scp079Controller = new Scp079Controller(this);
             Jail = new Jail(this);
             ActiveBroadcasts = new BroadcastList(this);
+            Inventory = new PlayerInventory(this);
         }
 
         #region Methods
@@ -61,17 +63,8 @@ namespace Synapse.Api
 
         public void SendRAConsoleMessage(string message, bool success = true, RaCategory type = RaCategory.None) => SynapseExtensions.RaMessage(CommandSender,message, success, type);
 
-        public void GiveItem(ItemType itemType, float duration = float.NegativeInfinity, int sight = 0, int barrel = 0, int other = 0) => Inventory.AddNewItem(itemType, duration, sight, barrel, other);
+        public void GiveItem(ItemType itemType, float duration = float.NegativeInfinity, int sight = 0, int barrel = 0, int other = 0) => VanillaInventory.AddNewItem(itemType, duration, sight, barrel, other);
 
-        public void DropAllItems() => Inventory.ServerDropAll();
-
-        public void DropItem(Inventory.SyncItemInfo item)
-        {
-            Inventory.SetPickup(item.id, item.durability, Position, Inventory.camera.transform.rotation, item.modSight, item.modBarrel, item.modOther);
-            Items.Remove(item);
-        }
-
-        public void ClearInventory() => Inventory.Clear();
 
         public void GiveEffect(Effect effect, byte intensity = 1, float duration = -1f) => PlayerEffectsController.ChangeByString(effect.ToString().ToLower(), intensity, duration);
 
@@ -170,6 +163,8 @@ namespace Synapse.Api
         public readonly Scp079Controller Scp079Controller;
 
         public BroadcastList ActiveBroadcasts { get; }
+
+        public PlayerInventory Inventory { get; }
 
         public Broadcast SendBroadcast(ushort time,string message,bool instant = false)
         {
@@ -422,10 +417,10 @@ namespace Synapse.Api
             set => Position = value.Position;
         }
 
-        public Inventory.SyncListItemInfo Items
+        internal Inventory.SyncListItemInfo VanillaItems
         {
-            get => Inventory.items;
-            set => Inventory.items = value;
+            get => VanillaInventory.items;
+            set => VanillaInventory.items = value;
         }
 
         public Player Cuffer
@@ -569,7 +564,7 @@ namespace Synapse.Api
 
         public Fraction Fraction => ClassManager.Fraction;
 
-        public Items.Item ItemInHand => Inventory.GetItemInHand().GetItem();
+        public Items.Item ItemInHand => VanillaInventory.GetItemInHand().GetItem();
 
         public NetworkConnection Connection => ClassManager.Connection;
 
@@ -609,7 +604,7 @@ namespace Synapse.Api
 
         public PlayerStats PlayerStats => Hub.playerStats;
 
-        public Inventory Inventory => Hub.inventory;
+        public Inventory VanillaInventory => Hub.inventory;
 
         public CharacterClassManager ClassManager => Hub.characterClassManager;
 

@@ -1,6 +1,7 @@
 ﻿using Synapse.Api;
 using Synapse.Api.Items;
 using System.ComponentModel;
+using UnityEngine;
 
 namespace Synapse.Config
 {
@@ -31,42 +32,50 @@ namespace Synapse.Config
         public float Y { get; set; }
         public float Z { get; set; }
 
-        public MapPoint Parse()
-        {
-            return MapPoint.Parse(ToString());
-        }
+        public MapPoint Parse() => MapPoint.Parse(ToString());
 
-        public override string ToString()
-        {
-            return $"{Room}:{X}:{Y}:{Z}";
-        }
+        public override string ToString() => $"{Room}:{X}:{Y}:{Z}";
     }
 
     public class SerializedItem
     {
-        int ID { get; set; }
+        public SerializedItem(Synapse.Api.Items.Item item)
+        {
+            ID = item.ID;
+            Durabillity = item.Durabillity;
+            Barrel = item.Barrel;
+            Sight = item.Sight;
+            Other = item.Other;
+            XSize = item.Scale.x;
+            YSize = item.Scale.y;
+            ZSize = item.Scale.z;
+        }
 
-        float Durabillity { get; set; }
-
-        int Barrel { get; set; }
-
-        int Sight { get; set; }
-
-        int Other { get; set; }
-
-        public SerializedItem(Synapse.Api.Items.Item item) { }
-
-        public SerializedItem(int id, float durabillity,int barrel, int sight,int other)
+        public SerializedItem(int id, float durabillity, int barrel, int sight, int other,Vector3 scale)
         {
             ID = id;
             Durabillity = durabillity;
             Barrel = barrel;
             Sight = sight;
             Other = other;
+            XSize = scale.x;
+            YSize = scale.y;
+            ZSize = scale.z;
         }
 
-        public SerializedItem() { }
+        public SerializedItem()
+        {
+        }
 
-        public Synapse.Api.Items.Item Parse() => new Api.Items.Item(ID, Durabillity, Sight, Barrel, Other);
+        public int ID { get; set; }
+        public float Durabillity { get; set; }
+        public int Sight { get; set; }
+        public int Barrel { get; set; }
+        public int Other { get; set; }
+        public float XSize { get; set; }
+        public float YSize { get; set; }
+        public float ZSize { get; set; }
+
+        public Synapse.Api.Items.Item Parse() => new Api.Items.Item(ID, Durabillity, Sight, Barrel, Other) { Scale = new Vector3(XSize,YSize,ZSize)};
     }
 }

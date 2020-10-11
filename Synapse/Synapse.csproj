@@ -39,6 +39,7 @@
     <Compile Include="Api\Generator.cs" />
     <Compile Include="Api\Enum\GeneratorInteraction.cs" />
     <Compile Include="Api\Events\ScpEvents.cs" />
+    <Compile Include="Api\Items\PlayerInventory.cs" />
     <Compile Include="Api\Items\ItemManager.cs" />
     <Compile Include="Api\Items\CustomItemInformations.cs" />
     <Compile Include="Api\Items\Item.cs" />

@@ -145,7 +145,7 @@ namespace Synapse.Api.Items
                 pickup.Delete();
                 pickup = null;
 
-                pickup = UnityEngine.Object.Instantiate(Server.Get.Host.Inventory.pickupPrefab).GetComponent<Pickup>();
+                pickup = UnityEngine.Object.Instantiate(Server.Get.Host.VanillaInventory.pickupPrefab).GetComponent<Pickup>();
                 pickup.transform.localScale = Scale;
                 NetworkServer.Spawn(pickup.gameObject);
                 pickup.SetupPickup(ItemType, Durabillity, owner, new Pickup.WeaponModifiers(true, Sight, Barrel, Other), pos, qua);
@@ -154,14 +154,14 @@ namespace Synapse.Api.Items
 
             if (ItemHolder != null)
             {
-                var index = ItemHolder.Inventory.items.IndexOf(itemInfo);
-                var item = ItemHolder.Items[index];
+                var index = ItemHolder.VanillaInventory.items.IndexOf(itemInfo);
+                var item = ItemHolder.VanillaItems[index];
                 item.durability = Durabillity;
                 item.modSight = Sight;
                 item.modBarrel = Barrel;
                 item.modOther = Other;
                 itemInfo = item;
-                ItemHolder.Items[index] = item;
+                ItemHolder.VanillaItems[index] = item;
             }
         }
 
@@ -171,7 +171,7 @@ namespace Synapse.Api.Items
 
             if (ItemHolder != null) return;
 
-            if (player.Items.Count >= 8) return;
+            if (player.VanillaItems.Count >= 8) return;
 
             if(!IsCustomItem && (ItemType == ItemType.Ammo556 || ItemType == ItemType.Ammo762 || ItemType == ItemType.Ammo9mm))
             {
@@ -208,7 +208,7 @@ namespace Synapse.Api.Items
                 pickup.Delete();
             pickup = null;
             ItemHolder = player;
-            ItemHolder.Items.Add(itemInfo);
+            ItemHolder.VanillaItems.Add(itemInfo);
         }
 
         public void Drop(Vector3 position)
@@ -217,13 +217,13 @@ namespace Synapse.Api.Items
 
             if (pickup != null) return;
 
-            pickup = UnityEngine.Object.Instantiate(Server.Get.Host.Inventory.pickupPrefab).GetComponent<Pickup>();
+            pickup = UnityEngine.Object.Instantiate(Server.Get.Host.VanillaInventory.pickupPrefab).GetComponent<Pickup>();
             pickup.transform.localScale = Scale;
             NetworkServer.Spawn(pickup.gameObject);
-            pickup.SetupPickup(ItemType, Durabillity, ItemHolder == null ? Server.Get.Host.gameObject : ItemHolder.gameObject, new Pickup.WeaponModifiers(true, Sight, Barrel, Other), position, ItemHolder != null ? ItemHolder.Inventory.camera.transform.rotation : Quaternion.identity);
+            pickup.SetupPickup(ItemType, Durabillity, ItemHolder == null ? Server.Get.Host.gameObject : ItemHolder.gameObject, new Pickup.WeaponModifiers(true, Sight, Barrel, Other), position, ItemHolder != null ? ItemHolder.VanillaInventory.camera.transform.rotation : Quaternion.identity);
 
             if (ItemHolder != null)
-                ItemHolder.Items.Remove(itemInfo);
+                ItemHolder.VanillaItems.Remove(itemInfo);
             ItemHolder = null;
         }
 
@@ -239,7 +239,7 @@ namespace Synapse.Api.Items
 
             if(ItemHolder != null)
             {
-                ItemHolder.Items.Remove(itemInfo);
+                ItemHolder.VanillaItems.Remove(itemInfo);
                 ItemHolder = null;
             }
         }

@@ -74,7 +74,7 @@ namespace Synapse.Events.Patches
 				var player = person.GetPlayer();
 				var generator = __instance.GetGenerator();
 
-				if (player.Inventory == null || __instance._doorAnimationCooldown > 0f || __instance._deniedCooldown > 0f) return false;
+				if (player.VanillaInventory == null || __instance._doorAnimationCooldown > 0f || __instance._deniedCooldown > 0f) return false;
 
 				if (!generator.Locked)
 				{
@@ -101,9 +101,9 @@ namespace Synapse.Events.Patches
 				//Unlock The Generator
 				var flag = player.Bypass;
 
-				if (player.Inventory.GetItemInHand().id > ItemType.KeycardJanitor)
+				if (player.VanillaInventory.GetItemInHand().id > ItemType.KeycardJanitor)
 				{
-					var permissions = player.Inventory.GetItemByID(player.Inventory.curItem).permissions;
+					var permissions = player.VanillaInventory.GetItemByID(player.VanillaInventory.curItem).permissions;
 
 					foreach (var t in permissions)
 						if (t == "ARMORY_LVL_2")
