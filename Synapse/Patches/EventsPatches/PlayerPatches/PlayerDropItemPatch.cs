@@ -36,7 +36,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             else
             {
-                //TODO: Remove this after fully implementing Custom Items into Synapse
+                //This Code is a Backup for the Case a Plugin creates a item on its own
                 __instance.SetPickup(syncItemInfo.id, syncItemInfo.durability,
                     __instance.transform.position, __instance.camera.transform.rotation, syncItemInfo.modSight,
                     syncItemInfo.modBarrel, syncItemInfo.modOther);

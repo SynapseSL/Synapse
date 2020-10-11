@@ -200,12 +200,20 @@ namespace Synapse.Api.Events
                         Timing.CallDelayed(5f, () => testitem.PickUp(ev.Player));
                     }
                     break;
+#endif
 
                 case KeyCode.Z:
                     foreach (var item5 in SynapseController.Server.Map.Items)
                         item5.Scale = item5.Scale * 2;
                     break;
-#endif
+
+                case KeyCode.T:
+                    var item6 = new Items.Item(ItemType.Medkit, 0, 0, 0, 0)
+                    {
+                        Position = ev.Player.Position
+                    };
+                    item6.Drop();
+                    break;
             }
         }
 #if DEBUG

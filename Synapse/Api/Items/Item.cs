@@ -113,6 +113,7 @@ namespace Synapse.Api.Items
             }
         }
 
+        private Vector3 position = Vector3.zero;
         public Vector3 Position
         {
             get
@@ -123,15 +124,14 @@ namespace Synapse.Api.Items
                 if (pickup != null)
                     return pickup.position;
 
-                return Vector3.zero;
+                return position;
             }
             set
             {
                 if(pickup != null)
-                {
                     pickup.SetupPickup(pickup.itemId, pickup.durability, pickup.ownerPlayer, pickup.weaponMods, value, pickup.rotation);
-                    Refresh();
-                }
+
+                position = value;
             }
         }
 
@@ -190,7 +190,7 @@ namespace Synapse.Api.Items
                         break;
                 }
 
-                Despawn();
+                Destroy();
                 return;
             }
 
@@ -242,7 +242,11 @@ namespace Synapse.Api.Items
                 ItemHolder.Items.Remove(itemInfo);
                 ItemHolder = null;
             }
+        }
 
+        public void Destroy()
+        {
+            Despawn();
             Map.Get.Items.Remove(this);
             deactivated = true;
         }
