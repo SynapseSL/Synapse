@@ -1,8 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30406.217
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synapse", "Synapse\Synapse.csproj", "{6933EF89-DB40-4851-A505-7F6FFCCF154A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SynapseInjector", "SynapseInjector\SynapseInjector.csproj", "{A6753236-E881-4DCF-A7F1-A98A0702E229}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyPressInjector", "KeyPressInjector\KeyPressInjector.csproj", "{883465F0-A153-4A77-AFD1-BDB1C3A8A3F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +23,15 @@ Global
 		{A6753236-E881-4DCF-A7F1-A98A0702E229}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6753236-E881-4DCF-A7F1-A98A0702E229}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6753236-E881-4DCF-A7F1-A98A0702E229}.Release|Any CPU.Build.0 = Release|Any CPU
+		{883465F0-A153-4A77-AFD1-BDB1C3A8A3F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{883465F0-A153-4A77-AFD1-BDB1C3A8A3F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{883465F0-A153-4A77-AFD1-BDB1C3A8A3F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{883465F0-A153-4A77-AFD1-BDB1C3A8A3F6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8DEC5ACD-02E2-41AC-BB9C-E4D37CA54361}
 	EndGlobalSection
 EndGlobal

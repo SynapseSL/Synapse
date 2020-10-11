@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "KeyPressInjector": {
+      "commandName": "Project",
+      "remoteDebugEnabled": false
+    }
+  }
+}
