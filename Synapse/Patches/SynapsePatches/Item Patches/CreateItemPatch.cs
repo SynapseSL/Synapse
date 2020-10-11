@@ -39,20 +39,16 @@ namespace Synapse.Patches.SynapsePatches.Item_Patches
     [HarmonyPatch(typeof(Inventory),nameof(Inventory.SetPickup))]
     internal static class SetPickupPatch
     {
-        private static bool Prefix(Inventory __instance, out Pickup __result,ItemType droppedItemId, float dur, Vector3 pos, Quaternion rot, int s, int b, int o)
+        private static void Postfix(Pickup __result)
         {
             try
             {
-                var item = new Synapse.Api.Items.Item(droppedItemId, dur, s, b, o);
-                item.Drop(pos);
-                __result = item.pickup;
-                return false;
+                var item = new Synapse.Api.Items.Item(__result.itemId, __result.durability, __result.weaponMods[0], __result.weaponMods[1], __result.weaponMods[2]);
+                item.pickup = __result;
             }
             catch(Exception e)
             {
-                __result = null;
                 Logger.Get.Error($"Synapse-Item: Create PickUp failed!!\n{e}");
-                return true;
             }
         }
     }
