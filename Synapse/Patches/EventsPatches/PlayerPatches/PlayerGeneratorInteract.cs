@@ -39,8 +39,8 @@ namespace Synapse.Events.Patches
 									Server.Get.Events.Player.InvokePlayerGeneratorInteractEvent(player, generator,GeneratorInteraction.TabletInjected, ref allow2);
 									if (!allow2) break;
 
-									component.items.Remove(syncItemInfo);
-									generator.IsTabledConnected = true;
+									var item = syncItemInfo.GetItem();
+									generator.ConnectedTabled = item;
 									break;
 								}
 							}
@@ -76,7 +76,7 @@ namespace Synapse.Events.Patches
 
 				if (player.Inventory == null || __instance._doorAnimationCooldown > 0f || __instance._deniedCooldown > 0f) return false;
 
-				if (generator.Locked)
+				if (!generator.Locked)
 				{
 					var allow = true;
 					if (!generator.Open)
@@ -100,9 +100,8 @@ namespace Synapse.Events.Patches
 
 				//Unlock The Generator
 				var flag = player.Bypass;
-				var flag2 = player.Team != Team.SCP;
 
-				if (flag2 && player.Inventory.curItem > ItemType.KeycardJanitor)
+				if (player.ItemInHand.id > ItemType.KeycardJanitor)
 				{
 					var permissions = player.Inventory.GetItemByID(player.Inventory.curItem).permissions;
 

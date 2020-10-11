@@ -177,7 +177,7 @@ namespace Synapse.Api.Events
                 Player = player,
                 Generator = generator,
                 GeneratorInteraction = interaction,
-                Allow = true
+                Allow = allow,
             };
 
             PlayerGeneratorInteractEvent.Invoke(ev);

@@ -44,13 +44,7 @@ public static class SynapseExtensions
         sender.RaReply($"{Assembly.GetCallingAssembly().GetName().Name}#" + message, success, true, category);
     }
 
-    public static Generator GetGenerator(this Generator079 generator079)
-    {
-        if (generator079.gameObject == Map.Get.MainGenerator.GameObject)
-            return Map.Get.MainGenerator;
-
-        return Map.Get.Generators.FirstOrDefault(x => x.GameObject == generator079.gameObject);
-    }
+    public static Generator GetGenerator(this Generator079 generator079) => Map.Get.Generators.FirstOrDefault(x => x.GameObject == generator079.gameObject);
 
     public static Synapse.Api.Door GetDoor(this Door door) => Map.Get.Doors.FirstOrDefault(x => x.GameObject == door.gameObject);
 

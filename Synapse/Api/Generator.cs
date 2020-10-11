@@ -35,6 +35,7 @@ namespace Synapse.Api
             get => !generator.NetworkisDoorUnlocked;
             set
             {
+                if (value == Locked) return;
                 generator.NetworkisDoorUnlocked = !value;
                 generator._doorAnimationCooldown = 0.5f;
             }
@@ -46,9 +47,34 @@ namespace Synapse.Api
             set
             {
                 if (value)
-                    generator.isTabletConnected = true;
+                {
+                    if (!IsTabledConnected)
+                        generator.NetworkisTabletConnected = true;
+                }
                 else
-                    generator.EjectTablet();
+                {
+                    if(IsTabledConnected)
+                        generator.EjectTablet();
+                }
+            }
+        }
+
+        private Items.Item tablet;
+        public Items.Item ConnectedTabled
+        {
+            get => tablet;
+            set
+            {
+                tablet = value;
+
+                if (value != null)
+                {
+                    IsTabledConnected = true;
+                    Map.Get.Items.Remove(value);
+                    value.Despawn();
+                }
+                else
+                    IsTabledConnected = false;
             }
         }
 

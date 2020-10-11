@@ -45,63 +45,54 @@ namespace Synapse.Api.Events
         {
             switch (ev.KeyCode)
             {
-                case KeyCode.Alpha0:
-                    var msg2 = "";
-
-                    foreach (var door in Synapse.Api.Map.Get.Doors)
-                        msg2 += $"\n{door.GameObject.name}";
-
-                    foreach (var elev in Synapse.Api.Map.Get.Elevators)
-                        msg2 += $"\n{elev.GameObject.name}";
-
-                    foreach (var gen in Synapse.Api.Map.Get.Generators)
-                        msg2 += $"\n{gen.GameObject.name}";
-
-                    Logger.Get.Info(msg2);
-                    break;
-
                 case KeyCode.Alpha1:
-                    foreach (var door in Synapse.Api.Map.Get.Doors)
-                        door.Open = true;
+                    foreach (var gen in SynapseController.Server.Map.Generators)
+                        gen.ConnectedTabled = new Items.Item(ItemType.Medkit, 0, 0, 0, 0);
                     break;
 
                 case KeyCode.Alpha2:
-                    foreach (var door in Synapse.Api.Map.Get.Doors)
-                        door.Locked = true;
+                    foreach (var gen in SynapseController.Server.Map.Generators)
+                        gen.Open = true;
                     break;
 
                 case KeyCode.Alpha3:
-                    foreach (var elev in Synapse.Api.Map.Get.Elevators)
-                        elev.Status = Lift.Status.Moving;
+                    foreach (var gen in SynapseController.Server.Map.Generators)
+                        gen.Open = false;
                     break;
 
                 case KeyCode.Alpha4:
-                    foreach (var elev in Synapse.Api.Map.Get.Elevators)
-                        elev.Locked = true;
+                    foreach (var gen in SynapseController.Server.Map.Generators)
+                        gen.Locked = false;
                     break;
 
                 case KeyCode.Alpha5:
-                    foreach (var elev in Synapse.Api.Map.Get.Elevators)
-                        elev.Use();
+                    foreach (var gen in SynapseController.Server.Map.Generators)
+                        gen.Locked = true;
                     break;
 
                 case KeyCode.Alpha6:
-                    foreach (var tes in Synapse.Api.Map.Get.Teslas)
-                        tes.Trigger();
-                    break;
-
-                case KeyCode.Alpha7:
-                    foreach (var tes in Synapse.Api.Map.Get.Teslas)
-                        tes.InstantTrigger();
+                    foreach (var gen in SynapseController.Server.Map.Generators)
+                        if (gen.Room != null)
+                            Logger.Get.Info(gen.Room.RoomName);
                     break;
 
                 case KeyCode.Alpha8:
-                    foreach (var tes in Synapse.Api.Map.Get.Teslas)
-                        tes.SizeOfTrigger = tes.SizeOfTrigger * 2;
+                    int delay = 1;
+                    foreach (var gen in SynapseController.Server.Map.Generators)
+                    {
+                        Timing.CallDelayed(delay, () => gen.ConnectedTabled = new Items.Item(ItemType.KeycardO5,0,0,0,0));
+                        delay++;
+                    }
                     break;
 
                 case KeyCode.Alpha9:
-                    Logger.Get.Info(ev.Player.HasPermission("Test.Command.Plugin.Awesome.Test").ToString());
+                    foreach (var gen in SynapseController.Server.Map.Generators)
+                    {
+                        gen.ConnectedTabled = new Items.Item(ItemType.Medkit, 0, 0, 0, 0) { Scale = Vector3.one * 10 };
+                        gen.Locked = false;
+                        gen.Open = true;
+                        gen.RemainingPowerUp = 0f;
+                    }
                     break;
 
                 case KeyCode.U:
@@ -118,10 +109,6 @@ namespace Synapse.Api.Events
 
                 case KeyCode.O:
                     ev.Player.Broadcast(5, ev.Player.LookingAt == null ? "Null" : ev.Player.LookingAt.name);
-                    break;
-
-                case KeyCode.Y:
-                    Logger.Get.Info((ev.Player.Room == Api.Map.Get.Rooms.FirstOrDefault(x => x.RoomName == "Start Positions")).ToString());
                     break;
 
                 case KeyCode.C:

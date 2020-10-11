@@ -26,8 +26,6 @@ namespace Synapse.Api
 
         public List<Generator> Generators { get; } = new List<Generator>();
 
-        public Generator MainGenerator { get; internal set; }
-
         public List<Items.Item> Items { get; } = new List<Items.Item>();
 
         public string IntercomText

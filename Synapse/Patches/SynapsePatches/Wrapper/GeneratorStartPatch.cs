@@ -14,7 +14,7 @@ namespace Synapse.Patches.SynapsePatches
 
             if (!__instance.name.Contains("("))
             {
-                Map.Get.MainGenerator = new Api.Generator(__instance,true);
+                Map.Get.Generators.Add(new Api.Generator(__instance,true));
                 return;
             }
 
