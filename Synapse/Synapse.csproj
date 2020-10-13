@@ -130,6 +130,7 @@
     <Compile Include="Patches\EventsPatches\ServerPatches\ConsoleCommandPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\RemoteAdminPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\Item Patches\Scp914Patch.cs" />
     <Compile Include="Patches\SynapsePatches\Item Patches\SetClassPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Item Patches\WorkStationPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Item Patches\SpawnItemPatch.cs" />
