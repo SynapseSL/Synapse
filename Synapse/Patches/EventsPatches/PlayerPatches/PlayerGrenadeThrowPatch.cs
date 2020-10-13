@@ -23,11 +23,11 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 
 		        if (player == null) return true;
 		        
-		        var item = __instance.hub.inventory.items[itemIndex];
+		        var item = __instance.hub.inventory.items[itemIndex].GetSynapseItem();
 		        var allow = true;
 		        
-		        SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(__instance.GetPlayer(), item.id, ItemInteractState.Initiating, ref allow);
-		        SynapseController.Server.Events.Player.InvokePlayerThrowGrenadeEvent(player, item, ref forceMultiplier, ref delay, ref allow);
+		        SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(player, item.ItemType, ItemInteractState.Initiating, ref allow);
+		        SynapseController.Server.Events.Player.InvokePlayerThrowGrenadeEvent(player, item,ref settings, ref forceMultiplier, ref delay, ref allow);
 		        
 		        __result = ServerThrowGrenadeOverride(__instance, settings, forceMultiplier, itemIndex, delay, !allow);
 	        }
@@ -96,16 +96,17 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 			}
 			
 			var allow = true;
-			SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(__instance.GetPlayer(), __instance.hub.inventory.items[itemIndex].id, ItemInteractState.Finalizing, ref allow);
+			var item = __instance.hub.inventory.items[itemIndex].GetSynapseItem();
+			SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(__instance.GetPlayer(), item.ItemType, ItemInteractState.Finalizing, ref allow);
 			if (!allow)
 			{
 				yield break;
 			}
 			
-			Grenade component = Object.Instantiate<GameObject>(settings.grenadeInstance).GetComponent<Grenade>();
+			Grenade component = Object.Instantiate(settings.grenadeInstance).GetComponent<Grenade>();
 			component.InitData(__instance, relativeVelocity, __instance.hub.PlayerCameraReference.forward, forceMultiplier);
 			NetworkServer.Spawn(component.gameObject);
-			__instance.hub.inventory.items.RemoveAt(itemIndex);
+			item.Destroy();
 			if (settings.inventoryID == global::ItemType.SCP018)
 			{
 				global::Team team = __instance.hub.characterClassManager.CurRole.team;

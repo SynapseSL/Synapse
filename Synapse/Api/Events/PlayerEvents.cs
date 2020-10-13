@@ -1,6 +1,8 @@
 ﻿using Assets._Scripts.Dissonance;
+using Grenades;
 using Synapse.Api;
 using Synapse.Api.Events.SynapseEventArguments;
+using Synapse.Api.Items;
 using UnityEngine;
 
 namespace Synapse.Api.Events
@@ -112,18 +114,36 @@ namespace Synapse.Api.Events
         {
             var ev = new PlayerItemInteractEventArgs { Player = player, Type = type, Allow = allow, CurrentItem = player.ItemInHand, State = state };
             PlayerItemUseEvent?.Invoke(ev);
+
+            allow = ev.Allow;
         }
         
-        internal void InvokePlayerThrowGrenadeEvent(Player player, Inventory.SyncItemInfo itemInfo, ref float force, ref float delay, ref bool allow)
+        internal void InvokePlayerThrowGrenadeEvent(Player player, SynapseItem item,ref GrenadeSettings settings, ref float force, ref float delay, ref bool allow)
         {
-            var ev = new PlayerThrowGrenadeEventArgs() { Player = player, ForceMultiplier = force, Delay = delay, Allow = allow };
+            var ev = new PlayerThrowGrenadeEventArgs
+            {
+                Player = player,
+                Item = item,
+                ForceMultiplier = force,
+                Delay = delay,
+                Allow = allow,
+                Settings = settings,
+            };
+
             PlayerThrowGrenadeEvent?.Invoke(ev);
+
+            force = ev.ForceMultiplier;
+            delay = ev.Delay;
+            allow = ev.Allow;
         }
 
         internal void InvokePlayerHealEvent(Player player, ref float amount, ref bool allow)
         {
             var ev = new PlayerHealEventArgs() { Player = player, Amount = amount, Allow = allow};
             PlayerHealEvent?.Invoke(ev);
+
+            amount = ev.Amount;
+            allow = ev.Allow;
         }
 
         internal void InvokePlayerEscapeEvent(Player player, ref RoleType spawnRoleType, RoleType cuffedRoleType,
@@ -131,10 +151,16 @@ namespace Synapse.Api.Events
         {
             var ev = new PlayerEscapeEventArgs
             {
-                Allow = allow, Player = player, CuffedRole = cuffedRoleType, IsCuffed = allow,
+                Allow = allow,
+                Player = player,
+                CuffedRole = cuffedRoleType,
+                IsCuffed = isCuffed,
                 SpawnRole = spawnRoleType
             };
             PlayerEscapseEvent?.Invoke(ev);
+
+            spawnRoleType = ev.SpawnRole;
+            allow = ev.Allow;
         }
 
         internal void InvokePlayerSyncDataEvent(Player player, out bool allow)
