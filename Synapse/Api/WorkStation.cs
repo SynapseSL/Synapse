@@ -36,6 +36,17 @@ namespace Synapse.Api
 
         public Vector3 Position => workStation.Networkposition.position;
 
+        public Vector3 Scale
+        {
+            get => GameObject.transform.localScale;
+            set
+            {
+                NetworkServer.UnSpawn(GameObject);
+                GameObject.transform.localScale = value;
+                NetworkServer.Spawn(GameObject);
+            }
+        }
+
         public bool IsTabletConnected
         {
             get => workStation.NetworkisTabletConnected;

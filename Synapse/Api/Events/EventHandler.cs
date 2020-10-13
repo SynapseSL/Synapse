@@ -86,13 +86,7 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha9:
-                    foreach (var gen in SynapseController.Server.Map.Generators)
-                    {
-                        gen.ConnectedTabled = new Items.SynapseItem(ItemType.Medkit, 0, 0, 0, 0) { Scale = Vector3.one * 10 };
-                        gen.Locked = false;
-                        gen.Open = true;
-                        gen.RemainingPowerUp = 0f;
-                    }
+                    SynapseController.Server.Map.CreateWorkStation(ev.Player.Position, Vector3.zero, Vector3.one * 0.5f);
                     break;
 
                 case KeyCode.U:

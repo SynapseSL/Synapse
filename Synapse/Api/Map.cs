@@ -53,6 +53,8 @@ namespace Synapse.Api
         public Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "") 
             => new Dummy(pos, rot, role, name, badgetext, badgecolor);
 
+        public WorkStation CreateWorkStation(Vector3 position, Vector3 rotation, Vector3 scale) => new WorkStation(position, rotation, scale);
+
         public void SendBroadcast(ushort time,string message,bool instant)
         {
             foreach (var ply in Server.Get.Players)
