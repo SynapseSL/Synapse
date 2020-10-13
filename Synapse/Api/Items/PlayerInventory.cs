@@ -9,7 +9,7 @@ namespace Synapse.Api.Items
 
         internal PlayerInventory(Player player1) => player = player1;
 
-        public List<Items.SynapseItem> Items => player.VanillaInventory.items.Select(x => x.GetSynapseItem()).ToList();
+        public List<Items.SynapseItem> Items => Map.Get.Items.Where(x => x.ItemHolder == player).ToList();
 
         public void AddItem(Items.SynapseItem item)
         {

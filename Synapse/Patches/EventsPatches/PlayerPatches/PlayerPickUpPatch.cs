@@ -17,7 +17,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 {
                     if (!(NetworkTime.time >= __instance.SessionPipe.Session.FinishTime)) return false;
 
-                    var item = __instance.Completor.TargetPickup.GetItem();
+                    var item = __instance.Completor.TargetPickup.GetSynapseItem();
                     var player = __instance.GetPlayer();
 
                     Server.Get.Events.Player.InvokePlayerPickUpEvent(player, item, out var allow);

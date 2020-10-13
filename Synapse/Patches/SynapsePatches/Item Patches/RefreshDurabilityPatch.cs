@@ -11,7 +11,7 @@ namespace Synapse.Patches.SynapsePatches.Item_Patches
         private static bool Prefix(Pickup __instance, bool allowAmmoRenew = false, bool setupAttachments = false)
         {
             var itembyid = Pickup.Inv.GetItemByID(__instance.itemId);
-            var item = __instance.GetItem();
+            var item = __instance.GetSynapseItem();
             if (!itembyid.noEquipable || allowAmmoRenew)
                 item.Durabillity = itembyid.durability;
 

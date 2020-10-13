@@ -86,7 +86,7 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha9:
-                    SynapseController.Server.Map.CreateWorkStation(ev.Player.Position, Vector3.zero, Vector3.one * 0.5f);
+                    Logger.Get.Info(ev.Player.Inventory.Items.Count.ToString());
                     break;
 
                 case KeyCode.U:
