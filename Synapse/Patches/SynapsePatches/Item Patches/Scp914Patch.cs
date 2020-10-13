@@ -51,6 +51,8 @@ namespace Synapse.Patches.SynapsePatches.Item_Patches
                 var splayer = inventory.GetPlayer();
                 foreach(var item in splayer.Inventory.Items)
                 {
+                    if (item.IsCustomItem) continue;
+
                     var type = __instance.UpgradeItemID(item.ItemType);
 
                     if (type < ItemType.KeycardJanitor)
@@ -85,6 +87,7 @@ namespace Synapse.Patches.SynapsePatches.Item_Patches
                 var type = __instance.UpgradeItemID(splayer.ItemInHand.ItemType);
                 var index = inventory.GetItemIndex();
                 if (index < 0 || index >= inventory.items.Count) return false;
+                if (splayer.ItemInHand.IsCustomItem) return false;
                 if (type == ItemType.None)
                 {
                     splayer.ItemInHand.Destroy();
