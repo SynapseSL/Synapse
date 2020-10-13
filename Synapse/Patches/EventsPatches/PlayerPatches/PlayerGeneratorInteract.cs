@@ -23,7 +23,7 @@ namespace Synapse.Events.Patches
 				{
 					case PlayerInteract.Generator079Operations.Tablet:
 
-						if (generator.IsTabledConnected || !generator.Open || __instance._localTime <= 0f || Generator079.mainGenerator.forcedOvercharge)
+						if (generator.IsTabletConnected || !generator.Open || __instance._localTime <= 0f || Generator079.mainGenerator.forcedOvercharge)
 							return false;
 
 						Inventory component = person.GetComponent<Inventory>();
@@ -39,7 +39,7 @@ namespace Synapse.Events.Patches
 									Server.Get.Events.Player.InvokePlayerGeneratorInteractEvent(player, generator,GeneratorInteraction.TabletInjected, ref allow2);
 									if (!allow2) break;
 
-									var item = syncItemInfo.GetItem();
+									var item = syncItemInfo.GetSynapseItem();
 									generator.ConnectedTabled = item;
 									break;
 								}
@@ -48,7 +48,7 @@ namespace Synapse.Events.Patches
 						return false;
 
 					case PlayerInteract.Generator079Operations.Cancel:
-						if (!generator.IsTabledConnected) return false;
+						if (!generator.IsTabletConnected) return false;
 
 						bool allow = true;
 						Server.Get.Events.Player.InvokePlayerGeneratorInteractEvent(player, generator, GeneratorInteraction.TabledEjected, ref allow);

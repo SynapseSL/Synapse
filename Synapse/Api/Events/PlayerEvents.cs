@@ -151,7 +151,7 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void InvokePlayerReloadEvent(Player player, ref bool allow, Items.Item syncItemInfo)
+        internal void InvokePlayerReloadEvent(Player player, ref bool allow, Items.SynapseItem syncItemInfo)
         {
             var ev = new PlayerReloadEventArgs {Allow = allow, Item = syncItemInfo,Player = player};
             PlayerReloadEvent?.Invoke(ev);
@@ -187,7 +187,7 @@ namespace Synapse.Api.Events
 
         internal void InvokePlayerKeyPressEvent(Player player, KeyCode keyCode) => PlayerKeyPressEvent?.Invoke(new PlayerKeyPressEventArgs { Player = player, KeyCode = keyCode });
 
-        internal void InvokePlayerDropItemPatch(Player player,Items.Item item,out bool allow)
+        internal void InvokePlayerDropItemPatch(Player player,Items.SynapseItem item,out bool allow)
         {
             allow = true;
             if (PlayerDropItemEvent == null) return;
@@ -204,7 +204,7 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void InvokePlayerPickUpEvent(Player player,Items.Item item,out bool allow)
+        internal void InvokePlayerPickUpEvent(Player player,Items.SynapseItem item,out bool allow)
         {
             allow = true;
 

@@ -9,9 +9,9 @@ namespace Synapse.Api.Items
 
         internal PlayerInventory(Player player1) => player = player1;
 
-        public List<Items.Item> Items => player.VanillaInventory.items.Select(x => x.GetItem()).ToList();
+        public List<Items.SynapseItem> Items => player.VanillaInventory.items.Select(x => x.GetSynapseItem()).ToList();
 
-        public void AddItem(Items.Item item)
+        public void AddItem(Items.SynapseItem item)
         {
             if (item.ItemHolder == player) return;
             if (item.ItemHolder != null)
@@ -20,13 +20,13 @@ namespace Synapse.Api.Items
             item.PickUp(player);
         }
 
-        public void AddItem(ItemType type, float dur, int sight, int barrel, int other) => new Items.Item(type, dur, sight, barrel, other).PickUp(player);
+        public void AddItem(ItemType type, float dur, int sight, int barrel, int other) => new Items.SynapseItem(type, dur, sight, barrel, other).PickUp(player);
 
-        public void AddItem(int id, float dur, int sight, int barrel, int other) => new Items.Item(id, dur, sight, barrel, other).PickUp(player);
+        public void AddItem(int id, float dur, int sight, int barrel, int other) => new Items.SynapseItem(id, dur, sight, barrel, other).PickUp(player);
 
 
 
-        public void RemoveItem(Items.Item item)
+        public void RemoveItem(Items.SynapseItem item)
         {
             if (item.ItemHolder != player) return;
 
@@ -35,7 +35,7 @@ namespace Synapse.Api.Items
 
         public void Clear() => player.VanillaInventory.Clear();
 
-        public void Drop(Items.Item item) => item.Drop(player.Position);
+        public void Drop(Items.SynapseItem item) => item.Drop(player.Position);
 
         public void DropAll() => player.VanillaInventory.ServerDropAll();
     }

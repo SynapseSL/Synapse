@@ -9,8 +9,8 @@ namespace Synapse.Patches.SynapsePatches.Item_Patches
         private static void Prefix(Inventory __instance)
         {
             foreach (var item in __instance.items.ToList())
-                if (item.GetItem() != null)
-                    item.GetItem().Drop();
+                if (item.GetSynapseItem() != null)
+                    item.GetSynapseItem().Drop();
         }
     }
 }

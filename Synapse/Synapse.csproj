@@ -35,6 +35,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Api\Broadcast.cs" />
+    <Compile Include="Api\Scp914.cs" />
+    <Compile Include="Api\WorkStation.cs" />
     <Compile Include="Api\Enum\GlobalBadge.cs" />
     <Compile Include="Api\Generator.cs" />
     <Compile Include="Api\Enum\GeneratorInteraction.cs" />
@@ -42,7 +44,7 @@
     <Compile Include="Api\Items\PlayerInventory.cs" />
     <Compile Include="Api\Items\ItemManager.cs" />
     <Compile Include="Api\Items\CustomItemInformations.cs" />
-    <Compile Include="Api\Items\Item.cs" />
+    <Compile Include="Api\Items\SynapseItem.cs" />
     <Compile Include="Api\Roles\RoleManager.cs" />
     <Compile Include="Api\Roles\IRole.cs" />
     <Compile Include="Api\Roles\Role.cs" />
@@ -128,6 +130,7 @@
     <Compile Include="Patches\EventsPatches\ServerPatches\ConsoleCommandPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\RemoteAdminPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\Item Patches\WorkStationPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Item Patches\SpawnItemPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Item Patches\InventoryClearPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Item Patches\GeneratorEjectPatch.cs" />

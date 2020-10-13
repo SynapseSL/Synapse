@@ -32,7 +32,7 @@ namespace Synapse.Patches.SynapsePatches.Item_Patches
         {
             for (int i = 0; i <= toSpawn._amount; i++)
             {
-                var item = new Synapse.Api.Items.Item(toSpawn._id, 0f, 0, 0, 0);
+                var item = new Synapse.Api.Items.SynapseItem(toSpawn._id, 0f, 0, 0, 0);
                 item.Drop(toSpawn._pos);
                 item.pickup.RefreshDurability(true,true);
                 item.pickup.Locked = locked;

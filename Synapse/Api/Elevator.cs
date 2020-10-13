@@ -10,6 +10,10 @@ namespace Synapse.Api
 
         public GameObject GameObject => Lift.gameObject;
 
+        public string Name => GameObject.name;
+
+        public Vector3 Position => GameObject.transform.position;
+
         public Lift.Status Status { get => Lift.status; set => Lift.SetStatus((byte)value); }
 
         public bool Locked { get => Lift._locked; set => Lift.SetLock(value); }

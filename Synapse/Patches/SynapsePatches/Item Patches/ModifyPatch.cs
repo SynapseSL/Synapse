@@ -7,7 +7,7 @@ namespace Synapse.Patches.SynapsePatches.Item_Patches
     {
         private static bool Prefix(Inventory.SyncListItemInfo __instance,int index, float value)
         {
-            var item = __instance[index].GetItem();
+            var item = __instance[index].GetSynapseItem();
             if(item != null)
             {
                 item.Durabillity = value;
@@ -22,7 +22,7 @@ namespace Synapse.Patches.SynapsePatches.Item_Patches
     {
         private static bool Prefix(Inventory.SyncListItemInfo __instance, int index, int s, int b, int o)
         {
-            var item = __instance[index].GetItem();
+            var item = __instance[index].GetSynapseItem();
             if (item != null)
             {
                 item.Sight = s;

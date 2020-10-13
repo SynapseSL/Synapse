@@ -1,5 +1,4 @@
 ﻿using Harmony;
-using Synapse.Api;
 
 namespace Synapse.Patches.SynapsePatches.Item_Patches
 {
@@ -13,10 +12,7 @@ namespace Synapse.Patches.SynapsePatches.Item_Patches
                 var gen = __instance.GetGenerator();
                 __instance.NetworkisTabletConnected = false;
                 if (gen.ConnectedTabled != null)
-                {
-                    Map.Get.Items.Add(gen.ConnectedTabled);
                     gen.ConnectedTabled.Drop(gen.TabletEjectionPoint);
-                }
             }
             return false;
         }

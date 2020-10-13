@@ -39,7 +39,7 @@ namespace Synapse.Config
 
     public class SerializedItem
     {
-        public SerializedItem(Synapse.Api.Items.Item item)
+        public SerializedItem(Synapse.Api.Items.SynapseItem item)
         {
             ID = item.ID;
             Durabillity = item.Durabillity;
@@ -76,6 +76,6 @@ namespace Synapse.Config
         public float YSize { get; set; }
         public float ZSize { get; set; }
 
-        public Synapse.Api.Items.Item Parse() => new Api.Items.Item(ID, Durabillity, Sight, Barrel, Other) { Scale = new Vector3(XSize,YSize,ZSize)};
+        public Synapse.Api.Items.SynapseItem Parse() => new Api.Items.SynapseItem(ID, Durabillity, Sight, Barrel, Other) { Scale = new Vector3(XSize,YSize,ZSize)};
     }
 }

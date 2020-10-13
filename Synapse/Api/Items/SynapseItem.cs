@@ -3,13 +3,13 @@ using UnityEngine;
 
 namespace Synapse.Api.Items
 {
-    public class Item
+    public class SynapseItem
     {
         private bool deactivated = false;
         internal Pickup pickup;
         internal Inventory.SyncItemInfo itemInfo;
 
-        public Item(int id, float durability, int sight, int barrel, int other)
+        public SynapseItem(int id, float durability, int sight, int barrel, int other)
         {
             if(id >= 0 && id <= 35)
             {
@@ -34,7 +34,7 @@ namespace Synapse.Api.Items
             Map.Get.Items.Add(this);
         }
 
-        public Item(ItemType item, float durability, int sight, int barrel, int other)
+        public SynapseItem(ItemType item, float durability, int sight, int barrel, int other)
         {
             IsCustomItem = false;
             ID = (int)item;

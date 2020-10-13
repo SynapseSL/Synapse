@@ -564,7 +564,7 @@ namespace Synapse.Api
 
         public Fraction Fraction => ClassManager.Fraction;
 
-        public Items.Item ItemInHand => VanillaInventory.GetItemInHand().GetItem();
+        public Items.SynapseItem ItemInHand => VanillaInventory.GetItemInHand().GetSynapseItem();
 
         public NetworkConnection Connection => ClassManager.Connection;
 

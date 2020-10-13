@@ -29,7 +29,7 @@ namespace Synapse.Api
 
         public Vector3 Position { get; set; }
 
-        public List<Items.Item> Items { get; set; } = new List<Items.Item>();
+        public List<Items.SynapseItem> Items { get; set; } = new List<Items.SynapseItem>();
 
         public float Health { get; set; }
 

@@ -30,7 +30,7 @@ namespace Synapse.Patches.SynapsePatches.Item_Patches
                 }
             }
 
-            var item = new Synapse.Api.Items.Item(id, dur, s, b, o);
+            var item = new Synapse.Api.Items.SynapseItem(id, dur, s, b, o);
             item.PickUp(player);
             return false;
         }
@@ -43,7 +43,7 @@ namespace Synapse.Patches.SynapsePatches.Item_Patches
         {
             try
             {
-                var item = new Synapse.Api.Items.Item(__result.itemId, __result.durability, __result.weaponMods[0], __result.weaponMods[1], __result.weaponMods[2]);
+                var item = new Synapse.Api.Items.SynapseItem(__result.itemId, __result.durability, __result.weaponMods[0], __result.weaponMods[1], __result.weaponMods[2]);
                 item.pickup = __result;
             }
             catch(Exception e)

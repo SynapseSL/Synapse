@@ -19,6 +19,8 @@ namespace Synapse.Api
 
         public string Name => GameObject.name;
 
+        public Vector3 Position => GameObject.transform.position;
+
         public bool Open
         {
             get => generator.NetworkisDoorOpen;
@@ -41,26 +43,26 @@ namespace Synapse.Api
             }
         }
 
-        public bool IsTabledConnected
+        public bool IsTabletConnected
         {
             get => generator.isTabletConnected;
             set
             {
                 if (value)
                 {
-                    if (!IsTabledConnected)
+                    if (!IsTabletConnected)
                         generator.NetworkisTabletConnected = true;
                 }
                 else
                 {
-                    if(IsTabledConnected)
+                    if(IsTabletConnected)
                         generator.EjectTablet();
                 }
             }
         }
 
-        private Items.Item tablet;
-        public Items.Item ConnectedTabled
+        private Items.SynapseItem tablet;
+        public Items.SynapseItem ConnectedTabled
         {
             get => tablet;
             set
@@ -69,12 +71,11 @@ namespace Synapse.Api
 
                 if (value != null)
                 {
-                    IsTabledConnected = true;
-                    Map.Get.Items.Remove(value);
+                    IsTabletConnected = true;
                     value.Despawn();
                 }
                 else
-                    IsTabledConnected = false;
+                    IsTabletConnected = false;
             }
         }
 

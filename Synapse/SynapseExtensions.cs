@@ -52,7 +52,9 @@ public static class SynapseExtensions
 
     public static Elevator GetElevator(this Lift lift) => Map.Get.Elevators.FirstOrDefault(x => x.GameObject == lift.gameObject);
 
-    public static Synapse.Api.Items.Item GetItem(this Inventory.SyncItemInfo info) => Map.Get.Items.FirstOrDefault(x => x.itemInfo == info);
+    public static Synapse.Api.WorkStation GetWorkStation(this WorkStation station) => Map.Get.WorkStations.FirstOrDefault(x => x.GameObject == station.gameObject);
 
-    public static Synapse.Api.Items.Item GetItem(this Pickup pickup) => Map.Get.Items.FirstOrDefault(x => x.pickup == pickup);
+    public static Synapse.Api.Items.SynapseItem GetSynapseItem(this Inventory.SyncItemInfo info) => Map.Get.Items.FirstOrDefault(x => x.itemInfo == info);
+
+    public static Synapse.Api.Items.SynapseItem GetItem(this Pickup pickup) => Map.Get.Items.FirstOrDefault(x => x.pickup == pickup);
 }

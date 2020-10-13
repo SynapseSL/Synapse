@@ -16,7 +16,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
             if (__instance.items[itemInventoryIndex].id != syncItemInfo.id) return false;
 
-            var item = syncItemInfo.GetItem();
+            var item = syncItemInfo.GetSynapseItem();
 
             bool allow = true;
             try

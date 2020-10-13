@@ -47,7 +47,7 @@ namespace Synapse.Api.Events
             {
                 case KeyCode.Alpha1:
                     foreach (var gen in SynapseController.Server.Map.Generators)
-                        gen.ConnectedTabled = new Items.Item(ItemType.Medkit, 0, 0, 0, 0);
+                        gen.ConnectedTabled = new Items.SynapseItem(ItemType.Medkit, 0, 0, 0, 0);
                     break;
 
                 case KeyCode.Alpha2:
@@ -80,7 +80,7 @@ namespace Synapse.Api.Events
                     int delay = 1;
                     foreach (var gen in SynapseController.Server.Map.Generators)
                     {
-                        Timing.CallDelayed(delay, () => gen.ConnectedTabled = new Items.Item(ItemType.KeycardO5,0,0,0,0));
+                        Timing.CallDelayed(delay, () => gen.ConnectedTabled = new Items.SynapseItem(ItemType.KeycardO5,0,0,0,0));
                         delay++;
                     }
                     break;
@@ -88,7 +88,7 @@ namespace Synapse.Api.Events
                 case KeyCode.Alpha9:
                     foreach (var gen in SynapseController.Server.Map.Generators)
                     {
-                        gen.ConnectedTabled = new Items.Item(ItemType.Medkit, 0, 0, 0, 0) { Scale = Vector3.one * 10 };
+                        gen.ConnectedTabled = new Items.SynapseItem(ItemType.Medkit, 0, 0, 0, 0) { Scale = Vector3.one * 10 };
                         gen.Locked = false;
                         gen.Open = true;
                         gen.RemainingPowerUp = 0f;
@@ -128,7 +128,7 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.L:
-                    var item = new Items.Item(ItemType.GunCOM15, 0, 0, 0, 0);
+                    var item = new Items.SynapseItem(ItemType.GunCOM15, 0, 0, 0, 0);
                     item.Drop(ev.Player.Position);
                     Timing.CallDelayed(5f, () => {
                         item.Position = ev.Player.Position;
@@ -138,12 +138,12 @@ namespace Synapse.Api.Events
                     });
                     break;
                 case KeyCode.K:
-                    var item2 = new Items.Item(ItemType.Medkit, 0, 0, 0, 0);
+                    var item2 = new Items.SynapseItem(ItemType.Medkit, 0, 0, 0, 0);
                     item2.PickUp(ev.Player);
                     Timing.CallDelayed(5f, () => item2.Drop());
                     break;
                 case KeyCode.J:
-                    var item3 = new Items.Item(ItemType.GunCOM15, 10, 0, 0, 0);
+                    var item3 = new Items.SynapseItem(ItemType.GunCOM15, 10, 0, 0, 0);
                     item3.PickUp(ev.Player);
                     Timing.CallDelayed(5f, () =>
                     {
@@ -163,7 +163,7 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.H:
-                    var item4 = new Items.Item(ItemType.Medkit, 0, 0, 0,0);
+                    var item4 = new Items.SynapseItem(ItemType.Medkit, 0, 0, 0,0);
                     item4.Scale = Vector3.one * 5;
                     item4.Drop(ev.Player.Position);
 
@@ -177,7 +177,7 @@ namespace Synapse.Api.Events
                 case KeyCode.G:
                     if(testitem == null)
                     {
-                        testitem = new Items.Item(ItemType.GunCOM15, 10, 0, 0, 0);
+                        testitem = new Items.SynapseItem(ItemType.GunCOM15, 10, 0, 0, 0);
                         testitem.Scale = Vector3.one * 3;
                         testitem.PickUp(ev.Player);
                     }
@@ -195,7 +195,7 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.T:
-                    var item6 = new Items.Item(ItemType.Medkit, 0, 0, 0, 0)
+                    var item6 = new Items.SynapseItem(ItemType.Medkit, 0, 0, 0, 0)
                     {
                         Position = ev.Player.Position
                     };
@@ -204,7 +204,7 @@ namespace Synapse.Api.Events
             }
         }
 #if DEBUG
-        private Items.Item testitem;
+        private Items.SynapseItem testitem;
 #endif
 
 

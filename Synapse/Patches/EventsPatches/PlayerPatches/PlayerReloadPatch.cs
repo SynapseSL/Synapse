@@ -15,7 +15,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 
                 var allow = true;
                 var itemIndex = __instance._hub.inventory.GetItemIndex();
-                var item = __instance._hub.inventory.items[itemIndex].GetItem();
+                var item = __instance._hub.inventory.items[itemIndex].GetSynapseItem();
                 var player = __instance._hub.GetPlayer();
 
                 SynapseController.Server.Events.Player.InvokePlayerReloadEvent(player, ref allow, item);

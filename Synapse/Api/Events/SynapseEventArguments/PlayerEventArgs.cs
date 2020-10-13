@@ -80,7 +80,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         
         public ItemInteractState State { get; internal set; }
         
-        public Items.Item CurrentItem { get; internal set; }
+        public Items.SynapseItem CurrentItem { get; internal set; }
         
         public bool Allow { get; set; }
     }
@@ -89,7 +89,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
     {
         public Player Player { get; internal set; }
 
-        public Items.Item Item { get; set; }
+        public Items.SynapseItem Item { get; set; }
         
         public GrenadeSettings Settings { get; set; }
 
@@ -142,7 +142,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public bool Allow { get; set; } = true;
         
-        public Items.Item Item { get; internal set; }
+        public Items.SynapseItem Item { get; internal set; }
     }
 
     public class PlayerEnterFemurEventArgs : EventHandler.ISynapseEventArgs
@@ -176,7 +176,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
     {
         public Player Player { get; internal set; }
 
-        public Items.Item Item { get; internal set; }
+        public Items.SynapseItem Item { get; internal set; }
 
         public bool Allow { get; set; }
     }
@@ -185,7 +185,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
     {
         public Player Player { get; internal set; }
 
-        public Items.Item Item { get; internal set; }
+        public Items.SynapseItem Item { get; internal set; }
 
         public bool Allow { get; set; }
     }

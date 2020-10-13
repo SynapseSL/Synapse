@@ -10,13 +10,8 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
     {
         private static void Prefix()
         {
-            var map = Map.Get;
-            map.Teslas.Clear();
-            map.Doors.Clear();
-            map.Elevators.Clear();
-            map.Rooms.Clear();
-            map.Generators.Clear();
-            map.Items.Clear();
+            Map.Get.ClearObjects();
+            
             PlayerBasicItemUsePatch.HealCache.Clear();
 
             try

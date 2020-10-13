@@ -16,6 +16,8 @@ namespace Synapse.Api
 
         public Decontamination Decontamination { get; } = new Decontamination();
 
+        public Scp914 Scp914 { get; } = new Scp914();
+
         public List<Tesla> Teslas { get; } = new List<Tesla>();
 
         public List<Elevator> Elevators { get; } = new List<Elevator>();
@@ -26,7 +28,9 @@ namespace Synapse.Api
 
         public List<Generator> Generators { get; } = new List<Generator>();
 
-        public List<Items.Item> Items { get; } = new List<Items.Item>();
+        public List<WorkStation> WorkStations { get; } = new List<WorkStation>();
+
+        public List<Items.SynapseItem> Items { get; } = new List<Items.SynapseItem>();
 
         public string IntercomText
         {
@@ -55,13 +59,27 @@ namespace Synapse.Api
                 ply.SendBroadcast(time, message, instant);
         }
 
-        internal void RefreshObjects()
+        internal void AddObjects()
         {
             foreach (var tesla in SynapseController.Server.GetObjectsOf<TeslaGate>())
                 SynapseController.Server.Map.Teslas.Add(new Tesla(tesla));
 
             foreach (var room in SynapseController.Server.GetObjectsOf<Transform>().Where(x => x.CompareTag("Room") || x.name == "Root_*&*Outside Cams" || x.name == "PocketWorld" || x.name == "Start Positions"))
                 Rooms.Add(new Room(room.gameObject));
+
+            foreach (var station in Server.Get.GetObjectsOf<global::WorkStation>())
+                WorkStations.Add(new WorkStation(station));
+        }
+
+        internal void ClearObjects()
+        {
+            Teslas.Clear();
+            Doors.Clear();
+            Elevators.Clear();
+            Rooms.Clear();
+            Generators.Clear();
+            WorkStations.Clear();
+            Items.Clear();
         }
     }
 }
