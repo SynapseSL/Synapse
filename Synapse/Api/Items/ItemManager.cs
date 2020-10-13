@@ -28,6 +28,8 @@ namespace Synapse.Api.Items
             return item.Name;
         }
 
+        public CustomItemInformations GetInfo(int id) => customItems.FirstOrDefault(x => x.ID == id);
+
         public void RegisterCustomItem(CustomItemInformations info)
         {
             if (info.ID >= 0 && info.ID <= 35)
