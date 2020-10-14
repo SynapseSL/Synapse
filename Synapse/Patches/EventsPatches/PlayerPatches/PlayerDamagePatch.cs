@@ -26,7 +26,11 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 SynapseController.Server.Events.Player.InvokePlayerDamageEvent(player, killer, ref info);
                 
                 if(player.Health + player.ArtificialHealth - info.Amount <= 0)
+                {
                     SynapseController.Server.Events.Player.InvokePlayerDeathEvent(player, killer, info);
+                    if (player.CustomRole != null)
+                        player.CustomRole = null;
+                }
             }
             catch (Exception e)
             {

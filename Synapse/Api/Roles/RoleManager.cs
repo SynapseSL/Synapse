@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MEC;
 using Synapse.Api.Events.SynapseEventArguments;
 
 namespace Synapse.Api.Roles
@@ -13,7 +14,6 @@ namespace Synapse.Api.Roles
         {
             SynapseController.Server.Events.Player.PlayerEscapseEvent += OnEscape;
             SynapseController.Server.Events.Player.PlayerLeaveEvent += OnLeave;
-            SynapseController.Server.Events.Player.PlayerDeathEvent += OnDeath;
             SynapseController.Server.Events.Player.PlayerEnterFemurEvent += OnFemur;
             SynapseController.Server.Events.Server.RemoteAdminCommandEvent += OnRa;
             SynapseController.Server.Events.Player.PlayerDamageEvent += OnDamage;
@@ -118,12 +118,6 @@ namespace Synapse.Api.Roles
         {
             if (ev.Player.CustomRole != null)
                 ev.Player.CustomRole = null;
-        }
-
-        private void OnDeath(Events.SynapseEventArguments.PlayerDeathEventArgs ev)
-        {
-            if (ev.Victim.CustomRole != null)
-                ev.Victim.CustomRole = null;
         }
 
         private void OnRa(Events.SynapseEventArguments.RemoteAdminCommandEventArgs ev)
