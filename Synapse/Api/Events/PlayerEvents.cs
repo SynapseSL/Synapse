@@ -46,6 +46,8 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<PlayerDropItemEventArgs> PlayerDropItemEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerPickUpItemEventArgs> PlayerPickUpItemEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerShootEventArgs> PlayerShootEvent;
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -250,6 +252,22 @@ namespace Synapse.Api.Events
             };
 
             PlayerPickUpItemEvent.Invoke(ev);
+
+            allow = ev.Allow;
+        }
+
+        internal void InvokePlayerShootEvent(Player player,Player target,Vector3 targetpos,SynapseItem weapon,out bool allow)
+        {
+            var ev = new PlayerShootEventArgs
+            {
+                Player = player,
+                Allow = true,
+                Target = target,
+                TargetPosition = targetpos,
+                Weapon = weapon,
+            };
+
+            PlayerShootEvent?.Invoke(ev);
 
             allow = ev.Allow;
         }

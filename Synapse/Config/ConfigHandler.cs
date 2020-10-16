@@ -60,6 +60,5 @@ namespace Synapse.Config
             _syml.Load();
             SynapseTranslation.ReloadTranslations();
         }
-        
     }
 }
