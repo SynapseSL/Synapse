@@ -63,7 +63,18 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Player Killer { get; internal set; }
         
         public Player Victim { get; internal set; }
-        
+       
+        public float DamageAmount
+        {
+            get => HitInfo.Amount;
+            set
+            {
+                var info = HitInfo;
+                info.Amount = value;
+                HitInfo = info;
+            }
+        }
+
         public PlayerStats.HitInfo HitInfo { get; set; }
     }
 
