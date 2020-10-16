@@ -110,9 +110,15 @@ namespace Synapse.Api.Events
             LoadComponentsEvent?.Invoke(ev);
         }
 
-        internal void InvokePlayerItemUseEvent(Player player, ItemType type, ItemInteractState state, ref bool allow)
+        internal void InvokePlayerItemUseEvent(Player player, Api.Items.SynapseItem item, ItemInteractState state, ref bool allow)
         {
-            var ev = new PlayerItemInteractEventArgs { Player = player, Type = type, Allow = allow, CurrentItem = player.ItemInHand, State = state };
+            var ev = new PlayerItemInteractEventArgs
+            {
+                Player = player,
+                CurrentItem = item,
+                State = state,
+                Allow = allow,
+            };
             PlayerItemUseEvent?.Invoke(ev);
 
             allow = ev.Allow;

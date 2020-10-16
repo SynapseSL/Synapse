@@ -87,8 +87,6 @@ namespace Synapse.Api.Events.SynapseEventArguments
     {
         public Player Player { get; internal set; }
         
-        public ItemType Type { get; internal set; }
-        
         public ItemInteractState State { get; internal set; }
         
         public Items.SynapseItem CurrentItem { get; internal set; }

@@ -11,7 +11,7 @@ using Synapse.Api.Events.SynapseEventArguments;
 // ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(ConsumableAndWearableItems), nameof(ConsumableAndWearableItems.UseMedicalItem))]
+    /*[HarmonyPatch(typeof(ConsumableAndWearableItems), nameof(ConsumableAndWearableItems.UseMedicalItem))]
     public class PlayerBasicItemUsePatch
     {
         internal static Dictionary<int,ItemType> HealCache = new Dictionary<int, ItemType>();
@@ -38,26 +38,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 return true;
             }
         }
-    }
+    }*/
 
-    [HarmonyPatch(typeof(ConsumableAndWearableItems), nameof(ConsumableAndWearableItems.CallCmdCancelMedicalItem))]
-    public class CancelBasicItemUse
-    {
-        [SuppressMessage("ReSharper", "InconsistentNaming")]
-        public static void Postfix(ConsumableAndWearableItems __instance)
-        {
-            
-            if (PlayerBasicItemUsePatch.HealCache.ContainsKey(__instance.GetPlayer().PlayerId))
-            {
-                var cached = PlayerBasicItemUsePatch.HealCache[__instance.GetPlayer().PlayerId];
-                var allow = true;
-                SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(__instance.GetPlayer(), __instance._hub.inventory.curItem, ItemInteractState.Stopping, ref allow);
-                PlayerBasicItemUsePatch.HealCache.Remove(__instance.GetPlayer().PlayerId);
-            }
-        }
-    }
-
-    //[HarmonyPatch(typeof(ConsumableAndWearableItems), nameof(ConsumableAndWearableItems.CallCmdUseMedicalItem))]
+    [HarmonyPatch(typeof(ConsumableAndWearableItems), nameof(ConsumableAndWearableItems.CallCmdUseMedicalItem))]
     internal static class PlayerBasicItemUsePatchBeta
     {
         private static bool Prefix(ConsumableAndWearableItems __instance)
@@ -69,7 +52,22 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
             for (int i = 0; i < __instance.usableItems.Length; i++)
                 if (__instance.usableItems[i].inventoryID == __instance._hub.inventory.curItem && __instance.usableCooldowns[i] <= 0f)
+                {
+                    try
+                    {
+                        var player = __instance.GetPlayer();
+                        var item = player.ItemInHand;
+                        var allow = true;
+                        Server.Get.Events.Player.InvokePlayerItemUseEvent(player, item, ItemInteractState.Initiating, ref allow);
+                        if (!allow) return false;
+                    }
+                    catch(Exception e)
+                    {
+                        Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent Initiating failed!!\n{e}");
+                    }
+
                     Timing.RunCoroutine(UseMedialItem(__instance, i));
+                }
 
             return false;
         }
@@ -91,7 +89,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
             //Wait for Animation
             var start = UnityEngine.Time.time;
-            while (UnityEngine.Time.time < start + usableitem.animationDuration)
+            while (UnityEngine.Time.time <= start + usableitem.animationDuration)
             {
                 yield return Timing.WaitForOneFrame;
                 if(consumable._cancel && UnityEngine.Time.time < start + usableitem.cancelableTime)
@@ -101,12 +99,25 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 }
             }
 
-            //End Animation and set Cooldown
+            //End Animation
             consumable.SendRpc(ConsumableAndWearableItems.HealAnimation.DequipMedicalItem, mid);
+
+            //Event
+            try
+            {
+                var allow = true;
+                Server.Get.Events.Player.InvokePlayerItemUseEvent(player, item, ItemInteractState.Finalizing, ref allow);
+                if (!allow) yield break;
+            }
+            catch (Exception e)
+            {
+                Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent finalizing failed!!\n{e}");
+            }
+
+            //Set Cooldown
             consumable.usableCooldowns[mid] = usableitem.cooldownAfterUse;
             consumable.RpcSetCooldown(mid, usableitem.cooldownAfterUse);
-            
-            
+
             //Adding Health/ArtificialHealth
             if (usableitem.instantHealth > 0)
                 player.PlayerStats.HealHPAmount(usableitem.instantHealth);
@@ -145,6 +156,25 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     yield return Timing.WaitForSeconds(key.time);
                     consumable.hpToHeal += key.value;
                 }
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(ConsumableAndWearableItems), nameof(ConsumableAndWearableItems.CallCmdCancelMedicalItem))]
+    public class CancelBasicItemUse
+    {
+        public static bool Prefix(ConsumableAndWearableItems __instance)
+        {
+            try
+            {
+                var allow = true;
+                Server.Get.Events.Player.InvokePlayerItemUseEvent(__instance.GetPlayer(),__instance.GetPlayer().ItemInHand,ItemInteractState.Stopping,ref allow);
+                return allow;
+            }
+            catch(Exception e)
+            {
+                Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent Stopping failed!!\n{e}");
+                return true;
             }
         }
     }

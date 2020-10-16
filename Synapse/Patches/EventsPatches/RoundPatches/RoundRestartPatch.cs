@@ -11,8 +11,6 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
         private static void Prefix()
         {
             Map.Get.ClearObjects();
-            
-            PlayerBasicItemUsePatch.HealCache.Clear();
 
             try
             {

@@ -26,7 +26,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 		        var item = __instance.hub.inventory.items[itemIndex].GetSynapseItem();
 		        var allow = true;
 		        
-		        SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(player, item.ItemType, ItemInteractState.Initiating, ref allow);
+		        SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(player, item, ItemInteractState.Initiating, ref allow);
 		        SynapseController.Server.Events.Player.InvokePlayerThrowGrenadeEvent(player, item,ref settings, ref forceMultiplier, ref delay, ref allow);
 		        
 		        __result = ServerThrowGrenadeOverride(__instance, settings, forceMultiplier, itemIndex, delay, !allow);
@@ -97,7 +97,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 			
 			var allow = true;
 			var item = __instance.hub.inventory.items[itemIndex].GetSynapseItem();
-			SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(__instance.GetPlayer(), item.ItemType, ItemInteractState.Finalizing, ref allow);
+			SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(__instance.GetPlayer(), item, ItemInteractState.Finalizing, ref allow);
 			if (!allow)
 			{
 				yield break;
