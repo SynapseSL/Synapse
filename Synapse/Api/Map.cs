@@ -30,6 +30,8 @@ namespace Synapse.Api
 
         public List<WorkStation> WorkStations { get; } = new List<WorkStation>();
 
+        public List<Ragdoll> Ragdolls { get; } = new List<Ragdoll>();
+
         public List<Items.SynapseItem> Items { get; } = new List<Items.SynapseItem>();
 
         public string IntercomText
@@ -54,6 +56,8 @@ namespace Synapse.Api
             => new Dummy(pos, rot, role, name, badgetext, badgecolor);
 
         public WorkStation CreateWorkStation(Vector3 position, Vector3 rotation, Vector3 scale) => new WorkStation(position, rotation, scale);
+
+        public Ragdoll CreateRagdoll(RoleType roletype, Vector3 pos, Quaternion rot, Vector3 velocity, PlayerStats.HitInfo info, bool allowRecall, Player owner) => new Ragdoll(roletype, pos, rot, velocity, info, allowRecall, owner);
 
         public void SendBroadcast(ushort time,string message,bool instant)
         {

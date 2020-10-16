@@ -35,6 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Api\Broadcast.cs" />
+    <Compile Include="Api\Ragdoll.cs" />
     <Compile Include="Api\Scp914.cs" />
     <Compile Include="Api\WorkStation.cs" />
     <Compile Include="Api\Enum\GlobalBadge.cs" />
@@ -143,6 +144,7 @@
     <Compile Include="Patches\SynapsePatches\Permission System\RefreshPermissionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Permission System\SignatureCompletePatch.cs" />
     <Compile Include="Patches\SynapsePatches\Permission System\SetGroup Patch.cs" />
+    <Compile Include="Patches\SynapsePatches\Wrapper\RagdollPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\GeneratorStartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\NukeLockPatch.cs" />
     <Compile Include="Patches\SynapsePatches\CommandPatches.cs" />

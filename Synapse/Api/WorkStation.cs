@@ -34,7 +34,16 @@ namespace Synapse.Api
 
         public string Name => GameObject.name;
 
-        public Vector3 Position => workStation.Networkposition.position;
+        public Vector3 Position
+        {
+            get => workStation.Networkposition.position;
+            set
+            {
+                var offset = workStation.Networkposition;
+                offset.position = value;
+                workStation.Networkposition = offset;
+            }
+        }
 
         public Vector3 Scale
         {
