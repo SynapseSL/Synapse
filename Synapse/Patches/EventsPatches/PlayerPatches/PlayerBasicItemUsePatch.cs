@@ -41,7 +41,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     }*/
 
     [HarmonyPatch(typeof(ConsumableAndWearableItems), nameof(ConsumableAndWearableItems.CallCmdUseMedicalItem))]
-    internal static class PlayerBasicItemUsePatchBeta
+    internal static class PlayerBasicItemUsePatch
     {
         private static bool Prefix(ConsumableAndWearableItems __instance)
         {
@@ -150,11 +150,34 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var process = new ConsumableAndWearableItems.HealthRegenerationProcess(usableitem.regenOverTime);
                 var curve = usableitem.regenOverTime;
 
-                foreach(var key in curve.keys)
+                //TODO: fix this so that it actualy use the animation curve from above
+
+                float HptoHeal;
+                float time;
+                switch (usableitem.inventoryID)
                 {
-                    Logger.Get.Info(key.value.ToString());
-                    yield return Timing.WaitForSeconds(key.time);
-                    consumable.hpToHeal += key.value;
+                    case ItemType.SCP500:
+                        HptoHeal = 38;
+                        time = 12;
+                        break;
+
+                    case ItemType.Adrenaline:
+                        HptoHeal = 49;
+                        time = 20;
+                        break;
+
+                    case ItemType.Painkillers:
+                        HptoHeal = 26;
+                        time = 26;
+                        break;
+
+                    default: yield break;
+                }
+
+                for (float i = 0; i <= time; i += time / HptoHeal) 
+                {
+                    yield return Timing.WaitForSeconds(time / HptoHeal);
+                    consumable.hpToHeal++;
                 }
             }
         }
