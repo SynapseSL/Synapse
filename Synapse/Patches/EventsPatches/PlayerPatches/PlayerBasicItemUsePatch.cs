@@ -11,35 +11,6 @@ using Synapse.Api.Events.SynapseEventArguments;
 // ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    /*[HarmonyPatch(typeof(ConsumableAndWearableItems), nameof(ConsumableAndWearableItems.UseMedicalItem))]
-    public class PlayerBasicItemUsePatch
-    {
-        internal static Dictionary<int,ItemType> HealCache = new Dictionary<int, ItemType>();
-        
-        public static bool Prefix(ConsumableAndWearableItems __instance)
-        {
-            try
-            {
-#if DEBUG
-                SynapseController.Server.Logger.Info($"ItemUse: { __instance._hub.inventory.curItem}");
-#endif
-
-                var t = __instance._hub.inventory.curItem;
-
-                HealCache.Add(__instance.GetPlayer().PlayerId, t);
-                
-                var allow = true;
-                SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(__instance.GetPlayer(), __instance._hub.inventory.curItem, ItemInteractState.Initiating, ref allow);
-                return allow;
-            }
-            catch (Exception e)
-            {
-                SynapseController.Server.Logger.Error($"Synapse-Event: BasicItemUse failed!!\n{e}");
-                return true;
-            }
-        }
-    }*/
-
     [HarmonyPatch(typeof(ConsumableAndWearableItems), nameof(ConsumableAndWearableItems.CallCmdUseMedicalItem))]
     internal static class PlayerBasicItemUsePatch
     {
