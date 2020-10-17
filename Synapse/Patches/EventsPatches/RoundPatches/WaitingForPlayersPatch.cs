@@ -19,7 +19,9 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 		{
 			try
 			{
-				if (q == "Waiting for players...")
+                if (q.StartsWith("Round finished! Anomalies: "))
+					Server.Get.Events.Round.InvokeRoundEndEvent();
+				else if (q == "Waiting for players...")
                 {
 					SynapseController.Server.Map.AddObjects();
 					SynapseController.Server.Map.Round.CurrentRound++;

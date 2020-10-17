@@ -64,5 +64,11 @@ namespace Synapse.Api
             get => ragdoll.allowRecall;
             set => ragdoll.allowRecall = value;
         }
+
+        public void Destroy()
+        {
+            Object.Destroy(GameObject);
+            Map.Get.Ragdolls.Remove(this);
+        }
     }
 }

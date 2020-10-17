@@ -85,6 +85,7 @@ namespace Synapse.Api
             Rooms.Clear();
             Generators.Clear();
             WorkStations.Clear();
+            Ragdolls.Clear();
             Items.Clear();
         }
     }
