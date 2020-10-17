@@ -6,7 +6,7 @@ namespace Synapse.Command.Commands
         Name = "permission",
         Aliases = new[] { "pm" },
         Description = "A Command for managing the Permission System",
-        Usage = "Use \"permission help\"",
+        Usage = "Execute the command without paramater to get a Help",
         Permission = "none",
         Platforms = new[] { Platform.RemoteAdmin,Platform.ServerConsole }
     )]
@@ -43,7 +43,7 @@ namespace Synapse.Command.Commands
                     {
                         result.Message = "You don´t have Permission to set the Group of a player (RequiredPermission: synapse.permission.setgroup)";
                         result.State = CommandResultState.NoPermission;
-                        return result;
+                        break;
                     }
 
                     var group2 = Server.Get.PermissionHandler.GetServerGroup(context.Arguments.First());
@@ -51,23 +51,66 @@ namespace Synapse.Command.Commands
                     {
                         result.Message = "No Group with that name was found!";
                         result.State = CommandResultState.Error;
-                        return result;
+                        break;
                     }
 
                     if (!context.Player.HasPermission($"synapse.permission.group.{context.Arguments.First().ToLower()}"))
                     {
                         result.Message = $"You don´t have Permission to set a player this specific group (RequiredPermission: synapse.permission.group.{context.Arguments.First().ToLower()})";
                         result.State = CommandResultState.NoPermission;
-                        return result;
+                        break;
                     }
 
+                    if (context.Arguments.Count < 2)
+                        context.Arguments = new System.ArraySegment<string>(new string[] { "setgroup","" });
 
+                    if (context.Arguments.Count < 3)
+                        context.Arguments = new System.ArraySegment<string>(new string[] { "setgroup", context.Arguments.ElementAt(1), "" });
+
+                    var player = Server.Get.GetPlayer(context.Arguments.ElementAt(1));
+                    var group3 = Server.Get.PermissionHandler.GetServerGroup(context.Arguments.ElementAt(2));
+
+                    if(player == null)
+                    {
+                        result.Message = "No Player with that Name/ID was found!";
+                        result.State = CommandResultState.Error;
+                        break;
+                    }
+
+                    if (group3 == null)
+                    {
+                        result.Message = "No Group with that Name was found!";
+                        result.State = CommandResultState.Error;
+                        break;
+                    }
+
+                    player.SynapseGroup = group3;
+                    result.Message = "Group of the Player was set!";
+                    result.State = CommandResultState.Ok;
                     break;
 
-                case "ADDPERMISSION":
+                case "GROUPS":
+                    if(!context.Player.HasPermission("synapse.permission.groups"))
+                    {
+                        result.Message = "You don´t have Permission to get all groups (synapse.permission.groups)";
+                        result.State = CommandResultState.Error;
+                        break;
+                    }
+
+                    var msg = "All Groups:";
+                    foreach (var pair in Server.Get.PermissionHandler.Groups)
+                        msg += $"\n{pair.Key} Badge: {pair.Value.Badge}";
+
+                    result.Message = msg;
+                    result.State = CommandResultState.Ok;
                     break;
 
                 default:
+                    result.Message = "All Permission Commands:" +
+                        "\nPermission me - Gives you informations ybout your Role" +
+                        "\nPermission setgroup player groupname - Sets the Group of a Player for one Round" +
+                        "\nPermission groups - Gives you a List of All Groups";
+                    result.State = CommandResultState.Ok;
                     break;
             }
 
