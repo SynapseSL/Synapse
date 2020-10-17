@@ -13,24 +13,31 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 	/// the IEnumerator. Until Northwood does a better Handling of this, this is here to stay.
 	/// </summary>
 	[HarmonyPatch(typeof(ServerConsole), nameof(ServerConsole.AddLog))]
-	public class WaitingForPlayersPatch
+	public class WaitingandEndPatch
 	{
 		public static void Prefix(ref string q)
 		{
-			try
-			{
-                if (q.StartsWith("Round finished! Anomalies: "))
+			if (q.StartsWith("Round finished! Anomalies: "))
+				try
+				{
 					Server.Get.Events.Round.InvokeRoundEndEvent();
-				else if (q == "Waiting for players...")
-                {
+				}
+				catch (Exception e)
+				{
+					SynapseController.Server.Logger.Error($"Synapse-Event: RoundEnd failed!!\n{e}");
+				}
+			else if (q == "Waiting for players...")
+			{
+				try
+				{
 					SynapseController.Server.Map.AddObjects();
 					SynapseController.Server.Map.Round.CurrentRound++;
 					SynapseController.Server.Events.Round.InvokeWaitingForPlayers();
-                }
-			}
-			catch (Exception e)
-			{
-				SynapseController.Server.Logger.Error($"Synapse-Event: WaitingForPlayers failed!!\n{e}");
+				}
+				catch (Exception e)
+				{
+					SynapseController.Server.Logger.Error($"Synapse-Event: WaitingForPlayers failed!!\n{e}");
+				}
 			}
 		}
 	}

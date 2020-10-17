@@ -35,4 +35,11 @@
         
         public bool Allow { get; set; }
     }
+
+    public class PortalCreateEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Scp106 { get; internal set; }
+
+        public bool Allow { get; set; }
+    }
 }

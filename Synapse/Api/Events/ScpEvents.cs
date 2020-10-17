@@ -48,6 +48,8 @@ namespace Synapse.Api.Events
             
             public event EventHandler.OnSynapseEvent<PocketDimensionLeaveEventArgs> PocketDimensionLeaveEvent;
 
+            public event EventHandler.OnSynapseEvent<PortalCreateEventArgs> PortalCreateEvent;
+
             #region Invoke106Events
 
             internal void InvokeScp106ContainmentEvent(Player player, ref bool allow)
@@ -76,6 +78,18 @@ namespace Synapse.Api.Events
                 teleportType = ev.TeleportType;
             }
 
+            internal void InvokePortalCreateEvent(Player scp106, out bool allow)
+            {
+                var ev = new PortalCreateEventArgs
+                {
+                    Scp106 = scp106,
+                    Allow = true,
+                };
+
+                PortalCreateEvent?.Invoke(ev);
+
+                allow = ev.Allow;
+            }
             #endregion
         }
     }
