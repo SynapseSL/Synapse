@@ -86,8 +86,10 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha9:
-                    foreach (var rag in SynapseController.Server.Map.Ragdolls)
-                        rag.Scale = rag.Scale * 2;
+                    break;
+
+                case KeyCode.Alpha0:
+                    SynapseController.Server.Map.Decontamination.InstantStart();
                     break;
 
                 case KeyCode.U:

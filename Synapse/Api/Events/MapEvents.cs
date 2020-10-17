@@ -13,6 +13,8 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<DoorInteractEventArgs> DoorInteractEvent;
 
+        public event EventHandler.OnSynapseEvent<LCZDecontaminationEventArgs> LCZDecontaminationEvent;
+
         #region Invoke
         internal void InvokeTriggerTeslaEv(Player player,Tesla tesla,bool hurtrange,out bool trigger)
         {
@@ -47,6 +49,18 @@ namespace Synapse.Api.Events
         }
 
         internal void InvokeWarheadDetonationEvent() => WarheadDetonationEvent?.Invoke();
+
+        internal void InvokeLCZDeconEvent(out bool allow)
+        {
+            var ev = new LCZDecontaminationEventArgs
+            {
+                Allow = true,
+            };
+
+            LCZDecontaminationEvent?.Invoke(ev);
+
+            allow = ev.Allow;
+        }
 
         #endregion
     }

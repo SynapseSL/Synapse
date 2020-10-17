@@ -1,5 +1,6 @@
 ﻿using LightContainmentZoneDecontamination;
 using Mirror;
+using System.Linq;
 
 namespace Synapse.Api
 {
@@ -37,6 +38,6 @@ namespace Synapse.Api
         /// <summary>
         ///  Starts the Decontamination
         /// </summary>
-        public void InstantDecontamination() => Controller.FinishDecontamination();
+        public void InstantStart() => Controller.FinishDecontamination();
     }
 }
