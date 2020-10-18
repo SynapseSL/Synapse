@@ -105,10 +105,17 @@ namespace Synapse.Command.Commands
             if (context.Arguments.Count > 8)
                 if (!float.TryParse(context.Arguments.ElementAt(8), out zsize))
                 {
-                    result.Message = "Invalid Parameter for YSize";
+                    result.Message = "Invalid Parameter for ZSize";
                     result.State = CommandResultState.Error;
                     return result;
                 }
+
+            if (!Server.Get.ItemManager.IsIDRegistered(id))
+            {
+                result.Message = "No Item with this ItemId was found";
+                result.State = CommandResultState.Error;
+                return result;
+            }
 
             var item = new Api.Items.SynapseItem(id, durabillity, sight, barrel, other);
             item.Scale = new UnityEngine.Vector3(xsize, ysize, zsize);
