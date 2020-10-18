@@ -77,19 +77,15 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha8:
-                    int delay = 1;
-                    foreach (var gen in SynapseController.Server.Map.Generators)
-                    {
-                        Timing.CallDelayed(delay, () => gen.ConnectedTabled = new Items.SynapseItem(ItemType.KeycardO5,0,0,0,0));
-                        delay++;
-                    }
+                    ev.Player.SendBroadcast(5, SynapseController.Server.Map.Decontamination.IsDecontaminationInProgress.ToString());
                     break;
 
                 case KeyCode.Alpha9:
+                    SynapseController.Server.Map.Decontamination.DisableDecontamination = false;
                     break;
 
                 case KeyCode.Alpha0:
-                    SynapseController.Server.Map.Decontamination.InstantStart();
+                    SynapseController.Server.Map.Decontamination.DisableDecontamination = true;
                     break;
 
                 case KeyCode.U:

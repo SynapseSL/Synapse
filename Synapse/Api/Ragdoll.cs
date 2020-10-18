@@ -1,5 +1,4 @@
 ﻿using Mirror;
-using System.Net;
 using UnityEngine;
 
 namespace Synapse.Api

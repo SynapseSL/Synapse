@@ -1,6 +1,4 @@
 ﻿using Synapse.Api;
-using Synapse.Api.Items;
-using System.ComponentModel;
 using UnityEngine;
 
 namespace Synapse.Config
