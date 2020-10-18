@@ -87,6 +87,7 @@
     <Compile Include="Api\Tesla.cs" />
     <Compile Include="Command\CommandHandler.cs" />
     <Compile Include="Command\CommandInformations.cs" />
+    <Compile Include="Command\Commands\SynapseGiveCustomItemCommand.cs" />
     <Compile Include="Command\Commands\SynapsePermissionCommand.cs" />
     <Compile Include="Command\Commands\SynapsePluginCommand.cs" />
     <Compile Include="Command\Commands\SynapseKeyPressCommand.cs" />

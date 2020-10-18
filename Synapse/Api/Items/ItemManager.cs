@@ -40,5 +40,12 @@ namespace Synapse.Api.Items
 
             customItems.Add(info);
         }
+
+        public bool IsIDRegistered(int id)
+        {
+            if (id >= 0 && id <= 35) return true;
+            if (customItems.Any(x => x.ID == id)) return true;
+            return false;
+        }
     }
 }
