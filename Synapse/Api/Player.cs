@@ -195,6 +195,15 @@ namespace Synapse.Api
             }
         }
 
+        public int RoleID
+        {
+            get
+            {
+                if (CustomRole == null) return (int)RoleType;
+                else return CustomRole.GetRoleID();
+            }
+        }
+
         //Stuff for the Permission System
         private SynapseGroup synapseGroup;
 
