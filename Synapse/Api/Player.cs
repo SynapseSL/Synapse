@@ -182,6 +182,8 @@ namespace Synapse.Api
             {
                 if (value == null)
                 {
+                    if (_role == null) return;
+
                     _role.DeSpawn();
                     _role = value;
                     return;

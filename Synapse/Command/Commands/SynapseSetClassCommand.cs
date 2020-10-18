@@ -1,0 +1,67 @@
+﻿using System.Linq;
+
+namespace Synapse.Command.Commands
+{
+    [CommandInformations(
+        Name = "setclass",
+        Aliases = new[] {"sc","class"},
+        Description = "A Command to set the class of a Player",
+        Permission = "synapse.command.setclass",
+        Platforms = new[] {Platform.RemoteAdmin,Platform.ServerConsole},
+        Usage = "setclass player RoleID"
+        )]
+    public class SynapseSetClassCommand : ISynapseCommand
+    {
+        public CommandResult Execute(CommandContext context)
+        {
+            var result = new CommandResult();
+
+            if (!context.Player.HasPermission("synapse.command.setclass"))
+            {
+                result.Message = "You dont have Permission to execute thus command!";
+                result.State = CommandResultState.NoPermission;
+                return result;
+            }
+
+            if(context.Arguments.Count < 2)
+            {
+                result.Message = "Missing Parameters! Command Usage: setclass player RoleID";
+                result.State = CommandResultState.Error;
+                return result;
+            }
+
+            var player = Server.Get.GetPlayer(context.Arguments.FirstElement());
+            if(player == null)
+            {
+                result.Message = "No Player was found!";
+                result.State = CommandResultState.Error;
+                return result;
+            }
+
+            if(!int.TryParse(context.Arguments.ElementAt(1),out var id))
+            {
+                result.Message = "Invalid Paramter for RoleID";
+                result.State = CommandResultState.Error;
+                return result;
+            }
+
+            if (!Server.Get.RoleManager.IsIDRegistered(id))
+            {
+                result.Message = "No Role with this RoleID was found";
+                result.State = CommandResultState.Error;
+                return result;
+            }
+
+            player.CustomRole = null;
+
+            if (id >= 0 && id <= 17)
+                player.RoleType = (RoleType)id;
+            else
+                player.CustomRole = Server.Get.RoleManager.GetCustomRole(id);
+
+            result.Message = "Player Role was set";
+            result.State = CommandResultState.Ok;
+            return result;
+        }
+    }
+}
