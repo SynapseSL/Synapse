@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Assets._Scripts.Dissonance;
 using Hints;
 using Mirror;
 using Mirror.LiteNetLib4Mirror;
@@ -201,6 +202,19 @@ namespace Synapse.Api
             {
                 if (CustomRole == null) return (int)RoleType;
                 else return CustomRole.GetRoleID();
+            }
+            set
+            {
+                if(value >= 0 && value <= 17)
+                {
+                    RoleType = (RoleType)value;
+                    return;
+                }
+
+                if (!Server.Get.RoleManager.IsIDRegistered(value))
+                    throw new Exception("Plugin tried to set the RoleId of a Player with an not registered RoldeID");
+
+                CustomRole = Server.Get.RoleManager.GetCustomRole(value);
             }
         }
 
