@@ -32,6 +32,12 @@ namespace Synapse.Patches.SynapsePatches.Item_Patches
                 newitem.pickup = item;
                 newitem.Position = newitem.pickup.transform.position;
                 newitem.pickup.RefreshDurability();
+                if(newitem.ItemType == ItemType.GunLogicer)
+                {
+                    newitem.Sight = 0;
+                    newitem.Barrel = 0;
+                    newitem.Other = 0;
+                }
             }
             catch(Exception e)
             {
@@ -61,6 +67,12 @@ namespace Synapse.Patches.SynapsePatches.Item_Patches
                     {
                         var newitem = new SynapseItem(type, item.Durabillity, item.Sight, item.Barrel, item.Other);
                         item.Destroy();
+                        if(newitem.ItemType == ItemType.GunLogicer)
+                        {
+                            newitem.Sight = 0;
+                            newitem.Barrel = 0;
+                            newitem.Other = 0;
+                        }
                         newitem.PickUp(splayer);
                         Scp914Machine.TryFriendshipAchievement(type, player, players);
                     }
