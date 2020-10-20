@@ -262,7 +262,7 @@ namespace Synapse.Api
             if (!ServerRoles.OverwatchPermitted && SynapseGroup.HasVanillaPermission(PlayerPermissions.Overwatch))
                 ServerRoles.OverwatchPermitted = true;
 
-            else if (SynapseGroup.RemoteAdmin)
+            if (SynapseGroup.RemoteAdmin)
                 RaLogin();
             else
                 RaLogout();
