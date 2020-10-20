@@ -22,6 +22,58 @@ namespace Synapse.Api.Roles
             SynapseController.Server.Events.Player.PlayerGeneratorInteractEvent += OnGenerator;
             SynapseController.Server.Events.Scp.Scp106.PocketDimensionEnterEvent += Scp106OnPocketDimensionEnterEvent;
             SynapseController.Server.Events.Scp.Scp106.PocketDimensionLeaveEvent += Scp106OnPocketDimensionLeaveEvent;
+            Server.Get.Events.Round.RoundCheckEvent += CheckEnd;
+        }
+
+        private void CheckEnd(RoundCheckEventArgs ev)
+        {
+            List<Team> teams = Server.Get.Players.Select(x => x.RealTeam).ToList();
+
+            var teamAmounts = 0;
+            if (teams.Contains(Team.MTF)) teamAmounts++;
+            if (teams.Contains(Team.RSC)) teamAmounts++;
+            if (teams.Contains(Team.CHI)) teamAmounts++;
+            if (teams.Contains(Team.CDP)) teamAmounts++;
+            if (teams.Contains(Team.SCP)) teamAmounts++;
+
+            var roundEnd = teamAmounts < 2;
+            if (teamAmounts == 2)
+            {
+                if (teams.Contains(Team.CHI) && teams.Contains(Team.SCP))
+                    roundEnd = Server.Get.Configs.SynapseConfiguration.ChaosScpEnd;
+
+                if (teams.Contains(Team.CHI) && teams.Contains(Team.CDP))
+                    roundEnd = true;
+
+                if (teams.Contains(Team.MTF) && teams.Contains(Team.RSC))
+                    roundEnd = true;
+            }
+
+            foreach (var role in Server.Get.GetPlayers(x => x.CustomRole != null).Select(x => x.CustomRole))
+                if (role.GetEnemys().Any(t => teams.Contains(t)))
+                    roundEnd = false;
+
+            if (!roundEnd) ev.Allow = false;
+            else
+            {
+                ev.ForceEnd = true;
+
+                if (RoundSummary.escaped_ds + teams.Count(x => x == Team.CDP) > 0)
+                {
+                    if (!teams.Contains(Team.SCP) && !teams.Contains(Team.CHI))
+                        ev.Team = RoundSummary.LeadingTeam.Draw;
+                    else
+                        ev.Team = RoundSummary.LeadingTeam.ChaosInsurgency;
+                }
+                else
+                {
+                    if (teams.Contains(Team.MTF) || teams.Contains(Team.RSC))
+                    {
+                        ev.Team = RoundSummary.escaped_scientists + teams.Count(x => x == Team.RSC) > 0 ? RoundSummary.LeadingTeam.FacilityForces : RoundSummary.LeadingTeam.Draw;
+                    }
+                    else ev.Team = RoundSummary.LeadingTeam.Anomalies;
+                }
+            }
         }
 
         public Dictionary<Type, KeyValuePair<string, int>> CustomRoles = new Dictionary<Type, KeyValuePair<string, int>>();
