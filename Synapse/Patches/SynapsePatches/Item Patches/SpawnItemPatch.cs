@@ -34,6 +34,7 @@ namespace Synapse.Patches.SynapsePatches.Item_Patches
             {
                 var item = new Synapse.Api.Items.SynapseItem(toSpawn._id, 0f, 0, 0, 0);
                 item.Drop(toSpawn._pos);
+                item.pickup.SetupPickup(item.ItemType, item.Durabillity, item.pickup.ownerPlayer, item.pickup.weaponMods, item.pickup.position, toSpawn._rot);
                 item.pickup.RefreshDurability(true,true);
                 item.pickup.Locked = locked;
                 item.pickup.Chamber = toSpawn.chamberId;

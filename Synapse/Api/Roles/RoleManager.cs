@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MEC;
 using Synapse.Api.Events.SynapseEventArguments;
 
 namespace Synapse.Api.Roles
