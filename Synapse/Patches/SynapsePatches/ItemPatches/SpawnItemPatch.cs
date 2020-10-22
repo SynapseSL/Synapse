@@ -4,7 +4,7 @@ using MEC;
 using UnityEngine;
 using Logger = Synapse.Api.Logger;
 
-namespace Synapse.Patches.SynapsePatches.Item_Patches
+namespace Synapse.Patches.SynapsePatches.ItemPatches
 {
     [HarmonyPatch(typeof(Locker),nameof(Locker.DoorTrigger))]
     internal static class SpawnItemPatch

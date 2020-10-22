@@ -1,9 +1,8 @@
 ﻿using System;
 using Harmony;
-using UnityEngine;
 using Logger = Synapse.Api.Logger;
 
-namespace Synapse.Patches.SynapsePatches.Item_Patches
+namespace Synapse.Patches.SynapsePatches.ItemPatches
 {
     [HarmonyPatch(typeof(Inventory),nameof(Inventory.AddNewItem))]
     internal static class AddNewItemPatch

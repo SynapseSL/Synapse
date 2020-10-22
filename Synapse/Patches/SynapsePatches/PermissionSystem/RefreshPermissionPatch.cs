@@ -2,7 +2,7 @@
 using Harmony;
 using Synapse.Api;
 
-namespace Synapse.Patches.SynapsePatches.Permission_System
+namespace Synapse.Patches.SynapsePatches.PermissionSystem
 {
     [HarmonyPatch(typeof(ServerRoles), nameof(ServerRoles.RefreshPermissions))]
     internal static class PermissionPatch2

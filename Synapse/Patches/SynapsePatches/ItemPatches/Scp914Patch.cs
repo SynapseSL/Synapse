@@ -5,7 +5,7 @@ using Scp914;
 using Synapse.Api;
 using Synapse.Api.Items;
 
-namespace Synapse.Patches.SynapsePatches.Item_Patches
+namespace Synapse.Patches.SynapsePatches.ItemPatches
 {
     [HarmonyPatch(typeof(Scp914Machine),nameof(Scp914Machine.UpgradeItem))]
     internal static class Scp914Patch

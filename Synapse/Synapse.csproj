@@ -136,19 +136,19 @@
     <Compile Include="Patches\EventsPatches\ServerPatches\ConsoleCommandPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\RemoteAdminPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\Item Patches\Scp914Patch.cs" />
-    <Compile Include="Patches\SynapsePatches\Item Patches\SetClassPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\Item Patches\WorkStationPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\Item Patches\SpawnItemPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\Item Patches\InventoryClearPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\Item Patches\GeneratorEjectPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\Item Patches\RefreshDurabilityPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\Item Patches\CreateItemPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\Item Patches\DropAllPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\Item Patches\ModifyPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\Permission System\RefreshPermissionPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\Permission System\SignatureCompletePatch.cs" />
-    <Compile Include="Patches\SynapsePatches\Permission System\SetGroup Patch.cs" />
+    <Compile Include="Patches\SynapsePatches\ItemPatches\Scp914Patch.cs" />
+    <Compile Include="Patches\SynapsePatches\ItemPatches\SetClassPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\ItemPatches\WorkStationPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\ItemPatches\SpawnItemPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\ItemPatches\InventoryClearPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\ItemPatches\GeneratorEjectPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\ItemPatches\RefreshDurabilityPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\ItemPatches\CreateItemPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\ItemPatches\DropAllPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\ItemPatches\ModifyPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\PermissionSystem\RefreshPermissionPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\PermissionSystem\SignatureCompletePatch.cs" />
+    <Compile Include="Patches\SynapsePatches\PermissionSystem\SetGroup Patch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\RagdollPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\GeneratorStartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\NukeLockPatch.cs" />
@@ -211,7 +211,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.

@@ -1,9 +1,9 @@
-﻿using Harmony;
-using System;
+﻿using System;
+using Harmony;
 using UnityEngine;
 using Logger = Synapse.Api.Logger;
 
-namespace Synapse.Patches.SynapsePatches.Item_Patches
+namespace Synapse.Patches.SynapsePatches.ItemPatches
 {
     [HarmonyPatch(typeof(Pickup),nameof(Pickup.RefreshDurability))]
     internal static class RefreshDurabilityPatch

@@ -3,7 +3,7 @@ using Harmony;
 using UnityEngine;
 using Logger = Synapse.Api.Logger;
 
-namespace Synapse.Patches.SynapsePatches.Item_Patches
+namespace Synapse.Patches.SynapsePatches.ItemPatches
 {
     [HarmonyPatch(typeof(WorkStation),nameof(WorkStation.ConnectTablet))]
     internal static class WorkStationPatch

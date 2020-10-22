@@ -1,8 +1,6 @@
-﻿using System;
-using Harmony;
-using Synapse.Api;
+﻿using Harmony;
 
-namespace Synapse.Patches.SynapsePatches
+namespace Synapse.Patches.SynapsePatches.PermissionSystem
 {
     [HarmonyPatch(typeof(ServerRoles),nameof(ServerRoles.SetGroup))]
     internal static class PermissionPatch

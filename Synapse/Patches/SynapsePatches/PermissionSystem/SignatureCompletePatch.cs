@@ -1,9 +1,7 @@
 ﻿using System;
-using Harmony;
-using NorthwoodLib;
 using Synapse.Api;
 
-namespace Synapse.Patches.SynapsePatches.Permission_System
+namespace Synapse.Patches.SynapsePatches.PermissionSystem
 {
     internal class SignatureCompletePatch
     {

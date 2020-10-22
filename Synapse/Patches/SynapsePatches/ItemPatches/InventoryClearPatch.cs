@@ -1,7 +1,6 @@
 ﻿using Harmony;
-using Synapse.Api;
 
-namespace Synapse.Patches.SynapsePatches.Item_Patches
+namespace Synapse.Patches.SynapsePatches.ItemPatches
 {
     [HarmonyPatch(typeof(Inventory),nameof(Inventory.Clear))]
     internal static class InventoryClearPatch

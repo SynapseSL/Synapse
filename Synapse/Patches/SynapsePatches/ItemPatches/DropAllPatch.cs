@@ -1,7 +1,7 @@
-﻿using Harmony;
-using System.Linq;
+﻿using System.Linq;
+using Harmony;
 
-namespace Synapse.Patches.SynapsePatches.Item_Patches
+namespace Synapse.Patches.SynapsePatches.ItemPatches
 {
     [HarmonyPatch(typeof(Inventory),nameof(Inventory.ServerDropAll))]
     internal static class DropAllPatch

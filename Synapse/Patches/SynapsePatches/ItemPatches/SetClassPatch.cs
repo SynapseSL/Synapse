@@ -1,13 +1,10 @@
 ﻿using System.Collections.Generic;
 using Harmony;
 using Mirror;
-using Synapse.Api;
 using Synapse.Api.Items;
 using UnityEngine;
-using Utf8Json.Resolvers.Internal;
-using Logger = Synapse.Api.Logger;
 
-namespace Synapse.Patches.SynapsePatches.Item_Patches
+namespace Synapse.Patches.SynapsePatches.ItemPatches
 {
     [HarmonyPatch(typeof(CharacterClassManager),nameof(CharacterClassManager.SetPlayersClass))]
     internal static class SetClassPatch

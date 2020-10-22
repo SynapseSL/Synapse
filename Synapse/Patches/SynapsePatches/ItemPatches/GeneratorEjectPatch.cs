@@ -1,6 +1,6 @@
 ﻿using Harmony;
 
-namespace Synapse.Patches.SynapsePatches.Item_Patches
+namespace Synapse.Patches.SynapsePatches.ItemPatches
 {
     [HarmonyPatch(typeof(Generator079),nameof(Generator079.EjectTablet))]
     internal static class GeneratorEjectPatch
