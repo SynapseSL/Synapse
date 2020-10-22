@@ -67,9 +67,7 @@ namespace Synapse.Api.Roles
                 else
                 {
                     if (teams.Contains(Team.MTF) || teams.Contains(Team.RSC))
-                    {
                         ev.Team = RoundSummary.escaped_scientists + teams.Count(x => x == Team.RSC) > 0 ? RoundSummary.LeadingTeam.FacilityForces : RoundSummary.LeadingTeam.Draw;
-                    }
                     else ev.Team = RoundSummary.LeadingTeam.Anomalies;
                 }
             }

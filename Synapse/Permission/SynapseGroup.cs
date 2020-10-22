@@ -73,7 +73,7 @@ namespace Synapse.Permission
             return false;
         }
 
-        public bool HasVanillaPermission(PlayerPermissions permission) => Permissions.Any(x => x.ToLower() == $"{VanillaPrefix}.{permission}".ToLower());
+        public bool HasVanillaPermission(PlayerPermissions permission) => HasPermission(VanillaPrefix + "." + permission.ToString());
 
         public ulong GetVanillaPermissionValue()
         {
