@@ -7,7 +7,7 @@ using Synapse.Api;
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
     [HarmonyPatch(typeof(SearchCoordinator), nameof(SearchCoordinator.ContinuePickupServer))]
-    internal class PlayerPickUpPatch
+    internal static class PlayerPickUpPatch
     {
         private static bool Prefix(SearchCoordinator __instance)
         {
@@ -25,8 +25,16 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     if (!allow) return false;
 
                     if (item != null)
+                    {
+                        if(item.ItemType == ItemType.Ammo556 || item.ItemType == ItemType.Ammo762 || item.ItemType == ItemType.Ammo9mm)
+                        {
+                            __instance.Completor.Complete();
+                            item.Destroy();
+                            return false;
+                        }
                         item.PickUp(player);
-                    //This Code is a Backup for the Case a Plugin creates a item on its own
+                    }
+                    //This Code is a Backup for the Case a Plugin creates a pickup on its own
                     else
                         __instance.Completor.Complete();
                 }
