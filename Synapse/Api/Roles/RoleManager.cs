@@ -24,6 +24,34 @@ namespace Synapse.Api.Roles
             Server.Get.Events.Round.RoundCheckEvent += CheckEnd;
         }
 
+        public Dictionary<Type, KeyValuePair<string, int>> CustomRoles = new Dictionary<Type, KeyValuePair<string, int>>();
+
+
+        public IRole GetCustomRole(string name) => (IRole)Activator.CreateInstance(CustomRoles.FirstOrDefault(x => x.Value.Key.ToLower() == name.ToLower()).Key);
+
+        public IRole GetCustomRole(int id) => (IRole)Activator.CreateInstance(CustomRoles.FirstOrDefault(x => x.Value.Value == id).Key);
+
+        public void RegisterCustomRole<TRole>() where TRole : IRole
+        {
+            var role = (IRole)Activator.CreateInstance(typeof(TRole));
+
+            if (role.GetRoleID() >= 0 && role.GetRoleID() <= 17) throw new Exception("A Plugin tried to register a CustomRole with an Id of an Vanilla RoleType");
+
+            var pair = new KeyValuePair<string, int>(role.GetRoleName(), role.GetRoleID());
+
+            CustomRoles.Add(typeof(TRole), pair);
+        }
+
+        public bool IsIDRegistered(int id)
+        {
+            if (id >= 0 && id <= 17) return true;
+
+            if (CustomRoles.Any(x => x.Value.Value == id)) return true;
+
+            return false;
+        }
+
+        #region Events
         private void CheckEnd(RoundCheckEventArgs ev)
         {
             List<Team> teams = Server.Get.Players.Select(x => x.RealTeam).ToList();
@@ -73,34 +101,6 @@ namespace Synapse.Api.Roles
             }
         }
 
-        public Dictionary<Type, KeyValuePair<string, int>> CustomRoles = new Dictionary<Type, KeyValuePair<string, int>>();
-
-
-        public IRole GetCustomRole(string name) => (IRole)Activator.CreateInstance(CustomRoles.FirstOrDefault(x => x.Value.Key.ToLower() == name.ToLower()).Key);
-
-        public IRole GetCustomRole(int id) => (IRole)Activator.CreateInstance(CustomRoles.FirstOrDefault(x => x.Value.Value == id).Key);
-
-        public void RegisterCustomRole<TRole>() where TRole : IRole
-        {
-            var role = (IRole)Activator.CreateInstance(typeof(TRole));
-
-            if (role.GetRoleID() >= 0 && role.GetRoleID() <= 17) throw new Exception("A Plugin tried to register a CustomRole with an Id of an Vanilla RoleType");
-
-            var pair = new KeyValuePair<string, int>(role.GetRoleName(), role.GetRoleID());
-
-            CustomRoles.Add(typeof(TRole), pair);
-        }
-
-        public bool IsIDRegistered(int id)
-        {
-            if (id >= 0 && id <= 17) return true;
-
-            if (CustomRoles.Any(x => x.Value.Value == id)) return true;
-
-            return false;
-        }
-
-        #region Events
         private void OnGenerator(Events.SynapseEventArguments.PlayerGeneratorInteractEventArgs ev)
         {
             if(ev.Player.CustomRole != null && ev.Player.CustomRole.GetFriends().Any(x => x == Team.SCP))
@@ -183,7 +183,7 @@ namespace Synapse.Api.Roles
         private void OnRa(Events.SynapseEventArguments.RemoteAdminCommandEventArgs ev)
         {
             var args = ev.Command.Split(' ');
-            if (args[0].ToUpper() != "KILL" && args[0].ToUpper() != "FORCECLASS" || args.Count() <= 1) return;
+            if (args[0].ToUpper() != "OVERWATCH" && args[0].ToUpper() != "KILL" && args[0].ToUpper() != "FORCECLASS" || args.Count() <= 1) return;
             var ids = args[1].Split('.');
             foreach (var id in ids)
             {
