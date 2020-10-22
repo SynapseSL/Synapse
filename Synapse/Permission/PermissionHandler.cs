@@ -76,7 +76,7 @@ namespace Synapse.Permission
 
         public SynapseGroup GetPlayerGroup(Player player)
         {
-            var group = Groups.Values.FirstOrDefault(x => x.Members == null ? false : x.Members.Contains(player.UserId));
+            var group = Groups.Values.FirstOrDefault(x => x.Members?.Contains(player.UserId) ?? false);
 
             if (group != null)
                 return group;
