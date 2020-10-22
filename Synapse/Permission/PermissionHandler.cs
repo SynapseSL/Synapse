@@ -58,6 +58,8 @@ namespace Synapse.Permission
                 };
 
                 AddServerGroup(group, "Owner");
+
+                AddServerGroup(GetDefaultGroup(),"User");
             }
 
             foreach (var player in Server.Get.Players)
@@ -112,6 +114,7 @@ namespace Synapse.Permission
             return new SynapseGroup
             {
                 Default = true,
+                Permissions = new List<string> { "synapse.command.help", "ssynapse.command.plugins" },
             };
         }
 

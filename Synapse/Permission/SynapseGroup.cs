@@ -1,10 +1,8 @@
-﻿using Synapse.Api;
-using Synapse.Config;
+﻿using Synapse.Config;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using YamlDotNet.Serialization;
 
 namespace Synapse.Permission
 {

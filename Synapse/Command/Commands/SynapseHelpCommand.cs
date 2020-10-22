@@ -9,7 +9,7 @@ namespace Synapse.Command.Commands
         Aliases = new[]{"h"},
         Description = "Shows all available commands with usage description",
         Usage = "help {Optional Command Name for a specific Command}",
-        Permission = "synapse.commands.help",
+        Permission = "synapse.command.help",
         Platforms = new[] {Platform.ClientConsole, Platform.RemoteAdmin, Platform.ServerConsole}
     )]
     public class SynapseHelpCommand : ISynapseCommand
