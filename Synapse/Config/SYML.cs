@@ -78,7 +78,7 @@ namespace Synapse.Config
         private static Dictionary<string,ConfigSection> ParseString(string str)
         {
             var sections = new Dictionary<string, ConfigSection>();
-            var split =  str.Split(new string[] {"::"}, StringSplitOptions.None);
+            var split =  str.Split(new string[] {"[","]"}, StringSplitOptions.None);
 
             for (var i = 1; i < split.Length; i+=2)
             {
@@ -103,6 +103,14 @@ namespace Synapse.Config
                     } 
                 }
                 content = content.Substring(firstBracket + 1, lastBracket - firstBracket - 1);
+
+                content = content
+	                .Replace("::lcb::", "[")
+	                .Replace("::rcb::", "]")
+	                .Replace("::lsb::", "{")
+	                .Replace("::rsb::", "}")
+	                ;
+                
                 sections.Add(identifier, new ConfigSection(identifier,content));
             }
             
@@ -155,12 +163,11 @@ namespace Synapse.Config
         {
             try
             {
-                SynapseController.Server.Logger.Info($"Deserializing section {Section}");
+	            SynapseController.Server.Logger.Send($"==SymlDez==> '{Section}' ~> {typeof(T).FullName}", ConsoleColor.Magenta);
                 var ret = new DeserializerBuilder()
 	                .WithNamingConvention(CamelCaseNamingConvention.Instance)
 	                .IgnoreUnmatchedProperties().IgnoreFields()
 	                .Build().Deserialize<T>(Content);
-                SynapseController.Server.Logger.Info("Deserialization done");
                 return ret;
             }
             catch (Exception e)
@@ -174,12 +181,11 @@ namespace Synapse.Config
         {
             try
             {
-                SynapseController.Server.Logger.Info($"Deserializing section {Section} unsafely with type {type.Name}");
+                SynapseController.Server.Logger.Send($"==SymlDez==> '{Section}' ~> {type.FullName}", ConsoleColor.Magenta);
                 var ret = new DeserializerBuilder()
 	                .WithNamingConvention(CamelCaseNamingConvention.Instance)
 	                .IgnoreUnmatchedProperties().IgnoreFields()
 	                .Build().Deserialize(Content, type);
-                SynapseController.Server.Logger.Info("Deserialization done");
                 return ret;
             }
             catch (Exception e)
@@ -213,7 +219,12 @@ namespace Synapse.Config
         
         public string Serialize()
         {
-            return "::" + Section + "::" + "\n" + "{\n" + Content.Trim() + "\n}\n";
+            return "[" + Section + "]" + "\n" + "{\n" + Content
+	            .Replace("[", "::lcb::")
+	            .Replace("]", "::rcb::")
+	            .Replace("{", "::lsb::")
+	            .Replace("}", "::rsb::")
+	            .Trim() + "\n}\n";
         }
     }
     
