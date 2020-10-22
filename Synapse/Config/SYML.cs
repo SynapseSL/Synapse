@@ -166,7 +166,7 @@ namespace Synapse.Config
 	            SynapseController.Server.Logger.Send($"==SymlDez==> '{Section}' ~> {typeof(T).FullName}", ConsoleColor.Magenta);
                 var ret = new DeserializerBuilder()
 	                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-	                .IgnoreUnmatchedProperties().IgnoreFields()
+	                .IgnoreUnmatchedProperties()
 	                .Build().Deserialize<T>(Content);
                 return ret;
             }
@@ -181,10 +181,10 @@ namespace Synapse.Config
         {
             try
             {
-                SynapseController.Server.Logger.Send($"==SymlDez==> '{Section}' ~> {type.FullName}", ConsoleColor.Magenta);
+                SynapseController.Server.Logger.Info($"==SymlDez==> '{Section}' ~> {type.FullName}");
                 var ret = new DeserializerBuilder()
 	                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-	                .IgnoreUnmatchedProperties().IgnoreFields()
+	                .IgnoreUnmatchedProperties()
 	                .Build().Deserialize(Content, type);
                 return ret;
             }
