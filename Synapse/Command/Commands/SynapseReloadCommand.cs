@@ -6,7 +6,7 @@
         Aliases = new[] { "rl" },
         Description = "Reloads all Plugins and Features of Synapse",
         Usage = "reload",
-        Permission = "synapse.commands.reload",
+        Permission = "synapse.command.reload",
         Platforms = new[] { Platform.RemoteAdmin, Platform.ServerConsole }
     )]
     public class SynapseReloadCommand : ISynapseCommand

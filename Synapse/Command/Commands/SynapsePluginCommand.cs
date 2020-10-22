@@ -7,7 +7,7 @@ namespace Synapse.Command.Commands
         Aliases = new[] { "pl" },
         Description = "A Command which gives Informations about the currently installed Plugins",
         Usage = "\"plugin\" for a list of all plugins or \"plugin {pluginname}\" for informations of a special Plugin",
-        Permission = "none",
+        Permission = "synapse.command.plugins",
         Platforms = new[] { Platform.ClientConsole,Platform.RemoteAdmin,Platform.ServerConsole }
     )]
     public class SynapsePluginCommand : ISynapseCommand
