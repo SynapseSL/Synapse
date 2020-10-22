@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameCore;
 using Grenades;
 using Harmony;
 using Mirror;
@@ -14,10 +13,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
 
     [HarmonyPatch(typeof(GrenadeManager), nameof(GrenadeManager._ServerThrowGrenade))]
-    public class GrenadeThrowCompletePatch
+    internal static class GrenadeThrowCompletePatch
     {
-
-        public static bool Prefix(ref GrenadeManager __instance, ref IEnumerator<float> __result, ref GrenadeSettings settings, ref float forceMultiplier, ref int itemIndex, ref float delay)
+        private static bool Prefix(ref GrenadeManager __instance, ref IEnumerator<float> __result, ref GrenadeSettings settings, ref float forceMultiplier, ref int itemIndex, ref float delay)
         {
 	        try
 	        {
@@ -25,11 +23,11 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 
 		        if (player == null) return true;
 		        
-		        var item = __instance.hub.inventory.items[itemIndex];
+		        var item = __instance.hub.inventory.items[itemIndex].GetSynapseItem();
 		        var allow = true;
 		        
-		        SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(__instance.GetPlayer(), item.id, ItemInteractState.Initiating, ref allow);
-		        SynapseController.Server.Events.Player.InvokePlayerThrowGrenadeEvent(player, item, ref forceMultiplier, ref delay, ref allow);
+		        SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(player, item, ItemInteractState.Initiating, ref allow);
+		        SynapseController.Server.Events.Player.InvokePlayerThrowGrenadeEvent(player, item,ref settings, ref forceMultiplier, ref delay, ref allow);
 		        
 		        __result = ServerThrowGrenadeOverride(__instance, settings, forceMultiplier, itemIndex, delay, !allow);
 	        }
@@ -98,16 +96,17 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 			}
 			
 			var allow = true;
-			SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(__instance.GetPlayer(), __instance.hub.inventory.items[itemIndex].id, ItemInteractState.Finalizing, ref allow);
+			var item = __instance.hub.inventory.items[itemIndex].GetSynapseItem();
+			SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(__instance.GetPlayer(), item, ItemInteractState.Finalizing, ref allow);
 			if (!allow)
 			{
 				yield break;
 			}
 			
-			Grenade component = Object.Instantiate<GameObject>(settings.grenadeInstance).GetComponent<Grenade>();
+			Grenade component = Object.Instantiate(settings.grenadeInstance).GetComponent<Grenade>();
 			component.InitData(__instance, relativeVelocity, __instance.hub.PlayerCameraReference.forward, forceMultiplier);
 			NetworkServer.Spawn(component.gameObject);
-			__instance.hub.inventory.items.RemoveAt(itemIndex);
+			item.Destroy();
 			if (settings.inventoryID == global::ItemType.SCP018)
 			{
 				global::Team team = __instance.hub.characterClassManager.CurRole.team;

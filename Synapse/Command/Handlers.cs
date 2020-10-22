@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Synapse.Command.Commands;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace Synapse.Command
 {
@@ -14,6 +17,17 @@ namespace Synapse.Command
 
         public CommandHandler ServerConsoleHandler { get; } = new CommandHandler();
 
+
+        internal void RegisterSynapseCommands()
+        {
+            RegisterCommand(new SynapseHelpCommand(), false);
+            RegisterCommand(new SynapseReloadCommand(), false);
+            RegisterCommand(new SynapseKeyPressCommand(), false);
+            RegisterCommand(new SynapsePluginCommand(), false);
+            RegisterCommand(new SynapsePermissionCommand(), false);
+            RegisterCommand(new SynapseGiveCustomItemCommand(), false);
+            RegisterCommand(new SynapseSetClassCommand(), false);
+        }
 
         internal static void RegisterCommand(ISynapseCommand iSynapseCommand, bool awaitPluginInitialisation)
         {

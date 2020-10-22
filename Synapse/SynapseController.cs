@@ -9,8 +9,6 @@ public class SynapseController
 {
     private static bool IsLoaded = false;
 
-    public static bool EnableDatabase = true;
-
     public static Synapse.Server Server { get; } = new Synapse.Server();
 
     public static PluginLoader PluginLoader { get; } = new PluginLoader();
@@ -32,8 +30,9 @@ public class SynapseController
         
         PatchMethods();
         Server.Configs.Init();
-        
-        Handlers.RegisterCommand(new SynapseHelpCommand(), false);
+        Server.PermissionHandler.Init();
+        Server.RoleManager.Init();
+        CommandHandlers.RegisterSynapseCommands();
         
         PluginLoader.ActivatePlugins();
 

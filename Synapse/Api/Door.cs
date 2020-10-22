@@ -10,6 +10,10 @@ namespace Synapse.Api
 
         public GameObject GameObject => door.gameObject;
 
+        public string Name => GameObject.name;
+
+        public Vector3 Position => door.localPos;
+
         public bool Open { get => door.isOpen; set => door.SetState(value); }
 
         public bool Locked { get => door.locked; set => door.SetLock(value); }

@@ -1,4 +1,5 @@
-﻿using Synapse.Api.Events.SynapseEventArguments;
+﻿using System;
+using Synapse.Api.Events.SynapseEventArguments;
 
 namespace Synapse.Api.Events
 {
@@ -8,7 +9,11 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<TriggerTeslaEventArgs> TriggerTeslaEvent;
 
+        public event Action WarheadDetonationEvent;
+
         public event EventHandler.OnSynapseEvent<DoorInteractEventArgs> DoorInteractEvent;
+
+        public event EventHandler.OnSynapseEvent<LCZDecontaminationEventArgs> LCZDecontaminationEvent;
 
         #region Invoke
         internal void InvokeTriggerTeslaEv(Player player,Tesla tesla,bool hurtrange,out bool trigger)
@@ -42,6 +47,21 @@ namespace Synapse.Api.Events
 
             allow = ev.Allow;
         }
+
+        internal void InvokeWarheadDetonationEvent() => WarheadDetonationEvent?.Invoke();
+
+        internal void InvokeLCZDeconEvent(out bool allow)
+        {
+            var ev = new LCZDecontaminationEventArgs
+            {
+                Allow = true,
+            };
+
+            LCZDecontaminationEvent?.Invoke(ev);
+
+            allow = ev.Allow;
+        }
+
         #endregion
     }
 }

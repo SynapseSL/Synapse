@@ -1,6 +1,5 @@
 ﻿using System;
 using Harmony;
-using Synapse.Api;
 using UnityEngine;
 
 // ReSharper disable All
@@ -21,13 +20,17 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     killer = SynapseController.Server.GetPlayer(info.PlayerId);
 
                 var player = go.GetPlayer();
-                
-                SynapseController.Server.Events.Player.InvokePlayerDamageEvent(player, killer, ref info);
 
                 if (player.GodMode) return;
+
+                SynapseController.Server.Events.Player.InvokePlayerDamageEvent(player, killer, ref info);
                 
                 if(player.Health + player.ArtificialHealth - info.Amount <= 0)
+                {
                     SynapseController.Server.Events.Player.InvokePlayerDeathEvent(player, killer, info);
+                    if (player.CustomRole != null)
+                        player.CustomRole = null;
+                }
             }
             catch (Exception e)
             {

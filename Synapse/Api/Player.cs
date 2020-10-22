@@ -1,13 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Assets._Scripts.Dissonance;
 using Hints;
 using Mirror;
 using Mirror.LiteNetLib4Mirror;
 using RemoteAdmin;
 using Searching;
-using Synapse.Api.Enums;
+using Synapse.Api.Enum;
+using Synapse.Api.Items;
+using Synapse.Api.Roles;
 using Synapse.Database;
 using Synapse.Patches.EventsPatches.PlayerPatches;
+using Synapse.Permission;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -20,6 +25,8 @@ namespace Synapse.Api
             Scp106Controller = new Scp106Controller(this);
             Scp079Controller = new Scp079Controller(this);
             Jail = new Jail(this);
+            ActiveBroadcasts = new BroadcastList(this);
+            Inventory = new PlayerInventory(this);
         }
 
         #region Methods
@@ -43,43 +50,55 @@ namespace Synapse.Api
                 }, HintEffectPresets.FadeInAndOut(duration), duration));
         }
 
-        public void ClearBroadcasts() => GetComponent<Broadcast>().TargetClearElements(Connection);
+        internal void ClearBroadcasts() => GetComponent<global::Broadcast>().TargetClearElements(Connection);
 
-        public void Broadcast(ushort time, string message) => GetComponent<Broadcast>().TargetAddElement(Connection, message, time, new Broadcast.BroadcastFlags());
+        internal void Broadcast(ushort time, string message) => GetComponent<global::Broadcast>().TargetAddElement(Connection, message, time, new global::Broadcast.BroadcastFlags());
 
-        public void InstantBroadcast(ushort time, string message)
+        internal void InstantBroadcast(ushort time, string message)
         {
             ClearBroadcasts();
-            GetComponent<Broadcast>().TargetAddElement(Connection, message, time, new Broadcast.BroadcastFlags());
+            GetComponent<global::Broadcast>().TargetAddElement(Connection, message, time, new global::Broadcast.BroadcastFlags());
         }
 
         public void SendConsoleMessage(string message, string color = "red") => ClassManager.TargetConsolePrint(Connection, message, color);
 
         public void SendRAConsoleMessage(string message, bool success = true, RaCategory type = RaCategory.None) => SynapseExtensions.RaMessage(CommandSender,message, success, type);
 
-        public void GiveItem(ItemType itemType, float duration = float.NegativeInfinity, int sight = 0, int barrel = 0, int other = 0) => Inventory.AddNewItem(itemType, duration, sight, barrel, other);
+        public void GiveItem(ItemType itemType, float duration = float.NegativeInfinity, int sight = 0, int barrel = 0, int other = 0) => VanillaInventory.AddNewItem(itemType, duration, sight, barrel, other);
 
-        public void DropAllItems() => Inventory.ServerDropAll();
-
-        public void DropItem(Inventory.SyncItemInfo item)
-        {
-            Inventory.SetPickup(item.id, item.durability, Position, Inventory.camera.transform.rotation, item.modSight, item.modBarrel, item.modOther);
-            Items.Remove(item);
-        }
-
-        public void ClearInventory() => Inventory.Clear();
 
         public void GiveEffect(Effect effect, byte intensity = 1, float duration = -1f) => PlayerEffectsController.ChangeByString(effect.ToString().ToLower(), intensity, duration);
 
         public void RaLogin()
         {
             ServerRoles.RemoteAdmin = true;
-            ServerRoles.RemoteAdminMode = ServerRoles.AccessMode.PasswordOverride;
+            ServerRoles.Permissions = SynapseGroup.GetVanillaPermissionValue() | ServerRoles._globalPerms;
+            ServerRoles.RemoteAdminMode = ServerRoles._globalPerms > 0UL ? ServerRoles.AccessMode.GlobalAccess : ServerRoles.AccessMode.PasswordOverride;
+            if(!ServerRoles.AdminChatPerms)
+                ServerRoles.AdminChatPerms = SynapseGroup.HasVanillaPermission(PlayerPermissions.AdminChat);
             ServerRoles.TargetOpenRemoteAdmin(Connection, false);
         }
 
         public void RaLogout()
         {
+            if (GlobalBadge == GlobalBadge.GlobalBanning && Server.Get.PermissionHandler.ServerSection.GlobalBanTeamAccess)
+            {
+                RaLogin();
+                return;
+            }
+
+            if (GlobalBadge == GlobalBadge.Manager && Server.Get.PermissionHandler.ServerSection.ManagerAccess)
+            {
+                RaLogin();
+                return;
+            }
+
+            if (GlobalBadge == GlobalBadge.Staff && Server.Get.PermissionHandler.ServerSection.StaffAccess)
+            {
+                RaLogin();
+                return;
+            }
+
             Hub.serverRoles.RemoteAdmin = false;
             Hub.serverRoles.RemoteAdminMode = ServerRoles.AccessMode.LocalAccess;
             Hub.serverRoles.TargetCloseRemoteAdmin(Connection);
@@ -135,22 +154,158 @@ namespace Synapse.Api
             Connection.Send(msg);
             NetworkWriterPool.Recycle(writer);
         }
-
-
-        //TODO: Permission Check Method
-        public bool HasPermission(string permission)
-        {
-            return true;
-        }
         #endregion
 
-        #region Synapse Api Objects
-
+        #region Synapse Api Stuff
         public readonly Jail Jail;
 
         public readonly Scp106Controller Scp106Controller;
 
         public readonly Scp079Controller Scp079Controller;
+
+        public BroadcastList ActiveBroadcasts { get; }
+
+        public PlayerInventory Inventory { get; }
+
+        public Broadcast SendBroadcast(ushort time,string message,bool instant = false)
+        {
+            var bc = new Broadcast(message, time,this);
+            ActiveBroadcasts.Add(bc, instant);
+            return bc;
+        }
+
+        private IRole _role;
+
+        public IRole CustomRole
+        {
+            get => _role;
+            set
+            {
+                if (value == null)
+                {
+                    if (_role == null) return;
+
+                    _role.DeSpawn();
+                    _role = value;
+                    return;
+                }
+                _role = value;
+
+                _role.Player = this;
+                _role.Spawn();
+            }
+        }
+
+        public int RoleID
+        {
+            get
+            {
+                if (CustomRole == null) return (int)RoleType;
+                else return CustomRole.GetRoleID();
+            }
+            set
+            {
+                if(value >= 0 && value <= 17)
+                {
+                    RoleType = (RoleType)value;
+                    return;
+                }
+
+                if (!Server.Get.RoleManager.IsIDRegistered(value))
+                    throw new Exception("Plugin tried to set the RoleId of a Player with an not registered RoldeID");
+
+                CustomRole = Server.Get.RoleManager.GetCustomRole(value);
+            }
+        }
+
+        //Stuff for the Permission System
+        private SynapseGroup synapseGroup;
+
+        public SynapseGroup SynapseGroup
+        {
+            get
+            {
+                if (synapseGroup == null)
+                    return Server.Get.PermissionHandler.GetPlayerGroup(this);
+
+                return synapseGroup;
+            }
+            set
+            {
+                if (value == null)
+                    return;
+
+                synapseGroup = value;
+
+                RefreshPermission(HideRank);
+            }
+        }
+
+        public bool HasPermission(string permission) => this == Server.Get.Host ? true : SynapseGroup.HasPermission(permission);
+
+        public void RefreshPermission(bool disp)
+        {
+            var group = new UserGroup
+            {
+                BadgeText = SynapseGroup.Badge.ToUpper() == "NONE" ? null : SynapseGroup.Badge,
+                BadgeColor = SynapseGroup.Color.ToLower(),
+                Cover = SynapseGroup.Cover,
+                HiddenByDefault = SynapseGroup.Hidden,
+                KickPower = SynapseGroup.KickPower,
+                Permissions = SynapseGroup.GetVanillaPermissionValue(),
+                RequiredKickPower = SynapseGroup.RequiredKickPower,
+                Shared = false
+            };
+
+            ServerRoles.Group = group;
+
+            if (!ServerRoles.OverwatchPermitted && SynapseGroup.HasVanillaPermission(PlayerPermissions.Overwatch))
+                ServerRoles.OverwatchPermitted = true;
+
+            if (SynapseGroup.RemoteAdmin)
+                RaLogin();
+            else
+                RaLogout();
+
+            ServerRoles.SendRealIds();
+
+            var flag = ServerRoles.Staff || SynapseGroup.HasVanillaPermission(PlayerPermissions.ViewHiddenBadges);
+            var flag2 = ServerRoles.Staff || SynapseGroup.HasVanillaPermission(PlayerPermissions.ViewHiddenGlobalBadges);
+
+            if(flag || flag2)
+                foreach(var player in Server.Get.Players)
+                {
+                    if (!string.IsNullOrEmpty(player.ServerRoles.HiddenBadge) && (!player.ServerRoles.GlobalHidden || flag2) && (player.ServerRoles.GlobalHidden || flag))
+                        player.ServerRoles.TargetSetHiddenRole(Connection, player.ServerRoles.HiddenBadge);
+                }
+
+            if (group.BadgeColor == "none")
+                return;
+
+            if (ServerRoles._hideLocalBadge || (group.HiddenByDefault && !disp && !ServerRoles._neverHideLocalBadge))
+            {
+                ServerRoles._badgeCover = false;
+                if (!string.IsNullOrEmpty(RankName))
+                    return;
+
+                ServerRoles.NetworkMyText = null;
+                ServerRoles.NetworkMyColor = "default";
+                ServerRoles.HiddenBadge = group.BadgeText;
+                ServerRoles.RefreshHiddenTag();
+                ServerRoles.TargetSetHiddenRole(Connection, group.BadgeText);
+            }
+            else
+            {
+                ServerRoles.HiddenBadge = null;
+                ServerRoles.RpcResetFixed();
+                ServerRoles.NetworkMyText = group.BadgeText;
+                ServerRoles.NetworkMyColor = group.BadgeColor;
+            }
+        }
+
+        public GlobalBadge GlobalBadge { get; internal set; }
+
+        internal Dictionary<string, string> globalBadgeRequest;
         #endregion
 
         #region Default Stuff
@@ -269,7 +424,7 @@ namespace Synapse.Api
             set => PlayerStats.maxArtificialHealth = value;
         }
 
-        public RoleType Role
+        public RoleType RoleType
         {
             get => ClassManager.CurClass;
             set => ClassManager.SetPlayersClass(value, gameObject);
@@ -287,10 +442,10 @@ namespace Synapse.Api
             set => Position = value.Position;
         }
 
-        public Inventory.SyncListItemInfo Items
+        internal Inventory.SyncListItemInfo VanillaItems
         {
-            get => Inventory.items;
-            set => Inventory.items = value;
+            get => VanillaInventory.items;
+            set => VanillaInventory.items = value;
         }
 
         public Player Cuffer
@@ -430,11 +585,13 @@ namespace Synapse.Api
 
         public Team Team => ClassManager.CurRole.team;
 
+        public Team RealTeam => (CustomRole == null) ? Team : CustomRole.GetTeam();
+
         public Fraction Fraction => ClassManager.Fraction;
 
-        public Inventory.SyncItemInfo ItemInHand => Inventory.GetItemInHand();
+        public Items.SynapseItem ItemInHand => VanillaInventory.GetItemInHand().GetSynapseItem();
 
-        public NetworkConnection Connection => QueryProcessor.connectionToClient;
+        public NetworkConnection Connection => ClassManager.Connection;
 
         public string IpAddress => QueryProcessor._ipAddress;
         #endregion
@@ -472,7 +629,7 @@ namespace Synapse.Api
 
         public PlayerStats PlayerStats => Hub.playerStats;
 
-        public Inventory Inventory => Hub.inventory;
+        public Inventory VanillaInventory => Hub.inventory;
 
         public CharacterClassManager ClassManager => Hub.characterClassManager;
 

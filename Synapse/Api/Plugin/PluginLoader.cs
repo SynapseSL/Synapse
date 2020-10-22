@@ -10,13 +10,13 @@ namespace Synapse.Api.Plugin
 {
     public class PluginLoader
     {
-        private readonly List<IContextProcessor> _processors = new List<IContextProcessor> { new ConfigInjector()};
+        private readonly List<IContextProcessor> _processors = new List<IContextProcessor> { new ConfigInjector(),new CommandProcessor()};
 
         private readonly List<IPlugin> _plugins = new List<IPlugin>();
 
         private readonly List<PluginLoadContext> _contexts = new List<PluginLoadContext>();
 
-        public readonly List<PluginInformations> PluginInformation = new List<PluginInformations>(); 
+        public readonly List<PluginInformations> Plugins = new List<PluginInformations>(); 
         
         internal void ActivatePlugins() 
         {
@@ -64,7 +64,7 @@ namespace Synapse.Api.Plugin
                     plugin.PluginDirectory = SynapseController.Server.Files.GetPluginDirectory(plugin.Informations);
                     _contexts.Add(new PluginLoadContext(plugin, infoTypePair.Value.Key, infoTypePair.Key, infoTypePair.Value.Value));
                     _plugins.Add(plugin);
-                    PluginInformation.Add(infoTypePair.Key);
+                    Plugins.Add(infoTypePair.Key);
                 }
                 catch(Exception e) 
                 {
@@ -89,7 +89,6 @@ namespace Synapse.Api.Plugin
                 catch (Exception e)
                 {
                     SynapseController.Server.Logger.Error($"Synapse-Loader: {plugin.Informations.Name} Loading failed!!\n{e}");
-                    throw;
                 }
         }
 
@@ -110,7 +109,6 @@ namespace Synapse.Api.Plugin
                 catch (Exception e)
                 {
                     SynapseController.Server.Logger.Error($"Synapse-Loader: {plugin.Informations.Name} Reload Config failed!!\n{e}");
-                    throw;
                 }
         }
     }

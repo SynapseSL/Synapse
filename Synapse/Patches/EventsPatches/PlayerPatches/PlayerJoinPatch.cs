@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Harmony;
+using Synapse.Api;
 using Synapse.Config;
 using Synapse.Database;
 
@@ -42,7 +43,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 });
                 
                 if(!string.IsNullOrEmpty(player.UserId))
-                    SynapseController.Server.Events.Player.InvokePlayerJoinEvent(player, ref n);
+                {
+                   SynapseController.Server.Events.Player.InvokePlayerJoinEvent(player, ref n);
+                }
             }
             catch (Exception e)
             {

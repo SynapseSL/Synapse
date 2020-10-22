@@ -1,5 +1,5 @@
-﻿using Synapse.Api.Enum;
-using System.Linq;
+﻿using System.Linq;
+using Synapse.Api.Enum;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -18,6 +18,9 @@ namespace Synapse.Api
         {
             get
             {
+                if (RoomName == "Start Positions")
+                    return ZoneType.Lobby;
+
                 switch (Position.y)
                 {
                     case 0f:
@@ -29,8 +32,8 @@ namespace Synapse.Api
                     case -1000f:
                         if (RoomName.Contains("HCZ"))
                             return ZoneType.HCZ;
-                        else
-                            return ZoneType.Entrance;
+
+                        return ZoneType.Entrance;
 
 
                     case -2000f:
@@ -49,8 +52,28 @@ namespace Synapse.Api
                 if (RoomName.Contains("LCZ_ClassDSpawn"))
                     return ImageGenerator.RoomType.Prison;
 
-                string[] straight = new string[]
-                {
+                if (StraightRooms.Any(x => RoomName.Contains(x)))
+                    return ImageGenerator.RoomType.Straight;
+
+                else if (CurveRooms.Any(x => RoomName.Contains(x)))
+                    return ImageGenerator.RoomType.Curve;
+
+                else if (CrossRooms.Any(x => RoomName.Contains(x)))
+                    return ImageGenerator.RoomType.Cross;
+
+                else if (TRooms.Any(x => RoomName.Contains(x)))
+                    return ImageGenerator.RoomType.RoomT;
+
+                else if (EndRooms.Any(x => RoomName.Contains(x)))
+                    return ImageGenerator.RoomType.Endoff;
+
+                else
+                    return (ImageGenerator.RoomType)(-1);
+            }
+        }
+
+
+        public static readonly string[] StraightRooms = {
                     "HCZ_Servers",
                     "HCZ_Testroom",
                     "EZ_Smallrooms2",
@@ -70,31 +93,27 @@ namespace Synapse.Api
                     "EZ_upstairs"
                 };
 
-                string[] curve = new string[]
-                {
+        public static readonly string[] CurveRooms = {
                     "LCZ_Curve",
                     "HCZ_Curve",
-                    "EZ_Curve"
+                    "EZ_Curve",
+                    "EZ_Intercom"
                 };
 
-                string[] cross = new string[]
-                {
+        public static readonly string[] CrossRooms =  {
                     "EZ_Crossing",
                     "LCZ_Crossing",
                     "Root_*&*Outside Cams",
                     "PocketWorld",
-                    "EZ_Intercom"
                 };
 
-                string[] t = new string[]
-                {
+        public static readonly string[] TRooms = {
                     "LCZ_TCross",
                     "HCZ_Room3ar",
                     "HCZ_Room3"
                 };
 
-                string[] end = new string[]
-                {
+        public static readonly string[] EndRooms = {
                     "EZ_Endoof",
                     "LCZ_914",
                     "HCZ_106",
@@ -112,28 +131,8 @@ namespace Synapse.Api
                     "HCZ_079",
                     "LCZ_372",
                     "HCZ_457",
-                    "EZ_CollapsedTunnel"
+                    "EZ_CollapsedTunnel",
+                    "Start Positions"
                 };
-
-                if (straight.Any(x => RoomName.Contains(x)))
-                    return ImageGenerator.RoomType.Straight;
-
-                else if (curve.Any(x => RoomName.Contains(x)))
-                    return ImageGenerator.RoomType.Curve;
-
-                else if (cross.Any(x => RoomName.Contains(x)))
-                    return ImageGenerator.RoomType.Cross;
-
-                else if (t.Any(x => RoomName.Contains(x)))
-                    return ImageGenerator.RoomType.RoomT;
-
-                else if (end.Any(x => RoomName.Contains(x)))
-                    return ImageGenerator.RoomType.Endoff;
-
-                else
-                    return (ImageGenerator.RoomType)(-1);
-            }
-        }
-        
     }
 }

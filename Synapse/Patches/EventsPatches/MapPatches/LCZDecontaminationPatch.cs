@@ -1,0 +1,25 @@
+﻿using System;
+using Harmony;
+using LightContainmentZoneDecontamination;
+using Synapse.Api;
+
+namespace Synapse.Patches.EventsPatches.MapPatches
+{
+    [HarmonyPatch(typeof(DecontaminationController),nameof(DecontaminationController.FinishDecontamination))]
+    internal static class LCZDecontaminationPatch
+    {
+        private static bool Prefix()
+        {
+            try
+            {
+                Server.Get.Events.Map.InvokeLCZDeconEvent(out var allow);
+                return allow;
+            }
+            catch(Exception e)
+            {
+                Logger.Get.Error($"Synapse-Event: LCZDecontamination failed!!\n{e}");
+                return true;
+            }
+        }
+    }
+}

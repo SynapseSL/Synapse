@@ -29,7 +29,7 @@ namespace Synapse.Api
 
         public Vector3 Position { get; set; }
 
-        public List<Inventory.SyncItemInfo> Items { get; set; } = new List<Inventory.SyncItemInfo>();
+        public List<Items.SynapseItem> Items { get; set; } = new List<Items.SynapseItem>();
 
         public float Health { get; set; }
 
@@ -38,16 +38,19 @@ namespace Synapse.Api
             if (IsJailed) return;
 
             Admin = admin;
-            Role = Player.Role;
+            Role = Player.RoleType;
             Position = Player.Position;
 
             Items.Clear();
-            foreach (var item in Player.Items)
+            foreach (var item in Player.Inventory.Items)
+            {
                 Items.Add(item);
+                item.Despawn();
+            }
 
             Health = Player.Health;
 
-            Player.Role = RoleType.Tutorial;
+            Player.RoleType = RoleType.Tutorial;
 
             IsJailed = true;
         }
@@ -59,13 +62,12 @@ namespace Synapse.Api
             Player.ChangeRoleAtPosition(Role);
             Player.Position = Position;
             Player.Health = Health;
-            Player.ClearInventory();
+            Player.Inventory.Clear();
 
             foreach (var item in Items)
-                Player.Inventory.items.Add(item);
+                Player.Inventory.AddItem(item);
 
             IsJailed = false;
-
         }
     }
 }

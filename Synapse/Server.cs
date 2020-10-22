@@ -8,7 +8,8 @@ using System.Linq;
 using Logger = Synapse.Api.Logger;
 using EventHandler = Synapse.Api.Events.EventHandler;
 using Synapse.Api.Plugin;
-using GameCore;
+using Synapse.Api.Roles;
+using Synapse.Api.Items;
 
 namespace Synapse
 {
@@ -27,7 +28,13 @@ namespace Synapse
 
         public EventHandler Events { get; } = new EventHandler();
 
+        public RoleManager RoleManager { get; } = new RoleManager();
+
+        public ItemManager ItemManager { get; } = new ItemManager();
+
         public ConfigHandler Configs { get; } = new ConfigHandler();
+
+        public Synapse.Permission.PermissionHandler PermissionHandler { get; } = new Synapse.Permission.PermissionHandler();
 
         public Player Host
         {
@@ -66,6 +73,13 @@ namespace Synapse
         }
 
 
+
+        public void Reload()
+        {
+            Configs.Reload();
+            PermissionHandler.Reload();
+            SynapseController.PluginLoader.ReloadConfigs();
+        }
 
         public List<TObject> GetObjectsOf<TObject>() where TObject : UnityEngine.Object => UnityEngine.Object.FindObjectsOfType<TObject>().ToList();
 
@@ -127,6 +141,7 @@ namespace Synapse
             private string _mainConfigDirectory;
             private string _configDirectory;
             private string _sharedConfigDirectory;
+            private string _permissionFile;
 
             private string _configFile;
             //Synapse
@@ -224,6 +239,17 @@ namespace Synapse
                 }
                 private set => _sharedConfigDirectory = value;
             }
+            public string PermissionFile
+            {
+                get
+                {
+                    if (!File.Exists(_permissionFile))
+                        File.Create(_permissionFile).Close();
+
+                    return _permissionFile;
+                }
+                set => _permissionFile = value;
+            }
 
             public string ConfigFile
             {
@@ -252,7 +278,19 @@ namespace Synapse
                 ConfigDirectory = Path.Combine(MainConfigDirectory, $"server-{ServerStatic.ServerPort}");
                 SharedConfigDirectory = Path.Combine(MainConfigDirectory, "server-shared");
 
-                ConfigFile = Path.Combine(ConfigDirectory, "config.syml");
+
+                var sharedconfigpath = Path.Combine(SharedConfigDirectory, "config.syml");
+                if (File.Exists(sharedconfigpath))
+                    ConfigFile = sharedconfigpath;
+                else
+                    ConfigFile = Path.Combine(ConfigDirectory, "config.syml");
+
+
+                var sharedpermissionpath = Path.Combine(SharedConfigDirectory, "permission.syml");
+                if (File.Exists(sharedpermissionpath))
+                    PermissionFile = sharedpermissionpath;
+                else
+                    PermissionFile = Path.Combine(ConfigDirectory, "permission.syml");
             }
             public string GetTranslationFile(PluginInformations infos)
             {

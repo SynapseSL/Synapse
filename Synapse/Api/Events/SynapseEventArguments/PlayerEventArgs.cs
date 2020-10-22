@@ -1,5 +1,6 @@
 ﻿using Assets._Scripts.Dissonance;
 using Grenades;
+using Synapse.Api.Items;
 using UnityEngine;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -63,7 +64,18 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Player Killer { get; internal set; }
         
         public Player Victim { get; internal set; }
-        
+       
+        public float DamageAmount
+        {
+            get => HitInfo.Amount;
+            set
+            {
+                var info = HitInfo;
+                info.Amount = value;
+                HitInfo = info;
+            }
+        }
+
         public PlayerStats.HitInfo HitInfo { get; set; }
     }
 
@@ -76,11 +88,9 @@ namespace Synapse.Api.Events.SynapseEventArguments
     {
         public Player Player { get; internal set; }
         
-        public ItemType Type { get; internal set; }
-        
         public ItemInteractState State { get; internal set; }
         
-        public Inventory.SyncItemInfo CurrentItem { get; internal set; }
+        public Items.SynapseItem CurrentItem { get; internal set; }
         
         public bool Allow { get; set; }
     }
@@ -89,7 +99,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
     {
         public Player Player { get; internal set; }
 
-        public Inventory.SyncItemInfo ItemInfo { get; set; }
+        public Items.SynapseItem Item { get; internal set; }
         
         public GrenadeSettings Settings { get; set; }
 
@@ -124,7 +134,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         
         public bool Allow { get; set; }
         
-        public RoleType ChuffedRole { get; internal set; }
+        public RoleType CuffedRole { get; internal set; }
         
         public bool IsCuffed { get; internal set; }
     }
@@ -134,5 +144,72 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Player Player { get; internal set; }
 
         public bool Allow { get; set; } = true;
+    }
+
+    public class PlayerReloadEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public bool Allow { get; set; } = true;
+        
+        public Items.SynapseItem Item { get; internal set; }
+    }
+
+    public class PlayerEnterFemurEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public bool Allow { get; set; } = true;
+        
+        public bool CloseFemur { get; set; }
+    }
+
+    public class PlayerGeneratorInteractEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public Generator Generator { get; internal set; }
+
+        public Enum.GeneratorInteraction GeneratorInteraction { get; internal set; }
+
+        public bool Allow { get; set; }
+    }
+
+    public class PlayerKeyPressEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public KeyCode KeyCode { get; internal set; }
+    }
+
+    public class PlayerDropItemEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public Items.SynapseItem Item { get; internal set; }
+
+        public bool Allow { get; set; }
+    }
+
+    public class PlayerPickUpItemEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public Items.SynapseItem Item { get; internal set; }
+
+        public bool Allow { get; set; }
+    }
+
+    public class PlayerShootEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public Player Target { get; internal set; }
+
+        public Vector3 TargetPosition { get; internal set; }
+
+        public SynapseItem Weapon { get; internal set; }
+
+        public bool Allow { get; set; }
     }
 }

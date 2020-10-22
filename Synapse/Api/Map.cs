@@ -16,6 +16,8 @@ namespace Synapse.Api
 
         public Decontamination Decontamination { get; } = new Decontamination();
 
+        public Scp914 Scp914 { get; } = new Scp914();
+
         public List<Tesla> Teslas { get; } = new List<Tesla>();
 
         public List<Elevator> Elevators { get; } = new List<Elevator>();
@@ -23,6 +25,14 @@ namespace Synapse.Api
         public List<Door> Doors { get; } = new List<Door>();
 
         public List<Room> Rooms { get; } = new List<Room>();
+
+        public List<Generator> Generators { get; } = new List<Generator>();
+
+        public List<WorkStation> WorkStations { get; } = new List<WorkStation>();
+
+        public List<Ragdoll> Ragdolls { get; } = new List<Ragdoll>();
+
+        public List<Items.SynapseItem> Items { get; } = new List<Items.SynapseItem>();
 
         public string IntercomText
         {
@@ -40,18 +50,43 @@ namespace Synapse.Api
             }
         }
 
+        public int Seed => RandomSeedSync.staticSeed;
+
         public Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "") 
             => new Dummy(pos, rot, role, name, badgetext, badgecolor);
 
-        internal void RefreshObjects()
+        public WorkStation CreateWorkStation(Vector3 position, Vector3 rotation, Vector3 scale) => new WorkStation(position, rotation, scale);
+
+        public Ragdoll CreateRagdoll(RoleType roletype, Vector3 pos, Quaternion rot, Vector3 velocity, PlayerStats.HitInfo info, bool allowRecall, Player owner) => new Ragdoll(roletype, pos, rot, velocity, info, allowRecall, owner);
+
+        public void SendBroadcast(ushort time,string message,bool instant)
         {
-            Teslas.Clear();
+            foreach (var ply in Server.Get.Players)
+                ply.SendBroadcast(time, message, instant);
+        }
+
+        internal void AddObjects()
+        {
             foreach (var tesla in SynapseController.Server.GetObjectsOf<TeslaGate>())
                 SynapseController.Server.Map.Teslas.Add(new Tesla(tesla));
 
-            Rooms.Clear();
-            foreach (var room in SynapseController.Server.GetObjectsOf<Transform>().Where(x => x.CompareTag("Room") || x.name == "Root_*&*Outside Cams" || x.name == "PocketWorld"))
+            foreach (var room in SynapseController.Server.GetObjectsOf<Transform>().Where(x => x.CompareTag("Room") || x.name == "Root_*&*Outside Cams" || x.name == "PocketWorld" || x.name == "Start Positions"))
                 Rooms.Add(new Room(room.gameObject));
+
+            foreach (var station in Server.Get.GetObjectsOf<global::WorkStation>())
+                WorkStations.Add(new WorkStation(station));
+        }
+
+        internal void ClearObjects()
+        {
+            Teslas.Clear();
+            Doors.Clear();
+            Elevators.Clear();
+            Rooms.Clear();
+            Generators.Clear();
+            WorkStations.Clear();
+            Ragdolls.Clear();
+            Items.Clear();
         }
     }
 }

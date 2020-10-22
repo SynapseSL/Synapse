@@ -6,16 +6,9 @@ namespace Synapse.Command
 {
     public class GeneratedCommand : ICommand
     {
-        public bool Execute(ArraySegment<string> arguments, Player player, out string Response)
+        public CommandResult Execute(CommandContext command)
         {
-            var command = new CommandContext()
-            {
-                Arguments = arguments,
-                Player = player
-            };
-            var result = OnCommand.Invoke(command);
-            Response = result.Message;
-            return result.State == CommandResultState.Ok;
+            return OnCommand.Invoke(command);
         }
 
         public Func<CommandContext,CommandResult> OnCommand { get; set; }
@@ -48,6 +41,7 @@ namespace Synapse.Command
     {
         public ArraySegment<string> Arguments;
         public Player Player;
+        public Platform Platform;
     }
 
     public class CommandResult

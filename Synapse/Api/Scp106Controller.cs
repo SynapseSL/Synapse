@@ -14,7 +14,7 @@ namespace Synapse.Api
 
         private readonly Scp106PlayerScript script;
 
-        public bool Is106 => player.Role == RoleType.Scp106;
+        public bool Is106 => player.RoleType == RoleType.Scp106;
 
         public Vector3 PortalPosition { get => script.NetworkportalPosition; set => script.SetPortalPosition(value); }
 

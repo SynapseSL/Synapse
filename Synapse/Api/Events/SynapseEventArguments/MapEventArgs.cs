@@ -19,4 +19,9 @@
 
         public bool Allow { get; set; }
     }
+
+    public class LCZDecontaminationEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public bool Allow { get; set; }
+    }
 }
