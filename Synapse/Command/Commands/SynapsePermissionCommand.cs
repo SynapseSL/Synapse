@@ -41,8 +41,8 @@ namespace Synapse.Command.Commands
                 case "GROUPS":
                     if(!context.Player.HasPermission("synapse.permission.groups"))
                     {
-                        result.Message = "You don´t have Permission to get all groups (synapse.permission.groups)";
-                        result.State = CommandResultState.Error;
+                        result.Message = "You don't have permission to get all groups (synapse.permission.groups)";
+                        result.State = CommandResultState.NoPermission;
                         break;
                     }
 
@@ -51,6 +51,23 @@ namespace Synapse.Command.Commands
                         msg += $"\n{pair.Key} Badge: {pair.Value.Badge}";
 
                     result.Message = msg;
+                    result.State = CommandResultState.Ok;
+                    break;
+                
+                case "SETGROUP":
+                    if (!context.Player.HasPermission("synapse.permission.setgroup"))
+                    {
+                        result.Message = "You don't have permission to set groups (synapse.permission.setgroup)";
+                        result.State = CommandResultState.NoPermission;
+                        break;
+                    }
+
+                    var setGroup = context.Arguments.ElementAt(1);
+                    var player = Server.Get.GetPlayer(context.Arguments.ElementAt(2));
+                    
+                    Server.Get.PermissionHandler.AddPlayerToGroup(setGroup, player);
+
+                    result.Message = $"Set {player.NickName} player group to ${setGroup}.";
                     result.State = CommandResultState.Ok;
                     break;
 

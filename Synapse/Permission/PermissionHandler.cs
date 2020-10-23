@@ -3,6 +3,8 @@ using Synapse.Config;
 using System.Collections.Generic;
 using Synapse.Api;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using GameCore;
 
 namespace Synapse.Permission
 {
@@ -120,5 +122,23 @@ namespace Synapse.Permission
         }
 
         public SynapseGroup GetNorthwoodGroup() => Groups.Values.FirstOrDefault(x => x.Northwood);
+
+        public void AddPlayerToGroup(string groupname, Player player)
+        {
+            var group = GetServerGroup(groupname);
+
+            if (group == null)
+            {
+                Logger.Get.Warn($"Group {groupname} does not exist!");
+                return;
+            }
+            
+            group.Members.Add(player.UserId);
+            
+            _permissionSYML.Sections[groupname].Import(group);
+            _permissionSYML.Store();
+            
+            Reload();
+        }
     }
 }
