@@ -6,6 +6,8 @@ namespace Synapse.Api.Items
 {
     public class ItemManager
     {
+        public const int HighestItem = (int)ItemType.PinkCandy;
+
         private readonly List<CustomItemInformations> customItems = new List<CustomItemInformations>();
 
         public ItemType GetBaseType(int id)
@@ -47,7 +49,5 @@ namespace Synapse.Api.Items
             if (customItems.Any(x => x.ID == id)) return true;
             return false;
         }
-
-        public static readonly int HighestItem = (int)((ItemType[])System.Enum.GetValues(typeof(ItemType))).ElementAt(System.Enum.GetValues(typeof(ItemType)).Length - 1);
     }
 }

@@ -7,7 +7,7 @@ namespace Synapse.Api.Roles
 {
     public class RoleManager
     {
-        public static readonly int HighestRole = (int)((RoleType[])System.Enum.GetValues(typeof(RoleType))).ElementAt(System.Enum.GetValues(typeof(RoleType)).Length - 1);
+        public static readonly int HighestRole = (int)RoleType.Scp93989;
 
         internal RoleManager() { }
 
