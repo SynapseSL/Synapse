@@ -114,7 +114,7 @@ namespace Synapse.Permission
             return new SynapseGroup
             {
                 Default = true,
-                Permissions = new List<string> { "synapse.command.help", "ssynapse.command.plugins" },
+                Permissions = new List<string> { "synapse.command.help", "synapse.command.plugins" },
             };
         }
 
