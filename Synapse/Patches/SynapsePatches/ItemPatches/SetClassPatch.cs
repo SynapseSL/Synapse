@@ -12,7 +12,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
     [HarmonyPatch(typeof(CharacterClassManager),nameof(CharacterClassManager.SetPlayersClass))]
     internal static class SetClassPatch
     {
-        private static bool Prefix(CharacterClassManager __instance, ref PlayerSetClassEventArgs __state, ref RoleType classid, GameObject ply, ref bool escape)
+        private static bool Prefix(CharacterClassManager __instance, ref PlayerSetClassEventArgs __state, ref RoleType classid, GameObject ply, ref bool escape,bool lite)
         {
             if (!NetworkServer.active) return false;
             var player = ply.GetPlayer();
@@ -35,6 +35,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
             __state.Player = player;
             __state.Role = classid;
             __state.Items = new List<SynapseItem>();
+            if(!lite)
             foreach (var id in __instance.Classes.SafeGet(classid).startItems)
             {
                 var synapseitem = new SynapseItem(id, 0, 0, 0, 0);
@@ -71,14 +72,19 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
             return true;
         }
 
-        private static void Postfix(CharacterClassManager __instance, PlayerSetClassEventArgs __state, GameObject ply)
+        private static void Postfix(CharacterClassManager __instance, PlayerSetClassEventArgs __state,RoleType classid, GameObject ply,bool lite)
         {
+            if(lite) return;
             if (__state == null) return;
             if (!__state.Allow) return;
 
             var player = ply.GetPlayer();
 
             player.Inventory.Clear();
+            var role = player.ClassManager.Classes.SafeGet(classid);
+            player.Ammo5 = role.ammoTypes[0];
+            player.Ammo7 = role.ammoTypes[1];
+            player.Ammo9 = role.ammoTypes[2];
             foreach (var item in __state.Items)
                 player.Inventory.AddItem(item);
 

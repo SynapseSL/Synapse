@@ -59,9 +59,9 @@ namespace Synapse.Api.Plugin
                     SynapseController.Server.Logger.Info($"{infoTypePair.Key.Name} will now be activated!");
 
                     IPlugin plugin = (IPlugin)Activator.CreateInstance(infoTypePair.Value.Key);
-                    plugin.Informations = infoTypePair.Key;
-                    plugin.Translation = new Translation(plugin.Informations);
-                    plugin.PluginDirectory = SynapseController.Server.Files.GetPluginDirectory(plugin.Informations);
+                    plugin.Information = infoTypePair.Key;
+                    plugin.Translation = new Translation(plugin.Information);
+                    plugin.PluginDirectory = SynapseController.Server.Files.GetPluginDirectory(plugin.Information);
                     _contexts.Add(new PluginLoadContext(plugin, infoTypePair.Value.Key, infoTypePair.Key, infoTypePair.Value.Value));
                     _plugins.Add(plugin);
                     Plugins.Add(infoTypePair.Key);
@@ -88,7 +88,7 @@ namespace Synapse.Api.Plugin
                 }
                 catch (Exception e)
                 {
-                    SynapseController.Server.Logger.Error($"Synapse-Loader: {plugin.Informations.Name} Loading failed!!\n{e}");
+                    SynapseController.Server.Logger.Error($"Synapse-Loader: {plugin.Information.Name} Loading failed!!\n{e}");
                 }
         }
 
@@ -108,7 +108,7 @@ namespace Synapse.Api.Plugin
                 }
                 catch (Exception e)
                 {
-                    SynapseController.Server.Logger.Error($"Synapse-Loader: {plugin.Informations.Name} Reload Config failed!!\n{e}");
+                    SynapseController.Server.Logger.Error($"Synapse-Loader: {plugin.Information.Name} Reload Config failed!!\n{e}");
                 }
         }
     }
