@@ -48,6 +48,6 @@ namespace Synapse.Api.Items
             return false;
         }
 
-        public const int HighestItem = (int)ItemType.PinkCandy;
+        public static readonly int HighestItem = (int)((ItemType[])System.Enum.GetValues(typeof(ItemType))).ElementAt(System.Enum.GetValues(typeof(ItemType)).Length - 1);
     }
 }
