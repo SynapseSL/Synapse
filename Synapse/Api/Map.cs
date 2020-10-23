@@ -68,7 +68,7 @@ namespace Synapse.Api
         public void AnnounceScpDeath(string scp)
         {
             float num2 = (AlphaWarheadController.Host.timeToDetonation <= 0f) ? 3.5f : 1f;
-            var text = $"cassie SCP {scp} SUCCESSFULLY TERMINATED . TERMINATION CAUSE UNSPECIFIED";
+            var text = $"SCP {scp} SUCCESSFULLY TERMINATED . TERMINATION CAUSE UNSPECIFIED";
 
             Server.Get.GetObjectOf<NineTailedFoxAnnouncer>().ServerOnlyAddGlitchyPhrase(text, UnityEngine.Random.Range(0.1f, 0.14f) * num2, UnityEngine.Random.Range(0.07f, 0.08f) * num2);
         }
