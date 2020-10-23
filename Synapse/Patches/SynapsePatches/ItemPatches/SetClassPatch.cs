@@ -34,6 +34,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
             __state.Allow = true;
             __state.Player = player;
             __state.Role = classid;
+            __state.Items = new List<SynapseItem>();
             foreach (var id in __instance.Classes.SafeGet(classid).startItems)
             {
                 var synapseitem = new SynapseItem(id, 0, 0, 0, 0);
