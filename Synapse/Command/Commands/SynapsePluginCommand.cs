@@ -16,6 +16,13 @@ namespace Synapse.Command.Commands
         {
             var result = new CommandResult();
 
+            if (!context.Player.HasPermission("synapse.command.plugins"))
+            {
+                result.Message = "You dont have Permissions to use this command";
+                result.State = CommandResultState.NoPermission;
+                return result;
+            }
+
             if(context.Arguments.Count > 0)
             {
                 var pl = SynapseController.PluginLoader.Plugins.FirstOrDefault(x => x.Name.ToUpper() == context.Arguments.First().ToUpper());

@@ -18,7 +18,7 @@ namespace Synapse.Command.Commands
         {
             var result = new CommandResult();
 
-            if (!context.Player.HasPermission("synapse.commands.help"))
+            if (!context.Player.HasPermission("synapse.command.help"))
             {
                 result.State = CommandResultState.NoPermission;
                 result.Message = "You have no Permission to execute this Command!";

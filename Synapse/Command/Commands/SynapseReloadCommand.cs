@@ -15,7 +15,7 @@
         {
             var result = new CommandResult();
 
-            if (!context.Player.HasPermission("synapse.commands.reload"))
+            if (!context.Player.HasPermission("synapse.command.reload"))
             {
                 result.State = CommandResultState.NoPermission;
                 result.Message = "You have no Permission to execute this Command!";
