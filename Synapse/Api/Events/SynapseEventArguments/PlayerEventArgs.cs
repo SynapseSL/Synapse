@@ -1,6 +1,7 @@
 ﻿using Assets._Scripts.Dissonance;
 using Grenades;
 using Synapse.Api.Items;
+using System.Collections.Generic;
 using UnityEngine;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -209,6 +210,19 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Vector3 TargetPosition { get; internal set; }
 
         public SynapseItem Weapon { get; internal set; }
+
+        public bool Allow { get; set; }
+    }
+
+    public class PlayerSetClassEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public RoleType Role { get; set; }
+
+        public List<SynapseItem> Items { get; set; }
+
+        public List<SynapseItem> EscapeItems { get; set; }
 
         public bool Allow { get; set; }
     }

@@ -292,7 +292,7 @@ namespace Synapse
                 else
                     PermissionFile = Path.Combine(ConfigDirectory, "permission.syml");
             }
-            public string GetTranslationFile(PluginInformations infos)
+            public string GetTranslationFile(PluginInformation infos)
             {
                 if (File.Exists(Path.Combine(SharedConfigDirectory, infos.Name + "-translation.txt")))
                     return Path.Combine(SharedConfigDirectory, infos.Name + "-translation.txt");
@@ -300,7 +300,7 @@ namespace Synapse
                 return Path.Combine(ConfigDirectory, infos.Name + "-translation.txt");
             }
 
-            public string GetPluginDirectory(PluginInformations infos)
+            public string GetPluginDirectory(PluginInformation infos)
             {
                 
                 if (infos.shared)

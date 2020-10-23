@@ -4,7 +4,7 @@ namespace Synapse.Api.Plugin
 {
     public interface IPlugin
     {
-        PluginInformations Informations { get; set; }
+        PluginInformation Informations { get; set; }
 
         Translation Translation { get; set; }
 
@@ -30,7 +30,7 @@ namespace Synapse.Api.Plugin
 
         public Translation Translation { get; set; }
 
-        public PluginInformations Informations { get; set; }
+        public PluginInformation Informations { get; set; }
 
         public string PluginDirectory
         {

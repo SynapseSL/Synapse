@@ -16,14 +16,14 @@ namespace Synapse.Api.Plugin
 
         private readonly List<PluginLoadContext> _contexts = new List<PluginLoadContext>();
 
-        public readonly List<PluginInformations> Plugins = new List<PluginInformations>(); 
+        public readonly List<PluginInformation> Plugins = new List<PluginInformation>(); 
         
         internal void ActivatePlugins() 
         {
             var paths = Directory.GetFiles(SynapseController.Server.Files.SharedPluginDirectory, "*.dll").ToList();
             paths.AddRange(Directory.GetFiles(SynapseController.Server.Files.PluginDirectory, "*.dll").ToList());
 
-            var dictionary = new Dictionary<PluginInformations, KeyValuePair<Type, List<Type>>>();
+            var dictionary = new Dictionary<PluginInformation, KeyValuePair<Type, List<Type>>>();
             
             _contexts.Clear();
 
@@ -35,12 +35,12 @@ namespace Synapse.Api.Plugin
                     if (!typeof(IPlugin).IsAssignableFrom(type))
                         continue;
 
-                    var infos = type.GetCustomAttribute<PluginInformations>();
+                    var infos = type.GetCustomAttribute<PluginInformation>();
 
                     if (infos == null)
                     {
                         SynapseController.Server.Logger.Info($"The File {assembly.GetName().Name} has a class which inherit from IPlugin but has no PluginInformations ... Default Values will be added");
-                        infos = new PluginInformations();
+                        infos = new PluginInformation();
                     }
 
                     if (pluginpath.Contains("server-shared"))
@@ -115,7 +115,7 @@ namespace Synapse.Api.Plugin
 
     public class PluginLoadContext
     {
-        internal PluginLoadContext(IPlugin plugin, Type type, PluginInformations pluginInformations, List<Type> classes)
+        internal PluginLoadContext(IPlugin plugin, Type type, PluginInformation pluginInformations, List<Type> classes)
         {
             Plugin = plugin;
             PluginType = type;
@@ -126,7 +126,7 @@ namespace Synapse.Api.Plugin
         public readonly IPlugin Plugin;
         public readonly Type PluginType;
         public readonly List<Type> Classes;
-        public readonly PluginInformations Information;
+        public readonly PluginInformation Information;
     }
 
     public interface IContextProcessor

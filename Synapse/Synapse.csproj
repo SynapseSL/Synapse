@@ -76,7 +76,7 @@
     <Compile Include="Api\Player.cs" />
     <Compile Include="Api\Plugin\Config.cs" />
     <Compile Include="Api\Plugin\IPlugin.cs" />
-    <Compile Include="Api\Plugin\PluginInformations.cs" />
+    <Compile Include="Api\Plugin\PluginInformation.cs" />
     <Compile Include="Api\Plugin\PluginLoader.cs" />
     <Compile Include="Api\Plugin\Processors\CommandProcessor.cs" />
     <Compile Include="Api\Plugin\Processors\ConfigInjector.cs" />

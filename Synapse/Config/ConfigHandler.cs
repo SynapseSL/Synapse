@@ -16,7 +16,7 @@ namespace Synapse.Config
         
         public void Init()
         {
-            SynapseTranslation = new Translation(new PluginInformations { Name = "Synapse" });
+            SynapseTranslation = new Translation(new PluginInformation { Name = "Synapse" });
             var trans = new Dictionary<string, string>
             {
                 {"sameteam","You cant harm this Person" },

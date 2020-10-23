@@ -2,7 +2,7 @@
 
 namespace Synapse.Api.Plugin
 {
-    public class PluginInformations : Attribute
+    public class PluginInformation : Attribute
     {
         public int SynapseMajor = SynapseController.SynapseMajor;
         public int SynapseMinor = SynapseController.SynapseMinor;

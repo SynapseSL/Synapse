@@ -3,6 +3,7 @@ using Grenades;
 using Synapse.Api;
 using Synapse.Api.Events.SynapseEventArguments;
 using Synapse.Api.Items;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Synapse.Api.Events
@@ -48,6 +49,8 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<PlayerPickUpItemEventArgs> PlayerPickUpItemEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerShootEventArgs> PlayerShootEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerSetClassEventArgs> PlayerSetClassEvent;
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -271,6 +274,8 @@ namespace Synapse.Api.Events
 
             allow = ev.Allow;
         }
+
+        internal void InvokeSetClassEvent(PlayerSetClassEventArgs ev) => PlayerSetClassEvent?.Invoke(ev);
         #endregion
     }
 }

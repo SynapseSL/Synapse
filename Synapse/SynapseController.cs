@@ -3,7 +3,6 @@ using CommandSystem.Commands;
 using Harmony;
 using Synapse.Api.Plugin;
 using Synapse.Command;
-using Synapse.Command.Commands;
 
 public class SynapseController
 {
