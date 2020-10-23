@@ -73,6 +73,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
 
         private static void Postfix(CharacterClassManager __instance, PlayerSetClassEventArgs __state, GameObject ply)
         {
+            if (__state == null) return;
             if (!__state.Allow) return;
 
             var player = ply.GetPlayer();
