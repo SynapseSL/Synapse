@@ -20,7 +20,7 @@ namespace Synapse.Api.Items
 
         public string GetName(int id)
         {
-            if (id >= 0 && id <= 35)
+            if (id >= 0 && id <= HighestItem)
                 return ((ItemType)id).ToString();
 
             var item = customItems.FirstOrDefault(x => x.ID == id);
@@ -32,7 +32,7 @@ namespace Synapse.Api.Items
 
         public void RegisterCustomItem(CustomItemInformations info)
         {
-            if (info.ID >= 0 && info.ID <= 35)
+            if (info.ID >= 0 && info.ID <= HighestItem)
                 throw new Exception("A Plugin tryied to register a CustomItem with an ID of a BaseGame Item");
 
             if (customItems.Select(x => x.ID).Contains(info.ID))
@@ -43,9 +43,11 @@ namespace Synapse.Api.Items
 
         public bool IsIDRegistered(int id)
         {
-            if (id >= 0 && id <= 35) return true;
+            if (id >= 0 && id <= HighestItem) return true;
             if (customItems.Any(x => x.ID == id)) return true;
             return false;
         }
+
+        public const int HighestItem = (int)ItemType.PinkCandy;
     }
 }

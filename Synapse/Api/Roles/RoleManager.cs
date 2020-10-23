@@ -7,6 +7,8 @@ namespace Synapse.Api.Roles
 {
     public class RoleManager
     {
+        public const int HighestRole = (int)RoleType.Scp93989;
+
         internal RoleManager() { }
 
         internal void Init()
@@ -35,7 +37,7 @@ namespace Synapse.Api.Roles
         {
             var role = (IRole)Activator.CreateInstance(typeof(TRole));
 
-            if (role.GetRoleID() >= 0 && role.GetRoleID() <= 17) throw new Exception("A Plugin tried to register a CustomRole with an Id of an Vanilla RoleType");
+            if (role.GetRoleID() >= 0 && role.GetRoleID() <= HighestRole) throw new Exception("A Plugin tried to register a CustomRole with an Id of an Vanilla RoleType");
 
             var pair = new KeyValuePair<string, int>(role.GetRoleName(), role.GetRoleID());
 
@@ -44,7 +46,7 @@ namespace Synapse.Api.Roles
 
         public bool IsIDRegistered(int id)
         {
-            if (id >= 0 && id <= 17) return true;
+            if (id >= 0 && id <= HighestRole) return true;
 
             if (CustomRoles.Any(x => x.Value.Value == id)) return true;
 
