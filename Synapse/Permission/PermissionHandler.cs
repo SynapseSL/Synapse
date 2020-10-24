@@ -123,7 +123,7 @@ namespace Synapse.Permission
 
         public SynapseGroup GetNorthwoodGroup() => Groups.Values.FirstOrDefault(x => x.Northwood);
 
-        public void AddPlayerToGroup(string groupname, Player player)
+        public void AddPlayerToGroup(string groupname, string player)
         {
             var group = GetServerGroup(groupname);
 
@@ -133,7 +133,7 @@ namespace Synapse.Permission
                 return;
             }
             
-            group.Members.Add(player.UserId);
+            group.Members.Add(player);
             
             _permissionSYML.Sections[groupname].Import(group);
             _permissionSYML.Store();

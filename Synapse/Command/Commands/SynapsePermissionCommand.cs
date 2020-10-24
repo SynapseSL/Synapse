@@ -63,18 +63,19 @@ namespace Synapse.Command.Commands
                     }
 
                     var setGroup = context.Arguments.ElementAt(1);
-                    var player = Server.Get.GetPlayer(context.Arguments.ElementAt(2));
+                    var player = context.Arguments.ElementAt(2);
                     
                     Server.Get.PermissionHandler.AddPlayerToGroup(setGroup, player);
 
-                    result.Message = $"Set {player.NickName} player group to ${setGroup}.";
+                    result.Message = $"Set {player} player group to ${setGroup}.";
                     result.State = CommandResultState.Ok;
                     break;
 
                 default:
                     result.Message = "All Permission Commands:" +
                         "\nPermission me - Gives you informations about your Role" +
-                        "\nPermission groups - Gives you a List of All Groups";
+                        "\nPermission groups - Gives you a List of All Groups" + 
+                        "\nPermission setgroup {Group} {Player} - Sets a User group";
                     result.State = CommandResultState.Ok;
                     break;
             }
