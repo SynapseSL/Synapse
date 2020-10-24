@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Management.Instrumentation;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -67,10 +68,16 @@ namespace Synapse.Api
 
         public void AnnounceScpDeath(string scp)
         {
-            float num2 = (AlphaWarheadController.Host.timeToDetonation <= 0f) ? 3.5f : 1f;
             var text = $"SCP {scp} SUCCESSFULLY TERMINATED . TERMINATION CAUSE UNSPECIFIED";
+            GlitchedCassie(text);
+        }
 
-            Server.Get.GetObjectOf<NineTailedFoxAnnouncer>().ServerOnlyAddGlitchyPhrase(text, UnityEngine.Random.Range(0.1f, 0.14f) * num2, UnityEngine.Random.Range(0.07f, 0.08f) * num2);
+        public void Cassie(string words, bool makehold = true, bool makenoise = true) => Respawning.RespawnEffectsController.PlayCassieAnnouncement(words, makehold, makenoise);
+
+        public void GlitchedCassie(string words)
+        {
+            float num2 = (AlphaWarheadController.Host.timeToDetonation <= 0f) ? 3.5f : 1f;
+            Server.Get.GetObjectOf<NineTailedFoxAnnouncer>().ServerOnlyAddGlitchyPhrase(words, UnityEngine.Random.Range(0.1f, 0.14f) * num2, UnityEngine.Random.Range(0.07f, 0.08f) * num2);
         }
 
         internal void AddObjects()

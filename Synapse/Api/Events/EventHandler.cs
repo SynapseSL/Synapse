@@ -81,11 +81,7 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha9:
-                    SynapseController.Server.Map.Decontamination.DisableDecontamination = false;
-                    break;
-
-                case KeyCode.Alpha0:
-                    SynapseController.Server.Map.Decontamination.DisableDecontamination = true;
+                    SynapseController.Server.Map.GlitchedCassie("Hello World that is awesome and have many scps");
                     break;
 
                 case KeyCode.U:
