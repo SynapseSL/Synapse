@@ -11,7 +11,7 @@ namespace Synapse.Api.Items
 
         public SynapseItem(int id, float durability, int sight, int barrel, int other)
         {
-            if(id >= 0 && id <= 35)
+            if(id >= 0 && id <= ItemManager.HighestItem)
             {
                 ID = id;
                 IsCustomItem = false;
