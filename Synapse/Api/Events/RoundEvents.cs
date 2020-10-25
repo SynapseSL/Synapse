@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Synapse.Api.Events.SynapseEventArguments;
 
 namespace Synapse.Api.Events
@@ -15,7 +16,9 @@ namespace Synapse.Api.Events
 
         public event Action RoundEndEvent;
 
-        public event EventHandler.OnSynapseEvent<RoundCheckEventArgs> RoundCheckEvent; 
+        public event EventHandler.OnSynapseEvent<RoundCheckEventArgs> RoundCheckEvent;
+
+        public event EventHandler.OnSynapseEvent<SpawnPlayersEventArgs> SpawnPlayersEvent;
 
         #region PlayerEventsInvoke
         internal void InvokeWaitingForPlayers() => WaitingForPlayersEvent?.Invoke();
@@ -37,6 +40,18 @@ namespace Synapse.Api.Events
             teamChanged = ev.TeamChanged;
         }
 
+        internal void InvokeSpawnPlayersEvent(ref Dictionary<Player, int> spawnplayers, out bool allow)
+        {
+            var ev = new SpawnPlayersEventArgs
+            {
+                SpawnPlayers = spawnplayers,
+                Allow = true,
+            };
+
+            SpawnPlayersEvent?.Invoke(ev);
+
+            allow = ev.Allow;
+        }
         #endregion
     }
 }

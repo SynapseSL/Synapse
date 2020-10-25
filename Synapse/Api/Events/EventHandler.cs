@@ -81,7 +81,11 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha9:
-                    SynapseController.Server.Map.GlitchedCassie("Hello World that is awesome and have many scps");
+                    foreach(var player in SynapseController.Server.GetPlayers(x => x != ev.Player))
+                    {
+                        ev.Player.PlayerStats._hpDirty = false;
+                        player.PlayerStats.TargetSyncHp(ev.Player.Connection, 1f);
+                    }
                     break;
 
                 case KeyCode.U:
@@ -89,7 +93,7 @@ namespace Synapse.Api.Events
                     foreach (var gobject in Synapse.Server.Get.GetObjectsOf<GameObject>())
                         text += $"\n{gobject.name} : Position {gobject.transform.position} Scale: {gobject.transform.localScale}";
 
-                    var path = Path.Combine(Synapse.Server.Get.Files.SynapseDirectory, "GameObjects.txt");
+                    var path = Path.Combine(Synapse.Server.Get.Files.SynapseDirectory, $"GameObjects-{Api.Map.Get.Seed}.txt");
 
                     if (!File.Exists(path)) File.Create(path).Close();
 

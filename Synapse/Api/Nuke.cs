@@ -1,5 +1,4 @@
-﻿using Dissonance;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Synapse.Api
 {

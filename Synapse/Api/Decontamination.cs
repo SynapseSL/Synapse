@@ -1,6 +1,5 @@
 ﻿using LightContainmentZoneDecontamination;
 using Mirror;
-using System.Linq;
 
 namespace Synapse.Api
 {

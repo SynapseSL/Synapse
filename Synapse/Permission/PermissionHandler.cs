@@ -3,8 +3,6 @@ using Synapse.Config;
 using System.Collections.Generic;
 using Synapse.Api;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using GameCore;
 
 namespace Synapse.Permission
 {
