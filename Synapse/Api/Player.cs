@@ -207,6 +207,7 @@ namespace Synapse.Api
             {
                 if(value >= 0 && value <= RoleManager.HighestRole)
                 {
+                    CustomRole = null;
                     RoleType = (RoleType)value;
                     return;
                 }
