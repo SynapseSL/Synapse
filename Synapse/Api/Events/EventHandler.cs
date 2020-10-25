@@ -81,11 +81,11 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha9:
-                    foreach(var player in SynapseController.Server.GetPlayers(x => x != ev.Player))
-                    {
-                        ev.Player.PlayerStats._hpDirty = false;
-                        player.PlayerStats.TargetSyncHp(ev.Player.Connection, 1f);
-                    }
+                    Api.Map.Get.Explode(ev.Player.Position + Vector3.up * 10);
+                    break;
+
+                case KeyCode.Alpha0:
+                    ev.Player.GiveEffect(Enum.Effect.Discharge);
                     break;
 
                 case KeyCode.U:

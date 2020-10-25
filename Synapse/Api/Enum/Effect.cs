@@ -10,6 +10,7 @@ namespace Synapse.Api.Enum
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Amnesia,
+        ArtificialRegen,
         /// <summary>
         /// Quickly drains stamina then health if there is none left
         /// </summary>
@@ -54,6 +55,8 @@ namespace Synapse.Api.Enum
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Disabled,
+        Disarmed,
+        Discharge,
         /// <summary>
         /// Prevents all movement
         /// </summary>
@@ -64,6 +67,7 @@ namespace Synapse.Api.Enum
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Exhausted,
+        Exsanguination,
         /// <summary>
         /// Flash the Player
         /// </summary>

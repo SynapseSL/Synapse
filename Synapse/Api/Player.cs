@@ -424,6 +424,12 @@ namespace Synapse.Api
             set => PlayerStats.maxArtificialHealth = value;
         }
 
+        public float Stamina
+        {
+            get => Hub.fpc.staminaController.RemainingStamina * 100;
+            set => Hub.fpc.staminaController.RemainingStamina = value / 100f;
+        }
+
         public RoleType RoleType
         {
             get => ClassManager.CurClass;

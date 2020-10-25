@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Mirror;
+using System.Collections.Generic;
 using System.Linq;
 using System.Management.Instrumentation;
 using UnityEngine;
@@ -78,6 +79,15 @@ namespace Synapse.Api
         {
             float num2 = (AlphaWarheadController.Host.timeToDetonation <= 0f) ? 3.5f : 1f;
             Server.Get.GetObjectOf<NineTailedFoxAnnouncer>().ServerOnlyAddGlitchyPhrase(words, UnityEngine.Random.Range(0.1f, 0.14f) * num2, UnityEngine.Random.Range(0.07f, 0.08f) * num2);
+        }
+
+        public void Explode(Vector3 position) 
+        {
+            var component = Server.Get.Host.GetComponent<Grenades.GrenadeManager>();
+            var component2 = Object.Instantiate(component.availableGrenades[0].grenadeInstance).GetComponent<Grenades.Grenade>();
+            component2.FullInitData(component, position, Quaternion.identity, Vector3.zero, Vector3.zero);
+            component2.NetworkfuseTime = 0.10000000149011612;
+            NetworkServer.Spawn(component2.gameObject);
         }
 
         internal void AddObjects()
