@@ -31,6 +31,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 
                     var newDictionary = new Dictionary<Player, int>();
                     foreach (var pair in dictionary)
+                        if(pair.Key.GetPlayer() != Server.Get.Host)
                         newDictionary.Add(pair.Key.GetPlayer(), (int)pair.Value);
 
                     Server.Get.Events.Round.InvokeSpawnPlayersEvent(ref newDictionary, out var allow);

@@ -205,7 +205,7 @@ namespace Synapse.Api
             }
             set
             {
-                if(value >= 0 && value <= 17)
+                if(value >= 0 && value <= RoleManager.HighestRole)
                 {
                     RoleType = (RoleType)value;
                     return;
@@ -481,20 +481,20 @@ namespace Synapse.Api
 
         public uint Ammo5 
         { 
-            get => AmmoBox.amount[0]; 
-            set => AmmoBox.amount[0] = value; 
+            get => AmmoBox[0]; 
+            set => AmmoBox[0] = value; 
         }
 
         public uint Ammo7 
         { 
-            get => AmmoBox.amount[1]; 
-            set => AmmoBox.amount[1] = value; 
+            get => AmmoBox[1]; 
+            set => AmmoBox[1] = value; 
         }
 
         public uint Ammo9 
         { 
-            get => AmmoBox.amount[2]; 
-            set => AmmoBox.amount[2] = value; 
+            get => AmmoBox[2]; 
+            set => AmmoBox[2] = value; 
         }
 
         public UserGroup Rank 
