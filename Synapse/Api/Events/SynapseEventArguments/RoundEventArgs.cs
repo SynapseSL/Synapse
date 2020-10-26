@@ -4,7 +4,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
 {
     public class RoundCheckEventArgs: EventHandler.ISynapseEventArgs
     {        
-        public bool Allow { get; set; }
+        public bool EndRound { get; set; }
         
         public RoundSummary.LeadingTeam Team { get; set; }
     }

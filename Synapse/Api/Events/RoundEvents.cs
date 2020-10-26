@@ -32,12 +32,12 @@ namespace Synapse.Api.Events
             var ev = new RoundCheckEventArgs
             {
                 Team = leadingTeam,
-                Allow = allow,
+                EndRound = allow,
             };
 
             RoundCheckEvent?.Invoke(ev);
 
-            allow = ev.Allow;
+            allow = ev.EndRound;
             leadingTeam = ev.Team;
         }
 
