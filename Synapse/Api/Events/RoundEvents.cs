@@ -27,17 +27,18 @@ namespace Synapse.Api.Events
         internal void InvokeRoundEndEvent() => RoundEndEvent?.Invoke();
 
 
-        internal void InvokeRoundCheckEvent(ref bool forceEnd, ref bool allow, ref RoundSummary.LeadingTeam team,
-            ref bool teamChanged)
+        internal void InvokeRoundCheckEvent(ref bool allow,ref RoundSummary.LeadingTeam leadingTeam)
         {
             var ev = new RoundCheckEventArgs
-                {Allow = allow, Team = team, ForceEnd = forceEnd, TeamChanged = teamChanged};
+            {
+                Team = leadingTeam,
+                Allow = allow,
+            };
+
             RoundCheckEvent?.Invoke(ev);
 
             allow = ev.Allow;
-            team = ev.Team;
-            forceEnd = ev.ForceEnd;
-            teamChanged = ev.TeamChanged;
+            leadingTeam = ev.Team;
         }
 
         internal void InvokeSpawnPlayersEvent(ref Dictionary<Player, int> spawnplayers, out bool allow)

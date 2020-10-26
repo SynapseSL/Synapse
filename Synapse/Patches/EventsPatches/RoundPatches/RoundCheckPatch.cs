@@ -5,6 +5,8 @@ using System.Reflection;
 using System.Reflection.Emit;
 using GameCore;
 using Harmony;
+using MEC;
+using Synapse.Api;
 using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.RoundPatches
@@ -35,145 +37,131 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 
         public static IEnumerator<float> ProcessServerSide(RoundSummary instance)
         {
-            var roundSummary = instance;
-
-            while (roundSummary != null)
+            while(instance != null)
             {
-                while (RoundSummary.RoundLock || !RoundSummary.RoundInProgress() ||
-                       roundSummary._keepRoundOnOne && PlayerManager.players.Count < 2) yield return 0.0f;
-                
-                var newList = new RoundSummary.SumInfo_ClassList();
+                while (Map.Get.Round.RoundLock || !RoundSummary.RoundInProgress() || (instance._keepRoundOnOne && Server.Get.Players.Count < 2))
+                    yield return Timing.WaitForOneFrame;
 
-                foreach (var chrClassManager in PlayerManager.players.Where(gameObject => gameObject != null).Select(gameObject => gameObject.GetComponent<CharacterClassManager>()).Where(chrClassManager => chrClassManager.Classes.CheckBounds(chrClassManager.CurClass)))
+                var teams = Server.Get.Players.Select(x => x.RealTeam);
+                var teamAmounts = 0;
+                if (teams.Contains(Team.MTF)) teamAmounts++;
+                if (teams.Contains(Team.RSC)) teamAmounts++;
+                if (teams.Contains(Team.CHI)) teamAmounts++;
+                if (teams.Contains(Team.CDP)) teamAmounts++;
+                if (teams.Contains(Team.SCP)) teamAmounts++;
+                var leadingTeam = RoundSummary.LeadingTeam.Draw;
+                var result = default(RoundSummary.SumInfo_ClassList);
+
+                foreach(var player in Server.Get.Players)
                 {
-                    // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
-                    switch (chrClassManager.Classes.SafeGet(chrClassManager.CurClass).team)
+                    switch (player.RealTeam)
                     {
                         case Team.SCP:
-                            if (chrClassManager.CurClass == RoleType.Scp0492)
-                            {
-                                newList.zombies++;
-                                continue;
-                            }
+                            if (player.RoleID == (int)RoleType.Scp0492)
+                                result.zombies++;
+                            else
+                                result.scps_except_zombies++;
+                            break;
 
-                            newList.scps_except_zombies++;
-                            continue;
                         case Team.MTF:
-                            newList.mtf_and_guards++;
-                            continue;
+                            result.mtf_and_guards++;
+                            break;
+
                         case Team.CHI:
-                            newList.chaos_insurgents++;
-                            continue;
+                            result.chaos_insurgents++;
+                            break;
+
                         case Team.RSC:
-                            newList.scientists++;
-                            continue;
+                            result.scientists++;
+                            break;
+
                         case Team.CDP:
-                            newList.class_ds++;
-                            continue;
-                        default:
-                            continue;
+                            result.class_ds++;
+                            break;
                     }
                 }
 
-                newList.warhead_kills =
-                    AlphaWarheadController.Host.detonated ? AlphaWarheadController.Host.warheadKills : -1;
+                result.warhead_kills = Map.Get.Nuke.Detonated ? Map.Get.Nuke.NukeKills : -1;
 
-                yield return float.NegativeInfinity;
-                newList.time = (int) Time.realtimeSinceStartup;
-                yield return float.NegativeInfinity;
+                yield return Timing.WaitForOneFrame;
 
-                RoundSummary.roundTime = newList.time - roundSummary.classlistStart.time;
+                result.time = (int)Time.realtimeSinceStartup;
 
-                var mtfSum = newList.mtf_and_guards + newList.scientists;
-                var chaosSum = newList.chaos_insurgents + newList.class_ds;
-                var scpSum = newList.scps_except_zombies + newList.zombies;
+                yield return Timing.WaitForOneFrame;
 
-                var escapedDs = (float)(roundSummary.classlistStart.class_ds == 0 ? 0 : (RoundSummary.escaped_ds + newList.class_ds) / roundSummary.classlistStart.class_ds);
-                var escapedScientists = (float)(roundSummary.classlistStart.scientists == 0 ? 1 : (RoundSummary.escaped_scientists + newList.scientists) / roundSummary.classlistStart.scientists);
+                RoundSummary.roundTime = result.time - instance.classlistStart.time;
 
-                var allow = true;
-                var forceEnd = false;
-                var teamChanged = false;
-                var team = RoundSummary.LeadingTeam.Draw;
-
-                try
+                switch (teamAmounts)
                 {
-                    SynapseController.Server.Events.Round.InvokeRoundCheckEvent(ref forceEnd, ref allow, ref team, ref teamChanged);
-                }
-                catch (Exception e)
-                {
-                    SynapseController.Server.Logger.Error($"Synapse-Event: CheckRound failed!!\n{e}");
-                    continue;
+                    case 1:
+                        instance._roundEnded = true;
+                        break;
+                    case 2:
+                        if (teams.Contains(Team.CHI) && teams.Contains(Team.SCP))
+                            instance._roundEnded = Server.Get.Configs.SynapseConfiguration.ChaosScpEnd;
+
+                        else if (teams.Contains(Team.CHI) && teams.Contains(Team.CDP))
+                            instance._roundEnded = true;
+
+                        else if (teams.Contains(Team.MTF) && teams.Contains(Team.RSC))
+                            instance._roundEnded = true;
+                        break;
                 }
 
-                if (forceEnd) roundSummary._roundEnded = true;
-                
-                if(!allow) continue;
+                foreach (var role in Server.Get.GetPlayers(x => x.CustomRole != null).Select(x => x.CustomRole))
+                    if (role.GetEnemys().Any(x => teams.Contains(x)))
+                        instance._roundEnded = false;
 
-                if (newList.class_ds == 0 && mtfSum == 0)
-                {
-                    roundSummary._roundEnded = true;
-                }
-                
-                else if (mtfSum == 0 && Respawning.RespawnTickets.Singleton.GetAvailableTickets(Respawning.SpawnableTeamType.NineTailedFox) == 0)
-                {
-                    roundSummary._roundEnded = true;
-                }
 
-                else
-                {
-                    //Okay. SCP hat hier einfach wirklich nur Staub gefressen oder so.
-                    var checkVar = 0;
+                Server.Get.Events.Round.InvokeRoundCheckEvent(ref instance._roundEnded, ref leadingTeam);
 
-                    if (mtfSum > 0) checkVar++;
-                    if (chaosSum > 0) checkVar++;
-                    if (scpSum > 0) checkVar++;
 
-                    if (checkVar <= 1) roundSummary._roundEnded = true;
-                }
-                
-                
-                if (!roundSummary._roundEnded) continue;
-                var leadingTeam = RoundSummary.LeadingTeam.Draw;
+                if (instance._roundEnded)
+                {
+                    if(RoundSummary.escaped_ds + teams.Count(x => x == Team.CDP) > 0)
+                    {
+                        if (!teams.Contains(Team.SCP) && !teams.Contains(Team.CHI) && !teams.Contains(Team.CDP))
+                            leadingTeam = RoundSummary.LeadingTeam.Draw;
+                        else
+                            leadingTeam = RoundSummary.LeadingTeam.ChaosInsurgency;
+                    }
+                    else
+                    {
+                        if (teams.Contains(Team.MTF) || teams.Contains(Team.RSC))
+                            leadingTeam = RoundSummary.escaped_scientists + teams.Count(x => x == Team.RSC) > 0 ? 
+                                RoundSummary.LeadingTeam.FacilityForces : RoundSummary.LeadingTeam.Draw;
+                        else
+                            leadingTeam = RoundSummary.LeadingTeam.Anomalies;
+                    }
 
-                if (mtfSum > 0)
-                {
-                    if (RoundSummary.escaped_ds == 0 && RoundSummary.escaped_scientists != 0)
-                        leadingTeam = RoundSummary.LeadingTeam.FacilityForces;
-                }
-                else
-                    leadingTeam = RoundSummary.escaped_ds != 0
-                        ? RoundSummary.LeadingTeam.ChaosInsurgency
-                        : RoundSummary.LeadingTeam.Anomalies;
 
-                if (teamChanged) leadingTeam = team;
+                    FriendlyFireConfig.PauseDetector = true;
 
-                var text = $"Round finished! Anomalies:{scpSum} | Chaos: {chaosSum} | Facility Forces: {mtfSum} | D escaped percentage: {escapedDs} | S escaped percentage: {escapedScientists}";
-                
-                GameCore.Console.AddLog(text, Color.gray);
-                ServerLogs.AddLog(ServerLogs.Modules.Logger, text, ServerLogs.ServerLogType.GameEvent);
-                
-                for (byte i = 0; i < 75; i += 1)
-                {
-                    yield return 0f;
+                    var dpercentage = (float)instance.classlistStart.class_ds == 0 ? 0 : RoundSummary.escaped_ds + result.class_ds / instance.classlistStart.class_ds;
+                    var spercentage = (float)instance.classlistStart.scientists == 0 ? 0 : RoundSummary.escaped_scientists + result.scientists / instance.classlistStart.scientists;
+                    var text = $"Round finished! Anomalies: {teams.Where(x => x == Team.SCP).Count()} | Chaos: {teams.Where(x => x == Team.CHI || x == Team.CDP).Count()}" +
+                        $" | Facility Forces: {teams.Where(x => x == Team.MTF || x == Team.RSC).Count()} | D escaped percentage: {dpercentage} | S escaped percentage : {spercentage}";
+                    GameCore.Console.AddLog(text, Color.gray, false);
+                    ServerLogs.AddLog(ServerLogs.Modules.Logger, text, ServerLogs.ServerLogType.GameEvent, false);
+
+                    for (byte i = 0; i < 75; i++)
+                        yield return 0f;
+
+                    var timeToRoundRestart = Mathf.Clamp(GameCore.ConfigFile.ServerConfig.GetInt("auto_round_restart_time", 10), 5, 1000);
+
+                    if(instance != null)
+                        Map.Get.Round.ShowRoundSummary(instance.classlistStart, result, leadingTeam, RoundSummary.escaped_ds, RoundSummary.escaped_scientists, RoundSummary.kills_by_scp, timeToRoundRestart);
+
+                    for (int j = 0; j < 50 * timeToRoundRestart; j++)
+                        yield return 0f;
+
+                    Map.Get.Round.DimScreens();
+
+                    for (byte i = 0; i < 50; i++)
+                        yield return 0f;
+
+                    Map.Get.Round.RestartRound();
                 }
-                var timeToRoundRestart = Mathf.Clamp(ConfigFile.ServerConfig.GetInt("auto_round_restart_time", 10), 5, 1000);
-                if (roundSummary != null)
-                {
-                    roundSummary.RpcShowRoundSummary(roundSummary.classlistStart, newList, leadingTeam, RoundSummary.escaped_ds, RoundSummary.escaped_scientists, RoundSummary.kills_by_scp, timeToRoundRestart);
-                }
-                int num7;
-                for (var j = 0; j < 50 * (timeToRoundRestart - 1); j = num7 + 1)
-                {
-                    yield return 0f;
-                    num7 = j;
-                }
-                roundSummary.RpcDimScreen();
-                for (byte i = 0; i < 50; i += 1)
-                {
-                    yield return 0f;
-                }
-                PlayerManager.localPlayer.GetComponent<PlayerStats>().Roundrestart();
             }
         }
     }
