@@ -204,7 +204,7 @@ namespace Synapse.Api.Events
         private void PlayerJoin(SynapseEventArguments.PlayerJoinEventArgs ev)
         {
             ev.Player.Broadcast(conf.JoinMessagesDuration, conf.JoinBroadcast);
-            ev.Player.Broadcast(conf.JoinMessagesDuration, conf.JoinTextHint);
+            ev.Player.GiveTextHint(conf.JoinTextHint, conf.JoinMessagesDuration);
         }
 
         private void PlayerSyncData(SynapseEventArguments.PlayerSyncDataEventArgs ev)
