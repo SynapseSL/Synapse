@@ -82,9 +82,12 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
 
             player.Inventory.Clear();
             var role = player.ClassManager.Classes.SafeGet(classid);
-            player.Ammo5 = role.ammoTypes[0];
-            player.Ammo7 = role.ammoTypes[1];
-            player.Ammo9 = role.ammoTypes[2];
+            if(role.roleId != RoleType.Spectator)
+            {
+                player.Ammo5 = role.ammoTypes[0];
+                player.Ammo7 = role.ammoTypes[1];
+                player.Ammo9 = role.ammoTypes[2];
+            }
             foreach (var item in __state.Items)
                 player.Inventory.AddItem(item);
 
