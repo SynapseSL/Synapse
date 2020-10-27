@@ -56,11 +56,12 @@ namespace Synapse.Api.Roles
 
         private void OnGenerator(Events.SynapseEventArguments.PlayerGeneratorInteractEventArgs ev)
         {
-            if(ev.Player.CustomRole != null && ev.Player.CustomRole.GetFriends().Any(x => x == Team.SCP))
-            {
-                ev.Allow = false;
-                ev.Player.InstantBroadcast(3, Server.Get.Configs.SynapseTranslation.GetTranslation("scpteam"));
-            }
+            if (ev.GeneratorInteraction == Enum.GeneratorInteraction.TabletInjected || ev.GeneratorInteraction == Enum.GeneratorInteraction.Unlocked)
+                if (ev.Player.CustomRole != null && ev.Player.CustomRole.GetFriends().Any(x => x == Team.SCP))
+                {
+                    ev.Allow = false;
+                    ev.Player.InstantBroadcast(3, Server.Get.Configs.SynapseTranslation.GetTranslation("scpteam"));
+                }
         }
 
         private void OnDamage(Events.SynapseEventArguments.PlayerDamageEventArgs ev)

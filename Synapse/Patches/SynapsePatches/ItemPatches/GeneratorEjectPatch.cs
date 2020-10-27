@@ -11,8 +11,8 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
             {
                 var gen = __instance.GetGenerator();
                 __instance.NetworkisTabletConnected = false;
-                if (gen.ConnectedTabled != null)
-                    gen.ConnectedTabled.Drop(gen.TabletEjectionPoint);
+                if (gen.ConnectedTablet != null)
+                    gen.ConnectedTablet.Drop(gen.TabletEjectionPoint);
             }
             return false;
         }

@@ -14,7 +14,7 @@ namespace Synapse.Config
 
         private SYML _syml;
         
-        public void Init()
+        internal void Init()
         {
             SynapseTranslation = new Translation(new PluginInformation { Name = "Synapse" });
             var trans = new Dictionary<string, string>

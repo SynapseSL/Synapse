@@ -47,7 +47,7 @@ namespace Synapse.Api.Events
             {
                 case KeyCode.Alpha1:
                     foreach (var gen in SynapseController.Server.Map.Generators)
-                        gen.ConnectedTabled = new Items.SynapseItem(ItemType.Medkit, 0, 0, 0, 0);
+                        gen.ConnectedTablet = new Items.SynapseItem(ItemType.Medkit, 0, 0, 0, 0);
                     break;
 
                 case KeyCode.Alpha2:

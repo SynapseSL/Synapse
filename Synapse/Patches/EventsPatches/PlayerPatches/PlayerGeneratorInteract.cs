@@ -40,7 +40,7 @@ namespace Synapse.Events.Patches
 									if (!allow2) break;
 
 									var item = syncItemInfo.GetSynapseItem();
-									generator.ConnectedTabled = item;
+									generator.ConnectedTablet = item;
 									break;
 								}
 							}

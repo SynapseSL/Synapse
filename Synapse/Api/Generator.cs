@@ -62,7 +62,7 @@ namespace Synapse.Api
         }
 
         private Items.SynapseItem tablet;
-        public Items.SynapseItem ConnectedTabled
+        public Items.SynapseItem ConnectedTablet
         {
             get => tablet;
             set
