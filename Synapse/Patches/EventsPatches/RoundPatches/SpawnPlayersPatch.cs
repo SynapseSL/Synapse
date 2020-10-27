@@ -31,11 +31,19 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 
                     var newDictionary = new Dictionary<Player, int>();
                     foreach (var pair in dictionary)
-                        if (pair.Key.GetPlayer() != Server.Get.Host)
-                            if (pair.Key.GetPlayer().OverWatch)
-                                pair.Key.GetPlayer().RoleID = (int)RoleType.Spectator;
-                            else
-                                newDictionary.Add(pair.Key.GetPlayer(), (int)pair.Value);
+                    {
+                        var player = pair.Key.GetPlayer();
+                        if (player == Server.Get.Host) continue;
+
+                        //This fix the Bug that Overwatch Players get spawned in for a sec and then get sets to Spectator again which results in many bugs
+                        if (player.OverWatch)
+                        {
+                            player.RoleID = (int)RoleType.Spectator;
+                            continue;
+                        }
+                        
+                        newDictionary.Add(player, (int)pair.Value);
+                    }
 
                     Server.Get.Events.Round.InvokeSpawnPlayersEvent(ref newDictionary, out var allow);
 
