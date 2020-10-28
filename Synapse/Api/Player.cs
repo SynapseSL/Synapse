@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Assets._Scripts.Dissonance;
 using Hints;
 using Mirror;
 using Mirror.LiteNetLib4Mirror;
@@ -63,8 +62,6 @@ namespace Synapse.Api
         public void SendConsoleMessage(string message, string color = "red") => ClassManager.TargetConsolePrint(Connection, message, color);
 
         public void SendRAConsoleMessage(string message, bool success = true, RaCategory type = RaCategory.None) => SynapseExtensions.RaMessage(CommandSender,message, success, type);
-
-        public void GiveItem(ItemType itemType, float duration = float.NegativeInfinity, int sight = 0, int barrel = 0, int other = 0) => VanillaInventory.AddNewItem(itemType, duration, sight, barrel, other);
 
 
         public void GiveEffect(Effect effect, byte intensity = 1, float duration = -1f) => PlayerEffectsController.ChangeByString(effect.ToString().ToLower(), intensity, duration);
@@ -585,8 +582,6 @@ namespace Synapse.Api
         public string AuthToken => ClassManager.AuthToken;
 
         public int Ping => LiteNetLib4MirrorServer.Peers[Connection.connectionId].Ping;
-
-        public string GroupName => ServerStatic.PermissionsHandler._members[UserId];
 
         public string NickName => NicknameSync.Network_myNickSync;
 
