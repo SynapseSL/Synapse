@@ -3,7 +3,7 @@
 namespace Synapse.Command.Commands
 {
     [CommandInformations(
-        Name = "giveitem",
+        Name = "GiveItem",
         Aliases = new string[] {"gi"},
         Description = "A Command to give a Player an Item",
         Permission = "synapse.command.give",

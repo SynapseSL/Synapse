@@ -3,7 +3,7 @@
 namespace Synapse.Command.Commands
 {
     [CommandInformations(
-        Name = "plugin",
+        Name = "Plugin",
         Aliases = new[] { "pl","plugins" },
         Description = "A Command which gives Informations about the currently installed Plugins",
         Usage = "\"plugin\" for a list of all plugins or \"plugin {pluginname}\" for informations of a special Plugin",

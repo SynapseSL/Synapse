@@ -20,11 +20,11 @@
                 return result;
             }
             var point = context.Player.MapPoint;
-            result.Message = "Your Current Position:" +
-                $"  room: {point.Room.RoomName}" +
-                $"  x: {point.RelativePosition.x}" +
-                $"  y: {point.RelativePosition.y}" +
-                $"  z: {point.RelativePosition.z}";
+            result.Message = "\nYour Current Position:" +
+                $"\n  room: {point.Room.RoomName}" +
+                $"\n  x: {point.RelativePosition.x}" +
+                $"\n  y: {point.RelativePosition.y}" +
+                $"\n  z: {point.RelativePosition.z}";
             result.State = CommandResultState.Ok;
             return result;
         }

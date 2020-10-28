@@ -3,7 +3,7 @@
 namespace Synapse.Command.Commands
 {
     [CommandInformations(
-        Name = "setclass",
+        Name = "Setclass",
         Aliases = new[] {"sc","class"},
         Description = "A Command to set the class of a Player",
         Permission = "synapse.command.setclass",

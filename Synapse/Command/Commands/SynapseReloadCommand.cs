@@ -2,7 +2,7 @@
 {
 
     [CommandInformations(
-        Name = "reload",
+        Name = "Reload",
         Aliases = new[] { "rl" },
         Description = "Reloads all Plugins and Features of Synapse",
         Usage = "reload",

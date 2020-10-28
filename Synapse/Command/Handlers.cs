@@ -25,6 +25,7 @@ namespace Synapse.Command
             RegisterCommand(new SynapsePermissionCommand(), false);
             RegisterCommand(new SynapseGiveCustomItemCommand(), false);
             RegisterCommand(new SynapseSetClassCommand(), false);
+            RegisterCommand(new SynapseMapPointCommand(), false);
         }
 
         internal static void RegisterCommand(ISynapseCommand iSynapseCommand, bool awaitPluginInitialisation)

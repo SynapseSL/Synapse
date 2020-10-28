@@ -5,7 +5,7 @@ namespace Synapse.Command.Commands
 {
     
     [CommandInformations(
-        Name = "help",
+        Name = "Help",
         Aliases = new[]{"h"},
         Description = "Shows all available commands with usage description",
         Usage = "help {Optional Command Name for a specific Command}",
