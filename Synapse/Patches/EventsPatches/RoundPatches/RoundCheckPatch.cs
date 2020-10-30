@@ -42,18 +42,25 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                 while (Map.Get.Round.RoundLock || !RoundSummary.RoundInProgress() || (instance._keepRoundOnOne && Server.Get.Players.Count < 2))
                     yield return Timing.WaitForOneFrame;
 
-                var teams = Server.Get.Players.Select(x => x.RealTeam);
+                var teams = new List<Team>();
+
+                var customroles = new List<Synapse.Api.Roles.IRole>();
+
                 var teamAmounts = 0;
-                if (teams.Contains(Team.MTF)) teamAmounts++;
-                if (teams.Contains(Team.RSC)) teamAmounts++;
-                if (teams.Contains(Team.CHI)) teamAmounts++;
-                if (teams.Contains(Team.CDP)) teamAmounts++;
-                if (teams.Contains(Team.SCP)) teamAmounts++;
+
                 var leadingTeam = RoundSummary.LeadingTeam.Draw;
+
                 var result = default(RoundSummary.SumInfo_ClassList);
+
+                var endround = false;
 
                 foreach(var player in Server.Get.Players)
                 {
+                    if (player.CustomRole != null)
+                        customroles.Add(player.CustomRole);
+
+                    teams.Add(player.RealTeam);
+
                     switch (player.RealTeam)
                     {
                         case Team.SCP:
@@ -81,6 +88,12 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                     }
                 }
 
+                if (teams.Contains(Team.MTF)) teamAmounts++;
+                if (teams.Contains(Team.RSC)) teamAmounts++;
+                if (teams.Contains(Team.CHI)) teamAmounts++;
+                if (teams.Contains(Team.CDP)) teamAmounts++;
+                if (teams.Contains(Team.SCP)) teamAmounts++;
+
                 result.warhead_kills = Map.Get.Nuke.Detonated ? Map.Get.Nuke.NukeKills : -1;
 
                 yield return Timing.WaitForOneFrame;
@@ -93,48 +106,52 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 
                 switch (teamAmounts)
                 {
+                    case 0:
                     case 1:
-                        instance._roundEnded = true;
+                        endround = true;
                         break;
                     case 2:
                         if (teams.Contains(Team.CHI) && teams.Contains(Team.SCP))
-                            instance._roundEnded = Server.Get.Configs.SynapseConfiguration.ChaosScpEnd;
+                            endround = Server.Get.Configs.SynapseConfiguration.ChaosScpEnd;
 
                         else if (teams.Contains(Team.CHI) && teams.Contains(Team.CDP))
-                            instance._roundEnded = true;
+                            endround = true;
 
                         else if (teams.Contains(Team.MTF) && teams.Contains(Team.RSC))
-                            instance._roundEnded = true;
+                            endround = true;
+                        else
+                            endround = false;
+                        break;
+                    default:
+                        endround = false;
                         break;
                 }
 
-                foreach (var role in Server.Get.GetPlayers(x => x.CustomRole != null).Select(x => x.CustomRole))
+                foreach (var role in customroles)
                     if (role.GetEnemys().Any(x => teams.Contains(x)))
-                        instance._roundEnded = false;
+                        endround = false;
 
-
-                Server.Get.Events.Round.InvokeRoundCheckEvent(ref instance._roundEnded, ref leadingTeam);
-
-
-                if (instance._roundEnded)
+                if (RoundSummary.escaped_ds + teams.Count(x => x == Team.CDP) > 0)
                 {
-                    if(RoundSummary.escaped_ds + teams.Count(x => x == Team.CDP) > 0)
+                    if(teams.Contains(Team.SCP) || teams.Contains(Team.CHI) || teams.Contains(Team.CHI))
+                        leadingTeam = RoundSummary.LeadingTeam.ChaosInsurgency;
+                }
+                else
+                {
+                    if (teams.Contains(Team.MTF) || teams.Contains(Team.RSC))
                     {
-                        if (!teams.Contains(Team.SCP) && !teams.Contains(Team.CHI) && !teams.Contains(Team.CDP))
-                            leadingTeam = RoundSummary.LeadingTeam.Draw;
-                        else
-                            leadingTeam = RoundSummary.LeadingTeam.ChaosInsurgency;
+                        if (RoundSummary.escaped_scientists + teams.Count(x => x == Team.RSC) > 0)
+                            leadingTeam = RoundSummary.LeadingTeam.FacilityForces;
                     }
                     else
-                    {
-                        if (teams.Contains(Team.MTF) || teams.Contains(Team.RSC))
-                            leadingTeam = RoundSummary.escaped_scientists + teams.Count(x => x == Team.RSC) > 0 ? 
-                                RoundSummary.LeadingTeam.FacilityForces : RoundSummary.LeadingTeam.Draw;
-                        else
-                            leadingTeam = RoundSummary.LeadingTeam.Anomalies;
-                    }
+                        leadingTeam = RoundSummary.LeadingTeam.Anomalies;
+                }
+
+                Server.Get.Events.Round.InvokeRoundCheckEvent(ref endround, ref leadingTeam);
 
 
+                if (endround || instance._roundEnded)
+                {
                     FriendlyFireConfig.PauseDetector = true;
 
                     var dpercentage = (float)instance.classlistStart.class_ds == 0 ? 0 : RoundSummary.escaped_ds + result.class_ds / instance.classlistStart.class_ds;
