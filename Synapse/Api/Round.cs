@@ -1,6 +1,7 @@
 ﻿using GameCore;
 using Respawning;
 using System;
+using UnityEngine;
 
 namespace Synapse.Api
 {
@@ -24,6 +25,26 @@ namespace Synapse.Api
             set => RoundSummary.RoundLock = value;
         }
 
+        public int EscapedDPersonnel
+        {
+            get => RoundSummary.escaped_ds;
+            set => RoundSummary.escaped_ds = value;
+        }
+
+        public int EscapedScientists
+        {
+            get => RoundSummary.escaped_scientists;
+            set => RoundSummary.escaped_scientists = value;
+        }
+
+        public int ScpKills
+        {
+            get => RoundSummary.kills_by_scp;
+            set => RoundSummary.kills_by_scp = value;
+        }
+
+        internal bool Forceend { get; set; } = false;
+
         public TimeSpan RoundLength => RoundStart.RoundLenght;
 
         public bool RoundIsActive => RoundSummary.RoundInProgress();
@@ -32,15 +53,18 @@ namespace Synapse.Api
 
         public void StartRound() => CharacterClassManager.ForceRoundStart();
 
-        public void EndRound() => rs.ForceEnd();
+        public void EndRound() => Forceend = true;
 
         public void RestartRound() => Server.Get.Host.PlayerStats.Roundrestart();
 
         public void DimScreens() => rs.RpcDimScreen();
 
-        public void ShowRoundSummary(RoundSummary.SumInfo_ClassList list_start, RoundSummary.SumInfo_ClassList list_finish,
-            RoundSummary.LeadingTeam leadingTeam, int e_ds, int e_sc, int scp_kills, int round_cd)
-                => rs.RpcShowRoundSummary(list_start, list_finish, leadingTeam, e_ds, e_sc, scp_kills, round_cd);
+        public void ShowRoundSummary(RoundSummary.SumInfo_ClassList remainingPlayers,RoundSummary.LeadingTeam team)
+        {
+            var timeToRoundRestart = Mathf.Clamp(GameCore.ConfigFile.ServerConfig.GetInt("auto_round_restart_time", 10), 5, 1000);
+
+            rs.RpcShowRoundSummary(rs.classlistStart,remainingPlayers, team, EscapedDPersonnel, EscapedScientists, ScpKills, timeToRoundRestart);
+        }
 
         public void MtfRespawn(bool isCI = false)
         {

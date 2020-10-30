@@ -30,6 +30,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                     }
 
                     var newDictionary = new Dictionary<Player, int>();
+                    var flag = UnityEngine.Random.Range(1f, 100f) <= GameCore.ConfigFile.ServerConfig.GetFloat("ci_on_start_percent");
                     foreach (var pair in dictionary)
                     {
                         var player = pair.Key.GetPlayer();
@@ -41,11 +42,22 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                             player.RoleID = (int)RoleType.Spectator;
                             continue;
                         }
-                        
-                        newDictionary.Add(player, (int)pair.Value);
+
+                        if (flag && pair.Value == RoleType.FacilityGuard)
+                            newDictionary.Add(player, (int)RoleType.ChaosInsurgency);
+                        else
+                            newDictionary.Add(player, (int)pair.Value);
                     }
 
-                    Server.Get.Events.Round.InvokeSpawnPlayersEvent(ref newDictionary, out var allow);
+                    var allow = true;
+                    try
+                    {
+                        Server.Get.Events.Round.InvokeSpawnPlayersEvent(ref newDictionary, out allow);
+                    }
+                    catch(Exception e)
+                    {
+                        Logger.Get.Error($"Synapse-Event: SpawnPlayersEvent failed!!\n{e}");
+                    }
 
                     if (allow)
                     {

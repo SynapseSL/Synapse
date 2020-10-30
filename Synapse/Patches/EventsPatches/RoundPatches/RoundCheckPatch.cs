@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using GameCore;
+using Logger = Synapse.Api.Logger;
 using Harmony;
 using MEC;
 using Synapse.Api;
@@ -147,11 +147,20 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                         leadingTeam = RoundSummary.LeadingTeam.Anomalies;
                 }
 
-                Server.Get.Events.Round.InvokeRoundCheckEvent(ref endround, ref leadingTeam);
-
-
-                if (endround || instance._roundEnded)
+                try
                 {
+                    Server.Get.Events.Round.InvokeRoundCheckEvent(ref endround, ref leadingTeam);
+                }
+                catch (Exception e)
+                {
+                    Logger.Get.Error($"Synapse-Event: RoundCheckEvent failed!!\n{e}");
+                }
+
+
+                if (endround || Map.Get.Round.Forceend)
+                {
+                    instance._roundEnded = true;
+                    Map.Get.Round.Forceend = false;
                     FriendlyFireConfig.PauseDetector = true;
 
                     var dpercentage = (float)instance.classlistStart.class_ds == 0 ? 0 : RoundSummary.escaped_ds + result.class_ds / instance.classlistStart.class_ds;
@@ -167,7 +176,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                     var timeToRoundRestart = Mathf.Clamp(GameCore.ConfigFile.ServerConfig.GetInt("auto_round_restart_time", 10), 5, 1000);
 
                     if(instance != null)
-                        Map.Get.Round.ShowRoundSummary(instance.classlistStart, result, leadingTeam, RoundSummary.escaped_ds, RoundSummary.escaped_scientists, RoundSummary.kills_by_scp, timeToRoundRestart);
+                        Map.Get.Round.ShowRoundSummary(result, leadingTeam);
 
                     for (int j = 0; j < 50 * timeToRoundRestart; j++)
                         yield return 0f;
