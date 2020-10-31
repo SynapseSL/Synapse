@@ -6,7 +6,7 @@ namespace Synapse.Api.Enum
     public enum Effect
     {
         /// <summary>
-        /// The Player can't open his inventory and reload his weapons
+        /// The Player can't open their inventory and reload their weapons
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Amnesia,
@@ -17,7 +17,7 @@ namespace Synapse.Api.Enum
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Asphyxiated,
         /// <summary>
-        /// Damage-over time starting high and getting low. Ticks every 5s.
+        /// Decreasing damage over time. Ticks every 5s.
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Bleeding,
@@ -89,7 +89,7 @@ namespace Synapse.Api.Enum
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Panic,
         /// <summary>
-        /// Damage-over time starting low and rising high. Ticks every 5s.
+        /// Ascending damage over time. Ticks every 5s.
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Poisoned,
@@ -99,12 +99,12 @@ namespace Synapse.Api.Enum
         /// <remarks>0 = Disabled, 1 = 1xCola, 2 = 2xCola, 3 = 3xCola, 4 = 4xCola</remarks>
         Scp207,
         /// <summary>
-        /// The Player cant be seen by other entities. He need do activate Scp268 in his inventory
+        /// The Player can't be seen by other entities. They need to hold Scp268 in their inventory.
         /// </summary>
         /// <remarks>0 = Disabled,1 = Enabled</remarks>
         Scp268,
         /// <summary>
-        /// Slows down players but not SCP's
+        /// Slows down player (No effect on SCPs)
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         SinkHole,

@@ -66,7 +66,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
 
             if (!__state.Allow) return false;
 
-            //WHY THE FUCK DOES SCP DONT USE THEY OWN METHODS TO CLEAR THE INVENTORY THAT I ALREADY PATCHED?
+            //WHY THE FUCK DOES SCP NOT USE THEIR OWN METHODS TO CLEAR THE INVENTORY THAT I ALREADY PATCHED?
             player.Inventory.Clear();
 
             return true;

@@ -6,10 +6,10 @@ namespace Synapse.Command.Commands
     [CommandInformation(
         Name = "MapPoint",
         Aliases = new [] { "GetMapPoint","MP" },
-        Description = "A Command to get your Current Location as MapPoint",
+        Description = "A command to get the current location as MapPoint",
         Permission = "synapse.command.mappoint",
         Platforms = new [] { Platform.RemoteAdmin },
-        Usage = "Just use the Command and you get the Point"
+        Usage = "Just use the command for the Point"
         )]
     public class SynapseMapPointCommand : ISynapseCommand
     {
@@ -18,7 +18,7 @@ namespace Synapse.Command.Commands
             var result = new CommandResult();
             if (!context.Player.HasPermission("synapse.command.mappoint"))
             {
-                result.Message = "You dont have permissions to execute this command";
+                result.Message = "You don't have permission to use this command";
                 result.State = CommandResultState.NoPermission;
                 return result;
             }

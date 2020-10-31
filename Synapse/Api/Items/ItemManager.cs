@@ -16,7 +16,7 @@ namespace Synapse.Api.Items
                 return (ItemType)id;
 
             var item = customItems.FirstOrDefault(x => x.ID == id);
-            if (item == null) throw new System.Exception("BaseItemType was request from an CustomItem which is not registered");
+            if (item == null) throw new System.Exception("BaseItemType was requested from a CustomItem which is not registered");
             return item.BasedItemType;
         }
 
@@ -26,7 +26,7 @@ namespace Synapse.Api.Items
                 return ((ItemType)id).ToString();
 
             var item = customItems.FirstOrDefault(x => x.ID == id);
-            if (item == null) throw new System.Exception("Name was request from an CustomItem which is not registered");
+            if (item == null) throw new System.Exception("Name was requested from a CustomItem which is not registered");
             return item.Name;
         }
 
@@ -35,10 +35,10 @@ namespace Synapse.Api.Items
         public void RegisterCustomItem(CustomItemInformation info)
         {
             if (info.ID >= 0 && info.ID <= HighestItem)
-                throw new Exception("A Plugin tryied to register a CustomItem with an ID of a BaseGame Item");
+                throw new Exception("A plugin tried to register a CustomItem with an ID of a BaseGame Item");
 
             if (customItems.Select(x => x.ID).Contains(info.ID))
-                throw new Exception("A Plugin tryied to register a CustomItem with an ID which already was registered");
+                throw new Exception("A plugin tried to register a CustomItem with an ID which was already registered");
 
             customItems.Add(info);
         }
