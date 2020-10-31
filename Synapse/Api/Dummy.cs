@@ -11,7 +11,7 @@ namespace Synapse.Api
         private GameObject gameObject;
 
         /// <summary>
-        /// Get / Set the Current Role of the Dummy
+        /// Get / Set the current Role of the Dummy
         /// </summary>
         public RoleType Role
         {
@@ -25,7 +25,7 @@ namespace Synapse.Api
         }
 
         /// <summary>
-        /// Get / Set the Current Name of the Dummy
+        /// Get / Set the current Name of the Dummy
         /// </summary>
         public string Name
         {
@@ -34,7 +34,7 @@ namespace Synapse.Api
         }
 
         /// <summary>
-        /// Get / Set the Current Position of the Dummy
+        /// Get / Set the current Position of the Dummy
         /// </summary>
         public Vector3 Position
         {
@@ -62,7 +62,7 @@ namespace Synapse.Api
         }
 
         /// <summary>
-        /// Get / Set the Current Item the Dummy is holding
+        /// Get / Set the current Item the Dummy is holding
         /// </summary>
         public ItemType HeldItem
         {
@@ -84,7 +84,7 @@ namespace Synapse.Api
         }
 
         /// <summary>
-        /// Get / Set the BadgeCOlor of the Dummy
+        /// Get / Set the BadgeColor of the Dummy
         /// </summary>
         public string BadgeColor
         {
@@ -93,14 +93,14 @@ namespace Synapse.Api
         }
 
         /// <summary>
-        /// Creates a New Dummy and Spawn it
+        /// Creates a new Dummy and spawns it
         /// </summary>
         /// <param name="pos">The Position where the Dummy should spawn</param>
         /// <param name="rot">The Rotation of the Dummy</param>
         /// <param name="role">The Role which the Dummy should be</param>
         /// <param name="name">The Name of the Dummy</param>
-        /// <param name="badgetext">The Displayed BadgeTeyt of the Dummy</param>
-        /// <param name="badgecolor">The Displayed BadgeColor of the Dummy</param>
+        /// <param name="badgetext">The displayed BadgeText of the Dummy</param>
+        /// <param name="badgecolor">The displayed BadgeColor of the Dummy</param>
         public Dummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "")
         {
             GameObject obj =

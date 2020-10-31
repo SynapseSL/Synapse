@@ -5,8 +5,8 @@ namespace Synapse.Command.Commands
     [CommandInformation(
         Name = "Permission",
         Aliases = new[] { "pm" },
-        Description = "A Command for managing the Permission System",
-        Usage = "Execute the command without paramater to get a Help",
+        Description = "A command to manage the Permission System",
+        Usage = "Execute the command without parameters for help",
         Permission = "none",
         Platforms = new[] { Platform.RemoteAdmin,Platform.ServerConsole }
     )]

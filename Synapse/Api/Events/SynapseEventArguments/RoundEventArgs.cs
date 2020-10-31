@@ -12,7 +12,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
     public class SpawnPlayersEventArgs: EventHandler.ISynapseEventArgs
     {
         /// <summary>
-        /// This determined which Player gets which RoleID
+        /// Determines which Player has which RoleID
         /// </summary>
         public Dictionary<Player,int> SpawnPlayers { get; set; }
 

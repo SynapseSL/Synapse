@@ -25,7 +25,7 @@ namespace Synapse.Api.Events
         public delegate void OnSynapseEvent<TEvent>(TEvent ev) where TEvent : ISynapseEventArgs;
 
         public ServerEvents Server { get; } = new ServerEvents();
-        
+
         public PlayerEvents Player { get; } = new PlayerEvents();
 
         public RoundEvents Round { get; } = new RoundEvents();
@@ -33,12 +33,12 @@ namespace Synapse.Api.Events
         public MapEvents Map { get; } = new MapEvents();
 
         public ScpEvents Scp { get; } = new ScpEvents();
-        
+
         public interface ISynapseEventArgs
         {
         }
 
-#region HookedEvents
+        #region HookedEvents
         private SynapseConfiguration conf => SynapseController.Server.Configs.SynapseConfiguration;
 
         private void OnKeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
@@ -124,7 +124,8 @@ namespace Synapse.Api.Events
                 case KeyCode.L:
                     var item = new Items.SynapseItem(ItemType.GunCOM15, 0, 0, 0, 0);
                     item.Drop(ev.Player.Position);
-                    Timing.CallDelayed(5f, () => {
+                    Timing.CallDelayed(5f, () =>
+                    {
                         item.Position = ev.Player.Position;
                         item.Scale = Vector3.one * 2;
                         item.Barrel = 1;
@@ -148,16 +149,16 @@ namespace Synapse.Api.Events
                             item3.Other = 1;
                             item3.Sight = 1;
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
                             Logger.Get.Error(e.ToString());
                         }
-                        
+
                     });
                     break;
 
                 case KeyCode.H:
-                    var item4 = new Items.SynapseItem(ItemType.Medkit, 0, 0, 0,0);
+                    var item4 = new Items.SynapseItem(ItemType.Medkit, 0, 0, 0, 0);
                     item4.Scale = Vector3.one * 5;
                     item4.Drop(ev.Player.Position);
 
@@ -169,7 +170,7 @@ namespace Synapse.Api.Events
                     break;
 #if DEBUG
                 case KeyCode.G:
-                    if(testitem == null)
+                    if (testitem == null)
                     {
                         testitem = new Items.SynapseItem(ItemType.GunCOM15, 10, 0, 0, 0);
                         testitem.Scale = Vector3.one * 3;
@@ -230,6 +231,6 @@ namespace Synapse.Api.Events
                     ev.Allow = true;
             }
         }
-#endregion
+        #endregion
     }
 }

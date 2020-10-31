@@ -56,7 +56,7 @@ namespace Synapse.Api
 
         public void Refresh()
         {
-            var time = Time - (UnityEngine.Time.time - DisplayTime) + 1; //The one is there because by converting a float (14,99999) to a ushort the number becomes one smaller (14)
+            var time = Time - (UnityEngine.Time.time - DisplayTime) + 1; //The one is there because by converting a float (14,99999) to a ushort the decimal places are ignored (14)
             _player.InstantBroadcast((ushort)time, Message);
         }
 

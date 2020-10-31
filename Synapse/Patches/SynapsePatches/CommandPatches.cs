@@ -34,13 +34,13 @@ namespace Synapse.Patches.SynapsePatches
                             color = ConsoleColor.Red;
                             break;
 
-                        //Since the Console Have Always all Permissions a Check for NoPermission is not needed!
+                        //Since the Console always has all Permissions, a check for NoPermission is not needed!
                     }
                     Logger.Get.Send(flag.Message, color);
                 }
                 catch(Exception e)
                 {
-                    Logger.Get.Error($"Synapse-Commands: Command Execution of failed!!\n{e}");
+                    Logger.Get.Error($"Synapse-Commands: Command Execution failed!!\n{e}");
                 }
                 return false;
             }
@@ -81,7 +81,7 @@ namespace Synapse.Patches.SynapsePatches
                 }
                 catch(Exception e)
                 {
-                    Logger.Get.Error($"Synapse-Commands: Command Execution of failed!!\n{e}");
+                    Logger.Get.Error($"Synapse-Commands: Command Execution failed!!\n{e}");
                 }
                 return false;
             }
@@ -110,7 +110,7 @@ namespace Synapse.Patches.SynapsePatches
                 }
                 catch(Exception e)
                 {
-                    Logger.Get.Error($"Synapse-Commands: Command Execution of failed!!\n{e}");
+                    Logger.Get.Error($"Synapse-Commands: Command Execution failed!!\n{e}");
                 }
                 return false;
             }

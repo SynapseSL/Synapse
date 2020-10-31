@@ -34,7 +34,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                         }
                         item.PickUp(player);
                     }
-                    //This Code is a Backup for the Case a Plugin creates a pickup on its own
+                    //This code is a backup for the case a Plugin creates a pickup on its own
                     else
                         __instance.Completor.Complete();
                 }

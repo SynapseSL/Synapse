@@ -167,7 +167,7 @@ namespace Synapse.Api.Items
 
         public void PickUp(Player player)
         {
-            if (deactivated) throw new System.Exception("Player tryied to Pickup a Destroyed Item??");
+            if (deactivated) throw new System.Exception("Player tried to pickup a destroyed Item??");
 
             if (ItemHolder != null) return;
 
@@ -213,7 +213,7 @@ namespace Synapse.Api.Items
 
         public void Drop(Vector3 position)
         {
-            if (deactivated) throw new System.Exception("Something tryied to Drop a Destroyed Item??");
+            if (deactivated) throw new System.Exception("Something tried to drop a destroyed Item??");
 
             if (pickup != null) return;
 

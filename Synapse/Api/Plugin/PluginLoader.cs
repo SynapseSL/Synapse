@@ -39,7 +39,7 @@ namespace Synapse.Api.Plugin
 
                     if (infos == null)
                     {
-                        SynapseController.Server.Logger.Info($"The File {assembly.GetName().Name} has a class which inherit from IPlugin but has no PluginInformation ... Default Values will be added");
+                        SynapseController.Server.Logger.Info($"The File {assembly.GetName().Name} has a class which inherits from IPlugin but has no PluginInformation ... Default Values will be added");
                         infos = new PluginInformation();
                     }
 

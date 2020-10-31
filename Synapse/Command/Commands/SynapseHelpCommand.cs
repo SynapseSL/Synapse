@@ -8,7 +8,7 @@ namespace Synapse.Command.Commands
         Name = "Help",
         Aliases = new[]{"h"},
         Description = "Shows all available commands with usage description",
-        Usage = "help {Optional Command Name for a specific Command}",
+        Usage = "help {optional command name for a specific command}",
         Permission = "synapse.command.help",
         Platforms = new[] {Platform.ClientConsole, Platform.RemoteAdmin, Platform.ServerConsole}
     )]
@@ -21,7 +21,7 @@ namespace Synapse.Command.Commands
             if (!context.Player.HasPermission("synapse.command.help"))
             {
                 result.State = CommandResultState.NoPermission;
-                result.Message = "You have no Permission to execute this Command!";
+                result.Message = "You don't have permission to use this command";
                 return result;
             }
 

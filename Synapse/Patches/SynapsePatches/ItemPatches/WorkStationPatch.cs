@@ -45,7 +45,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Item: Unconnect Workstation Tablet failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Item: Disconnect Workstation Tablet failed!!\n{e}");
             }
             return false;
         }

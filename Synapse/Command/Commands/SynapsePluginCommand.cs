@@ -5,8 +5,8 @@ namespace Synapse.Command.Commands
     [CommandInformation(
         Name = "Plugin",
         Aliases = new[] { "pl","plugins" },
-        Description = "A Command which gives Informations about the currently installed Plugins",
-        Usage = "\"plugin\" for a list of all plugins or \"plugin {pluginname}\" for informations of a special Plugin",
+        Description = "A command which provides information about the currently installed Plugins",
+        Usage = "\"plugin\" for a list of all plugins or \"plugin {pluginname}\" for information about a specific plugin",
         Permission = "synapse.command.plugins",
         Platforms = new[] { Platform.ClientConsole,Platform.RemoteAdmin,Platform.ServerConsole }
     )]
@@ -18,7 +18,7 @@ namespace Synapse.Command.Commands
 
             if (!context.Player.HasPermission("synapse.command.plugins"))
             {
-                result.Message = "You dont have Permissions to use this command";
+                result.Message = "You don't have permission to use this command";
                 result.State = CommandResultState.NoPermission;
                 return result;
             }

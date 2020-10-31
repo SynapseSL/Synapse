@@ -35,7 +35,7 @@ public class SynapseController
         
         PluginLoader.ActivatePlugins();
 
-        Server.Logger.Info("Synapse is now Ready!");
+        Server.Logger.Info("Synapse is now ready!");
     } 
     
     private void PatchMethods()
@@ -48,7 +48,7 @@ public class SynapseController
         }
         catch(Exception e)
         {
-            Server.Logger.Error($"Harmony Patching throw an Error:\n\n {e}");
+            Server.Logger.Error($"Harmony Patching threw an error:\n\n {e}");
         }
     }
 

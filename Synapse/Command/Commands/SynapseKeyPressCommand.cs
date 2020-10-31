@@ -8,7 +8,7 @@ namespace Synapse.Command.Commands
     [CommandInformation(
         Name = "Keypress",
         Aliases = new[] { "key" },
-        Description = "A Command for the KeyPressEvent from Synapse",
+        Description = "A command for the KeyPressEvent from Synapse",
         Usage = "Read the wiki",
         Permission = "none",
         Platforms = new[] { Platform.ClientConsole }

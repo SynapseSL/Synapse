@@ -17,8 +17,8 @@ namespace Synapse.Config
             SynapseTranslation = new Translation(new PluginInformation { Name = "Synapse" });
             var trans = new Dictionary<string, string>
             {
-                {"sameteam","You cant harm this Person" },
-                {"scpteam","As your current Role cant you harm an Scp"  },
+                {"sameteam","You can't harm this Person" },
+                {"scpteam","As your current Role you can't harm an Scp"  },
             };
             SynapseTranslation.CreateTranslations(trans);
 

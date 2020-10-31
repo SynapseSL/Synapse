@@ -5,7 +5,7 @@ namespace Synapse.Command.Commands
     [CommandInformation(
         Name = "Setclass",
         Aliases = new[] {"sc","class"},
-        Description = "A Command to set the class of a Player",
+        Description = "A command to set the class of a Player",
         Permission = "synapse.command.setclass",
         Platforms = new[] {Platform.RemoteAdmin,Platform.ServerConsole},
         Usage = "setclass player RoleID"
@@ -18,7 +18,7 @@ namespace Synapse.Command.Commands
 
             if (!context.Player.HasPermission("synapse.command.setclass"))
             {
-                result.Message = "You dont have Permission to execute thus command!";
+                result.Message = "You don't have permission to use this command";
                 result.State = CommandResultState.NoPermission;
                 return result;
             }
