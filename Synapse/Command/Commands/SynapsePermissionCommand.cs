@@ -73,7 +73,7 @@ namespace Synapse.Command.Commands
 
                 default:
                     result.Message = "All Permission Commands:" +
-                        "\nPermission me - Gives you informations about your Role" +
+                        "\nPermission me - Gives you information about your Role" +
                         "\nPermission groups - Gives you a List of All Groups" + 
                         "\nPermission setgroup {Group} {Player} - Sets a User group";
                     result.State = CommandResultState.Ok;
