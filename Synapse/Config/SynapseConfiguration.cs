@@ -14,7 +14,7 @@ namespace Synapse.Config
         [Description("Changes whether or not the instance should use a shared or an instance specific database")]
         public bool DatabaseShared = true;
         
-        [Description("Enables or disables whether the Player needs to equip his keycard to open a door")]
+        [Description("Enables or disables whether the Player needs to equip their keycard to open a door")]
         public bool RemoteKeyCard = false;
 
         [Description("The Broadcast Message a Player gets when joining the Server")]
@@ -23,22 +23,22 @@ namespace Synapse.Config
         [Description("The TextHint a Player gets when joining the Server")]
         public string JoinTextHint = string.Empty;
 
-        [Description("The Duration of how long the TextHint and Broadcast will be displayed")]
+        [Description("The duration of how long the TextHint and Broadcast will be displayed")]
         public ushort JoinMessagesDuration = 5;
 
         [Description("The IDs of the Scps which can speak")]
         public List<int> SpeakingScps = new List<int> { 16, 17 };
 
-        [Description("If Enabled your Server is marked as Synapse Server")]
+        [Description("If enabled your Server is marked as Synapse Server")]
         public bool NameTracking = true;
 
-        [Description("The Amount of people needed to contain Scp-106")]
+        [Description("The amount of people needed to contain Scp-106")]
         public int RequiredForFemur = 1;
 
         [Description("If disabled Chaos must kill all Scps to end the round")]
         public bool ChaosScpEnd = true;
 
-        [Description("If enabled custom Scps like 035 can trigger Scp096's rage")]
+        [Description("If enabled custom Scps such as 035 can trigger Scp096's rage")]
         public bool ScpTrigger096 = false;
     }
 }
