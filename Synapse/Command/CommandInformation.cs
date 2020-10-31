@@ -2,7 +2,7 @@
 
 namespace Synapse.Command
 {
-    public class CommandInformations : Attribute
+    public class CommandInformation : Attribute
     {
         public string Name;
 

@@ -39,7 +39,7 @@ namespace Synapse.Api.Plugin
 
                     if (infos == null)
                     {
-                        SynapseController.Server.Logger.Info($"The File {assembly.GetName().Name} has a class which inherit from IPlugin but has no PluginInformations ... Default Values will be added");
+                        SynapseController.Server.Logger.Info($"The File {assembly.GetName().Name} has a class which inherit from IPlugin but has no PluginInformation ... Default Values will be added");
                         infos = new PluginInformation();
                     }
 
@@ -115,11 +115,11 @@ namespace Synapse.Api.Plugin
 
     public class PluginLoadContext
     {
-        internal PluginLoadContext(IPlugin plugin, Type type, PluginInformation pluginInformations, List<Type> classes)
+        internal PluginLoadContext(IPlugin plugin, Type type, PluginInformation pluginInformation, List<Type> classes)
         {
             Plugin = plugin;
             PluginType = type;
-            Information = pluginInformations;
+            Information = pluginInformation;
             Classes = classes;
         }
 

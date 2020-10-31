@@ -1,6 +1,6 @@
 ﻿namespace Synapse.Api.Items
 {
-    public class CustomItemInformations
+    public class CustomItemInformation
     {
         public int ID;
 

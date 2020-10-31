@@ -5,7 +5,7 @@ using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Command.Commands
 {
-    [CommandInformations(
+    [CommandInformation(
         Name = "Keypress",
         Aliases = new[] { "key" },
         Description = "A Command for the KeyPressEvent from Synapse",

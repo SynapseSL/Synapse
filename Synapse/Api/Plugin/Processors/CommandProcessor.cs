@@ -11,7 +11,7 @@ namespace Synapse.Api.Plugin.Processors
             foreach (var @class in context.Classes)
             {
                 if (!typeof(ISynapseCommand).IsAssignableFrom(@class)) continue;
-                var inf = @class.GetCustomAttribute<CommandInformations>();
+                var inf = @class.GetCustomAttribute<CommandInformation>();
                 if (inf == null) continue;
                 var classObject = Activator.CreateInstance(@class);
                 Handlers.RegisterCommand(classObject as ISynapseCommand, true);

@@ -44,7 +44,7 @@
     <Compile Include="Api\Events\ScpEvents.cs" />
     <Compile Include="Api\Items\PlayerInventory.cs" />
     <Compile Include="Api\Items\ItemManager.cs" />
-    <Compile Include="Api\Items\CustomItemInformations.cs" />
+    <Compile Include="Api\Items\CustomItemInformation.cs" />
     <Compile Include="Api\Items\SynapseItem.cs" />
     <Compile Include="Api\Roles\RoleManager.cs" />
     <Compile Include="Api\Roles\IRole.cs" />
@@ -86,7 +86,7 @@
     <Compile Include="Api\Scp106Controller.cs" />
     <Compile Include="Api\Tesla.cs" />
     <Compile Include="Command\CommandHandler.cs" />
-    <Compile Include="Command\CommandInformations.cs" />
+    <Compile Include="Command\CommandInformation.cs" />
     <Compile Include="Command\Commands\SynapseMapPointCommand.cs" />
     <Compile Include="Command\Commands\SynapseSetClassCommand.cs" />
     <Compile Include="Command\Commands\SynapseGiveCustomItemCommand.cs" />

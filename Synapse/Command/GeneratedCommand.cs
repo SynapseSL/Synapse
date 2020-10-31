@@ -23,7 +23,7 @@ namespace Synapse.Command
         public static GeneratedCommand FromSynapseCommand(ISynapseCommand command)
         {
             var type = command.GetType();
-            var cmdInf = type.GetCustomAttribute<CommandInformations>();
+            var cmdInf = type.GetCustomAttribute<CommandInformation>();
             return new GeneratedCommand
             {
                 OnCommand = command.Execute,

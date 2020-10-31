@@ -1,7 +1,7 @@
 ﻿namespace Synapse.Command.Commands
 {
 
-    [CommandInformations(
+    [CommandInformation(
         Name = "Reload",
         Aliases = new[] { "rl" },
         Description = "Reloads all Plugins and Features of Synapse",

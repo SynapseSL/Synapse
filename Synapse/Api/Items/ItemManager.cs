@@ -8,7 +8,7 @@ namespace Synapse.Api.Items
     {
         public const int HighestItem = (int)ItemType.PinkCandy;
 
-        private readonly List<CustomItemInformations> customItems = new List<CustomItemInformations>();
+        private readonly List<CustomItemInformation> customItems = new List<CustomItemInformation>();
 
         public ItemType GetBaseType(int id)
         {
@@ -30,9 +30,9 @@ namespace Synapse.Api.Items
             return item.Name;
         }
 
-        public CustomItemInformations GetInfo(int id) => customItems.FirstOrDefault(x => x.ID == id);
+        public CustomItemInformation GetInfo(int id) => customItems.FirstOrDefault(x => x.ID == id);
 
-        public void RegisterCustomItem(CustomItemInformations info)
+        public void RegisterCustomItem(CustomItemInformation info)
         {
             if (info.ID >= 0 && info.ID <= HighestItem)
                 throw new Exception("A Plugin tryied to register a CustomItem with an ID of a BaseGame Item");

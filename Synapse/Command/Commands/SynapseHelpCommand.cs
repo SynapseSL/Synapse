@@ -4,7 +4,7 @@ using System.Linq;
 namespace Synapse.Command.Commands
 {
     
-    [CommandInformations(
+    [CommandInformation(
         Name = "Help",
         Aliases = new[]{"h"},
         Description = "Shows all available commands with usage description",

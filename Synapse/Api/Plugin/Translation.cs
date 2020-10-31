@@ -7,16 +7,16 @@ namespace Synapse.Api.Plugin
 {
     public class Translation
     {
-        internal Translation(PluginInformation infos) => Informations = infos;
+        internal Translation(PluginInformation info) => Information = info;
 
         private Dictionary<string, string> _rawtranslation;
         private Dictionary<string, string> _translation = new Dictionary<string, string>();
-        internal PluginInformation Informations { private get; set; }
+        internal PluginInformation Information { private get; set; }
 
         public void CreateTranslations(Dictionary<string, string> translations)
         {
             _rawtranslation = translations;
-            var Path = SynapseController.Server.Files.GetTranslationFile(Informations);
+            var Path = SynapseController.Server.Files.GetTranslationFile(Information);
 
             if (!File.Exists(Path))
                 File.Create(Path).Close();

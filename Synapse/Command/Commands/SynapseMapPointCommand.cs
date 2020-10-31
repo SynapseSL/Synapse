@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Synapse.Command.Commands
 {
-    [CommandInformations(
+    [CommandInformation(
         Name = "MapPoint",
         Aliases = new [] { "GetMapPoint","MP" },
         Description = "A Command to get your Current Location as MapPoint",

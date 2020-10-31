@@ -54,7 +54,7 @@ namespace Synapse.Api
         public MapPoint(string mappointstring)
         {
             string[] args = mappointstring.Split(':');
-            if (args.Count() < 4) throw new IndexOutOfRangeException("Parsing of string to MapPoint failed because there was missing informations!He need to look like this: \"Roomname:1,434:-2,346456:1,6554\"");
+            if (args.Count() < 4) throw new IndexOutOfRangeException("Parsing of string to MapPoint failed because there was missing information!It needs to look like this: \"Roomname:1,434:-2,346456:1,6554\"");
             var room = SynapseController.Server.Map.Rooms.FirstOrDefault(r => r.RoomName.ToLower() == args[0].ToLower());
             if (room == null) throw new Exception("Parsing of string to MapPoint failed because of the roomname");
 
