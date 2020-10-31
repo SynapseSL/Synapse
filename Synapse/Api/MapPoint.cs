@@ -7,7 +7,7 @@ namespace Synapse.Api
     public class MapPoint
     {
         /// <summary>
-        /// Tries to Parse a string to a MapPoint
+        /// Tries to parse a string to a MapPoint
         /// </summary>
         /// <param name="mappointstring">The string you try to parse</param>
         /// <param name="mapPoint">The MapPoint you Parse</param>
@@ -73,17 +73,17 @@ namespace Synapse.Api
         public readonly Room Room;
 
         /// <summary>
-        /// The Relative Position of the MapPoint to the Room
+        /// The relative Position of the MapPoint to the Room
         /// </summary>
         public readonly Vector3 RelativePosition;
 
         /// <summary>
-        /// The Calculated end Position on the Map
+        /// The calculated end Position on the Map
         /// </summary>
         public Vector3 Position { get => Room.GameObject.transform.TransformPoint(RelativePosition); }
 
         /// <summary>
-        /// The MapPoint as a String
+        /// The MapPoint as a string
         /// </summary>
         /// <returns></returns>
         public override string ToString() => $"{Room.RoomName}:{RelativePosition.x}:{RelativePosition.y}:{RelativePosition.z}";

@@ -8,12 +8,12 @@ namespace Synapse.Api
         internal Decontamination() { }
 
         /// <summary>
-        /// Gives you the Decontamination Controller
+        /// Returns the Decontamination Controller
         /// </summary>
         public DecontaminationController Controller => DecontaminationController.Singleton;
 
         /// <summary>
-        /// Is the Decontamination Countdown disabled?
+        /// Returns whether the Decontamination Countdown is enabled
         /// </summary>
         public bool DisableDecontamination
         {
@@ -30,12 +30,12 @@ namespace Synapse.Api
         }
 
         /// <summary>
-        /// Is the Decontamination in Progress?
+        /// Returns whether the Decontamination is in Progress
         /// </summary>
         public bool IsDecontaminationInProgress => Controller._decontaminationBegun;
 
         /// <summary>
-        ///  Starts the Decontamination
+        /// Starts the Decontamination
         /// </summary>
         public void InstantStart() => Controller.FinishDecontamination();
     }

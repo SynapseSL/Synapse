@@ -8,10 +8,10 @@ namespace Synapse.Permission
 {
     public class SynapseGroup : IConfigSection
     {
-        [Description("If Enabled this Group will be assigned to all players,which are in no other Group")]
+        [Description("If Enabled this Group will be assigned to all players, which are in no other Group")]
         public bool Default = false;
 
-        [Description("If Enabled this Group will be assigned to Northwood staff players,which are in no other Group")]
+        [Description("If Enabled this Group will be assigned to Northwood staff players, which are in no other Group")]
         public bool Northwood = false;
 
         [Description("If Enabled this Group has Acces to RemoteAdmin")]
@@ -38,7 +38,7 @@ namespace Synapse.Permission
         [Description("The Permissions which the group has")]
         public List<string> Permissions = new List<string> { };
 
-        [Description("The UserID´s of the Players in the Group")]
+        [Description("The UserID's of the Players in the Group")]
         public List<string> Members = new List<string> { };
 
         public bool HasPermission(string permission)

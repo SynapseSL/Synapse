@@ -18,7 +18,7 @@
             if (!context.Player.HasPermission("synapse.command.reload"))
             {
                 result.State = CommandResultState.NoPermission;
-                result.Message = "You have no Permission to execute this Command!";
+                result.Message = "You don't have permission to use this command"; 
                 return result;
             }
 
@@ -26,12 +26,12 @@
             {
                 Server.Get.Reload();
                 result.State = CommandResultState.Ok;
-                result.Message = "Reloading was succesfully";
+                result.Message = "Reloading was successful";
             }
             catch
             {
                 result.State = CommandResultState.Error;
-                result.Message = "Error Occured while Reloading";
+                result.Message = "Error occured while reloading";
             }
 
             return result;

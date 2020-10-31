@@ -36,7 +36,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             else
             {
-                //This Code is a Backup for the Case a Plugin creates a item on its own
+                //This code is a backup for the case a Plugin creates a item on its own
                 __instance.SetPickup(syncItemInfo.id, syncItemInfo.durability,
                     __instance.transform.position, __instance.camera.transform.rotation, syncItemInfo.modSight,
                     syncItemInfo.modBarrel, syncItemInfo.modOther);

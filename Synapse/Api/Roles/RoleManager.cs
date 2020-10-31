@@ -36,7 +36,7 @@ namespace Synapse.Api.Roles
         {
             var role = (IRole)Activator.CreateInstance(typeof(TRole));
 
-            if (role.GetRoleID() >= 0 && role.GetRoleID() <= HighestRole) throw new Exception("A Plugin tried to register a CustomRole with an Id of an Vanilla RoleType");
+            if (role.GetRoleID() >= 0 && role.GetRoleID() <= HighestRole) throw new Exception("A Plugin tried to register a CustomRole with an Id of a vanilla RoleType");
 
             var pair = new KeyValuePair<string, int>(role.GetRoleName(), role.GetRoleID());
 

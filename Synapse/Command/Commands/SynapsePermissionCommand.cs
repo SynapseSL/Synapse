@@ -5,8 +5,8 @@ namespace Synapse.Command.Commands
     [CommandInformation(
         Name = "Permission",
         Aliases = new[] { "pm" },
-        Description = "A Command for managing the Permission System",
-        Usage = "Execute the command without paramater to get a Help",
+        Description = "A command to manage the Permission System",
+        Usage = "Execute the command without parameters for help",
         Permission = "none",
         Platforms = new[] { Platform.RemoteAdmin,Platform.ServerConsole }
     )]
@@ -73,7 +73,7 @@ namespace Synapse.Command.Commands
 
                 default:
                     result.Message = "All Permission Commands:" +
-                        "\nPermission me - Gives you informations about your Role" +
+                        "\nPermission me - Gives you information about your Role" +
                         "\nPermission groups - Gives you a List of All Groups" + 
                         "\nPermission setgroup {Group} {Player} - Sets a User group";
                     result.State = CommandResultState.Ok;
