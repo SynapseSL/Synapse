@@ -13,7 +13,7 @@ namespace Synapse.Api
         public DecontaminationController Controller => DecontaminationController.Singleton;
 
         /// <summary>
-        /// Returns whether Decontamination Countdown is enabled
+        /// Returns whether the Decontamination Countdown is enabled
         /// </summary>
         public bool DisableDecontamination
         {
@@ -30,7 +30,7 @@ namespace Synapse.Api
         }
 
         /// <summary>
-        /// Returns whether Decontamination is in Progress
+        /// Returns whether the Decontamination is in Progress
         /// </summary>
         public bool IsDecontaminationInProgress => Controller._decontaminationBegun;
 
