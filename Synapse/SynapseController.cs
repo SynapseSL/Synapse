@@ -1,6 +1,6 @@
 ﻿using System;
 using CommandSystem.Commands;
-using Harmony;
+using HarmonyLib;
 using Synapse.Api.Plugin;
 using Synapse.Command;
 
@@ -42,7 +42,7 @@ public class SynapseController
     {
         try
         {
-            var instance = HarmonyInstance.Create("Synapse.patches");
+            var instance = new Harmony("synapse.patches");
             instance.PatchAll();
             Server.Logger.Info("Harmony Patching was sucessfully!");
         }
@@ -55,5 +55,5 @@ public class SynapseController
     public const int SynapseMajor = 2;
     public const int SynapseMinor = 0;
     public const int SynapsePatch = 0;
-    public const string SynapseVersion = "2.0.0-pre8.1";
+    public const string SynapseVersion = "2.0.0-pre9";
 }

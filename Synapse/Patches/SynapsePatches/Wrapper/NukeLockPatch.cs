@@ -1,4 +1,4 @@
-﻿using Harmony;
+﻿using HarmonyLib;
 using Synapse.Api;
 
 namespace Synapse.Patches.SynapsePatches

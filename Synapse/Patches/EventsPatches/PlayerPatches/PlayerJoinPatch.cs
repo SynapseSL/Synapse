@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Harmony;
+using HarmonyLib;
 using Synapse.Api;
 using Synapse.Config;
 using Synapse.Database;

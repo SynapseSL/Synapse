@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Harmony;
+using HarmonyLib;
 using Scp914;
 using Synapse.Api;
 using Synapse.Api.Items;

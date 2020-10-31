@@ -1,5 +1,5 @@
 ﻿using System;
-using Harmony;
+using HarmonyLib;
 using Mirror;
 using UnityEngine;
 using EventHandler = Synapse.Api.Events.EventHandler;

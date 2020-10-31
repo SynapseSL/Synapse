@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using Logger = Synapse.Api.Logger;
-using Harmony;
+using HarmonyLib;
 using MEC;
 using Synapse.Api;
 using UnityEngine;
@@ -52,7 +52,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 
                 var result = default(RoundSummary.SumInfo_ClassList);
 
-                var endround = false;
+                bool endround;
 
                 foreach(var player in Server.Get.Players)
                 {
@@ -175,8 +175,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 
                     var timeToRoundRestart = Mathf.Clamp(GameCore.ConfigFile.ServerConfig.GetInt("auto_round_restart_time", 10), 5, 1000);
 
-                    if(instance != null)
-                        Map.Get.Round.ShowRoundSummary(result, leadingTeam);
+                    Map.Get.Round.ShowRoundSummary(result, leadingTeam);
 
                     for (int j = 0; j < 50 * timeToRoundRestart; j++)
                         yield return 0f;

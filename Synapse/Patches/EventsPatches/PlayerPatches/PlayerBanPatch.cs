@@ -1,6 +1,6 @@
 ﻿using System;
 using GameCore;
-using Harmony;
+using HarmonyLib;
 using Synapse.Api;
 using UnityEngine;
 

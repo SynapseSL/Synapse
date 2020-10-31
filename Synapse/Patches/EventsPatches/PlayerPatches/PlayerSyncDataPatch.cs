@@ -1,5 +1,5 @@
 ﻿using System;
-using Harmony;
+using HarmonyLib;
 using Synapse.Api;
 using UnityEngine;
 using Logger = Synapse.Api.Logger;

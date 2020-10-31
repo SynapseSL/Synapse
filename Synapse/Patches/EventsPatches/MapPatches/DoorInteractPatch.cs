@@ -1,5 +1,5 @@
 ﻿using System;
-using Harmony;
+using HarmonyLib;
 using System.Collections.Generic;
 using Logger = Synapse.Api.Logger;
 using EventHandler = Synapse.Api.Events.EventHandler;

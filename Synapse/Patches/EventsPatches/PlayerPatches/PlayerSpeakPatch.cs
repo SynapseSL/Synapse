@@ -1,7 +1,7 @@
 ﻿using System;
 using Assets._Scripts.Dissonance;
 using GameCore;
-using Harmony;
+using HarmonyLib;
 using Synapse.Api;
 
 // ReSharper disable All

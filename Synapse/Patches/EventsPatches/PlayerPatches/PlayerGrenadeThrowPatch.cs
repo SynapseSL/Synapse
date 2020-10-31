@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Grenades;
-using Harmony;
+using HarmonyLib;
 using Mirror;
 using Synapse.Api.Events.SynapseEventArguments;
 using UnityEngine;

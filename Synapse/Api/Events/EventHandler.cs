@@ -81,7 +81,8 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha9:
-                    Api.Map.Get.Explode(ev.Player.Position + Vector3.up * 10);
+                    Respawning.RespawnEffectsController.ExecuteAllEffects(Respawning.RespawnEffectsController.EffectType.Selection, Respawning.SpawnableTeamType.ChaosInsurgency);
+                    Respawning.RespawnEffectsController.ExecuteAllEffects(Respawning.RespawnEffectsController.EffectType.Selection, Respawning.SpawnableTeamType.NineTailedFox);
                     break;
 
                 case KeyCode.Alpha0:

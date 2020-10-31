@@ -1,5 +1,5 @@
 ﻿using System;
-using Harmony;
+using HarmonyLib;
 using UnityEngine;
 
 // ReSharper disable All

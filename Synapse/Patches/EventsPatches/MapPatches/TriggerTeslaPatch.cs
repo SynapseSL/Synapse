@@ -1,5 +1,5 @@
 ﻿using System;
-using Harmony;
+using HarmonyLib;
 using System.Collections.Generic;
 using Synapse.Api;
 using System.Linq;

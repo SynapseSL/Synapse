@@ -1,7 +1,6 @@
 ﻿using System;
-using Harmony;
+using HarmonyLib;
 using Mirror;
-using Synapse.Api;
 using Synapse.Api.Enum;
 using UnityEngine;
 using Logger = Synapse.Api.Logger;

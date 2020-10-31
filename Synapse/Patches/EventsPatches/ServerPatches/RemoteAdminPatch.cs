@@ -1,5 +1,5 @@
 ﻿using System;
-using Harmony;
+using HarmonyLib;
 using RemoteAdmin;
 
 namespace Synapse.Patches.EventsPatches.ServerPatches

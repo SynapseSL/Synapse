@@ -1,5 +1,5 @@
 ﻿using System;
-using Harmony;
+using HarmonyLib;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.SynapsePatches.ItemPatches

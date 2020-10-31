@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Harmony;
+using HarmonyLib;
 using MEC;
 using Mirror;
 using Synapse.Api;

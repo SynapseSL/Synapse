@@ -1,5 +1,5 @@
 ﻿using System;
-using Harmony;
+using HarmonyLib;
 
 namespace Synapse.Patches.EventsPatches.RoundPatches
 {
