@@ -39,7 +39,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
         {
             while(instance != null)
             {
-                while (Map.Get.Round.RoundLock || !RoundSummary.RoundInProgress() || (instance._keepRoundOnOne && Server.Get.Players.Count < 2))
+                while (Map.Get.Round.RoundLock || !RoundSummary.RoundInProgress() || (instance._keepRoundOnOne && Server.Get.Players.Count < 2) || Map.Get.Round.RoundLength.TotalSeconds <= 3)
                     yield return Timing.WaitForOneFrame;
 
                 var teams = new List<Team>();
