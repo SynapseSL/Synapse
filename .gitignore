@@ -8,3 +8,4 @@ riderModule.iml
 *.user
 /Synapse/Api/Events/SynapseEvents.cs
 Synapse.nuspec
+*.nupkg
