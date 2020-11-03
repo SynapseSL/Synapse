@@ -8,18 +8,18 @@ namespace Synapse.Api
     public class Dummy
     {
         private ItemType helditem;
-        private GameObject gameObject;
+        public GameObject GameObject { get; internal set; }
 
         /// <summary>
         /// Get / Set the current Role of the Dummy
         /// </summary>
         public RoleType Role
         {
-            get => gameObject.GetComponent<CharacterClassManager>().CurClass;
+            get => GameObject.GetComponent<CharacterClassManager>().CurClass;
             set
             {
                 Despawn();
-                gameObject.GetComponent<CharacterClassManager>().CurClass = value;
+                GameObject.GetComponent<CharacterClassManager>().CurClass = value;
                 Spawn();
             }
         }
@@ -29,8 +29,8 @@ namespace Synapse.Api
         /// </summary>
         public string Name
         {
-            get => gameObject.GetComponent<NicknameSync>().Network_myNickSync;
-            set => gameObject.GetComponent<NicknameSync>().Network_myNickSync = value;
+            get => GameObject.GetComponent<NicknameSync>().Network_myNickSync;
+            set => GameObject.GetComponent<NicknameSync>().Network_myNickSync = value;
         }
 
         /// <summary>
@@ -38,11 +38,11 @@ namespace Synapse.Api
         /// </summary>
         public Vector3 Position
         {
-            get => gameObject.transform.position;
+            get => GameObject.transform.position;
             set
             {
                 Despawn();
-                gameObject.transform.position = value;
+                GameObject.transform.position = value;
                 Spawn();
             }
         }
@@ -52,11 +52,11 @@ namespace Synapse.Api
         /// </summary>
         public Vector3 Scale
         {
-            get => gameObject.transform.localScale;
+            get => GameObject.transform.localScale;
             set
             {
                 Despawn();
-                gameObject.transform.localScale = value;
+                GameObject.transform.localScale = value;
                 Spawn();
             }
         }
@@ -69,7 +69,7 @@ namespace Synapse.Api
             get => helditem;
             set
             {
-                gameObject.GetComponent<Inventory>().SetCurItem(value);
+                GameObject.GetComponent<Inventory>().SetCurItem(value);
                 helditem = value;
             }
         }
@@ -79,8 +79,8 @@ namespace Synapse.Api
         /// </summary>
         public string BadgeName
         {
-            get => gameObject.GetComponent<ServerRoles>().MyText;
-            set => gameObject.GetComponent<ServerRoles>().SetText(value);
+            get => GameObject.GetComponent<ServerRoles>().MyText;
+            set => GameObject.GetComponent<ServerRoles>().SetText(value);
         }
 
         /// <summary>
@@ -88,8 +88,8 @@ namespace Synapse.Api
         /// </summary>
         public string BadgeColor
         {
-            get => gameObject.GetComponent<ServerRoles>().MyColor;
-            set => gameObject.GetComponent<ServerRoles>().SetColor(value);
+            get => GameObject.GetComponent<ServerRoles>().MyColor;
+            set => GameObject.GetComponent<ServerRoles>().SetColor(value);
         }
 
         /// <summary>
@@ -110,12 +110,12 @@ namespace Synapse.Api
             if (obj.GetComponent<Player>() == null)
                 obj.AddComponent<Player>();
 
-            gameObject = obj;
+            GameObject = obj;
 
             obj.GetComponent<CharacterClassManager>().CurClass = role;
             obj.GetComponent<NicknameSync>().Network_myNickSync = name;
-            gameObject.GetComponent<ServerRoles>().MyText = badgetext;
-            gameObject.GetComponent<ServerRoles>().MyColor = badgecolor;
+            GameObject.GetComponent<ServerRoles>().MyText = badgetext;
+            GameObject.GetComponent<ServerRoles>().MyColor = badgecolor;
             obj.transform.localScale = Vector3.one;
             obj.transform.position = pos;
             obj.transform.rotation = rot;
@@ -129,16 +129,16 @@ namespace Synapse.Api
         /// <summary>
         /// Despawns the Dummy
         /// </summary>
-        public void Despawn() => NetworkServer.UnSpawn(gameObject);
+        public void Despawn() => NetworkServer.UnSpawn(GameObject);
 
         /// <summary>
         /// Spawns the Dummy again after Despawning
         /// </summary>
-        public void Spawn() => NetworkServer.Spawn(gameObject);
+        public void Spawn() => NetworkServer.Spawn(GameObject);
 
         /// <summary>
         /// Destroys the Object
         /// </summary>
-        public void Destroy() => Object.Destroy(gameObject);
+        public void Destroy() => Object.Destroy(GameObject);
     }
 }

@@ -485,20 +485,77 @@ namespace Synapse.Api
 
         public uint Ammo5 
         { 
-            get => AmmoBox[0]; 
-            set => AmmoBox[0] = value; 
+            get
+            {
+                try
+                {
+                    return AmmoBox[0];
+                }
+                catch
+                {
+                    return 0;
+                }
+            }
+            set
+            {
+                try
+                {
+                    AmmoBox[0] = value;
+                }
+                catch
+                {
+                }
+            }
         }
 
-        public uint Ammo7 
-        { 
-            get => AmmoBox[1]; 
-            set => AmmoBox[1] = value; 
+        public uint Ammo7
+        {
+            get
+            {
+                try
+                {
+                    return AmmoBox[1];
+                }
+                catch
+                {
+                    return 0;
+                }
+            }
+            set
+            {
+                try
+                {
+                    AmmoBox[1] = value;
+                }
+                catch
+                {
+                }
+            }
         }
 
-        public uint Ammo9 
-        { 
-            get => AmmoBox[2]; 
-            set => AmmoBox[2] = value; 
+        public uint Ammo9
+        {
+            get
+            {
+                try
+                {
+                    return AmmoBox[2];
+                }
+                catch
+                {
+                    return 0;
+                }
+            }
+            set
+            {
+                try
+                {
+                    AmmoBox[2] = value;
+                }
+                catch
+                {
+                }
+            }
         }
 
         public UserGroup Rank 

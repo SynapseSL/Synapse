@@ -81,8 +81,8 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha9:
-                    Respawning.RespawnEffectsController.ExecuteAllEffects(Respawning.RespawnEffectsController.EffectType.Selection, Respawning.SpawnableTeamType.ChaosInsurgency);
-                    Respawning.RespawnEffectsController.ExecuteAllEffects(Respawning.RespawnEffectsController.EffectType.Selection, Respawning.SpawnableTeamType.NineTailedFox);
+                    Api.Map.Get.WalkSpeed = 10f;
+                    Api.Map.Get.SprintSpeed = 100f;
                     break;
 
                 case KeyCode.Alpha0:

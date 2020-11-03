@@ -52,6 +52,24 @@ namespace Synapse.Api
             }
         }
 
+        public Vector3 RespawnPoint
+        {
+            get => NonFacilityCompatibility.currentSceneSettings.constantRespawnPoint;
+            set => NonFacilityCompatibility.currentSceneSettings.constantRespawnPoint = value;
+        }
+
+        public float WalkSpeed
+        {
+            get => ServerConfigSynchronizer.Singleton.NetworkHumanWalkSpeedMultiplier;
+            set => ServerConfigSynchronizer.Singleton.NetworkHumanWalkSpeedMultiplier = value;
+        }
+
+        public float SprintSpeed
+        {
+            get => ServerConfigSynchronizer.Singleton.NetworkHumanSprintSpeedMultiplier;
+            set => ServerConfigSynchronizer.Singleton.NetworkHumanSprintSpeedMultiplier = value;
+        }
+
         public int Seed => RandomSeedSync.staticSeed;
 
         public Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "") 
