@@ -15,7 +15,7 @@ namespace Synapse.Api
             ragdoll = gameobject.GetComponent<global::Ragdoll>();
             ragdoll.Networkowner = new global::Ragdoll.Info(owner.GetComponent<Dissonance.Integrations.MirrorIgnorance.MirrorIgnorancePlayer>().PlayerId, owner.NickName, info,role, owner.PlayerId);
             ragdoll.NetworkallowRecall = allowRecall;
-            ragdoll.RpcSyncVelo(velocity);
+            ragdoll.NetworkPlayerVelo = velocity;
             Map.Get.Ragdolls.Add(this);
         }
 

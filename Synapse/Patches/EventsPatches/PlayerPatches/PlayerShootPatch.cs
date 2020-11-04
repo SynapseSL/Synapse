@@ -9,7 +9,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     [HarmonyPatch(typeof(WeaponManager),nameof(WeaponManager.CallCmdShoot))]
     internal static class PlayerShootPatch
     {
-        private static bool Prefix(WeaponManager __instance, GameObject target, string hitboxType, Vector3 dir, Vector3 sourcePos, Vector3 targetPos)
+        private static bool Prefix(WeaponManager __instance, GameObject target, Vector3 targetPos)
         {
             try
             {

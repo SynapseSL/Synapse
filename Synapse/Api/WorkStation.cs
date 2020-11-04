@@ -23,7 +23,7 @@ namespace Synapse.Api
             offset.scale = Vector3.one;
             workStation = bench.GetComponent<global::WorkStation>();
             workStation.Networkposition = offset;
-            bench.AddComponent<WorkStationUpgrader>();
+            //bench.AddComponent<WorkStationUpgrader>();
 
             Map.Get.WorkStations.Add(this);
         }

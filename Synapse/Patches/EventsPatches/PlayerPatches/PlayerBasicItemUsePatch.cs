@@ -94,9 +94,6 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             if (usableitem.artificialHealth > 0)
                 player.ArtificialHealth += usableitem.artificialHealth;
 
-            //Adding Stamina
-            if (usableitem.instantStamina > 0)
-                player.Stamina += usableitem.instantStamina;
 
             //Give Effects
             foreach (var effectstring in usableitem.effectsToInitialize)
