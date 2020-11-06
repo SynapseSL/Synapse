@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using HarmonyLib;
+using Synapse.Api;
 using UnityEngine;
 
 // ReSharper disable All
@@ -15,11 +17,13 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 if (go == null) return;
                 
                 var killer = __instance.GetPlayer();
+                var player = go.GetPlayer();
 
                 if (info.GetDamageType() == DamageTypes.Grenade)
                     killer = SynapseController.Server.GetPlayer(info.PlayerId);
 
-                var player = go.GetPlayer();
+                if (info.GetDamageType() == DamageTypes.Pocket)
+                    killer = Server.Get.Players.FirstOrDefault(x => x.Scp106Controller.PocketPlayers.Contains(player));
 
                 if (player.GodMode) return;
 
@@ -28,8 +32,10 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 if(player.Health + player.ArtificialHealth - info.Amount <= 0)
                 {
                     SynapseController.Server.Events.Player.InvokePlayerDeathEvent(player, killer, info);
-                    if (player.CustomRole != null)
-                        player.CustomRole = null;
+
+                    if (killer != null && killer.Scp106Controller.PocketPlayers.Contains(player))
+                        killer.Scp106Controller.PocketPlayers.Remove(player);
+                    player.CustomRole = null;
                 }
             }
             catch (Exception e)

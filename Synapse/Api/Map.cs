@@ -79,7 +79,7 @@ namespace Synapse.Api
 
         public Ragdoll CreateRagdoll(RoleType roletype, Vector3 pos, Quaternion rot, Vector3 velocity, PlayerStats.HitInfo info, bool allowRecall, Player owner) => new Ragdoll(roletype, pos, rot, velocity, info, allowRecall, owner);
 
-        public void SendBroadcast(ushort time,string message,bool instant)
+        public void SendBroadcast(ushort time,string message,bool instant = false)
         {
             foreach (var ply in Server.Get.Players)
                 ply.SendBroadcast(time, message, instant);

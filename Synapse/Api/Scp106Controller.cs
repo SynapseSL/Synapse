@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Synapse.Api
 {
@@ -17,6 +18,8 @@ namespace Synapse.Api
         public bool Is106 => player.RoleType == RoleType.Scp106;
 
         public Vector3 PortalPosition { get => script.NetworkportalPosition; set => script.SetPortalPosition(value); }
+
+        public List<Player> PocketPlayers { get; } = new List<Player>();
 
 
         public void UsePortal() => script.UseTeleport();

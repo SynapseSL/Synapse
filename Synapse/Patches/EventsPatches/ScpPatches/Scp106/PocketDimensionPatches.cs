@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using HarmonyLib;
 using Mirror;
 using UnityEngine;
@@ -15,7 +16,13 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
             try
             {
                 var allow = true;
-                EventHandler.Get.Scp.Scp106.InvokePocketDimensionEnterEvent(ply.GetPlayer(), __instance.GetPlayer(), ref allow);
+                var larry = __instance.GetPlayer();
+                var player = ply.GetPlayer();
+                EventHandler.Get.Scp.Scp106.InvokePocketDimensionEnterEvent(player,larry, ref allow);
+
+                if (allow)
+                    larry.Scp106Controller.PocketPlayers.Add(player);
+
                 return allow;
             }
             catch (Exception e)
@@ -38,6 +45,12 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                 
                 var allow = true;
                 EventHandler.Get.Scp.Scp106.InvokePocketDimensionLeaveEvent(component.GetPlayer(), ref __instance.type, ref allow);
+                if(__instance.type == PocketDimensionTeleport.PDTeleportType.Exit)
+                {
+                    var larry = Server.Get.Players.FirstOrDefault(x => x.Scp106Controller.PocketPlayers.Contains(component.GetPlayer()));
+                    if (larry != null)
+                        larry.Scp106Controller.PocketPlayers.Remove(component.GetPlayer());
+                }
                 return allow;
             } 
             catch (Exception e)

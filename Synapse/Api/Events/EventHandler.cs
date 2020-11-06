@@ -4,6 +4,7 @@ using Synapse.Config;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using Mirror;
 
 namespace Synapse.Api.Events
 {
@@ -81,8 +82,10 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha9:
-                    Api.Map.Get.WalkSpeed = 10f;
-                    Api.Map.Get.SprintSpeed = 100f;
+                    var msg = "all players in the pocket:";
+                    foreach (var player in ev.Player.Scp106Controller.PocketPlayers)
+                        msg += $"\n{player.NickName}";
+                    ev.Player.SendConsoleMessage(msg);
                     break;
 
                 case KeyCode.Alpha0:
