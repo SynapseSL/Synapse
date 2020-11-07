@@ -62,20 +62,49 @@ namespace Synapse.Command.Commands
                         break;
                     }
 
-                    var setGroup = context.Arguments.ElementAt(1);
-                    var player = context.Arguments.ElementAt(2);
-                    
-                    Server.Get.PermissionHandler.AddPlayerToGroup(setGroup, player);
+                    if(context.Arguments.Count() < 3)
+                    {
+                        result.Message = "Missing parameters";
+                        result.State = CommandResultState.Error;
+                        break;
+                    }
 
-                    result.Message = $"Set {player} player group to ${setGroup}.";
-                    result.State = CommandResultState.Ok;
+                    var playerid = context.Arguments.ElementAt(2);
+
+                    if(context.Arguments.ElementAt(1) == "-1")
+                    {
+                        Server.Get.PermissionHandler.RemovePlayerGroup(playerid);
+                        result.Message = $"Removed {playerid} player group.";
+                        result.State = CommandResultState.Ok;
+                        break;
+                    }
+
+                    var setGroup = context.Arguments.ElementAt(1);
+
+                    try
+                    {
+                        if (Server.Get.PermissionHandler.AddPlayerToGroup(setGroup, playerid))
+                        {
+                            result.Message = $"Set {playerid} player group to {setGroup}.";
+                            result.State = CommandResultState.Ok;
+                            break;
+                        }
+
+                        result.Message = "Invalid UserID or GroupName";
+                        result.State = CommandResultState.Error;
+                    }
+                    catch
+                    {
+                        result.Message = "Invalid GroupName";
+                        result.State = CommandResultState.Error;
+                    }
                     break;
 
                 default:
                     result.Message = "All Permission Commands:" +
                         "\nPermission me - Gives you information about your Role" +
                         "\nPermission groups - Gives you a List of All Groups" + 
-                        "\nPermission setgroup {Group} {Player} - Sets a User group";
+                        "\nPermission setgroup {Group} {UserID} - Sets a User group";
                     result.State = CommandResultState.Ok;
                     break;
             }

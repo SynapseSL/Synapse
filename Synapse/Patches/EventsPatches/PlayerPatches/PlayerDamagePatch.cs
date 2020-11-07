@@ -33,8 +33,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 {
                     SynapseController.Server.Events.Player.InvokePlayerDeathEvent(player, killer, info);
 
-                    if (killer != null && killer.Scp106Controller.PocketPlayers.Contains(player))
-                        killer.Scp106Controller.PocketPlayers.Remove(player);
+                    foreach (var ply in Server.Get.GetPlayers(x => x.Scp106Controller.PocketPlayers.Contains(player)))
+                        ply.Scp106Controller.PocketPlayers.Remove(player);
+
                     player.CustomRole = null;
                 }
             }

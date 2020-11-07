@@ -121,22 +121,54 @@ namespace Synapse.Permission
 
         public SynapseGroup GetNorthwoodGroup() => Groups.Values.FirstOrDefault(x => x.Northwood);
 
-        public void AddPlayerToGroup(string groupname, string player)
+        public bool AddPlayerToGroup(string groupname, string userid)
         {
             var group = GetServerGroup(groupname);
 
             if (group == null)
             {
                 Logger.Get.Warn($"Group {groupname} does not exist!");
-                return;
+                return false;
             }
-            
-            group.Members.Add(player);
+
+            if (!userid.Contains("@"))
+                return false;
+
+            RemovePlayerGroup(userid);
+
+            if (group.Members == null)
+                group.Members = new List<string>();
+
+            group.Members.Add(userid);
             
             _permissionSYML.Sections[groupname].Import(group);
             _permissionSYML.Store();
             
             Reload();
+
+            return true;
+        }
+
+        public bool RemovePlayerGroup(string userid)
+        {
+            if (!userid.Contains("@"))
+                return false;
+
+            var safe = false;
+            foreach(var group in Groups.Where(x => x.Value.Members != null && x.Value.Members.Contains(userid)))
+            {
+                group.Value.Members.Remove(userid);
+                _permissionSYML.Sections[group.Key].Import(group.Value);
+                safe = true;
+            }
+
+            if (safe)
+            {
+                _permissionSYML.Store();
+                Reload();
+            }
+
+            return true;
         }
     }
 }
