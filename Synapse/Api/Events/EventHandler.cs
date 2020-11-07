@@ -89,7 +89,7 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha0:
-                    ev.Player.GiveEffect(Enum.Effect.Discharge);
+                    ev.Player.Invisible = !ev.Player.Invisible;
                     break;
 
                 case KeyCode.U:

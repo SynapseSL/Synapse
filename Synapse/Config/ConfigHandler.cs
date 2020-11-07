@@ -54,6 +54,7 @@ namespace Synapse.Config
         public void Reload()
         {
             _syml.Load();
+            SynapseConfiguration = _syml.GetOrSetDefault("Synapse", new SynapseConfiguration());
             SynapseTranslation.ReloadTranslations();
         }
     }

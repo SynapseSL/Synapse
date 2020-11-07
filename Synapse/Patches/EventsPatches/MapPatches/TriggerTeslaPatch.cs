@@ -23,6 +23,9 @@ namespace Synapse.Patches.EventsPatches.MapPatches
                     if (Vector3.Distance(Tesla.Position, player.Position) > Tesla.SizeOfTrigger || player.IsDead) 
                         continue;
 
+                    if (player.Invisible)
+                        continue;
+
                     SynapseController.Server.Events.Map.InvokeTriggerTeslaEv(player, Tesla, hurtRange, out var trigger);
 
                     if (trigger) __result.Add(player.PlayerStats);

@@ -12,7 +12,12 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
         {
             try
             {
-                Server.Get.Events.Scp.Scp096.InvokeScpTargetEvent(info.Source.GetPlayer(), __instance.GetPlayer(), __instance.PlayerState, out var allow);
+                var player = info.Source == null ? null : info.Source.GetPlayer();
+
+                if (player.Invisible)
+                    return false;
+
+                Server.Get.Events.Scp.Scp096.InvokeScpTargetEvent(player, __instance.GetPlayer(), __instance.PlayerState, out var allow);
                 return allow;
             }
             catch (Exception e)
@@ -30,7 +35,12 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
         {
             try
             {
-                Server.Get.Events.Scp.Scp096.InvokeScpTargetEvent(info.RHub.GetPlayer(), __instance.GetPlayer(), __instance.PlayerState, out var allow);
+                var player = info.RHub.GetPlayer();
+
+                if (player.Invisible)
+                    return false;
+
+                Server.Get.Events.Scp.Scp096.InvokeScpTargetEvent(player, __instance.GetPlayer(), __instance.PlayerState, out var allow);
                 return allow;
             }
             catch (Exception e)

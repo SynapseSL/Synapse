@@ -40,5 +40,8 @@ namespace Synapse.Config
 
         [Description("If enabled custom Scps such as 035 can trigger Scp096's rage")]
         public bool ScpTrigger096 = false;
+
+        [Description("If Enabled Scp-079 and Scp-096 can't see the Player who is wearing Scp-268")]
+        public bool Better268 = false;
     }
 }

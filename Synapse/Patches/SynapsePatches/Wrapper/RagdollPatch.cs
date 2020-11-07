@@ -10,7 +10,7 @@ namespace Synapse.Patches.SynapsePatches.Wrapper
     {
         private static bool Prefix(RagdollManager __instance,Vector3 pos, Quaternion rot, Vector3 velocity, int classId, global::PlayerStats.HitInfo ragdollInfo, bool allowRecall, string ownerID, string ownerNick, int playerId)
         {
-			global::Role role = __instance.hub.characterClassManager.Classes.SafeGet(classId);
+			Role role = __instance.hub.characterClassManager.Classes.SafeGet(classId);
 			if (role.model_ragdoll == null)
 				return false;
 

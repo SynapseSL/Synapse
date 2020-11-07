@@ -355,6 +355,8 @@ namespace Synapse.Api
             set => ClassManager.GodMode = value;
         }
 
+        public bool Invisible { get; set; }
+
         public Vector3 Position
         {
             get => PlayerMovementSync.GetRealPosition();

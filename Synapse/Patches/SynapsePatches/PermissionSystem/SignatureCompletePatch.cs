@@ -5,7 +5,7 @@ namespace Synapse.Patches.SynapsePatches.PermissionSystem
 {
     internal class SignatureCompletePatch
     {
-        private void Postfix(ServerRoles __instance, string challenge, string response, string publickey, bool hide)
+        private void Postfix(ServerRoles __instance, string challenge)
         {
             try
             {
