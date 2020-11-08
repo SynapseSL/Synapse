@@ -43,7 +43,7 @@ namespace SynapseInjector
                 " __)  \\/  | |  (_|  |_)  _>  (/_ \n" +
                 "      /             |            \n\n" +
                 $"SynapseVersion {syn.GetName().Version}\n" +
-                //$"LoaderVersion: {Assembly.GetExecutingAssembly().GetName().Version}\n" + // <- this is always 0.0.0.0 because of SL's Assembly being 0.0.0.0
+                $"LoaderVersion: 1.0.0.0\n" +
                 $"RuntimeVersion: {Assembly.GetExecutingAssembly().ImageRuntimeVersion}\n\n" +
                 string.Join("\n", dep.Select(assembly => $"{assembly.GetName().Name}: {assembly.GetName().Version}").ToList()) + "\n" +
                 "-------------------===Loader===-------------------", ConsoleColor.Yellow);
