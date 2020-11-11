@@ -11,6 +11,23 @@ namespace Synapse.Api.Events
             Player.PlayerJoinEvent += PlayerJoin;
             Player.PlayerSyncDataEvent += PlayerSyncData;
             Map.DoorInteractEvent += DoorInteract;
+#if DEBUG
+            Player.PlayerKeyPressEvent += KeyPress;
+#endif
+        }
+
+        private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
+        {
+            switch (ev.KeyCode)
+            {
+                case KeyCode.Alpha1:
+                    ev.Player.Jail.JailPlayer(ev.Player);
+                    break;
+
+                case KeyCode.Alpha2:
+                    ev.Player.Jail.UnJailPlayer();
+                    break;
+            }
         }
 
         public static EventHandler Get => SynapseController.Server.Events;
@@ -31,7 +48,7 @@ namespace Synapse.Api.Events
         {
         }
 
-        #region HookedEvents
+#region HookedEvents
         private SynapseConfiguration conf => SynapseController.Server.Configs.SynapseConfiguration;
 
         private void PlayerJoin(SynapseEventArguments.PlayerJoinEventArgs ev)
@@ -62,6 +79,6 @@ namespace Synapse.Api.Events
                     ev.Allow = true;
             }
         }
-        #endregion
+#endregion
     }
 }

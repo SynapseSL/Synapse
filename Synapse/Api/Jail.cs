@@ -52,7 +52,7 @@ namespace Synapse.Api
 
             Player.RoleType = RoleType.Tutorial;
 
-            IsJailed = true;
+            isjailed = true;
         }
 
         public void UnJailPlayer()
@@ -67,7 +67,7 @@ namespace Synapse.Api
             foreach (var item in Items)
                 Player.Inventory.AddItem(item);
 
-            IsJailed = false;
+            isjailed = false;
         }
     }
 }
