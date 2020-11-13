@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Hints;
 using Mirror;
 using Mirror.LiteNetLib4Mirror;
@@ -391,7 +392,8 @@ namespace Synapse.Api
                     transform.localScale = value;
 
                     foreach(var player in SynapseController.Server.Players)
-                        typeof(NetworkServer).GetMethod("SendSpawnMessage")?.Invoke(null, new object[] { GetComponent<NetworkIdentity>(), player.Connection});
+                        typeof(NetworkServer).GetMethod("SendSpawnMessage", BindingFlags.Instance | BindingFlags.InvokeMethod
+                        | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public)?.Invoke(null, new object[] { GetComponent<NetworkIdentity>(), player.Connection});
                 }
                 catch (Exception e)
                 {
