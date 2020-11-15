@@ -54,6 +54,6 @@ public class SynapseController
 
     public const int SynapseMajor = 2;
     public const int SynapseMinor = 0;
-    public const int SynapsePatch = 1;
-    public const string SynapseVersion = "2.0.0";
+    public const int SynapsePatch = 2;
+    public const string SynapseVersion = "2.0.2";
 }

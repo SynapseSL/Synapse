@@ -167,6 +167,9 @@ namespace Synapse.Api
 
         public Broadcast SendBroadcast(ushort time,string message,bool instant = false)
         {
+            if(this == Server.Get.Host)
+                Logger.Get.Send($"Broadcast: {message}", ConsoleColor.White);
+
             var bc = new Broadcast(message, time,this);
             ActiveBroadcasts.Add(bc, instant);
             return bc;

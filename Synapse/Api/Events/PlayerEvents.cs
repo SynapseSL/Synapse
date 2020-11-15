@@ -32,7 +32,7 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<PlayerHealEventArgs> PlayerHealEvent;
 
-        public event EventHandler.OnSynapseEvent<PlayerEscapeEventArgs> PlayerEscapseEvent;
+        public event EventHandler.OnSynapseEvent<PlayerEscapeEventArgs> PlayerEscapesEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerSyncDataEventArgs> PlayerSyncDataEvent;
 
@@ -168,7 +168,7 @@ namespace Synapse.Api.Events
                 IsCuffed = isCuffed,
                 SpawnRole = spawnRoleType
             };
-            PlayerEscapseEvent?.Invoke(ev);
+            PlayerEscapesEvent?.Invoke(ev);
 
             spawnRoleType = ev.SpawnRole;
             allow = ev.Allow;
