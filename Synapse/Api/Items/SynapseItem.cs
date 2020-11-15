@@ -56,6 +56,20 @@ namespace Synapse.Api.Items
 
         public readonly string Name;
 
+        public Enum.ItemState State
+        {
+            get
+            {
+                if (deactivated) return Enum.ItemState.Destroyed;
+
+                if (ItemHolder != null) return Enum.ItemState.Inventory;
+
+                if (pickup != null) return Enum.ItemState.Map;
+
+                return Enum.ItemState.Despawned;
+            }
+        }
+
         public Player ItemHolder { get; private set; }
 
         private float durabillity;

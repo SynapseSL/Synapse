@@ -102,6 +102,8 @@ namespace Synapse.Api
             Hub.serverRoles.TargetCloseRemoteAdmin(Connection);
         }
 
+        public void Heal(float hp) => PlayerStats.HealHPAmount(hp);
+
         public void Hurt(int amount, DamageTypes.DamageType damagetype = default, Player attacker = null) =>
             PlayerStats.HurtPlayer(new PlayerStats.HitInfo(amount, attacker == null ? "WORLD" : attacker.NickName, damagetype, attacker == null ? 0 : attacker.PlayerId), gameObject);
 
@@ -635,9 +637,9 @@ namespace Synapse.Api
 
         public bool IsDead => Team == Team.RIP;
 
-        public bool IsZooming => Hub.weaponManager.ZoomInProgress();
+        public bool IsZooming => WeaponManager.ZoomInProgress();
 
-        public bool IsReloading => Hub.weaponManager.IsReloading();
+        public bool IsReloading => WeaponManager.IsReloading();
 
         public bool IsCuffed => Cuffer != null;
 
@@ -664,6 +666,8 @@ namespace Synapse.Api
 
         #region ReferenceHub
         public Transform CameraReference => Hub.PlayerCameraReference;
+
+        public WeaponManager WeaponManager => Hub.weaponManager;
 
         public AmmoBox AmmoBox => Hub.ammoBox;
 
