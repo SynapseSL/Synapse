@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Linq;
 
 namespace Synapse.Api
 {
@@ -17,6 +18,8 @@ namespace Synapse.Api
         public bool Open { get => door.isOpen; set => door.SetState(value); }
 
         public bool Locked { get => door.locked; set => door.SetLock(value); }
+
+        public Room Room { get => Map.Get.Rooms.OrderBy(x => Vector3.Distance(x.Position, Position)).FirstOrDefault(); }
 
         public global::Door.AccessRequirements PermissionLevels { get => door.PermissionLevels; set => door.PermissionLevels = value; }
     }
