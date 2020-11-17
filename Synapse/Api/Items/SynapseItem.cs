@@ -185,9 +185,7 @@ namespace Synapse.Api.Items
 
             if (ItemHolder != null) return;
 
-            if (player.VanillaItems.Count >= 8) return;
-
-            if(!IsCustomItem && (ItemType == ItemType.Ammo556 || ItemType == ItemType.Ammo762 || ItemType == ItemType.Ammo9mm))
+            if (!IsCustomItem && (ItemType == ItemType.Ammo556 || ItemType == ItemType.Ammo762 || ItemType == ItemType.Ammo9mm))
             {
                 switch (ItemType)
                 {
@@ -207,6 +205,8 @@ namespace Synapse.Api.Items
                 Destroy();
                 return;
             }
+
+            if (player.VanillaItems.Count >= 8) return;
 
             Inventory._uniqId++;
             itemInfo = new Inventory.SyncItemInfo()
