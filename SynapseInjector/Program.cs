@@ -19,7 +19,6 @@ namespace SynapseInjector
         {
             try
             {
-
                 if (args.Length == 0)
                 {
                     return;
@@ -51,6 +50,7 @@ namespace SynapseInjector
             InjectLoader(loadModule, loader);
             StoreModule(loadModule);
             Publicise(loadModule);
+            Console.ReadKey();
         }
 
         private static void Publicise(ModuleDef md)
