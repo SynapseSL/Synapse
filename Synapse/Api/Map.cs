@@ -99,7 +99,7 @@ namespace Synapse.Api
             Server.Get.GetObjectOf<NineTailedFoxAnnouncer>().ServerOnlyAddGlitchyPhrase(words, UnityEngine.Random.Range(0.1f, 0.14f) * num2, UnityEngine.Random.Range(0.07f, 0.08f) * num2);
         }
 
-        public void SpawnGrenade(Vector3 position,Vector3 velocity,float fusetime, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null)
+        public Grenades.Grenade SpawnGrenade(Vector3 position,Vector3 velocity,float fusetime = 3f, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null)
         {
             if(player == null)
             player = Server.Get.Host;
@@ -109,6 +109,8 @@ namespace Synapse.Api
             component2.FullInitData(component, position, Quaternion.Euler(component2.throwStartAngle), velocity, component2.throwAngularVelocity, player == Server.Get.Host ? Team.RIP : player.Team);
             component2.NetworkfuseTime = NetworkTime.time + (double)fusetime;
             NetworkServer.Spawn(component2.gameObject);
+
+            return component2;
         }
 
         public void Explode(Vector3 position, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null) 

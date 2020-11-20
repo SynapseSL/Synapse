@@ -43,7 +43,7 @@ namespace Synapse.Api
 
                 if (Name.Contains("PrisonDoor")) return Enum.DoorType.PrisonDoor;
 
-                //if (Name.Contains("ContDoor")) return Enum.DoorType.Other;
+                //if (Name.Contains("ContDoor")) return Enum.DoorType.ContDoor;
 
                 return Enum.DoorType.Other;
             }
