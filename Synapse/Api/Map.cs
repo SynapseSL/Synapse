@@ -106,7 +106,7 @@ namespace Synapse.Api
 
             var component = player.GrenadeManager;
             var component2 = Object.Instantiate(component.availableGrenades[(int)grenadeType].grenadeInstance).GetComponent<Grenades.Grenade>();
-            component2.FullInitData(component, position, Quaternion.Euler(component2.throwStartAngle), velocity, component2.throwAngularVelocity, Team.RIP);
+            component2.FullInitData(component, position, Quaternion.Euler(component2.throwStartAngle), velocity, component2.throwAngularVelocity, player == Server.Get.Host ? Team.RIP : player.Team);
             component2.NetworkfuseTime = NetworkTime.time + (double)fusetime;
             NetworkServer.Spawn(component2.gameObject);
         }
