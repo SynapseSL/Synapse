@@ -22,5 +22,7 @@ namespace Synapse.Api
         public Room Room { get => Map.Get.Rooms.OrderBy(x => Vector3.Distance(x.Position, Position)).FirstOrDefault(); }
 
         public global::Door.AccessRequirements PermissionLevels { get => door.PermissionLevels; set => door.PermissionLevels = value; }
+
+        public global::Door.DoorStatus Status => door.status;
     }
 }
