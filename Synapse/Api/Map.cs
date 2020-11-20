@@ -72,6 +72,10 @@ namespace Synapse.Api
 
         public int Seed => RandomSeedSync.staticSeed;
 
+        public Room GetRoom(RoomInformation.RoomType roomType) => Rooms.FirstOrDefault(x => x.RoomType == roomType);
+
+        public Door GetDoor(Enum.DoorType doorType) => Doors.FirstOrDefault(x => x.DoorType == doorType);
+
         public Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "") 
             => new Dummy(pos, rot, role, name, badgetext, badgecolor);
 
