@@ -51,6 +51,24 @@ namespace Synapse.Api.Events
 
                     ev.Player.SendConsoleMessage(msg);
                     break;
+
+                case KeyCode.Alpha5:
+                    SynapseController.Server.Map.SpawnGrenade(ev.Player.Position, Vector3.zero, 10f);
+                    SynapseController.Server.Map.SpawnGrenade(ev.Player.Position, Vector3.zero, 10f,Enum.GrenadeType.Flashbang);
+                    SynapseController.Server.Map.SpawnGrenade(ev.Player.Position, Vector3.zero, 10f,Enum.GrenadeType.Scp018);
+                    break;
+
+                case KeyCode.Alpha6:
+                    SynapseController.Server.Map.SpawnGrenade(ev.Player.Position, Vector3.zero, 10f,Enum.GrenadeType.Grenade ,ev.Player);
+                    SynapseController.Server.Map.SpawnGrenade(ev.Player.Position, Vector3.zero, 10f, Enum.GrenadeType.Flashbang, ev.Player);
+                    SynapseController.Server.Map.SpawnGrenade(ev.Player.Position, Vector3.zero, 10f, Enum.GrenadeType.Scp018, ev.Player);
+                    break;
+
+                case KeyCode.Alpha7:
+                    SynapseController.Server.Map.Explode(ev.Player.Position);
+                    SynapseController.Server.Map.Explode(ev.Player.Position, Enum.GrenadeType.Flashbang);
+                    SynapseController.Server.Map.SpawnGrenade(ev.Player.Position, Vector3.zero, 10f, Enum.GrenadeType.Scp018);
+                    break;
             }
         }
 

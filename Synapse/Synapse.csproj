@@ -35,6 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Api\Broadcast.cs" />
+    <Compile Include="Api\Enum\GrenadeType.cs" />
     <Compile Include="Api\Enum\DoorType.cs" />
     <Compile Include="Api\Enum\ItemState.cs" />
     <Compile Include="Api\Ragdoll.cs" />
