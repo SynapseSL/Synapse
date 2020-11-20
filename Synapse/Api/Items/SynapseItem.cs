@@ -56,6 +56,20 @@ namespace Synapse.Api.Items
 
         public readonly string Name;
 
+        public Enum.ItemState State
+        {
+            get
+            {
+                if (deactivated) return Enum.ItemState.Destroyed;
+
+                if (ItemHolder != null) return Enum.ItemState.Inventory;
+
+                if (pickup != null) return Enum.ItemState.Map;
+
+                return Enum.ItemState.Despawned;
+            }
+        }
+
         public Player ItemHolder { get; private set; }
 
         private float durabillity;
@@ -171,9 +185,7 @@ namespace Synapse.Api.Items
 
             if (ItemHolder != null) return;
 
-            if (player.VanillaItems.Count >= 8) return;
-
-            if(!IsCustomItem && (ItemType == ItemType.Ammo556 || ItemType == ItemType.Ammo762 || ItemType == ItemType.Ammo9mm))
+            if (!IsCustomItem && (ItemType == ItemType.Ammo556 || ItemType == ItemType.Ammo762 || ItemType == ItemType.Ammo9mm))
             {
                 switch (ItemType)
                 {
@@ -193,6 +205,8 @@ namespace Synapse.Api.Items
                 Destroy();
                 return;
             }
+
+            if (player.VanillaItems.Count >= 8) return;
 
             Inventory._uniqId++;
             itemInfo = new Inventory.SyncItemInfo()

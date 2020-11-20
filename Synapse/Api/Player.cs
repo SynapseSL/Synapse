@@ -27,6 +27,7 @@ namespace Synapse.Api
             Jail = new Jail(this);
             ActiveBroadcasts = new BroadcastList(this);
             Inventory = new PlayerInventory(this);
+            GrenadeManager = GetComponent<Grenades.GrenadeManager>();
         }
 
         #region Methods
@@ -102,8 +103,10 @@ namespace Synapse.Api
             Hub.serverRoles.TargetCloseRemoteAdmin(Connection);
         }
 
+        public void Heal(float hp) => PlayerStats.HealHPAmount(hp);
+
         public void Hurt(int amount, DamageTypes.DamageType damagetype = default, Player attacker = null) =>
-            PlayerStats.HurtPlayer(new PlayerStats.HitInfo(amount, attacker == null ? "WORLD" : attacker.NickName, damagetype, attacker == null ? PlayerId : attacker.PlayerId), attacker == null ? gameObject : attacker.gameObject);
+            PlayerStats.HurtPlayer(new PlayerStats.HitInfo(amount, attacker == null ? "WORLD" : attacker.NickName, damagetype, attacker == null ? 0 : attacker.PlayerId), gameObject);
 
         public void SendToServer(ushort port)
         {
@@ -167,6 +170,9 @@ namespace Synapse.Api
 
         public Broadcast SendBroadcast(ushort time,string message,bool instant = false)
         {
+            if(this == Server.Get.Host)
+                Logger.Get.Send($"Broadcast: {message}", ConsoleColor.White);
+
             var bc = new Broadcast(message, time,this);
             ActiveBroadcasts.Add(bc, instant);
             return bc;
@@ -440,7 +446,20 @@ namespace Synapse.Api
 
         public Room Room
         {
-            get => SynapseController.Server.Map.Rooms.OrderBy(x => Vector3.Distance(x.Position, Position)).FirstOrDefault();
+            get
+            {
+                var pos = Position;
+                pos.y -= 50f;
+
+                if (Physics.Linecast(Position,pos,out var info, -84058629) && info.transform != null)
+                {
+                    var room = Map.Get.Rooms.FirstOrDefault(x => x.GameObject == info.transform.gameObject);
+                    if (room != null)
+                        return room;
+                }
+
+                return SynapseController.Server.Map.Rooms.OrderBy(x => Vector3.Distance(x.Position, Position)).FirstOrDefault();
+            }
             set => Position = value.Position;
         }
 
@@ -632,9 +651,9 @@ namespace Synapse.Api
 
         public bool IsDead => Team == Team.RIP;
 
-        public bool IsZooming => Hub.weaponManager.ZoomInProgress();
+        public bool IsZooming => WeaponManager.ZoomInProgress();
 
-        public bool IsReloading => Hub.weaponManager.IsReloading();
+        public bool IsReloading => WeaponManager.IsReloading();
 
         public bool IsCuffed => Cuffer != null;
 
@@ -661,6 +680,10 @@ namespace Synapse.Api
 
         #region ReferenceHub
         public Transform CameraReference => Hub.PlayerCameraReference;
+
+        public Grenades.GrenadeManager GrenadeManager { get; }
+
+        public WeaponManager WeaponManager => Hub.weaponManager;
 
         public AmmoBox AmmoBox => Hub.ammoBox;
 

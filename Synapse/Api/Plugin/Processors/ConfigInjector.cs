@@ -16,14 +16,30 @@ namespace Synapse.Api.Plugin.Processors
                     if (configAttribute == null) continue;
                     var section = configAttribute.section;
                     Type t = FieldInfo.GetFieldFromHandle(field.FieldHandle).FieldType;
-                    if (section == null) section = t.FullName?.Replace("."," ");
+                    if (section == null) section = t.FullName?.Replace(".", " ");
 
                     if (!typeof(IConfigSection).IsAssignableFrom(t))
                         continue;
 
                     object typeObj = Activator.CreateInstance(t);
                     object config = SynapseController.Server.Configs.GetOrSetDefault(section, typeObj);
-                    field.SetValue(context.Plugin,config);
+                    field.SetValue(context.Plugin, config);
+                }
+
+                foreach (var property in context.PluginType.GetProperties())
+                {
+                    var configAttribute = property.GetCustomAttribute<Config>();
+                    if (configAttribute == null) continue;
+                    var section = configAttribute.section;
+                    Type t = property.PropertyType;
+                    if (section == null) section = t.FullName?.Replace(".", " ");
+
+                    if (!typeof(IConfigSection).IsAssignableFrom(t))
+                        continue;
+
+                    object typeObj = Activator.CreateInstance(t);
+                    object config = SynapseController.Server.Configs.GetOrSetDefault(section, typeObj);
+                    property.SetValue(context.Plugin, config);
                 }
             }
             catch (Exception e)

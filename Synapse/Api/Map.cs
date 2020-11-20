@@ -103,7 +103,7 @@ namespace Synapse.Api
         {
             var component = Server.Get.Host.GetComponent<Grenades.GrenadeManager>();
             var component2 = Object.Instantiate(component.availableGrenades[0].grenadeInstance).GetComponent<Grenades.Grenade>();
-            component2.FullInitData(component, position, Quaternion.identity, Vector3.zero, Vector3.zero);
+            component2.FullInitData(component, position, Quaternion.identity, Vector3.zero, Vector3.zero,Team.RIP);
             component2.NetworkfuseTime = 0.10000000149011612;
             NetworkServer.Spawn(component2.gameObject);
         }
@@ -113,7 +113,7 @@ namespace Synapse.Api
             foreach (var tesla in SynapseController.Server.GetObjectsOf<TeslaGate>())
                 SynapseController.Server.Map.Teslas.Add(new Tesla(tesla));
 
-            foreach (var room in SynapseController.Server.GetObjectsOf<Transform>().Where(x => x.CompareTag("Room") || x.name == "Root_*&*Outside Cams" || x.name == "PocketWorld" || x.name == "Start Positions"))
+            foreach (var room in SynapseController.Server.GetObjectsOf<Transform>().Where(x => x.CompareTag("Room") || x.name == "Root_*&*Outside Cams" || x.name == "PocketWorld"))
                 Rooms.Add(new Room(room.gameObject));
 
             foreach (var station in Server.Get.GetObjectsOf<global::WorkStation>())

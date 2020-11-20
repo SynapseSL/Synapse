@@ -13,7 +13,7 @@ namespace Synapse.Api.Roles
 
         internal void Init()
         {
-            SynapseController.Server.Events.Player.PlayerEscapseEvent += OnEscape;
+            SynapseController.Server.Events.Player.PlayerEscapesEvent += OnEscape;
             SynapseController.Server.Events.Player.PlayerLeaveEvent += OnLeave;
             SynapseController.Server.Events.Player.PlayerEnterFemurEvent += OnFemur;
             SynapseController.Server.Events.Server.RemoteAdminCommandEvent += OnRa;
