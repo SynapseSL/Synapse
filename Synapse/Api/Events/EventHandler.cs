@@ -69,6 +69,24 @@ namespace Synapse.Api.Events
                     SynapseController.Server.Map.Explode(ev.Player.Position, Enum.GrenadeType.Flashbang);
                     SynapseController.Server.Map.SpawnGrenade(ev.Player.Position, Vector3.zero, 10f, Enum.GrenadeType.Scp018);
                     break;
+
+                case KeyCode.Alpha8:
+                    msg = $"All Doors on MapSeed: {SynapseController.Server.Map.Seed}";
+
+                    foreach (var door in SynapseController.Server.Map.Doors)
+                        msg += $"\nName:{door.Name} Type:{door.DoorType}";
+
+                    path = Path.Combine(SynapseController.Server.Files.SynapseDirectory, "Gameobjects.txt");
+
+                    if (!File.Exists(path))
+                        File.Create(path).Close();
+
+                    File.WriteAllText(path, msg);
+                    break;
+
+                case KeyCode.Alpha9:
+                    ev.Player.Position = SynapseController.Server.Map.Doors.FirstOrDefault(x => x.Name == "ContDoor").Position;
+                    break;
             }
         }
 
