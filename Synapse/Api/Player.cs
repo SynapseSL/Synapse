@@ -447,7 +447,10 @@ namespace Synapse.Api
         {
             get
             {
-                if (Physics.Raycast(Position,Vector3.up*-50,out var info))
+                var pos = Position;
+                pos.y -= 50f;
+
+                if (Physics.Linecast(Position,pos,out var info, -84058629) && info.transform != null)
                 {
                     var room = Map.Get.Rooms.FirstOrDefault(x => x.GameObject == info.transform.gameObject);
                     if (room != null)
