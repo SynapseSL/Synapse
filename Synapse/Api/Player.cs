@@ -27,6 +27,7 @@ namespace Synapse.Api
             Jail = new Jail(this);
             ActiveBroadcasts = new BroadcastList(this);
             Inventory = new PlayerInventory(this);
+            GrenadeManager = GetComponent<Grenades.GrenadeManager>();
         }
 
         #region Methods
@@ -679,6 +680,8 @@ namespace Synapse.Api
 
         #region ReferenceHub
         public Transform CameraReference => Hub.PlayerCameraReference;
+
+        public Grenades.GrenadeManager GrenadeManager { get; }
 
         public WeaponManager WeaponManager => Hub.weaponManager;
 
