@@ -445,7 +445,17 @@ namespace Synapse.Api
 
         public Room Room
         {
-            get => SynapseController.Server.Map.Rooms.OrderBy(x => Vector3.Distance(x.Position, Position)).FirstOrDefault();
+            get
+            {
+                if (Physics.Raycast(Position,Vector3.up*-50,out var info))
+                {
+                    var room = Map.Get.Rooms.FirstOrDefault(x => x.GameObject == info.transform.gameObject);
+                    if (room != null)
+                        return room;
+                }
+
+                return SynapseController.Server.Map.Rooms.OrderBy(x => Vector3.Distance(x.Position, Position)).FirstOrDefault();
+            }
             set => Position = value.Position;
         }
 

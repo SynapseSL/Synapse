@@ -2,8 +2,7 @@
 {
    public enum ZoneType
     {
-        None = -1,
-        Lobby,
+        None,
         LCZ,
         HCZ,
         Entrance,

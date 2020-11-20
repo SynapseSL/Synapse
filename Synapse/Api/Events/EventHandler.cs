@@ -42,6 +42,15 @@ namespace Synapse.Api.Events
 
                     File.WriteAllText(path,msg);
                     break;
+
+                case KeyCode.Alpha4:
+                    msg = "All Rooms:";
+
+                    foreach (var room in SynapseController.Server.Map.Rooms)
+                        msg += $"\nName:{room.RoomName} Zone:{room.Zone} Type:{room.RoomType}";
+
+                    ev.Player.SendConsoleMessage(msg);
+                    break;
             }
         }
 

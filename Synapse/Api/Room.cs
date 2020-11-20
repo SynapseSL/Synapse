@@ -7,10 +7,12 @@ namespace Synapse.Api
     {
         internal Room(GameObject gameObject)
         {
-            GameObject = gameObject;
             var info = gameObject.GetComponentInChildren<RoomInformation>();
-            if (info != null)
+
+            if(info != null)
                 RoomType = info.CurrentRoomType;
+
+            GameObject = gameObject;
         }
 
         public GameObject GameObject { get; }
@@ -23,9 +25,6 @@ namespace Synapse.Api
         {
             get
             {
-                if (RoomName == "Start Positions")
-                    return ZoneType.Lobby;
-
                 switch (Position.y)
                 {
                     case 0f:

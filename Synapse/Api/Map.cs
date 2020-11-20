@@ -113,7 +113,7 @@ namespace Synapse.Api
             foreach (var tesla in SynapseController.Server.GetObjectsOf<TeslaGate>())
                 SynapseController.Server.Map.Teslas.Add(new Tesla(tesla));
 
-            foreach (var room in SynapseController.Server.GetObjectsOf<Transform>().Where(x => x.CompareTag("Room") || x.name == "Root_*&*Outside Cams" || x.name == "PocketWorld" || x.name == "Start Positions"))
+            foreach (var room in SynapseController.Server.GetObjectsOf<Transform>().Where(x => x.CompareTag("Room") || x.name == "Root_*&*Outside Cams" || x.name == "PocketWorld"))
                 Rooms.Add(new Room(room.gameObject));
 
             foreach (var station in Server.Get.GetObjectsOf<global::WorkStation>())
