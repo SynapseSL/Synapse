@@ -1,5 +1,6 @@
 ﻿using Synapse.Config;
 using System.Linq;
+using System.IO;
 using UnityEngine;
 
 namespace Synapse.Api.Events
@@ -26,6 +27,20 @@ namespace Synapse.Api.Events
 
                 case KeyCode.Alpha2:
                     ev.Player.Jail.UnJailPlayer();
+                    break;
+
+                case KeyCode.Alpha3:
+                    var msg = $"All Gameobject on MapSeed: {SynapseController.Server.Map.Seed}";
+
+                    foreach (var go in SynapseController.Server.GetObjectsOf<GameObject>())
+                        msg += $"\n{go.name} - Position: {go.transform.position}";
+
+                    var path = Path.Combine(SynapseController.Server.Files.SynapseDirectory, "Gameobjects.txt");
+
+                    if (!File.Exists(path))
+                        File.Create(path).Close();
+
+                    File.WriteAllText(path,msg);
                     break;
             }
         }

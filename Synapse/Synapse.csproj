@@ -35,6 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Api\Broadcast.cs" />
+    <Compile Include="Api\Enum\DoorType.cs" />
     <Compile Include="Api\Enum\ItemState.cs" />
     <Compile Include="Api\Ragdoll.cs" />
     <Compile Include="Api\Scp914.cs" />
@@ -200,9 +201,6 @@
     </Reference>
     <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\Synapse-Stuff\Server\SCPSL_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.Physics2DModule">
-      <HintPath>..\..\Synapse-Stuff\Server\SCPSL_Data\Managed\UnityEngine.Physics2DModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\Synapse-Stuff\Server\SCPSL_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
