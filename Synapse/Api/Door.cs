@@ -25,27 +25,37 @@ namespace Synapse.Api
 
         public global::Door.DoorStatus Status => door.status;
 
+        private Enum.DoorType doorType;
+
         public Enum.DoorType DoorType
         {
             get
             {
+                if (door != null)
+                    return doorType;
+
                 foreach(var type in (Enum.DoorType[])System.Enum.GetValues(typeof(Enum.DoorType)))
                     if (type.ToString().ToUpper().Contains(Name.ToUpper()))
-                        return type;
+                    {
+                        doorType = type;
+                        return doorType;
+                    }
 
-                if (Name.Contains("Airlocks")) return Enum.DoorType.Airlock;
+                if (Name.Contains("Airlocks")) doorType = Enum.DoorType.Airlock;
 
-                if (Name.Contains("EntrDoor")) return Enum.DoorType.EZ_Door;
+                else if (Name.Contains("EntrDoor")) doorType = Enum.DoorType.EZ_Door;
 
-                if (Name.Contains("LightContainmentDoor")) return Enum.DoorType.LCZ_Door;
+                else if (Name.Contains("LightContainmentDoor")) doorType = Enum.DoorType.LCZ_Door;
 
-                if (Name.Contains("HeavyContainmentDoor")) return Enum.DoorType.HCZ_Door;
+                else if (Name.Contains("HeavyContainmentDoor")) doorType = Enum.DoorType.HCZ_Door;
 
-                if (Name.Contains("PrisonDoor")) return Enum.DoorType.PrisonDoor;
+                else if (Name.Contains("PrisonDoor")) doorType = Enum.DoorType.PrisonDoor;
 
-                //if (Name.Contains("ContDoor")) return Enum.DoorType.ContDoor;
+                //else if (Name.Contains("ContDoor")) doorType = Enum.DoorType.ContDoor;
 
-                return Enum.DoorType.Other;
+                else doorType = Enum.DoorType.Other;
+
+                return doorType;
             }
         }
     }
