@@ -87,11 +87,7 @@ namespace Synapse.Command.Commands
 
             foreach (var command in commandlist)
             {
-                string alias = "{ ";
-                foreach (var ali in command.Aliases)
-                    alias += $"{ali},";
-                alias += " }";
-
+                string alias = "{ " + string.Join(", ", command.Aliases) + " }";
 
                 msg += $"\n{command.Name}:\n    -Usage: {command.Usage}\n    -Description: {command.Description}\n    -Aliases: {alias}";
             }
