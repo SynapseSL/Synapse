@@ -320,6 +320,12 @@ namespace Synapse.Api
             set => NicknameSync.DisplayName = value; 
         }
 
+        public string DisplayInfo
+        {
+            get => NicknameSync._customPlayerInfoString;
+            set => NicknameSync.Network_customPlayerInfoString = value;
+        }
+
         public int PlayerId
         {
             get => QueryProcessor.PlayerId;
