@@ -11,7 +11,7 @@
 
         public bool Is079 => player.RoleType == RoleType.Scp079;
 
-        public byte Level { get => script.Lvl; set => script.Lvl = value; }
+        public byte Level { get => (byte)(script.Lvl + 1); set => script.Lvl = (byte)(value - 1); }
 
         public string Speaker { get => script.Speaker; set => script.Speaker = value; }
 
