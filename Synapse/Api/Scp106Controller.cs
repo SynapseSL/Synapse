@@ -5,15 +5,11 @@ namespace Synapse.Api
 {
     public class Scp106Controller
     {
-        internal Scp106Controller(Player player)
-        {
-            this.player = player;
-            script = player.ClassManager.Scp106;
-        }
+        internal Scp106Controller(Player player) => this.player = player;
 
         private readonly Player player;
 
-        private readonly Scp106PlayerScript script;
+        private Scp106PlayerScript script => player.ClassManager.Scp106;
 
         public bool Is106 => player.RoleType == RoleType.Scp106;
 

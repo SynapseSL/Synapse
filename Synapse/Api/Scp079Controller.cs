@@ -2,15 +2,11 @@
 {
     public class Scp079Controller
     {
-        internal Scp079Controller(Player player)
-        {
-            this.player = player;
-            script = player.ClassManager.Scp079;
-        }
+        internal Scp079Controller(Player player) => this.player = player;
 
         private readonly Player player;
 
-        private readonly Scp079PlayerScript script;
+        private Scp079PlayerScript script => player.ClassManager.Scp079;
 
 
         public bool Is079 => player.RoleType == RoleType.Scp079;
