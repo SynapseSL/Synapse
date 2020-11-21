@@ -72,6 +72,10 @@ namespace Synapse.Api
 
         public int Seed => RandomSeedSync.staticSeed;
 
+        public byte ActiveGenerators { get => ForcedOvercharge? (byte)5 : Generator079.mainGenerator.totalVoltage; set => Generator079.mainGenerator.totalVoltage = value; }
+
+        public bool ForcedOvercharge => Generator079.mainGenerator.forcedOvercharge;
+
         public Room GetRoom(RoomInformation.RoomType roomType) => Rooms.FirstOrDefault(x => x.RoomType == roomType);
 
         public Door GetDoor(Enum.DoorType doorType) => Doors.FirstOrDefault(x => x.DoorType == doorType);
