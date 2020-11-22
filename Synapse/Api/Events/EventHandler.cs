@@ -85,7 +85,19 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha9:
-                    ev.Player.Position = SynapseController.Server.Map.Doors.FirstOrDefault(x => x.Name == "ContDoor").Position;
+                    var dummy = new Dummy(ev.Player.Position, Quaternion.identity);
+                    MEC.Timing.CallDelayed(3f, () =>
+                     {
+                         dummy.RotateToPosition(ev.Player.Position);
+                     });
+                    MEC.Timing.CallDelayed(6f, () =>
+                    {
+                        dummy.RotateToPosition(ev.Player.Position);
+                    });
+                    MEC.Timing.CallDelayed(9f, () =>
+                    {
+                        dummy.RotateToPosition(ev.Player.Position);
+                    });
                     break;
             }
         }

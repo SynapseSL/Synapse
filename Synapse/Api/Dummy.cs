@@ -47,6 +47,17 @@ namespace Synapse.Api
             }
         }
 
+        public Quaternion Rotation
+        {
+            get => GameObject.transform.rotation;
+            set
+            {
+                Despawn();
+                GameObject.transform.rotation = value;
+                Spawn();
+            }
+        }
+
         /// <summary>
         /// Get / Set the Scale of the Dummy
         /// </summary>
@@ -125,6 +136,8 @@ namespace Synapse.Api
             NetworkServer.Spawn(obj);
             ReferenceHub.Hubs.Remove(obj);
         }
+
+        public void RotateToPosition(Vector3 pos) => Rotation = Quaternion.LookRotation((pos - Position).normalized);
 
         /// <summary>
         /// Despawns the Dummy

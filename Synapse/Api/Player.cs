@@ -379,7 +379,7 @@ namespace Synapse.Api
         public Vector2 Rotation
         {
             get => PlayerMovementSync.RotationSync;
-            set => PlayerMovementSync.RotationSync = value;
+            set => PlayerMovementSync.NetworkRotationSync = value;
         }
 
         public Vector3 DeathPosition
