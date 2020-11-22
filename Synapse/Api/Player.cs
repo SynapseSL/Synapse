@@ -185,15 +185,12 @@ namespace Synapse.Api
             get => _role;
             set
             {
-                if (value == null)
-                {
-                    if (_role == null) return;
-
+                if (_role != null)
                     _role.DeSpawn();
-                    _role = value;
-                    return;
-                }
+
                 _role = value;
+
+                if (_role == null) return;
 
                 _role.Player = this;
                 _role.Spawn();
