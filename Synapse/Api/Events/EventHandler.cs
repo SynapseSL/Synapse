@@ -85,19 +85,38 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha9:
-                    var dummy = new Dummy(ev.Player.Position, Quaternion.identity);
-                    MEC.Timing.CallDelayed(3f, () =>
-                     {
-                         dummy.RotateToPosition(ev.Player.Position);
-                     });
-                    MEC.Timing.CallDelayed(6f, () =>
+                    foreach (var recipe in SynapseController.Server.Map.Scp914.Recipes)
                     {
-                        dummy.RotateToPosition(ev.Player.Position);
-                    });
-                    MEC.Timing.CallDelayed(9f, () =>
-                    {
-                        dummy.RotateToPosition(ev.Player.Position);
-                    });
+                        msg = $"All Recipes for {recipe.itemID}";
+
+                        msg += "\nRough:";
+                        foreach (var id in recipe.rough)
+                        {
+                            msg += $"\n- {id}";
+                        }
+                        msg += "\nCoarse:";
+                        foreach (var id in recipe.coarse)
+                        {
+                            msg += $"\n- {id}";
+                        }
+                        msg += "\n1:1:";
+                        foreach (var id in recipe.oneToOne)
+                        {
+                            msg += $"\n- {id}";
+                        }
+                        msg += "\nfine:";
+                        foreach (var id in recipe.fine)
+                        {
+                            msg += $"\n- {id}";
+                        }
+                        msg += "\nVeryFine:";
+                        foreach (var id in recipe.veryFine)
+                        {
+                            msg += $"\n- {id}";
+                        }
+
+                        Logger.Get.Info(msg);
+                    }
                     break;
             }
         }
