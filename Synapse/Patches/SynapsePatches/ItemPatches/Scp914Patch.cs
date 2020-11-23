@@ -17,8 +17,6 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
                 var synapseitem = item.GetSynapseItem();
                 var type = Map.Get.Scp914.UpgradeItemID(synapseitem.ID);
 
-                if (synapseitem.IsCustomItem) return false;
-
                 if (type < 0)
                 {
                     synapseitem.Destroy();
@@ -57,8 +55,6 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
                 var splayer = inventory.GetPlayer();
                 foreach(var item in splayer.Inventory.Items)
                 {
-                    if (item.IsCustomItem) continue;
-
                     var type = Map.Get.Scp914.UpgradeItemID(item.ID);
 
                     if (type < 0)
@@ -99,7 +95,6 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
                 var type = Map.Get.Scp914.UpgradeItemID(splayer.ItemInHand.ID);
                 var index = inventory.GetItemIndex();
                 if (index < 0 || index >= inventory.items.Count) return false;
-                if (splayer.ItemInHand.IsCustomItem) return false;
                 if (type < 0)
                 {
                     splayer.ItemInHand.Destroy();
