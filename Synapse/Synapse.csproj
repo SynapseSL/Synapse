@@ -155,6 +155,7 @@
     <Compile Include="Patches\SynapsePatches\PermissionSystem\RefreshPermissionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\PermissionSystem\SignatureCompletePatch.cs" />
     <Compile Include="Patches\SynapsePatches\PermissionSystem\SetGroupPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\Wrapper\Scp914StartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\RagdollPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\GeneratorStartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\NukeLockPatch.cs" />
