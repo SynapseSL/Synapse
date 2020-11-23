@@ -29,27 +29,34 @@ namespace Synapse.Api.Plugin
 
             foreach(var pluginpath in paths)
             {
-                var assembly = Assembly.Load(File.ReadAllBytes(pluginpath));
-                foreach(var type in assembly.GetTypes())
+                try
                 {
-                    if (!typeof(IPlugin).IsAssignableFrom(type))
-                        continue;
-
-                    var infos = type.GetCustomAttribute<PluginInformation>();
-
-                    if (infos == null)
+                    var assembly = Assembly.Load(File.ReadAllBytes(pluginpath));
+                    foreach (var type in assembly.GetTypes())
                     {
-                        SynapseController.Server.Logger.Info($"The File {assembly.GetName().Name} has a class which inherits from IPlugin but has no PluginInformation ... Default Values will be added");
-                        infos = new PluginInformation();
+                        if (!typeof(IPlugin).IsAssignableFrom(type))
+                            continue;
+
+                        var infos = type.GetCustomAttribute<PluginInformation>();
+
+                        if (infos == null)
+                        {
+                            SynapseController.Server.Logger.Info($"The File {assembly.GetName().Name} has a class which inherits from IPlugin but has no PluginInformation ... Default Values will be added");
+                            infos = new PluginInformation();
+                        }
+
+                        if (pluginpath.Contains("server-shared"))
+                            infos.shared = true;
+
+                        var allTypes = assembly.GetTypes().ToList();
+                        allTypes.Remove(type);
+                        dictionary.Add(infos, new KeyValuePair<Type, List<Type>>(type, allTypes));
+                        break;
                     }
-
-                    if (pluginpath.Contains("server-shared"))
-                        infos.shared = true;
-
-                    var allTypes = assembly.GetTypes().ToList();
-                    allTypes.Remove(type);
-                    dictionary.Add(infos, new KeyValuePair<Type, List<Type>>(type, allTypes));
-                    break;
+                }
+                catch(Exception e)
+                {
+                    SynapseController.Server.Logger.Error($"Synapse-Controller: Loading Assembly of {pluginpath} failed!!\n{e}");
                 }
             }
         
