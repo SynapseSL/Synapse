@@ -37,6 +37,8 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
         {
             try
             {
+                if (info == null || info.RHub == null) return false;
+
                 var player = info.RHub.GetPlayer();
 
                 if (player.Invisible)
