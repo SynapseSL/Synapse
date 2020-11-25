@@ -35,10 +35,11 @@ namespace Synapse.Events.Patches
 								if (syncItemInfo.id == ItemType.WeaponManagerTablet)
 								{
 									bool allow2 = true;
+									var item = syncItemInfo.GetSynapseItem();
 									Server.Get.Events.Player.InvokePlayerGeneratorInteractEvent(player, generator,GeneratorInteraction.TabletInjected, ref allow2);
+									Server.Get.Events.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allow2);
 									if (!allow2) break;
 
-									var item = syncItemInfo.GetSynapseItem();
 									generator.ConnectedTablet = item;
 									break;
 								}
