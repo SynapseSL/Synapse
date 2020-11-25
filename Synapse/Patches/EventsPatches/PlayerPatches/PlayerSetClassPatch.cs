@@ -7,10 +7,10 @@ using Synapse.Api.Items;
 using UnityEngine;
 using Logger = Synapse.Api.Logger;
 
-namespace Synapse.Patches.SynapsePatches.ItemPatches
+namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
     [HarmonyPatch(typeof(CharacterClassManager),nameof(CharacterClassManager.SetPlayersClass))]
-    internal static class SetClassPatch
+    internal static class PlayerSetClassPatch
     {
         private static bool Prefix(CharacterClassManager __instance, ref PlayerSetClassEventArgs __state, ref RoleType classid, GameObject ply, ref bool escape,bool lite)
         {

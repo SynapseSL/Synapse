@@ -144,7 +144,7 @@
     <Compile Include="Patches\EventsPatches\ServerPatches\RemoteAdminPatch.cs" />
     <Compile Include="Patches\SynapsePatches\InvisiblePatch.cs" />
     <Compile Include="Patches\SynapsePatches\ItemPatches\Scp914Patch.cs" />
-    <Compile Include="Patches\SynapsePatches\ItemPatches\SetClassPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSetClassPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ItemPatches\WorkStationPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ItemPatches\SpawnItemPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ItemPatches\InventoryClearPatch.cs" />
