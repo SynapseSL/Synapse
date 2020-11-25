@@ -51,6 +51,10 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<PlayerShootEventArgs> PlayerShootEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerSetClassEventArgs> PlayerSetClassEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerConnectWorkstationEventArgs> PlayerConnectWorkstation;
+
+        public event EventHandler.OnSynapseEvent<PlayerUnconnectWorkstationEventArgs> PlayerUnconnectWorkstation;
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -276,6 +280,33 @@ namespace Synapse.Api.Events
         }
 
         internal void InvokeSetClassEvent(PlayerSetClassEventArgs ev) => PlayerSetClassEvent?.Invoke(ev);
+
+        internal void InvokePlayerConnectWorkstation(Player player,SynapseItem item,WorkStation station,out bool allow)
+        {
+            var ev = new PlayerConnectWorkstationEventArgs
+            {
+                Player = player,
+                Item = item,
+                WorkStation = station
+            };
+
+            PlayerConnectWorkstation?.Invoke(ev);
+
+            allow = ev.Allow;
+        }
+
+        internal void InvokePlayerUnonnectWorkstation(Player player,WorkStation station, out bool allow)
+        {
+            var ev = new PlayerUnconnectWorkstationEventArgs
+            {
+                Player = player,
+                WorkStation = station
+            };
+
+            PlayerUnconnectWorkstation?.Invoke(ev);
+
+            allow = ev.Allow;
+        }
         #endregion
     }
 }

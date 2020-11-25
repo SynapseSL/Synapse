@@ -226,4 +226,24 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public bool Allow { get; set; }
     }
+
+    public class PlayerConnectWorkstationEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public SynapseItem Item { get; internal set; }
+
+        public WorkStation WorkStation { get; internal set; }
+
+        public bool Allow { get; set; } = true;
+    }
+
+    public class PlayerUnconnectWorkstationEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public WorkStation WorkStation { get; internal set; }
+
+        public bool Allow { get; set; } = true;
+    }
 }
