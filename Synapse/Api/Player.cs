@@ -438,7 +438,13 @@ namespace Synapse.Api
         public float Stamina
         {
             get => Hub.fpc.staminaController.RemainingStamina * 100;
-            set => Hub.fpc.staminaController.RemainingStamina = value / 100f;
+            set => Hub.fpc.staminaController.RemainingStamina = (value / 100f);
+        }
+
+        public float StaminaUsage
+        {
+            get => Hub.fpc.staminaController.StaminaUse * 100;
+            set => Hub.fpc.staminaController.StaminaUse = (value / 100f);
         }
 
         public RoleType RoleType
