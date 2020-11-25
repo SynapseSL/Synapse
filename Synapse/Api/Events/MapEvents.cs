@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Synapse.Api.Events.SynapseEventArguments;
 
 namespace Synapse.Api.Events
@@ -14,6 +15,8 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<DoorInteractEventArgs> DoorInteractEvent;
 
         public event EventHandler.OnSynapseEvent<LCZDecontaminationEventArgs> LCZDecontaminationEvent;
+
+        public event EventHandler.OnSynapseEvent<Scp914ActivateEventArgs> Scp914ActivateEvent;
 
         #region Invoke
         internal void InvokeTriggerTeslaEv(Player player,Tesla tesla,bool hurtrange,out bool trigger)
@@ -62,6 +65,21 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
+        internal void Invoke914Activate(ref List<Player> players,ref List<Synapse.Api.Items.SynapseItem> items,out bool allow,out bool move)
+        {
+            var ev = new Scp914ActivateEventArgs
+            {
+                Items = items,
+                Players = players
+            };
+
+            Scp914ActivateEvent?.Invoke(ev);
+
+            allow = ev.Allow;
+            move = ev.Move;
+            players = ev.Players;
+            items = ev.Items;
+        }
         #endregion
     }
 }

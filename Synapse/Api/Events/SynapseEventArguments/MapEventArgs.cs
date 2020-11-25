@@ -1,4 +1,6 @@
-﻿namespace Synapse.Api.Events.SynapseEventArguments
+﻿using System.Collections.Generic;
+
+namespace Synapse.Api.Events.SynapseEventArguments
 {
     public class TriggerTeslaEventArgs : EventHandler.ISynapseEventArgs
     {
@@ -23,5 +25,16 @@
     public class LCZDecontaminationEventArgs : EventHandler.ISynapseEventArgs
     {
         public bool Allow { get; set; }
+    }
+
+    public class Scp914ActivateEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public List<Player> Players { get; set; }
+
+        public List<Synapse.Api.Items.SynapseItem> Items { get; set; }
+
+        public bool Move { get; set; } = true;
+
+        public bool Allow { get; set; } = true;
     }
 }
