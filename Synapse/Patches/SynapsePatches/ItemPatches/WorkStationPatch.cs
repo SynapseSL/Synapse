@@ -19,7 +19,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
                 var station = __instance.GetWorkStation();
 
                 foreach (var item in player.Inventory.Items)
-                    if (item.ItemType == ItemType.WeaponManagerTablet && !item.IsCustomItem)
+                    if (item.ItemType == ItemType.WeaponManagerTablet)
                     {
                         try
                         {
