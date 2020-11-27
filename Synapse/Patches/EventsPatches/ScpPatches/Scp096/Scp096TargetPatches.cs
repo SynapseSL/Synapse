@@ -45,8 +45,6 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                         }
                     }
                 }
-
-                //Server.Get.Events.Scp.Scp096.InvokeScpTargetEvent(player, __instance.GetPlayer(), __instance.PlayerState, out var allow);
                 return false;
             }
             catch (Exception e)
