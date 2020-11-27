@@ -57,6 +57,8 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<PlayerUnconnectWorkstationEventArgs> PlayerUnconnectWorkstationEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerDropAmmoEventArgs> PlayerDropAmmoEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerCuffTargetEventArgs> PlayerCuffTargetEvent;
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -310,7 +312,7 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void InvokePlayerDropAmmoPatch(Player player, SynapseItem item, ref uint amount, ref int type, out bool allow)
+        internal void InvokePlayerDropAmmoEvent(Player player, SynapseItem item, ref uint amount, ref int type, out bool allow)
         {
             var ev = new PlayerDropAmmoEventArgs
             {
@@ -324,6 +326,20 @@ namespace Synapse.Api.Events
 
             amount = ev.Amount;
             type = (int)ev.AmmoType;
+            allow = ev.Allow;
+        }
+
+        internal void InvokePlayerCuffTargetEvent(Player target,Player cuffer,SynapseItem disarmer,ref bool allow)
+        {
+            var ev = new PlayerCuffTargetEventArgs
+            {
+                Cuffer = cuffer,
+                Disarmer = disarmer,
+                Target = target
+            };
+
+            PlayerCuffTargetEvent?.Invoke(ev);
+
             allow = ev.Allow;
         }
         #endregion

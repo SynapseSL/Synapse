@@ -257,6 +257,17 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public uint Amount { get; set; }
 
-        public bool Allow { get; set; }
+        public bool Allow { get; set; } = true;
+    }
+
+    public class PlayerCuffTargetEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Target { get; internal set; }
+
+        public Player Cuffer { get; internal set; }
+
+        public SynapseItem Disarmer { get; internal set; }
+
+        public bool Allow { get; set; } = true;
     }
 }
