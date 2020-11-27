@@ -1,25 +1,53 @@
 ﻿using System;
 using HarmonyLib;
 using UnityEngine;
+using PlayableScps;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
 {
-    [HarmonyPatch(typeof(PlayableScps.Scp096), nameof(PlayableScps.Scp096.AddTarget))]
-    static class Scp096LookPatch
+    [HarmonyPatch(typeof(PlayableScps.Scp096), nameof(PlayableScps.Scp096.UpdateVision))]
+    internal static class Scp096LookPatch
     {
-        public static bool Prefix(PlayableScps.Scp096 __instance, GameObject target)
+        private static bool Prefix(PlayableScps.Scp096 __instance)
         {
             try
             {
-                if (target == null) return true;
-
-                var player = target.GetPlayer();
-
-                if (player.Invisible)
+                if (__instance._flash.Enabled)
+                {
                     return false;
+                }
+                var vector = __instance.Hub.transform.TransformPoint(PlayableScps.Scp096._headOffset);
+                foreach (var player in Server.Get.Players)
+                {
+                    var characterClassManager = player.ClassManager;
+                    if (characterClassManager.CurClass != RoleType.Spectator && !(player.Hub == __instance.Hub) && !characterClassManager.IsAnyScp() && Vector3.Dot((player.CameraReference.position - vector).normalized, __instance.Hub.PlayerCameraReference.forward) >= 0.1f)
+                    {
+                        var visionInformation = VisionInformation.GetVisionInformation(player.Hub, vector, -0.1f, 60f, true, true, __instance.Hub.localCurrentRoomEffects);
+                        if (visionInformation.IsLooking)
+                        {
+                            float delay = visionInformation.LookingAmount / 0.25f * (visionInformation.Distance * 0.1f);
+                            if (!__instance.Calming)
+                            {
+                                if (player.Invisible)
+                                    continue;
 
-                Server.Get.Events.Scp.Scp096.InvokeScpTargetEvent(player, __instance.GetPlayer(), __instance.PlayerState, out var allow);
-                return allow;
+                                if (player.RealTeam == Team.SCP && !Server.Get.Configs.SynapseConfiguration.ScpTrigger096)
+                                    continue;
+
+                                Server.Get.Events.Scp.Scp096.InvokeScpTargetEvent(player, __instance.GetPlayer(), __instance.PlayerState, out var allow);
+                                __instance.AddTarget(player.gameObject);
+                                if (!allow) continue;
+                            }
+                            if (__instance.CanEnrage && player.gameObject != null)
+                            {
+                                __instance.PreWindup(delay);
+                            }
+                        }
+                    }
+                }
+
+                //Server.Get.Events.Scp.Scp096.InvokeScpTargetEvent(player, __instance.GetPlayer(), __instance.PlayerState, out var allow);
+                return false;
             }
             catch (Exception e)
             {
@@ -30,10 +58,11 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
     }
 
     [HarmonyPatch(typeof(PlayableScps.Scp096), nameof(PlayableScps.Scp096.OnDamage))]
-    static class Scp096ShootPatch
+    internal static class Scp096ShootPatch
     {
-        public static bool Prefix(PlayableScps.Scp096 __instance, PlayerStats.HitInfo info)
+        private static bool Prefix(PlayableScps.Scp096 __instance, PlayerStats.HitInfo info)
         {
+            Synapse.Api.Logger.Get.Info("Scp096 Shoot");
             try
             {
                 if (info == null || info.RHub == null) return false;
@@ -41,6 +70,9 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                 var player = info.RHub.GetPlayer();
 
                 if (player.Invisible)
+                    return false;
+
+                if (player.RealTeam == Team.SCP && !Server.Get.Configs.SynapseConfiguration.ScpTrigger096)
                     return false;
 
                 Server.Get.Events.Scp.Scp096.InvokeScpTargetEvent(player, __instance.GetPlayer(), __instance.PlayerState, out var allow);

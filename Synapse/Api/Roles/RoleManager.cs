@@ -18,7 +18,6 @@ namespace Synapse.Api.Roles
             SynapseController.Server.Events.Player.PlayerEnterFemurEvent += OnFemur;
             SynapseController.Server.Events.Server.RemoteAdminCommandEvent += OnRa;
             SynapseController.Server.Events.Player.PlayerDamageEvent += OnDamage;
-            SynapseController.Server.Events.Scp.Scp096.Scp096AddTargetEvent += On096Target;
             SynapseController.Server.Events.Scp.Scp106.Scp106ContainmentEvent += On106Containment;
             SynapseController.Server.Events.Player.PlayerGeneratorInteractEvent += OnGenerator;
             SynapseController.Server.Events.Scp.Scp106.PocketDimensionEnterEvent += Scp106OnPocketDimensionEnterEvent;
@@ -87,12 +86,6 @@ namespace Synapse.Api.Roles
             }
 
             ev.HitInfo = info;
-        }
-
-        private void On096Target(Events.SynapseEventArguments.Scp096AddTargetEventArgument ev)
-        {
-            if (ev.Player.CustomRole != null && ev.Player.CustomRole.GetTeam() == Team.SCP && !Server.Get.Configs.SynapseConfiguration.ScpTrigger096)
-                ev.Allow = false;
         }
 
         private void OnEscape(Events.SynapseEventArguments.PlayerEscapeEventArgs ev)

@@ -1,0 +1,54 @@
+﻿using System;
+using System.Linq;
+using HarmonyLib;
+
+namespace Synapse.Patches.SynapsePatches
+{
+    [HarmonyPatch(typeof(WeaponManager), nameof(WeaponManager.GetShootPermission), new Type[] { typeof(CharacterClassManager), typeof(bool) })]
+    internal static class ShootPermissionPatch
+    {
+        private static bool Prefix(WeaponManager __instance,out bool __result, CharacterClassManager c, bool forceFriendlyFire = false)
+        {
+            try
+            {
+                var shooter = __instance.GetPlayer();
+                var target = c.GetPlayer();
+
+                __result = true;
+
+                if (shooter.CustomRole == null && target.CustomRole == null)
+                {
+                    if (shooter.Team == Team.SCP && target.Team == Team.SCP) __result = false;
+
+                    else if (Server.Get.FF) __result = shooter.Team != target.Team;
+                }
+                else
+                {
+                    if (shooter.CustomRole != null)
+                    {
+                        if (shooter.CustomRole.GetFriends().Any(x => x == target.RealTeam))
+                        {
+                            __result = false;
+                            shooter.GiveTextHint(Server.Get.Configs.SynapseTranslation.GetTranslation("sameteam"));
+                        }
+                    }
+                    if (target.CustomRole != null)
+                    {
+                        if (target.CustomRole.GetFriends().Any(x => x == shooter.RealTeam))
+                        {
+                            __result = false;
+                            shooter.GiveTextHint(Server.Get.Configs.SynapseTranslation.GetTranslation("sameteam"));
+                        }
+                    }
+                }
+                return false;
+            }
+            catch(Exception e)
+            {
+                Synapse.Api.Logger.Get.Error($"Synapse-API: GetShootPermission  failed!!\n{e}");
+                __result = true;
+                return true;
+            }
+        }
+    }
+}

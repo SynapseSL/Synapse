@@ -24,6 +24,10 @@ namespace Synapse.Api.Events
                 case KeyCode.Alpha1:
                     ev.Player.WeaponManager.RpcEmptyClip();
                     break;
+
+                case KeyCode.Alpha2:
+                    Logger.Get.Info(SynapseController.Server.FF.ToString());
+                    break;
             }
         }
 
