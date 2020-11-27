@@ -20,6 +20,8 @@ namespace Synapse.Api
 
         public Scp914 Scp914 { get; } = new Scp914();
 
+        public HeavyController HeavyController { get; } = new HeavyController();
+
         public List<Tesla> Teslas { get; } = new List<Tesla>();
 
         public List<Elevator> Elevators { get; } = new List<Elevator>();
@@ -72,6 +74,10 @@ namespace Synapse.Api
 
         public int Seed => RandomSeedSync.staticSeed;
 
+        public Room GetRoom(RoomInformation.RoomType roomType) => Rooms.FirstOrDefault(x => x.RoomType == roomType);
+
+        public Door GetDoor(Enum.DoorType doorType) => Doors.FirstOrDefault(x => x.DoorType == doorType);
+
         public Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "") 
             => new Dummy(pos, rot, role, name, badgetext, badgecolor);
 
@@ -99,10 +105,27 @@ namespace Synapse.Api
             Server.Get.GetObjectOf<NineTailedFoxAnnouncer>().ServerOnlyAddGlitchyPhrase(words, UnityEngine.Random.Range(0.1f, 0.14f) * num2, UnityEngine.Random.Range(0.07f, 0.08f) * num2);
         }
 
-        public void Explode(Vector3 position) 
+        public Grenades.Grenade SpawnGrenade(Vector3 position,Vector3 velocity,float fusetime = 3f, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null)
         {
-            var component = Server.Get.Host.GetComponent<Grenades.GrenadeManager>();
-            var component2 = Object.Instantiate(component.availableGrenades[0].grenadeInstance).GetComponent<Grenades.Grenade>();
+            if(player == null)
+            player = Server.Get.Host;
+
+            var component = player.GrenadeManager;
+            var component2 = Object.Instantiate(component.availableGrenades[(int)grenadeType].grenadeInstance).GetComponent<Grenades.Grenade>();
+            component2.FullInitData(component, position, Quaternion.Euler(component2.throwStartAngle), velocity, component2.throwAngularVelocity, player == Server.Get.Host ? Team.RIP : player.Team);
+            component2.NetworkfuseTime = NetworkTime.time + (double)fusetime;
+            NetworkServer.Spawn(component2.gameObject);
+
+            return component2;
+        }
+
+        public void Explode(Vector3 position, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null) 
+        {
+            if (player == null)
+                player = Server.Get.Host;
+
+            var component = player.GrenadeManager;
+            var component2 = Object.Instantiate(component.availableGrenades[(int)grenadeType].grenadeInstance).GetComponent<Grenades.Grenade>();
             component2.FullInitData(component, position, Quaternion.identity, Vector3.zero, Vector3.zero,Team.RIP);
             component2.NetworkfuseTime = 0.10000000149011612;
             NetworkServer.Spawn(component2.gameObject);

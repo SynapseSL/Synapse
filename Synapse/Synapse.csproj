@@ -35,6 +35,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Api\Broadcast.cs" />
+    <Compile Include="Api\HeavyController.cs" />
+    <Compile Include="Api\Enum\AmmoType.cs" />
+    <Compile Include="Api\Enum\GrenadeType.cs" />
     <Compile Include="Api\Enum\DoorType.cs" />
     <Compile Include="Api\Enum\ItemState.cs" />
     <Compile Include="Api\Ragdoll.cs" />
@@ -108,10 +111,13 @@
     <Compile Include="Config\SynapseConfiguration.cs" />
     <Compile Include="Database\DatabaseManager.cs" />
     <Compile Include="Database\Repository.cs" />
+    <Compile Include="Patches\EventsPatches\MapPatches\914ActivatePatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\LCZDecontaminationPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\DoorInteractPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\TriggerTeslaPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\WarheadDetonationPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDisarmPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDropAmmoPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerShootPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerPickUpPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDropItemPatch.cs" />
@@ -140,9 +146,10 @@
     <Compile Include="Patches\EventsPatches\ServerPatches\ConsoleCommandPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\RemoteAdminPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\ShootPermissionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\InvisiblePatch.cs" />
     <Compile Include="Patches\SynapsePatches\ItemPatches\Scp914Patch.cs" />
-    <Compile Include="Patches\SynapsePatches\ItemPatches\SetClassPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSetClassPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ItemPatches\WorkStationPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ItemPatches\SpawnItemPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ItemPatches\InventoryClearPatch.cs" />
@@ -154,6 +161,7 @@
     <Compile Include="Patches\SynapsePatches\PermissionSystem\RefreshPermissionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\PermissionSystem\SignatureCompletePatch.cs" />
     <Compile Include="Patches\SynapsePatches\PermissionSystem\SetGroupPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\Wrapper\Scp914StartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\RagdollPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\GeneratorStartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\NukeLockPatch.cs" />

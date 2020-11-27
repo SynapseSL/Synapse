@@ -51,6 +51,14 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<PlayerShootEventArgs> PlayerShootEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerSetClassEventArgs> PlayerSetClassEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerConnectWorkstationEventArgs> PlayerConnectWorkstationEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerUnconnectWorkstationEventArgs> PlayerUnconnectWorkstationEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerDropAmmoEventArgs> PlayerDropAmmoEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerCuffTargetEventArgs> PlayerCuffTargetEvent;
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -276,6 +284,64 @@ namespace Synapse.Api.Events
         }
 
         internal void InvokeSetClassEvent(PlayerSetClassEventArgs ev) => PlayerSetClassEvent?.Invoke(ev);
+
+        internal void InvokePlayerConnectWorkstation(Player player,SynapseItem item,WorkStation station,out bool allow)
+        {
+            var ev = new PlayerConnectWorkstationEventArgs
+            {
+                Player = player,
+                Item = item,
+                WorkStation = station
+            };
+
+            PlayerConnectWorkstationEvent?.Invoke(ev);
+
+            allow = ev.Allow;
+        }
+
+        internal void InvokePlayerUnonnectWorkstation(Player player,WorkStation station, out bool allow)
+        {
+            var ev = new PlayerUnconnectWorkstationEventArgs
+            {
+                Player = player,
+                WorkStation = station
+            };
+
+            PlayerUnconnectWorkstationEvent?.Invoke(ev);
+
+            allow = ev.Allow;
+        }
+
+        internal void InvokePlayerDropAmmoEvent(Player player, SynapseItem item, ref uint amount, ref int type, out bool allow)
+        {
+            var ev = new PlayerDropAmmoEventArgs
+            {
+                Tablet = item,
+                AmmoType = (Enum.AmmoType)type,
+                Amount = amount,
+                Player = player
+            };
+
+            PlayerDropAmmoEvent?.Invoke(ev);
+
+            amount = ev.Amount;
+            type = (int)ev.AmmoType;
+            allow = ev.Allow;
+        }
+
+        internal void InvokePlayerCuffTargetEvent(Player target,Player cuffer,SynapseItem disarmer,ref bool allow)
+        {
+            var ev = new PlayerCuffTargetEventArgs
+            {
+                Cuffer = cuffer,
+                Disarmer = disarmer,
+                Target = target
+            };
+
+            PlayerCuffTargetEvent?.Invoke(ev);
+
+            allow = ev.Allow;
+        }
         #endregion
     }
 }

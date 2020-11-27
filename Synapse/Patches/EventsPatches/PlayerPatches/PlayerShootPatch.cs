@@ -31,6 +31,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var item = player.ItemInHand;
 
                 Server.Get.Events.Player.InvokePlayerShootEvent(player, targetplayer, targetPos, item, out var allow);
+                if (item != null)
+                    Server.Get.Events.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allow);
 
                 return allow;
             }

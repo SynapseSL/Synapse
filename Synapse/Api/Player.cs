@@ -185,15 +185,12 @@ namespace Synapse.Api
             get => _role;
             set
             {
-                if (value == null)
-                {
-                    if (_role == null) return;
-
+                if (_role != null)
                     _role.DeSpawn();
-                    _role = value;
-                    return;
-                }
+
                 _role = value;
+
+                if (_role == null) return;
 
                 _role.Player = this;
                 _role.Spawn();
@@ -320,6 +317,12 @@ namespace Synapse.Api
             set => NicknameSync.DisplayName = value; 
         }
 
+        public string DisplayInfo
+        {
+            get => NicknameSync._customPlayerInfoString;
+            set => NicknameSync.Network_customPlayerInfoString = value;
+        }
+
         public int PlayerId
         {
             get => QueryProcessor.PlayerId;
@@ -373,7 +376,7 @@ namespace Synapse.Api
         public Vector2 Rotation
         {
             get => PlayerMovementSync.RotationSync;
-            set => PlayerMovementSync.RotationSync = value;
+            set => PlayerMovementSync.NetworkRotationSync = value;
         }
 
         public Vector3 DeathPosition
@@ -435,7 +438,13 @@ namespace Synapse.Api
         public float Stamina
         {
             get => Hub.fpc.staminaController.RemainingStamina * 100;
-            set => Hub.fpc.staminaController.RemainingStamina = value / 100f;
+            set => Hub.fpc.staminaController.RemainingStamina = (value / 100f);
+        }
+
+        public float StaminaUsage
+        {
+            get => Hub.fpc.staminaController.StaminaUse * 100;
+            set => Hub.fpc.staminaController.StaminaUse = (value / 100f);
         }
 
         public RoleType RoleType

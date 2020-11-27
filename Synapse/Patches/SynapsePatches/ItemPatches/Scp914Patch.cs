@@ -14,12 +14,10 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
         {
             try
             {
-                var type = __instance.UpgradeItemID(item.itemId);
                 var synapseitem = item.GetSynapseItem();
+                var type = Map.Get.Scp914.UpgradeItemID(synapseitem.ID);
 
-                if (synapseitem.IsCustomItem) return false;
-
-                if (type < ItemType.KeycardJanitor)
+                if (type < 0)
                 {
                     synapseitem.Destroy();
                     __result = false;
@@ -41,7 +39,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: Scp914ItemUpgrade failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Item: Scp914ItemUpgrade failed!!\n{e}");
             }
             return false;
         }
@@ -57,11 +55,9 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
                 var splayer = inventory.GetPlayer();
                 foreach(var item in splayer.Inventory.Items)
                 {
-                    if (item.IsCustomItem) continue;
+                    var type = Map.Get.Scp914.UpgradeItemID(item.ID);
 
-                    var type = __instance.UpgradeItemID(item.ItemType);
-
-                    if (type < ItemType.KeycardJanitor)
+                    if (type < 0)
                         item.Destroy();
                     else
                     {
@@ -74,7 +70,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
                             newitem.Other = 0;
                         }
                         newitem.PickUp(splayer);
-                        Scp914Machine.TryFriendshipAchievement(type, player, players);
+                        Scp914Machine.TryFriendshipAchievement(item.ItemType, player, players);
                     }
                 }
             }
@@ -96,11 +92,10 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
                 if (inventory.curItem == ItemType.None) return false;
 
                 var splayer = inventory.GetPlayer();
-                var type = __instance.UpgradeItemID(splayer.ItemInHand.ItemType);
+                var type = Map.Get.Scp914.UpgradeItemID(splayer.ItemInHand.ID);
                 var index = inventory.GetItemIndex();
                 if (index < 0 || index >= inventory.items.Count) return false;
-                if (splayer.ItemInHand.IsCustomItem) return false;
-                if (type == ItemType.None)
+                if (type < 0)
                 {
                     splayer.ItemInHand.Destroy();
                     return false;
@@ -108,7 +103,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
 
                 var item = splayer.ItemInHand;
                 var newitem = new SynapseItem(type, item.Durabillity, item.Sight, item.Barrel, item.Other);
-                if(type == ItemType.GunLogicer)
+                if(newitem.ItemType == ItemType.GunLogicer)
                 {
                     newitem.Barrel = 0;
                     newitem.Sight = 0;
@@ -117,7 +112,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
                 item.Destroy();
                 newitem.PickUp(splayer);
 
-                Scp914Machine.TryFriendshipAchievement(type, player, players);
+                Scp914Machine.TryFriendshipAchievement(newitem.ItemType, player, players);
             }
             catch (Exception e)
             {

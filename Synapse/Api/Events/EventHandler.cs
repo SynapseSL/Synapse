@@ -22,34 +22,11 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    ev.Player.Jail.JailPlayer(ev.Player);
+                    ev.Player.WeaponManager.RpcEmptyClip();
                     break;
 
                 case KeyCode.Alpha2:
-                    ev.Player.Jail.UnJailPlayer();
-                    break;
-
-                case KeyCode.Alpha3:
-                    var msg = $"All Gameobject on MapSeed: {SynapseController.Server.Map.Seed}";
-
-                    foreach (var go in SynapseController.Server.GetObjectsOf<GameObject>())
-                        msg += $"\n{go.name} - Position: {go.transform.position}";
-
-                    var path = Path.Combine(SynapseController.Server.Files.SynapseDirectory, "Gameobjects.txt");
-
-                    if (!File.Exists(path))
-                        File.Create(path).Close();
-
-                    File.WriteAllText(path,msg);
-                    break;
-
-                case KeyCode.Alpha4:
-                    msg = "All Rooms:";
-
-                    foreach (var room in SynapseController.Server.Map.Rooms)
-                        msg += $"\nName:{room.RoomName} Zone:{room.Zone} Type:{room.RoomType}";
-
-                    ev.Player.SendConsoleMessage(msg);
+                    Logger.Get.Info(SynapseController.Server.FF.ToString());
                     break;
             }
         }
