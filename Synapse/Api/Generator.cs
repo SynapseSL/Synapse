@@ -89,17 +89,17 @@ namespace Synapse.Api
 
         public Vector3 TabletEjectionPoint => generator.tabletEjectionPoint.position;
 
-        public bool IsOvercharged => Map.Get.ForcedOvercharge || generator._localTime <= 0f;
+        public bool IsOvercharged => Map.Get.HeavyController.ForcedOvercharge || generator._localTime <= 0f;
 
         public void Overcharge()
         {
             if (IsOvercharged) return;
-            Map.Get.ActiveGenerators++;
+            Map.Get.HeavyController.ActiveGenerators++;
             generator.NetworkremainingPowerup = 0f;
             generator._localTime = 0f;
             generator.EjectTablet();
-            generator.RpcNotify(Map.Get.ActiveGenerators);
-            if (Map.Get.ActiveGenerators < 5)
+            generator.RpcNotify(Map.Get.HeavyController.ActiveGenerators);
+            if (Map.Get.HeavyController.ActiveGenerators < 5)
                 Respawning.RespawnEffectsController.PlayCassieAnnouncement(string.Concat(new object[]
                 {
                         "JAM_",
@@ -107,7 +107,7 @@ namespace Synapse.Api
                         "_",
                         UnityEngine.Random.Range(2, 5),
                         " SCP079RECON",
-                        Map.Get.ActiveGenerators
+                        Map.Get.HeavyController.ActiveGenerators
                 }), false, true);
             else
                 Recontainer079.BeginContainment(false);

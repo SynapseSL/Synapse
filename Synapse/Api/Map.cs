@@ -20,6 +20,8 @@ namespace Synapse.Api
 
         public Scp914 Scp914 { get; } = new Scp914();
 
+        public HeavyController HeavyController { get; } = new HeavyController();
+
         public List<Tesla> Teslas { get; } = new List<Tesla>();
 
         public List<Elevator> Elevators { get; } = new List<Elevator>();
@@ -71,10 +73,6 @@ namespace Synapse.Api
         }
 
         public int Seed => RandomSeedSync.staticSeed;
-
-        public byte ActiveGenerators { get => ForcedOvercharge? (byte)5 : Generator079.mainGenerator.totalVoltage; set => Generator079.mainGenerator.totalVoltage = value; }
-
-        public bool ForcedOvercharge => Generator079.mainGenerator.forcedOvercharge;
 
         public Room GetRoom(RoomInformation.RoomType roomType) => Rooms.FirstOrDefault(x => x.RoomType == roomType);
 
