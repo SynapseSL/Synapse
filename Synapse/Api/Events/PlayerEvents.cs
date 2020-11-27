@@ -52,9 +52,11 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<PlayerSetClassEventArgs> PlayerSetClassEvent;
 
-        public event EventHandler.OnSynapseEvent<PlayerConnectWorkstationEventArgs> PlayerConnectWorkstation;
+        public event EventHandler.OnSynapseEvent<PlayerConnectWorkstationEventArgs> PlayerConnectWorkstationEvent;
 
-        public event EventHandler.OnSynapseEvent<PlayerUnconnectWorkstationEventArgs> PlayerUnconnectWorkstation;
+        public event EventHandler.OnSynapseEvent<PlayerUnconnectWorkstationEventArgs> PlayerUnconnectWorkstationEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerDropAmmoEventArgs> PlayerDropAmmoEvent;
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -290,7 +292,7 @@ namespace Synapse.Api.Events
                 WorkStation = station
             };
 
-            PlayerConnectWorkstation?.Invoke(ev);
+            PlayerConnectWorkstationEvent?.Invoke(ev);
 
             allow = ev.Allow;
         }
@@ -303,8 +305,25 @@ namespace Synapse.Api.Events
                 WorkStation = station
             };
 
-            PlayerUnconnectWorkstation?.Invoke(ev);
+            PlayerUnconnectWorkstationEvent?.Invoke(ev);
 
+            allow = ev.Allow;
+        }
+
+        internal void InvokePlayerDropAmmoPatch(Player player, SynapseItem item, ref uint amount, ref int type, out bool allow)
+        {
+            var ev = new PlayerDropAmmoEventArgs
+            {
+                Tablet = item,
+                AmmoType = (Enum.AmmoType)type,
+                Amount = amount,
+                Player = player
+            };
+
+            PlayerDropAmmoEvent?.Invoke(ev);
+
+            amount = ev.Amount;
+            type = (int)ev.AmmoType;
             allow = ev.Allow;
         }
         #endregion

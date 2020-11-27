@@ -35,6 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Api\Broadcast.cs" />
+    <Compile Include="Api\Enum\AmmoType.cs" />
     <Compile Include="Api\Enum\GrenadeType.cs" />
     <Compile Include="Api\Enum\DoorType.cs" />
     <Compile Include="Api\Enum\ItemState.cs" />
@@ -114,6 +115,7 @@
     <Compile Include="Patches\EventsPatches\MapPatches\DoorInteractPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\TriggerTeslaPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\WarheadDetonationPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDropAmmoPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerShootPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerPickUpPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDropItemPatch.cs" />

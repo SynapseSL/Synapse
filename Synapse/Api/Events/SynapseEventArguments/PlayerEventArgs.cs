@@ -246,4 +246,17 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public bool Allow { get; set; } = true;
     }
+
+    public class PlayerDropAmmoEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public SynapseItem Tablet { get; internal set; }
+
+        public Enum.AmmoType AmmoType { get; set; }
+
+        public uint Amount { get; set; }
+
+        public bool Allow { get; set; }
+    }
 }

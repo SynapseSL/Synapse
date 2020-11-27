@@ -1,6 +1,5 @@
 ﻿using System;
 using HarmonyLib;
-using Synapse.Api;
 using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
