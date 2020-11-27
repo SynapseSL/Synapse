@@ -8,6 +8,11 @@
 
         public byte ActiveGenerators { get => ForcedOvercharge ? (byte)5 : Generator079.mainGenerator.totalVoltage; internal set => Generator079.mainGenerator.totalVoltage = value; }
 
-        public void Overcharge(bool forced = true) => Recontainer079.BeginContainment(forced);
+        public void Overcharge(bool forced = true)
+        {
+            if (forced)
+                Generator079.mainGenerator.forcedOvercharge = true;
+            Recontainer079.BeginContainment(forced);
+        }
     }
 }
