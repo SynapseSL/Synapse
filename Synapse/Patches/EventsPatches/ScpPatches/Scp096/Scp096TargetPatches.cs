@@ -60,7 +60,6 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
     {
         private static bool Prefix(PlayableScps.Scp096 __instance, PlayerStats.HitInfo info)
         {
-            Synapse.Api.Logger.Get.Info("Scp096 Shoot");
             try
             {
                 if (info == null || info.RHub == null) return false;
