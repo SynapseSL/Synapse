@@ -220,6 +220,8 @@ namespace Synapse.Api
             }
         }
 
+        public string RoleName => Server.Get.RoleManager.GetRoleName(RoleID);
+
         //Stuff for the Permission System
         private SynapseGroup synapseGroup;
 

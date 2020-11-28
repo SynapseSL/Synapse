@@ -32,7 +32,7 @@ namespace Synapse.Api.Roles
             if (id >= -1 && id <= HighestRole)
                 return ((RoleType)id).ToString();
 
-            if (!IsIDRegistered(id)) throw new Exception("Plugin tryied to get the Name of a non registered Role");
+            if (!IsIDRegistered(id)) throw new Exception("Plugin tried to get the Name of a non registered Role");
 
             return CustomRoles.Values.First(x => x.Value == id).Key;
         }
