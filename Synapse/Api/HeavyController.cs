@@ -14,5 +14,7 @@
                 Generator079.mainGenerator.forcedOvercharge = true;
             Recontainer079.BeginContainment(forced);
         }
+
+        public void LightsOut(float duration, bool onlyHeavy = true) => Generator079.mainGenerator.ServerOvercharge(duration, onlyHeavy);
     }
 }
