@@ -27,6 +27,16 @@ namespace Synapse.Api.Roles
         public Dictionary<Type, KeyValuePair<string, int>> CustomRoles = new Dictionary<Type, KeyValuePair<string, int>>();
 
 
+        public string GetRoleName(int id)
+        {
+            if (id >= -1 && id <= HighestRole)
+                return ((RoleType)id).ToString();
+
+            if (!IsIDRegistered(id)) throw new Exception("Plugin tryied to get the Name of a non registered Role");
+
+            return CustomRoles.Values.First(x => x.Value == id).Key;
+        }
+
         public IRole GetCustomRole(string name) => (IRole)Activator.CreateInstance(CustomRoles.FirstOrDefault(x => x.Value.Key.ToLower() == name.ToLower()).Key);
 
         public IRole GetCustomRole(int id) => (IRole)Activator.CreateInstance(CustomRoles.FirstOrDefault(x => x.Value.Value == id).Key);
