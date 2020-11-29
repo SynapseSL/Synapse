@@ -475,20 +475,7 @@ namespace Synapse.Api
 
         public Room Room
         {
-            get
-            {
-                var pos = Position;
-                pos.y -= 50f;
-
-                if (Physics.Linecast(Position,pos,out var info, -84058629) && info.transform != null)
-                {
-                    var room = Map.Get.Rooms.FirstOrDefault(x => x.GameObject == info.transform.gameObject);
-                    if (room != null)
-                        return room;
-                }
-
-                return SynapseController.Server.Map.Rooms.OrderBy(x => Vector3.Distance(x.Position, Position)).FirstOrDefault();
-            }
+            get => Map.Get.Rooms.FirstOrDefault(x => x.GameObject == Hub.localCurrentRoomEffects.curRoom);
             set => Position = value.Position;
         }
 
@@ -711,6 +698,8 @@ namespace Synapse.Api
         public Transform CameraReference => Hub.PlayerCameraReference;
 
         public Grenades.GrenadeManager GrenadeManager { get; }
+
+        public LocalCurrentRoomEffects LocalCurrentRoomEffects => Hub.localCurrentRoomEffects;
 
         public WeaponManager WeaponManager => Hub.weaponManager;
 
