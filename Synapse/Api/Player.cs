@@ -475,7 +475,11 @@ namespace Synapse.Api
 
         public Room Room
         {
-            get => Map.Get.Rooms.FirstOrDefault(x => x.GameObject == Hub.localCurrentRoomEffects.curRoom);
+            get
+            {
+                if (Vector3.Distance(Vector3.up * -1997, Position) <= 50) return Map.Get.GetRoom(RoomInformation.RoomType.POCKET);
+                return Map.Get.Rooms.FirstOrDefault(x => x.GameObject == Hub.localCurrentRoomEffects.curRoom);
+            }
             set => Position = value.Position;
         }
 
