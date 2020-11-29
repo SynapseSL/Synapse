@@ -155,6 +155,24 @@ namespace Synapse.Api
             Connection.Send(msg);
             NetworkWriterPool.Recycle(writer);
         }
+
+        private void PlaceBlood(Vector3 pos, int type, float size)
+        {
+            var component = ClassManager;
+            var writer = NetworkWriterPool.GetWriter();
+            writer.WriteVector3(pos);
+            writer.WritePackedInt32(type);
+            writer.WriteSingle(size);
+            var msg = new RpcMessage
+            {
+                netId = component.netId,
+                componentIndex = component.ComponentIndex,
+                functionHash = typeof(CharacterClassManager).FullName.GetStableHashCode() * 503 + "RpcPlaceBlood".GetStableHashCode(),
+                payload = writer.ToArraySegment()
+            };
+            Connection.Send(msg);
+            NetworkWriterPool.Recycle(writer);
+        }
         #endregion
 
         #region Synapse Api Stuff
