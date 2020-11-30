@@ -40,18 +40,55 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
         {
             try
             {
+                if (!NetworkServer.active) return false;
+
                 var component = other.GetComponent<NetworkIdentity>();
-                if (!NetworkServer.active || component == null) return false;
-                
-                var allow = true;
-                EventHandler.Get.Scp.Scp106.InvokePocketDimensionLeaveEvent(component.GetPlayer(), ref __instance.type, ref allow);
-                if(__instance.type == PocketDimensionTeleport.PDTeleportType.Exit)
+                if (component == null) return false;
+
+                var type = __instance.type;
+                var player = component.GetPlayer();
+
+                if (player == null) return false;
+
+                __instance.tpPositions.Clear();
+                var stringList = GameCore.ConfigFile.ServerConfig.GetStringList(Synapse.Api.Map.Get.Decontamination.IsDecontaminationInProgress ? "pd_random_exit_rids_after_decontamination" : "pd_random_exit_rids");
+                foreach (GameObject gameObject in Server.Get.Map.Rooms.Select(x => x.GameObject))
                 {
-                    var larry = Server.Get.Players.FirstOrDefault(x => x.Scp106Controller.PocketPlayers.Contains(component.GetPlayer()));
-                    if (larry != null)
-                        larry.Scp106Controller.PocketPlayers.Remove(component.GetPlayer());
+                    var component2 = gameObject.GetComponent<global::Rid>();
+                    if (component2 != null && stringList.Contains(component2.id, StringComparison.Ordinal))
+                        __instance.tpPositions.Add(gameObject.transform.position);
                 }
-                return allow;
+
+                if (stringList.Contains("PORTAL"))
+                    foreach (Scp106PlayerScript scp106PlayerScript in UnityEngine.Object.FindObjectsOfType<Scp106PlayerScript>())
+                        if (scp106PlayerScript.portalPosition != Vector3.zero)
+                            __instance.tpPositions.Add(scp106PlayerScript.portalPosition);
+
+                if(__instance.tpPositions == null || __instance.tpPositions.Count == 0)
+                    foreach (GameObject gameObject2 in GameObject.FindGameObjectsWithTag("PD_EXIT"))
+                        __instance.tpPositions.Add(gameObject2.transform.position);
+
+                var pos = __instance.tpPositions[UnityEngine.Random.Range(0, __instance.tpPositions.Count)];
+                pos.y += 2f;
+
+
+                EventHandler.Get.Scp.Scp106.InvokePocketDimensionLeaveEvent(player, ref pos, ref type, out var allow);
+
+                if (!allow) return false;
+
+                if (type == PocketDimensionTeleport.PDTeleportType.Killer || BlastDoor.OneDoor.isClosed)
+                {
+                    player.Hurt(9999, DamageTypes.Pocket, player);
+                    return false;
+                }
+
+                player.PlayerMovementSync.AddSafeTime(2f, false);
+                player.Position = pos;
+                __instance.RemoveCorrosionEffect(player.gameObject);
+                PlayerManager.localPlayer.GetComponent<PlayerStats>().TargetAchieve(component.connectionToClient, "larryisyourfriend");
+                if (PocketDimensionTeleport.RefreshExit)
+                    ImageGenerator.pocketDimensionGenerator.GenerateRandom();
+                return false;
             } 
             catch (Exception e)
             {

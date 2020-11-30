@@ -68,14 +68,20 @@ namespace Synapse.Api.Events
                 allow = ev.Allow;
             }
             
-            internal void InvokePocketDimensionLeaveEvent(Player player, ref PocketDimensionTeleport.PDTeleportType teleportType, ref bool allow)
+            internal void InvokePocketDimensionLeaveEvent(Player player,ref UnityEngine.Vector3 pos, ref PocketDimensionTeleport.PDTeleportType teleportType, out bool allow)
             {
                 var ev = new PocketDimensionLeaveEventArgs
-                    {Allow = allow, TeleportType = teleportType, Player = player};
+                {
+                    ExitPosition = pos,
+                    Player = player,
+                    TeleportType = teleportType
+                };
+
                 PocketDimensionLeaveEvent?.Invoke(ev);
 
-                allow = ev.Allow;
+                pos = ev.ExitPosition;
                 teleportType = ev.TeleportType;
+                allow = ev.Allow;
             }
 
             internal void InvokePortalCreateEvent(Player scp106, out bool allow)

@@ -1,4 +1,6 @@
-﻿namespace Synapse.Api.Events.SynapseEventArguments
+﻿using UnityEngine;
+
+namespace Synapse.Api.Events.SynapseEventArguments
 {
     public class Scp096AddTargetEventArgument : EventHandler.ISynapseEventArgs
     {
@@ -30,10 +32,12 @@
     public class PocketDimensionLeaveEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Player { get; internal set; }
+
+        public Vector3 ExitPosition { get; set; }
         
         public PocketDimensionTeleport.PDTeleportType TeleportType { get; set; }
-        
-        public bool Allow { get; set; }
+
+        public bool Allow { get; set; } = true;
     }
 
     public class PortalCreateEventArgs : EventHandler.ISynapseEventArgs
