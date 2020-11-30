@@ -41,7 +41,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 
 				if (!allow) return false;
 
-				var vanillaitems = items.Select(x => x.pickup);
+				var vanillaitems = items.Where(x => x.State == Api.Enum.ItemState.Map).Select(x => x.pickup);
 				var vanillaplayers = players.Select(x => x.ClassManager);
 
 				try

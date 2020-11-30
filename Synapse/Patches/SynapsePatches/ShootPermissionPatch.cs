@@ -20,7 +20,11 @@ namespace Synapse.Patches.SynapsePatches
                 {
                     if (shooter.Team == Team.SCP && target.Team == Team.SCP) __result = false;
 
-                    else if (Server.Get.FF) __result = shooter.Team != target.Team;
+                    var ff = Server.Get.FF;
+                    if (forceFriendlyFire)
+                        ff = true;
+
+                    else if (!ff) __result = shooter.Team != target.Team;
                 }
                 else
                 {

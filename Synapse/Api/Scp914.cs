@@ -66,7 +66,7 @@ namespace Synapse.Api
             rough = recipe.rough.Select(x => (int)x).ToList();
             coarse = recipe.coarse.Select(x => (int)x).ToList();
             oneToOne = recipe.oneToOne.Select(x => (int)x).ToList();
-            fine = recipe.oneToOne.Select(x => (int)x).ToList();
+            fine = recipe.fine.Select(x => (int)x).ToList();
             veryFine = recipe.veryFine.Select(x => (int)x).ToList();
         }
 
