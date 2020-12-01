@@ -64,6 +64,12 @@ namespace Synapse
             }
         }
 
+        public int Slots
+        {
+            get => CustomNetworkManager.slots;
+            set => CustomNetworkManager.slots = value;
+        }
+
         [SuppressMessage("ReSharper", "UnusedMember.Global")]
         [SuppressMessage("ReSharper", "InconsistentNaming")]
         public bool FF
