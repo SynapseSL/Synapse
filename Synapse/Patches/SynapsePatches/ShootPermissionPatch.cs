@@ -24,7 +24,7 @@ namespace Synapse.Patches.SynapsePatches
                     if (forceFriendlyFire)
                         ff = true;
 
-                    else if (!ff) __result = shooter.Team != target.Team;
+                    else if (!ff) __result = Misc.GetFraction(shooter.Team) != Misc.GetFraction(target.Team);
                 }
                 else
                 {
