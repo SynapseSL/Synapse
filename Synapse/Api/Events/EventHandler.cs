@@ -28,6 +28,14 @@ namespace Synapse.Api.Events
                 case KeyCode.Alpha2:
                     Logger.Get.Info(SynapseController.Server.FF.ToString());
                     break;
+
+                case KeyCode.Alpha3:
+                    SynapseController.Server.Map.HeavyController.Overcharge(true);
+                    break;
+
+                case KeyCode.Alpha4:
+                    SynapseController.Server.Map.HeavyController.Overcharge(false);
+                    break;
             }
         }
 
