@@ -12,6 +12,8 @@ namespace Synapse.Api
         /// </summary>
         public DecontaminationController Controller => DecontaminationController.Singleton;
 
+        public bool Locked { get => Controller._stopUpdating; set => Controller._stopUpdating = value; }
+
         /// <summary>
         /// Returns whether the Decontamination is in Progress
         /// </summary>

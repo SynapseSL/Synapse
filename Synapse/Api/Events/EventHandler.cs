@@ -36,6 +36,14 @@ namespace Synapse.Api.Events
                 case KeyCode.Alpha4:
                     SynapseController.Server.Map.HeavyController.Overcharge(false);
                     break;
+
+                case KeyCode.Alpha5:
+                    SynapseController.Server.Map.Decontamination.Locked = true;
+                    break;
+
+                case KeyCode.Alpha6:
+                    SynapseController.Server.Map.Decontamination.Locked = false;
+                    break;
             }
         }
 
