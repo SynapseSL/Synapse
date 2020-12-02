@@ -1,5 +1,5 @@
 ﻿using Synapse.Api.Events.SynapseEventArguments;
-using Synapse.Patches.EventsPatches.ScpPatches.Scp106;
+using Synapse.Api.Enum;
 
 namespace Synapse.Api.Events
 {
@@ -10,6 +10,8 @@ namespace Synapse.Api.Events
         public Scp096Events Scp096 { get; } = new Scp096Events();
         
         public Scp106Events Scp106 { get; } = new Scp106Events();
+
+        public Scp079Events Scp079 { get; } = new Scp079Events();
 
         public class Scp096Events
         {
@@ -97,6 +99,25 @@ namespace Synapse.Api.Events
                 allow = ev.Allow;
             }
             #endregion
+        }
+
+        public class Scp079Events
+        {
+            internal Scp079Events() { }
+
+            public event EventHandler.OnSynapseEvent<Scp079RecontainEventArgs> Scp079RecontainEvent;
+
+            internal void Invoke079RecontainEvent(Recontain079Status status,out bool allow)
+            {
+                var ev = new Scp079RecontainEventArgs
+                {
+                    Status = status
+                };
+
+                Scp079RecontainEvent?.Invoke(ev);
+
+                allow = ev.Allow;
+            }
         }
     }
 }

@@ -46,4 +46,11 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public bool Allow { get; set; }
     }
+
+    public class Scp079RecontainEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Enum.Recontain079Status Status { get; internal set; }
+
+        public bool Allow { get; set; } = true;
+    }
 }

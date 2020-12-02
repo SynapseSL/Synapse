@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using HarmonyLib;
+using Synapse.Api.Enum;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 {
@@ -15,7 +16,16 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 
         private static IEnumerator<float> OverrideRecontain(bool forced)
         {
-			//RecontainEventInitialising
+			var ev = SynapseController.Server.Events.Scp.Scp079;
+            try
+            {
+				ev.Invoke079RecontainEvent(Recontain079Status.Initialize, out var allow);
+				if (!allow) yield break;
+            }
+			catch(Exception e)
+            {
+				Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp079RecontainEvent initializing failed!!\n{e}");
+			}
 
 			PlayerStats ps = PlayerManager.localPlayer.GetComponent<PlayerStats>();
 			NineTailedFoxAnnouncer annc = NineTailedFoxAnnouncer.singleton;
@@ -42,7 +52,15 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 			while (annc.queue.Count > 0 || AlphaWarheadController.Host.inProgress)
 				yield return float.NegativeInfinity;
 
-			//RecontainEventStart
+			try
+			{
+				ev.Invoke079RecontainEvent(Recontain079Status.Start, out var allow);
+				if (!allow) yield break;
+			}
+			catch (Exception e)
+			{
+				Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp079RecontainEvent start failed!!\n{e}");
+			}
 
 			Synapse.Api.Map.Get.HeavyController.Is079Recontained = true;
 
@@ -80,7 +98,15 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 
 			Recontainer079.isLocked = false;
 
-			//RecontainEventEnd
+			try
+			{
+				ev.Invoke079RecontainEvent(Recontain079Status.Finished, out var allow);
+				if (!allow) yield break;
+			}
+			catch (Exception e)
+			{
+				Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp079RecontainEvent finished failed!!\n{e}");
+			}
 
 			yield break;
 		}
