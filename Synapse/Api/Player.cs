@@ -667,6 +667,8 @@ namespace Synapse.Api
             }
         }
 
+        public ZoneType Zone => Room.Zone;
+
         public bool DoNotTrack => ServerRoles.DoNotTrack;
 
         public bool IsDead => Team == Team.RIP;
