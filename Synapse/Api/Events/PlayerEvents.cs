@@ -335,7 +335,8 @@ namespace Synapse.Api.Events
             {
                 Cuffer = cuffer,
                 Disarmer = disarmer,
-                Target = target
+                Target = target,
+                Allow = allow
             };
 
             PlayerCuffTargetEvent?.Invoke(ev);
