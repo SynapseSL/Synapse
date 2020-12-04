@@ -15,11 +15,7 @@ namespace Synapse.Api
 
         public Vector3 PortalPosition { get => script.NetworkportalPosition; set => script.SetPortalPosition(value); }
 
-        public bool GoingViaThePortal
-        {
-            get => script.goingViaThePortal;
-            set => script.goingViaThePortal = value;
-        }
+        public bool IsUsingPortal => script.goingViaThePortal;
 
         public List<Player> PocketPlayers { get; } = new List<Player>();
 
