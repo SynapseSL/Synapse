@@ -270,4 +270,13 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public bool Allow { get; set; } = true;
     }
+
+    public class PlayerUseMicroEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public SynapseItem Micro { get; internal set; }
+
+        public MicroHID.MicroHidState State { get; set; }
+    }
 }

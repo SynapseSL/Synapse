@@ -117,6 +117,7 @@
     <Compile Include="Patches\EventsPatches\MapPatches\DoorInteractPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\TriggerTeslaPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\WarheadDetonationPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerUseMicroPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDisarmPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDropAmmoPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerShootPatch.cs" />
