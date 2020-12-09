@@ -8,11 +8,18 @@ using Synapse.Api.Enum;
 
 public static class SynapseExtensions
 {
-    public static Player GetPlayer(this MonoBehaviour mono) => mono.gameObject.GetComponent<Player>();
+    public static Player GetPlayer(this MonoBehaviour mono) => mono?.gameObject.GetComponent<Player>();
 
-    public static Player GetPlayer(this GameObject gameObject) => gameObject.GetComponent<Player>();
+    public static Player GetPlayer(this GameObject gameObject) => gameObject?.GetComponent<Player>();
 
-    public static Player GetPlayer(this PlayableScps.PlayableScp scp) => scp.Hub.GetPlayer();
+    public static Player GetPlayer(this PlayableScps.PlayableScp scp) => scp?.Hub?.GetPlayer();
+
+    public static Player GetPlayer(this CommandSender sender)
+    {
+        return sender?.SenderId == "SERVER CONSOLE" || sender?.SenderId == "GAME CONSOLE"
+        ? Server.Get.Host
+        : Server.Get.GetPlayer(sender.SenderId);
+    }
 
     public static List<Player> GetPlayers(this RoleType role) => SynapseController.Server.Players.Where(x => x.RoleType == role).ToList();
 
@@ -25,13 +32,6 @@ public static class SynapseExtensions
     public static List<Player> GetPlayers(this Team[] teams) => SynapseController.Server.Players.Where(x => teams.Any(y => x.Team == y)).ToList();
 
     public static List<Player> GetPlayers(this Fraction[] fractions) => SynapseController.Server.Players.Where(x => fractions.Any(y => x.Fraction == y)).ToList();
-
-    public static Player GetPlayer(this CommandSender sender)
-    {
-        return sender.SenderId == "SERVER CONSOLE" || sender.SenderId == "GAME CONSOLE"
-        ? Server.Get.Host
-        : Server.Get.GetPlayer(sender.SenderId);
-    }
 
     public static void RaMessage(this CommandSender sender, string message, bool success = true,
             RaCategory type = RaCategory.None)

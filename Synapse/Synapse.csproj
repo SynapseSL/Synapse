@@ -135,6 +135,7 @@
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerJoinPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerLeavePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSpeakPatch.cs" />
+    <Compile Include="Patches\EventsPatches\RoundPatches\TeamRespawnPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\SpawnPlayersPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\RoundRestartPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\RoundCheckPatch.cs" />
