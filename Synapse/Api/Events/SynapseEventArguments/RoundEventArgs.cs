@@ -18,4 +18,13 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public bool Allow { get; set; }
     }
+
+    public class TeamRespawnEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Respawning.SpawnableTeamType Team { get; set; }
+
+        public List<Player> Players { get; set; }
+
+        public bool Allow { get; set; } = true;
+    }
 }
