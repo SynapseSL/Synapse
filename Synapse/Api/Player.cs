@@ -420,9 +420,10 @@ namespace Synapse.Api
                 {
                     transform.localScale = value;
 
-                    foreach(var player in SynapseController.Server.Players)
-                        typeof(NetworkServer).GetMethod("SendSpawnMessage", BindingFlags.Instance | BindingFlags.InvokeMethod
-                        | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public)?.Invoke(null, new object[] { GetComponent<NetworkIdentity>(), player.Connection});
+                    var method = typeof(NetworkServer).GetMethod("SendSpawnMessage", BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public);
+
+                    foreach(var ply in Server.Get.Players)
+                        method.Invoke(null, new object[] { NetworkIdentity, ply.Connection });
                 }
                 catch (Exception e)
                 {
@@ -702,6 +703,8 @@ namespace Synapse.Api
 
         #region ReferenceHub
         public Transform CameraReference => Hub.PlayerCameraReference;
+
+        public NetworkIdentity NetworkIdentity => Hub.networkIdentity;
 
         public Grenades.GrenadeManager GrenadeManager { get; }
 
