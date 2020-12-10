@@ -279,4 +279,13 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public MicroHID.MicroHidState State { get; set; }
     }
+
+    public class PlayerWalkOnSinkholeEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public SinkholeEnvironmentalHazard Sinkhole { get; internal set; }
+
+        public bool Allow { get; set; }
+    }
 }

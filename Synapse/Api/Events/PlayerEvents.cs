@@ -61,6 +61,8 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<PlayerCuffTargetEventArgs> PlayerCuffTargetEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerUseMicroEventArgs> PlayerUseMicroEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerWalkOnSinkholeEventArgs> PlayerWalkOnSinkholeEvent;
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -358,6 +360,20 @@ namespace Synapse.Api.Events
             PlayerUseMicroEvent?.Invoke(ev);
 
             state = ev.State;
+        }
+
+        internal void InvokeSinkhole(Player player,SinkholeEnvironmentalHazard sinkhole,ref bool allow)
+        {
+            var ev = new PlayerWalkOnSinkholeEventArgs
+            {
+                Allow = allow,
+                Player = player,
+                Sinkhole = sinkhole
+            };
+
+            PlayerWalkOnSinkholeEvent?.Invoke(ev);
+
+            allow = ev.Allow;
         }
         #endregion
     }
