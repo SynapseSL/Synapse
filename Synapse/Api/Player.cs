@@ -156,7 +156,7 @@ namespace Synapse.Api
             NetworkWriterPool.Recycle(writer);
         }
 
-        private void PlaceBlood(Vector3 pos, int type, float size)
+        public void PlaceBlood(Vector3 pos, int type, float size)
         {
             var component = ClassManager;
             var writer = NetworkWriterPool.GetWriter();
