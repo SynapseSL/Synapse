@@ -21,27 +21,11 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    ev.Player.WeaponManager.RpcEmptyClip();
+                    ev.Player.Scale = ev.Player.Scale / 2;
                     break;
 
                 case KeyCode.Alpha2:
-                    Logger.Get.Info(SynapseController.Server.FF.ToString());
-                    break;
-
-                case KeyCode.Alpha3:
-                    SynapseController.Server.Map.HeavyController.Overcharge(true);
-                    break;
-
-                case KeyCode.Alpha4:
-                    SynapseController.Server.Map.HeavyController.Overcharge(false);
-                    break;
-
-                case KeyCode.Alpha5:
-                    SynapseController.Server.Map.Decontamination.Locked = true;
-                    break;
-
-                case KeyCode.Alpha6:
-                    SynapseController.Server.Map.Decontamination.Locked = false;
+                    ev.Player.Scale = ev.Player.Scale * 2;
                     break;
             }
         }
