@@ -3,6 +3,8 @@ using HarmonyLib;
 using Mirror;
 using Synapse.Api.Enum;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Events.Patches
@@ -101,13 +103,33 @@ namespace Synapse.Events.Patches
 				//Unlock The Generator
 				var flag = player.Bypass;
 
-				if (player.VanillaInventory.GetItemInHand().id > ItemType.KeycardJanitor)
-				{
-					var permissions = player.VanillaInventory.GetItemByID(player.VanillaInventory.curItem).permissions;
+				var items = new List<Synapse.Api.Items.SynapseItem>();
+				if (Server.Get.Configs.SynapseConfiguration.RemoteKeyCard)
+					items.AddRange(player.Inventory.Items.Where(x => x.ItemCategory == ItemCategory.Keycard));
+				else if (player.ItemInHand != null && player.ItemInHand.ItemCategory == ItemCategory.Keycard)
+					items.Add(player.ItemInHand);
+
+
+				foreach(var item in items)
+                {
+					var keycardcanopen = false;
+					var permissions = player.VanillaInventory.GetItemByID(item.ItemType).permissions;
 
 					foreach (var t in permissions)
 						if (t == "ARMORY_LVL_2")
-							flag = true;
+							keycardcanopen = true;
+
+					try
+					{
+						Server.Get.Events.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref keycardcanopen);
+					}
+					catch (Exception e)
+					{
+						Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent(Keycard) failed!!\n{e}");
+					}
+
+					if (keycardcanopen)
+						flag = true;
 				}
 
 				Server.Get.Events.Player.InvokePlayerGeneratorInteractEvent(player, generator, GeneratorInteraction.Unlocked, ref flag);

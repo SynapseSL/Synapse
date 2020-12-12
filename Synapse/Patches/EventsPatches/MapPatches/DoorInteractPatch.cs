@@ -57,22 +57,21 @@ namespace Synapse.Patches.EventsPatches.MapPatches
                                 allowTheAccess = false;
                             else
                             {
-                                var allow = true;
+                                var itemPerms = __instance._inv.GetItemByID(__instance._inv.curItem).permissions;
+
+                                allowTheAccess = itemPerms.Any(p =>
+                                    Door.backwardsCompatPermissions.TryGetValue(p, out var flag) &&
+                                    door.PermissionLevels.HasPermission(flag));
+
                                 try
                                 {
                                     Server.Get.Events.Player.InvokePlayerItemUseEvent(player, keycard,
-                                        Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allow);
+                                        Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allowTheAccess);
                                 }
-                                catch(Exception e)
+                                catch (Exception e)
                                 {
                                     Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent(Keycard) failed!!\n{e}");
                                 }
-
-                                var itemPerms = __instance._inv.GetItemByID(__instance._inv.curItem).permissions;
-
-                                allowTheAccess = allow && itemPerms.Any(p =>
-                                    Door.backwardsCompatPermissions.TryGetValue(p, out var flag) &&
-                                    door.PermissionLevels.HasPermission(flag));
                             }
                         }
                         else allowTheAccess = false;
@@ -97,17 +96,14 @@ namespace Synapse.Patches.EventsPatches.MapPatches
                              synapsedoor.PermissionLevels.HasPermission(flag)))
                             havepermission = true;
 
-                        if (havepermission)
+                        try
                         {
-                            try
-                            {
-                                Server.Get.Events.Player.InvokePlayerItemUseEvent(player, item,
-                                            Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref havepermission);
-                            }
-                            catch (Exception e)
-                            {
-                                Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent(Keycard-Remote) failed!!\n{e}");
-                            }
+                            Server.Get.Events.Player.InvokePlayerItemUseEvent(player, item,
+                                        Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref havepermission);
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent(Keycard-Remote) failed!!\n{e}");
                         }
 
                         if (havepermission)
