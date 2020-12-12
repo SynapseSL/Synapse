@@ -6,7 +6,6 @@ using EventHandler = Synapse.Api.Events.EventHandler;
 using UnityEngine;
 using Synapse.Api;
 using System.Linq;
-using Synapse.Api.Events;
 
 namespace Synapse.Patches.EventsPatches.MapPatches
 {
@@ -18,6 +17,10 @@ namespace Synapse.Patches.EventsPatches.MapPatches
             try
             {
                 var player = __instance.GetPlayer();
+                var keycard = player.ItemInHand;
+                if (keycard?.ItemCategory != ItemCategory.Keycard)
+                    keycard = null;
+                    
 
                 var allowTheAccess = true;
                 Door door = null;
@@ -46,15 +49,31 @@ namespace Synapse.Patches.EventsPatches.MapPatches
                     try
                     {
                         if (door.PermissionLevels == 0)
-                        {
                             allowTheAccess = !door.locked;
-                        }
+
                         else if (!door.RequireAllPermissions)
                         {
-                            var itemPerms = __instance._inv.GetItemByID(__instance._inv.curItem).permissions;
-                            allowTheAccess = itemPerms.Any(p =>
-                                Door.backwardsCompatPermissions.TryGetValue(p, out var flag) &&
-                                door.PermissionLevels.HasPermission(flag));
+                            if (keycard == null)
+                                allowTheAccess = false;
+                            else
+                            {
+                                var allow = true;
+                                try
+                                {
+                                    Server.Get.Events.Player.InvokePlayerItemUseEvent(player, keycard,
+                                        Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allow);
+                                }
+                                catch(Exception e)
+                                {
+                                    Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent(Keycard) failed!!\n{e}");
+                                }
+
+                                var itemPerms = __instance._inv.GetItemByID(__instance._inv.curItem).permissions;
+
+                                allowTheAccess = allow && itemPerms.Any(p =>
+                                    Door.backwardsCompatPermissions.TryGetValue(p, out var flag) &&
+                                    door.PermissionLevels.HasPermission(flag));
+                            }
                         }
                         else allowTheAccess = false;
                     }
@@ -64,9 +83,39 @@ namespace Synapse.Patches.EventsPatches.MapPatches
                     }
                 }
 
-                var Synapsedoor = Map.Get.Doors.FirstOrDefault(x => x.GameObject == doorId);
+                var synapsedoor = Map.Get.Doors.FirstOrDefault(x => x.GameObject == doorId);
 
-                EventHandler.Get.Map.InvokeDoorInteractEvent(player, Synapsedoor, ref allowTheAccess);
+                if (Server.Get.Configs.SynapseConfiguration.RemoteKeyCard && !allowTheAccess && player.VanillaItems.Any())
+                {
+                    foreach(var item in player.Inventory.Items.Where(x => x.ItemCategory == ItemCategory.Keycard && x != keycard))
+                    {
+                        var gameItem = player.VanillaInventory.GetItemByID(item.ItemType);
+                        var havepermission = false;
+
+                        if (gameItem.permissions.Any(p =>
+                             Door.backwardsCompatPermissions.TryGetValue(p, out var flag) &&
+                             synapsedoor.PermissionLevels.HasPermission(flag)))
+                            havepermission = true;
+
+                        if (havepermission)
+                        {
+                            try
+                            {
+                                Server.Get.Events.Player.InvokePlayerItemUseEvent(player, item,
+                                            Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref havepermission);
+                            }
+                            catch (Exception e)
+                            {
+                                Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent(Keycard-Remote) failed!!\n{e}");
+                            }
+                        }
+
+                        if (havepermission)
+                            allowTheAccess = true;
+                    }
+                }
+
+                EventHandler.Get.Map.InvokeDoorInteractEvent(player, synapsedoor, ref allowTheAccess);
 
                 if (allowTheAccess) door.ChangeState(__instance._sr.BypassMode);
                 else __instance.RpcDenied(doorId);

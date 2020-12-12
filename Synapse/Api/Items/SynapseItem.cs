@@ -30,6 +30,7 @@ namespace Synapse.Api.Items
             Sight = sight;
             Barrel = barrel;
             Other = other;
+            ItemCategory = Server.Get.Host.VanillaInventory.GetItemByID(ItemType).itemCategory;
 
             Map.Get.Items.Add(this);
         }
@@ -44,6 +45,7 @@ namespace Synapse.Api.Items
             Sight = sight;
             Barrel = barrel;
             Other = other;
+            ItemCategory = Server.Get.Host.VanillaInventory.GetItemByID(ItemType).itemCategory;
 
             Map.Get.Items.Add(this);
         }
@@ -51,6 +53,8 @@ namespace Synapse.Api.Items
         public readonly int ID;
 
         public readonly ItemType ItemType;
+
+        public readonly ItemCategory ItemCategory;
 
         public readonly bool IsCustomItem;
 

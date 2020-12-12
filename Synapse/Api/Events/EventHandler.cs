@@ -10,12 +10,12 @@ namespace Synapse.Api.Events
         {
             Player.PlayerJoinEvent += PlayerJoin;
             Player.PlayerSyncDataEvent += PlayerSyncData;
-            Map.DoorInteractEvent += DoorInteract;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
 #endif
         }
 
+#if DEBUG
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
         {
             switch (ev.KeyCode)
@@ -29,6 +29,7 @@ namespace Synapse.Api.Events
                     break;
             }
         }
+#endif
 
         public static EventHandler Get => SynapseController.Server.Events;
 
@@ -63,21 +64,6 @@ namespace Synapse.Api.Events
                 ev.Player.RoleType != RoleType.Scientist &&
                 !(Vector3.Distance(ev.Player.Position, ev.Player.GetComponent<Escape>().worldPosition) >= Escape.radius))
                 ev.Player.ClassManager.CmdRegisterEscape();
-        }
-
-        private void DoorInteract(SynapseEventArguments.DoorInteractEventArgs ev)
-        {
-            if (!SynapseController.Server.Configs.SynapseConfiguration.RemoteKeyCard) return;
-            if (ev.Allow) return;
-
-            if (!ev.Player.VanillaItems.Any()) return;
-            foreach (var gameItem in ev.Player.VanillaItems.Select(item => ev.Player.VanillaInventory.GetItemByID(item.id)).Where(gameitem => gameitem.permissions != null && gameitem.permissions.Length != 0))
-            {
-                if (gameItem.permissions.Any(p =>
-                     global::Door.backwardsCompatPermissions.TryGetValue(p, out var flag) &&
-                     ev.Door.PermissionLevels.HasPermission(flag)))
-                    ev.Allow = true;
-            }
         }
 #endregion
     }
