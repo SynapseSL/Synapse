@@ -78,7 +78,7 @@ namespace Synapse
             set => ServerConsole.FriendlyFire = value;
         }
 
-        public List<string> Colors { get; } = new List<string>
+        public string[] Colors { get; } = new string[]
         {
             "silver",
             "pink",
