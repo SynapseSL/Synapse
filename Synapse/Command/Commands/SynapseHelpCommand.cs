@@ -65,16 +65,8 @@ namespace Synapse.Command.Commands
                     return result;
                 }
 
-                string platforms = "{ ";
-                string aliases = "{ ";
-                foreach (var x in command.Platforms)
-                    platforms += $"{x},";
-
-                foreach (var y in command.Aliases)
-                    aliases += $"{y},";
-
-                platforms += " }";
-                aliases += " }";
+                string platforms = "{ " + string.Join(", ", command.Platforms) + " }";
+                string aliases = "{ " + string.Join(", ", command.Aliases) + " }";
 
                 result.Message = $"\n{command.Name}\n    - Permission: {command.Permission}\n    - Description: {command.Description}\n    - Usage: {command.Usage}\n    - Platforms: {platforms}\n    - Aliases: {aliases}";
 
