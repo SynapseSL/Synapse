@@ -19,6 +19,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var killer = __instance.GetPlayer();
                 var player = go.GetPlayer();
 
+                if (player == null) return;
+
                 if (info.GetDamageType() == DamageTypes.Grenade)
                     killer = SynapseController.Server.GetPlayer(info.PlayerId);
 
