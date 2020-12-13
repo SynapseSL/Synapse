@@ -175,6 +175,7 @@ namespace Synapse.Api
         }
 
         private float delay = Time.time;
+        private int pos = 0;
 
         private void Update()
         {
@@ -183,7 +184,10 @@ namespace Synapse.Api
             if(Time.time >= delay)
             {
                 delay = Time.time + 1f;
-                RankColor = Server.Get.Colors.ElementAt(UnityEngine.Random.Range(0, Server.Get.Colors.Count));
+
+                RankName = Server.Get.Colors.ElementAt(pos);
+
+                pos = pos + 1 >= Server.Get.Colors.Count ? 0 : pos +1;
             }
         }
         #endregion
