@@ -173,6 +173,19 @@ namespace Synapse.Api
             Connection.Send(msg);
             NetworkWriterPool.Recycle(writer);
         }
+
+        private float delay = Time.time;
+
+        private void Update()
+        {
+            if (this == Server.Get.Host || SynapseGroup.Color.ToUpper() != "RAINBOW") return;
+
+            if(Time.time >= delay)
+            {
+                delay = Time.time + 1f;
+                RankColor = Server.Get.Colors.ElementAt(UnityEngine.Random.Range(0, Server.Get.Colors.Count));
+            }
+        }
         #endregion
 
         #region Synapse Api Stuff
