@@ -185,7 +185,7 @@ namespace Synapse.Api
             {
                 delay = Time.time + 1f;
 
-                RankName = Server.Get.Colors.ElementAt(pos);
+                RankColor = Server.Get.Colors.ElementAt(pos);
 
                 pos = pos + 1 >= Server.Get.Colors.Count() ? 0 : pos +1;
             }

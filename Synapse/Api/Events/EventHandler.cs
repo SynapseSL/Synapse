@@ -21,19 +21,13 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    ev.Player.Scale = ev.Player.Scale / 2;
+                    ev.Player.Invisible = true;
                     break;
 
                 case KeyCode.Alpha2:
-                    ev.Player.Scale = ev.Player.Scale * 2;
+                    ev.Player.Invisible = false;
                     break;
 
-                case KeyCode.Alpha3:
-                    foreach(var color in SynapseController.Server.Host.ServerRoles.NamedColors)
-                    {
-                        Logger.Get.Info($"Name:{color.Name} Erlaubt:{!color.Restricted} Hex:{color.ColorHex}");
-                    }
-                    break;
             }
         }
 #endif
