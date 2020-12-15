@@ -35,6 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Api\Broadcast.cs" />
+    <Compile Include="Api\Enum\ScpAttackType.cs" />
     <Compile Include="Api\Enum\Recontain079Status.cs" />
     <Compile Include="Api\HeavyController.cs" />
     <Compile Include="Api\Enum\AmmoType.cs" />
@@ -143,11 +144,14 @@
     <Compile Include="Patches\EventsPatches\RoundPatches\RoundCheckPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\RoundStartPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\WaitingandEndPatch.cs" />
+    <Compile Include="Patches\EventsPatches\ScpPatches\Scp049\Scp0492AttackPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp079\Scp079RecontainPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp096\Scp096TargetPatches.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp106\Scp106PortalCreatePatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp106\PocketDimensionPatches.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp106\Scp106ContainmentPatch.cs" />
+    <Compile Include="Patches\EventsPatches\ScpPatches\Scp173\Scp173AttackPatch.cs" />
+    <Compile Include="Patches\EventsPatches\ScpPatches\Scp939\Scp939AttackPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\ConsoleCommandPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\RemoteAdminPatch.cs" />

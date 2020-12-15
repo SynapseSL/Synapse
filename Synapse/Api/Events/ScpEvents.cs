@@ -13,6 +13,8 @@ namespace Synapse.Api.Events
 
         public Scp079Events Scp079 { get; } = new Scp079Events();
 
+        public event EventHandler.OnSynapseEvent<ScpAttackEventArgs> ScpAttackEvent;
+
         public class Scp096Events
         {
             internal Scp096Events() { }
@@ -118,6 +120,21 @@ namespace Synapse.Api.Events
 
                 allow = ev.Allow;
             }
+        }
+
+
+        internal void InvokeScpAttack(Player scp,Player target,Enum.ScpAttackType attackType , out bool allow)
+        {
+            var ev = new ScpAttackEventArgs
+            {
+                Scp = scp,
+                Target = target,
+                AttackType = attackType,
+            };
+
+            ScpAttackEvent?.Invoke(ev);
+
+            allow = ev.Allow;
         }
     }
 }

@@ -53,4 +53,15 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public bool Allow { get; set; } = true;
     }
+
+    public class ScpAttackEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Enum.ScpAttackType AttackType { get; internal set; }
+
+        public Player Scp { get; internal set; }
+
+        public Player Target { get; internal set; }
+
+        public bool Allow { get; set; } = true;
+    }
 }
