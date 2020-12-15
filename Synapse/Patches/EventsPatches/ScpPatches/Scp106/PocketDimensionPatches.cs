@@ -15,15 +15,57 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
         {
             try
             {
-                var allow = true;
-                var larry = __instance.GetPlayer();
+                if (!__instance._iawRateLimit.CanExecute(true) || ply == null) return false;
+                var scp = __instance.GetPlayer();
                 var player = ply.GetPlayer();
-                EventHandler.Get.Scp.Scp106.InvokePocketDimensionEnterEvent(player,larry, ref allow);
+                if (player == null || player.GodMode || !ServerTime.CheckSynchronization(t) || !__instance.iAm106 || Vector3.Distance(scp.Position,player.Position) >= 3f) 
+                    return false;
 
-                if (allow)
-                    larry.Scp106Controller.PocketPlayers.Add(player);
+                if (!scp.WeaponManager.GetShootPermission(player.ClassManager))
+                    return false;
 
-                return allow;
+                EventHandler.Get.Scp.InvokeScpAttack(scp, player, Api.Enum.ScpAttackType.Scp106_Grab, out var allow);
+                if (!allow) return false;
+
+                scp.ClassManager.RpcPlaceBlood(player.Position, 1, 2f);
+                __instance.TargetHitMarker(scp.Connection);
+                if (Scp106PlayerScript._blastDoor.isClosed)
+                    player.Hurt(500, DamageTypes.Scp106, scp);
+                else
+                {
+                    player.Hurt(40, DamageTypes.Scp106, scp);
+                    player.Position = Vector3.down * 1998.5f;
+                    foreach(var scp079 in Scp079PlayerScript.instances)
+                    {
+                        var room = player.ClassManager.Scp079.GetOtherRoom();
+                        var filter = new Scp079Interactable.InteractableType[]
+                        {
+                            Scp079Interactable.InteractableType.Door,
+                            Scp079Interactable.InteractableType.Light,
+                            Scp079Interactable.InteractableType.Lockdown,
+                            Scp079Interactable.InteractableType.Tesla,
+                            Scp079Interactable.InteractableType.ElevatorUse,
+                        };
+
+                        var flag = true;
+                        foreach (var interaction in scp079.ReturnRecentHistory(12f, filter))
+                            foreach (var zoneRoom in interaction.interactable.currentZonesAndRooms)
+                                if (zoneRoom.currentZone == room.currentZone && zoneRoom.currentRoom == room.currentRoom)
+                                    flag = true;
+                        if (flag)
+                            scp079.RpcGainExp(ExpGainType.PocketAssist, player.RoleType);
+                    }
+
+                    if (player.RoleType == RoleType.Spectator) return false;
+
+                    EventHandler.Get.Scp.Scp106.InvokePocketDimensionEnterEvent(player, scp, ref allow);
+                    if (!allow) return false;
+
+                    player.PlayerEffectsController.GetEffect<CustomPlayerEffects.Corroding>().IsInPd = true;
+                    player.GiveEffect(Api.Enum.Effect.Corroding);
+                }
+
+                return false;
             }
             catch (Exception e)
             {
