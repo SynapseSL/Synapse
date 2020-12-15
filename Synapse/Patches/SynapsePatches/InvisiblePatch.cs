@@ -151,6 +151,6 @@ namespace Synapse.Patches.SynapsePatches
     [HarmonyPatch(typeof(Scp173PlayerScript), nameof(Scp173PlayerScript.LookFor173))]
     internal static class PeanutPatch
     {
-        private static void Postfix(ref bool __result, Scp173PlayerScript __instance) => __result = __instance.GetPlayer()?.Invisible == true ? false : __result;
+        private static void Postfix(ref bool __result, Scp173PlayerScript __instance) => __result = (__instance.GetPlayer()?.Invisible) != true && __result;
     }
 }
