@@ -144,6 +144,7 @@
     <Compile Include="Patches\EventsPatches\RoundPatches\RoundCheckPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\RoundStartPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\WaitingandEndPatch.cs" />
+    <Compile Include="Patches\EventsPatches\ScpPatches\Scp049\Scp049AttackPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp049\Scp0492AttackPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp079\Scp079RecontainPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp096\Scp096TargetPatches.cs" />

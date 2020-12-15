@@ -69,7 +69,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
             }
             catch (Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: PocketDimEnter failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Event: PocketDimEnter/ScpAttackEvent(106) failed!!\n{e}");
                 return true;
             }
         }
