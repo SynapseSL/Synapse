@@ -39,7 +39,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Item: Scp914ItemUpgrade failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Item: Scp914ItemUpgrade failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
             return false;
         }
@@ -76,7 +76,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
             }
             catch (Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: Scp914PlayerUpgrade failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Event: Scp914PlayerUpgrade failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
             return false;
         }
@@ -116,7 +116,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
             }
             catch (Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: Scp914HeldItemUpgrade failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Event: Scp914HeldItemUpgrade failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
             return false;
         }

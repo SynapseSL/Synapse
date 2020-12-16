@@ -49,7 +49,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             catch (Exception e)
             {
-                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerJoin failed!!\n{e}");
+                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerJoin failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
         }
     }

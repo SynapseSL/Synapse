@@ -69,7 +69,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
             }
             catch (Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: PocketDimEnter/ScpAttackEvent(106) failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Event: PocketDimEnter/ScpAttackEvent(106) failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;
             }
         }
@@ -134,7 +134,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
             } 
             catch (Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: PocketDimLeave failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Event: PocketDimLeave failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;
             }
         }

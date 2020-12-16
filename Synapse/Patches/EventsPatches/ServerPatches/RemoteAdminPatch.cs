@@ -20,7 +20,7 @@ namespace Synapse.Patches.EventsPatches.ServerPatches
             }
             catch (Exception e)
             {
-                SynapseController.Server.Logger.Error($"Synapse-Event: RemoteAdminEvent failed!!\n{e}");
+                SynapseController.Server.Logger.Error($"Synapse-Event: RemoteAdminEvent failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;
             }
         }

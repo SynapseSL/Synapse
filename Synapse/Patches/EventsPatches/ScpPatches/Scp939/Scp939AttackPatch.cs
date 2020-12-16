@@ -31,7 +31,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp939
             }
             catch(Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp939) failed!!\n{e}");
+                Synapse.Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp939) failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;
             }
         }

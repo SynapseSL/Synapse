@@ -13,7 +13,7 @@ namespace Synapse.Patches.EventsPatches.ServerPatches
             }
             catch (Exception e)
             {
-                SynapseController.Server.Logger.Error($"Synapse-Event: ConsoleCommandEvent failed!!\n{e}");
+                SynapseController.Server.Logger.Error($"Synapse-Event: ConsoleCommandEvent failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
         }
     }

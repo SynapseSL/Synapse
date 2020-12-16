@@ -49,7 +49,7 @@ namespace Synapse.Patches.SynapsePatches
             }
             catch(Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-API: GetShootPermission  failed!!\n{e}");
+                Synapse.Api.Logger.Get.Error($"Synapse-API: GetShootPermission  failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 __result = true;
                 return true;
             }

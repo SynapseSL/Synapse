@@ -119,7 +119,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 			}
             catch(Exception e)
             {
-                SynapseController.Server.Logger.Error($"Synapse-Event: TeamRespawn failed!!\n{e}");
+                SynapseController.Server.Logger.Error($"Synapse-Event: TeamRespawn failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;
             }
         }

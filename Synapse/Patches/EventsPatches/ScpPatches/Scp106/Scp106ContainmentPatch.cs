@@ -18,7 +18,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
             }
             catch (Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: Scp106Containment failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Event: Scp106Containment failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;
             }
         }

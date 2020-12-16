@@ -47,7 +47,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Item: Create PickUp failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Item: Create PickUp failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
         }
     }

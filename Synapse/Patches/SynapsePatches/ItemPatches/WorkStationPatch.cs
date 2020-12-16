@@ -30,7 +30,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
                         }
                         catch(Exception e)
                         {
-                            Synapse.Api.Logger.Get.Error($"Synapse-Event: PlayerConnectWorkstation Event failed!!\n{e}");
+                            Synapse.Api.Logger.Get.Error($"Synapse-Event: PlayerConnectWorkstation Event failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                         }
 
                         item.Despawn();
@@ -40,7 +40,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Item: Connect Workstation Tablet failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Item: Connect Workstation Tablet failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
             
             return false;
@@ -67,7 +67,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
                 }
                 catch(Exception e)
                 {
-                    Synapse.Api.Logger.Get.Error($"Synapse-Event: PlayerConnectWorkstation Event failed!!\n{e}");
+                    Synapse.Api.Logger.Get.Error($"Synapse-Event: PlayerConnectWorkstation Event failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 }
 
                 station.TabletOwner = player;
@@ -75,7 +75,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Item: Disconnect Workstation Tablet failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Item: Disconnect Workstation Tablet failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
             return false;
         }

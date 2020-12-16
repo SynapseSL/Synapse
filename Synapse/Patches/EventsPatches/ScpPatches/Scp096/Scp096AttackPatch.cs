@@ -64,7 +64,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                             }
                             catch (Exception e)
                             {
-                                Synapse.Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp096) failed!!\n{e}");
+                                Synapse.Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp096) failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                             }
 
                             if (allow)

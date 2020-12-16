@@ -24,7 +24,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
             }
 			catch(Exception e)
             {
-				Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp079RecontainEvent initializing failed!!\n{e}");
+				Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp079RecontainEvent initializing failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
 			}
 
 			PlayerStats ps = PlayerManager.localPlayer.GetComponent<PlayerStats>();

@@ -42,7 +42,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             catch (Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: PlayerWalkOnSinkholeEvent failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Event: PlayerWalkOnSinkholeEvent failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;
             }
         }

@@ -60,7 +60,7 @@ namespace Synapse.Events.Patches
 			}
 			catch (Exception e)
 			{
-				Logger.Get.Error($"Synapse-Event: PlayerGenerator failed!!\n{e}");
+				Logger.Get.Error($"Synapse-Event: PlayerGenerator failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
 				return true;
 			}
 		}
@@ -125,7 +125,7 @@ namespace Synapse.Events.Patches
 					}
 					catch (Exception e)
 					{
-						Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent(Keycard) failed!!\n{e}");
+						Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent(Keycard) failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
 					}
 
 					if (keycardcanopen)
@@ -145,7 +145,7 @@ namespace Synapse.Events.Patches
 			}
 			catch(Exception e)
             {
-				Logger.Get.Error($"Synapse-Event: DoorInteract failed!!\n{e}");
+				Logger.Get.Error($"Synapse-Event: DoorInteract failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
 				return true;
             }
 		}

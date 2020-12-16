@@ -24,7 +24,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             catch (Exception e)
             {
-                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerReload failed!!\n{e}");
+                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerReload failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;
             }
         }

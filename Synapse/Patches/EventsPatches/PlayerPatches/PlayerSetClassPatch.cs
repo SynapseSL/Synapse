@@ -60,7 +60,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             catch (Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: PlayerSetClass failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Event: PlayerSetClass failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
             classid = __state.Role;
 

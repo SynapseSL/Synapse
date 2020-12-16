@@ -62,7 +62,7 @@ namespace Synapse.Patches.SynapsePatches
             }
             catch(Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Api: AntiCheatPatch failed!!\n{e}");
+                Synapse.Api.Logger.Get.Error($"Synapse-Api: AntiCheatPatch failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;
             }
         }

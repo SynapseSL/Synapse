@@ -1,5 +1,4 @@
 ﻿using Synapse.Config;
-using System.Linq;
 using UnityEngine;
 
 namespace Synapse.Api.Events

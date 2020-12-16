@@ -49,7 +49,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
             }
             catch (Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp096AddTargetEvent failed!!\n{e}");
+                Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp096AddTargetEvent failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;
             }
         }

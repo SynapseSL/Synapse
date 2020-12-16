@@ -87,17 +87,6 @@ namespace Synapse.Api.Items
             }
         }
 
-        private int barrel;
-        public int Barrel
-        {
-            get => barrel;
-            set
-            {
-                barrel = value;
-                Refresh();
-            }
-        }
-
         private int sight;
         public int Sight
         {
@@ -105,6 +94,17 @@ namespace Synapse.Api.Items
             set
             {
                 sight = value;
+                Refresh();
+            }
+        }
+
+        private int barrel;
+        public int Barrel
+        {
+            get => barrel;
+            set
+            {
+                barrel = value;
                 Refresh();
             }
         }

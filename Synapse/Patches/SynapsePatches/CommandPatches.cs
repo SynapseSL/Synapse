@@ -84,7 +84,7 @@ namespace Synapse.Patches.SynapsePatches
                 }
                 catch(Exception e)
                 {
-                    Logger.Get.Error($"Synapse-Commands: Command Execution failed!!\n{e}");
+                    Logger.Get.Error($"Synapse-Commands: Command Execution failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 }
                 return false;
             }
@@ -113,7 +113,7 @@ namespace Synapse.Patches.SynapsePatches
                 }
                 catch(Exception e)
                 {
-                    Logger.Get.Error($"Synapse-Commands: Command Execution failed!!\n{e}");
+                    Logger.Get.Error($"Synapse-Commands: Command Execution failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 }
                 return false;
             }

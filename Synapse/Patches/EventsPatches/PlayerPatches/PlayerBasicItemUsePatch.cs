@@ -33,7 +33,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     }
                     catch(Exception e)
                     {
-                        Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent Initiating failed!!\n{e}");
+                        Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent Initiating failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                     }
 
                     Timing.RunCoroutine(UseMedialItem(__instance, i));
@@ -167,7 +167,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent Stopping failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent Stopping failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;
             }
         }

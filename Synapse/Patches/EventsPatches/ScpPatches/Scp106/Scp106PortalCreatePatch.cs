@@ -16,7 +16,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: Scp106PortalCreate failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Event: Scp106PortalCreate failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;
             }
         }

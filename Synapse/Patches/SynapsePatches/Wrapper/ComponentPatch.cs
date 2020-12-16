@@ -19,7 +19,7 @@ namespace Synapse.Patches.SynapsePatches
             }
             catch (Exception e)
             {
-                SynapseController.Server.Logger.Error($"Synapse-Event: LoadComponents failed!!\n{e}");
+                SynapseController.Server.Logger.Error($"Synapse-Event: LoadComponents failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
         }
     }

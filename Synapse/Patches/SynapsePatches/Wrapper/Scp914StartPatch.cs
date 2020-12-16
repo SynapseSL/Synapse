@@ -21,7 +21,7 @@ namespace Synapse.Patches.SynapsePatches.Wrapper
             }
             catch(Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Wrapper: Scp914 recipes failed!!\n{e}");
+                Synapse.Api.Logger.Get.Error($"Synapse-Wrapper: Scp914 recipes failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
         }
     }

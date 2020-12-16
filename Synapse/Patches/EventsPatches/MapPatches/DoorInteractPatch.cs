@@ -70,7 +70,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
                                 }
                                 catch (Exception e)
                                 {
-                                    Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent(Keycard) failed!!\n{e}");
+                                    Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent(Keycard) failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                                 }
                             }
                         }
