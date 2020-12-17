@@ -21,14 +21,14 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 {
                     if (!(Vector3.Distance(player.Position, __instance._lureSpj.transform.position) <
                           1.97f)) continue;
-                    if (player.RoleType == RoleType.Spectator || player.GodMode) continue;
+                    if (player.RoleType == RoleType.Spectator || player.GodMode || !SynapseExtensions.CanHarmScp(player)) continue;
                     var allow = player.Team != Team.SCP;
 
                     var closeFemur = FemurBrokePeople + 1 >= Server.Get.Configs.SynapseConfiguration.RequiredForFemur;
 
                     SynapseController.Server.Events.Player.InvokePlayerEnterFemurEvent(player, ref allow, ref closeFemur);
 
-                    if (!allow) return false;
+                    if (!allow) continue;
                     player.Hurt(10000, DamageTypes.Lure);
                     FemurBrokePeople++;
                     if (closeFemur) __instance._lureSpj.SetState(true);

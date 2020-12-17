@@ -96,7 +96,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                 var stringList = GameCore.ConfigFile.ServerConfig.GetStringList(Synapse.Api.Map.Get.Decontamination.IsDecontaminationInProgress ? "pd_random_exit_rids_after_decontamination" : "pd_random_exit_rids");
                 foreach (GameObject gameObject in Server.Get.Map.Rooms.Select(x => x.GameObject))
                 {
-                    var component2 = gameObject.GetComponent<global::Rid>();
+                    var component2 = gameObject.GetComponent<Rid>();
                     if (component2 != null && stringList.Contains(component2.id, StringComparison.Ordinal))
                         __instance.tpPositions.Add(gameObject.transform.position);
                 }
@@ -113,6 +113,8 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                 var pos = __instance.tpPositions[UnityEngine.Random.Range(0, __instance.tpPositions.Count)];
                 pos.y += 2f;
 
+                if ((player.CustomRole != null && player.CustomRole.GetFriends().Any(x => x == Team.SCP)) || player.Team == Team.SCP)
+                    type = PocketDimensionTeleport.PDTeleportType.Exit;
 
                 EventHandler.Get.Scp.Scp106.InvokePocketDimensionLeaveEvent(player, ref pos, ref type, out var allow);
 
