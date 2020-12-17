@@ -24,7 +24,7 @@ namespace Synapse.Events.Patches
 				{
 					case PlayerInteract.Generator079Operations.Tablet:
 
-						if (generator.IsTabletConnected || !generator.Open || __instance._localTime <= 0f || Generator079.mainGenerator.forcedOvercharge)
+						if (generator.IsTabletConnected || !generator.Open || __instance._localTime <= 0f || Generator079.mainGenerator.forcedOvercharge || !SynapseExtensions.CanHarmScp(player))
 							return false;
 
 						Inventory component = person.GetComponent<Inventory>();
@@ -99,6 +99,12 @@ namespace Synapse.Events.Patches
 					generator.Open = !generator.Open;
 					return false;
 				}
+
+                if (!SynapseExtensions.CanHarmScp(player))
+                {
+					__instance.RpcDenied();
+					return false;
+                }
 
 				//Unlock The Generator
 				var flag = player.Bypass;

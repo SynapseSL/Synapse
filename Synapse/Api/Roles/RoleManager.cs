@@ -15,7 +15,6 @@ namespace Synapse.Api.Roles
         {
             SynapseController.Server.Events.Player.PlayerEscapesEvent += OnEscape;
             SynapseController.Server.Events.Server.RemoteAdminCommandEvent += OnRa;
-            SynapseController.Server.Events.Player.PlayerGeneratorInteractEvent += OnGenerator;
         }
 
         public Dictionary<Type, KeyValuePair<string, int>> CustomRoles = new Dictionary<Type, KeyValuePair<string, int>>();
@@ -56,17 +55,6 @@ namespace Synapse.Api.Roles
         }
 
         #region Events
-
-        private void OnGenerator(Events.SynapseEventArguments.PlayerGeneratorInteractEventArgs ev)
-        {
-            if (ev.GeneratorInteraction == Enum.GeneratorInteraction.TabletInjected || ev.GeneratorInteraction == Enum.GeneratorInteraction.Unlocked)
-                if (ev.Player.CustomRole != null && ev.Player.CustomRole.GetFriends().Any(x => x == Team.SCP))
-                {
-                    ev.Allow = false;
-                    ev.Player.InstantBroadcast(3, Server.Get.Configs.SynapseTranslation.GetTranslation("scpteam"));
-                }
-        }
-
         private void OnEscape(Events.SynapseEventArguments.PlayerEscapeEventArgs ev)
         {
             if (ev.Player.CustomRole == null) return;
