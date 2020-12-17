@@ -20,13 +20,32 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    ev.Player.Invisible = true;
+                    ev.Player.Scp096Controller.RageState = PlayableScps.Scp096PlayerState.Attacking;
                     break;
 
                 case KeyCode.Alpha2:
-                    ev.Player.Invisible = false;
+                    ev.Player.Scp096Controller.RageState = PlayableScps.Scp096PlayerState.Calming;
                     break;
 
+                case KeyCode.Alpha3:
+                    ev.Player.Scp096Controller.RageState = PlayableScps.Scp096PlayerState.Charging;
+                    break;
+
+                case KeyCode.Alpha4:
+                    ev.Player.Scp096Controller.RageState = PlayableScps.Scp096PlayerState.Docile;
+                    break;
+
+                case KeyCode.Alpha5:
+                    ev.Player.Scp096Controller.RageState = PlayableScps.Scp096PlayerState.Enraged;
+                    break;
+
+                case KeyCode.Alpha6:
+                    ev.Player.Scp096Controller.RageState = PlayableScps.Scp096PlayerState.Enraging;
+                    break;
+
+                case KeyCode.Alpha7:
+                    ev.Player.Scp096Controller.RageState = PlayableScps.Scp096PlayerState.TryNotToCry;
+                    break;
             }
         }
 #endif
