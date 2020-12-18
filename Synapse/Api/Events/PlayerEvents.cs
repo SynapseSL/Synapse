@@ -63,6 +63,8 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<PlayerUseMicroEventArgs> PlayerUseMicroEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerWalkOnSinkholeEventArgs> PlayerWalkOnSinkholeEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerReportEventArgs> PlayerReportEvent;
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -373,6 +375,22 @@ namespace Synapse.Api.Events
 
             PlayerWalkOnSinkholeEvent?.Invoke(ev);
 
+            allow = ev.Allow;
+        }
+
+        internal void InvokePlayerReport(Player player, Player target, string reason, ref bool global, out bool allow)
+        {
+            var ev = new PlayerReportEventArgs
+            {
+                Reporter = player,
+                Target = target,
+                GlobalReport = global,
+                Reason = reason,
+            };
+
+            PlayerReportEvent?.Invoke(ev);
+
+            global = ev.GlobalReport;
             allow = ev.Allow;
         }
         #endregion

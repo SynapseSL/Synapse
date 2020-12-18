@@ -288,4 +288,17 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public bool Allow { get; set; }
     }
+
+    public class PlayerReportEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Reporter { get; internal set; }
+
+        public Player Target { get; internal set; }
+
+        public string Reason { get; internal set; }
+
+        public bool GlobalReport { get; set; }
+
+        public bool Allow { get; set; } = true;
+    }
 }
