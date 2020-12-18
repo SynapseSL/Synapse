@@ -258,7 +258,7 @@ namespace Synapse.Api
             }
         }
 
-        public string RoleName => Server.Get.RoleManager.GetRoleName(RoleID);
+        public string RoleName => CustomRole == null ? RoleType.ToString() : CustomRole.GetRoleName();
 
         //Stuff for the Permission System
         private SynapseGroup synapseGroup;
