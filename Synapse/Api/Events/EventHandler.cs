@@ -60,7 +60,7 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha9:
-                    ev.Player.GetComponent<GameConsoleTransmission>().SendToClient(ev.Player.Connection, "[REPORTING] Test", "red");
+                    ev.Player.OpenReportWindow("<color=red>Welcome on my Server!</color>\nHere are some Rules:\n1. ...\n2. ...\n3. ...\n4. ...\n<color=blue>Thank you for Reading the Rules!</color>");
                     break;
             }
         }

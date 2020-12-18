@@ -29,6 +29,7 @@ namespace Synapse.Api
             ActiveBroadcasts = new BroadcastList(this);
             Inventory = new PlayerInventory(this);
             GrenadeManager = GetComponent<Grenades.GrenadeManager>();
+            GameConsoleTransmission = this.GetComponent<GameConsoleTransmission>();
         }
 
         #region Methods
@@ -108,6 +109,8 @@ namespace Synapse.Api
 
         public void Hurt(int amount, DamageTypes.DamageType damagetype = default, Player attacker = null) =>
             PlayerStats.HurtPlayer(new PlayerStats.HitInfo(amount, attacker == null ? "WORLD" : attacker.NickName, damagetype, attacker == null ? 0 : attacker.PlayerId), gameObject);
+
+        public void OpenReportWindow(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
 
         public void SendToServer(ushort port)
         {
@@ -727,6 +730,8 @@ namespace Synapse.Api
         public Transform CameraReference => Hub.PlayerCameraReference;
 
         public NetworkIdentity NetworkIdentity => Hub.networkIdentity;
+
+        public GameConsoleTransmission GameConsoleTransmission { get; }
 
         public Grenades.GrenadeManager GrenadeManager { get; }
 
