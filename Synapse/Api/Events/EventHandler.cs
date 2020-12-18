@@ -14,7 +14,6 @@ namespace Synapse.Api.Events
 #endif
         }
 
-#if DEBUG
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
         {
             switch (ev.KeyCode)
@@ -46,9 +45,13 @@ namespace Synapse.Api.Events
                 case KeyCode.Alpha7:
                     ev.Player.Scp096Controller.RageState = PlayableScps.Scp096PlayerState.TryNotToCry;
                     break;
+
+                case KeyCode.Alpha8:
+                    ev.Player.Scp096Controller.CurMaxShield = 100000f;
+                    ev.Player.Scp096Controller.EnrageTimeLeft = 100000000f;
+                    break;
             }
         }
-#endif
 
         public static EventHandler Get => SynapseController.Server.Events;
 

@@ -28,6 +28,34 @@ namespace Synapse.Api
             }
         }
 
+        public float CurMaxShield
+        {
+            get
+            {
+                if (Is096) return Scp096.CurMaxShield;
+                return 0f;
+            }
+            set
+            {
+                if (!Is096) return;
+                Scp096.CurMaxShield = value;
+            }
+        }
+
+        public float EnrageTimeLeft
+        {
+            get
+            {
+                if (Is096) return Scp096.EnrageTimeLeft;
+                return 0f;
+            }
+            set
+            {
+                if (!Is096) return;
+                Scp096.EnrageTimeLeft = value;
+            }
+        }
+
         public PlayableScps.Scp096PlayerState RageState
         {
             get
@@ -95,6 +123,24 @@ namespace Synapse.Api
             {
                 if (!Is096) return new List<Player>();
                 return Scp096._targets.Select(x => x.GetPlayer()).ToList();
+            }
+        }
+
+        public bool CanAttack
+        {
+            get
+            {
+                if (Is096) return Scp096.CanAttack;
+                return false;
+            }
+        }
+
+        public bool CanCharge
+        {
+            get
+            {
+                if (Is096) return Scp096.CanCharge;
+                return false;
             }
         }
 
