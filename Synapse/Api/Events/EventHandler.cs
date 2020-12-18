@@ -90,6 +90,8 @@ namespace Synapse.Api.Events
         {
             ev.Player.Broadcast(conf.JoinMessagesDuration, conf.JoinBroadcast);
             ev.Player.GiveTextHint(conf.JoinTextHint, conf.JoinMessagesDuration);
+            if (!string.IsNullOrWhiteSpace(conf.JoinWindow))
+                ev.Player.OpenReportWindow(conf.JoinWindow.Replace("\\n","\n"));
         }
 
         private void PlayerSyncData(SynapseEventArguments.PlayerSyncDataEventArgs ev)
