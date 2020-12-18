@@ -16,7 +16,7 @@ namespace Synapse.Patches.SynapsePatches.PermissionSystem
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Permission: RefreshPermissionPatch failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Permission: RefreshPermissionPatch failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
             return false;
         }

@@ -59,6 +59,12 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<PlayerDropAmmoEventArgs> PlayerDropAmmoEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerCuffTargetEventArgs> PlayerCuffTargetEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerUseMicroEventArgs> PlayerUseMicroEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerWalkOnSinkholeEventArgs> PlayerWalkOnSinkholeEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerReportEventArgs> PlayerReportEvent;
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -335,11 +341,56 @@ namespace Synapse.Api.Events
             {
                 Cuffer = cuffer,
                 Disarmer = disarmer,
-                Target = target
+                Target = target,
+                Allow = allow
             };
 
             PlayerCuffTargetEvent?.Invoke(ev);
 
+            allow = ev.Allow;
+        }
+
+        internal void InvokeMicroUse(Player player, SynapseItem micro, ref MicroHID.MicroHidState state)
+        {
+            var ev = new PlayerUseMicroEventArgs
+            {
+                Player = player,
+                Micro = micro,
+                State = state,
+            };
+
+            PlayerUseMicroEvent?.Invoke(ev);
+
+            state = ev.State;
+        }
+
+        internal void InvokeSinkhole(Player player,SinkholeEnvironmentalHazard sinkhole,ref bool allow)
+        {
+            var ev = new PlayerWalkOnSinkholeEventArgs
+            {
+                Allow = allow,
+                Player = player,
+                Sinkhole = sinkhole
+            };
+
+            PlayerWalkOnSinkholeEvent?.Invoke(ev);
+
+            allow = ev.Allow;
+        }
+
+        internal void InvokePlayerReport(Player player, Player target, string reason, ref bool global, out bool allow)
+        {
+            var ev = new PlayerReportEventArgs
+            {
+                Reporter = player,
+                Target = target,
+                GlobalReport = global,
+                Reason = reason,
+            };
+
+            PlayerReportEvent?.Invoke(ev);
+
+            global = ev.GlobalReport;
             allow = ev.Allow;
         }
         #endregion

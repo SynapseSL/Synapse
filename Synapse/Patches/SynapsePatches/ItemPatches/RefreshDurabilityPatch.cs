@@ -28,7 +28,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
                     }
                     catch(Exception e)
                     {
-                        Logger.Get.Error($"Synapse-Event: RefreshDurability failed!!\n{e}");
+                        Logger.Get.Error($"Synapse-Event: RefreshDurability failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                     }
                 }
             return false;

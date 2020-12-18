@@ -142,9 +142,15 @@ namespace Synapse.Patches.SynapsePatches
             }
             catch(Exception e)
             {
-                Api.Logger.Get.Error($"Synapse-InvisibleMode: TransmitData failed failed!!\n{e}");
+                Api.Logger.Get.Error($"Synapse-InvisibleMode: TransmitData failed failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;
             }
         }
+    }
+
+    [HarmonyPatch(typeof(Scp173PlayerScript), nameof(Scp173PlayerScript.LookFor173))]
+    internal static class PeanutPatch
+    {
+        private static void Postfix(ref bool __result, Scp173PlayerScript __instance) => __result = (__instance.GetPlayer()?.Invisible) != true && __result;
     }
 }

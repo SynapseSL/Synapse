@@ -64,6 +64,12 @@ namespace Synapse
             }
         }
 
+        public int Slots
+        {
+            get => CustomNetworkManager.slots;
+            set => CustomNetworkManager.slots = value;
+        }
+
         [SuppressMessage("ReSharper", "UnusedMember.Global")]
         [SuppressMessage("ReSharper", "InconsistentNaming")]
         public bool FF
@@ -72,6 +78,31 @@ namespace Synapse
             set => ServerConsole.FriendlyFire = value;
         }
 
+        public string[] Colors { get; } = new string[]
+        {
+            "silver",
+            "pink",
+            "deep_pink",
+            "magenta",
+            "tomato",
+            "crimson",
+            "carmine",
+            "red",
+            "brown",
+            "army_green",
+            "green",
+            "light_green",
+            "emerald",
+            "orange",
+            "yellow",
+            "lime",
+            "pumpkin",
+            "blue_green",
+            "aqua",
+            "cyan",
+            "mint",
+            "nickel",
+        };
 
 
         public void Reload()

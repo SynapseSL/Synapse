@@ -58,7 +58,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 			}
             catch (Exception e)
             {
-				Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp914 Activate Event failed!!\n{e}");
+				Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp914 Activate Event failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
 				return true;
             }
         }

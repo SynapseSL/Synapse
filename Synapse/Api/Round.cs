@@ -66,11 +66,7 @@ namespace Synapse.Api
             rs.RpcShowRoundSummary(rs.classlistStart,remainingPlayers, team, EscapedDPersonnel, EscapedScientists, ScpKills, timeToRoundRestart);
         }
 
-        public void MtfRespawn(bool isCI = false)
-        {
-            var component = Server.Get.Host.GetComponent<RespawnManager>();
-            component.NextKnownTeam = isCI ? SpawnableTeamType.ChaosInsurgency : SpawnableTeamType.NineTailedFox;
-            component.Spawn();
-        }
+        public void MtfRespawn(bool isCI = false) 
+            => RespawnManager.Singleton.ForceSpawnTeam(isCI ? SpawnableTeamType.ChaosInsurgency : SpawnableTeamType.NineTailedFox);
     }
 }

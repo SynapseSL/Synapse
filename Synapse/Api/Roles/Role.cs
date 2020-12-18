@@ -15,10 +15,7 @@ namespace Synapse.Api.Roles
                     return;
 
                 if (player != null)
-                {
-                    player.CustomRole.DeSpawn();
                     player.CustomRole = null;
-                }
 
                 player = value;
             }

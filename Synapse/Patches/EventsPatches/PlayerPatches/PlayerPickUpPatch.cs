@@ -25,7 +25,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 }
                 catch (Exception e)
                 {
-                    Logger.Get.Error($"Synapse-Event: PlayerPickUp failed!!\n{e}");
+                    Logger.Get.Error($"Synapse-Event: PlayerPickUp failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 }
 
                 if (!allow)

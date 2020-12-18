@@ -19,13 +19,21 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var killer = __instance.GetPlayer();
                 var player = go.GetPlayer();
 
+                if (player == null || player.GodMode) return;
+
                 if (info.GetDamageType() == DamageTypes.Grenade)
                     killer = SynapseController.Server.GetPlayer(info.PlayerId);
 
                 if (info.GetDamageType() == DamageTypes.Pocket)
+                {
                     killer = Server.Get.Players.FirstOrDefault(x => x.Scp106Controller.PocketPlayers.Contains(player));
 
-                if (player.GodMode) return;
+                    if (player.Team == Team.SCP || (player.CustomRole != null && player.CustomRole.GetFriends().Any(x => x == Team.SCP)))
+                    {
+                        info.Amount = 0;
+                        return;
+                    }
+                }
 
                 SynapseController.Server.Events.Player.InvokePlayerDamageEvent(player, killer, ref info);
                 
@@ -41,7 +49,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             catch (Exception e)
             {
-                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDamage failed!!\n{e}");
+                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDamage failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
         }
     }

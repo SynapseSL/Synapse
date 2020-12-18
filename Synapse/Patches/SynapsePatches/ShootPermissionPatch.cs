@@ -24,7 +24,7 @@ namespace Synapse.Patches.SynapsePatches
                     if (forceFriendlyFire)
                         ff = true;
 
-                    else if (!ff) __result = shooter.Team != target.Team;
+                    else if (!ff) __result = Misc.GetFraction(shooter.Team) != Misc.GetFraction(target.Team);
                 }
                 else
                 {
@@ -49,7 +49,7 @@ namespace Synapse.Patches.SynapsePatches
             }
             catch(Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-API: GetShootPermission  failed!!\n{e}");
+                Synapse.Api.Logger.Get.Error($"Synapse-API: GetShootPermission  failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 __result = true;
                 return true;
             }

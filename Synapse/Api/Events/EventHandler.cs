@@ -1,6 +1,4 @@
 ﻿using Synapse.Config;
-using System.Linq;
-using System.IO;
 using UnityEngine;
 
 namespace Synapse.Api.Events
@@ -11,10 +9,17 @@ namespace Synapse.Api.Events
         {
             Player.PlayerJoinEvent += PlayerJoin;
             Player.PlayerSyncDataEvent += PlayerSyncData;
-            Map.DoorInteractEvent += DoorInteract;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
+            Player.PlayerReportEvent += Report;
 #endif
+        }
+
+        private void Report(SynapseEventArguments.PlayerReportEventArgs ev)
+        {
+            Synapse.Api.Logger.Get.Info($"{ev.Reporter} hat {ev.Target} reportet für:\n{ev.Reason}\nGlobal: {ev.GlobalReport}");
+            ev.Allow = false;
+            ev.GlobalReport = false;
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
@@ -22,11 +27,40 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    ev.Player.WeaponManager.RpcEmptyClip();
+                    ev.Player.Scp096Controller.RageState = PlayableScps.Scp096PlayerState.Attacking;
                     break;
 
                 case KeyCode.Alpha2:
-                    Logger.Get.Info(SynapseController.Server.FF.ToString());
+                    ev.Player.Scp096Controller.RageState = PlayableScps.Scp096PlayerState.Calming;
+                    break;
+
+                case KeyCode.Alpha3:
+                    ev.Player.Scp096Controller.RageState = PlayableScps.Scp096PlayerState.Charging;
+                    break;
+
+                case KeyCode.Alpha4:
+                    ev.Player.Scp096Controller.RageState = PlayableScps.Scp096PlayerState.Docile;
+                    break;
+
+                case KeyCode.Alpha5:
+                    ev.Player.Scp096Controller.RageState = PlayableScps.Scp096PlayerState.Enraged;
+                    break;
+
+                case KeyCode.Alpha6:
+                    ev.Player.Scp096Controller.RageState = PlayableScps.Scp096PlayerState.Enraging;
+                    break;
+
+                case KeyCode.Alpha7:
+                    ev.Player.Scp096Controller.RageState = PlayableScps.Scp096PlayerState.TryNotToCry;
+                    break;
+
+                case KeyCode.Alpha8:
+                    ev.Player.Scp096Controller.CurMaxShield = 100000f;
+                    ev.Player.Scp096Controller.EnrageTimeLeft = 100000000f;
+                    break;
+
+                case KeyCode.Alpha9:
+                    ev.Player.OpenReportWindow("<color=red>Welcome on my Server!</color>\nHere are some Rules:\n1. ...\n2. ...\n3. ...\n4. ...\n<color=blue>Thank you for Reading the Rules!</color>");
                     break;
             }
         }
@@ -56,6 +90,8 @@ namespace Synapse.Api.Events
         {
             ev.Player.Broadcast(conf.JoinMessagesDuration, conf.JoinBroadcast);
             ev.Player.GiveTextHint(conf.JoinTextHint, conf.JoinMessagesDuration);
+            if (!string.IsNullOrWhiteSpace(conf.JoinWindow))
+                ev.Player.OpenReportWindow(conf.JoinWindow.Replace("\\n","\n"));
         }
 
         private void PlayerSyncData(SynapseEventArguments.PlayerSyncDataEventArgs ev)
@@ -64,21 +100,6 @@ namespace Synapse.Api.Events
                 ev.Player.RoleType != RoleType.Scientist &&
                 !(Vector3.Distance(ev.Player.Position, ev.Player.GetComponent<Escape>().worldPosition) >= Escape.radius))
                 ev.Player.ClassManager.CmdRegisterEscape();
-        }
-
-        private void DoorInteract(SynapseEventArguments.DoorInteractEventArgs ev)
-        {
-            if (!SynapseController.Server.Configs.SynapseConfiguration.RemoteKeyCard) return;
-            if (ev.Allow) return;
-
-            if (!ev.Player.VanillaItems.Any()) return;
-            foreach (var gameItem in ev.Player.VanillaItems.Select(item => ev.Player.VanillaInventory.GetItemByID(item.id)).Where(gameitem => gameitem.permissions != null && gameitem.permissions.Length != 0))
-            {
-                if (gameItem.permissions.Any(p =>
-                     global::Door.backwardsCompatPermissions.TryGetValue(p, out var flag) &&
-                     ev.Door.PermissionLevels.HasPermission(flag)))
-                    ev.Allow = true;
-            }
         }
 #endregion
     }

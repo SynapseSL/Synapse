@@ -34,11 +34,32 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 if (radio) __instance.RadioAsHuman = value;
 
+                try
+                {
+                    if (__instance.RadioAsHuman)
+                    {
+                        var player = __instance.GetPlayer();
+                        var index = __instance.GetComponent<Radio>().myRadio;
+
+                        if (index != -1 && index < player.VanillaInventory.items.Count)
+                        {
+                            var item = player.VanillaInventory.items[index].GetSynapseItem();
+                            var allowradio = true;
+                            SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allowradio);
+                            __instance.RadioAsHuman = allowradio;
+                        }
+                    }
+                }
+                catch(Exception e)
+                {
+                    SynapseController.Server.Logger.Error($"Synapse-Event: PlayerUseItemEvent(Radio) failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                }
+
                 return allow;
             }
             catch (Exception e)
             {
-                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerSpeak failed!!\n{e}");
+                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerSpeak failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;
             }
         }

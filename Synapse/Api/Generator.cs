@@ -94,6 +94,7 @@ namespace Synapse.Api
         public void Overcharge()
         {
             if (IsOvercharged) return;
+            Locked = false;
             Map.Get.HeavyController.ActiveGenerators++;
             generator.NetworkremainingPowerup = 0f;
             generator._localTime = 0f;

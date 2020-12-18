@@ -33,7 +33,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
             }
             catch (Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: TriggerTesla failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Event: TriggerTesla failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
         }
     }

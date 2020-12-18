@@ -20,7 +20,9 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<SpawnPlayersEventArgs> SpawnPlayersEvent;
 
-        #region PlayerEventsInvoke
+        public event EventHandler.OnSynapseEvent<TeamRespawnEventArgs> TeamRespawnEvent;
+
+        #region RoundEventsInvoke
         internal void InvokeWaitingForPlayers() => WaitingForPlayersEvent?.Invoke();
         internal void InvokeRoundStartEvent() => RoundStartEvent?.Invoke();
         internal void InvokeRoundRestartEvent() => RoundRestartEvent?.Invoke();
@@ -51,6 +53,21 @@ namespace Synapse.Api.Events
 
             SpawnPlayersEvent?.Invoke(ev);
 
+            allow = ev.Allow;
+        }
+
+        internal void InvokeTeamRespawn(ref List<Player> players,ref Respawning.SpawnableTeamType teamType, out bool allow)
+        {
+            var ev = new TeamRespawnEventArgs
+            {
+                Players = players,
+                Team = teamType
+            };
+
+            TeamRespawnEvent?.Invoke(ev);
+
+            players = ev.Players;
+            teamType = ev.Team;
             allow = ev.Allow;
         }
         #endregion

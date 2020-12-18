@@ -23,6 +23,9 @@ namespace Synapse.Config
         [Description("The TextHint a Player gets when joining the Server")]
         public string JoinTextHint = string.Empty;
 
+        [Description("Opens a Window with the Text when a Player join the Server")]
+        public string JoinWindow = string.Empty;
+
         [Description("The duration of how long the TextHint and Broadcast will be displayed")]
         public ushort JoinMessagesDuration = 5;
 

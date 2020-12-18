@@ -270,4 +270,35 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public bool Allow { get; set; } = true;
     }
+
+    public class PlayerUseMicroEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public SynapseItem Micro { get; internal set; }
+
+        public MicroHID.MicroHidState State { get; set; }
+    }
+
+    public class PlayerWalkOnSinkholeEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public SinkholeEnvironmentalHazard Sinkhole { get; internal set; }
+
+        public bool Allow { get; set; }
+    }
+
+    public class PlayerReportEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Reporter { get; internal set; }
+
+        public Player Target { get; internal set; }
+
+        public string Reason { get; internal set; }
+
+        public bool GlobalReport { get; set; }
+
+        public bool Allow { get; set; } = true;
+    }
 }

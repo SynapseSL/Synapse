@@ -24,10 +24,12 @@ namespace Synapse.Api
             Hub = GetComponent<ReferenceHub>();
             Scp106Controller = new Scp106Controller(this);
             Scp079Controller = new Scp079Controller(this);
+            Scp096Controller = new Scp096Controller(this);
             Jail = new Jail(this);
             ActiveBroadcasts = new BroadcastList(this);
             Inventory = new PlayerInventory(this);
             GrenadeManager = GetComponent<Grenades.GrenadeManager>();
+            GameConsoleTransmission = this.GetComponent<GameConsoleTransmission>();
         }
 
         #region Methods
@@ -108,6 +110,8 @@ namespace Synapse.Api
         public void Hurt(int amount, DamageTypes.DamageType damagetype = default, Player attacker = null) =>
             PlayerStats.HurtPlayer(new PlayerStats.HitInfo(amount, attacker == null ? "WORLD" : attacker.NickName, damagetype, attacker == null ? 0 : attacker.PlayerId), gameObject);
 
+        public void OpenReportWindow(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
+
         public void SendToServer(ushort port)
         {
             var component = SynapseController.Server.Host.PlayerStats;
@@ -155,6 +159,41 @@ namespace Synapse.Api
             Connection.Send(msg);
             NetworkWriterPool.Recycle(writer);
         }
+
+        public void PlaceBlood(Vector3 pos, int type, float size)
+        {
+            var component = ClassManager;
+            var writer = NetworkWriterPool.GetWriter();
+            writer.WriteVector3(pos);
+            writer.WritePackedInt32(type);
+            writer.WriteSingle(size);
+            var msg = new RpcMessage
+            {
+                netId = component.netId,
+                componentIndex = component.ComponentIndex,
+                functionHash = typeof(CharacterClassManager).FullName.GetStableHashCode() * 503 + "RpcPlaceBlood".GetStableHashCode(),
+                payload = writer.ToArraySegment()
+            };
+            Connection.Send(msg);
+            NetworkWriterPool.Recycle(writer);
+        }
+
+        private float delay = Time.time;
+        private int pos = 0;
+
+        private void Update()
+        {
+            if (this == Server.Get.Host || SynapseGroup.Color.ToUpper() != "RAINBOW") return;
+
+            if(Time.time >= delay)
+            {
+                delay = Time.time + 1f;
+
+                RankColor = Server.Get.Colors.ElementAt(pos);
+
+                pos = pos + 1 >= Server.Get.Colors.Count() ? 0 : pos +1;
+            }
+        }
         #endregion
 
         #region Synapse Api Stuff
@@ -163,6 +202,8 @@ namespace Synapse.Api
         public readonly Scp106Controller Scp106Controller;
 
         public readonly Scp079Controller Scp079Controller;
+
+        public readonly Scp096Controller Scp096Controller;
 
         public BroadcastList ActiveBroadcasts { get; }
 
@@ -219,6 +260,8 @@ namespace Synapse.Api
                 CustomRole = Server.Get.RoleManager.GetCustomRole(value);
             }
         }
+
+        public string RoleName => CustomRole == null ? RoleType.ToString() : CustomRole.GetRoleName();
 
         //Stuff for the Permission System
         private SynapseGroup synapseGroup;
@@ -400,9 +443,10 @@ namespace Synapse.Api
                 {
                     transform.localScale = value;
 
-                    foreach(var player in SynapseController.Server.Players)
-                        typeof(NetworkServer).GetMethod("SendSpawnMessage", BindingFlags.Instance | BindingFlags.InvokeMethod
-                        | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public)?.Invoke(null, new object[] { GetComponent<NetworkIdentity>(), player.Connection});
+                    var method = typeof(NetworkServer).GetMethod("SendSpawnMessage", BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public);
+
+                    foreach(var ply in Server.Get.Players)
+                        method.Invoke(null, new object[] { NetworkIdentity, ply.Connection });
                 }
                 catch (Exception e)
                 {
@@ -457,17 +501,8 @@ namespace Synapse.Api
         {
             get
             {
-                var pos = Position;
-                pos.y -= 50f;
-
-                if (Physics.Linecast(Position,pos,out var info, -84058629) && info.transform != null)
-                {
-                    var room = Map.Get.Rooms.FirstOrDefault(x => x.GameObject == info.transform.gameObject);
-                    if (room != null)
-                        return room;
-                }
-
-                return SynapseController.Server.Map.Rooms.OrderBy(x => Vector3.Distance(x.Position, Position)).FirstOrDefault();
+                if (Vector3.Distance(Vector3.up * -1997, Position) <= 50) return Map.Get.GetRoom(RoomInformation.RoomType.POCKET);
+                return Map.Get.Rooms.FirstOrDefault(x => x.GameObject == Hub.localCurrentRoomEffects.curRoom);
             }
             set => Position = value.Position;
         }
@@ -656,6 +691,8 @@ namespace Synapse.Api
             }
         }
 
+        public ZoneType Zone => Room.Zone;
+
         public bool DoNotTrack => ServerRoles.DoNotTrack;
 
         public bool IsDead => Team == Team.RIP;
@@ -680,6 +717,8 @@ namespace Synapse.Api
 
         public Fraction Fraction => ClassManager.Fraction;
 
+        public Fraction RealFraction => Misc.GetFraction(RealTeam);
+
         public Items.SynapseItem ItemInHand => VanillaInventory.GetItemInHand().GetSynapseItem();
 
         public NetworkConnection Connection => ClassManager.Connection;
@@ -690,7 +729,13 @@ namespace Synapse.Api
         #region ReferenceHub
         public Transform CameraReference => Hub.PlayerCameraReference;
 
+        public NetworkIdentity NetworkIdentity => Hub.networkIdentity;
+
+        public GameConsoleTransmission GameConsoleTransmission { get; }
+
         public Grenades.GrenadeManager GrenadeManager { get; }
+
+        public LocalCurrentRoomEffects LocalCurrentRoomEffects => Hub.localCurrentRoomEffects;
 
         public WeaponManager WeaponManager => Hub.weaponManager;
 

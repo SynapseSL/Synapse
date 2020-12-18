@@ -29,9 +29,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
 
                 //Team of the person who cuffs someone
-                var team = __instance.MyReferenceHub.characterClassManager.CurRole.team;
+                var team = player.Team;
                 //Team of the Person who will become cuffed
-                var team2 = handcuffs.MyReferenceHub.characterClassManager.CurRole.team;
+                var team2 = targetplayer.Team;
 
                 var flag = false;
 
@@ -87,7 +87,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 if (!flag) return false;
 
-                if (team2 == global::Team.MTF && team == global::Team.CDP)
+                if (team2 == Team.MTF && team == global::Team.CDP)
                 {
                     __instance.MyReferenceHub.playerStats.TargetAchieve(__instance.MyReferenceHub.playerStats.connectionToClient, "tableshaveturned");
                 }
@@ -99,7 +99,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             catch (Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Event: PlayerAmmoDrop failed!!\n{e}");
+                Synapse.Api.Logger.Get.Error($"Synapse-Event: PlayerAmmoDrop failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;
             }
         }

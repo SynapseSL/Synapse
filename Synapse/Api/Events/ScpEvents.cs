@@ -1,5 +1,5 @@
 ﻿using Synapse.Api.Events.SynapseEventArguments;
-using Synapse.Patches.EventsPatches.ScpPatches.Scp106;
+using Synapse.Api.Enum;
 
 namespace Synapse.Api.Events
 {
@@ -10,6 +10,10 @@ namespace Synapse.Api.Events
         public Scp096Events Scp096 { get; } = new Scp096Events();
         
         public Scp106Events Scp106 { get; } = new Scp106Events();
+
+        public Scp079Events Scp079 { get; } = new Scp079Events();
+
+        public event EventHandler.OnSynapseEvent<ScpAttackEventArgs> ScpAttackEvent;
 
         public class Scp096Events
         {
@@ -68,14 +72,20 @@ namespace Synapse.Api.Events
                 allow = ev.Allow;
             }
             
-            internal void InvokePocketDimensionLeaveEvent(Player player, ref PocketDimensionTeleport.PDTeleportType teleportType, ref bool allow)
+            internal void InvokePocketDimensionLeaveEvent(Player player,ref UnityEngine.Vector3 pos, ref PocketDimensionTeleport.PDTeleportType teleportType, out bool allow)
             {
                 var ev = new PocketDimensionLeaveEventArgs
-                    {Allow = allow, TeleportType = teleportType, Player = player};
+                {
+                    ExitPosition = pos,
+                    Player = player,
+                    TeleportType = teleportType
+                };
+
                 PocketDimensionLeaveEvent?.Invoke(ev);
 
-                allow = ev.Allow;
+                pos = ev.ExitPosition;
                 teleportType = ev.TeleportType;
+                allow = ev.Allow;
             }
 
             internal void InvokePortalCreateEvent(Player scp106, out bool allow)
@@ -91,6 +101,40 @@ namespace Synapse.Api.Events
                 allow = ev.Allow;
             }
             #endregion
+        }
+
+        public class Scp079Events
+        {
+            internal Scp079Events() { }
+
+            public event EventHandler.OnSynapseEvent<Scp079RecontainEventArgs> Scp079RecontainEvent;
+
+            internal void Invoke079RecontainEvent(Recontain079Status status,out bool allow)
+            {
+                var ev = new Scp079RecontainEventArgs
+                {
+                    Status = status
+                };
+
+                Scp079RecontainEvent?.Invoke(ev);
+
+                allow = ev.Allow;
+            }
+        }
+
+
+        internal void InvokeScpAttack(Player scp,Player target,Enum.ScpAttackType attackType , out bool allow)
+        {
+            var ev = new ScpAttackEventArgs
+            {
+                Scp = scp,
+                Target = target,
+                AttackType = attackType,
+            };
+
+            ScpAttackEvent?.Invoke(ev);
+
+            allow = ev.Allow;
         }
     }
 }

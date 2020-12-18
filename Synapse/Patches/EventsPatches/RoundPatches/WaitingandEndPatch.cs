@@ -36,7 +36,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 				}
 				catch (Exception e)
 				{
-					SynapseController.Server.Logger.Error($"Synapse-Event: WaitingForPlayers failed!!\n{e}");
+					SynapseController.Server.Logger.Error($"Synapse-Event: WaitingForPlayers failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
 				}
 			}
 		}

@@ -3,6 +3,8 @@ using HarmonyLib;
 using Mirror;
 using Synapse.Api.Enum;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Events.Patches
@@ -22,7 +24,7 @@ namespace Synapse.Events.Patches
 				{
 					case PlayerInteract.Generator079Operations.Tablet:
 
-						if (generator.IsTabletConnected || !generator.Open || __instance._localTime <= 0f || Generator079.mainGenerator.forcedOvercharge)
+						if (generator.IsTabletConnected || !generator.Open || __instance._localTime <= 0f || Generator079.mainGenerator.forcedOvercharge || !SynapseExtensions.CanHarmScp(player))
 							return false;
 
 						Inventory component = person.GetComponent<Inventory>();
@@ -58,7 +60,7 @@ namespace Synapse.Events.Patches
 			}
 			catch (Exception e)
 			{
-				Logger.Get.Error($"Synapse-Event: PlayerGenerator failed!!\n{e}");
+				Logger.Get.Error($"Synapse-Event: PlayerGenerator failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
 				return true;
 			}
 		}
@@ -98,16 +100,42 @@ namespace Synapse.Events.Patches
 					return false;
 				}
 
+                if (!SynapseExtensions.CanHarmScp(player))
+                {
+					__instance.RpcDenied();
+					return false;
+                }
+
 				//Unlock The Generator
 				var flag = player.Bypass;
 
-				if (player.VanillaInventory.GetItemInHand().id > ItemType.KeycardJanitor)
-				{
-					var permissions = player.VanillaInventory.GetItemByID(player.VanillaInventory.curItem).permissions;
+				var items = new List<Synapse.Api.Items.SynapseItem>();
+				if (Server.Get.Configs.SynapseConfiguration.RemoteKeyCard)
+					items.AddRange(player.Inventory.Items.Where(x => x.ItemCategory == ItemCategory.Keycard));
+				else if (player.ItemInHand != null && player.ItemInHand.ItemCategory == ItemCategory.Keycard)
+					items.Add(player.ItemInHand);
+
+
+				foreach(var item in items)
+                {
+					var keycardcanopen = false;
+					var permissions = player.VanillaInventory.GetItemByID(item.ItemType).permissions;
 
 					foreach (var t in permissions)
 						if (t == "ARMORY_LVL_2")
-							flag = true;
+							keycardcanopen = true;
+
+					try
+					{
+						Server.Get.Events.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref keycardcanopen);
+					}
+					catch (Exception e)
+					{
+						Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent(Keycard) failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+					}
+
+					if (keycardcanopen)
+						flag = true;
 				}
 
 				Server.Get.Events.Player.InvokePlayerGeneratorInteractEvent(player, generator, GeneratorInteraction.Unlocked, ref flag);
@@ -123,7 +151,7 @@ namespace Synapse.Events.Patches
 			}
 			catch(Exception e)
             {
-				Logger.Get.Error($"Synapse-Event: DoorInteract failed!!\n{e}");
+				Logger.Get.Error($"Synapse-Event: DoorInteract failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
 				return true;
             }
 		}

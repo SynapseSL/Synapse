@@ -52,7 +52,7 @@ namespace Synapse.Patches.SynapsePatches.PermissionSystem
             }
             catch(Exception e)
             {
-                Logger.Get.Info($"Synapse-Permission: ServerSignature Postfix failed!!\n{e}");
+                Logger.Get.Info($"Synapse-Permission: ServerSignature Postfix failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
         }
     }

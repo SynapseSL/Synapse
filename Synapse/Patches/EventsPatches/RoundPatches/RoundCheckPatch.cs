@@ -153,7 +153,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                 }
                 catch (Exception e)
                 {
-                    Logger.Get.Error($"Synapse-Event: RoundCheckEvent failed!!\n{e}");
+                    Logger.Get.Error($"Synapse-Event: RoundCheckEvent failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 }
 
 

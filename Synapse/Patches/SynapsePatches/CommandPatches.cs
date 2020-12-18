@@ -53,7 +53,10 @@ namespace Synapse.Patches.SynapsePatches
     {
         private static bool Prefix(QueryProcessor __instance,string query,bool encrypted)
         {
+            if (__instance._sender == null) return false;
+
             var player = __instance._sender.GetPlayer();
+            if (player == null) return false;
             var args = query.Split(' ');
             if(SynapseController.CommandHandlers.ClientCommandHandler.TryGetCommand(args[0],out var command))
             {
@@ -81,7 +84,7 @@ namespace Synapse.Patches.SynapsePatches
                 }
                 catch(Exception e)
                 {
-                    Logger.Get.Error($"Synapse-Commands: Command Execution failed!!\n{e}");
+                    Logger.Get.Error($"Synapse-Commands: Command Execution failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 }
                 return false;
             }
@@ -110,7 +113,7 @@ namespace Synapse.Patches.SynapsePatches
                 }
                 catch(Exception e)
                 {
-                    Logger.Get.Error($"Synapse-Commands: Command Execution failed!!\n{e}");
+                    Logger.Get.Error($"Synapse-Commands: Command Execution failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 }
                 return false;
             }

@@ -33,8 +33,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 	        }
 	        catch (Exception e)
 	        {
-		        Console.WriteLine(e);
-		        throw;
+				Synapse.Api.Logger.Get.Error($"Synapse-Event: PlayerThrowGrenade failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+				throw;
 	        }
             
             return false;

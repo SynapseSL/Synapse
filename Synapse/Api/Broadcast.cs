@@ -132,7 +132,7 @@ namespace Synapse.Api
             activebc.EndBc();
         }
 
-
+        public IEnumerator<Broadcast> GetEnumerator() => bcs.GetEnumerator();
 
 
 

@@ -11,11 +11,14 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                SynapseController.Server.Events.Player.InvokePlayerLeaveEvent(__instance.GetPlayer());
+                var player = __instance.GetPlayer();
+                if (player.CustomRole != null)
+                    player.CustomRole = null;
+                SynapseController.Server.Events.Player.InvokePlayerLeaveEvent(player);
             }
             catch (Exception e)
             {
-                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerLeave failed!!\n{e}");
+                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerLeave failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
         }
     }

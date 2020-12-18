@@ -22,7 +22,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Item: SpawnItem failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Item: SpawnItem failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
 
             return false;
@@ -86,7 +86,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Item: SpawnItem failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Item: SpawnItem failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
 
             return false;
@@ -112,7 +112,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Item: SpawnItem failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Item: SpawnItem failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
 
             return false;

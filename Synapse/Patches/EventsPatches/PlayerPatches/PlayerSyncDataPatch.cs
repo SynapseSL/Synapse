@@ -18,7 +18,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             catch (Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: PlayerSyncData failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Event: PlayerSyncData failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;
             }
         }
