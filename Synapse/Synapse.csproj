@@ -46,7 +46,6 @@
     <Compile Include="Api\Ragdoll.cs" />
     <Compile Include="Api\Scp914.cs" />
     <Compile Include="Api\WorkStation.cs" />
-    <Compile Include="Api\Enum\GlobalBadge.cs" />
     <Compile Include="Api\Generator.cs" />
     <Compile Include="Api\Enum\GeneratorInteraction.cs" />
     <Compile Include="Api\Events\ScpEvents.cs" />

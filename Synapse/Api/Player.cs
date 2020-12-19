@@ -279,10 +279,13 @@ namespace Synapse.Api
                 Cover = SynapseGroup.Cover,
                 HiddenByDefault = SynapseGroup.Hidden,
                 KickPower = SynapseGroup.KickPower,
-                Permissions = GlobalPerms == 0 ? SynapseGroup.GetVanillaPermissionValue() : GlobalPerms,
+                Permissions = SynapseGroup.GetVanillaPermissionValue(),
                 RequiredKickPower = SynapseGroup.RequiredKickPower,
                 Shared = false
             };
+
+            if (GlobalPerms != 0)
+                group.Permissions |= GlobalPerms;
 
             ServerRoles.Group = group;
 
@@ -327,22 +330,6 @@ namespace Synapse.Api
                 ServerRoles.RpcResetFixed();
                 ServerRoles.NetworkMyText = group.BadgeText;
                 ServerRoles.NetworkMyColor = group.BadgeColor;
-            }
-        }
-
-        public GlobalBadge GlobalBadge
-        {
-            get
-            {
-                switch (ServerRoles.GlobalBadgeType)
-                {
-                    case 0: return GlobalBadge.Patreon;
-                    case 1: return GlobalBadge.Staff;
-                    case 2: return GlobalBadge.Manager;
-                    case 3:
-                    case 4: return GlobalBadge.GlobalBanning;
-                    default: return GlobalBadge.None;
-                }
             }
         }
 
