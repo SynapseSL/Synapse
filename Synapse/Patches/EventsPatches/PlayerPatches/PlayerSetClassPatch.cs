@@ -83,13 +83,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             if(lite) return;
             if (__state == null) return;
-            if (!__state.Allow)
-            {
-                foreach (var item in __state.EscapeItems)
-                    item.PickUp(__state.Player);
-
-                return;
-            }
+            if (!__state.Allow) return;
 
             var player = ply.GetPlayer();
 
