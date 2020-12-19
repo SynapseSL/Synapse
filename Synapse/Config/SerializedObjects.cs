@@ -1,8 +1,10 @@
 ﻿using Synapse.Api;
 using UnityEngine;
+using System;
 
 namespace Synapse.Config
 {
+    [Serializable]
     public class SerializedMapPoint
     {
         public SerializedMapPoint(string room, float x, float y, float z)
@@ -35,6 +37,7 @@ namespace Synapse.Config
         public override string ToString() => $"{Room}:{X}:{Y}:{Z}";
     }
 
+    [Serializable]
     public class SerializedItem
     {
         public SerializedItem(Synapse.Api.Items.SynapseItem item)
