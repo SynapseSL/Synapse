@@ -20,7 +20,12 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
             __state = new PlayerSetClassEventArgs();
             __state.EscapeItems = new List<SynapseItem>();
-            __state.Escape = escape;
+            __state.IsEscaping = escape;
+
+            __state.Allow = true;
+            __state.Player = player;
+            __state.Role = classid;
+            __state.Items = new List<SynapseItem>();
 
             if (escape && CharacterClassManager.KeepItemsAfterEscaping)
             {
@@ -32,29 +37,25 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 escape = false;
             }
 
-            __state.Allow = true;
-            __state.Player = player;
-            __state.Role = classid;
-            __state.Items = new List<SynapseItem>();
-            if(!lite)
-            foreach (var id in __instance.Classes.SafeGet(classid).startItems)
-            {
-                var synapseitem = new SynapseItem(id, 0, 0, 0, 0);
-                var item = new Item(player.VanillaInventory.GetItemByID(id));
-                synapseitem.Durabillity = item.durability;
-
-                for (int i = 0; i < player.VanillaInventory._weaponManager.weapons.Length; i++)
+            if (!lite)
+                foreach (var id in __instance.Classes.SafeGet(classid).startItems)
                 {
-                    if (player.VanillaInventory._weaponManager.weapons[i].inventoryID == id)
-                    {
-                        synapseitem.Sight = player.VanillaInventory._weaponManager.modPreferences[i, 0];
-                        synapseitem.Barrel = player.VanillaInventory._weaponManager.modPreferences[i, 1];
-                        synapseitem.Other = player.VanillaInventory._weaponManager.modPreferences[i, 2];
-                    }
-                }
+                    var synapseitem = new SynapseItem(id, 0, 0, 0, 0);
+                    var item = new Item(player.VanillaInventory.GetItemByID(id));
+                    synapseitem.Durabillity = item.durability;
 
-                __state.Items.Add(synapseitem);
-            }
+                    for (int i = 0; i < player.VanillaInventory._weaponManager.weapons.Length; i++)
+                    {
+                        if (player.VanillaInventory._weaponManager.weapons[i].inventoryID == id)
+                        {
+                            synapseitem.Sight = player.VanillaInventory._weaponManager.modPreferences[i, 0];
+                            synapseitem.Barrel = player.VanillaInventory._weaponManager.modPreferences[i, 1];
+                            synapseitem.Other = player.VanillaInventory._weaponManager.modPreferences[i, 2];
+                        }
+                    }
+
+                    __state.Items.Add(synapseitem);
+                }
             try
             {
                 Server.Get.Events.Player.InvokeSetClassEvent(__state);
@@ -65,7 +66,12 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             classid = __state.Role;
 
-            if (!__state.Allow) return false;
+            if (!__state.Allow)
+            {
+                foreach (var item in __state.EscapeItems)
+                    item.PickUp(player);
+                return false;
+            }
 
             //WHY THE FUCK DOES SCP NOT USE THEIR OWN METHODS TO CLEAR THE INVENTORY THAT I ALREADY PATCHED?
             player.Inventory.Clear();
@@ -77,7 +83,13 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             if(lite) return;
             if (__state == null) return;
-            if (!__state.Allow) return;
+            if (!__state.Allow)
+            {
+                foreach (var item in __state.EscapeItems)
+                    item.PickUp(__state.Player);
+
+                return;
+            }
 
             var player = ply.GetPlayer();
 
