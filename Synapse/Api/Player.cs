@@ -67,7 +67,6 @@ namespace Synapse.Api
 
         public void SendRAConsoleMessage(string message, bool success = true, RaCategory type = RaCategory.None) => SynapseExtensions.RaMessage(CommandSender,message, success, type);
 
-
         public void GiveEffect(Effect effect, byte intensity = 1, float duration = -1f) => PlayerEffectsController.ChangeByString(effect.ToString().ToLower(), intensity, duration);
 
         public void RaLogin()
@@ -663,9 +662,6 @@ namespace Synapse.Api
             get => ClassManager.NetworkCurUnitName; 
             set => ClassManager.NetworkCurUnitName = value; 
         }
-
-
-
 
         public CommandSender CommandSender
         {
