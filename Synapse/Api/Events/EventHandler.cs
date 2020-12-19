@@ -11,15 +11,7 @@ namespace Synapse.Api.Events
             Player.PlayerSyncDataEvent += PlayerSyncData;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
-            Player.PlayerReportEvent += Report;
 #endif
-        }
-
-        private void Report(SynapseEventArguments.PlayerReportEventArgs ev)
-        {
-            Synapse.Api.Logger.Get.Info($"{ev.Reporter} hat {ev.Target} reportet für:\n{ev.Reason}\nGlobal: {ev.GlobalReport}");
-            ev.Allow = false;
-            ev.GlobalReport = false;
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)

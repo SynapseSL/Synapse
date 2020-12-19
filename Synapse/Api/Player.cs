@@ -183,7 +183,7 @@ namespace Synapse.Api
 
         private void Update()
         {
-            if (this == Server.Get.Host || SynapseGroup.Color.ToUpper() != "RAINBOW") return;
+            if (this == Server.Get.Host || HideRank || SynapseGroup.Color.ToUpper() != "RAINBOW") return;
 
             if(Time.time >= delay)
             {
@@ -286,7 +286,7 @@ namespace Synapse.Api
             }
         }
 
-        public bool HasPermission(string permission) => this == Server.Get.Host ? true : SynapseGroup.HasPermission(permission);
+        public bool HasPermission(string permission) => this == Server.Get.Host || SynapseGroup.HasPermission(permission);
 
         public void RefreshPermission(bool disp)
         {
@@ -349,8 +349,6 @@ namespace Synapse.Api
         }
 
         public GlobalBadge GlobalBadge { get; internal set; }
-
-        internal Dictionary<string, string> globalBadgeRequest;
         #endregion
 
         #region Default Stuff
@@ -645,7 +643,7 @@ namespace Synapse.Api
 
         public bool HideRank
         {
-            get => string.IsNullOrEmpty(ServerRoles.HiddenBadge);
+            get => !string.IsNullOrEmpty(ServerRoles.HiddenBadge);
             set
             {
                 if (value)
