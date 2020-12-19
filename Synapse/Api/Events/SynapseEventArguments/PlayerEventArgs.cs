@@ -225,6 +225,8 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public List<SynapseItem> EscapeItems { get; set; }
 
         public bool Allow { get; set; }
+
+        public bool IsEscaping { get; internal set; }
     }
 
     public class PlayerConnectWorkstationEventArgs : EventHandler.ISynapseEventArgs
