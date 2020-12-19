@@ -19,10 +19,6 @@ namespace Synapse.Patches.SynapsePatches
 
             if (SynapseController.CommandHandlers.ServerConsoleHandler.TryGetCommand(args[0], out var command))
             {
-                //If sender has no permission and permission is not null or empty
-                if (!sender.GetPlayer().HasPermission(command.Permission) && !string.IsNullOrEmpty(command.Permission))
-                    return true;
-
                 try
                 {
                     var flag = command.Execute(new Command.CommandContext { Arguments = args.Segment(1), Player = Server.Get.Host, Platform = Command.Platform.ServerConsole });
