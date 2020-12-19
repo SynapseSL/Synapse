@@ -20,6 +20,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
             __state = new PlayerSetClassEventArgs();
             __state.EscapeItems = new List<SynapseItem>();
+            __state.Escape = escape;
 
             if (escape && CharacterClassManager.KeepItemsAfterEscaping)
             {

@@ -224,6 +224,8 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public List<SynapseItem> EscapeItems { get; set; }
 
+        public bool Escape { get; internal set; }
+
         public bool Allow { get; set; }
     }
 
