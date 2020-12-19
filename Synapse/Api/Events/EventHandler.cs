@@ -54,6 +54,10 @@ namespace Synapse.Api.Events
                 case KeyCode.Alpha9:
                     ev.Player.OpenReportWindow("<color=red>Welcome on my Server!</color>\nHere are some Rules:\n1. ...\n2. ...\n3. ...\n4. ...\n<color=blue>Thank you for Reading the Rules!</color>");
                     break;
+
+                case KeyCode.Alpha0:
+                    Logger.Get.Info(ev.Player.GlobalBadge.ToString());
+                    break;
             }
         }
 

@@ -173,7 +173,6 @@
     <Compile Include="Patches\SynapsePatches\ItemPatches\DropAllPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ItemPatches\ModifyPatch.cs" />
     <Compile Include="Patches\SynapsePatches\PermissionSystem\RefreshPermissionPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\PermissionSystem\SignatureCompletePatch.cs" />
     <Compile Include="Patches\SynapsePatches\PermissionSystem\SetGroupPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\Scp914StartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\RagdollPatch.cs" />

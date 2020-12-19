@@ -74,7 +74,7 @@ namespace Synapse.Api
         {
             ServerRoles.RemoteAdmin = true;
             ServerRoles.Permissions = SynapseGroup.GetVanillaPermissionValue() | ServerRoles._globalPerms;
-            ServerRoles.RemoteAdminMode = ServerRoles._globalPerms > 0UL ? ServerRoles.AccessMode.GlobalAccess : ServerRoles.AccessMode.PasswordOverride;
+            ServerRoles.RemoteAdminMode = GlobalRemoteAdmin ? ServerRoles.AccessMode.GlobalAccess : ServerRoles.AccessMode.PasswordOverride;
             if(!ServerRoles.AdminChatPerms)
                 ServerRoles.AdminChatPerms = SynapseGroup.HasVanillaPermission(PlayerPermissions.AdminChat);
             ServerRoles.TargetOpenRemoteAdmin(Connection, false);
@@ -82,24 +82,6 @@ namespace Synapse.Api
 
         public void RaLogout()
         {
-            if (GlobalBadge == GlobalBadge.GlobalBanning && Server.Get.PermissionHandler.ServerSection.GlobalBanTeamAccess)
-            {
-                RaLogin();
-                return;
-            }
-
-            if (GlobalBadge == GlobalBadge.Manager && Server.Get.PermissionHandler.ServerSection.ManagerAccess)
-            {
-                RaLogin();
-                return;
-            }
-
-            if (GlobalBadge == GlobalBadge.Staff && Server.Get.PermissionHandler.ServerSection.StaffAccess)
-            {
-                RaLogin();
-                return;
-            }
-
             Hub.serverRoles.RemoteAdmin = false;
             Hub.serverRoles.RemoteAdminMode = ServerRoles.AccessMode.LocalAccess;
             Hub.serverRoles.TargetCloseRemoteAdmin(Connection);
@@ -297,7 +279,7 @@ namespace Synapse.Api
                 Cover = SynapseGroup.Cover,
                 HiddenByDefault = SynapseGroup.Hidden,
                 KickPower = SynapseGroup.KickPower,
-                Permissions = SynapseGroup.GetVanillaPermissionValue(),
+                Permissions = GlobalPerms == 0 ? SynapseGroup.GetVanillaPermissionValue() : GlobalPerms,
                 RequiredKickPower = SynapseGroup.RequiredKickPower,
                 Shared = false
             };
@@ -307,7 +289,7 @@ namespace Synapse.Api
             if (!ServerRoles.OverwatchPermitted && SynapseGroup.HasVanillaPermission(PlayerPermissions.Overwatch))
                 ServerRoles.OverwatchPermitted = true;
 
-            if (SynapseGroup.RemoteAdmin)
+            if (SynapseGroup.RemoteAdmin || GlobalRemoteAdmin)
                 RaLogin();
             else
                 RaLogout();
@@ -348,7 +330,25 @@ namespace Synapse.Api
             }
         }
 
-        public GlobalBadge GlobalBadge { get; internal set; }
+        public GlobalBadge GlobalBadge
+        {
+            get
+            {
+                switch (ServerRoles.GlobalBadgeType)
+                {
+                    case 0: return GlobalBadge.Patreon;
+                    case 1: return GlobalBadge.Staff;
+                    case 2: return GlobalBadge.Manager;
+                    case 3:
+                    case 4: return GlobalBadge.GlobalBanning;
+                    default: return GlobalBadge.None;
+                }
+            }
+        }
+
+        public ulong GlobalPerms => ServerRoles._globalPerms;
+
+        public bool GlobalRemoteAdmin => ServerRoles.RemoteAdminMode == ServerRoles.AccessMode.GlobalAccess;
         #endregion
 
         #region Default Stuff
