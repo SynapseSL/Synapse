@@ -61,7 +61,7 @@ namespace Synapse.Patches.SynapsePatches
             if (SynapseController.CommandHandlers.ClientCommandHandler.TryGetCommand(args[0], out var command))
             {
                 //If sender has no permission and permission is not null or empty
-                if (!__instance.GetPlayer().HasPermission(command.Permission) && !string.IsNullOrEmpty(command.Permission))
+                if (!__instance.GetPlayer().HasPermission(command.Permission) && !string.IsNullOrWhiteSpace(command.Permission))
                     return true;
 
                 try
@@ -110,7 +110,7 @@ namespace Synapse.Patches.SynapsePatches
             if (SynapseController.CommandHandlers.RemoteAdminHandler.TryGetCommand(args[0], out var command))
             {
                 //If sender has no permission and permission is not null or empty
-                if (!sender.GetPlayer().HasPermission(command.Permission) && !string.IsNullOrEmpty(command.Permission))
+                if (!sender.GetPlayer().HasPermission(command.Permission) && !string.IsNullOrWhiteSpace(command.Permission))
                     return true;
 
                 try
