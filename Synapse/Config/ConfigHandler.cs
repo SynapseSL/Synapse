@@ -19,6 +19,7 @@ namespace Synapse.Config
             {
                 {"sameteam","<b>You can't harm this person</b>" },
                 {"scpteam","As your current Role you can't harm an Scp"  },
+                {"noperm", "You don't have permission to execute this command (%perm%)" }
             };
             SynapseTranslation.CreateTranslations(trans);
 
