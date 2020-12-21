@@ -14,6 +14,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 
             try
             {
+                Map.Get.HeavyController.Is079Recontained = false;
                 Server.Get.Events.Round.InvokeRoundRestartEvent();
             }
             catch(Exception e)
