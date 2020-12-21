@@ -12,9 +12,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             try
             {
                 var player = __instance.GetPlayer();
-                SynapseController.Server.Events.Player.InvokePlayerLeaveEvent(player);
                 if (player.CustomRole != null)
                     player.CustomRole = null;
+                SynapseController.Server.Events.Player.InvokePlayerLeaveEvent(player);
             }
             catch (Exception e)
             {
