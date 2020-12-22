@@ -14,28 +14,20 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     {
         private static bool Prefix(CharacterClassManager __instance, ref PlayerSetClassEventArgs __state, ref RoleType classid, GameObject ply, ref bool escape,bool lite)
         {
-            if (!NetworkServer.active) return false;
+            if (!NetworkServer.active || ply == null) return false;
             var player = ply.GetPlayer();
             if (player.Hub.isDedicatedServer || !player.Hub.Ready) return false;
 
             __state = new PlayerSetClassEventArgs();
             __state.EscapeItems = new List<SynapseItem>();
             __state.IsEscaping = escape;
-
             __state.Allow = true;
             __state.Player = player;
             __state.Role = classid;
             __state.Items = new List<SynapseItem>();
 
-            if (escape && CharacterClassManager.KeepItemsAfterEscaping)
-            {
-                foreach (var item in player.Inventory.Items)
-                {
-                    item.Despawn();
-                    __state.EscapeItems.Add(item);
-                }
-                escape = false;
-            }
+            if (escape && CharacterClassManager.KeepItemsAfterEscaping && !lite)
+                __state.EscapeItems = player.Inventory.Items;
 
             if (!lite)
                 foreach (var id in __instance.Classes.SafeGet(classid).startItems)
@@ -64,14 +56,12 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             {
                 Logger.Get.Error($"Synapse-Event: PlayerSetClass failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
+
+            if (!__state.Allow) return false;
             classid = __state.Role;
 
-            if (!__state.Allow)
-            {
-                foreach (var item in __state.EscapeItems)
-                    item.PickUp(player);
-                return false;
-            }
+            foreach (var item in __state.EscapeItems)
+                item.Despawn();
 
             //WHY THE FUCK DOES SCP NOT USE THEIR OWN METHODS TO CLEAR THE INVENTORY THAT I ALREADY PATCHED?
             player.Inventory.Clear();
@@ -79,13 +69,13 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             return true;
         }
 
-        private static void Postfix(CharacterClassManager __instance, PlayerSetClassEventArgs __state,RoleType classid, GameObject ply,bool lite)
+        private static void Postfix(CharacterClassManager __instance, PlayerSetClassEventArgs __state,RoleType classid, bool lite)
         {
             if(lite) return;
             if (__state == null) return;
             if (!__state.Allow) return;
 
-            var player = ply.GetPlayer();
+            var player = __state.Player;
 
             player.Inventory.Clear();
             var role = player.ClassManager.Classes.SafeGet(classid);
