@@ -8,10 +8,7 @@ namespace Synapse.Api
         internal Room(GameObject gameObject)
         {
             var info = gameObject.GetComponentInChildren<RoomInformation>();
-
-            if(info != null)
-                RoomType = info.CurrentRoomType;
-
+            RoomType = info.CurrentRoomType;
             GameObject = gameObject;
         }
 

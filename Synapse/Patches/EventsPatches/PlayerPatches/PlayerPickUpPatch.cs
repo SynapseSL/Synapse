@@ -11,11 +11,13 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     {
         private static bool Prefix(SearchCoordinator __instance)
         {
+            var item = __instance.Completor.TargetPickup?.GetSynapseItem();
+
+            if (item == null) return true;
+
             if (__instance.Completor.ValidateUpdate())
             {
                 if (!(NetworkTime.time >= __instance.SessionPipe.Session.FinishTime)) return false;
-
-                var item = __instance.Completor.TargetPickup.GetSynapseItem();
                 var player = __instance.GetPlayer();
 
                 var allow = true;
