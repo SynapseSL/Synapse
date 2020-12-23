@@ -18,13 +18,15 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             var player = ply.GetPlayer();
             if (player.Hub.isDedicatedServer || !player.Hub.Ready) return false;
 
-            __state = new PlayerSetClassEventArgs();
-            __state.EscapeItems = new List<SynapseItem>();
-            __state.IsEscaping = escape;
-            __state.Allow = true;
-            __state.Player = player;
-            __state.Role = classid;
-            __state.Items = new List<SynapseItem>();
+            __state = new PlayerSetClassEventArgs
+            {
+                EscapeItems = new List<SynapseItem>(),
+                IsEscaping = escape,
+                Allow = true,
+                Player = player,
+                Role = classid,
+                Items = new List<SynapseItem>()
+            };
 
             if (escape && CharacterClassManager.KeepItemsAfterEscaping && !lite)
                 __state.EscapeItems = player.Inventory.Items;
