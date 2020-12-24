@@ -11,7 +11,13 @@ namespace Synapse.Api.Events
             Player.PlayerSyncDataEvent += PlayerSyncData;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
+            Player.PlayerSetClassEvent += SetClass;
 #endif
+        }
+
+        private void SetClass(SynapseEventArguments.PlayerSetClassEventArgs ev)
+        {
+            ev.Position = new SerializedMapPoint("EZ_GateA",0f,2f,-5f).Parse().Position;
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)

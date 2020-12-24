@@ -25,7 +25,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 Allow = true,
                 Player = player,
                 Role = classid,
-                Items = new List<SynapseItem>()
+                Items = new List<SynapseItem>(),
+                Position = Vector3.zero,
+                Rotation = 0f
             };
 
             if (escape && CharacterClassManager.KeepItemsAfterEscaping && !lite)
@@ -50,6 +52,29 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                     __state.Items.Add(synapseitem);
                 }
+
+            if(__instance.Classes.SafeGet(classid).team != Team.RIP)
+            {
+                if (lite)
+                    __state.Position = player.Position;
+                else
+                {
+                    if (Synapse.Api.Map.Get.RespawnPoint != Vector3.zero)
+                        __state.Position = Synapse.Api.Map.Get.RespawnPoint;
+                    else
+                    {
+                        var randomPosition = CharacterClassManager._spawnpointManager.GetRandomPosition(classid);
+                        if (randomPosition != null)
+                        {
+                            __state.Position = randomPosition.transform.position;
+                            __state.Rotation = randomPosition.transform.rotation.eulerAngles.y;
+                        }
+                        else
+                            __state.Position = player.DeathPosition;
+                    }
+                }
+            }
+
             try
             {
                 Server.Get.Events.Player.InvokeSetClassEvent(__state);
@@ -68,6 +93,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             //WHY THE FUCK DOES SCP NOT USE THEIR OWN METHODS TO CLEAR THE INVENTORY THAT I ALREADY PATCHED?
             player.Inventory.Clear();
 
+            player.spawnPosition = __state.Position;
+            player.spawnRotation = __state.Rotation;
             return true;
         }
 
@@ -127,6 +154,86 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 }
                 else
                     item.Drop(__instance._pms.RealModelPosition);
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(CharacterClassManager),nameof(CharacterClassManager.ApplyProperties))]
+    internal static class PositionPatch
+    {
+        private static bool Prefix(CharacterClassManager __instance, bool lite, bool escape)
+        {
+            try
+            {
+                var player = __instance.GetPlayer();
+                var curRole = __instance.CurRole;
+                if (!__instance._wasAnytimeAlive && player.RoleType != RoleType.Spectator && player.RoleType != RoleType.None)
+                    __instance._wasAnytimeAlive = true;
+
+                __instance.InitSCPs();
+                __instance.AliveTime = 0f;
+                if (player.Team - Team.RSC <= 1)
+                    __instance.EscapeStartTime = (int)Time.realtimeSinceStartup;
+                try
+                {
+                    __instance._hub.footstepSync.SetLoudness(curRole.team, curRole.roleId.Is939());
+                }
+                catch
+                {
+                }
+                if (NetworkServer.active)
+                {
+                    player.Handcuffs.ClearTarget();
+                    player.Handcuffs.NetworkCufferId = -1;
+                    player.Handcuffs.NetworkForceCuff = false;
+                    if (curRole.roleId != RoleType.Spectator 
+                        && Respawning.RespawnManager.CurrentSequence() != Respawning.RespawnManager.RespawnSequencePhase.SpawningSelectedTeam 
+                        && Respawning.NamingRules.UnitNamingManager.RolesWithEnforcedDefaultName.TryGetValue(curRole.roleId, out var spawnableTeamType) 
+                        && Respawning.RespawnManager.Singleton.NamingManager.TryGetAllNamesFromGroup((byte)spawnableTeamType, out var array) 
+                        && array.Length != 0)
+                    {
+                        __instance.NetworkCurSpawnableTeamType = (byte)spawnableTeamType;
+                        __instance.NetworkCurUnitName = array[0];
+                    }
+                    else if (__instance.CurSpawnableTeamType != 0)
+                    {
+                        __instance.NetworkCurSpawnableTeamType = 0;
+                        __instance.NetworkCurUnitName = string.Empty;
+                    }
+                }
+                if(player.Team != Team.RIP)
+                {
+                    if(NetworkServer.active && !lite)
+                    {
+                        player.PlayerMovementSync.OnPlayerClassChange(player.spawnPosition, player.spawnRotation);
+                        player.PlayerMovementSync.IsAFK = true;
+                        if(escape && CharacterClassManager.KeepItemsAfterEscaping)
+                        {
+                            for (var num = 0; num < 3; num++)
+                                if (player.AmmoBox[num] >= 15)
+                                {
+                                    var item = new SynapseItem(player.AmmoBox.types[num].inventoryID, player.AmmoBox[num], 0, 0, 0);
+                                    item.Drop(player.spawnPosition);
+                                }
+                        }
+                        player.AmmoBox.ResetAmmo();
+
+                        if(!__instance.SpawnProtected && CharacterClassManager.EnableSP && CharacterClassManager.SProtectedTeam.Contains((int)curRole.team))
+                        {
+                            __instance.GodMode = true;
+                            __instance.SpawnProtected = true;
+                            __instance.ProtectedTime = Time.time;
+                        }
+                    }
+                    if (!__instance.isLocalPlayer)
+                        player.MaxHealth = curRole.maxHP;
+                }
+                return false;
+            }
+            catch(Exception e)
+            {
+                Logger.Get.Error($"Synapse-Event: PlayerSetClass(position) failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                return true;
             }
         }
     }

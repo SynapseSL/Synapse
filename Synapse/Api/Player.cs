@@ -244,6 +244,10 @@ namespace Synapse.Api
 
         public string RoleName => CustomRole == null ? RoleType.ToString() : CustomRole.GetRoleName();
 
+        internal Vector3 spawnPosition;
+
+        internal float spawnRotation;
+
         //Stuff for the Permission System
         private SynapseGroup synapseGroup;
 
