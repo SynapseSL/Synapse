@@ -287,7 +287,15 @@ namespace Synapse.Api
                 Shared = false
             };
 
-            if (GlobalPerms != 0)
+            var globalAccesAllowed = true;
+            switch (ServerRoles.GlobalBadgeType)
+            {
+                case 1: globalAccesAllowed = Server.Get.PermissionHandler.ServerSection.StaffAccess; break;
+                case 2: globalAccesAllowed = Server.Get.PermissionHandler.ServerSection.ManagerAccess; break;
+                case 3: globalAccesAllowed = Server.Get.PermissionHandler.ServerSection.GlobalBanTeamAccess; break;
+                case 4: globalAccesAllowed = Server.Get.PermissionHandler.ServerSection.GlobalBanTeamAccess; break;
+            }
+            if (GlobalPerms != 0 && globalAccesAllowed)
                 group.Permissions |= GlobalPerms;
 
             ServerRoles.Group = group;
