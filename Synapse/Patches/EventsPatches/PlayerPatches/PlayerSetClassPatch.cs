@@ -14,146 +14,160 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     {
         private static bool Prefix(CharacterClassManager __instance, ref PlayerSetClassEventArgs __state, ref RoleType classid, GameObject ply, ref bool escape,bool lite)
         {
-            if (!NetworkServer.active || ply == null) return false;
-            var player = ply.GetPlayer();
-            if (player.Hub.isDedicatedServer || !player.Hub.Ready) return false;
-
-            __state = new PlayerSetClassEventArgs
-            {
-                EscapeItems = new List<SynapseItem>(),
-                IsEscaping = escape,
-                Allow = true,
-                Player = player,
-                Role = classid,
-                Items = new List<SynapseItem>(),
-                Position = Vector3.zero,
-                Rotation = 0f
-            };
-
-            if (escape && CharacterClassManager.KeepItemsAfterEscaping && !lite)
-                __state.EscapeItems = player.Inventory.Items;
-
-            if (!lite)
-                foreach (var id in __instance.Classes.SafeGet(classid).startItems)
-                {
-                    var synapseitem = new SynapseItem(id, 0, 0, 0, 0);
-                    var item = new Item(player.VanillaInventory.GetItemByID(id));
-                    synapseitem.Durabillity = item.durability;
-
-                    for (int i = 0; i < player.VanillaInventory._weaponManager.weapons.Length; i++)
-                    {
-                        if (player.VanillaInventory._weaponManager.weapons[i].inventoryID == id)
-                        {
-                            synapseitem.Sight = player.VanillaInventory._weaponManager.modPreferences[i, 0];
-                            synapseitem.Barrel = player.VanillaInventory._weaponManager.modPreferences[i, 1];
-                            synapseitem.Other = player.VanillaInventory._weaponManager.modPreferences[i, 2];
-                        }
-                    }
-
-                    __state.Items.Add(synapseitem);
-                }
-
-            if(__instance.Classes.SafeGet(classid).team != Team.RIP)
-            {
-                if (lite)
-                    __state.Position = player.Position;
-                else
-                {
-                    if (Synapse.Api.Map.Get.RespawnPoint != Vector3.zero)
-                        __state.Position = Synapse.Api.Map.Get.RespawnPoint;
-                    else
-                    {
-                        var randomPosition = CharacterClassManager._spawnpointManager.GetRandomPosition(classid);
-                        if (randomPosition != null)
-                        {
-                            __state.Position = randomPosition.transform.position;
-                            __state.Rotation = randomPosition.transform.rotation.eulerAngles.y;
-                        }
-                        else
-                            __state.Position = player.DeathPosition;
-                    }
-                }
-            }
-
             try
             {
-                Server.Get.Events.Player.InvokeSetClassEvent(__state);
+                if (!NetworkServer.active || ply == null) return false;
+                var player = ply.GetPlayer();
+                if (player.Hub.isDedicatedServer || !player.Hub.Ready) return false;
+
+                __state = new PlayerSetClassEventArgs
+                {
+                    EscapeItems = new List<SynapseItem>(),
+                    IsEscaping = escape,
+                    Allow = true,
+                    Player = player,
+                    Role = classid,
+                    Items = new List<SynapseItem>(),
+                    Position = Vector3.zero,
+                    Rotation = 0f
+                };
+
+                if (escape && CharacterClassManager.KeepItemsAfterEscaping && !lite)
+                    __state.EscapeItems = player.Inventory.Items;
+
+                if (!lite)
+                    foreach (var id in __instance.Classes.SafeGet(classid).startItems)
+                    {
+                        var synapseitem = new SynapseItem(id, 0, 0, 0, 0);
+                        var item = new Item(player.VanillaInventory.GetItemByID(id));
+                        synapseitem.Durabillity = item.durability;
+
+                        for (int i = 0; i < player.VanillaInventory._weaponManager.weapons.Length; i++)
+                        {
+                            if (player.VanillaInventory._weaponManager.weapons[i].inventoryID == id)
+                            {
+                                synapseitem.Sight = player.VanillaInventory._weaponManager.modPreferences[i, 0];
+                                synapseitem.Barrel = player.VanillaInventory._weaponManager.modPreferences[i, 1];
+                                synapseitem.Other = player.VanillaInventory._weaponManager.modPreferences[i, 2];
+                            }
+                        }
+
+                        __state.Items.Add(synapseitem);
+                    }
+
+                if (__instance.Classes.SafeGet(classid).team != Team.RIP)
+                {
+                    if (lite)
+                        __state.Position = player.Position;
+                    else
+                    {
+                        if (Synapse.Api.Map.Get.RespawnPoint != Vector3.zero)
+                            __state.Position = Synapse.Api.Map.Get.RespawnPoint;
+                        else
+                        {
+                            var randomPosition = CharacterClassManager._spawnpointManager.GetRandomPosition(classid);
+                            if (randomPosition != null)
+                            {
+                                __state.Position = randomPosition.transform.position;
+                                __state.Rotation = randomPosition.transform.rotation.eulerAngles.y;
+                            }
+                            else
+                                __state.Position = player.DeathPosition;
+                        }
+                    }
+                }
+
+                try
+                {
+                    Server.Get.Events.Player.InvokeSetClassEvent(__state);
+                }
+                catch (Exception e)
+                {
+                    Logger.Get.Error($"Synapse-Event: PlayerSetClass failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                }
+
+                if (!__state.Allow) return false;
+                classid = __state.Role;
+
+                foreach (var item in __state.EscapeItems)
+                    item.Despawn();
+
+                //WHY THE FUCK DOES SCP NOT USE THEIR OWN METHODS TO CLEAR THE INVENTORY THAT I ALREADY PATCHED?
+                player.Inventory.Clear();
+
+                player.spawnPosition = __state.Position;
+                player.spawnRotation = __state.Rotation;
             }
-            catch (Exception e)
+            catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: PlayerSetClass failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Logger.Get.Error($"Synapse-Event: PlayerSetClass Prefix failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
-
-            if (!__state.Allow) return false;
-            classid = __state.Role;
-
-            foreach (var item in __state.EscapeItems)
-                item.Despawn();
-
-            //WHY THE FUCK DOES SCP NOT USE THEIR OWN METHODS TO CLEAR THE INVENTORY THAT I ALREADY PATCHED?
-            player.Inventory.Clear();
-
-            player.spawnPosition = __state.Position;
-            player.spawnRotation = __state.Rotation;
             return true;
         }
 
         private static void Postfix(CharacterClassManager __instance, PlayerSetClassEventArgs __state,RoleType classid, bool lite)
         {
-            if(lite) return;
-            if (__state == null) return;
-            if (!__state.Allow) return;
-
-            var player = __state.Player;
-
-            player.Inventory.Clear();
-            var role = player.ClassManager.Classes.SafeGet(classid);
-            if(role.roleId != RoleType.Spectator)
+            try
             {
-                player.Ammo5 = role.ammoTypes[0];
-                player.Ammo7 = role.ammoTypes[1];
-                player.Ammo9 = role.ammoTypes[2];
-            }
-            foreach (var item in __state.Items)
-                player.Inventory.AddItem(item);
+                if (lite) return;
+                if (__state == null) return;
+                if (!__state.Allow) return;
 
-            if (__state.EscapeItems.Count == 0) return;
-            foreach(var item in __state.EscapeItems)
-            {
-                if (CharacterClassManager.PutItemsInInvAfterEscaping)
+                var player = __state.Player;
+
+                player.Inventory.Clear();
+                var role = player.ClassManager.Classes.SafeGet(classid);
+                if (role.roleId != RoleType.Spectator)
                 {
-                    var itemByID = player.VanillaInventory.GetItemByID(item.ItemType);
-                    var flag = false;
-                    var categories = __instance._search.categories;
-                    int i = 0;
-                    while (i < categories.Length)
-                    {
-                        var invcategorie = categories[i];
-                        if (invcategorie.itemType == itemByID.itemCategory && itemByID.itemCategory != ItemCategory.None)
-                        {
-                            int num = 0;
-                            foreach (var sync in player.VanillaInventory.items)
-                                if (player.VanillaInventory.GetItemByID(sync.id).itemCategory == itemByID.itemCategory)
-                                    num++;
+                    player.Ammo5 = role.ammoTypes[0];
+                    player.Ammo7 = role.ammoTypes[1];
+                    player.Ammo9 = role.ammoTypes[2];
+                }
+                foreach (var item in __state.Items)
+                    player.Inventory.AddItem(item);
 
-                            if (num >= (int)invcategorie.maxItems)
+                if (__state.EscapeItems.Count == 0) return;
+                foreach (var item in __state.EscapeItems)
+                {
+                    if (CharacterClassManager.PutItemsInInvAfterEscaping)
+                    {
+                        var itemByID = player.VanillaInventory.GetItemByID(item.ItemType);
+                        var flag = false;
+                        var categories = __instance._search.categories;
+                        int i = 0;
+                        while (i < categories.Length)
+                        {
+                            var invcategorie = categories[i];
+                            if (invcategorie.itemType == itemByID.itemCategory && itemByID.itemCategory != ItemCategory.None)
                             {
-                                flag = true;
+                                int num = 0;
+                                foreach (var sync in player.VanillaInventory.items)
+                                    if (player.VanillaInventory.GetItemByID(sync.id).itemCategory == itemByID.itemCategory)
+                                        num++;
+
+                                if (num >= (int)invcategorie.maxItems)
+                                {
+                                    flag = true;
+                                    break;
+                                }
                                 break;
                             }
-                            break;
+                            else
+                                i++;
                         }
-                        else
-                            i++;
-                    }
 
-                    if (player.VanillaInventory.items.Count >= 8 || (flag && !item.IsCustomItem))
-                        item.Drop(__instance._pms.RealModelPosition);
+                        if (player.VanillaInventory.items.Count >= 8 || (flag && !item.IsCustomItem))
+                            item.Drop(__instance._pms.RealModelPosition);
+                        else
+                            item.PickUp(player);
+                    }
                     else
-                        item.PickUp(player);
+                        item.Drop(__instance._pms.RealModelPosition);
                 }
-                else
-                    item.Drop(__instance._pms.RealModelPosition);
+            }
+            catch(Exception e)
+            {
+                Logger.Get.Error($"Synapse-Event: PlayerSetClass Postfix failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
         }
     }
