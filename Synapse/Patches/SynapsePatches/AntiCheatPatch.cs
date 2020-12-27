@@ -88,6 +88,7 @@ namespace Synapse.Patches.SynapsePatches
                             }
                         }
                         __result = true;
+                        break;
                     }
                 }
 
