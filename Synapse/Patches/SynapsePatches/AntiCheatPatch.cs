@@ -1,10 +1,12 @@
 ﻿using System;
 using HarmonyLib;
+using PlayableScps;
+using Scp914;
 using UnityEngine;
 
 namespace Synapse.Patches.SynapsePatches
 {
-    [HarmonyPatch(typeof(PlayerMovementSync),nameof(PlayerMovementSync.AnticheatIsIntersecting))]
+    [HarmonyPatch(typeof(PlayerMovementSync), nameof(PlayerMovementSync.AnticheatIsIntersecting))]
     internal static class AntiCheatPatch
     {
         private static bool Prefix(PlayerMovementSync __instance, out bool __result, Vector3 pos)
@@ -42,36 +44,68 @@ namespace Synapse.Patches.SynapsePatches
 
                 var number = Physics.OverlapCapsuleNonAlloc(pos1, pos2, radius, PlayerMovementSync._sphereHits, PlayerMovementSync._r3CollidableSurfaces);
 
-                for(int i = 0; i < number; i++)
+                for (int i = 0; i < number; i++)
                 {
-                    PlayableScps.Scp096 scp;
-                    if ((__instance._hub.characterClassManager.CurClass != RoleType.Scp106 || (PlayerMovementSync._sphereHits[i].gameObject.layer != 27 && PlayerMovementSync._sphereHits[i].gameObject.layer != 14)) && (PlayerMovementSync._sphereHits[i].gameObject.layer != 27 || (scp = (__instance._hub.scpsController.CurrentScp as PlayableScps.Scp096)) == null || !scp.Enraged))
-                        continue;
+                    Scp096 scp;
 
-                    if (PlayerMovementSync._sphereHits[i].gameObject.layer == 27)
+                    if ((__instance._hub.characterClassManager.CurClass != RoleType.Scp106 ||
+                        ((PlayerMovementSync._sphereHits[i].gameObject.layer != 27 ||
+                        PlayerMovementSync._sphereHits[i].gameObject.CompareTag("LiftDoor")) && PlayerMovementSync._sphereHits[i].gameObject.layer != 14)) && (PlayerMovementSync._sphereHits[i].gameObject.layer != 27 ||
+                        (scp = (__instance._hub.scpsController.CurrentScp as Scp096)) == null ||
+                        !scp.Enraged ||
+                        PlayerMovementSync._sphereHits[i].gameObject.CompareTag("LiftDoor") ||
+                        PlayerMovementSync._sphereHits[i].gameObject.CompareTag("SCP914Door")))
                     {
-                        Door componentInParent = PlayerMovementSync._sphereHits[i].GetComponentInParent<Door>();
-                        if (componentInParent != null && componentInParent.curCooldown > 0f && !componentInParent.isOpen)
-                            continue;
-                    }
+                        if (PlayerMovementSync._sphereHits[i].gameObject.layer == 27)
+                        {
+                            if ((Scp914Machine.singleton.DoorMoving && PlayerMovementSync._sphereHits[i].gameObject.CompareTag("SCP914Door")) || PlayerMovementSync._sphereHits[i].gameObject.CompareTag("AnticheatIgnore"))
+                                continue;
 
-                    __result = true;
+                            if (PlayerMovementSync._sphereHits[i].gameObject.CompareTag("LiftDoor"))
+                            {
+                                LiftDoor componentInParent = PlayerMovementSync._sphereHits[i].gameObject.GetComponentInParent<LiftDoor>();
+                                if (componentInParent == null || componentInParent.Animator == null)
+                                {
+                                    __result = false;
+                                    break;
+                                }
+
+                                if (Time.fixedTime - componentInParent.Animator.GetFloat(Lift.LastChange) >= 0.9f && !componentInParent.Animator.GetBool(Lift.IsOpen))
+                                {
+                                    __result = false;
+                                    break;
+                                }
+
+                                continue;
+                            }
+                            else
+                            {
+                                Door componentInParent2 = PlayerMovementSync._sphereHits[i].GetComponentInParent<Door>();
+                                if (componentInParent2 != null && componentInParent2.curCooldown > 0f && !componentInParent2.isOpen)
+                                {
+                                    continue;
+                                }
+                            }
+                        }
+                        __result = true;
+                        break;
+                    }
                 }
 
                 return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Api: AntiCheatPatch failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Api.Logger.Get.Error($"Synapse-Api: AntiCheatPatch failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;
             }
         }
     }
 
-    [HarmonyPatch(typeof(PlayerMovementSync),nameof(PlayerMovementSync.AnticheatRaycast))]
+    [HarmonyPatch(typeof(PlayerMovementSync), nameof(PlayerMovementSync.AnticheatRaycast))]
     internal static class AntiCheatPatch2
     {
-        private static void Prefix(PlayerMovementSync __instance,ref Vector3 offset)
+        private static void Prefix(PlayerMovementSync __instance, ref Vector3 offset)
         {
             var player = __instance.GetPlayer();
             offset.y *= player.Scale.y;
