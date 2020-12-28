@@ -28,7 +28,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                             float delay = visionInformation.LookingAmount / 0.25f * (visionInformation.Distance * 0.1f);
                             if (!__instance.Calming)
                             {
-                                if (player.Invisible)
+                                if (player.Invisible || Server.Get.Configs.SynapseConfiguration.CantRage096.Contains(player.RoleID))
                                     continue;
 
                                 if (player.RealTeam == Team.SCP && !Server.Get.Configs.SynapseConfiguration.ScpTrigger096)
@@ -66,7 +66,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
 
                 var player = info.RHub.GetPlayer();
 
-                if (player.Invisible)
+                if (player.Invisible || Server.Get.Configs.SynapseConfiguration.CantRage096.Contains(player.RoleID))
                     return false;
 
                 if (player.RealTeam == Team.SCP && !Server.Get.Configs.SynapseConfiguration.ScpTrigger096)
