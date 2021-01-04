@@ -20,9 +20,7 @@ namespace Synapse.Api.Plugin
     {
         private string _pluginDirectory;
 
-        public virtual void Load()
-        {  
-        }
+        public virtual void Load() => Logger.Get.Info($"{Information.Name} by {Information.Author} has loaded!");
 
         public virtual void ReloadConfigs()
         {
