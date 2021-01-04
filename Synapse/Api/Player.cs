@@ -380,6 +380,18 @@ namespace Synapse.Api
             set => ClassManager.UserId2 = value;
         }
 
+        public bool RemoteAdminAccess
+        {
+            get => ServerRoles.RemoteAdmin;
+            set
+            {
+                if (value)
+                    RaLogin();
+                else
+                    RaLogout();
+            }
+        }
+
         public bool NoClip
         {
             get => ServerRoles.NoclipReady;
