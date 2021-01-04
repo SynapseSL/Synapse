@@ -19,7 +19,30 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    Api.Map.Get.PlaceBlood(ev.Player.Position);
+                    Logger.Get.Info(ev.Player.NicknameSync.Network_playerInfoToShow.ToString());
+                    ev.Player.DisplayInfo = "TestRole";
+                    ev.Player.NicknameSync.Network_playerInfoToShow &= ~PlayerInfoArea.Role;
+                    Logger.Get.Info(ev.Player.NicknameSync.Network_playerInfoToShow.ToString());
+                    break;
+
+                case KeyCode.Alpha2:
+                    ev.Player.DisplayInfo = "TestRole";
+                    break;
+
+                case KeyCode.Alpha3:
+                    ev.Player.RemoveDisplayInfo(PlayerInfoArea.Role);
+                    break;
+
+                case KeyCode.Alpha4:
+                    ev.Player.AddDisplayInfo(PlayerInfoArea.Role);
+                    break;
+
+                case KeyCode.Alpha5:
+                    ev.Player.RemoveDisplayInfo(PlayerInfoArea.Nickname);
+                    break;
+
+                case KeyCode.Alpha6:
+                    ev.Player.AddDisplayInfo(PlayerInfoArea.Nickname);
                     break;
             }
         }

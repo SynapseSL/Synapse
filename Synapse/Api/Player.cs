@@ -93,6 +93,10 @@ namespace Synapse.Api
 
         public void OpenReportWindow(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
 
+        public void RemoveDisplayInfo(PlayerInfoArea playerInfo) => NicknameSync.Network_playerInfoToShow &= ~playerInfo;
+
+        public void AddDisplayInfo(PlayerInfoArea playerInfo) => NicknameSync.Network_playerInfoToShow |= playerInfo;
+
         public void SendToServer(ushort port)
         {
             var component = SynapseController.Server.Host.PlayerStats;
