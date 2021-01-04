@@ -135,7 +135,10 @@ namespace Synapse.Events.Patches
 					}
 
 					if (keycardcanopen)
+                    {
 						flag = true;
+						break;
+					}
 				}
 
 				Server.Get.Events.Player.InvokePlayerGeneratorInteractEvent(player, generator, GeneratorInteraction.Unlocked, ref flag);

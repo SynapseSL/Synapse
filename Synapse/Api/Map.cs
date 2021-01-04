@@ -153,6 +153,7 @@ namespace Synapse.Api
             WorkStations.Clear();
             Ragdolls.Clear();
             Items.Clear();
+            HeavyController.Is079Recontained = false;
         }
     }
 }
