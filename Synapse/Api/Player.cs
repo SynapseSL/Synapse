@@ -172,7 +172,7 @@ namespace Synapse.Api
 
                 RankColor = Server.Get.Colors.ElementAt(pos);
 
-                pos = pos + 1 >= Server.Get.Colors.Count() ? 0 : pos +1;
+                pos = pos + 1 >= Server.Get.Colors.Count() ? 0 : pos + 1;
             }
         }
         #endregion

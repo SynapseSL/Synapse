@@ -1,4 +1,5 @@
 bin/
+Refs/Assembly-CSharp.dll
 obj/
 /packages/
 riderModule.iml
