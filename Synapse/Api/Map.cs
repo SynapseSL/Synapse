@@ -131,6 +131,8 @@ namespace Synapse.Api
             NetworkServer.Spawn(component2.gameObject);
         }
 
+        public void PlaceBlood(Vector3 pos, int type = 0, float size = 2) => Server.Get.Host.ClassManager.RpcPlaceBlood(pos, type, size);
+
         internal void AddObjects()
         {
             foreach (var tesla in SynapseController.Server.GetObjectsOf<TeslaGate>())

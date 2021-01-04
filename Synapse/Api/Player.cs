@@ -141,7 +141,7 @@ namespace Synapse.Api
             NetworkWriterPool.Recycle(writer);
         }
 
-        public void PlaceBlood(Vector3 pos, int type, float size)
+        public void PlaceBlood(Vector3 pos, int type = 1, float size = 2f)
         {
             var component = ClassManager;
             var writer = NetworkWriterPool.GetWriter();
@@ -303,10 +303,7 @@ namespace Synapse.Api
             if (!ServerRoles.OverwatchPermitted && SynapseGroup.HasVanillaPermission(PlayerPermissions.Overwatch))
                 ServerRoles.OverwatchPermitted = true;
 
-            if (SynapseGroup.RemoteAdmin || GlobalRemoteAdmin)
-                RaLogin();
-            else
-                RaLogout();
+            RemoteAdminAccess = SynapseGroup.RemoteAdmin || GlobalRemoteAdmin;
 
             ServerRoles.SendRealIds();
 
