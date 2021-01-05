@@ -51,13 +51,17 @@ namespace Synapse.Patches.SynapsePatches
     [HarmonyPatch(typeof(QueryProcessor), nameof(QueryProcessor.ProcessGameConsoleQuery))]
     internal static class ClientCommandPatch
     {
-        private static bool Prefix(QueryProcessor __instance, string query, bool encrypted)
+        private static bool Prefix(QueryProcessor __instance, string query)
         {
             if (__instance._sender == null) return false;
 
             var player = __instance._sender.GetPlayer();
+
+            SynapseController.Server.Events.Server.InvokeConsoleCommandEvent(player, query);
+
             if (player == null) return false;
             var args = query.Split(' ');
+
             if (SynapseController.CommandHandlers.ClientCommandHandler.TryGetCommand(args[0], out var command))
             {
                 //If sender has no permission and permission is not null or empty
@@ -109,6 +113,13 @@ namespace Synapse.Patches.SynapsePatches
 
             if (q.StartsWith("@"))
                 return true;
+
+            if (q.StartsWith("REQUEST_DATA PLAYER_LIST SILENT"))
+                return true;
+
+            var allow = true;
+            SynapseController.Server.Events.Server.InvokeRemoteAdminCommandEvent(sender, q, ref allow);
+            if (!allow) return false;
 
             if (SynapseController.CommandHandlers.RemoteAdminHandler.TryGetCommand(args[0], out var command))
             {

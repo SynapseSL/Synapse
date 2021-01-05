@@ -56,6 +56,12 @@ namespace Synapse.Patches.SynapsePatches
                             var newplayer = players[k];
                             var vector = __instance._transmitBuffer[k].position - player.Position;
 
+                            if(player.RoleType == RoleType.Scp173 && player.Scp173Controller.IgnoredPlayers.Contains(newplayer))
+                            {
+                                showinvoid = true;
+                                goto AA_001;
+                            }
+
                             if (newplayer.Invisible && !player.HasPermission("synapse.see.invisible"))
                             {
                                 showinvoid = true;
