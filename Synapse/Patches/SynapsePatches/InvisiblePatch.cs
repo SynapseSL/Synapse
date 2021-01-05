@@ -157,6 +157,15 @@ namespace Synapse.Patches.SynapsePatches
     [HarmonyPatch(typeof(Scp173PlayerScript), nameof(Scp173PlayerScript.LookFor173))]
     internal static class PeanutPatch
     {
-        private static void Postfix(ref bool __result, Scp173PlayerScript __instance) => __result = (__instance.GetPlayer()?.Invisible) != true && __result;
+        private static void Postfix(ref bool __result, Scp173PlayerScript __instance, GameObject scp)
+        {
+            var player = __instance.GetPlayer();
+            var peanut = scp.GetPlayer();
+
+            __result = player?.Invisible != true && __result;
+
+            if (peanut.RoleType == RoleType.Scp173 && peanut.Scp173Controller.IgnoredPlayers.Contains(player))
+                __result = false;
+        }
     }
 }

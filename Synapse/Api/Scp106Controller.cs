@@ -17,7 +17,7 @@ namespace Synapse.Api
 
         public bool IsUsingPortal => script.goingViaThePortal;
 
-        public List<Player> PocketPlayers { get; } = new List<Player>();
+        public HashSet<Player> PocketPlayers { get; } = new HashSet<Player>();
 
 
         public void UsePortal() => script.UseTeleport();

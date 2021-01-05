@@ -19,30 +19,9 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    Logger.Get.Info(ev.Player.NicknameSync.Network_playerInfoToShow.ToString());
-                    ev.Player.DisplayInfo = "TestRole";
-                    ev.Player.NicknameSync.Network_playerInfoToShow &= ~PlayerInfoArea.Role;
-                    Logger.Get.Info(ev.Player.NicknameSync.Network_playerInfoToShow.ToString());
-                    break;
-
-                case KeyCode.Alpha2:
-                    ev.Player.DisplayInfo = "TestRole";
-                    break;
-
-                case KeyCode.Alpha3:
-                    ev.Player.RemoveDisplayInfo(PlayerInfoArea.Role);
-                    break;
-
-                case KeyCode.Alpha4:
-                    ev.Player.AddDisplayInfo(PlayerInfoArea.Role);
-                    break;
-
-                case KeyCode.Alpha5:
-                    ev.Player.RemoveDisplayInfo(PlayerInfoArea.Nickname);
-                    break;
-
-                case KeyCode.Alpha6:
-                    ev.Player.AddDisplayInfo(PlayerInfoArea.Nickname);
+                    foreach (var player in SynapseController.Server.Players)
+                        if (player != ev.Player)
+                            ev.Player.Scp173Controller.IgnoredPlayers.Add(player);
                     break;
             }
         }
