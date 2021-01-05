@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Synapse.Api.Events.SynapseEventArguments
 {
@@ -63,5 +64,10 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Player Target { get; internal set; }
 
         public bool Allow { get; set; } = true;
+    }
+
+    public class Scp173BlinkEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Scp173 { get; internal set; }
     }
 }
