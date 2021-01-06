@@ -13,23 +13,6 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 	{
 		private static bool Prefix(PlayerStats __instance, out bool __result, PlayerStats.HitInfo info, GameObject go, bool noTeamDamage = false, bool IsValidDamage = true)
 		{
-			/*
-            try
-            {
-                SynapseController.Server.Events.Player.InvokePlayerDamageEvent(player, killer, ref info);
-
-                    SynapseController.Server.Events.Player.InvokePlayerDeathEvent(player, killer, info);
-
-                    foreach (var ply in Server.Get.GetPlayers(x => x.Scp106Controller.PocketPlayers.Contains(player)))
-                        ply.Scp106Controller.PocketPlayers.Remove(player);
-
-                    player.CustomRole = null;
-            }
-            catch (Exception e)
-            {
-                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDamage failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
-            }
-            */
 			try
 			{
 				__result = false;
