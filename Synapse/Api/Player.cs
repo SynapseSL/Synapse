@@ -31,6 +31,7 @@ namespace Synapse.Api
             Inventory = new PlayerInventory(this);
             GrenadeManager = GetComponent<Grenades.GrenadeManager>();
             GameConsoleTransmission = this.GetComponent<GameConsoleTransmission>();
+            MicroHID = GetComponent<MicroHID>();
         }
 
         #region Methods
@@ -739,6 +740,8 @@ namespace Synapse.Api
         public Transform CameraReference => Hub.PlayerCameraReference;
 
         public NetworkIdentity NetworkIdentity => Hub.networkIdentity;
+
+        public MicroHID MicroHID { get; }
 
         public GameConsoleTransmission GameConsoleTransmission { get; }
 
