@@ -15,14 +15,10 @@ namespace Synapse.Api
         {
             var bench = Object.Instantiate(NetworkManager.singleton.spawnPrefabs.Find(p => p.gameObject.name == "Work Station"));
             bench.gameObject.transform.localScale = scale;
+            bench.gameObject.transform.position = position;
 
             NetworkServer.Spawn(bench);
-            var offset = new Offset();
-            offset.position = position;
-            offset.rotation = rotation;
-            offset.scale = Vector3.one;
             workStation = bench.GetComponent<global::WorkStation>();
-            workStation.Networkposition = offset;
             //bench.AddComponent<WorkStationUpgrader>();
 
             Map.Get.WorkStations.Add(this);
@@ -36,7 +32,7 @@ namespace Synapse.Api
 
         public Vector3 Position
         {
-            get => workStation.Networkposition.position;
+            get => GameObject.transform.position;
         }
 
         public Vector3 Scale

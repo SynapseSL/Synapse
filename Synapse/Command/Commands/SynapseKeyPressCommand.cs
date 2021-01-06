@@ -10,7 +10,7 @@ namespace Synapse.Command.Commands
         Aliases = new[] { "key" },
         Description = "A command for the KeyPressEvent from Synapse",
         Usage = "Read the wiki",
-        Permission = "none",
+        Permission = "",
         Platforms = new[] { Platform.ClientConsole }
     )]
     public class SynapseKeyPressCommand : ISynapseCommand

@@ -25,11 +25,13 @@ namespace Synapse.Api
             Scp106Controller = new Scp106Controller(this);
             Scp079Controller = new Scp079Controller(this);
             Scp096Controller = new Scp096Controller(this);
+            Scp173Controller = new Scp173Controller(this);
             Jail = new Jail(this);
             ActiveBroadcasts = new BroadcastList(this);
             Inventory = new PlayerInventory(this);
             GrenadeManager = GetComponent<Grenades.GrenadeManager>();
             GameConsoleTransmission = this.GetComponent<GameConsoleTransmission>();
+            MicroHID = GetComponent<MicroHID>();
         }
 
         #region Methods
@@ -67,14 +69,13 @@ namespace Synapse.Api
 
         public void SendRAConsoleMessage(string message, bool success = true, RaCategory type = RaCategory.None) => SynapseExtensions.RaMessage(CommandSender,message, success, type);
 
-
         public void GiveEffect(Effect effect, byte intensity = 1, float duration = -1f) => PlayerEffectsController.ChangeByString(effect.ToString().ToLower(), intensity, duration);
 
         public void RaLogin()
         {
             ServerRoles.RemoteAdmin = true;
             ServerRoles.Permissions = SynapseGroup.GetVanillaPermissionValue() | ServerRoles._globalPerms;
-            ServerRoles.RemoteAdminMode = ServerRoles._globalPerms > 0UL ? ServerRoles.AccessMode.GlobalAccess : ServerRoles.AccessMode.PasswordOverride;
+            ServerRoles.RemoteAdminMode = GlobalRemoteAdmin ? ServerRoles.AccessMode.GlobalAccess : ServerRoles.AccessMode.PasswordOverride;
             if(!ServerRoles.AdminChatPerms)
                 ServerRoles.AdminChatPerms = SynapseGroup.HasVanillaPermission(PlayerPermissions.AdminChat);
             ServerRoles.TargetOpenRemoteAdmin(Connection, false);
@@ -82,24 +83,6 @@ namespace Synapse.Api
 
         public void RaLogout()
         {
-            if (GlobalBadge == GlobalBadge.GlobalBanning && Server.Get.PermissionHandler.ServerSection.GlobalBanTeamAccess)
-            {
-                RaLogin();
-                return;
-            }
-
-            if (GlobalBadge == GlobalBadge.Manager && Server.Get.PermissionHandler.ServerSection.ManagerAccess)
-            {
-                RaLogin();
-                return;
-            }
-
-            if (GlobalBadge == GlobalBadge.Staff && Server.Get.PermissionHandler.ServerSection.StaffAccess)
-            {
-                RaLogin();
-                return;
-            }
-
             Hub.serverRoles.RemoteAdmin = false;
             Hub.serverRoles.RemoteAdminMode = ServerRoles.AccessMode.LocalAccess;
             Hub.serverRoles.TargetCloseRemoteAdmin(Connection);
@@ -108,9 +91,13 @@ namespace Synapse.Api
         public void Heal(float hp) => PlayerStats.HealHPAmount(hp);
 
         public void Hurt(int amount, DamageTypes.DamageType damagetype = default, Player attacker = null) =>
-            PlayerStats.HurtPlayer(new PlayerStats.HitInfo(amount, attacker == null ? "WORLD" : attacker.NickName, damagetype, attacker == null ? 0 : attacker.PlayerId), gameObject);
+            attacker.PlayerStats.HurtPlayer(new PlayerStats.HitInfo(amount, attacker == null ? "WORLD" : attacker.NickName, damagetype, attacker == null ? 0 : attacker.PlayerId), gameObject);
 
         public void OpenReportWindow(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
+
+        public void RemoveDisplayInfo(PlayerInfoArea playerInfo) => NicknameSync.Network_playerInfoToShow &= ~playerInfo;
+
+        public void AddDisplayInfo(PlayerInfoArea playerInfo) => NicknameSync.Network_playerInfoToShow |= playerInfo;
 
         public void SendToServer(ushort port)
         {
@@ -160,7 +147,7 @@ namespace Synapse.Api
             NetworkWriterPool.Recycle(writer);
         }
 
-        public void PlaceBlood(Vector3 pos, int type, float size)
+        public void PlaceBlood(Vector3 pos, int type = 1, float size = 2f)
         {
             var component = ClassManager;
             var writer = NetworkWriterPool.GetWriter();
@@ -183,7 +170,7 @@ namespace Synapse.Api
 
         private void Update()
         {
-            if (this == Server.Get.Host || SynapseGroup.Color.ToUpper() != "RAINBOW") return;
+            if (this == Server.Get.Host || HideRank || SynapseGroup.Color.ToUpper() != "RAINBOW") return;
 
             if(Time.time >= delay)
             {
@@ -191,7 +178,7 @@ namespace Synapse.Api
 
                 RankColor = Server.Get.Colors.ElementAt(pos);
 
-                pos = pos + 1 >= Server.Get.Colors.Count() ? 0 : pos +1;
+                pos = pos + 1 >= Server.Get.Colors.Count() ? 0 : pos + 1;
             }
         }
         #endregion
@@ -204,6 +191,8 @@ namespace Synapse.Api
         public readonly Scp079Controller Scp079Controller;
 
         public readonly Scp096Controller Scp096Controller;
+
+        public readonly Scp173Controller Scp173Controller;
 
         public BroadcastList ActiveBroadcasts { get; }
 
@@ -263,6 +252,10 @@ namespace Synapse.Api
 
         public string RoleName => CustomRole == null ? RoleType.ToString() : CustomRole.GetRoleName();
 
+        internal Vector3 spawnPosition;
+
+        internal float spawnRotation;
+
         //Stuff for the Permission System
         private SynapseGroup synapseGroup;
 
@@ -286,7 +279,7 @@ namespace Synapse.Api
             }
         }
 
-        public bool HasPermission(string permission) => this == Server.Get.Host ? true : SynapseGroup.HasPermission(permission);
+        public bool HasPermission(string permission) => this == Server.Get.Host || SynapseGroup.HasPermission(permission);
 
         public void RefreshPermission(bool disp)
         {
@@ -302,15 +295,23 @@ namespace Synapse.Api
                 Shared = false
             };
 
+            var globalAccesAllowed = true;
+            switch (ServerRoles.GlobalBadgeType)
+            {
+                case 1: globalAccesAllowed = Server.Get.PermissionHandler.ServerSection.StaffAccess; break;
+                case 2: globalAccesAllowed = Server.Get.PermissionHandler.ServerSection.ManagerAccess; break;
+                case 3: globalAccesAllowed = Server.Get.PermissionHandler.ServerSection.GlobalBanTeamAccess; break;
+                case 4: globalAccesAllowed = Server.Get.PermissionHandler.ServerSection.GlobalBanTeamAccess; break;
+            }
+            if (GlobalPerms != 0 && globalAccesAllowed)
+                group.Permissions |= GlobalPerms;
+
             ServerRoles.Group = group;
 
             if (!ServerRoles.OverwatchPermitted && SynapseGroup.HasVanillaPermission(PlayerPermissions.Overwatch))
                 ServerRoles.OverwatchPermitted = true;
 
-            if (SynapseGroup.RemoteAdmin)
-                RaLogin();
-            else
-                RaLogout();
+            RemoteAdminAccess = SynapseGroup.RemoteAdmin || GlobalRemoteAdmin;
 
             ServerRoles.SendRealIds();
 
@@ -348,9 +349,9 @@ namespace Synapse.Api
             }
         }
 
-        public GlobalBadge GlobalBadge { get; internal set; }
+        public ulong GlobalPerms => ServerRoles._globalPerms;
 
-        internal Dictionary<string, string> globalBadgeRequest;
+        public bool GlobalRemoteAdmin => ServerRoles.RemoteAdminMode == ServerRoles.AccessMode.GlobalAccess;
         #endregion
 
         #region Default Stuff
@@ -382,6 +383,18 @@ namespace Synapse.Api
         {
             get => ClassManager.UserId2;
             set => ClassManager.UserId2 = value;
+        }
+
+        public bool RemoteAdminAccess
+        {
+            get => ServerRoles.RemoteAdmin;
+            set
+            {
+                if (value)
+                    RaLogin();
+                else
+                    RaLogout();
+            }
         }
 
         public bool NoClip
@@ -645,7 +658,7 @@ namespace Synapse.Api
 
         public bool HideRank
         {
-            get => string.IsNullOrEmpty(ServerRoles.HiddenBadge);
+            get => !string.IsNullOrEmpty(ServerRoles.HiddenBadge);
             set
             {
                 if (value)
@@ -678,9 +691,6 @@ namespace Synapse.Api
             get => ClassManager.NetworkCurUnitName; 
             set => ClassManager.NetworkCurUnitName = value; 
         }
-
-
-
 
         public CommandSender CommandSender
         {
@@ -730,6 +740,8 @@ namespace Synapse.Api
         public Transform CameraReference => Hub.PlayerCameraReference;
 
         public NetworkIdentity NetworkIdentity => Hub.networkIdentity;
+
+        public MicroHID MicroHID { get; }
 
         public GameConsoleTransmission GameConsoleTransmission { get; }
 

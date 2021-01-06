@@ -3,14 +3,14 @@ using System.Linq;
 
 namespace Synapse.Command.Commands
 {
-    
+
     [CommandInformation(
         Name = "Help",
-        Aliases = new[]{"h"},
+        Aliases = new[] { "h" },
         Description = "Shows all available commands with usage description",
         Usage = "help {optional command name for a specific command}",
         Permission = "synapse.command.help",
-        Platforms = new[] {Platform.ClientConsole, Platform.RemoteAdmin, Platform.ServerConsole}
+        Platforms = new[] { Platform.ClientConsole, Platform.RemoteAdmin, Platform.ServerConsole }
     )]
     public class SynapseHelpCommand : ISynapseCommand
     {
@@ -51,14 +51,14 @@ namespace Synapse.Command.Commands
 
             commandlist = commandlist.Where(x => context.Player.HasPermission(x.Permission) || string.IsNullOrWhiteSpace(x.Permission) || x.Permission.ToUpper() == "NONE").ToList();
 
-            if(context.Arguments.Count > 0)
+            if (context.Arguments.Count > 0)
             {
                 if (string.IsNullOrWhiteSpace(context.Arguments.First()))
                     goto A_001;
 
                 var command = commandlist.FirstOrDefault(x => x.Name.ToLower() == context.Arguments.First());
 
-                if(command == null)
+                if (command == null)
                 {
                     result.State = CommandResultState.Error;
                     result.Message = "No Command with this Name found";
@@ -68,13 +68,16 @@ namespace Synapse.Command.Commands
                 string platforms = "{ " + string.Join(", ", command.Platforms) + " }";
                 string aliases = "{ " + string.Join(", ", command.Aliases) + " }";
 
-                result.Message = $"\n{command.Name}\n    - Permission: {command.Permission}\n    - Description: {command.Description}\n    - Usage: {command.Usage}\n    - Platforms: {platforms}\n    - Aliases: {aliases}";
+                if (string.IsNullOrWhiteSpace(command.Permission))
+                    result.Message = $"\n{command.Name}\n    - Description: {command.Description}\n    - Usage: {command.Usage}\n    - Platforms: {platforms}\n    - Aliases: {aliases}";
+                else
+                    result.Message = $"\n{command.Name}\n    - Permission: {command.Permission}\n    - Description: {command.Description}\n    - Usage: {command.Usage}\n    - Platforms: {platforms}\n    - Aliases: {aliases}";
 
                 result.State = CommandResultState.Ok;
                 return result;
             }
 
-            A_001:
+        A_001:
             var msg = $"All Commands which you can execute for {context.Platform}:";
 
             foreach (var command in commandlist)

@@ -78,6 +78,8 @@ namespace Synapse.Api.Events.SynapseEventArguments
         }
 
         public PlayerStats.HitInfo HitInfo { get; set; }
+
+        public bool Allow { get; set; } = true;
     }
 
     public class LoadComponentEventArgs : EventHandler.ISynapseEventArgs
@@ -224,6 +226,12 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public List<SynapseItem> EscapeItems { get; set; }
 
+        public bool IsEscaping { get; internal set; }
+
+        public Vector3 Position { get; set; }
+
+        public float Rotation { get; set; }
+
         public bool Allow { get; set; }
     }
 
@@ -276,6 +284,12 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Player Player { get; internal set; }
 
         public SynapseItem Micro { get; internal set; }
+
+        public float Energy
+        {
+            get => Player.MicroHID.NetworkEnergy;
+            set => Player.MicroHID.NetworkEnergy = value;
+        }
 
         public MicroHID.MicroHidState State { get; set; }
     }

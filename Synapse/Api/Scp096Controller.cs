@@ -12,7 +12,7 @@ namespace Synapse.Api
 
         private PlayableScps.Scp096 Scp096 => player.Hub.scpsController.CurrentScp as PlayableScps.Scp096;
 
-        private bool Is096 => player.RoleType == RoleType.Scp096;
+        public bool Is096 => player.RoleType == RoleType.Scp096;
 
         public float ShieldAmount
         {
@@ -161,7 +161,7 @@ namespace Synapse.Api
         public void ChargeDoor(Door door)
         {
             if (!Is096) return;
-            Scp096.ChargeDoor(door.GameObject.GetComponent<global::Door>());
+            Scp096.ChargeDoor(door.door);
         }
     }
 }

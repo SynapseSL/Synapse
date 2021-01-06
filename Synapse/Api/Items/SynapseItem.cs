@@ -6,8 +6,6 @@ namespace Synapse.Api.Items
     public class SynapseItem
     {
         private bool deactivated = false;
-        internal Pickup pickup;
-        internal Inventory.SyncItemInfo itemInfo;
 
         public SynapseItem(int id, float durability, int sight, int barrel, int other)
         {
@@ -59,6 +57,9 @@ namespace Synapse.Api.Items
         public readonly bool IsCustomItem;
 
         public readonly string Name;
+
+        public Pickup pickup { get; internal set; }
+        public Inventory.SyncItemInfo itemInfo { get; internal set; }
 
         public Enum.ItemState State
         {

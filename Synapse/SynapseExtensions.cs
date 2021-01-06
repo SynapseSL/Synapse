@@ -46,7 +46,7 @@ public static class SynapseExtensions
 
     public static Generator GetGenerator(this Generator079 generator079) => Map.Get.Generators.FirstOrDefault(x => x.GameObject == generator079.gameObject);
 
-    public static Synapse.Api.Door GetDoor(this Door door) => Map.Get.Doors.FirstOrDefault(x => x.GameObject == door.gameObject);
+    public static Synapse.Api.Door GetDoor(this Interactables.Interobjects.DoorUtils.DoorVariant door) => Map.Get.Doors.FirstOrDefault(x => x.GameObject == door.gameObject);
 
     public static Tesla GetTesla(this TeslaGate teslaGate) => Map.Get.Teslas.FirstOrDefault(x => x.GameObject == teslaGate.gameObject);
 
@@ -67,4 +67,6 @@ public static class SynapseExtensions
         }
         return true;
     }
+
+    public static bool CanNotHurtByScp(Player player) => player.Team == Team.SCP || player.CustomRole == null ? false : player.CustomRole.GetFriends().Any(x => x == Team.SCP);
 }

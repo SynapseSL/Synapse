@@ -46,5 +46,11 @@ namespace Synapse.Config
 
         [Description("If Enabled Scp-079 and Scp-096 can't see the Player who is wearing Scp-268")]
         public bool Better268 = false;
+
+        [Description("All roles in the list can't rage SCP-096")]
+        public List<int> CantRage096 = new List<int>
+        {
+            (int)RoleType.Tutorial
+        };
     }
 }

@@ -72,7 +72,7 @@ namespace Synapse.Api
             set => ServerConfigSynchronizer.Singleton.NetworkHumanSprintSpeedMultiplier = value;
         }
 
-        public int Seed => RandomSeedSync.staticSeed;
+        public int Seed => MapGeneration.SeedSynchronizer.Seed;
 
         public Room GetRoom(RoomInformation.RoomType roomType) => Rooms.FirstOrDefault(x => x.RoomType == roomType);
 
@@ -131,6 +131,8 @@ namespace Synapse.Api
             NetworkServer.Spawn(component2.gameObject);
         }
 
+        public void PlaceBlood(Vector3 pos, int type = 0, float size = 2) => Server.Get.Host.ClassManager.RpcPlaceBlood(pos, type, size);
+
         internal void AddObjects()
         {
             foreach (var tesla in SynapseController.Server.GetObjectsOf<TeslaGate>())
@@ -153,6 +155,7 @@ namespace Synapse.Api
             WorkStations.Clear();
             Ragdolls.Clear();
             Items.Clear();
+            HeavyController.Is079Recontained = false;
         }
     }
 }

@@ -60,7 +60,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
 
                     EventHandler.Get.Scp.Scp106.InvokePocketDimensionEnterEvent(player, scp, ref allow);
                     if (!allow) return false;
-
+                    scp.Scp106Controller.PocketPlayers.Add(player);
                     player.PlayerEffectsController.GetEffect<CustomPlayerEffects.Corroding>().IsInPd = true;
                     player.GiveEffect(Api.Enum.Effect.Corroding);
                 }
@@ -131,7 +131,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                 __instance.RemoveCorrosionEffect(player.gameObject);
                 PlayerManager.localPlayer.GetComponent<PlayerStats>().TargetAchieve(component.connectionToClient, "larryisyourfriend");
                 if (PocketDimensionTeleport.RefreshExit)
-                    ImageGenerator.pocketDimensionGenerator.GenerateRandom();
+                    MapGeneration.ImageGenerator.pocketDimensionGenerator.GenerateRandom();
                 return false;
             } 
             catch (Exception e)

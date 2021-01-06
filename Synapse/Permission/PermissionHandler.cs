@@ -83,7 +83,7 @@ namespace Synapse.Permission
 
             var nwgroup = GetNorthwoodGroup();
 
-            if (player.GlobalBadge != Api.Enum.GlobalBadge.None && player.GlobalBadge != Api.Enum.GlobalBadge.Patreon && nwgroup != null)
+            if (player.ServerRoles.Staff && nwgroup != null)
                 return nwgroup;
 
             return GetDefaultGroup();

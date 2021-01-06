@@ -1,32 +1,25 @@
 ﻿using UnityEngine;
 using System.Linq;
+using Interactables.Interobjects.DoorUtils;
+using vDoor = Interactables.Interobjects.DoorUtils.DoorVariant;
 
 namespace Synapse.Api
 {
     public class Door
     {
-        internal Door(global::Door vanilladoor) => door = vanilladoor;
+        internal Door(vDoor vanilladoor) => door = vanilladoor;
 
-        private global::Door door;
+        internal vDoor door;
 
         public GameObject GameObject => door.gameObject;
 
-        public string Name => string.IsNullOrWhiteSpace(door.DoorName) ? GameObject.name : door.DoorName;
+        public string Name => string.IsNullOrWhiteSpace(door.name) ? GameObject.name : door.name;
 
-        public Vector3 Position => door.localPos;
+        public Vector3 Position => GameObject.transform.position;
 
-        public bool Open { get => door.isOpen; set => door.SetState(value); }
-
-        public bool Locked { get => door.locked; set => door.SetLock(value); }
-
-        public Room Room { get => Map.Get.Rooms.OrderBy(x => Vector3.Distance(x.Position, Position)).FirstOrDefault(); }
-
-        public global::Door.AccessRequirements PermissionLevels { get => door.PermissionLevels; set => door.PermissionLevels = value; }
-
-        public global::Door.DoorStatus Status => door.status;
+        public DoorPermissions DoorPermissions { get => door.RequiredPermissions; set => door.RequiredPermissions = value; }
 
         private Enum.DoorType doorType;
-
         public Enum.DoorType DoorType
         {
             get
