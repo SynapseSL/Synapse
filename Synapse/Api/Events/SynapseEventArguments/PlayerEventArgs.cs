@@ -285,6 +285,12 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public SynapseItem Micro { get; internal set; }
 
+        public float Energy
+        {
+            get => Player.MicroHID.NetworkEnergy;
+            set => Player.MicroHID.NetworkEnergy = value;
+        }
+
         public MicroHID.MicroHidState State { get; set; }
     }
 
