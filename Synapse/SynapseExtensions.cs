@@ -67,4 +67,6 @@ public static class SynapseExtensions
         }
         return true;
     }
+
+    public static bool CanNotHurtByScp(Player player) => player.Team == Team.SCP || player.CustomRole == null ? false : player.CustomRole.GetFriends().Any(x => x == Team.SCP);
 }

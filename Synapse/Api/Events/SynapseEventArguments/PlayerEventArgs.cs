@@ -78,6 +78,8 @@ namespace Synapse.Api.Events.SynapseEventArguments
         }
 
         public PlayerStats.HitInfo HitInfo { get; set; }
+
+        public bool Allow { get; set; } = true;
     }
 
     public class LoadComponentEventArgs : EventHandler.ISynapseEventArgs

@@ -115,12 +115,19 @@ namespace Synapse.Api.Events
             PlayerDeathEvent?.Invoke(ev);
         }
 
-        internal void InvokePlayerDamageEvent(Player victim, Player killer, ref PlayerStats.HitInfo info)
+        internal void InvokePlayerDamageEvent(Player victim, Player killer, ref PlayerStats.HitInfo info, out bool allow)
         {
-            var ev = new PlayerDamageEventArgs {HitInfo = info, Killer = killer, Victim = victim};
+            var ev = new PlayerDamageEventArgs
+            {
+                HitInfo = info,
+                Killer = killer,
+                Victim = victim
+            };
+
             PlayerDamageEvent?.Invoke(ev);
 
             info = ev.HitInfo;
+            allow = ev.Allow;
         }
 
         internal void InvokeLoadComponentsEvent(GameObject gameObject)
