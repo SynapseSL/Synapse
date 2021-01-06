@@ -161,7 +161,7 @@ namespace Synapse.Api
         public void ChargeDoor(Door door)
         {
             if (!Is096) return;
-            Scp096.ChargeDoor(door.GameObject.GetComponent<global::Door>());
+            Scp096.ChargeDoor(door.door);
         }
     }
 }

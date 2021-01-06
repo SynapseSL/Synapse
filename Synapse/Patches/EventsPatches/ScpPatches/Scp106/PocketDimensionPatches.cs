@@ -131,7 +131,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                 __instance.RemoveCorrosionEffect(player.gameObject);
                 PlayerManager.localPlayer.GetComponent<PlayerStats>().TargetAchieve(component.connectionToClient, "larryisyourfriend");
                 if (PocketDimensionTeleport.RefreshExit)
-                    ImageGenerator.pocketDimensionGenerator.GenerateRandom();
+                    MapGeneration.ImageGenerator.pocketDimensionGenerator.GenerateRandom();
                 return false;
             } 
             catch (Exception e)

@@ -72,7 +72,7 @@ namespace Synapse.Api
             set => ServerConfigSynchronizer.Singleton.NetworkHumanSprintSpeedMultiplier = value;
         }
 
-        public int Seed => RandomSeedSync.staticSeed;
+        public int Seed => MapGeneration.SeedSynchronizer.Seed;
 
         public Room GetRoom(RoomInformation.RoomType roomType) => Rooms.FirstOrDefault(x => x.RoomType == roomType);
 

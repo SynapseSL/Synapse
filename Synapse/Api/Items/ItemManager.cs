@@ -6,7 +6,7 @@ namespace Synapse.Api.Items
 {
     public class ItemManager
     {
-        public const int HighestItem = (int)ItemType.SCPCoal;
+        public const int HighestItem = (int)ItemType.Coin;
 
         private readonly List<CustomItemInformation> customItems = new List<CustomItemInformation>();
 

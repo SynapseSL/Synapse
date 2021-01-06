@@ -81,9 +81,17 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 
 			Generator079.Generators[0].ServerOvercharge(10f, true);
 
-			foreach (Door door in UnityEngine.Object.FindObjectsOfType<Door>())
-				if (door.GetComponent<Scp079Interactable>().currentZonesAndRooms[0].currentZone == "HeavyRooms" && door.isOpen && !door.locked)
-					door.ChangeState(true);
+			HashSet<Interactables.Interobjects.DoorUtils.DoorVariant> lockedDoors = new HashSet<Interactables.Interobjects.DoorUtils.DoorVariant>();
+			foreach (Interactables.Interobjects.DoorUtils.DoorVariant doorVariant in UnityEngine.Object.FindObjectsOfType<Interactables.Interobjects.DoorUtils.DoorVariant>())
+			{
+				Scp079Interactable scp079Interactable;
+				if (doorVariant is Interactables.Interobjects.BasicDoor && doorVariant.TryGetComponent(out scp079Interactable) && scp079Interactable.currentZonesAndRooms[0].currentZone == "HeavyRooms")
+				{
+					lockedDoors.Add(doorVariant);
+					doorVariant.NetworkTargetState = false;
+					doorVariant.ServerChangeLock(Interactables.Interobjects.DoorUtils.DoorLockReason.NoPower, true);
+				}
+			}
 
 			Recontainer079.isLocked = true;
 
@@ -94,6 +102,11 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 			{
 				yield return float.NegativeInfinity;
 				j = i;
+			}
+
+			foreach (Interactables.Interobjects.DoorUtils.DoorVariant doorVariant2 in lockedDoors)
+			{
+				doorVariant2.ServerChangeLock(Interactables.Interobjects.DoorUtils.DoorLockReason.NoPower, false);
 			}
 
 			Recontainer079.isLocked = false;

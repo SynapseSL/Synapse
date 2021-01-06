@@ -6,117 +6,66 @@ using EventHandler = Synapse.Api.Events.EventHandler;
 using UnityEngine;
 using Synapse.Api;
 using System.Linq;
+using Mirror;
+using Interactables.Interobjects.DoorUtils;
 
 namespace Synapse.Patches.EventsPatches.MapPatches
 {
-    [HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.CallCmdOpenDoor))]
+    [HarmonyPatch(typeof(DoorVariant), nameof(DoorVariant.ServerInteract))]
     internal static class DoorInteractPatch
     {
-        private static bool Prefix(PlayerInteract __instance, GameObject doorId)
+        private static bool Prefix(DoorVariant __instance, ReferenceHub ply, byte colliderId)
         {
             try
             {
-                var player = __instance.GetPlayer();
-                var keycard = player.ItemInHand;
-                if (keycard?.ItemCategory != ItemCategory.Keycard)
-                    keycard = null;
-                    
+				if (!NetworkServer.active)
+				{
+					Debug.LogWarning("[Server] function 'System.Void Interactables.Interobjects.DoorUtils.DoorVariant::ServerInteract(ReferenceHub,System.Byte)' called on client");
+					return false;
+				}
+				if (__instance.ActiveLocks > 0)
+				{
+					DoorLockMode mode = DoorLockUtils.GetMode((DoorLockReason)__instance.ActiveLocks);
+					if ((!mode.HasFlagFast(DoorLockMode.CanClose) || !mode.HasFlagFast(DoorLockMode.CanOpen)) && (!mode.HasFlagFast(DoorLockMode.ScpOverride) || ply.characterClassManager.CurRole.team != Team.SCP) && (mode == DoorLockMode.FullLock || (__instance.TargetState && !mode.HasFlagFast(DoorLockMode.CanClose)) || (!__instance.TargetState && !mode.HasFlagFast(DoorLockMode.CanOpen))))
+					{
+						__instance.LockBypassDenied(ply, colliderId);
+						return false;
+					}
+				}
+				if (__instance.AllowInteracting(ply, colliderId))
+				{
+					var player = ply.GetPlayer();
+					var keycardacces = false;
+					var items = new List<Api.Items.SynapseItem>();
+					if (Server.Get.Configs.SynapseConfiguration.RemoteKeyCard)
+						items.AddRange(player.Inventory.Items);
+					else
+						items.Add(player.ItemInHand);
 
-                var allowTheAccess = true;
-                Door door = null;
-
-                if (!__instance._playerInteractRateLimit.CanExecute() || (__instance._hc.CufferId > 0 && !PlayerInteract.CanDisarmedInteract))
-                    return false;
-
-                if (doorId == null)
-                    return false;
-
-                if (player.RoleType == RoleType.None || player.RoleType == RoleType.Spectator)
-                    return false;
-
-                if (!doorId.TryGetComponent(out door))
-                    return false;
-
-
-                if ((door.Buttons.Count == 0) ? (!__instance.ChckDis(doorId.transform.position)) : Enumerable.All(door.Buttons, item => !__instance.ChckDis(item.button.transform.position)))
-                    return false;
-
-                __instance.OnInteract();
-
-                if (!__instance._sr.BypassMode && !(door.PermissionLevels.HasPermission(Door.AccessRequirements.Checkpoints) &&
-                         player.Team == Team.SCP))
-                {
-                    try
+					foreach(var item in items)
                     {
-                        if (door.PermissionLevels == 0)
-                            allowTheAccess = !door.locked;
+						var allow = __instance.RequiredPermissions.CheckPermissions(item.ItemType, player.Hub);
 
-                        else if (!door.RequireAllPermissions)
+						Server.Get.Events.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allow);
+
+						if (allow)
                         {
-                            if (keycard == null)
-                                allowTheAccess = false;
-                            else
-                            {
-                                var itemPerms = __instance._inv.GetItemByID(__instance._inv.curItem).permissions;
+							keycardacces = true;
+							break;
+						}
+					}
 
-                                allowTheAccess = itemPerms.Any(p =>
-                                    Door.backwardsCompatPermissions.TryGetValue(p, out var flag) &&
-                                    door.PermissionLevels.HasPermission(flag));
+					if (ply.characterClassManager.CurClass == RoleType.Scp079 || keycardacces)
+					{
+						__instance.NetworkTargetState = !__instance.TargetState;
+						__instance._triggerPlayer = ply;
+						return false;
+					}
+					__instance.PermissionsDenied(ply, colliderId);
+					DoorEvents.TriggerAction(__instance, DoorAction.AccessDenied, ply);
+				}
 
-                                try
-                                {
-                                    Server.Get.Events.Player.InvokePlayerItemUseEvent(player, keycard,
-                                        Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allowTheAccess);
-                                }
-                                catch (Exception e)
-                                {
-                                    Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent(Keycard) failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
-                                }
-                            }
-                        }
-                        else allowTheAccess = false;
-                    }
-                    catch
-                    {
-                        allowTheAccess = false;
-                    }
-                }
-
-                var synapsedoor = Map.Get.Doors.FirstOrDefault(x => x.GameObject == doorId);
-
-                if (Server.Get.Configs.SynapseConfiguration.RemoteKeyCard && !allowTheAccess && player.VanillaItems.Any())
-                {
-                    foreach(var item in player.Inventory.Items.Where(x => x.ItemCategory == ItemCategory.Keycard && x != keycard))
-                    {
-                        var gameItem = player.VanillaInventory.GetItemByID(item.ItemType);
-                        var havepermission = false;
-
-                        if (gameItem.permissions.Any(p =>
-                             Door.backwardsCompatPermissions.TryGetValue(p, out var flag) &&
-                             synapsedoor.PermissionLevels.HasPermission(flag)))
-                            havepermission = true;
-
-                        try
-                        {
-                            Server.Get.Events.Player.InvokePlayerItemUseEvent(player, item,
-                                        Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref havepermission);
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent(Keycard-Remote) failed!!\n{e}");
-                        }
-
-                        if (havepermission)
-                            allowTheAccess = true;
-                    }
-                }
-
-                EventHandler.Get.Map.InvokeDoorInteractEvent(player, synapsedoor, ref allowTheAccess);
-
-                if (allowTheAccess) door.ChangeState(__instance._sr.BypassMode);
-                else __instance.RpcDenied(doorId);
-
-                return false;
+				return false;
             }
             catch (Exception e)
             {

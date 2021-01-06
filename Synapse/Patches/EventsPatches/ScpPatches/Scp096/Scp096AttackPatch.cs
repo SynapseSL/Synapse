@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using HarmonyLib;
 using Mirror;
+using NorthwoodLib.Pools;
 using ev = Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
@@ -21,6 +22,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
         {
             var scp = __instance.GetPlayer();
             var alreadyHit = new HashSet<GameObject>();
+            var alreadyDamagedDoors = HashSetPool<Interactables.Interobjects.DoorUtils.IDamageableDoor>.Shared.Rent();
             int armAttack = __instance._leftAttack ? 1 : -1;
             do
             {
@@ -30,12 +32,15 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                 for (int i = 0; i < num; i++)
                 {
                     var collider = PlayableScps.Scp096._cachedAttackSwingColliders[i];
-                    var comp = collider.GetComponentInParent<Door>();
-                    if (comp != null)
+                    var comp = collider.GetComponentInParent<Interactables.Interobjects.DoorUtils.DoorVariant>();
+                    if (comp != null && (object)comp is Interactables.Interobjects.DoorUtils.IDamageableDoor damageableDoor)
                     {
-                        comp.DestroyDoor(true);
-                        if (comp.destroyed && num2 < 1f)
-                            num2 = 1f;
+                        if (alreadyDamagedDoors.Add(damageableDoor))
+                        {
+                            damageableDoor.ServerDamage(250f, Interactables.Interobjects.DoorUtils.DoorDamageType.Scp096);
+                            if (num2 < 1f)
+                                num2 = 1f;
+                        }
                     }
                     else
                     {
