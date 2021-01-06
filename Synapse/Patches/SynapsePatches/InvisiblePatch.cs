@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Synapse.Patches.SynapsePatches
 {
-    [HarmonyPatch(typeof(PlayerPositionManager),nameof(PlayerPositionManager.TransmitData))]
+    [HarmonyPatch(typeof(PlayerPositionManager), nameof(PlayerPositionManager.TransmitData))]
     internal static class InvisiblePatch
     {
         private static bool Prefix(PlayerPositionManager __instance)
@@ -33,10 +33,10 @@ namespace Synapse.Patches.SynapsePatches
                 for (var i = 0; i < __instance._usedData; i++)
                     __instance._receivedData[i] = new PlayerPositionData(players[i].Hub);
 
-                if(__instance._transmitBuffer == null || __instance._transmitBuffer.Length < __instance._usedData)
+                if (__instance._transmitBuffer == null || __instance._transmitBuffer.Length < __instance._usedData)
                     __instance._transmitBuffer = new PlayerPositionData[__instance._usedData * 2];
 
-                foreach(var player in players)
+                foreach (var player in players)
                 {
                     Array.Copy(__instance._receivedData, __instance._transmitBuffer, __instance._usedData);
                     if (player.RoleID == (int)RoleType.Scp93953 || player.RoleID == (int)RoleType.Scp93989)
@@ -50,13 +50,14 @@ namespace Synapse.Patches.SynapsePatches
                             }
                     }
                     else
+                    {
                         for (int k = 0; k < __instance._usedData; k++)
                         {
                             var showinvoid = false;
                             var newplayer = players[k];
                             var vector = __instance._transmitBuffer[k].position - player.Position;
 
-                            if(player.RoleType == RoleType.Scp173 && player.Scp173Controller.IgnoredPlayers.Contains(newplayer))
+                            if (player.RoleType == RoleType.Scp173 && player.Scp173Controller.IgnoredPlayers.Contains(newplayer))
                             {
                                 showinvoid = true;
                                 goto AA_001;
@@ -121,9 +122,11 @@ namespace Synapse.Patches.SynapsePatches
 
 
                         AA_001:
-                            if (showinvoid == true)
+                            if (showinvoid)
                                 __instance._transmitBuffer[k] = new PlayerPositionData(Vector3.up * 6000f, 0.0f, newplayer.PlayerId);
                         }
+                    }
+
 
                     var conn = player.Connection;
                     if (__instance._usedData <= 20)
@@ -146,7 +149,7 @@ namespace Synapse.Patches.SynapsePatches
 
                 return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Api.Logger.Get.Error($"Synapse-InvisibleMode: TransmitData failed failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;

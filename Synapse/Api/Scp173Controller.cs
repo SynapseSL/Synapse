@@ -8,6 +8,7 @@ namespace Synapse.Api
 
         private Player player;
 
-        public HashSet<Player> IgnoredPlayers { get; } = new HashSet<Player>();
+        public HashSet<Player> IgnoredPlayers { get; internal set; } = new HashSet<Player>();
+        public HashSet<Player> ConfrontingPlayers { get; internal set; } = new HashSet<Player>();
     }
 }
