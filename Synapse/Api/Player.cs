@@ -729,7 +729,7 @@ namespace Synapse.Api
 
         public Fraction RealFraction => Misc.GetFraction(RealTeam);
 
-        public Items.SynapseItem ItemInHand => VanillaInventory.GetItemInHand().GetSynapseItem();
+        public Items.SynapseItem ItemInHand => Map.Get.Items.FirstOrDefault(x => x.State == ItemState.Inventory && x.itemInfo.uniq == VanillaInventory.itemUniq);
 
         public NetworkConnection Connection => ClassManager.Connection;
 

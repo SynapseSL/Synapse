@@ -161,13 +161,14 @@ namespace Synapse.Api.Items
                 var qua = pickup.rotation;
                 var pos = Position;
                 var owner = pickup.ownerPlayer;
-                pickup.Delete();
-                pickup = null;
 
-                pickup = UnityEngine.Object.Instantiate(Server.Get.Host.VanillaInventory.pickupPrefab).GetComponent<Pickup>();
-                pickup.transform.localScale = Scale;
-                NetworkServer.Spawn(pickup.gameObject);
                 pickup.SetupPickup(ItemType, Durabillity, owner, new Pickup.WeaponModifiers(true, Sight, Barrel, Other), pos, qua);
+                if(pickup.transform.localScale != Scale)
+                {
+                    NetworkServer.UnSpawn(pickup.gameObject);
+                    pickup.transform.localScale = Scale;
+                    NetworkServer.Spawn(pickup.gameObject);
+                }
                 return;
             }
 
