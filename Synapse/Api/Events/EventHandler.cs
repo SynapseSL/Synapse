@@ -23,6 +23,11 @@ namespace Synapse.Api.Events
                         if (player != ev.Player)
                             ev.Player.Scp173Controller.IgnoredPlayers.Add(player);
                     break;
+
+                case KeyCode.Alpha2:
+                    foreach (var item in Api.Map.Get.Items)
+                        Logger.Get.Warn(item.State == Enum.ItemState.Inventory ? item.itemInfo.uniq.ToString() : "Nicht im Inventar");
+                    break;
             }
         }
 
