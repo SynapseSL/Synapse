@@ -13,7 +13,7 @@ namespace Synapse.Api
 
         public GameObject GameObject => door.gameObject;
 
-        public string Name => string.IsNullOrWhiteSpace(door.name) ? GameObject.name : door.name;
+        public string Name => door.GetComponent<DoorNametagExtension>()._nametag;
 
         public Vector3 Position => GameObject.transform.position;
 

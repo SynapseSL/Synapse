@@ -178,7 +178,6 @@
     <Compile Include="Patches\SynapsePatches\Wrapper\NukeLockPatch.cs" />
     <Compile Include="Patches\SynapsePatches\CommandPatches.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\ComponentPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\Wrapper\DoorStartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\ElevatorStartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\RefreshNamePatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\RoleChangeClassIdPatch.cs" />
@@ -219,6 +218,9 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Runtime" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.2\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Refs\UnityEngine.dll</HintPath>
