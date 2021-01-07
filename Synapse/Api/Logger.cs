@@ -9,19 +9,19 @@ namespace Synapse.Api
         
         internal Logger() { }
 
-        public void Info(string message)
+        public void Info(object message)
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
             Send($"{name}: {message}", ConsoleColor.Cyan);
         }
 
-        public void Warn(string message)
+        public void Warn(object message)
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
             Send($"{name}: {message}", ConsoleColor.Green);
         }
 
-        public void Error(string message)
+        public void Error(object message)
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
             Send($"{name}: {message}", ConsoleColor.Red);

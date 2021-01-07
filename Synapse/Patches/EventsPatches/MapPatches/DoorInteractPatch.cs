@@ -11,13 +11,13 @@ using Interactables.Interobjects.DoorUtils;
 
 namespace Synapse.Patches.EventsPatches.MapPatches
 {
-    [HarmonyPatch(typeof(DoorVariant), nameof(DoorVariant.ServerInteract))]
-    internal static class DoorInteractPatch
-    {
-        private static bool Prefix(DoorVariant __instance, ReferenceHub ply, byte colliderId)
-        {
-            try
-            {
+	[HarmonyPatch(typeof(DoorVariant), nameof(DoorVariant.ServerInteract))]
+	internal static class DoorInteractPatch
+	{
+		private static bool Prefix(DoorVariant __instance, ReferenceHub ply, byte colliderId)
+		{
+			try
+			{
 				if (!NetworkServer.active)
 				{
 					Debug.LogWarning("[Server] function 'System.Void Interactables.Interobjects.DoorUtils.DoorVariant::ServerInteract(ReferenceHub,System.Byte)' called on client");
@@ -42,14 +42,14 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 					else
 						items.Add(player.ItemInHand);
 
-					foreach(var item in items)
-                    {
+					foreach (var item in items)
+					{
 						var allow = __instance.RequiredPermissions.CheckPermissions(item.ItemType, player.Hub);
 
 						Server.Get.Events.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allow);
 
 						if (allow)
-                        {
+						{
 							keycardacces = true;
 							break;
 						}
@@ -66,12 +66,12 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 				}
 
 				return false;
-            }
-            catch (Exception e)
-            {
-                Logger.Get.Error($"Synapse-Event: DoorInteract failed!!\n{e}");
-                return true;
-            }
-        }
-    }
+			}
+			catch (Exception e)
+			{
+				Logger.Get.Error($"Synapse-Event: DoorInteract failed!!\n{e}");
+				return true;
+			}
+		}
+	}
 }

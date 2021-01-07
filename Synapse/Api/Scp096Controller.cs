@@ -79,8 +79,8 @@ namespace Synapse.Api
                         break;
 
                     case PlayableScps.Scp096PlayerState.Enraged when RageState != PlayableScps.Scp096PlayerState.Attacking:
-                        if (RageState == PlayableScps.Scp096PlayerState.Docile 
-                            || RageState == PlayableScps.Scp096PlayerState.TryNotToCry 
+                        if (RageState == PlayableScps.Scp096PlayerState.Docile
+                            || RageState == PlayableScps.Scp096PlayerState.TryNotToCry
                             || RageState == PlayableScps.Scp096PlayerState.Calming)
                             RageState = PlayableScps.Scp096PlayerState.Enraging;
                         Scp096.Enrage();
@@ -161,7 +161,7 @@ namespace Synapse.Api
         public void ChargeDoor(Door door)
         {
             if (!Is096) return;
-            Scp096.ChargeDoor(door.door);
+            Scp096.ChargeDoor(door.VDoor);
         }
     }
 }
