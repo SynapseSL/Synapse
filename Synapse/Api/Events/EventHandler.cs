@@ -25,8 +25,8 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha2:
-                    foreach (var item in Api.Map.Get.Items)
-                        Logger.Get.Warn(item.State == Enum.ItemState.Inventory ? item.itemInfo.uniq.ToString() : "Nicht im Inventar");
+                    foreach (var door in Api.Map.Get.Doors)
+                        Logger.Get.Warn(door);
                     break;
             }
         }

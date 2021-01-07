@@ -7,13 +7,27 @@ namespace Synapse.Api
 {
     public class Door
     {
-        internal Door(vDoor vanilladoor) => VDoor = vanilladoor;
+        internal Door(vDoor vanilladoor)
+        {
+            VDoor = vanilladoor;
+            if (VDoor.TryGetComponent<DoorNametagExtension>(out var nametag))
+                Name = nametag.GetName;
+        }
 
         public vDoor VDoor { get; internal set; }
 
         public GameObject GameObject => VDoor.gameObject;
 
-        public string Name => string.IsNullOrWhiteSpace(VDoor.name) ? GameObject.name : VDoor.name;
+        private string name;
+        public string Name
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Name)) return GameObject.name;
+                return name;
+            }
+            set => name = value;
+        }
 
         public Vector3 Position => GameObject.transform.position;
 
@@ -49,6 +63,7 @@ namespace Synapse.Api
         }
 
         public bool IsBreakable => VDoor is BreakableDoor;
+
         public bool IsOpen { get => VDoor.IsConsideredOpen(); }
 
         public bool TryBreakDoor()
@@ -63,6 +78,7 @@ namespace Synapse.Api
                 return false;
             }
         }
+
         public bool TryPry()
         {
             if (VDoor is PryableDoor pry)
@@ -70,5 +86,7 @@ namespace Synapse.Api
             else
                 return false;
         }
+
+        public override string ToString() => Name;
     }
 }
