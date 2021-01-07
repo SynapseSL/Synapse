@@ -11,8 +11,8 @@ namespace Synapse.Patches.SynapsePatches
         {
             try
             {
-                if (Map.DoorVariantPrefab == null)
-                    Map.DoorVariantPrefab = UnityEngine.Object.Instantiate(__instance.TargetPrefab);
+                if (Server.Get.Prefabs.DoorVariantPrefab == null)
+                    Server.Get.Prefabs.DoorVariantPrefab = UnityEngine.Object.Instantiate(__instance.TargetPrefab);
             }
             catch (System.Exception e)
             {

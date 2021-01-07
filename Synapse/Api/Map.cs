@@ -14,9 +14,6 @@ namespace Synapse.Api
     {
         internal Map() { }
 
-        internal static BrokenDoor BrokenDoorPrefab { get; set; }
-        internal static DoorVariant DoorVariantPrefab { get; set; }
-
         public static Map Get => Server.Get.Map;
 
         public Nuke Nuke { get; } = new Nuke();
@@ -140,39 +137,18 @@ namespace Synapse.Api
 
         public void PlaceBlood(Vector3 pos, int type = 0, float size = 2) => Server.Get.Host.ClassManager.RpcPlaceBlood(pos, type, size);
 
-        //Theory:   Should work
-        //Practice: Does not work
-        //You may mess around with the "BrokenDoorPrefab" if you'd like
-        public BrokenDoor SpawnBrokenDoor(Vector3 position, Quaternion? rotation = null, float timeUntilFreeze = 5)
+        public Door SpawnDoorVariant(Vector3 position, Quaternion? rotation = null, DoorPermissions permissions = null)
         {
-            BrokenDoor brokenDoor = Object.Instantiate(BrokenDoorPrefab);
-
-            brokenDoor.transform.position = position;
-            //brokenDoor.transform.rotation = rotation ?? new Quaternion(0, 0, 0, 0);
-            brokenDoor._timeUntilFreeze = timeUntilFreeze;
-
-            //Logger.Get.Warn($"Broken parts count: " + brokenDoor._parts.Length);
-            brokenDoor.Start();
-            NetworkServer.Spawn(brokenDoor.gameObject);
-
-            //Logger.Get.Warn($"Broken parts count: " + brokenDoor._parts.Length);
-            //Logger.Get.Warn($"Broken parts rigidbody: {brokenDoor._parts[0]._rigidbody is null}"); //Throws NRE
-
-            return brokenDoor;
-        }
-
-        public DoorVariant SpawnDoorVariant(Vector3 position, Quaternion? rotation = null, DoorPermissions permissions = null)
-        {
-            DoorVariant doorVariant = Object.Instantiate(DoorVariantPrefab);
+            DoorVariant doorVariant = Object.Instantiate(Server.Get.Prefabs.DoorVariantPrefab);
 
             doorVariant.transform.position = position;
             doorVariant.transform.rotation = rotation ?? new Quaternion(0, 0, 0, 0);
             doorVariant.RequiredPermissions = permissions ?? new DoorPermissions();
-
-            Get.Doors.Add(new Door(doorVariant));
+            var door = new Door(doorVariant);
+            Get.Doors.Add(door);
             NetworkServer.Spawn(doorVariant.gameObject);
 
-            return doorVariant;
+            return door;
         }
 
         internal void AddObjects()
@@ -187,12 +163,7 @@ namespace Synapse.Api
                 WorkStations.Add(new WorkStation(station));
 
             foreach (var door in SynapseController.Server.GetObjectsOf<Interactables.Interobjects.DoorUtils.DoorVariant>())
-            {
                 Doors.Add(new Door(door));
-
-                if (BrokenDoorPrefab == null && door is BreakableDoor breakableDoor)
-                    BrokenDoorPrefab = Object.Instantiate(breakableDoor._brokenPrefab);
-            }
         }
 
         internal void ClearObjects()
