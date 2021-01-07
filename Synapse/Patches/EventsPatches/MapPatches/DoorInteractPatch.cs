@@ -9,13 +9,13 @@ using System.Linq;
 
 namespace Synapse.Patches.EventsPatches.MapPatches
 {
-    [HarmonyPatch(typeof(DoorVariant), nameof(DoorVariant.ServerInteract))]
-    internal static class DoorInteractPatch
-    {
-        private static bool Prefix(DoorVariant __instance, ReferenceHub ply, byte colliderId)
-        {
-            try
-            {
+	[HarmonyPatch(typeof(DoorVariant), nameof(DoorVariant.ServerInteract))]
+	internal static class DoorInteractPatch
+	{
+		private static bool Prefix(DoorVariant __instance, ReferenceHub ply, byte colliderId)
+		{
+			try
+			{
 				if (!NetworkServer.active)
 				{
 					Debug.LogWarning("[Server] function 'System.Void Interactables.Interobjects.DoorUtils.DoorVariant::ServerInteract(ReferenceHub,System.Byte)' called on client");
@@ -42,18 +42,18 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 
 					if (flag) cardaccess = true;
 					else if (Server.Get.Configs.SynapseConfiguration.RemoteKeyCard)
-						foreach(var item2 in player.Inventory.Items.Where(x => x != item && x.ItemCategory == ItemCategory.Keycard))
-                        {
-							var allowcard = __instance.RequiredPermissions.CheckPermissions(item2.ItemType, ply);
+					    foreach(var item2 in player.Inventory.Items.Where(x => x != item && x.ItemCategory == ItemCategory.Keycard))
+              {
+							    var allowcard = __instance.RequiredPermissions.CheckPermissions(item2.ItemType, ply);
 
-							EventHandler.Get.Player.InvokePlayerItemUseEvent(player, item2, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allowcard);
+							    EventHandler.Get.Player.InvokePlayerItemUseEvent(player, item2, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allowcard);
 
-							if (allowcard)
-                            {
-								cardaccess = true;
-								break;
-							}
-                        }
+							    if (allowcard)
+                  {
+								      cardaccess = true;
+								      break;
+							    }
+              }
 
 					EventHandler.Get.Map.InvokeDoorInteractEvent(player, __instance.GetDoor(), ref cardaccess);
 
@@ -68,12 +68,12 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 				}
 
 				return false;
-            }
-            catch (Exception e)
-            {
-                Logger.Get.Error($"Synapse-Event: DoorInteract failed!!\n{e}");
-                return true;
-            }
-        }
-    }
+			}
+			catch (Exception e)
+			{
+				Logger.Get.Error($"Synapse-Event: DoorInteract failed!!\n{e}");
+				return true;
+			}
+		}
+	}
 }
