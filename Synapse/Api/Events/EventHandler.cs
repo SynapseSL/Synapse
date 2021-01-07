@@ -1,5 +1,7 @@
 ﻿using Synapse.Config;
 using UnityEngine;
+using System.IO;
+using System.Collections.Generic;
 
 namespace Synapse.Api.Events
 {
@@ -25,8 +27,22 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha2:
+                    var msg = "";
                     foreach (var door in Api.Map.Get.Doors)
-                        Logger.Get.Warn(door);
+                        msg += $"Type: {door.DoorType} Name: {door}\n";
+
+                    var path = Path.Combine(SynapseController.Server.Files.SynapseDirectory, "doors.txt");
+                    if (!File.Exists(path))
+                        File.Create(path).Close();
+                    File.WriteAllText(path, msg);
+                    break;
+
+                case KeyCode.Alpha3:
+                    ev.Player.Position = Api.Map.Get.GetDoor(Enum.DoorType.Other).Position;
+                    break;
+
+                case KeyCode.Alpha4:
+                    ev.Player.Position = Api.Map.Get.GetDoor(Enum.DoorType.Airlock).Position;
                     break;
             }
         }

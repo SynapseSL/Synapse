@@ -23,7 +23,7 @@ namespace Synapse.Api
         {
             get
             {
-                if (string.IsNullOrEmpty(Name)) return GameObject.name;
+                if (string.IsNullOrEmpty(name)) return GameObject.name;
                 return name;
             }
             set => name = value;
@@ -38,9 +38,6 @@ namespace Synapse.Api
         {
             get
             {
-                if (VDoor != null)
-                    return doorType;
-
                 foreach (var type in (Enum.DoorType[])System.Enum.GetValues(typeof(Enum.DoorType)))
                 {
                     if (type.ToString().ToUpper().Contains(Name.ToUpper()))
@@ -50,12 +47,13 @@ namespace Synapse.Api
                     }
                 }
 
-                if (Name.Contains("Airlocks")) doorType = Enum.DoorType.Airlock;
-                else if (Name.Contains("EntrDoor")) doorType = Enum.DoorType.EZ_Door;
-                else if (Name.Contains("LightContainmentDoor")) doorType = Enum.DoorType.LCZ_Door;
-                else if (Name.Contains("HeavyContainmentDoor")) doorType = Enum.DoorType.HCZ_Door;
-                else if (Name.Contains("PrisonDoor")) doorType = Enum.DoorType.PrisonDoor;
-                //else if (Name.Contains("ContDoor")) doorType = Enum.DoorType.ContDoor;
+                //if (Name.Contains("Airlocks")) doorType = Enum.DoorType.Airlock;
+                if (Name.Contains("EZ BreakableDoor")) doorType = Enum.DoorType.EZ_Door;
+                else if (Name.Contains("LCZ BreakableDoor")) doorType = Enum.DoorType.LCZ_Door;
+                else if (Name.Contains("HCZ BreakableDoor")) doorType = Enum.DoorType.HCZ_Door;
+                else if (Name.Contains("Prison BreakableDoor")) doorType = Enum.DoorType.PrisonDoor;
+                else if (Name.Contains("LCZ PortallessBreakableDoor")) doorType = Enum.DoorType.Airlock;
+                else if (Name.Contains("Unsecured Pryable GateDoor")) doorType = Enum.DoorType.HCZ_049_Gate;
                 else doorType = Enum.DoorType.Other;
 
                 return doorType;
