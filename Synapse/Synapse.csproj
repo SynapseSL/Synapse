@@ -158,6 +158,7 @@
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp173\Scp173BlinkingPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp939\Scp939AttackPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\DoorSpawnpointPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ShootPermissionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\InvisiblePatch.cs" />
     <Compile Include="Patches\SynapsePatches\ItemPatches\Scp914Patch.cs" />

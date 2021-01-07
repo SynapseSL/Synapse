@@ -32,7 +32,7 @@ public class SynapseController
         Server.PermissionHandler.Init();
         Server.RoleManager.Init();
         CommandHandlers.RegisterSynapseCommands();
-        
+
         PluginLoader.ActivatePlugins();
 
         Server.Logger.Info("Synapse is now ready!");
