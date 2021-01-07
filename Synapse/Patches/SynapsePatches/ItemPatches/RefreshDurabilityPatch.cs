@@ -24,10 +24,7 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
                 }
 
                 if (!itembyid.noEquipable || allowAmmoRenew)
-                {
-                    Logger.Get.Warn($"Durabillity wird gesetzt für item {item.ItemType}");
                     item.Durabillity = itembyid.durability;
-                }
 
                 if (!setupAttachments) return false;
 
