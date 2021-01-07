@@ -41,6 +41,17 @@ namespace Synapse.Api
             }
         }
 
+        public Quaternion Rotation
+        {
+            get => GameObject.transform.rotation;
+            set
+            {
+                NetworkServer.UnSpawn(GameObject);
+                GameObject.transform.rotation = value;
+                NetworkServer.Spawn(GameObject);
+            }
+        }
+
         public DoorPermissions DoorPermissions { get => VDoor.RequiredPermissions; set => VDoor.RequiredPermissions = value; }
 
         private Enum.DoorType doorType;

@@ -28,7 +28,7 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha2:
-                    foreach (var door in Api.Map.Get.Doors.Where(x => x.DoorType == Enum.DoorType.LCZ_Door))
+                    foreach (var door in Api.Map.Get.Doors.Where(x => x.DoorType == Enum.DoorType.Airlock))
                         door.Position = pos;
                     break;
 
@@ -38,6 +38,11 @@ namespace Synapse.Api.Events
 
                 case KeyCode.Alpha4:
                     Api.Map.Get.GetDoor(Enum.DoorType.LCZ_012).Position = pos;
+                    break;
+
+                case KeyCode.Alpha5:
+                    foreach (var door in Api.Map.Get.Doors)
+                        door.Rotation = ev.Player.transform.rotation;
                     break;
             }
         }
