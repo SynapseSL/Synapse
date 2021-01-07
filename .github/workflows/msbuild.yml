@@ -2,8 +2,9 @@ name: MSBuild
 
 on:
   pull_request:
-    branches: 
+    branches:
       - master
+      - development
 
 env:
   # Path to the solution file relative to the root of the project.
