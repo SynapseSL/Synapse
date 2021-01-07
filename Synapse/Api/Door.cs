@@ -2,6 +2,7 @@
 using Interactables.Interobjects.DoorUtils;
 using vDoor = Interactables.Interobjects.DoorUtils.DoorVariant;
 using Interactables.Interobjects;
+using Mirror;
 
 namespace Synapse.Api
 {
@@ -29,7 +30,16 @@ namespace Synapse.Api
             set => name = value;
         }
 
-        public Vector3 Position => GameObject.transform.position;
+        public Vector3 Position
+        {
+            get => GameObject.transform.position;
+            set
+            {
+                NetworkServer.UnSpawn(GameObject);
+                GameObject.transform.position = value;
+                NetworkServer.Spawn(GameObject);
+            }
+        }
 
         public DoorPermissions DoorPermissions { get => VDoor.RequiredPermissions; set => VDoor.RequiredPermissions = value; }
 

@@ -1,7 +1,6 @@
 ﻿using Synapse.Config;
 using UnityEngine;
-using System.IO;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace Synapse.Api.Events
 {
@@ -18,6 +17,8 @@ namespace Synapse.Api.Events
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
         {
+            var pos = ev.Player.Position;
+            pos.y += 5;
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
@@ -27,22 +28,16 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha2:
-                    var msg = "";
-                    foreach (var door in Api.Map.Get.Doors)
-                        msg += $"Type: {door.DoorType} Name: {door}\n";
-
-                    var path = Path.Combine(SynapseController.Server.Files.SynapseDirectory, "doors.txt");
-                    if (!File.Exists(path))
-                        File.Create(path).Close();
-                    File.WriteAllText(path, msg);
+                    foreach (var door in Api.Map.Get.Doors.Where(x => x.DoorType == Enum.DoorType.LCZ_Door))
+                        door.Position = pos;
                     break;
 
                 case KeyCode.Alpha3:
-                    ev.Player.Position = Api.Map.Get.GetDoor(Enum.DoorType.Other).Position;
+                    Api.Map.Get.GetDoor(Enum.DoorType.Gate_B).Position = pos;
                     break;
 
                 case KeyCode.Alpha4:
-                    ev.Player.Position = Api.Map.Get.GetDoor(Enum.DoorType.Airlock).Position;
+                    Api.Map.Get.GetDoor(Enum.DoorType.LCZ_012).Position = pos;
                     break;
             }
         }
