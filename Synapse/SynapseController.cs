@@ -32,7 +32,7 @@ public class SynapseController
         Server.PermissionHandler.Init();
         Server.RoleManager.Init();
         CommandHandlers.RegisterSynapseCommands();
-        
+
         PluginLoader.ActivatePlugins();
 
         Server.Logger.Info("Synapse is now ready!");
@@ -54,6 +54,6 @@ public class SynapseController
 
     public const int SynapseMajor = 2;
     public const int SynapseMinor = 4;
-    public const int SynapsePatch = 1;
-    public const string SynapseVersion = "2.4.1";
+    public const int SynapsePatch = 2;
+    public const string SynapseVersion = "2.4.2";
 }

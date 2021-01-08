@@ -100,7 +100,15 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 				}
 				else
 				{
-					Server.Get.Events.Player.InvokePlayerDamageEvent(player, killer, ref info,out var allow);
+					var allow = true;
+					try
+					{
+						Server.Get.Events.Player.InvokePlayerDamageEvent(player, killer, ref info, out allow);
+					}
+					catch(Exception e)
+                    {
+						SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDamage Event failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+					}
 
                     if (!allow)
                     {
@@ -245,6 +253,16 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 					else if (info.GetDamageType() == DamageTypes.Grenade)
 						RoundSummary.kills_by_frag++;
 
+					try
+					{
+						Server.Get.Events.Player.InvokePlayerDeathEvent(player, killer, info);
+					}
+
+					catch (Exception e)
+					{
+						SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDeath Event failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+					}
+
 					if (!__instance._pocketCleanup || info.GetDamageType() != DamageTypes.Pocket)
 					{
 						referenceHub.inventory.ServerDropAll();
@@ -285,8 +303,6 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 							}
 						}
 					}
-
-					Server.Get.Events.Player.InvokePlayerDeathEvent(player, killer, info);
 
 					playerStats.SetHPAmount(100);
 					characterClassManager.SetClassID(RoleType.Spectator);
@@ -404,7 +420,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 			}
 			catch (Exception e)
 			{
-				SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDamage failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+				SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDamage Patch failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
 				__result = false;
 				return true;
 			}

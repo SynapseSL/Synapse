@@ -24,6 +24,8 @@ namespace Synapse
 
         public Map Map { get; } = new Map();
 
+        public Prefabs Prefabs { get; } = new Prefabs();
+
         public FileLocations Files { get; } = new FileLocations();
 
         public EventHandler Events { get; } = new EventHandler();

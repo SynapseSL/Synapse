@@ -1,4 +1,8 @@
-﻿using Mirror;
+﻿using Interactables.Interobjects;
+using Interactables.Interobjects.DoorUtils;
+using MapGeneration;
+using Mirror;
+using Synapse.Api.Enum;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management.Instrumentation;
@@ -78,14 +82,14 @@ namespace Synapse.Api
 
         public Door GetDoor(Enum.DoorType doorType) => Doors.FirstOrDefault(x => x.DoorType == doorType);
 
-        public Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "") 
+        public Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "")
             => new Dummy(pos, rot, role, name, badgetext, badgecolor);
 
         public WorkStation CreateWorkStation(Vector3 position, Vector3 rotation, Vector3 scale) => new WorkStation(position, rotation, scale);
 
         public Ragdoll CreateRagdoll(RoleType roletype, Vector3 pos, Quaternion rot, Vector3 velocity, PlayerStats.HitInfo info, bool allowRecall, Player owner) => new Ragdoll(roletype, pos, rot, velocity, info, allowRecall, owner);
 
-        public void SendBroadcast(ushort time,string message,bool instant = false)
+        public void SendBroadcast(ushort time, string message, bool instant = false)
         {
             foreach (var ply in Server.Get.Players)
                 ply.SendBroadcast(time, message, instant);
@@ -105,10 +109,10 @@ namespace Synapse.Api
             Server.Get.GetObjectOf<NineTailedFoxAnnouncer>().ServerOnlyAddGlitchyPhrase(words, UnityEngine.Random.Range(0.1f, 0.14f) * num2, UnityEngine.Random.Range(0.07f, 0.08f) * num2);
         }
 
-        public Grenades.Grenade SpawnGrenade(Vector3 position,Vector3 velocity,float fusetime = 3f, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null)
+        public Grenades.Grenade SpawnGrenade(Vector3 position, Vector3 velocity, float fusetime = 3f, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null)
         {
-            if(player == null)
-            player = Server.Get.Host;
+            if (player == null)
+                player = Server.Get.Host;
 
             var component = player.GrenadeManager;
             var component2 = Object.Instantiate(component.availableGrenades[(int)grenadeType].grenadeInstance).GetComponent<Grenades.Grenade>();
@@ -119,19 +123,33 @@ namespace Synapse.Api
             return component2;
         }
 
-        public void Explode(Vector3 position, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null) 
+        public void Explode(Vector3 position, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null)
         {
             if (player == null)
                 player = Server.Get.Host;
 
             var component = player.GrenadeManager;
             var component2 = Object.Instantiate(component.availableGrenades[(int)grenadeType].grenadeInstance).GetComponent<Grenades.Grenade>();
-            component2.FullInitData(component, position, Quaternion.identity, Vector3.zero, Vector3.zero,Team.RIP);
+            component2.FullInitData(component, position, Quaternion.identity, Vector3.zero, Vector3.zero, Team.RIP);
             component2.NetworkfuseTime = 0.10000000149011612;
             NetworkServer.Spawn(component2.gameObject);
         }
 
         public void PlaceBlood(Vector3 pos, int type = 0, float size = 2) => Server.Get.Host.ClassManager.RpcPlaceBlood(pos, type, size);
+
+        public Door SpawnDoorVariant(Vector3 position, Quaternion? rotation = null, DoorPermissions permissions = null)
+        {
+            DoorVariant doorVariant = Object.Instantiate(Server.Get.Prefabs.DoorVariantPrefab);
+
+            doorVariant.transform.position = position;
+            doorVariant.transform.rotation = rotation ?? new Quaternion(0, 0, 0, 0);
+            doorVariant.RequiredPermissions = permissions ?? new DoorPermissions();
+            var door = new Door(doorVariant);
+            Get.Doors.Add(door);
+            NetworkServer.Spawn(doorVariant.gameObject);
+
+            return door;
+        }
 
         internal void AddObjects()
         {

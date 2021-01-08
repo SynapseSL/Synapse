@@ -35,6 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Api\Broadcast.cs" />
+    <Compile Include="Api\Prefabs.cs" />
     <Compile Include="Api\Scp173Controller.cs" />
     <Compile Include="Api\Scp096Controller.cs" />
     <Compile Include="Api\Enum\ScpAttackType.cs" />
@@ -158,6 +159,7 @@
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp173\Scp173BlinkingPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp939\Scp939AttackPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\Wrapper\DoorSpawnpointPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ShootPermissionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\InvisiblePatch.cs" />
     <Compile Include="Patches\SynapsePatches\ItemPatches\Scp914Patch.cs" />
