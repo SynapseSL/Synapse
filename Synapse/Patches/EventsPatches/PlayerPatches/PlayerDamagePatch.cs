@@ -253,6 +253,16 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 					else if (info.GetDamageType() == DamageTypes.Grenade)
 						RoundSummary.kills_by_frag++;
 
+					try
+					{
+						Server.Get.Events.Player.InvokePlayerDeathEvent(player, killer, info);
+					}
+
+					catch (Exception e)
+					{
+						SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDeath Event failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+					}
+
 					if (!__instance._pocketCleanup || info.GetDamageType() != DamageTypes.Pocket)
 					{
 						referenceHub.inventory.ServerDropAll();
@@ -292,16 +302,6 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 									NineTailedFoxAnnouncer.AnnounceScpTermination(characterClassManager.CurRole, info, "UNKNOWN");
 							}
 						}
-					}
-
-					try
-					{
-						Server.Get.Events.Player.InvokePlayerDeathEvent(player, killer, info);
-					}
-
-					catch (Exception e)
-					{
-						SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDeath Event failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
 					}
 
 					playerStats.SetHPAmount(100);
