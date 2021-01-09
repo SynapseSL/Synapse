@@ -1,10 +1,6 @@
-name: MSBuild
+name: TestBuild
 
-on:
-  pull_request:
-    branches:
-      - master
-      - development
+on: [pull_request]
 
 env:
   # Path to the solution file relative to the root of the project.
