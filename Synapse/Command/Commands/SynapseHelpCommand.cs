@@ -60,9 +60,17 @@ namespace Synapse.Command.Commands
 
                 if (command == null)
                 {
-                    result.State = CommandResultState.Error;
-                    result.Message = "No Command with this Name found";
-                    return result;
+                    foreach (ICommand c in commandlist.Where(c => c.Aliases.FirstOrDefault(i => i.ToLower() == context.Arguments.First()) != null))
+                    {
+                        command = c;
+                    }
+
+                    if (command == null)
+                    {
+                        result.State = CommandResultState.Error;
+                        result.Message = "No Command with this Name found";
+                        return result;
+                    }
                 }
 
                 string platforms = "{ " + string.Join(", ", command.Platforms) + " }";
