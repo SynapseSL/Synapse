@@ -39,7 +39,7 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp-Publicized, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Synapse_Dependencies\Assembly-CSharp-Publicized.dll</HintPath>
+      <HintPath>..\Refs\Assembly-CSharp-Publicized.dll</HintPath>
     </Reference>
     <Reference Include="dnlib, Version=3.3.2.0, Culture=neutral, PublicKeyToken=50e96378b6e77999, processorArchitecture=MSIL">
       <HintPath>..\packages\dnlib.3.3.2\lib\net45\dnlib.dll</HintPath>
@@ -47,7 +47,7 @@
     <Reference Include="System" />
     <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Synapse_Dependencies\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>..\Refs\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
