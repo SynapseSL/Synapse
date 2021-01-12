@@ -90,8 +90,11 @@ namespace Synapse.Api
 
         public void Heal(float hp) => PlayerStats.HealHPAmount(hp);
 
-        public void Hurt(int amount, DamageTypes.DamageType damagetype = default, Player attacker = null) =>
+        public void Hurt(int amount, DamageTypes.DamageType damagetype = default, Player attacker = null)
+        {
+            if (attacker == null) attacker = this;
             attacker.PlayerStats.HurtPlayer(new PlayerStats.HitInfo(amount, attacker == null ? "WORLD" : attacker.NickName, damagetype, attacker == null ? 0 : attacker.PlayerId), gameObject);
+        }
 
         public void OpenReportWindow(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
 
