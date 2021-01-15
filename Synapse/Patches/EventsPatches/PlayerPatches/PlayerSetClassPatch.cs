@@ -55,29 +55,19 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                         __state.Items.Add(synapseitem);
                     }
 
-                Synapse.Api.Logger.Get.Warn("Pos finden");
                 if (__instance.Classes.SafeGet(classid).team != Team.RIP)
                 {
-                    Synapse.Api.Logger.Get.Warn("kein Spec");
                     if (lite)
-                    {
                         __state.Position = player.Position;
-                        Synapse.Api.Logger.Get.Warn("lite");
-                    }
                     else
                     {
                         if (Synapse.Api.Map.Get.RespawnPoint != Vector3.zero)
-                        {
                             __state.Position = Synapse.Api.Map.Get.RespawnPoint;
-                            Synapse.Api.Logger.Get.Warn("constant");
-                        }
                         else
                         {
-                            Synapse.Api.Logger.Get.Warn("spawnpoint suchen");
                             var randomPosition = CharacterClassManager._spawnpointManager.GetRandomPosition(classid);
                             if (randomPosition != null)
                             {
-                                Synapse.Api.Logger.Get.Warn("spawnpoint gefunden");
                                 __state.Position = randomPosition.transform.position;
                                 __state.Rotation = randomPosition.transform.rotation.eulerAngles.y;
                             }
