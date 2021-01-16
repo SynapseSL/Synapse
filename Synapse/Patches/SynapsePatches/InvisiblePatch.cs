@@ -111,7 +111,7 @@ namespace Synapse.Patches.SynapsePatches
 
                                         if (player.RoleType == RoleType.Scp079 || flag)
                                         {
-                                            if (Server.Get.Configs.SynapseConfiguration.Better268)
+                                            if (Server.Get.Configs.synapseConfiguration.Better268)
                                                 showinvoid = true;
                                         }
                                         else

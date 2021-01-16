@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System;
 
 namespace Synapse.Api.Plugin
 {
@@ -6,6 +7,7 @@ namespace Synapse.Api.Plugin
     {
         PluginInformation Information { get; set; }
 
+        [Obsolete("The old Translation System is not recommended to use",false)]
         Translation Translation { get; set; }
 
         string PluginDirectory { get; set; }
@@ -26,6 +28,7 @@ namespace Synapse.Api.Plugin
         {
         }
 
+        [Obsolete("The old Translation System is not recommended to use", false)]
         public Translation Translation { get; set; }
 
         public PluginInformation Information { get; set; }

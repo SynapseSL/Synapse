@@ -66,7 +66,7 @@ namespace Synapse.Api.Events
         }
 
 #region HookedEvents
-        private SynapseConfiguration conf => SynapseController.Server.Configs.SynapseConfiguration;
+        private SynapseConfiguration conf => SynapseController.Server.Configs.synapseConfiguration;
 
         private void PlayerJoin(SynapseEventArguments.PlayerJoinEventArgs ev)
         {

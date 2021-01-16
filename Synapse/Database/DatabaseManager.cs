@@ -9,11 +9,11 @@ namespace Synapse.Database
     public class DatabaseManager
     {
 
-        public static LiteDatabase LiteDatabase => !SynapseController.Server.Configs.SynapseConfiguration.DatabaseEnabled ? null : new LiteDatabase(Path.Combine(SynapseController.Server.Files.DatabaseDirectory, SynapseController.Server.Configs.SynapseConfiguration.DatabaseShared ? "database.db" : $"server-{ServerStatic.ServerPort}.db"));
+        public static LiteDatabase LiteDatabase => !SynapseController.Server.Configs.synapseConfiguration.DatabaseEnabled ? null : new LiteDatabase(Path.Combine(SynapseController.Server.Files.DatabaseDirectory, SynapseController.Server.Configs.synapseConfiguration.DatabaseShared ? "database.db" : $"server-{ServerStatic.ServerPort}.db"));
 
         public static void CheckEnabledOrThrow()
         {
-            if (!SynapseController.Server.Configs.SynapseConfiguration.DatabaseEnabled) throw new DataException("The Database has been disabled in the config. " +
+            if (!SynapseController.Server.Configs.synapseConfiguration.DatabaseEnabled) throw new DataException("The Database has been disabled in the config. " +
                                                                            "Please check SynapseController.EnableDatabase before accessing connected APIs");
         }
         

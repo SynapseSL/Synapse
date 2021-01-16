@@ -10,7 +10,7 @@ namespace Synapse.Api.Plugin
 {
     public class PluginLoader
     {
-        private readonly List<IContextProcessor> _processors = new List<IContextProcessor> { new ConfigInjector(),new CommandProcessor()};
+        private readonly List<IContextProcessor> _processors = new List<IContextProcessor> { new ConfigInjector(),new CommandProcessor(),new TranslationInjector()};
 
         private readonly List<IPlugin> _plugins = new List<IPlugin>();
 
@@ -102,9 +102,11 @@ namespace Synapse.Api.Plugin
         internal void ReloadConfigs()
         {
             var injector = new ConfigInjector();
+            var translationinjector = new TranslationInjector();
             foreach (var context in _contexts)
             {
                 injector.Process(context);
+                translationinjector.Process(context);
             }
 
             foreach (var plugin in _plugins)

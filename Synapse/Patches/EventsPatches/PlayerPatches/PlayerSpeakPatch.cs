@@ -16,7 +16,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             {
                 var intercom = __instance.IntercomAsHuman;
                 var radio = __instance.RadioAsHuman;
-                var scp939 = Server.Get.Configs.SynapseConfiguration.SpeakingScps.Contains(__instance.GetPlayer().RoleID);
+                var scp939 = Server.Get.Configs.synapseConfiguration.SpeakingScps.Contains(__instance.GetPlayer().RoleID);
                 var scpChat = __instance.SCPChat;
                 var specChat = __instance.SpectatorChat;
                 var allow = true;

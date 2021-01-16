@@ -110,7 +110,7 @@ namespace Synapse.Events.Patches
 				var flag = player.Bypass;
 
 				var items = new List<Synapse.Api.Items.SynapseItem>();
-				if (Server.Get.Configs.SynapseConfiguration.RemoteKeyCard)
+				if (Server.Get.Configs.synapseConfiguration.RemoteKeyCard)
 					items.AddRange(player.Inventory.Items.Where(x => x.ItemCategory == ItemCategory.Keycard));
 				else if (player.ItemInHand != null && player.ItemInHand.ItemCategory == ItemCategory.Keycard)
 					items.Add(player.ItemInHand);

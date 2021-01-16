@@ -52,5 +52,8 @@ namespace Synapse.Config
         {
             (int)RoleType.Tutorial
         };
+
+        [Description("The default Language that is used for translations")]
+        public string Language = "ENGLISH";
     }
 }

@@ -33,7 +33,7 @@ namespace Synapse.Patches.SynapsePatches
                         if (shooter.CustomRole.GetFriends().Any(x => x == target.RealTeam))
                         {
                             __result = false;
-                            shooter.GiveTextHint(Server.Get.Configs.SynapseTranslation.GetTranslation("sameteam"));
+                            shooter.GiveTextHint(Server.Get.Configs.synapseTranslation.ActiveTranslation.sameTeam);
                         }
                     }
                     if (target.CustomRole != null)
@@ -41,7 +41,7 @@ namespace Synapse.Patches.SynapsePatches
                         if (target.CustomRole.GetFriends().Any(x => x == shooter.RealTeam))
                         {
                             __result = false;
-                            shooter.GiveTextHint(Server.Get.Configs.SynapseTranslation.GetTranslation("sameteam"));
+                            shooter.GiveTextHint(Server.Get.Configs.synapseTranslation.ActiveTranslation.sameTeam);
                         }
                     }
                 }

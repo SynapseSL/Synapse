@@ -61,7 +61,7 @@ public static class SynapseExtensions
     {
         if (player.CustomRole != null && player.CustomRole.GetFriends().Any(x => x == Team.SCP))
         {
-            player.GiveTextHint(Server.Get.Configs.SynapseTranslation.GetTranslation("scpteam"));
+            player.GiveTextHint(Server.Get.Configs.synapseTranslation.ActiveTranslation.scpTeam);
             return false;
         }
         return true;

@@ -16,7 +16,7 @@ namespace Synapse.Api.Plugin
         public void CreateTranslations(Dictionary<string, string> translations)
         {
             _rawtranslation = translations;
-            var Path = SynapseController.Server.Files.GetTranslationFile(Information);
+            var Path = SynapseController.Server.Files.GetOldTranslationFile(Information);
 
             if (!File.Exists(Path))
                 File.Create(Path).Close();

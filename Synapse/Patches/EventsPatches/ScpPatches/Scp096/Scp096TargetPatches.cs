@@ -28,10 +28,10 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                             float delay = visionInformation.LookingAmount / 0.25f * (visionInformation.Distance * 0.1f);
                             if (!__instance.Calming)
                             {
-                                if (player.Invisible || Server.Get.Configs.SynapseConfiguration.CantRage096.Contains(player.RoleID))
+                                if (player.Invisible || Server.Get.Configs.synapseConfiguration.CantRage096.Contains(player.RoleID))
                                     continue;
 
-                                if (player.RealTeam == Team.SCP && !Server.Get.Configs.SynapseConfiguration.ScpTrigger096)
+                                if (player.RealTeam == Team.SCP && !Server.Get.Configs.synapseConfiguration.ScpTrigger096)
                                     continue;
 
                                 Server.Get.Events.Scp.Scp096.InvokeScpTargetEvent(player, __instance.GetPlayer(), __instance.PlayerState, out var allow);
@@ -66,10 +66,10 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
 
                 var player = info.RHub.GetPlayer();
 
-                if (player.Invisible || Server.Get.Configs.SynapseConfiguration.CantRage096.Contains(player.RoleID))
+                if (player.Invisible || Server.Get.Configs.synapseConfiguration.CantRage096.Contains(player.RoleID))
                     return false;
 
-                if (player.RealTeam == Team.SCP && !Server.Get.Configs.SynapseConfiguration.ScpTrigger096)
+                if (player.RealTeam == Team.SCP && !Server.Get.Configs.synapseConfiguration.ScpTrigger096)
                     return false;
 
                 Server.Get.Events.Scp.Scp096.InvokeScpTargetEvent(player, __instance.GetPlayer(), __instance.PlayerState, out var allow);

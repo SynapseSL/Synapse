@@ -112,7 +112,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                         break;
                     case 2:
                         if (teams.Contains(Team.CHI) && teams.Contains(Team.SCP))
-                            endround = Server.Get.Configs.SynapseConfiguration.ChaosScpEnd;
+                            endround = Server.Get.Configs.synapseConfiguration.ChaosScpEnd;
 
                         else if (teams.Contains(Team.CHI) && teams.Contains(Team.CDP))
                             endround = true;

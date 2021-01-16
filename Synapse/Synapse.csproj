@@ -35,6 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Api\Broadcast.cs" />
+    <Compile Include="Api\Plugin\Processors\TranslationInjector.cs" />
     <Compile Include="Api\Prefabs.cs" />
     <Compile Include="Api\Scp173Controller.cs" />
     <Compile Include="Api\Scp096Controller.cs" />
@@ -83,7 +84,7 @@
     <Compile Include="Api\MapPoint.cs" />
     <Compile Include="Api\MetaAttributes.cs" />
     <Compile Include="Api\Player.cs" />
-    <Compile Include="Api\Plugin\Config.cs" />
+    <Compile Include="Api\Plugin\PluginAttributes.cs" />
     <Compile Include="Api\Plugin\IPlugin.cs" />
     <Compile Include="Api\Plugin\PluginInformation.cs" />
     <Compile Include="Api\Plugin\PluginLoader.cs" />
@@ -190,6 +191,8 @@
     <Compile Include="Server.cs" />
     <Compile Include="SynapseController.cs" />
     <Compile Include="SynapseExtensions.cs" />
+    <Compile Include="Translation\Translation.cs" />
+    <Compile Include="Translation\SynapseTranslation.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
