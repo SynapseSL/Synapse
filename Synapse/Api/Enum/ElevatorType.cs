@@ -5,7 +5,7 @@ namespace Synapse.Api.Enum
     GateA,
     GateB,
     ElALeft,
-    ElaRight,
+    ElARight,
     ElBLeft,
     ElBRight,
     Nuke,
