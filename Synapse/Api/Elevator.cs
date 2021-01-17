@@ -10,7 +10,7 @@ namespace Synapse.Api
 
         public GameObject GameObject => Lift.gameObject;
 
-        public string Name => GameObject.name;
+        public string Name => Lift.elevatorName;
 
         public Vector3 Position => GameObject.transform.position;
 
@@ -21,5 +21,7 @@ namespace Synapse.Api
         public float MaxDistance { get => Lift.maxDistance; set => Lift.maxDistance = value; }
 
         public void Use() => Lift.UseLift();
+
+        public override string ToString() => Name;
     }
 }
