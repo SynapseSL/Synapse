@@ -82,6 +82,8 @@ namespace Synapse.Api
 
         public Door GetDoor(Enum.DoorType doorType) => Doors.FirstOrDefault(x => x.DoorType == doorType);
 
+        public Elevator GetElevator(Enum.ElevatorType elevatorType) => Elevators.FirstOrDefault(x => x.ElevatorType == elevatorType);
+
         public Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "")
             => new Dummy(pos, rot, role, name, badgetext, badgecolor);
 

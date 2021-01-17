@@ -44,6 +44,22 @@ namespace Synapse.Api.Events
                     foreach (var door in Api.Map.Get.Doors)
                         door.Rotation = ev.Player.transform.rotation;
                     break;
+
+                case KeyCode.Alpha6:
+                    ev.Player.Position = SynapseController.Server.Map.GetElevator(Enum.ElevatorType.ElALeft).Position;
+                    break;
+
+                case KeyCode.Alpha7:
+                    ev.Player.Position = SynapseController.Server.Map.GetElevator(Enum.ElevatorType.ElBLeft).Position;
+                    break;
+
+                case KeyCode.Alpha8:
+                    ev.Player.Position = SynapseController.Server.Map.GetElevator(Enum.ElevatorType.ElARight).Position;
+                    break;
+
+                case KeyCode.Alpha9:
+                    ev.Player.Position = SynapseController.Server.Map.GetElevator(Enum.ElevatorType.ElBRight).Position;
+                    break;
             }
         }
 
