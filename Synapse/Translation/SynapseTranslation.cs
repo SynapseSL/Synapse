@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Collections.Generic;
 using Synapse.Config;
 
 namespace Synapse.Translation
@@ -30,6 +31,8 @@ namespace Synapse.Translation
         public TPluginTranslation this[string translation] => translationSYML.Sections.FirstOrDefault(x => x.Key.ToUpper() == translation.ToUpper()).Value.LoadAs<TPluginTranslation>();
 
         public TPluginTranslation AddTranslation(TPluginTranslation translation, string language = "ENGLISH") => translationSYML.GetOrSetDefault(language, translation);
+
+        public List<string> Languages => translationSYML.Sections.Keys.ToList();
 
         public void Reload() => translationSYML.Load();
     }
