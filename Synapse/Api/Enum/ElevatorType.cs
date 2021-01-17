@@ -9,6 +9,6 @@ namespace Synapse.Api.Enum
     ElBLeft,
     ElBRight,
     Nuke,
-    Scp049
+    Scp049,
     }
 }
