@@ -161,7 +161,6 @@ namespace Synapse.Api
             foreach (var room in SynapseController.Server.GetObjectsOf<Transform>().Where(x => x.CompareTag("Room") || x.name == "Root_*&*Outside Cams" || x.name == "PocketWorld"))
                 Rooms.Add(new Room(room.gameObject));
 
-
             foreach (var station in Server.Get.GetObjectsOf<global::WorkStation>())
                 WorkStations.Add(new WorkStation(station));
 

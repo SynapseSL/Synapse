@@ -15,7 +15,7 @@ namespace Synapse.Api
 
         internal FlickerableLightController LightController { get; set; }
 
-        public void Overcharge(float duration)
+        public void LightsOut(float duration)
             => LightController.ServerFlickerLights(duration);
 
         public void SetLightIntensity(float intensity)
