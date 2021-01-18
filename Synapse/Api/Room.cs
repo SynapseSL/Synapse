@@ -10,12 +10,10 @@ namespace Synapse.Api
             var info = gameObject.GetComponentInChildren<RoomInformation>();
             RoomType = info.CurrentRoomType;
             GameObject = gameObject;
-            LightController = null;
+            LightController = GameObject.GetComponentInChildren<FlickerableLightController>();
         }
 
         internal FlickerableLightController LightController { get; set; }
-
-        public bool HasLightController => LightController != null;
 
         public void Overcharge(float duration)
             => LightController.ServerFlickerLights(duration);

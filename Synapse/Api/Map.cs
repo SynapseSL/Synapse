@@ -159,23 +159,14 @@ namespace Synapse.Api
                 Teslas.Add(new Tesla(tesla));
 
             foreach (var room in SynapseController.Server.GetObjectsOf<Transform>().Where(x => x.CompareTag("Room") || x.name == "Root_*&*Outside Cams" || x.name == "PocketWorld"))
-            {
-                Room synRoom = new Room(room.gameObject);
-                synRoom.LightController = synRoom.GameObject.GetComponentInChildren<FlickerableLightController>();
-                Rooms.Add(synRoom);
-            }
+                Rooms.Add(new Room(room.gameObject));
+
 
             foreach (var station in Server.Get.GetObjectsOf<global::WorkStation>())
                 WorkStations.Add(new WorkStation(station));
 
             foreach (var door in SynapseController.Server.GetObjectsOf<DoorVariant>())
                 Doors.Add(new Door(door));
-
-#if DEBUG
-            var allRoomLightContrs = Map.Get.Rooms.Select(_ => _.LightController);
-            var allLightContrsFiltered = SynapseController.Server.GetObjectsOf<FlickerableLightController>().Where(_ => !allRoomLightContrs.Contains(_));
-            Logger.Get.Info(allLightContrsFiltered.Count()); //The amount of lone light controllers
-#endif
         }
 
         internal void ClearObjects()
