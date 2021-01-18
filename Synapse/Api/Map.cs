@@ -159,15 +159,10 @@ namespace Synapse.Api
                 Teslas.Add(new Tesla(tesla));
 
             foreach (var room in SynapseController.Server.GetObjectsOf<Transform>().Where(x => x.CompareTag("Room") || x.name == "Root_*&*Outside Cams" || x.name == "PocketWorld"))
-                Rooms.Add(new Room(room.gameObject));
-
-            foreach (var lightController in SynapseController.Server.GetObjectsOf<FlickerableLightController>())
             {
-                var distanceOrdered = Rooms.OrderBy(_ => Vector3.Distance(_.Position, lightController.transform.position));
-                //Get the next room which doesnt have a controller yet, which is less or equal than 20 units away from the controller - Exceptions are surface & 173's room
-                Room room = distanceOrdered.FirstOrDefault(_ => !_.HasLightController && (Vector3.Distance(_.Position, lightController.transform.position) <= 20f || _.RoomName == "Root_*&*Outside Cams" || _.RoomName == "LCZ_173"));
-                if (room != null)
-                    room.LightController = lightController;
+                Room synRoom = new Room(room.gameObject);
+                synRoom.LightController = synRoom.GameObject.GetComponentInChildren<FlickerableLightController>();
+                Rooms.Add(synRoom);
             }
 
             foreach (var station in Server.Get.GetObjectsOf<global::WorkStation>())
