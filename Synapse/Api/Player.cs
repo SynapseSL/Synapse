@@ -117,6 +117,7 @@ namespace Synapse.Api
             };
             Connection.Send(msg);
             NetworkWriterPool.Recycle(writer);
+            
         }
 
         public void DimScreen()
@@ -173,6 +174,9 @@ namespace Synapse.Api
 
         private void Update()
         {
+            if (Hub.isDedicatedServer)
+                Server.Get.Events.Server.InvokeUpdateEvent();
+
             if (this == Server.Get.Host || HideRank || SynapseGroup.Color.ToUpper() != "RAINBOW") return;
 
             if(Time.time >= delay)

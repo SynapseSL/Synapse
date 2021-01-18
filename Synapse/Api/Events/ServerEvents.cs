@@ -1,5 +1,6 @@
 ﻿using LiteNetLib;
 using Synapse.Api.Events.SynapseEventArguments;
+using System;
 
 namespace Synapse.Api.Events
 {
@@ -11,7 +12,9 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<RemoteAdminCommandEventArgs> RemoteAdminCommandEvent;
 
-        public event EventHandler.OnSynapseEvent<ConsoleCommandEventArgs> ConsoleCommandEvent; 
+        public event EventHandler.OnSynapseEvent<ConsoleCommandEventArgs> ConsoleCommandEvent;
+
+        public event Action UpdateEvent;
 
         internal void InvokePreAuthenticationEvent(string userid, ref bool allow, ref string reason, ConnectionRequest request)
         {
@@ -35,5 +38,7 @@ namespace Synapse.Api.Events
             var ev = new ConsoleCommandEventArgs {Command = command, Player = player};
             ConsoleCommandEvent?.Invoke(ev);
         }
+
+        internal void InvokeUpdateEvent() => UpdateEvent?.Invoke();
     }
 }
