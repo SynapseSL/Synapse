@@ -3,6 +3,7 @@ using Interactables.Interobjects.DoorUtils;
 using vDoor = Interactables.Interobjects.DoorUtils.DoorVariant;
 using Interactables.Interobjects;
 using Mirror;
+using System.Collections.Generic;
 
 namespace Synapse.Api
 {
@@ -91,7 +92,7 @@ namespace Synapse.Api
         public bool Locked
         {
             get => VDoor.ActiveLocks > 0;
-            set => VDoor.ServerChangeLock(DoorLockReason.None, value);
+            set => VDoor.ServerChangeLock(DoorLockReason.SpecialDoorFeature, value);
         }
 
         public bool TryBreakDoor()
@@ -114,6 +115,8 @@ namespace Synapse.Api
             else
                 return false;
         }
+
+        public List<Room> Rooms { get; } = new List<Room>();
 
         public override string ToString() => Name;
     }

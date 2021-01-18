@@ -166,6 +166,23 @@ namespace Synapse.Api
 
             foreach (var door in SynapseController.Server.GetObjectsOf<DoorVariant>())
                 Doors.Add(new Door(door));
+
+            foreach(var interactable in Interface079.singleton.allInteractables)
+            {
+                foreach (var zoneroom in interactable.currentZonesAndRooms)
+                {
+                    try
+                    {
+                        var room = Rooms.FirstOrDefault(x => x.RoomName == zoneroom.currentRoom);
+                        var door = interactable.GetComponentInParent<Interactables.Interobjects.DoorUtils.DoorVariant>();
+                        if (room == null || door == null) continue;
+                        var sdoor = door.GetDoor();
+                        sdoor.Rooms.Add(room);
+                        room.Doors.Add(sdoor);
+                    }
+                    catch { }
+                }
+            }
         }
 
         internal void ClearObjects()

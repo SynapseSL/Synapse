@@ -1,5 +1,6 @@
 ﻿using Synapse.Api.Enum;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace Synapse.Api
 {
@@ -26,6 +27,8 @@ namespace Synapse.Api
         public Vector3 Position => GameObject.transform.position;
 
         public string RoomName => GameObject.name;
+
+        public List<Door> Doors { get; } = new List<Door>();
 
         public ZoneType Zone
         {

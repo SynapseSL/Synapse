@@ -17,48 +17,21 @@ namespace Synapse.Api.Events
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
         {
-            var pos = ev.Player.Position;
-            pos.y += 5;
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    foreach (var player in SynapseController.Server.Players)
-                        if (player != ev.Player)
-                            ev.Player.Scp173Controller.IgnoredPlayers.Add(player);
+                    foreach (var door in ev.Player.Room.Doors)
+                        door.Position += Vector3.up;
                     break;
 
                 case KeyCode.Alpha2:
-                    foreach (var door in Api.Map.Get.Doors.Where(x => x.DoorType == Enum.DoorType.Airlock))
-                        door.Position = pos;
+                    foreach (var door in ev.Player.Room.Doors)
+                        door.Open = !door.Open;
                     break;
 
                 case KeyCode.Alpha3:
-                    Api.Map.Get.GetDoor(Enum.DoorType.Gate_B).Position = pos;
-                    break;
-
-                case KeyCode.Alpha4:
-                    Api.Map.Get.GetDoor(Enum.DoorType.LCZ_012).Position = pos;
-                    break;
-
-                case KeyCode.Alpha5:
-                    foreach (var door in Api.Map.Get.Doors)
-                        door.Rotation = ev.Player.transform.rotation;
-                    break;
-
-                case KeyCode.Alpha6:
-                    ev.Player.Position = SynapseController.Server.Map.GetElevator(Enum.ElevatorType.ElALeft).Position;
-                    break;
-
-                case KeyCode.Alpha7:
-                    ev.Player.Position = SynapseController.Server.Map.GetElevator(Enum.ElevatorType.ElBLeft).Position;
-                    break;
-
-                case KeyCode.Alpha8:
-                    ev.Player.Position = SynapseController.Server.Map.GetElevator(Enum.ElevatorType.ElARight).Position;
-                    break;
-
-                case KeyCode.Alpha9:
-                    ev.Player.Position = SynapseController.Server.Map.GetElevator(Enum.ElevatorType.ElBRight).Position;
+                    foreach (var door in ev.Player.Room.Doors)
+                        door.Locked = !door.Locked;
                     break;
             }
         }
