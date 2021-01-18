@@ -118,6 +118,20 @@ namespace Synapse.Api
 
         public List<Room> Rooms { get; } = new List<Room>();
 
+        public static Door SpawnDoorVariant(Vector3 position, Quaternion? rotation = null, DoorPermissions permissions = null)
+        {
+            DoorVariant doorVariant = Object.Instantiate(Server.Get.Prefabs.DoorVariantPrefab);
+
+            doorVariant.transform.position = position;
+            doorVariant.transform.rotation = rotation ?? new Quaternion(0, 0, 0, 0);
+            doorVariant.RequiredPermissions = permissions ?? new DoorPermissions();
+            var door = new Door(doorVariant);
+            Map.Get.Doors.Add(door);
+            NetworkServer.Spawn(doorVariant.gameObject);
+
+            return door;
+        }
+
         public override string ToString() => Name;
     }
 }

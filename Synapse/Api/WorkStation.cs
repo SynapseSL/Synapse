@@ -98,5 +98,8 @@ namespace Synapse.Api
                     workStation.Network_playerConnected = value.gameObject;
             }
         }
+
+        public static WorkStation CreateWorkStation(Vector3 position, Vector3 rotation, Vector3 scale) 
+            => new WorkStation(position, rotation, scale);
     }
 }
