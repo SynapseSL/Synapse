@@ -10,7 +10,16 @@ namespace Synapse.Api
             var info = gameObject.GetComponentInChildren<RoomInformation>();
             RoomType = info.CurrentRoomType;
             GameObject = gameObject;
+            LightController = GameObject.GetComponentInChildren<FlickerableLightController>();
         }
+
+        internal FlickerableLightController LightController { get; set; }
+
+        public void Overcharge(float duration)
+            => LightController.ServerFlickerLights(duration);
+
+        public void SetLightIntensity(float intensity)
+            => LightController.ServerSetLightIntensity(intensity);
 
         public GameObject GameObject { get; }
 
@@ -35,7 +44,6 @@ namespace Synapse.Api
                             return ZoneType.HCZ;
 
                         return ZoneType.Entrance;
-
 
                     case -2000f:
                         return ZoneType.Pocket;
