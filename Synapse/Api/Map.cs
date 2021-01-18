@@ -138,7 +138,7 @@ namespace Synapse.Api
         public void PlaceBlood(Vector3 pos, int type = 0, float size = 2)
             => Server.Get.Host.ClassManager.RpcPlaceBlood(pos, type, size);
 
-        [Obsolete("Moved to Dummy.CreateDummy()", true)]
+        [Obsolete("Instantiate a Dummy instead", true)]
         public Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "")
             => new Dummy(pos, rot, role, name, badgetext, badgecolor);
 
