@@ -808,7 +808,7 @@ namespace Synapse.Api
             if (value == null) dbo.Data.Remove(key);
             DatabaseManager.PlayerRepository.Save(dbo);
         }
-        
+
         #endregion
 
         public override string ToString() => NickName;

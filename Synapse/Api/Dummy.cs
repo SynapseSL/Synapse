@@ -153,5 +153,8 @@ namespace Synapse.Api
         /// Destroys the Object
         /// </summary>
         public void Destroy() => Object.Destroy(GameObject);
+
+        public static Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "")
+            => new Dummy(pos, rot, role, name, badgetext, badgecolor);
     }
 }
