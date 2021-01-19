@@ -59,14 +59,14 @@ namespace Synapse.Api.Roles
         {
             if (ev.Player.CustomRole == null) return;
             var escapeRole = ev.Player.CustomRole.GetEscapeRole();
-            if (escapeRole == RoleType.None)
+            if (escapeRole == -1)
             {
                 ev.Allow = false;
                 return;
             }
 
-            ev.SpawnRole = escapeRole;
             ev.Player.CustomRole.Escape();
+            ev.Player.RoleID = escapeRole;
         }
 
         private void OnRa(Events.SynapseEventArguments.RemoteAdminCommandEventArgs ev)

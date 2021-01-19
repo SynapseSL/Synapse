@@ -16,7 +16,7 @@ namespace Synapse.Api.Roles
 
         List<Team> GetEnemys();
 
-        RoleType GetEscapeRole();
+        int GetEscapeRole();
 
         void Escape();
 

@@ -31,13 +31,11 @@ namespace Synapse.Api.Roles
 
         public virtual List<Team> GetEnemys() => new List<Team>();
 
-        public virtual RoleType GetEscapeRole() => RoleType.None;
+        public virtual int GetEscapeRole() => -1;
 
         public abstract void Spawn();
 
-        public virtual void DeSpawn()
-        {
-        }
+        public virtual void DeSpawn() { }
 
         public virtual void Escape() { }
     }
