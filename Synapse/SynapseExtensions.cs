@@ -57,11 +57,12 @@ public static class SynapseExtensions
     public static Synapse.Api.Items.SynapseItem GetSynapseItem(this Inventory.SyncItemInfo info) => Map.Get.Items.FirstOrDefault(x => x.itemInfo == info);
     public static Synapse.Api.Items.SynapseItem GetSynapseItem(this Pickup pickup) => Map.Get.Items.FirstOrDefault(x => x.pickup == pickup);
 
-    public static bool CanHarmScp(Player player)
+    public static bool CanHarmScp(Player player,bool message = true)
     {
         if (player.CustomRole != null && player.CustomRole.GetFriends().Any(x => x == Team.SCP))
         {
-            player.GiveTextHint(Server.Get.Configs.synapseTranslation.ActiveTranslation.scpTeam);
+            if (message)
+                player.GiveTextHint(Server.Get.Configs.synapseTranslation.ActiveTranslation.scpTeam);
             return false;
         }
         return true;
