@@ -64,7 +64,7 @@ namespace Synapse.Patches.SynapsePatches
                                     showinvoid = true;
                                     goto AA_001;
                                 }
-                                else if (!SynapseExtensions.CanHarmScp(newplayer, false))
+                                else if (!SynapseExtensions.CanHarmScp(newplayer, false) && !Server.Get.Configs.synapseConfiguration.ScpTrigger173)
                                 {
                                     var posinfo = __instance._transmitBuffer[k];
                                     var rot = Quaternion.LookRotation(newplayer.Position - player.Position).eulerAngles.y;
@@ -175,7 +175,7 @@ namespace Synapse.Patches.SynapsePatches
             var peanut = scp.GetPlayer();
             if (!__result) return;
 
-            if (player.Invisible || !SynapseExtensions.CanHarmScp(player, false))
+            if (player.Invisible || (!SynapseExtensions.CanHarmScp(player, false) && !Server.Get.Configs.synapseConfiguration.ScpTrigger173))
                 __result = false;
 
             if (peanut.RoleType == RoleType.Scp173 && peanut.Scp173Controller.IgnoredPlayers.Contains(player))
