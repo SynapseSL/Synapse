@@ -102,6 +102,8 @@ namespace Synapse.Api
 
         public void AddDisplayInfo(PlayerInfoArea playerInfo) => NicknameSync.Network_playerInfoToShow |= playerInfo;
 
+        public void ExecuteCommand(string command, bool RA = true) => GameCore.Console.singleton.TypeCommand(RA ? "/" : "" + command, CommandSender);
+
         public void SendToServer(ushort port)
         {
             var component = SynapseController.Server.Host.PlayerStats;
