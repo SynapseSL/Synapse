@@ -19,14 +19,13 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<Scp914ActivateEventArgs> Scp914ActivateEvent;
 
         #region Invoke
-        internal void InvokeTriggerTeslaEv(Player player,Tesla tesla,bool hurtrange,out bool trigger)
+        internal void InvokeTriggerTeslaEv(Player player, Tesla tesla, ref bool trigger)
         {
             trigger = true;
             var ev = new TriggerTeslaEventArgs
             {
                 Player = player,
                 Tesla = tesla,
-                HurtRange = hurtrange,
                 Trigger = trigger
             };
 

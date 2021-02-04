@@ -1,39 +1,29 @@
 ﻿using System;
 using HarmonyLib;
-using System.Collections.Generic;
-using Synapse.Api;
-using System.Linq;
 using UnityEngine;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.MapPatches
 {
-    [HarmonyPatch(typeof(TeslaGate), nameof(TeslaGate.PlayersInRange))]
+    [HarmonyPatch(typeof(TeslaGate), nameof(TeslaGate.PlayerInRange))]
     internal static class TriggerTeslaPatch
     {
-        private static void Postfix(TeslaGate __instance, bool hurtRange, ref List<PlayerStats> __result)
+        private static bool Prefix(TeslaGate __instance, out bool __result, ReferenceHub player)
         {
+            __result = false;
             try
             {
-                __result = new List<PlayerStats>();
-                var Tesla = Map.Get.Teslas.FirstOrDefault(x => x.GameObject == __instance.gameObject);
+                __result = Vector3.Distance(__instance.transform.position, player.playerMovementSync.RealModelPosition) < __instance.sizeOfTrigger;
 
-                foreach(var player in SynapseController.Server.Players)
-                {
-                    if (Vector3.Distance(Tesla.Position, player.Position) > Tesla.SizeOfTrigger || player.IsDead) 
-                        continue;
+                if (__result)
+                    Server.Get.Events.Map.InvokeTriggerTeslaEv(player.GetPlayer(), __instance.GetTesla(), ref __result);
 
-                    if (player.Invisible)
-                        continue;
-
-                    SynapseController.Server.Events.Map.InvokeTriggerTeslaEv(player, Tesla, hurtRange, out var trigger);
-
-                    if (trigger) __result.Add(player.PlayerStats);
-                }
+                return false;
             }
             catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: TriggerTesla failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                return true;
             }
         }
     }
