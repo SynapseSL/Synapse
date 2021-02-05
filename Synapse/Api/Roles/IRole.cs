@@ -10,11 +10,11 @@ namespace Synapse.Api.Roles
 
         int GetRoleID();
 
-        Team GetTeam();
+        int GetTeamID();
 
-        List<Team> GetFriends();
+        List<int> GetFriendsID();
 
-        List<Team> GetEnemys();
+        List<int> GetEnemiesID();
 
         int GetEscapeRole();
 

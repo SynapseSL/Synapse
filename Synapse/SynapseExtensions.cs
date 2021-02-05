@@ -59,7 +59,7 @@ public static class SynapseExtensions
 
     public static bool CanHarmScp(Player player,bool message = true)
     {
-        if (player.CustomRole != null && player.CustomRole.GetFriends().Any(x => x == Team.SCP))
+        if (player.Team == Team.SCP || player.CustomRole != null && player.CustomRole.GetFriendsID().Any(x => x == (int)Team.SCP))
         {
             if (message)
                 player.GiveTextHint(Server.Get.Configs.synapseTranslation.ActiveTranslation.scpTeam);
@@ -68,5 +68,5 @@ public static class SynapseExtensions
         return true;
     }
 
-    public static bool CanNotHurtByScp(Player player) => player.Team == Team.SCP || player.CustomRole == null ? false : player.CustomRole.GetFriends().Any(x => x == Team.SCP);
+    public static bool CanNotHurtByScp(Player player) => player.Team == Team.SCP || player.CustomRole == null ? false : player.CustomRole.GetFriendsID().Any(x => x == (int)Team.SCP);
 }

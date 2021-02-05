@@ -43,6 +43,8 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                     yield return Timing.WaitForOneFrame;
 
                 var teams = new List<Team>();
+                //I know it's a lazy solution but it should work
+                var teamids = new List<int>();
 
                 var customroles = new List<Synapse.Api.Roles.IRole>();
 
@@ -59,6 +61,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                     if (player.CustomRole != null)
                         customroles.Add(player.CustomRole);
 
+                    teamids.Add(player.TeamID);
                     teams.Add(player.RealTeam);
 
                     switch (player.RealTeam)
@@ -128,7 +131,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                 }
 
                 foreach (var role in customroles)
-                    if (role.GetEnemys().Any(x => teams.Contains(x)))
+                    if (role.GetEnemiesID().Any(x => teamids.Contains(x)))
                         endround = false;
 
                 if (RoundSummary.escaped_ds + teams.Count(x => x == Team.CDP) > 0)

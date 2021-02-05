@@ -10,6 +10,7 @@ using EventHandler = Synapse.Api.Events.EventHandler;
 using Synapse.Api.Plugin;
 using Synapse.Api.Roles;
 using Synapse.Api.Items;
+using Synapse.Api.Teams;
 
 namespace Synapse
 {
@@ -31,6 +32,8 @@ namespace Synapse
         public EventHandler Events { get; } = new EventHandler();
 
         public RoleManager RoleManager { get; } = new RoleManager();
+
+        public TeamManager TeamManager { get; } = new TeamManager();
 
         public ItemManager ItemManager { get; } = new ItemManager();
 

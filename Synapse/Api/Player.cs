@@ -732,7 +732,9 @@ namespace Synapse.Api
 
         public Team Team => ClassManager.CurRole.team;
 
-        public Team RealTeam => (CustomRole == null) ? Team : CustomRole.GetTeam();
+        public int TeamID => CustomRole == null ? (int)Team : CustomRole.GetTeamID();
+
+        public Team RealTeam => Server.Get.TeamManager.IsDefaultID(TeamID) ? (Team)TeamID : Team.RIP;
 
         public Fraction Fraction => ClassManager.Fraction;
 

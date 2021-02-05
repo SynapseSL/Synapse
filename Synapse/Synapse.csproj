@@ -49,6 +49,10 @@
     <Compile Include="Api\Enum\ItemState.cs" />
     <Compile Include="Api\Ragdoll.cs" />
     <Compile Include="Api\Scp914.cs" />
+    <Compile Include="Api\Teams\SynapseTeamInformation.cs" />
+    <Compile Include="Api\Teams\SynapseTeam.cs" />
+    <Compile Include="Api\Teams\ISynapseTeam.cs" />
+    <Compile Include="Api\Teams\TeamManager.cs" />
     <Compile Include="Api\WorkStation.cs" />
     <Compile Include="Api\Generator.cs" />
     <Compile Include="Api\Enum\GeneratorInteraction.cs" />
