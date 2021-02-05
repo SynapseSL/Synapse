@@ -102,6 +102,7 @@
     <Compile Include="Api\Tesla.cs" />
     <Compile Include="Command\CommandHandler.cs" />
     <Compile Include="Command\CommandInformation.cs" />
+    <Compile Include="Command\Commands\SynapseRespawnCommand.cs" />
     <Compile Include="Command\Commands\SynapseMapPointCommand.cs" />
     <Compile Include="Command\Commands\SynapseSetClassCommand.cs" />
     <Compile Include="Command\Commands\SynapseGiveCustomItemCommand.cs" />

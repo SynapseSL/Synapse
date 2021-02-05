@@ -15,13 +15,6 @@
         {
             var result = new CommandResult();
 
-            if (!context.Player.HasPermission("synapse.command.reload"))
-            {
-                result.State = CommandResultState.NoPermission;
-                result.Message = "You don't have permission to use this command"; 
-                return result;
-            }
-
             try
             {
                 Server.Get.Reload();

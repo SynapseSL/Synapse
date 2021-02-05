@@ -18,14 +18,6 @@ namespace Synapse.Command.Commands
         {
             var result = new CommandResult();
 
-            if (!context.Player.HasPermission("synapse.command.help"))
-            {
-                result.State = CommandResultState.NoPermission;
-                result.Message = "You don't have permission to use this command";
-                return result;
-            }
-
-
 
             List<ICommand> commandlist;
 
