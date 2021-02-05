@@ -58,7 +58,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 
 				if(team == SpawnableTeamType.None)
                 {
-					Server.Get.TeamManager.SpawnTeam(id);
+					Server.Get.TeamManager.SpawnTeam(id,players);
 					return false;
                 }
 

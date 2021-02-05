@@ -27,11 +27,11 @@ namespace Synapse.Api.Teams
 
         public bool IsDefaultID(int id) => id >= (int)Team.SCP && id <= (int)Team.TUT;
 
-        public void SpawnTeam(int id)
+        public void SpawnTeam(int id,List<Player> players)
         {
             var team = teams.FirstOrDefault(x => x.Info.ID == id);
             if (team == null) return;
-            team.Spawn();
+            team.Spawn(players);
         }
 
         public ISynapseTeam GetTeam(int id) => teams.FirstOrDefault(x => x.Info.ID == id);
