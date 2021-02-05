@@ -20,18 +20,11 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    foreach (var door in ev.Player.Room.Doors)
-                        door.Position += Vector3.up;
+                    ev.Player.GiveTextHint("Next spawn in : " + SynapseController.Server.Map.Round.NextRespawn.ToString());
                     break;
 
                 case KeyCode.Alpha2:
-                    foreach (var door in ev.Player.Room.Doors)
-                        door.Open = !door.Open;
-                    break;
-
-                case KeyCode.Alpha3:
-                    foreach (var door in ev.Player.Room.Doors)
-                        door.Locked = !door.Locked;
+                    SynapseController.Server.Map.Round.NextRespawn = 20;
                     break;
             }
         }

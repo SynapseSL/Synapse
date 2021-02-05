@@ -21,7 +21,37 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
     public class TeamRespawnEventArgs : EventHandler.ISynapseEventArgs
     {
-        public Respawning.SpawnableTeamType Team { get; set; }
+        private int team;
+
+        public Respawning.SpawnableTeamType Team
+        {
+            get
+            {
+                switch (team)
+                {
+                    case 1: return Respawning.SpawnableTeamType.NineTailedFox;
+                    case 2: return Respawning.SpawnableTeamType.ChaosInsurgency;
+                    default: return Respawning.SpawnableTeamType.None;
+                }
+            }
+            set
+            {
+                switch (value)
+                {
+                    case Respawning.SpawnableTeamType.NineTailedFox:
+                        team = 1;
+                        break;
+                    case Respawning.SpawnableTeamType.ChaosInsurgency:
+                        team = 2;
+                        break;
+                    default:
+                        team = -1;
+                        break;
+                }
+            }
+        }
+
+        public int TeamID { get => team; set => team = value; }
 
         public List<Player> Players { get; set; }
 

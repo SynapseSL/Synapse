@@ -56,7 +56,7 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void InvokeTeamRespawn(ref List<Player> players,ref Respawning.SpawnableTeamType teamType, out bool allow)
+        internal void InvokeTeamRespawn(ref List<Player> players,ref Respawning.SpawnableTeamType teamType, out bool allow,out int teamid)
         {
             var ev = new TeamRespawnEventArgs
             {
@@ -69,6 +69,7 @@ namespace Synapse.Api.Events
             players = ev.Players;
             teamType = ev.Team;
             allow = ev.Allow;
+            teamid = ev.TeamID;
         }
         #endregion
     }

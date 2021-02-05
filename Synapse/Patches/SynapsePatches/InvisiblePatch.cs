@@ -160,7 +160,7 @@ namespace Synapse.Patches.SynapsePatches
             }
             catch (Exception e)
             {
-                Api.Logger.Get.Error($"Synapse-InvisibleMode: TransmitData failed failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Api.Logger.Get.Error($"Synapse-InvisibleMode: TransmitData failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;
             }
         }
