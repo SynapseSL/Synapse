@@ -13,10 +13,13 @@ namespace Synapse.Patches.EventsPatches.MapPatches
             __result = false;
             try
             {
+                var synapseplayer = player.GetPlayer();
+                if (synapseplayer.Invisible) return false;
+
                 __result = Vector3.Distance(__instance.transform.position, player.playerMovementSync.RealModelPosition) < __instance.sizeOfTrigger;
 
                 if (__result)
-                    Server.Get.Events.Map.InvokeTriggerTeslaEv(player.GetPlayer(), __instance.GetTesla(), ref __result);
+                    Server.Get.Events.Map.InvokeTriggerTeslaEv(synapseplayer, __instance.GetTesla(), ref __result);
 
                 return false;
             }
