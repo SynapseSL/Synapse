@@ -29,7 +29,7 @@ namespace Synapse.Api.Events
                 Trigger = trigger
             };
 
-            TriggerTeslaEvent.Invoke(ev);
+            TriggerTeslaEvent?.Invoke(ev);
 
             trigger = ev.Trigger;
         }
