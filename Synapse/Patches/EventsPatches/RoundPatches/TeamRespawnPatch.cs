@@ -52,9 +52,15 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 				var players = list.Select(x => x.GetPlayer()).ToList();
 				var team = __instance.NextKnownTeam;
 
-				SynapseController.Server.Events.Round.InvokeTeamRespawn(ref players, ref team, out var allow);
+				SynapseController.Server.Events.Round.InvokeTeamRespawn(ref players, ref team, out var allow, out var id);
 
 				if (!allow) return false;
+
+				if(team == SpawnableTeamType.None)
+                {
+					Server.Get.TeamManager.SpawnTeam(id,players);
+					return false;
+                }
 
 				list = players.Select(x => x.Hub).ToList();
 				__instance.NextKnownTeam = team;

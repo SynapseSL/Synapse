@@ -1,17 +1,18 @@
 ﻿using System;
 using HarmonyLib;
+using Mirror;
 
 // ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(ReferenceHub), nameof(ReferenceHub.OnDestroy))]
+    [HarmonyPatch(typeof(CustomNetworkManager), nameof(CustomNetworkManager.OnServerDisconnect))]
     internal static class PlayerLeavePatch
     {
-        private static void Prefix(ReferenceHub __instance)
+        private static void Prefix(NetworkConnection conn)
         {
             try
             {
-                var player = __instance.GetPlayer();
+                var player = conn.identity.GetPlayer();
                 if (player.CustomRole != null)
                     player.CustomRole = null;
                 SynapseController.Server.Events.Player.InvokePlayerLeaveEvent(player);

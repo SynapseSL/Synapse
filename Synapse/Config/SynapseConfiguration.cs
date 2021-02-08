@@ -41,7 +41,10 @@ namespace Synapse.Config
         [Description("If disabled Chaos must kill all Scps to end the round")]
         public bool ChaosScpEnd = true;
 
-        [Description("If enabled custom Scps such as 035 can trigger Scp096's rage")]
+        [Description("If enabled custom Scps such as 035 can stop SCP-173 by looking at him")]
+        public bool ScpTrigger173 = false;
+
+        [Description("If enabled custom Scps such as 035 can trigger SCP-096's rage")]
         public bool ScpTrigger096 = false;
 
         [Description("If Enabled Scp-079 and Scp-096 can't see the Player who is wearing Scp-268")]
@@ -52,5 +55,8 @@ namespace Synapse.Config
         {
             (int)RoleType.Tutorial
         };
+
+        [Description("The default Language that is used for translations")]
+        public string Language = "ENGLISH";
     }
 }

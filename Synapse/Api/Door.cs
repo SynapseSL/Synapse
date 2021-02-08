@@ -3,6 +3,7 @@ using Interactables.Interobjects.DoorUtils;
 using vDoor = Interactables.Interobjects.DoorUtils.DoorVariant;
 using Interactables.Interobjects;
 using Mirror;
+using System.Collections.Generic;
 
 namespace Synapse.Api
 {
@@ -68,7 +69,6 @@ namespace Synapse.Api
                     }
                 }
 
-                //if (Name.Contains("Airlocks")) doorType = Enum.DoorType.Airlock;
                 if (Name.Contains("EZ BreakableDoor")) doorType = Enum.DoorType.EZ_Door;
                 else if (Name.Contains("LCZ BreakableDoor")) doorType = Enum.DoorType.LCZ_Door;
                 else if (Name.Contains("HCZ BreakableDoor")) doorType = Enum.DoorType.HCZ_Door;
@@ -83,7 +83,17 @@ namespace Synapse.Api
 
         public bool IsBreakable => VDoor is BreakableDoor;
 
-        public bool IsOpen { get => VDoor.IsConsideredOpen(); }
+        public bool Open
+        {
+            get => VDoor.IsConsideredOpen();
+            set => VDoor.NetworkTargetState = value;
+        }
+
+        public bool Locked
+        {
+            get => VDoor.ActiveLocks > 0;
+            set => VDoor.ServerChangeLock(DoorLockReason.SpecialDoorFeature, value);
+        }
 
         public bool TryBreakDoor()
         {
@@ -104,6 +114,22 @@ namespace Synapse.Api
                 return pry.TryPryGate();
             else
                 return false;
+        }
+
+        public List<Room> Rooms { get; } = new List<Room>();
+
+        public static Door SpawnDoorVariant(Vector3 position, Quaternion? rotation = null, DoorPermissions permissions = null)
+        {
+            DoorVariant doorVariant = Object.Instantiate(Server.Get.Prefabs.DoorVariantPrefab);
+
+            doorVariant.transform.position = position;
+            doorVariant.transform.rotation = rotation ?? new Quaternion(0, 0, 0, 0);
+            doorVariant.RequiredPermissions = permissions ?? new DoorPermissions();
+            var door = new Door(doorVariant);
+            Map.Get.Doors.Add(door);
+            NetworkServer.Spawn(doorVariant.gameObject);
+
+            return door;
         }
 
         public override string ToString() => Name;

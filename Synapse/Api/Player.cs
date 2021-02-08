@@ -90,14 +90,19 @@ namespace Synapse.Api
 
         public void Heal(float hp) => PlayerStats.HealHPAmount(hp);
 
-        public void Hurt(int amount, DamageTypes.DamageType damagetype = default, Player attacker = null) =>
+        public void Hurt(int amount, DamageTypes.DamageType damagetype = default, Player attacker = null)
+        {
+            if (attacker == null) attacker = this;
             attacker.PlayerStats.HurtPlayer(new PlayerStats.HitInfo(amount, attacker == null ? "WORLD" : attacker.NickName, damagetype, attacker == null ? 0 : attacker.PlayerId), gameObject);
+        }
 
         public void OpenReportWindow(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
 
         public void RemoveDisplayInfo(PlayerInfoArea playerInfo) => NicknameSync.Network_playerInfoToShow &= ~playerInfo;
 
         public void AddDisplayInfo(PlayerInfoArea playerInfo) => NicknameSync.Network_playerInfoToShow |= playerInfo;
+
+        public void ExecuteCommand(string command, bool RA = true) => GameCore.Console.singleton.TypeCommand(RA ? "/" : "" + command, CommandSender);
 
         public void SendToServer(ushort port)
         {
@@ -114,6 +119,7 @@ namespace Synapse.Api
             };
             Connection.Send(msg);
             NetworkWriterPool.Recycle(writer);
+            
         }
 
         public void DimScreen()
@@ -170,6 +176,9 @@ namespace Synapse.Api
 
         private void Update()
         {
+            if (Hub.isDedicatedServer)
+                Server.Get.Events.Server.InvokeUpdateEvent();
+
             if (this == Server.Get.Host || HideRank || SynapseGroup.Color.ToUpper() != "RAINBOW") return;
 
             if(Time.time >= delay)
@@ -723,7 +732,9 @@ namespace Synapse.Api
 
         public Team Team => ClassManager.CurRole.team;
 
-        public Team RealTeam => (CustomRole == null) ? Team : CustomRole.GetTeam();
+        public int TeamID => CustomRole == null ? (int)Team : CustomRole.GetTeamID();
+
+        public Team RealTeam => Server.Get.TeamManager.IsDefaultID(TeamID) ? (Team)TeamID : Team.RIP;
 
         public Fraction Fraction => ClassManager.Fraction;
 
@@ -805,7 +816,7 @@ namespace Synapse.Api
             if (value == null) dbo.Data.Remove(key);
             DatabaseManager.PlayerRepository.Save(dbo);
         }
-        
+
         #endregion
 
         public override string ToString() => NickName;

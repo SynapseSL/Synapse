@@ -41,7 +41,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 						EventHandler.Get.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref flag);
 
 					if (flag) cardaccess = true;
-					else if (Server.Get.Configs.SynapseConfiguration.RemoteKeyCard)
+					else if (Server.Get.Configs.synapseConfiguration.RemoteKeyCard)
 						foreach (var item2 in player.Inventory.Items.Where(x => x != item && x.ItemCategory == ItemCategory.Keycard))
 						{
 							var allowcard = __instance.RequiredPermissions.CheckPermissions(item2.ItemType, ply);

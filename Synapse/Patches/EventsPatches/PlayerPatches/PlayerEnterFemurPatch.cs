@@ -24,7 +24,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     if (player.RoleType == RoleType.Spectator || player.GodMode || !SynapseExtensions.CanHarmScp(player)) continue;
                     var allow = player.Team != Team.SCP;
 
-                    var closeFemur = FemurBrokePeople + 1 >= Server.Get.Configs.SynapseConfiguration.RequiredForFemur;
+                    var closeFemur = FemurBrokePeople + 1 >= Server.Get.Configs.synapseConfiguration.RequiredForFemur;
 
                     SynapseController.Server.Events.Player.InvokePlayerEnterFemurEvent(player, ref allow, ref closeFemur);
 

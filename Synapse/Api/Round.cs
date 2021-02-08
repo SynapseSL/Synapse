@@ -10,8 +10,15 @@ namespace Synapse.Api
         internal Round() { }
 
         private RoundSummary rs => RoundSummary.singleton;
+        private RespawnManager rm => RespawnManager.Singleton;
 
         public int CurrentRound { get; internal set; } = 0;
+
+        public float NextRespawn
+        {
+            get => rm._timeForNextSequence - rm._stopwatch.Elapsed.Seconds;
+            set => rm._timeForNextSequence = value + rm._stopwatch.Elapsed.Seconds;
+        }
 
         public bool LobbyLock
         {

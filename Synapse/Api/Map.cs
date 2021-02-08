@@ -3,6 +3,7 @@ using Interactables.Interobjects.DoorUtils;
 using MapGeneration;
 using Mirror;
 using Synapse.Api.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management.Instrumentation;
@@ -78,16 +79,14 @@ namespace Synapse.Api
 
         public int Seed => MapGeneration.SeedSynchronizer.Seed;
 
-        public Room GetRoom(RoomInformation.RoomType roomType) => Rooms.FirstOrDefault(x => x.RoomType == roomType);
+        public Room GetRoom(RoomInformation.RoomType roomType) 
+            => Rooms.FirstOrDefault(x => x.RoomType == roomType);
 
-        public Door GetDoor(Enum.DoorType doorType) => Doors.FirstOrDefault(x => x.DoorType == doorType);
+        public Door GetDoor(Enum.DoorType doorType) 
+            => Doors.FirstOrDefault(x => x.DoorType == doorType);
 
-        public Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "")
-            => new Dummy(pos, rot, role, name, badgetext, badgecolor);
-
-        public WorkStation CreateWorkStation(Vector3 position, Vector3 rotation, Vector3 scale) => new WorkStation(position, rotation, scale);
-
-        public Ragdoll CreateRagdoll(RoleType roletype, Vector3 pos, Quaternion rot, Vector3 velocity, PlayerStats.HitInfo info, bool allowRecall, Player owner) => new Ragdoll(roletype, pos, rot, velocity, info, allowRecall, owner);
+        public Elevator GetElevator(Enum.ElevatorType elevatorType) 
+            => Elevators.FirstOrDefault(x => x.ElevatorType == elevatorType);
 
         public void SendBroadcast(ushort time, string message, bool instant = false)
         {
@@ -101,7 +100,8 @@ namespace Synapse.Api
             GlitchedCassie(text);
         }
 
-        public void Cassie(string words, bool makehold = true, bool makenoise = true) => Respawning.RespawnEffectsController.PlayCassieAnnouncement(words, makehold, makenoise);
+        public void Cassie(string words, bool makehold = true, bool makenoise = true) 
+            => Respawning.RespawnEffectsController.PlayCassieAnnouncement(words, makehold, makenoise);
 
         public void GlitchedCassie(string words)
         {
@@ -115,7 +115,7 @@ namespace Synapse.Api
                 player = Server.Get.Host;
 
             var component = player.GrenadeManager;
-            var component2 = Object.Instantiate(component.availableGrenades[(int)grenadeType].grenadeInstance).GetComponent<Grenades.Grenade>();
+            var component2 = UnityEngine.Object.Instantiate(component.availableGrenades[(int)grenadeType].grenadeInstance).GetComponent<Grenades.Grenade>();
             component2.FullInitData(component, position, Quaternion.Euler(component2.throwStartAngle), velocity, component2.throwAngularVelocity, player == Server.Get.Host ? Team.RIP : player.Team);
             component2.NetworkfuseTime = NetworkTime.time + (double)fusetime;
             NetworkServer.Spawn(component2.gameObject);
@@ -129,17 +129,31 @@ namespace Synapse.Api
                 player = Server.Get.Host;
 
             var component = player.GrenadeManager;
-            var component2 = Object.Instantiate(component.availableGrenades[(int)grenadeType].grenadeInstance).GetComponent<Grenades.Grenade>();
+            var component2 = UnityEngine.Object.Instantiate(component.availableGrenades[(int)grenadeType].grenadeInstance).GetComponent<Grenades.Grenade>();
             component2.FullInitData(component, position, Quaternion.identity, Vector3.zero, Vector3.zero, Team.RIP);
             component2.NetworkfuseTime = 0.10000000149011612;
             NetworkServer.Spawn(component2.gameObject);
         }
 
-        public void PlaceBlood(Vector3 pos, int type = 0, float size = 2) => Server.Get.Host.ClassManager.RpcPlaceBlood(pos, type, size);
+        public void PlaceBlood(Vector3 pos, int type = 0, float size = 2)
+            => Server.Get.Host.ClassManager.RpcPlaceBlood(pos, type, size);
 
+        [Obsolete("Instantiate a Dummy instead", true)]
+        public Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "")
+            => new Dummy(pos, rot, role, name, badgetext, badgecolor);
+
+        [Obsolete("Moved to Workstation.CreateWorkStation()", true)]
+        public WorkStation CreateWorkStation(Vector3 position, Vector3 rotation, Vector3 scale) 
+            => new WorkStation(position, rotation, scale);
+
+        [Obsolete("Moved to Door.CreateRagdoll()", true)]
+        public Ragdoll CreateRagdoll(RoleType roletype, Vector3 pos, Quaternion rot, Vector3 velocity, PlayerStats.HitInfo info, bool allowRecall, Player owner) 
+            => new Ragdoll(roletype, pos, rot, velocity, info, allowRecall, owner);
+
+        [Obsolete("Moved to Door.SpawnDoorVariant()", true)]
         public Door SpawnDoorVariant(Vector3 position, Quaternion? rotation = null, DoorPermissions permissions = null)
         {
-            DoorVariant doorVariant = Object.Instantiate(Server.Get.Prefabs.DoorVariantPrefab);
+            DoorVariant doorVariant = UnityEngine.Object.Instantiate(Server.Get.Prefabs.DoorVariantPrefab);
 
             doorVariant.transform.position = position;
             doorVariant.transform.rotation = rotation ?? new Quaternion(0, 0, 0, 0);
@@ -162,8 +176,25 @@ namespace Synapse.Api
             foreach (var station in Server.Get.GetObjectsOf<global::WorkStation>())
                 WorkStations.Add(new WorkStation(station));
 
-            foreach (var door in SynapseController.Server.GetObjectsOf<Interactables.Interobjects.DoorUtils.DoorVariant>())
+            foreach (var door in SynapseController.Server.GetObjectsOf<DoorVariant>())
                 Doors.Add(new Door(door));
+
+            foreach (var interactable in Interface079.singleton.allInteractables)
+            {
+                foreach (var zoneroom in interactable.currentZonesAndRooms)
+                {
+                    try
+                    {
+                        var room = Rooms.FirstOrDefault(x => x.RoomName == zoneroom.currentRoom);
+                        var door = interactable.GetComponentInParent<Interactables.Interobjects.DoorUtils.DoorVariant>();
+                        if (room == null || door == null) continue;
+                        var sdoor = door.GetDoor();
+                        sdoor.Rooms.Add(room);
+                        room.Doors.Add(sdoor);
+                    }
+                    catch { }
+                }
+            }
         }
 
         internal void ClearObjects()

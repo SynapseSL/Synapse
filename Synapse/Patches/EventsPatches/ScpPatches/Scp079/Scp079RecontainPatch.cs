@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using HarmonyLib;
 using Synapse.Api.Enum;
@@ -82,15 +83,26 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 			Generator079.Generators[0].ServerOvercharge(10f, true);
 
 			HashSet<Interactables.Interobjects.DoorUtils.DoorVariant> lockedDoors = new HashSet<Interactables.Interobjects.DoorUtils.DoorVariant>();
-			foreach (Interactables.Interobjects.DoorUtils.DoorVariant doorVariant in UnityEngine.Object.FindObjectsOfType<Interactables.Interobjects.DoorUtils.DoorVariant>())
+
+			try
 			{
-				Scp079Interactable scp079Interactable;
-				if (doorVariant is Interactables.Interobjects.BasicDoor && doorVariant.TryGetComponent(out scp079Interactable) && scp079Interactable.currentZonesAndRooms[0].currentZone == "HeavyRooms")
+				foreach (var door in Synapse.Api.Map.Get.Doors)
 				{
-					lockedDoors.Add(doorVariant);
-					doorVariant.NetworkTargetState = false;
-					doorVariant.ServerChangeLock(Interactables.Interobjects.DoorUtils.DoorLockReason.NoPower, true);
+					Scp079Interactable scp079Interactable;
+					if (door.VDoor is Interactables.Interobjects.BasicDoor && door.VDoor.TryGetComponent(out scp079Interactable))
+					{
+						var zone = scp079Interactable.currentZonesAndRooms.FirstOrDefault();
+						if (zone == null || zone.currentZone != "HeavyRooms") continue;
+
+						lockedDoors.Add(door.VDoor);
+						door.VDoor.NetworkTargetState = false;
+						door.VDoor.ServerChangeLock(Interactables.Interobjects.DoorUtils.DoorLockReason.NoPower, true);
+					}
 				}
+			}
+			catch(Exception e)
+            {
+				Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp079RecontainEvent lock Door failed!!\n{e}");
 			}
 
 			Recontainer079.isLocked = true;
@@ -104,9 +116,14 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 				j = i;
 			}
 
-			foreach (Interactables.Interobjects.DoorUtils.DoorVariant doorVariant2 in lockedDoors)
-			{
-				doorVariant2.ServerChangeLock(Interactables.Interobjects.DoorUtils.DoorLockReason.NoPower, false);
+            try
+            {
+				foreach (Interactables.Interobjects.DoorUtils.DoorVariant doorVariant2 in lockedDoors)
+					doorVariant2.ServerChangeLock(Interactables.Interobjects.DoorUtils.DoorLockReason.NoPower, false);
+			}
+			catch(Exception e)
+            {
+				Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp079RecontainEvent unlock door failed!!\n{e}");
 			}
 
 			Recontainer079.isLocked = false;

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Synapse.Api.Plugin;
+﻿using Synapse.Translation;
+using System.IO;
 
 namespace Synapse.Config
 {
@@ -7,26 +7,26 @@ namespace Synapse.Config
     {
         internal ConfigHandler() { }
 
-        internal SynapseConfiguration SynapseConfiguration;
-        internal Translation SynapseTranslation;
+        internal SynapseConfiguration synapseConfiguration;
+        internal SynapseTranslation<Translation.Translation> synapseTranslation;
 
         private SYML _syml;
         
         internal void Init()
         {
-            SynapseTranslation = new Translation(new PluginInformation { Name = "Synapse" });
-            var trans = new Dictionary<string, string>
+            synapseTranslation = new SynapseTranslation<Translation.Translation>(Server.Get.Files.GetTranslationPath("Synapse"));
+            synapseTranslation.AddTranslation(new Synapse.Translation.Translation(), "ENGLISH");
+            synapseTranslation.AddTranslation(new Translation.Translation
             {
-                {"sameteam","<b>You can't harm this person</b>" },
-                {"scpteam","As your current Role you can't harm an Scp"  },
-                {"noperm", "You don't have permission to execute this command (%perm%)" }
-            };
-            SynapseTranslation.CreateTranslations(trans);
+                noPermissions = "Du hast keine Berechtigung diesen Command zu benutzen!(%perm%)",
+                sameTeam = "<b>Du kannst diese Person nicht verletzen!</b>",
+                scpTeam = "Als deine jetzige Rolle kannst du nichts machen was ein SCP verletzen würde!",
+            }, "GERMAN");
 
             _syml = new SYML(SynapseController.Server.Files.ConfigFile);
             _syml.Load();
-            SynapseConfiguration = new SynapseConfiguration();
-            SynapseConfiguration = _syml.GetOrSetDefault("Synapse", SynapseConfiguration);
+            synapseConfiguration = new SynapseConfiguration();
+            synapseConfiguration = _syml.GetOrSetDefault("Synapse", synapseConfiguration);
         }
 
         public T GetOrSetDefault<T>(string section, T defValue) where T : IConfigSection
@@ -55,8 +55,7 @@ namespace Synapse.Config
         public void Reload()
         {
             _syml.Load();
-            SynapseConfiguration = _syml.GetOrSetDefault("Synapse", new SynapseConfiguration());
-            SynapseTranslation.ReloadTranslations();
+            synapseConfiguration = _syml.GetOrSetDefault("Synapse", new SynapseConfiguration());
         }
     }
 }

@@ -16,17 +16,17 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 			try
 			{
 				__result = false;
-				var player = go?.GetPlayer();
+				var victim = go?.GetPlayer();
 				var killer = __instance?.GetPlayer();
-				if (player == null) return false;
+				if (victim == null) return false;
 
 				if (info.GetDamageType() == DamageTypes.Grenade)
 					killer = SynapseController.Server.GetPlayer(info.PlayerId);
 				else if (info.GetDamageType() == DamageTypes.Pocket)
                 {
-					killer = Server.Get.Players.FirstOrDefault(x => x.Scp106Controller.PocketPlayers.Contains(player));
+					killer = Server.Get.Players.FirstOrDefault(x => x.Scp106Controller.PocketPlayers.Contains(victim));
 
-					if (SynapseExtensions.CanNotHurtByScp(player))
+					if (SynapseExtensions.CanNotHurtByScp(victim))
 						return false;
                 }
 
@@ -103,7 +103,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 					var allow = true;
 					try
 					{
-						Server.Get.Events.Player.InvokePlayerDamageEvent(player, killer, ref info, out allow);
+						Server.Get.Events.Player.InvokePlayerDamageEvent(victim, killer, ref info, out allow);
 					}
 					catch(Exception e)
                     {
@@ -214,7 +214,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 					else if (__instance.ccm.CurRole.team == Team.SCP && go.GetComponent<MicroHID>().CurrentHidState != MicroHID.MicroHidState.Idle)
 						__instance.TargetAchieve(__instance.connectionToClient, "illpassthanks");
 
-					if (player.RealTeam == Team.RSC && player.RealTeam == Team.SCP)
+					if (victim.RealTeam == Team.RSC && victim.RealTeam == Team.SCP)
 						__instance.TargetAchieve(__instance.connectionToClient, "timetodoitmyself");
 
 					bool flag6 = info.IsPlayer && referenceHub == info.RHub;
@@ -255,7 +255,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
 					try
 					{
-						Server.Get.Events.Player.InvokePlayerDeathEvent(player, killer, info);
+						Server.Get.Events.Player.InvokePlayerDeathEvent(victim, killer, info);
 					}
 
 					catch (Exception e)
@@ -307,9 +307,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 					playerStats.SetHPAmount(100);
 					characterClassManager.SetClassID(RoleType.Spectator);
 
-					player.CustomRole = null;
-					foreach (var larry in Server.Get.Players.Where(x => x.Scp106Controller.PocketPlayers.Contains(player)))
-						larry.Scp106Controller.PocketPlayers.Remove(player);
+					victim.CustomRole = null;
+					foreach (var larry in Server.Get.Players.Where(x => x.Scp106Controller.PocketPlayers.Contains(victim)))
+						larry.Scp106Controller.PocketPlayers.Remove(victim);
 				}
 				else
 				{

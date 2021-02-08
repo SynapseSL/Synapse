@@ -7,4 +7,6 @@ namespace Synapse.Api.Plugin
         public string section = null;
         public int revision = 0;
     }
+
+    public class SynapseTranslation : Attribute { }
 }

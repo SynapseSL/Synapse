@@ -16,13 +16,6 @@ namespace Synapse.Command.Commands
         {
             var result = new CommandResult();
 
-            if (!context.Player.HasPermission("synapse.command.setclass"))
-            {
-                result.Message = "You don't have permission to use this command";
-                result.State = CommandResultState.NoPermission;
-                return result;
-            }
-
             if(context.Arguments.Count < 2)
             {
                 result.Message = "Missing Parameters! Command Usage: setclass player RoleID";

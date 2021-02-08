@@ -10,7 +10,7 @@ namespace Synapse.Api.Plugin
 {
     public class PluginLoader
     {
-        private readonly List<IContextProcessor> _processors = new List<IContextProcessor> { new ConfigInjector(),new CommandProcessor()};
+        private readonly List<IContextProcessor> _processors = new List<IContextProcessor> { new ConfigInjector(),new CommandProcessor(),new TranslationInjector()};
 
         private readonly List<IPlugin> _plugins = new List<IPlugin>();
 
@@ -61,6 +61,7 @@ namespace Synapse.Api.Plugin
             }
         
             foreach (var infoTypePair in dictionary.OrderByDescending(x => x.Key.LoadPriority))
+            {
                 try
                 {
                     SynapseController.Server.Logger.Info($"{infoTypePair.Key.Name} will now be activated!");
@@ -77,6 +78,7 @@ namespace Synapse.Api.Plugin
                 {
                     SynapseController.Server.Logger.Error($"Synapse-Controller: Activation of {infoTypePair.Value.Key.Assembly.GetName().Name} failed!!\n{e}");
                 }
+            }
 
             foreach (var context in _contexts) 
                 foreach (var processor in _processors) 
@@ -89,6 +91,7 @@ namespace Synapse.Api.Plugin
         private void LoadPlugins()
         {
             foreach (var plugin in _plugins)
+            {
                 try
                 {
                     plugin.Load();
@@ -97,17 +100,21 @@ namespace Synapse.Api.Plugin
                 {
                     SynapseController.Server.Logger.Error($"Synapse-Loader: {plugin.Information.Name} Loading failed!!\n{e}");
                 }
+            }
         }
 
         internal void ReloadConfigs()
         {
             var injector = new ConfigInjector();
+            var translationinjector = new TranslationInjector();
             foreach (var context in _contexts)
             {
                 injector.Process(context);
+                translationinjector.Process(context);
             }
 
             foreach (var plugin in _plugins)
+            {
                 try
                 {
                     plugin.Translation.ReloadTranslations();
@@ -117,6 +124,7 @@ namespace Synapse.Api.Plugin
                 {
                     SynapseController.Server.Logger.Error($"Synapse-Loader: {plugin.Information.Name} Reload Config failed!!\n{e}");
                 }
+            }
         }
     }
 

@@ -57,10 +57,19 @@ namespace Synapse.Patches.SynapsePatches
                             var newplayer = players[k];
                             var vector = __instance._transmitBuffer[k].position - player.Position;
 
-                            if (player.RoleType == RoleType.Scp173 && player.Scp173Controller.IgnoredPlayers.Contains(newplayer))
+                            if (player.RoleType == RoleType.Scp173)
                             {
-                                showinvoid = true;
-                                goto AA_001;
+                                if (player.Scp173Controller.IgnoredPlayers.Contains(newplayer))
+                                {
+                                    showinvoid = true;
+                                    goto AA_001;
+                                }
+                                else if (!SynapseExtensions.CanHarmScp(newplayer, false) && !Server.Get.Configs.synapseConfiguration.ScpTrigger173)
+                                {
+                                    var posinfo = __instance._transmitBuffer[k];
+                                    var rot = Quaternion.LookRotation(newplayer.Position - player.Position).eulerAngles.y;
+                                    __instance._transmitBuffer[k] = new PlayerPositionData(posinfo.position, rot, posinfo.playerID);
+                                }
                             }
 
                             if (newplayer.Invisible && !player.HasPermission("synapse.see.invisible"))
@@ -111,7 +120,7 @@ namespace Synapse.Patches.SynapsePatches
 
                                         if (player.RoleType == RoleType.Scp079 || flag)
                                         {
-                                            if (Server.Get.Configs.SynapseConfiguration.Better268)
+                                            if (Server.Get.Configs.synapseConfiguration.Better268)
                                                 showinvoid = true;
                                         }
                                         else
@@ -151,7 +160,7 @@ namespace Synapse.Patches.SynapsePatches
             }
             catch (Exception e)
             {
-                Api.Logger.Get.Error($"Synapse-InvisibleMode: TransmitData failed failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Api.Logger.Get.Error($"Synapse-InvisibleMode: TransmitData failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;
             }
         }
@@ -164,8 +173,10 @@ namespace Synapse.Patches.SynapsePatches
         {
             var player = __instance.GetPlayer();
             var peanut = scp.GetPlayer();
+            if (!__result) return;
 
-            __result = player?.Invisible != true && __result;
+            if (player.Invisible || (!SynapseExtensions.CanHarmScp(player, false) && !Server.Get.Configs.synapseConfiguration.ScpTrigger173))
+                __result = false;
 
             if (peanut.RoleType == RoleType.Scp173 && peanut.Scp173Controller.IgnoredPlayers.Contains(player))
                 __result = false;

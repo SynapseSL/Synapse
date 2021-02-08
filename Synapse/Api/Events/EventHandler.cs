@@ -17,32 +17,14 @@ namespace Synapse.Api.Events
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
         {
-            var pos = ev.Player.Position;
-            pos.y += 5;
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    foreach (var player in SynapseController.Server.Players)
-                        if (player != ev.Player)
-                            ev.Player.Scp173Controller.IgnoredPlayers.Add(player);
+                    ev.Player.GiveTextHint("Next spawn in : " + SynapseController.Server.Map.Round.NextRespawn.ToString());
                     break;
 
                 case KeyCode.Alpha2:
-                    foreach (var door in Api.Map.Get.Doors.Where(x => x.DoorType == Enum.DoorType.Airlock))
-                        door.Position = pos;
-                    break;
-
-                case KeyCode.Alpha3:
-                    Api.Map.Get.GetDoor(Enum.DoorType.Gate_B).Position = pos;
-                    break;
-
-                case KeyCode.Alpha4:
-                    Api.Map.Get.GetDoor(Enum.DoorType.LCZ_012).Position = pos;
-                    break;
-
-                case KeyCode.Alpha5:
-                    foreach (var door in Api.Map.Get.Doors)
-                        door.Rotation = ev.Player.transform.rotation;
+                    SynapseController.Server.Map.Round.NextRespawn = 20;
                     break;
             }
         }
@@ -66,7 +48,7 @@ namespace Synapse.Api.Events
         }
 
 #region HookedEvents
-        private SynapseConfiguration conf => SynapseController.Server.Configs.SynapseConfiguration;
+        private SynapseConfiguration conf => SynapseController.Server.Configs.synapseConfiguration;
 
         private void PlayerJoin(SynapseEventArguments.PlayerJoinEventArgs ev)
         {

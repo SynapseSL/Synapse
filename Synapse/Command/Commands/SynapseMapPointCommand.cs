@@ -16,12 +16,6 @@ namespace Synapse.Command.Commands
         public CommandResult Execute(CommandContext context)
         {
             var result = new CommandResult();
-            if (!context.Player.HasPermission("synapse.command.mappoint"))
-            {
-                result.Message = "You don't have permission to use this command";
-                result.State = CommandResultState.NoPermission;
-                return result;
-            }
 
             Physics.Raycast(context.Player.CameraReference.transform.position, context.Player.CameraReference.transform.forward, out RaycastHit raycastthit, 100f);
 

@@ -18,14 +18,6 @@ namespace Synapse.Command.Commands
         {
             var result = new CommandResult();
 
-            if (!context.Player.HasPermission("synapse.command.help"))
-            {
-                result.State = CommandResultState.NoPermission;
-                result.Message = "You don't have permission to use this command";
-                return result;
-            }
-
-
 
             List<ICommand> commandlist;
 
@@ -60,9 +52,17 @@ namespace Synapse.Command.Commands
 
                 if (command == null)
                 {
-                    result.State = CommandResultState.Error;
-                    result.Message = "No Command with this Name found";
-                    return result;
+                    foreach (ICommand c in commandlist.Where(c => c.Aliases.FirstOrDefault(i => i.ToLower() == context.Arguments.First()) != null))
+                    {
+                        command = c;
+                    }
+
+                    if (command == null)
+                    {
+                        result.State = CommandResultState.Error;
+                        result.Message = "No Command with this Name found";
+                        return result;
+                    }
                 }
 
                 string platforms = "{ " + string.Join(", ", command.Platforms) + " }";

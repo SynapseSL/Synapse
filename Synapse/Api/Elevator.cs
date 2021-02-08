@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Synapse.Api.Enum;
 
 namespace Synapse.Api
 {
@@ -10,7 +11,7 @@ namespace Synapse.Api
 
         public GameObject GameObject => Lift.gameObject;
 
-        public string Name => GameObject.name;
+        public string Name => Lift.elevatorName;
 
         public Vector3 Position => GameObject.transform.position;
 
@@ -21,5 +22,25 @@ namespace Synapse.Api
         public float MaxDistance { get => Lift.maxDistance; set => Lift.maxDistance = value; }
 
         public void Use() => Lift.UseLift();
+
+        public ElevatorType ElevatorType
+        {
+            get
+            {
+                switch (Name)
+                {
+                    case "GateB": return ElevatorType.GateB;
+                    case "GateA": return ElevatorType.GateA;
+                    case "SCP-049": return ElevatorType.Scp049;
+                    case "ElA": return ElevatorType.ElALeft;
+                    case "ElA2": return ElevatorType.ElARight;
+                    case "ElB": return ElevatorType.ElBLeft;
+                    case "ElB2": return ElevatorType.ElBRight;
+                    default: return ElevatorType.None;
+                }
+            }
+        }
+
+        public override string ToString() => Name;
     }
 }

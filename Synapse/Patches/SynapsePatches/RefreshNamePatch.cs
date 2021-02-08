@@ -8,7 +8,7 @@ namespace Synapse.Patches.SynapsePatches
     {
         public static void Postfix()
         {
-            if (!Server.Get.Configs.SynapseConfiguration.NameTracking) return;
+            if (!Server.Get.Configs.synapseConfiguration.NameTracking) return;
 
             ServerConsole._serverName += $" <color=#00000000><size=1>Synapse {SynapseController.SynapseVersion}</size></color>";
         }

@@ -57,15 +57,16 @@ public static class SynapseExtensions
     public static Synapse.Api.Items.SynapseItem GetSynapseItem(this Inventory.SyncItemInfo info) => Map.Get.Items.FirstOrDefault(x => x.itemInfo == info);
     public static Synapse.Api.Items.SynapseItem GetSynapseItem(this Pickup pickup) => Map.Get.Items.FirstOrDefault(x => x.pickup == pickup);
 
-    public static bool CanHarmScp(Player player)
+    public static bool CanHarmScp(Player player,bool message = true)
     {
-        if (player.CustomRole != null && player.CustomRole.GetFriends().Any(x => x == Team.SCP))
+        if (player.Team == Team.SCP || player.CustomRole != null && player.CustomRole.GetFriendsID().Any(x => x == (int)Team.SCP))
         {
-            player.GiveTextHint(Server.Get.Configs.SynapseTranslation.GetTranslation("scpteam"));
+            if (message)
+                player.GiveTextHint(Server.Get.Configs.synapseTranslation.ActiveTranslation.scpTeam);
             return false;
         }
         return true;
     }
 
-    public static bool CanNotHurtByScp(Player player) => player.Team == Team.SCP || player.CustomRole == null ? false : player.CustomRole.GetFriends().Any(x => x == Team.SCP);
+    public static bool CanNotHurtByScp(Player player) => player.Team == Team.SCP || player.CustomRole == null ? false : player.CustomRole.GetFriendsID().Any(x => x == (int)Team.SCP);
 }

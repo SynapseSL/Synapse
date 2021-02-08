@@ -10,6 +10,7 @@ using EventHandler = Synapse.Api.Events.EventHandler;
 using Synapse.Api.Plugin;
 using Synapse.Api.Roles;
 using Synapse.Api.Items;
+using Synapse.Api.Teams;
 
 namespace Synapse
 {
@@ -31,6 +32,8 @@ namespace Synapse
         public EventHandler Events { get; } = new EventHandler();
 
         public RoleManager RoleManager { get; } = new RoleManager();
+
+        public TeamManager TeamManager { get; } = new TeamManager();
 
         public ItemManager ItemManager { get; } = new ItemManager();
 
@@ -112,6 +115,46 @@ namespace Synapse
             Configs.Reload();
             PermissionHandler.Reload();
             SynapseController.PluginLoader.ReloadConfigs();
+        }
+        
+        /// <summary>
+        /// Bans a player that is not on the server
+        /// </summary>
+        /// <param name="reason">The reason for the ban</param>
+        /// <param name="issuer">The person/SCP that banned the player</param>
+        /// <param name="id">The person account id (e.g. xxxxxxxxxxx@steam) to ban</param>
+        /// <param name="duration">The duration for the ban  in seconds</param>
+        public void OfflineBanID(string reason, string issuer, string id, int duration)
+        {
+            BanHandler.IssueBan(new BanDetails()
+            {
+                Reason = reason,
+                Issuer = issuer,
+                Id = id,
+                OriginalName = "Unknown - offline ban",
+                IssuanceTime = DateTime.UtcNow.Ticks,
+                Expires = DateTime.UtcNow.AddSeconds(duration).Ticks
+            }, BanHandler.BanType.UserId);
+        }
+
+        /// <summary>
+        /// Bans a IP 
+        /// </summary>
+        /// <param name="reason">The reason for the ban</param>
+        /// <param name="issuer">The person/SCP that banned the player</param>
+        /// <param name="ip">The IPv4 or IPv6 to ban</param>
+        /// <param name="duration">The duration for the ban in seconds</param>
+        public void OfflineBanIP(string reason, string issuer, string ip, int duration)
+        {
+            BanHandler.IssueBan(new BanDetails()
+            {
+                Reason = reason,
+                Issuer = issuer,
+                Id = ip,
+                OriginalName = "Unknown - offline ban",
+                IssuanceTime = DateTime.UtcNow.Ticks,
+                Expires = DateTime.UtcNow.AddSeconds(duration).Ticks
+            }, BanHandler.BanType.IP);
         }
 
         public List<TObject> GetObjectsOf<TObject>() where TObject : UnityEngine.Object => UnityEngine.Object.FindObjectsOfType<TObject>().ToList();
@@ -325,12 +368,21 @@ namespace Synapse
                 else
                     PermissionFile = Path.Combine(ConfigDirectory, "permission.syml");
             }
-            public string GetTranslationFile(PluginInformation infos)
+
+            public string GetOldTranslationFile(PluginInformation infos)
             {
                 if (File.Exists(Path.Combine(SharedConfigDirectory, infos.Name + "-translation.txt")))
                     return Path.Combine(SharedConfigDirectory, infos.Name + "-translation.txt");
 
                 return Path.Combine(ConfigDirectory, infos.Name + "-translation.txt");
+            }
+
+            public string GetTranslationPath(string name)
+            {
+                if (File.Exists(Path.Combine(SharedConfigDirectory, name + "-translation.syml")))
+                    return Path.Combine(SharedConfigDirectory, name + "-translation.syml");
+
+                return Path.Combine(ConfigDirectory, name + "-translation.syml");
             }
 
             public string GetPluginDirectory(PluginInformation infos)

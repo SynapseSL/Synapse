@@ -219,6 +219,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 {
                     if(NetworkServer.active && !lite)
                     {
+                        if (__instance.CurClass == RoleType.Scp0492) player.spawnPosition = player.DeathPosition;
                         player.PlayerMovementSync.OnPlayerClassChange(player.spawnPosition, player.spawnRotation);
                         player.PlayerMovementSync.IsAFK = true;
                         if(escape && CharacterClassManager.KeepItemsAfterEscaping)
@@ -242,6 +243,12 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     if (!__instance.isLocalPlayer)
                         player.MaxHealth = curRole.maxHP;
                 }
+
+                __instance.Scp0492.iAm049_2 = __instance.CurClass == RoleType.Scp0492;
+                __instance.Scp106.iAm106 = __instance.CurClass == RoleType.Scp106;
+                __instance.Scp173.iAm173 = __instance.CurClass == RoleType.Scp173;
+                __instance.Scp939.iAm939 = __instance.CurClass.Is939();
+                __instance.RefreshPlyModel(RoleType.None);
                 return false;
             }
             catch(Exception e)
