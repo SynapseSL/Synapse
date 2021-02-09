@@ -72,6 +72,8 @@ namespace Synapse.Permission
             Groups.Add(groupname,group);
         }
 
+        public Dictionary<string, SynapseGroup> GetAllGroups() => Groups;
+        
         public SynapseGroup GetServerGroup(string groupname) => Groups.FirstOrDefault(x => x.Key.ToLower() == groupname.ToLower()).Value;
 
         public SynapseGroup GetPlayerGroup(Player player)
