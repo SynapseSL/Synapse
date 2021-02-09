@@ -72,7 +72,15 @@ namespace Synapse.Permission
             Groups.Add(groupname,group);
         }
 
-        public Dictionary<string, SynapseGroup> GetAllGroups() => Groups;
+        public Dictionary<string, SynapseGroup> GetAllGroups()
+        {
+            Dictionary<string, SynapseGroup> returnDictionary = new Dictionary<string, SynapseGroup>();
+            foreach (KeyValuePair<string, SynapseGroup> entry in Groups)
+            {
+                returnDictionary[entry.Key] = GetServerGroup(entry.Key);
+            }
+            return returnDictionary;
+        }
         
         public SynapseGroup GetServerGroup(string groupname) => Groups.FirstOrDefault(x => x.Key.ToLower() == groupname.ToLower()).Value;
 
