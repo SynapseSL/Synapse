@@ -67,7 +67,7 @@ namespace Synapse.Api
 
         public void SendConsoleMessage(string message, string color = "red") => ClassManager.TargetConsolePrint(Connection, message, color);
 
-        public void SendRAConsoleMessage(string message, bool success = true, RaCategory type = RaCategory.None) => SynapseExtensions.RaMessage(CommandSender,message, success, type);
+        public void SendRAConsoleMessage(string message, bool success = true, RaCategory type = RaCategory.None) => SynapseExtensions.RaMessage(CommandSender, message, success, type);
 
         public void GiveEffect(Effect effect, byte intensity = 1, float duration = -1f) => PlayerEffectsController.ChangeByString(effect.ToString().ToLower(), intensity, duration);
 
@@ -76,7 +76,7 @@ namespace Synapse.Api
             ServerRoles.RemoteAdmin = true;
             ServerRoles.Permissions = SynapseGroup.GetVanillaPermissionValue() | ServerRoles._globalPerms;
             ServerRoles.RemoteAdminMode = GlobalRemoteAdmin ? ServerRoles.AccessMode.GlobalAccess : ServerRoles.AccessMode.PasswordOverride;
-            if(!ServerRoles.AdminChatPerms)
+            if (!ServerRoles.AdminChatPerms)
                 ServerRoles.AdminChatPerms = SynapseGroup.HasVanillaPermission(PlayerPermissions.AdminChat);
             ServerRoles.TargetOpenRemoteAdmin(Connection, false);
         }
@@ -119,7 +119,7 @@ namespace Synapse.Api
             };
             Connection.Send(msg);
             NetworkWriterPool.Recycle(writer);
-            
+
         }
 
         public void DimScreen()
@@ -181,7 +181,7 @@ namespace Synapse.Api
 
             if (this == Server.Get.Host || HideRank || SynapseGroup.Color.ToUpper() != "RAINBOW") return;
 
-            if(Time.time >= delay)
+            if (Time.time >= delay)
             {
                 delay = Time.time + 1f;
 
@@ -207,12 +207,12 @@ namespace Synapse.Api
 
         public PlayerInventory Inventory { get; }
 
-        public Broadcast SendBroadcast(ushort time,string message,bool instant = false)
+        public Broadcast SendBroadcast(ushort time, string message, bool instant = false)
         {
-            if(this == Server.Get.Host)
+            if (this == Server.Get.Host)
                 Logger.Get.Send($"Broadcast: {message}", ConsoleColor.White);
 
-            var bc = new Broadcast(message, time,this);
+            var bc = new Broadcast(message, time, this);
             ActiveBroadcasts.Add(bc, instant);
             return bc;
         }
@@ -245,7 +245,7 @@ namespace Synapse.Api
             }
             set
             {
-                if(value >= 0 && value <= RoleManager.HighestRole)
+                if (value >= 0 && value <= RoleManager.HighestRole)
                 {
                     CustomRole = null;
                     RoleType = (RoleType)value;
@@ -327,8 +327,8 @@ namespace Synapse.Api
             var flag = ServerRoles.Staff || SynapseGroup.HasVanillaPermission(PlayerPermissions.ViewHiddenBadges);
             var flag2 = ServerRoles.Staff || SynapseGroup.HasVanillaPermission(PlayerPermissions.ViewHiddenGlobalBadges);
 
-            if(flag || flag2)
-                foreach(var player in Server.Get.Players)
+            if (flag || flag2)
+                foreach (var player in Server.Get.Players)
                 {
                     if (!string.IsNullOrEmpty(player.ServerRoles.HiddenBadge) && (!player.ServerRoles.GlobalHidden || flag2) && (player.ServerRoles.GlobalHidden || flag))
                         player.ServerRoles.TargetSetHiddenRole(Connection, player.ServerRoles.HiddenBadge);
@@ -364,10 +364,10 @@ namespace Synapse.Api
         #endregion
 
         #region Default Stuff
-        public string DisplayName 
-        { 
-            get => NicknameSync.DisplayName; 
-            set => NicknameSync.DisplayName = value; 
+        public string DisplayName
+        {
+            get => NicknameSync.DisplayName;
+            set => NicknameSync.DisplayName = value;
         }
 
         public string DisplayInfo
@@ -467,7 +467,7 @@ namespace Synapse.Api
 
                     var method = typeof(NetworkServer).GetMethod("SendSpawnMessage", BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public);
 
-                    foreach(var ply in Server.Get.Players)
+                    foreach (var ply in Server.Get.Players)
                         method.Invoke(null, new object[] { NetworkIdentity, ply.Connection });
                 }
                 catch (Exception e)
@@ -543,10 +543,9 @@ namespace Synapse.Api
 
         public Player Cuffer
         {
-            get => SynapseController.Server.GetPlayer(Handcuffs.CufferId);
+            get => Handcuffs.CufferId == -1 && Hub.handcuffs.NetworkForceCuff ? Server.Get.Host : SynapseController.Server.GetPlayer(Handcuffs.CufferId);
             set
             {
-
                 var handcuff = value.Handcuffs;
 
                 if (handcuff == null) return;
@@ -572,8 +571,8 @@ namespace Synapse.Api
             }
         }
 
-        public uint Ammo5 
-        { 
+        public uint Ammo5
+        {
             get
             {
                 try
@@ -647,10 +646,10 @@ namespace Synapse.Api
             }
         }
 
-        public UserGroup Rank 
-        { 
-            get => ServerRoles.Group; 
-            set => ServerRoles.SetGroup(value, value != null && value.Permissions > 0UL, true); 
+        public UserGroup Rank
+        {
+            get => ServerRoles.Group;
+            set => ServerRoles.SetGroup(value, value != null && value.Permissions > 0UL, true);
         }
 
         public string RankColor
@@ -677,28 +676,28 @@ namespace Synapse.Api
             }
         }
 
-        public ulong Permission 
-        { 
-            get => ServerRoles.Permissions; 
-            set => ServerRoles.Permissions = value; 
+        public ulong Permission
+        {
+            get => ServerRoles.Permissions;
+            set => ServerRoles.Permissions = value;
         }
 
-        public bool IsMuted 
-        { 
-            get => ClassManager.NetworkMuted; 
-            set => ClassManager.NetworkMuted = value; 
+        public bool IsMuted
+        {
+            get => ClassManager.NetworkMuted;
+            set => ClassManager.NetworkMuted = value;
         }
 
         public bool IsIntercomMuted
-        { 
-            get => ClassManager.NetworkIntercomMuted; 
-            set => ClassManager.NetworkIntercomMuted = value; 
+        {
+            get => ClassManager.NetworkIntercomMuted;
+            set => ClassManager.NetworkIntercomMuted = value;
         }
 
-        public string UnitName 
-        { 
-            get => ClassManager.NetworkCurUnitName; 
-            set => ClassManager.NetworkCurUnitName = value; 
+        public string UnitName
+        {
+            get => ClassManager.NetworkCurUnitName;
+            set => ClassManager.NetworkCurUnitName = value;
         }
 
         public CommandSender CommandSender
