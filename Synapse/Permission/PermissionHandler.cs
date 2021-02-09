@@ -141,7 +141,7 @@ namespace Synapse.Permission
 
             group.Members.Add(userid);
             
-            _permissionSYML.Sections[groupname].Import(group);
+            _permissionSYML.Sections.FirstOrDefault(x => x.Key.ToLower() == groupname.ToLower()).Value.Import(group);
             _permissionSYML.Store();
             
             Reload();
