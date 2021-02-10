@@ -77,7 +77,7 @@ namespace Synapse.Permission
             Dictionary<string, SynapseGroup> returnDictionary = new Dictionary<string, SynapseGroup>();
             foreach (KeyValuePair<string, SynapseGroup> entry in Groups)
             {
-                returnDictionary[entry.Key] = GetServerGroup(entry.Key);
+                returnDictionary[entry.Key] = entry.Value;
             }
             return returnDictionary;
         }
