@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using Synapse.Config;
 using System.Collections.Generic;
 using Synapse.Api;
 using System.Linq;
- using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 
- namespace Synapse.Permission
+namespace Synapse.Permission
 {
     public class PermissionHandler
     {
