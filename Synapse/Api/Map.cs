@@ -43,6 +43,8 @@ namespace Synapse.Api
 
         public List<Items.SynapseItem> Items { get; } = new List<Items.SynapseItem>();
 
+        public List<Dummy> Dummies { get; } = new List<Dummy>();
+
         public string IntercomText
         {
             get => Server.Get.Host.GetComponent<Intercom>().CustomContent;

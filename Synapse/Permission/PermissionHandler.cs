@@ -13,7 +13,7 @@ namespace Synapse.Permission
         private SYML _permissionSYML;
 
         internal readonly Dictionary<string, SynapseGroup> groups = new Dictionary<string, SynapseGroup>();
-        internal ServerSection ServerSection;
+        internal ServerSection serverSection;
         
         public Dictionary<string, SynapseGroup> Groups { get => new Dictionary<string, SynapseGroup>(groups); }
 
@@ -26,8 +26,8 @@ namespace Synapse.Permission
         public void Reload()
         {
             _permissionSYML.Load();
-            ServerSection = new ServerSection();
-            ServerSection = _permissionSYML.GetOrSetDefault("Server", ServerSection);
+            serverSection = new ServerSection();
+            serverSection = _permissionSYML.GetOrSetDefault("Server", serverSection);
             groups.Clear();
 
             foreach (var pair in _permissionSYML.Sections)

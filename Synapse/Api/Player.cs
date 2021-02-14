@@ -307,10 +307,10 @@ namespace Synapse.Api
             var globalAccesAllowed = true;
             switch (ServerRoles.GlobalBadgeType)
             {
-                case 1: globalAccesAllowed = Server.Get.PermissionHandler.ServerSection.StaffAccess; break;
-                case 2: globalAccesAllowed = Server.Get.PermissionHandler.ServerSection.ManagerAccess; break;
-                case 3: globalAccesAllowed = Server.Get.PermissionHandler.ServerSection.GlobalBanTeamAccess; break;
-                case 4: globalAccesAllowed = Server.Get.PermissionHandler.ServerSection.GlobalBanTeamAccess; break;
+                case 1: globalAccesAllowed = Server.Get.PermissionHandler.serverSection.StaffAccess; break;
+                case 2: globalAccesAllowed = Server.Get.PermissionHandler.serverSection.ManagerAccess; break;
+                case 3: globalAccesAllowed = Server.Get.PermissionHandler.serverSection.GlobalBanTeamAccess; break;
+                case 4: globalAccesAllowed = Server.Get.PermissionHandler.serverSection.GlobalBanTeamAccess; break;
             }
             if (GlobalPerms != 0 && globalAccesAllowed)
                 group.Permissions |= GlobalPerms;
@@ -361,6 +361,8 @@ namespace Synapse.Api
         public ulong GlobalPerms => ServerRoles._globalPerms;
 
         public bool GlobalRemoteAdmin => ServerRoles.RemoteAdminMode == ServerRoles.AccessMode.GlobalAccess;
+
+        public bool IsDummy { get; internal set; } = false;
         #endregion
 
         #region Default Stuff
