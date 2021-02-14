@@ -69,5 +69,8 @@ namespace Synapse.Api
             Object.Destroy(GameObject);
             Map.Get.Ragdolls.Remove(this);
         }
+        
+        public static Ragdoll CreateRagdoll(RoleType roletype, Vector3 pos, Quaternion rot, Vector3 velocity, PlayerStats.HitInfo info, bool allowRecall, Player owner) 
+            => new Ragdoll(roletype, pos, rot, velocity, info, allowRecall, owner);
     }
 }

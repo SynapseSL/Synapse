@@ -148,7 +148,7 @@ namespace Synapse.Api
         public WorkStation CreateWorkStation(Vector3 position, Vector3 rotation, Vector3 scale) 
             => new WorkStation(position, rotation, scale);
 
-        [Obsolete("Moved to Door.CreateRagdoll()", true)]
+        [Obsolete("Moved to Ragdoll.CreateRagdoll()", true)]
         public Ragdoll CreateRagdoll(RoleType roletype, Vector3 pos, Quaternion rot, Vector3 velocity, PlayerStats.HitInfo info, bool allowRecall, Player owner) 
             => new Ragdoll(roletype, pos, rot, velocity, info, allowRecall, owner);
 
