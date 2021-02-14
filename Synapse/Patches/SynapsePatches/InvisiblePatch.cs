@@ -45,7 +45,7 @@ namespace Synapse.Patches.SynapsePatches
                             if (__instance._transmitBuffer[j].position.y < 800f)
                             {
                                 var newplayer = players[j];
-                                if (newplayer.RealTeam != Team.SCP && newplayer.RealTeam != Team.RIP && !newplayer.GetComponent<Scp939_VisionController>().CanSee(player.ClassManager.Scp939))
+                                if (SynapseExtensions.CanHarmScp(newplayer,false) && newplayer.RealTeam != Team.RIP && !newplayer.GetComponent<Scp939_VisionController>().CanSee(player.ClassManager.Scp939))
                                     __instance._transmitBuffer[j] = new PlayerPositionData(Vector3.up * 6000f, 0f, __instance._transmitBuffer[j].playerID);
                             }
                     }
@@ -107,7 +107,7 @@ namespace Synapse.Patches.SynapsePatches
                                 {
                                     var scp = player.Hub.scpsController.CurrentScp as Scp096;
 
-                                    if (scp != null && scp.Enraged && !scp.HasTarget(newplayer.Hub) && newplayer.RealTeam != Team.SCP)
+                                    if (scp != null && scp.Enraged && !scp.HasTarget(newplayer.Hub) && SynapseExtensions.CanHarmScp(newplayer,false))
                                     {
                                         showinvoid = true;
                                         goto AA_001;

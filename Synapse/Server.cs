@@ -161,7 +161,7 @@ namespace Synapse
 
         public TObject GetObjectOf<TObject>() where TObject : UnityEngine.Object => UnityEngine.Object.FindObjectOfType<TObject>();
 
-        public List<Player> Players => PlayerManager.players.ToList().Select(x => x.GetComponent<Player>()).ToList();
+        public List<Player> Players => PlayerManager.players.Select(x => x.GetComponent<Player>()).Where(x => !x.IsDummy).ToList();
 
         public List<Player> GetPlayers(Func<Player,bool> func) => Players.Where(func).ToList();
 

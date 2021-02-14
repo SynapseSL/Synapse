@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using Synapse.Config;
 using System.Collections.Generic;
 using Synapse.Api;
 using System.Linq;
-
+ 
 namespace Synapse.Permission
 {
     public class PermissionHandler
@@ -12,8 +12,10 @@ namespace Synapse.Permission
 
         private SYML _permissionSYML;
 
-        internal readonly Dictionary<string, SynapseGroup> Groups = new Dictionary<string, SynapseGroup>();
-        internal ServerSection ServerSection;
+        internal readonly Dictionary<string, SynapseGroup> groups = new Dictionary<string, SynapseGroup>();
+        internal ServerSection serverSection;
+        
+        public Dictionary<string, SynapseGroup> Groups { get => new Dictionary<string, SynapseGroup>(groups); }
 
         internal void Init()
         {
@@ -24,9 +26,9 @@ namespace Synapse.Permission
         public void Reload()
         {
             _permissionSYML.Load();
-            ServerSection = new ServerSection();
-            ServerSection = _permissionSYML.GetOrSetDefault("Server", ServerSection);
-            Groups.Clear();
+            serverSection = new ServerSection();
+            serverSection = _permissionSYML.GetOrSetDefault("Server", serverSection);
+            groups.Clear();
 
             foreach (var pair in _permissionSYML.Sections)
                 if (pair.Key.ToLower() != "server")
@@ -34,7 +36,7 @@ namespace Synapse.Permission
                     try
                     {
                         var group = pair.Value.LoadAs<SynapseGroup>();
-                        Groups.Add(pair.Key, group);
+                        groups.Add(pair.Key, group);
                     }
                     catch (Exception e)
                     {
@@ -42,7 +44,7 @@ namespace Synapse.Permission
                     }
                 }
 
-            if (Groups.Count == 0)
+            if (groups.Count == 0)
             {
                 var group = new SynapseGroup()
                 {
@@ -69,14 +71,14 @@ namespace Synapse.Permission
         public void AddServerGroup(SynapseGroup group,string groupname)
         {
             group = _permissionSYML.GetOrSetDefault(groupname, group);
-            Groups.Add(groupname,group);
+            groups.Add(groupname,group);
         }
 
-        public SynapseGroup GetServerGroup(string groupname) => Groups.FirstOrDefault(x => x.Key.ToLower() == groupname.ToLower()).Value;
+        public SynapseGroup GetServerGroup(string groupname) => groups.FirstOrDefault(x => x.Key.ToLower() == groupname.ToLower()).Value;
 
         public SynapseGroup GetPlayerGroup(Player player)
         {
-            var group = Groups.Values.FirstOrDefault(x => x.Members?.Contains(player.UserId) ?? false);
+            var group = groups.Values.FirstOrDefault(x => x.Members?.Contains(player.UserId) ?? false);
 
             if (group != null)
                 return group;
@@ -91,7 +93,7 @@ namespace Synapse.Permission
 
         public SynapseGroup GetPlayerGroup(string UserID)
         {
-            var group = Groups.Values.FirstOrDefault(x => x.Members == null ? false : x.Members.Contains(UserID));
+            var group = groups.Values.FirstOrDefault(x => x.Members == null ? false : x.Members.Contains(UserID));
 
             if (group != null)
                 return group;
@@ -106,7 +108,7 @@ namespace Synapse.Permission
 
         public SynapseGroup GetDefaultGroup()
         {
-            var group = Groups.Values.FirstOrDefault(x => x.Default);
+            var group = groups.Values.FirstOrDefault(x => x.Default);
 
             if (group != null)
                 return group;
@@ -119,7 +121,7 @@ namespace Synapse.Permission
             };
         }
 
-        public SynapseGroup GetNorthwoodGroup() => Groups.Values.FirstOrDefault(x => x.Northwood);
+        public SynapseGroup GetNorthwoodGroup() => groups.Values.FirstOrDefault(x => x.Northwood);
 
         public bool AddPlayerToGroup(string groupname, string userid)
         {
@@ -155,7 +157,7 @@ namespace Synapse.Permission
                 return false;
 
             var safe = false;
-            foreach(var group in Groups.Where(x => x.Value.Members != null && x.Value.Members.Contains(userid)))
+            foreach(var group in groups.Where(x => x.Value.Members != null && x.Value.Members.Contains(userid)))
             {
                 group.Value.Members.Remove(userid);
                 _permissionSYML.Sections[group.Key].Import(group.Value);

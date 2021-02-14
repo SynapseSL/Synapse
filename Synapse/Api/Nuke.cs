@@ -30,7 +30,7 @@ namespace Synapse.Api
 
         public void CancelDetonation() => WarheadController.CancelDetonation();
 
-        public void Detoante() => WarheadController.Detonate();
+        public void Detonate() => WarheadController.Detonate();
 
         public void InstantPrepare() => WarheadController.InstantPrepare();
 
@@ -72,5 +72,8 @@ namespace Synapse.Api
                 set => Panel.NetworkkeycardEntered = value;
             }
         }
+
+        [System.Obsolete("Use Detonate()")]
+        public void Detoante() => WarheadController.Detonate();
     }
 }

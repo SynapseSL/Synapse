@@ -1,6 +1,7 @@
 ﻿using Synapse.Config;
 using UnityEngine;
 using System.Linq;
+using MEC;
 
 namespace Synapse.Api.Events
 {
@@ -20,11 +21,7 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    ev.Player.GiveTextHint("Next spawn in : " + SynapseController.Server.Map.Round.NextRespawn.ToString());
-                    break;
-
-                case KeyCode.Alpha2:
-                    SynapseController.Server.Map.Round.NextRespawn = 20;
+                    var dummy = new Dummy(ev.Player.Position, ev.Player.transform.rotation, ev.Player.RoleType, ev.Player.NickName);
                     break;
             }
         }

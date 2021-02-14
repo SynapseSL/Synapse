@@ -10,6 +10,8 @@ namespace Synapse.Api
         private ItemType helditem;
         public GameObject GameObject { get; internal set; }
 
+        public Player Player { get; internal set; }
+
         /// <summary>
         /// Get / Set the current Role of the Dummy
         /// </summary>
@@ -118,23 +120,24 @@ namespace Synapse.Api
                 Object.Instantiate(
                     NetworkManager.singleton.spawnPrefabs.FirstOrDefault(p => p.gameObject.name == "Player"));
 
-            if (obj.GetComponent<Player>() == null)
-                obj.AddComponent<Player>();
-
             GameObject = obj;
+            Player = GameObject.GetPlayer();
+            Player.IsDummy = true;
 
-            obj.GetComponent<CharacterClassManager>().CurClass = role;
-            obj.GetComponent<NicknameSync>().Network_myNickSync = name;
-            GameObject.GetComponent<ServerRoles>().MyText = badgetext;
-            GameObject.GetComponent<ServerRoles>().MyColor = badgecolor;
-            obj.transform.localScale = Vector3.one;
-            obj.transform.position = pos;
-            obj.transform.rotation = rot;
-            obj.GetComponent<QueryProcessor>().NetworkPlayerId = 9999;
-            obj.GetComponent<QueryProcessor>().PlayerId = 9999;
 
-            NetworkServer.Spawn(obj);
-            ReferenceHub.Hubs.Remove(obj);
+            Player.transform.localScale = Vector3.one;
+            Player.transform.position = pos;
+            Player.transform.rotation = rot;
+            Player.QueryProcessor.NetworkPlayerId = QueryProcessor._idIterator++;
+            Player.QueryProcessor._ipAddress = Server.Get.Host.IpAddress;
+            Player.ClassManager.CurClass = role;
+            Player.Health = Player.ClassManager.Classes.SafeGet((int)Player.RoleType).maxHP;
+            Player.NicknameSync.Network_myNickSync = name;
+            Player.RankName = badgetext;
+            Player.RankColor = badgecolor;
+
+            NetworkServer.Spawn(GameObject);
+            Map.Get.Dummies.Add(this);
         }
 
         public void RotateToPosition(Vector3 pos) => Rotation = Quaternion.LookRotation((pos - Position).normalized);
@@ -142,7 +145,11 @@ namespace Synapse.Api
         /// <summary>
         /// Despawns the Dummy
         /// </summary>
-        public void Despawn() => NetworkServer.UnSpawn(GameObject);
+        public void Despawn()
+        {
+            NetworkServer.UnSpawn(GameObject);
+            Map.Get.Dummies.Remove(this);
+        }
 
         /// <summary>
         /// Spawns the Dummy again after Despawning
@@ -152,7 +159,11 @@ namespace Synapse.Api
         /// <summary>
         /// Destroys the Object
         /// </summary>
-        public void Destroy() => Object.Destroy(GameObject);
+        public void Destroy()
+        {
+            Object.Destroy(GameObject);
+            Map.Get.Dummies.Remove(this);
+        }
 
         public static Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "")
             => new Dummy(pos, rot, role, name, badgetext, badgecolor);
