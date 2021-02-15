@@ -362,11 +362,8 @@ namespace Synapse
                     ConfigFile = Path.Combine(ConfigDirectory, "config.syml");
 
 
-                var sharedpermissionpath = Path.Combine(SharedConfigDirectory, "permission.syml");
-                if (File.Exists(sharedpermissionpath))
-                    PermissionFile = sharedpermissionpath;
-                else
-                    PermissionFile = Path.Combine(ConfigDirectory, "permission.syml");
+                string permissionspath = Path.Combine(ConfigDirectory, "permission.syml");
+                PermissionFile = File.Exists(permissionspath) ? permissionspath : Path.Combine(SharedConfigDirectory, "permission.syml");
             }
 
             public string GetOldTranslationFile(PluginInformation infos)
