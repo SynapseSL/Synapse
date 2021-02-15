@@ -3,7 +3,7 @@ using Synapse.Config;
 using System.Collections.Generic;
 using Synapse.Api;
 using System.Linq;
- 
+
 namespace Synapse.Permission
 {
     public class PermissionHandler
@@ -14,7 +14,7 @@ namespace Synapse.Permission
 
         internal readonly Dictionary<string, SynapseGroup> groups = new Dictionary<string, SynapseGroup>();
         internal ServerSection serverSection;
-        
+
         public Dictionary<string, SynapseGroup> Groups { get => new Dictionary<string, SynapseGroup>(groups); }
 
         internal void Init()
@@ -31,6 +31,7 @@ namespace Synapse.Permission
             groups.Clear();
 
             foreach (var pair in _permissionSYML.Sections)
+            {
                 if (pair.Key.ToLower() != "server")
                 {
                     try
@@ -43,6 +44,7 @@ namespace Synapse.Permission
                         Logger.Get.Error($"Synapse-Permission: Section {pair.Key} in permission.syml is no SynapseGroup or ServerGroup\n{e}");
                     }
                 }
+            }
 
             if (groups.Count == 0)
             {
@@ -61,17 +63,17 @@ namespace Synapse.Permission
 
                 AddServerGroup(group, "Owner");
 
-                AddServerGroup(GetDefaultGroup(),"User");
+                AddServerGroup(GetDefaultGroup(), "User");
             }
 
             foreach (var player in Server.Get.Players)
                 player.RefreshPermission(player.HideRank);
         }
 
-        public void AddServerGroup(SynapseGroup group,string groupname)
+        public void AddServerGroup(SynapseGroup group, string groupname)
         {
             group = _permissionSYML.GetOrSetDefault(groupname, group);
-            groups.Add(groupname,group);
+            groups.Add(groupname, group);
         }
 
         public SynapseGroup GetServerGroup(string groupname) => groups.FirstOrDefault(x => x.Key.ToLower() == groupname.ToLower()).Value;
@@ -142,10 +144,10 @@ namespace Synapse.Permission
                 group.Members = new List<string>();
 
             group.Members.Add(userid);
-            
+
             _permissionSYML.Sections.FirstOrDefault(x => x.Key.ToLower() == groupname.ToLower()).Value.Import(group);
             _permissionSYML.Store();
-            
+
             Reload();
 
             return true;
@@ -157,7 +159,7 @@ namespace Synapse.Permission
                 return false;
 
             var safe = false;
-            foreach(var group in groups.Where(x => x.Value.Members != null && x.Value.Members.Contains(userid)))
+            foreach (var group in groups.Where(x => x.Value.Members != null && x.Value.Members.Contains(userid)))
             {
                 group.Value.Members.Remove(userid);
                 _permissionSYML.Sections[group.Key].Import(group.Value);
