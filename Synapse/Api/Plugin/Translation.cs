@@ -7,6 +7,7 @@ namespace Synapse.Api.Plugin
 {
     public class Translation
     {
+        private static readonly object _fileLock = new object();
         internal Translation(PluginInformation info) => Information = info;
 
         private Dictionary<string, string> _rawtranslation;
@@ -22,7 +23,11 @@ namespace Synapse.Api.Plugin
                 File.Create(Path).Close();
 
             var dictionary = new Dictionary<string, string>();
-            var lines = File.ReadAllLines(Path);
+            string[] lines;
+            lock (_fileLock)
+            {
+                lines = File.ReadAllLines(Path);
+            }
             var newlines = new List<string>();
             var position = 0;
 
@@ -48,7 +53,10 @@ namespace Synapse.Api.Plugin
                 }
 
                 position++;
-                File.WriteAllLines(Path, newlines.ToArray());
+                lock (_fileLock)
+                {
+                    File.WriteAllLines(Path, newlines.ToArray());
+                }
             }
 
             _translation = dictionary;
