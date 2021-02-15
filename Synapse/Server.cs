@@ -355,11 +355,8 @@ namespace Synapse
                 SharedConfigDirectory = Path.Combine(MainConfigDirectory, "server-shared");
 
 
-                var sharedconfigpath = Path.Combine(SharedConfigDirectory, "config.syml");
-                if (File.Exists(sharedconfigpath))
-                    ConfigFile = sharedconfigpath;
-                else
-                    ConfigFile = Path.Combine(ConfigDirectory, "config.syml");
+                var configpath = Path.Combine(ConfigDirectory, "config.syml");
+                ConfigFile = File.Exists(configpath) ? configpath : Path.Combine(SharedConfigDirectory, "config.syml");
 
 
                 var sharedpermissionpath = Path.Combine(SharedConfigDirectory, "permission.syml");
