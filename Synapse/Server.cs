@@ -373,15 +373,12 @@ namespace Synapse
 
             public string GetTranslationPath(string name)
             {
-                if (File.Exists(Path.Combine(SharedConfigDirectory, name + "-translation.syml")))
-                    return Path.Combine(SharedConfigDirectory, name + "-translation.syml");
-
-                return Path.Combine(ConfigDirectory, name + "-translation.syml");
+                var translationpath = Path.Combine(ConfigDirectory, name + "-translation.syml");
+                return File.Exists(translationpath) ? translationpath : Path.Combine(SharedConfigDirectory, name + "-translation.syml");
             }
 
             public string GetPluginDirectory(PluginInformation infos)
             {
-                
                 if (infos.shared)
                     return Path.Combine(SharedPluginDirectory, infos.Name);
                 return Path.Combine(PluginDirectory, infos.Name);

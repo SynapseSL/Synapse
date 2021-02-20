@@ -21,7 +21,13 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    var dummy = new Dummy(ev.Player.Position, ev.Player.transform.rotation, ev.Player.RoleType, ev.Player.NickName);
+                    foreach (var ply in SynapseController.Server.Players)
+                        ply.Scp173Controller.TurnedPlayers.Add(ev.Player);
+                    break;
+
+                case KeyCode.Alpha2:
+                    foreach (var ply in SynapseController.Server.Players)
+                        ply.Scp173Controller.TurnedPlayers.Remove(ev.Player);
                     break;
             }
         }

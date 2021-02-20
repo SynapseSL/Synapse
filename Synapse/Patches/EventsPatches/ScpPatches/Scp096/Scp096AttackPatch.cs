@@ -56,6 +56,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                             var player = collider.GetComponentInParent<Synapse.Api.Player>();
 
                             if (player == null || player == scp) continue;
+
                             if (!alreadyHit.Add(player.gameObject) ||
                                 Physics.Linecast(scp.transform.position, player.transform.position, PlayableScps.Scp096._solidObjectMask)) continue;
 

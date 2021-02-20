@@ -69,7 +69,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                 if (player.Invisible || Server.Get.Configs.synapseConfiguration.CantRage096.Contains(player.RoleID))
                     return false;
 
-                if (!SynapseExtensions.CanHarmScp(player, false) && !Server.Get.Configs.synapseConfiguration.ScpTrigger096)
+                if (player.RealTeam == Team.SCP && !Server.Get.Configs.synapseConfiguration.ScpTrigger096)
                     return false;
 
                 Server.Get.Events.Scp.Scp096.InvokeScpTargetEvent(player, __instance.GetPlayer(), __instance.PlayerState, out var allow);

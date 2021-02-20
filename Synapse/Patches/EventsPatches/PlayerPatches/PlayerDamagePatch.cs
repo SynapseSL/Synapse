@@ -26,7 +26,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 {
 					killer = Server.Get.Players.FirstOrDefault(x => x.Scp106Controller.PocketPlayers.Contains(victim));
 
-					if (SynapseExtensions.CanNotHurtByScp(victim))
+					if (!SynapseExtensions.CanHarmScp(victim, false))
 						return false;
                 }
 
