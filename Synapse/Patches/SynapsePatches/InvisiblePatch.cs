@@ -64,7 +64,7 @@ namespace Synapse.Patches.SynapsePatches
                                     showinvoid = true;
                                     goto AA_001;
                                 }
-                                else if (!SynapseExtensions.CanHarmScp(newplayer, false) && !Server.Get.Configs.synapseConfiguration.ScpTrigger173)
+                                else if ((newplayer.RealTeam == Team.SCP && !Server.Get.Configs.synapseConfiguration.ScpTrigger173) || Server.Get.Configs.synapseConfiguration.CantLookAt173.Contains(newplayer.RoleID) || player.Scp173Controller.TurnedPlayers.Contains(newplayer) || newplayer.Invisible)
                                 {
                                     var posinfo = __instance._transmitBuffer[k];
                                     var rot = Quaternion.LookRotation(newplayer.Position - player.Position).eulerAngles.y;
@@ -175,10 +175,10 @@ namespace Synapse.Patches.SynapsePatches
             var peanut = scp.GetPlayer();
             if (!__result) return;
 
-            if (player.Invisible || (!SynapseExtensions.CanHarmScp(player, false) && !Server.Get.Configs.synapseConfiguration.ScpTrigger173))
+            if (player.Invisible || (player.RealTeam == Team.SCP && !Server.Get.Configs.synapseConfiguration.ScpTrigger173) || Server.Get.Configs.synapseConfiguration.CantLookAt173.Contains(player.RoleID))
                 __result = false;
 
-            if (peanut.RoleType == RoleType.Scp173 && peanut.Scp173Controller.IgnoredPlayers.Contains(player))
+            if (peanut.Scp173Controller.IgnoredPlayers.Contains(player) || player.Scp173Controller.TurnedPlayers.Contains(player))
                 __result = false;
         }
     }

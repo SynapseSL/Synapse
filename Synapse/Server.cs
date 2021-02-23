@@ -355,18 +355,12 @@ namespace Synapse
                 SharedConfigDirectory = Path.Combine(MainConfigDirectory, "server-shared");
 
 
-                var sharedconfigpath = Path.Combine(SharedConfigDirectory, "config.syml");
-                if (File.Exists(sharedconfigpath))
-                    ConfigFile = sharedconfigpath;
-                else
-                    ConfigFile = Path.Combine(ConfigDirectory, "config.syml");
+                var configpath = Path.Combine(ConfigDirectory, "config.syml");
+                ConfigFile = File.Exists(configpath) ? configpath : Path.Combine(SharedConfigDirectory, "config.syml");
 
 
-                var sharedpermissionpath = Path.Combine(SharedConfigDirectory, "permission.syml");
-                if (File.Exists(sharedpermissionpath))
-                    PermissionFile = sharedpermissionpath;
-                else
-                    PermissionFile = Path.Combine(ConfigDirectory, "permission.syml");
+                string permissionspath = Path.Combine(ConfigDirectory, "permission.syml");
+                PermissionFile = File.Exists(permissionspath) ? permissionspath : Path.Combine(SharedConfigDirectory, "permission.syml");
             }
 
             public string GetOldTranslationFile(PluginInformation infos)
@@ -379,15 +373,12 @@ namespace Synapse
 
             public string GetTranslationPath(string name)
             {
-                if (File.Exists(Path.Combine(SharedConfigDirectory, name + "-translation.syml")))
-                    return Path.Combine(SharedConfigDirectory, name + "-translation.syml");
-
-                return Path.Combine(ConfigDirectory, name + "-translation.syml");
+                var translationpath = Path.Combine(ConfigDirectory, name + "-translation.syml");
+                return File.Exists(translationpath) ? translationpath : Path.Combine(SharedConfigDirectory, name + "-translation.syml");
             }
 
             public string GetPluginDirectory(PluginInformation infos)
             {
-                
                 if (infos.shared)
                     return Path.Combine(SharedPluginDirectory, infos.Name);
                 return Path.Combine(PluginDirectory, infos.Name);

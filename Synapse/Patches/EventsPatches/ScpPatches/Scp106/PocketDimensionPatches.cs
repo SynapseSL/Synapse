@@ -113,7 +113,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                 var pos = __instance.tpPositions[UnityEngine.Random.Range(0, __instance.tpPositions.Count)];
                 pos.y += 2f;
 
-                if (SynapseExtensions.CanNotHurtByScp(player) || player.Team == Team.SCP)
+                if (!SynapseExtensions.CanHarmScp(player, false) || player.Team == Team.SCP)
                     type = PocketDimensionTeleport.PDTeleportType.Exit;
 
                 EventHandler.Get.Scp.Scp106.InvokePocketDimensionLeaveEvent(player, ref pos, ref type, out var allow);

@@ -3,9 +3,9 @@
 namespace Synapse.Command.Commands
 {
     [CommandInformation(
-        Name = "respawn",
+        Name = "Respawn",
         Aliases = new string[] { "spawn" },
-        Description = "spawns a specific tea,",
+        Description = "spawns a specific team,",
         Usage = "respawn teamid size",
         Permission = "synapse.command.respawn",
         Platforms = new[] { Platform.ClientConsole, Platform.RemoteAdmin, Platform.ServerConsole }

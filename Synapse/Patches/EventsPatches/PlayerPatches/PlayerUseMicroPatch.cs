@@ -76,7 +76,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                                 break;
                         }
                         var allow = true;
-                        SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(player, item, itemstate, ref allow);
+                        if (item != null)
+                            SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(player, item, itemstate, ref allow);
                         if (!allow) state = MicroHID.MicroHidState.Idle;
                     }
 

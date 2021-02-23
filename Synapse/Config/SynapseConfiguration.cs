@@ -56,6 +56,12 @@ namespace Synapse.Config
             (int)RoleType.Tutorial
         };
 
+        [Description("All roles that can look at 173 without stopping him")]
+        public List<int> CantLookAt173 = new List<int>
+        {
+            (int)RoleType.Tutorial
+        };
+
         [Description("The default Language that is used for translations")]
         public string Language = "ENGLISH";
     }

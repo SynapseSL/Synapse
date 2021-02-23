@@ -13,6 +13,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             try
             {
                 var player = conn.identity.GetPlayer();
+                if (player == null) return;
+
                 if (player.CustomRole != null)
                     player.CustomRole = null;
                 SynapseController.Server.Events.Player.InvokePlayerLeaveEvent(player);
