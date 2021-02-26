@@ -79,4 +79,30 @@ namespace Synapse.Config
 
         public Synapse.Api.Items.SynapseItem Parse() => new Api.Items.SynapseItem(ID, Durabillity, Sight, Barrel, Other) { Scale = new Vector3(XSize,YSize,ZSize)};
     }
+
+    [Serializable]
+    public class SerializedVector3
+    {
+        public SerializedVector3(Vector3 vector)
+        {
+            X = vector.x;
+            Y = vector.y;
+            Z = vector.z;
+        }
+
+        public SerializedVector3(float x, float y, float z)
+        {
+            X = x;
+            Y = y;
+            Z = z;
+        }
+
+        public SerializedVector3() { }
+
+        public Vector3 Parse() => new Vector3(X, Y, Z);
+
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Z { get; set; }
+    }
 }
