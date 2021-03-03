@@ -43,8 +43,12 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 						info.Amount = ((referenceHub.playerStats != null) ? Mathf.Abs(referenceHub.playerStats.Health + referenceHub.playerStats.syncArtificialHealth + 10f) : Mathf.Abs(999999f));
 				}
 
-				if (__instance._burned.Enabled)
-					info.Amount *= __instance._burned.DamageMult;
+				if(referenceHub != null)
+                {
+					var effect = referenceHub.playerEffectsController.GetEffect<CustomPlayerEffects.Burned>();
+					if (effect != null && effect.Enabled)
+						info.Amount *= effect.DamageMult;
+                }
 
 				if (info.Amount > 2.14748365E+09f)
 					info.Amount = 2.14748365E+09f;
