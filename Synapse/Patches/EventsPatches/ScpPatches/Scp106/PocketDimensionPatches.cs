@@ -18,19 +18,37 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                 if (!__instance._iawRateLimit.CanExecute(true) || ply == null) return false;
                 var scp = __instance.GetPlayer();
                 var player = ply.GetPlayer();
-                if (player == null || player.GodMode || !ServerTime.CheckSynchronization(t) || !__instance.iAm106 || Vector3.Distance(scp.Position,player.Position) >= 3f) 
+                if (player == null || player.GodMode || !ServerTime.CheckSynchronization(t) || !__instance.iAm106) 
                     return false;
 
                 if (!scp.WeaponManager.GetShootPermission(player.ClassManager))
                     return false;
 
+                var pos = player.Position;
+                var num = Vector3.Distance(scp.Position, pos);
+                var num2 = Math.Abs(scp.Position.y - pos.y);
+                if ((num >= 1.818f && num2 < 1.02f) || (num >= 2.1f && num2 < 1.95f) || (num >= 2.65f && num2 < 2.2f) || (num >= 3.2f && num2 < 3f) || num >= 3.64f)
+                {
+                    __instance._hub.characterClassManager.TargetConsolePrint(scp.Connection, string.Format("106 MovePlayer command rejected - too big distance (code: T1). Distance: {0}, Y Diff: {1}.", num, num2), "gray");
+                    return false;
+                }
+                if (Physics.Linecast(scp.Position, ply.transform.position, scp.WeaponManager.raycastServerMask))
+                {
+                    __instance._hub.characterClassManager.TargetConsolePrint(scp.Connection, string.Format("106 MovePlayer command rejected - collider found between you and the target (code: T2). Distance: {0}, Y Diff: {1}.", num, num2), "gray");
+                    return false;
+                }
+
                 EventHandler.Get.Scp.InvokeScpAttack(scp, player, Api.Enum.ScpAttackType.Scp106_Grab, out var allow);
                 if (!allow) return false;
 
                 scp.ClassManager.RpcPlaceBlood(player.Position, 1, 2f);
-                __instance.TargetHitMarker(scp.Connection);
+                __instance.TargetHitMarker(scp.Connection, __instance.captureCooldown);
+                __instance._currentServerCooldown = __instance.captureCooldown;
                 if (Scp106PlayerScript._blastDoor.isClosed)
+                {
+                    __instance._hub.characterClassManager.RpcPlaceBlood(player.Position, 1, 2f);
                     player.Hurt(500, DamageTypes.Scp106, scp);
+                }
                 else
                 {
                     player.Hurt(40, DamageTypes.Scp106, scp);

@@ -75,6 +75,8 @@ namespace Synapse.Permission
 
         public ulong GetVanillaPermissionValue()
         {
+            if (Permissions == null) return 0;
+
             if (Permissions.Any(x => x == "*" || x == ".*" || x == "*.*" || x == $"{VanillaPrefix}.*"))
                 return FullVanillaPerms();
 

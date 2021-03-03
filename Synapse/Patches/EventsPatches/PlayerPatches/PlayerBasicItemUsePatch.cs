@@ -54,7 +54,6 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             var usableitem = consumable.usableItems[mid];
 
             //Start Animation
-            consumable.healInProgress = true;
             consumable.SendRpc(ConsumableAndWearableItems.HealAnimation.StartHealing, mid);
 
             //Wait for Animation
@@ -108,8 +107,6 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             //Scp500
             if (usableitem.inventoryID == ItemType.SCP500)
                 player.PlayerEffectsController.UseMedicalItem(usableitem.inventoryID);
-            
-            consumable.healInProgress = false;
 
             //Destroy Item if it is one time use
             if (usableitem.inventoryID != ItemType.SCP268)
