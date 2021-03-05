@@ -3,7 +3,7 @@
 namespace Synapse.Network
 {
     [Serializable]
-    public class NetworkAck
+    public class NetworkAuthAck : SuccessfulStatus
     {
         public string PublicKey { get; set; }
         public string ClientIdentifier { get; set; }

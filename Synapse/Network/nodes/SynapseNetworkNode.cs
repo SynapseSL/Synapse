@@ -6,8 +6,9 @@ namespace Synapse.Network.nodes
     {
         public void RegisterWebserverWith(WebServer server)
         {
-            server.WithWebApi("/synapse", x =>
-                x.RegisterController<SynapseAuthController>());
+            server.WithWebApi("/synapse", x => x.RegisterController<SynapseSynapseRouteController>());
+            server.WithWebApi("/networksync", x => x.RegisterController<SynapseNetworkSyncController>());
+
         }
 
         public void Reconfigure(InstanceAuthority authority)

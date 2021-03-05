@@ -3,7 +3,7 @@
 namespace Synapse.Network
 {
     [Serializable]
-    public class NetworkResAuth
+    public class NetworkAuthResAuth : SuccessfulStatus
     {
         public string SessionToken { get; set; }
     }

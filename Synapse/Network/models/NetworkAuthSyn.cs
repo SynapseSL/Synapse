@@ -3,7 +3,7 @@
 namespace Synapse.Network
 {
     [Serializable]
-    public class NetworkSyn
+    public class NetworkAuthSyn
     {
         public string ClientName { get; set; }
         public string PublicKey { get; set; }

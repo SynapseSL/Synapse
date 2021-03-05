@@ -5,7 +5,7 @@ using Swan;
 namespace Synapse.Network
 {
     [Serializable]
-    public class KeyExchange
+    public class NetworkAuthKeyExchange : SuccessfulStatus
     {
         public string Key { get; set; }
 

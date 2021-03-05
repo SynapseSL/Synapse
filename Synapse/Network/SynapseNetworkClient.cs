@@ -41,6 +41,26 @@ namespace Synapse.Network
             CipherKey = TokenFactory.Instance.GenerateShortToken();
             PublicKey = PrivateKey.ToXmlString(false);
         }
+
+        [ItemCanBeNull]
+        public async Task<TR> RequestNetworkVar<TR>(string key)
+        {
+            var entry = await Server.Get.NetworkManager.Client.Get<NetworkSyncEntry>($"/networksync?key={key}");
+            if (entry != null) return entry.Value<TR>();
+            return (TR) await Task.FromResult<object>(null);
+        }
+        
+        public async Task<bool> SetNetworkVar<TR>(string key, TR value)
+        {
+            var result = await Server.Get.NetworkManager.Client.Post<StatusMessage, NetworkSyncEntry>($"/networksync?key={key}", NetworkSyncEntry.FromPair(key,value));
+            return result?.Successful ?? false;
+        }
+        
+        public async Task<List<NetworkSyncEntry>> RequestAllNetworkVars()
+        {
+            var entry = await Server.Get.NetworkManager.Client.Get<List<NetworkSyncEntry>>($"/networksync");
+            return entry ?? new List<NetworkSyncEntry>();
+        }
         
         [ItemCanBeNull]
         public async Task<TR> Get<TR>(string path, bool authenticated = true, Action<Exception> exceptionHandler = null)
@@ -70,6 +90,9 @@ namespace Synapse.Network
                 if (authenticated) message.Headers.Authorization = new AuthenticationHeaderValue("Bearer",SessionToken);
                 var result = await Client.SendAsync(message);
                 var content = await result.Content.ReadAsStringAsync();
+#if DEBUG
+                Server.Get.Logger.Info($">>> {message.RequestUri}\n{content}");
+#endif
                 return content;
             }
             catch (Exception e)
@@ -91,9 +114,17 @@ namespace Synapse.Network
                 message.RequestUri = new Uri(Url + path);
                 message.Method = HttpMethod.Post;
                 message.Content = new StringContent(data);
+                
+#if DEBUG
+                Server.Get.Logger.Info($"<<< {data}");
+#endif
+                
                 if (authenticated) message.Headers.Authorization = new AuthenticationHeaderValue("Bearer",SessionToken);
                 var result = await Client.SendAsync(message);
                 var content = await result.Content.ReadAsStringAsync();
+#if DEBUG
+                Server.Get.Logger.Info($">>> {content}");
+#endif
                 return content;
             }
             catch (Exception e)
@@ -126,7 +157,7 @@ namespace Synapse.Network
             {
                 var result = await Get<Dictionary<string,object>>("/synapse/ping", exceptionHandler: x => {});
 #if DEBUG
-                Server.Get.Logger.Info($"Ping Result: {result?.Humanize().Insert(0, "\n")??"connection reset"}");
+                //Server.Get.Logger.Info($"Ping Result: {result?.Humanize().Insert(0, "\n")??"connection reset"}");
 #endif
                 return result != null;
             }
@@ -172,7 +203,7 @@ namespace Synapse.Network
 
         private async Task KeyExchange()
         {
-            var obj = new KeyExchange
+            var obj = new NetworkAuthKeyExchange
             {
                 Key = CipherKey
             };
@@ -180,22 +211,22 @@ namespace Synapse.Network
             var reqContent = Json.Serialize(obj);
             var req = await Client.PostAsync($"/synapse/client/{ClientIdentifier}/key", new StringContent(reqContent));
             var content = await req.Content.ReadAsStringAsync();
-            var serverKey = Json.Deserialize<KeyExchange>(content);
+            var serverKey = Json.Deserialize<NetworkAuthKeyExchange>(content);
             serverKey.DecodeWithPrivate(PrivateKey);
             ServerCipherKey = serverKey.Key;
         }
 
         private async Task SyncMaster()
         {
-            var obj = new NetworkSyn
+            var obj = new NetworkAuthSyn
             {
                 ClientName = ClientName,
                 PublicKey = PublicKey
             };
             var reqContent = Json.Serialize(obj);
-            var req = await Client.PostAsync("/synapse/sync", new StringContent(reqContent));
+            var req = await Client.PostAsync("/synapse/handshake", new StringContent(reqContent));
             var content = await req.Content.ReadAsStringAsync();
-            var ack = Json.Deserialize<NetworkAck>(content);
+            var ack = Json.Deserialize<NetworkAuthAck>(content);
             ServerPublicKey = RSA.Create();
             ServerPublicKey.FromXmlString(ack.PublicKey);
             MigrationPriority = ack.MigrationPriority;
@@ -204,7 +235,7 @@ namespace Synapse.Network
 
         private async Task AuthMaster()
         {
-            var payload = Json.Serialize(new NetworkReqAuth
+            var payload = Json.Serialize(new NetworkAuthReqAuth
             {
                 Secret = Secret,
                 ClientIdentifier = ClientIdentifier
@@ -214,7 +245,7 @@ namespace Synapse.Network
             var content = await req.Content.ReadAsStringAsync();
             content = content.Replace("\"", ""); //For any reason, this payload always is in " ".
             content = AESUtils.Decrypt(content, CipherKey);
-            var res = Json.Deserialize<NetworkResAuth>(content);
+            var res = Json.Deserialize<NetworkAuthResAuth>(content);
             SessionToken = res.SessionToken;
         }
         

@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using Mirror;
 using Swan;
+using Swan.Formatters;
 using Synapse.Network.nodes;
 using UnityEngine;
 
@@ -104,6 +107,99 @@ namespace Synapse.Network
             }
             Server.Start();
             Synapse.Server.Get.Logger.Info($"Synapse-Network Server running on port {synapseConfig.NetworkPort}");
+        }
+    }
+
+    [Serializable]
+    public class NetworkSyncEntry : SuccessfulStatus
+    {
+        public string Key { get; set; }
+        public string Class { get; set; }
+        public string Data { get; set; }
+
+        [JsonProperty("_", true)]
+        public Type ParseTypeData => Type.GetType(Class);
+
+        [JsonProperty("__", true)]
+        public bool IsCoreType => ParseTypeData?.AssemblyQualifiedName?.Contains("mscorlib") ?? true;
+        
+        public static bool CheckIsCoreType(Type type) => type?.AssemblyQualifiedName?.Contains("mscorlib") ?? true;
+        
+        private object _valStore;
+        
+        public T Value<T>()
+        {
+            if (_valStore != null) return (T) _valStore;
+            var val = Parse();
+            _valStore = val;
+            return (T) val;
+        }
+
+        public void Update<T>(T obj)
+        {
+            _valStore = null;
+            Data = Serialize(obj);
+            Class = obj.GetType().AssemblyQualifiedName;
+        }
+        
+        public static NetworkSyncEntry FromPair<T>(string key, T value)
+        {
+            var type = value.GetType();
+            return new NetworkSyncEntry
+            {
+                Key = key,
+                Data = Serialize(value),
+                Class = type.AssemblyQualifiedName.Contains("mscorlib") ? type.Name : type.AssemblyQualifiedName
+            };
+        }
+
+        public object Parse()
+        {
+            var t = ParseTypeData;
+            if (IsCoreType)
+            {
+                if (t == typeof(string)) return Data;
+                if (t == typeof(int)) return int.Parse(Data);
+                if (t == typeof(float)) return float.Parse(Data);
+                if (t == typeof(bool)) return bool.Parse(Data);
+                if (t == typeof(long)) return long.Parse(Data);
+                if (t == typeof(double)) return double.Parse(Data);
+                if (t == typeof(short)) return short.Parse(Data);
+                if (t == typeof(byte)) return byte.Parse(Data);
+            }
+            
+            return Json.Deserialize(Data, t);
+        }
+        
+        public static string Serialize(object obj)
+        {
+            var t = obj.GetType();
+            if (CheckIsCoreType(t))
+            {
+                #if DEBUG
+                Server.Get.Logger.Info("Primitive DataType Serialization");
+                #endif
+                return obj.ToString();
+            }
+            return Json.Serialize(obj);
+        }
+
+        protected bool Equals(NetworkSyncEntry other)
+        {
+            return Key == other.Key;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((NetworkSyncEntry) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return (Key != null ? Key.GetHashCode() : 0);
         }
     }
 }

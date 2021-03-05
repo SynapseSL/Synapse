@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -14,6 +15,7 @@ using EmbedIO.WebSockets;
 using JetBrains.Annotations;
 using MEC;
 using Mirror;
+using Swan;
 using Swan.Logging;
 using Swan.Validators;
 using UnityEngine;
@@ -36,7 +38,8 @@ namespace Synapse.Network
         
         public readonly string PublicKey;
         public readonly RSA PrivateKey;
-        public readonly List<ClientData> ClientData = new List<ClientData>();
+        public readonly List<ClientData> ClientData = new List<ClientData>();       
+        public readonly HashSet<NetworkSyncEntry> NetworkSyncEntries = new HashSet<NetworkSyncEntry>();
 
         public WebServerState Status => Server?.State ?? WebServerState.Stopped;
 
@@ -45,6 +48,9 @@ namespace Synapse.Network
             _instance = this;
             PrivateKey = RSA.Create();
             PublicKey = PrivateKey.ToXmlString(false);
+            NetworkSyncEntries.Add(NetworkSyncEntry.FromPair("example", "Some string value"));
+            NetworkSyncEntries.Add(NetworkSyncEntry.FromPair("example2", 6969));
+            Synapse.Server.Get.Logger.Info("\n" + NetworkSyncEntries.Humanize());
         }
         
         public ClientData DataById(string uid)
@@ -70,6 +76,12 @@ namespace Synapse.Network
                 {
                     x.RegisterWebserverWith(Server);
                 });
+                #if DEBUG
+                foreach (var module in Server.Modules)
+                {
+                    Synapse.Server.Get.Logger.Info($"HTTP-Server Module with BaseRoute {module.BaseRoute} hooked");
+                }
+                #endif
                 Synapse.Server.Get.Logger.Info("Executing WebServer");
                 Server.RunAsync();
             }
@@ -82,7 +94,8 @@ namespace Synapse.Network
         public void Stop()
         {
             Server?.Dispose();
-            ClientData.Clear();
+            ClientData.Clear();          
+            NetworkSyncEntries.Clear();
         }
         
             
@@ -95,9 +108,9 @@ namespace Synapse.Network
                 // First, we will configure our web server by adding Modules.
                 .WithLocalSessionManager()
                 .WithWebApi("/synapse", m => m
-                    .WithController<SynapseAuthController>()
-                )
-                .WithModule(new ActionModule("/", HttpVerbs.Any, ctx => ctx.SendDataAsync(new { Message = "Error" })));
+                    .WithController<SynapseSynapseRouteController>()
+                );
+            // .WithModule(new ActionModule("/", HttpVerbs.Any, ctx => ctx.SendDataAsync(new { Message = "Error" })));
             
             
             // Listen for state changes.
@@ -127,11 +140,77 @@ namespace Synapse.Network
             }
         }
     }
-
-
+    
     public enum InstanceAuthority
     {
         Master,
         Client
+    }
+
+    public class PingResponse : SuccessfulStatus
+    {
+        public bool Authenticated { get; set; }
+    }
+    
+    public class StatusMessage
+    {
+        public static StatusMessage Success = new SuccessfulStatus(); 
+        public static StatusMessage Unauthorized = new UnauthorizedStatus();
+        public static StatusMessage NotFound = new NotFoundStatus();
+            
+        public bool Successful { get; set; }
+        public string Message { get; set; }
+    }
+
+    public class StatusListWrapper<T> : SuccessfulStatus, IEnumerable<T>
+    {
+        public StatusListWrapper(IEnumerable<T> enumerable)
+        {
+            Enumerable = enumerable;
+        }
+
+        private IEnumerable<T> Enumerable { get; set; }
+        
+        public IEnumerator<T> GetEnumerator()
+        {
+            return Enumerable.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return Enumerable.GetEnumerator();
+        }
+    }
+    
+    public class SuccessfulStatus : StatusMessage
+    {
+        public SuccessfulStatus()
+        {
+            Successful = true;
+            Message = "Ok";
+        }
+    }
+    
+    public class ErrorStatus : StatusMessage
+    {
+        public ErrorStatus(string message)
+        {
+            Successful = false;
+            Message = message;
+        }
+    }
+
+    public class UnauthorizedStatus : ErrorStatus
+    {
+        public UnauthorizedStatus() : base("Unauthorized")
+        {
+        }
+    }
+    
+    public class NotFoundStatus : ErrorStatus
+    {
+        public NotFoundStatus() : base("Not found")
+        {
+        }
     }
 }
