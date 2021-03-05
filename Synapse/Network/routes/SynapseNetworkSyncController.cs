@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -12,7 +11,7 @@ namespace Synapse.Network
     public class SynapseNetworkSyncController : WebApiController
     {
         [Route(HttpVerbs.Get, "/")]
-        public StatusMessage Get([QueryField("key")] string key)
+        public StatusedResponse Get([QueryField("key")] string key)
         {
             if (key == null)
             {
@@ -24,7 +23,7 @@ namespace Synapse.Network
                 }
                 catch (InvalidOperationException e)
                 {
-                    return StatusMessage.NotFound;
+                    return StatusedResponse.NotFound;
                 }
             }
             
@@ -36,17 +35,17 @@ namespace Synapse.Network
             }
             catch (InvalidOperationException e)
             {
-                return null;
+                return StatusedResponse.NotFound;
             }
         }
         
         [Route(HttpVerbs.Post, "/")]
-        public async Task<StatusMessage> Set([QueryField("key")] string key)
+        public async Task<StatusedResponse> Set([QueryField("key")] string key)
         {
             try
             {
                 var clientData = this.GetClientData();
-                if (clientData == null) return StatusMessage.Unauthorized;
+                if (clientData == null) return StatusedResponse.Unauthorized;
                 var syncVar = await HttpContext.GetRequestDataAsync<NetworkSyncEntry>();
                 syncVar.Key = key;
                 var syncEntries = SynapseNetworkServer.Instance.NetworkSyncEntries;
@@ -55,7 +54,7 @@ namespace Synapse.Network
                     syncEntries.Remove(syncVar);
                     if (syncVar.Data.Trim() != "") syncEntries.Add(syncVar);
                 } 
-                return StatusMessage.Success;
+                return StatusedResponse.Success;
             }
             catch (Exception e)
             {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -13,7 +12,7 @@ namespace Synapse.Network
     public class SynapseSynapseRouteController : WebApiController
     {
         [Route(HttpVerbs.Get, "/ping")]
-        public StatusMessage Ping()
+        public StatusedResponse Ping()
         {
             var clientData = this.GetClientData();
             return new PingResponse()
@@ -24,7 +23,7 @@ namespace Synapse.Network
 
 
         [Route(HttpVerbs.Post, "/handshake")]
-        public async Task<StatusMessage> Handshake()
+        public async Task<StatusedResponse> Handshake()
         {
             var networkSyn = await HttpContext.GetRequestDataAsync<NetworkAuthSyn>();
             Server.Get.Logger.Info($"Synapse-Network Handshake-Request from {networkSyn.ClientName}@{HttpContext.RemoteEndPoint}'");
@@ -49,7 +48,7 @@ namespace Synapse.Network
         }
 
         [Route(HttpVerbs.Post, "/client/{id}/key")]
-        public async Task<StatusMessage> ExchangeKeys(string id)
+        public async Task<StatusedResponse> ExchangeKeys(string id)
         {
             var data = SynapseNetworkServer.Instance.DataById(id);
             data.ValidateEndpoint(this);

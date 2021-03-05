@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using HarmonyLib;
+﻿using System.Linq;
 using Swan;
 using Synapse.Network;
 
@@ -24,7 +20,7 @@ namespace Synapse.Command.Commands
 
             if (context.Arguments.Count == 0)
             {
-                var awaiter = Server.Get.NetworkManager.Client.Get<List<NetworkSyncEntry>>($"/networksync").GetAwaiter();
+                var awaiter =    Server.Get.NetworkManager.Client.RequestAllNetworkVars().GetAwaiter();
                 awaiter.OnCompleted(() =>
                 {
                     var entry = awaiter.GetResult();
@@ -46,18 +42,19 @@ namespace Synapse.Command.Commands
             } else if (context.Arguments.Count >= 3)
             {
                 var data = string.Join(" ", context.Arguments.Where((x, i) => i >= 2));
-                var awaiter = Server.Get.NetworkManager.Client.Post<StatusMessage, NetworkSyncEntry>(
-                    $"/networksync?key={context.Arguments.At(0)}",
-                    new NetworkSyncEntry
+                var entry = new NetworkSyncEntry
                 {
                     Key = context.Arguments.At(0),
                     Class = context.Arguments.At(1),
                     Data = data
-                }).GetAwaiter(); 
+                };
+                Server.Get.Logger.Info(entry.Humanize());
+
+                var awaiter = Server.Get.NetworkManager.Client.Post<StatusedResponse,NetworkSyncEntry>($"/networksync?key={entry.Key}", entry).GetAwaiter(); 
                 awaiter.OnCompleted(() =>
                 {
-                    var entry = awaiter.GetResult();
-                    Server.Get.Logger.Info($"\n{entry.Humanize()}");
+                    var r = awaiter.GetResult();
+                    Server.Get.Logger.Info($"\n{r.Humanize()}");
                 });
                 result.Message = $"Sending Set-Request with data {data}";
                 result.State = CommandResultState.Ok;

@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.ComTypes;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
-using Mirror;
-using Swan;
 using Swan.Formatters;
 using Synapse.Network.nodes;
-using UnityEngine;
 
 namespace Synapse.Network
 {
@@ -60,6 +54,8 @@ namespace Synapse.Network
                     if (!availability)
                     {
 
+                        Synapse.Server.Get.Logger.Warn("Master-Ping failed");
+                        
                         if (Synapse.Server.Get.Configs.synapseConfiguration.MasterAuthority)
                         {
                             BoostrapServer();
@@ -134,6 +130,14 @@ namespace Synapse.Network
             _valStore = val;
             return (T) val;
         }
+        
+        public object Value()
+        {
+            if (_valStore != null) return _valStore;
+            var val = Parse();
+            _valStore = val;
+            return val;
+        }
 
         public void Update<T>(T obj)
         {
@@ -157,7 +161,10 @@ namespace Synapse.Network
         {
             var t = ParseTypeData;
             if (IsCoreType)
-            {
+            {         
+#if DEBUG
+                Server.Get.Logger.Info("Primitive DataType Deserialization");
+#endif
                 if (t == typeof(string)) return Data;
                 if (t == typeof(int)) return int.Parse(Data);
                 if (t == typeof(float)) return float.Parse(Data);
@@ -176,9 +183,9 @@ namespace Synapse.Network
             var t = obj.GetType();
             if (CheckIsCoreType(t))
             {
-                #if DEBUG
+#if DEBUG
                 Server.Get.Logger.Info("Primitive DataType Serialization");
-                #endif
+#endif
                 return obj.ToString();
             }
             return Json.Serialize(obj);

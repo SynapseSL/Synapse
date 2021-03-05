@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using EmbedIO;
 using JetBrains.Annotations;
-using Mirror;
-using Swan;
 using Swan.Formatters;
 
 namespace Synapse.Network
@@ -45,14 +40,22 @@ namespace Synapse.Network
         [ItemCanBeNull]
         public async Task<TR> RequestNetworkVar<TR>(string key)
         {
-            var entry = await Server.Get.NetworkManager.Client.Get<NetworkSyncEntry>($"/networksync?key={key}");
-            if (entry != null) return entry.Value<TR>();
+            var hasException = false;
+            var entry = await Server.Get.NetworkManager.Client.Get<NetworkSyncEntry>($"/networksync?key={key}", exceptionHandler: x =>
+            {
+                hasException = true;
+                hasException = true;
+#if DEBUG
+                Server.Get.Logger.Info(x);
+#endif
+            });
+            if (entry != null && !hasException) return entry.Value<TR>();
             return (TR) await Task.FromResult<object>(null);
         }
         
         public async Task<bool> SetNetworkVar<TR>(string key, TR value)
         {
-            var result = await Server.Get.NetworkManager.Client.Post<StatusMessage, NetworkSyncEntry>($"/networksync?key={key}", NetworkSyncEntry.FromPair(key,value));
+            var result = await Server.Get.NetworkManager.Client.Post<StatusedResponse, NetworkSyncEntry>($"/networksync?key={key}", NetworkSyncEntry.FromPair(key,value));
             return result?.Successful ?? false;
         }
         
@@ -69,6 +72,16 @@ namespace Synapse.Network
             try
             {
                 var content = await GetString(path, authenticated, exc);
+                try
+                {
+                    var status = Json.Deserialize<StatusedResponse>(content);
+                    if (!status.Successful)
+                    {
+                        exc(new Exception($"Request failed: {status.Message}"));
+                        return (TR) await Task.FromResult<object>(null);
+                    }
+                } catch (Exception ignored) {}
+                
                 return Json.Deserialize<TR>(content);
             }
             catch (Exception e)
@@ -142,6 +155,15 @@ namespace Synapse.Network
             try
             {
                 var content = await PostString(path, body, authenticated, encodeBody, exc);
+                try
+                {
+                    var status = Json.Deserialize<StatusedResponse>(content);
+                    if (!status.Successful)
+                    {
+                        exc(new Exception($"Request failed: {status.Message}"));
+                        return (TR) await Task.FromResult<object>(null);
+                    }
+                } catch (Exception ignored) {}
                 return Json.Deserialize<TR>(content);
             }
             catch (Exception e)

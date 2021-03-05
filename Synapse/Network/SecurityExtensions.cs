@@ -1,13 +1,9 @@
 ﻿using System.Net;
-using System.Security.Permissions;
 using System.Text;
-using System.Threading;
 using EmbedIO;
-using EmbedIO.Utilities;
 using EmbedIO.WebApi;
 using JetBrains.Annotations;
 using Swan;
-using Utf8Json.Resolvers.Internal;
 
 namespace Synapse.Network
 {

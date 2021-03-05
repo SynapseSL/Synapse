@@ -3,24 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.Sockets;
 using System.Security.Cryptography;
-using System.Threading;
 using EmbedIO;
-using EmbedIO.Actions;
-using EmbedIO.Files;
 using EmbedIO.WebApi;
-using EmbedIO.WebSockets;
 using JetBrains.Annotations;
-using MEC;
-using Mirror;
 using Swan;
 using Swan.Logging;
-using Swan.Validators;
-using UnityEngine;
-using UnityEngine.Serialization;
-using Random = System.Random;
 
 namespace Synapse.Network
 {
@@ -47,9 +36,9 @@ namespace Synapse.Network
         {
             _instance = this;
             PrivateKey = RSA.Create();
-            PublicKey = PrivateKey.ToXmlString(false);
             NetworkSyncEntries.Add(NetworkSyncEntry.FromPair("example", "Some string value"));
             NetworkSyncEntries.Add(NetworkSyncEntry.FromPair("example2", 6969));
+            PublicKey = PrivateKey.ToXmlString(false);
             Synapse.Server.Get.Logger.Info("\n" + NetworkSyncEntries.Humanize());
         }
         
@@ -96,6 +85,8 @@ namespace Synapse.Network
             Server?.Dispose();
             ClientData.Clear();          
             NetworkSyncEntries.Clear();
+            NetworkSyncEntries.Add(NetworkSyncEntry.FromPair("example", "Some string value"));
+            NetworkSyncEntries.Add(NetworkSyncEntry.FromPair("example2", 6969));
         }
         
             
@@ -152,11 +143,11 @@ namespace Synapse.Network
         public bool Authenticated { get; set; }
     }
     
-    public class StatusMessage
+    public class StatusedResponse
     {
-        public static StatusMessage Success = new SuccessfulStatus(); 
-        public static StatusMessage Unauthorized = new UnauthorizedStatus();
-        public static StatusMessage NotFound = new NotFoundStatus();
+        public static StatusedResponse Success = new SuccessfulStatus(); 
+        public static StatusedResponse Unauthorized = new UnauthorizedStatus();
+        public static StatusedResponse NotFound = new NotFoundStatus();
             
         public bool Successful { get; set; }
         public string Message { get; set; }
@@ -182,7 +173,7 @@ namespace Synapse.Network
         }
     }
     
-    public class SuccessfulStatus : StatusMessage
+    public class SuccessfulStatus : StatusedResponse
     {
         public SuccessfulStatus()
         {
@@ -191,7 +182,7 @@ namespace Synapse.Network
         }
     }
     
-    public class ErrorStatus : StatusMessage
+    public class ErrorStatus : StatusedResponse
     {
         public ErrorStatus(string message)
         {
