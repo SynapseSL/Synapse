@@ -30,11 +30,10 @@ public class SynapseController
         PatchMethods();
         Server.Configs.Init();
         Server.PermissionHandler.Init();
-        Server.RoleManager.Init(); 
-        Server.NetworkManager.Start();
+        Server.RoleManager.Init();
         CommandHandlers.RegisterSynapseCommands();
-
         PluginLoader.ActivatePlugins();
+        Server.NetworkManager.Start();
 
         Server.Logger.Info("Synapse is now ready!");
     } 
