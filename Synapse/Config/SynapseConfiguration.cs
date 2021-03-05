@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using Synapse.Network;
 
 namespace Synapse.Config
 {
@@ -64,5 +65,23 @@ namespace Synapse.Config
 
         [Description("The default Language that is used for translations")]
         public string Language = "ENGLISH";
+
+        [Description("Enables the Networking Capabilites of Synapse")]
+        public bool NetworkEnable = true;
+
+        [Description("Enables this server to start a master-webserver if none is present")]
+        public bool MasterAuthority = true;
+
+        [Description("The name of the client which will be visible in logs")]
+        public string NetworkName = "Synapse Server";
+        
+        [Description("The url of master endpoints for the network")]
+        public string NetworkUrl = "http://localhost:8880";
+
+        [Description("The port used if this server tries to gain master authority")]
+        public int NetworkPort = 8880;
+        
+        [Description("The shared secret for your synapse server network")]
+        public string NetworkSecret = TokenFactory.Instance.GenerateLongToken();
     }
 }

@@ -5,12 +5,14 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Logger = Synapse.Api.Logger;
 using EventHandler = Synapse.Api.Events.EventHandler;
 using Synapse.Api.Plugin;
 using Synapse.Api.Roles;
 using Synapse.Api.Items;
 using Synapse.Api.Teams;
+using Synapse.Network;
 
 namespace Synapse
 {
@@ -38,6 +40,8 @@ namespace Synapse
         public ItemManager ItemManager { get; } = new ItemManager();
 
         public ConfigHandler Configs { get; } = new ConfigHandler();
+
+        public SynapseNetworkManager NetworkManager { get; } = new SynapseNetworkManager();
 
         public Synapse.Permission.PermissionHandler PermissionHandler { get; } = new Synapse.Permission.PermissionHandler();
 
@@ -115,6 +119,12 @@ namespace Synapse
             Configs.Reload();
             PermissionHandler.Reload();
             SynapseController.PluginLoader.ReloadConfigs();
+            NetworkManager.Shutdown();
+            new Thread(() =>
+            {
+                Thread.Sleep(1000); // Wait for 1.0 seconds
+                NetworkManager.Start();
+            }).Start();
         }
         
         /// <summary>
