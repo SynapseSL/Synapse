@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Text;
 using EmbedIO;
 using EmbedIO.WebApi;
@@ -13,17 +14,17 @@ namespace Synapse.Network
         {
             return Encoding.UTF8.GetBytes(value).ToLowerHex();
         }
-        
+
         public static string FromHex(this string value)
         {
             return Encoding.UTF8.GetString(value.ConvertHexadecimalToBytes());
         }
-        
+
         public static string ParseString(this byte[] byteArray)
         {
             return Encoding.UTF8.GetString(byteArray);
         }
-        
+
         public static byte[] ToBytes(this string value)
         {
             return Encoding.UTF8.GetBytes(value);
@@ -32,11 +33,18 @@ namespace Synapse.Network
         [CanBeNull]
         public static ClientData GetClientData(this WebApiController controller)
         {
-            var authHeader = controller.Request.Headers.Get("Authorization");
-            if (authHeader == null) return null;
-            var dataClient = SynapseNetworkServer.Instance.DataByToken(authHeader.Replace("Bearer ", ""));
-            if (dataClient == null) return null;
-            return dataClient.ValidateRequestSafe(controller) ? dataClient : null;
+            try
+            {
+                var authHeader = controller.Request.Headers.Get("Authorization");
+                if (authHeader == null) return null;
+                var dataClient = SynapseNetworkServer.Instance.DataByToken(authHeader.Replace("Bearer ", ""));
+                if (dataClient == null) return null;
+                return dataClient.ValidateRequestSafe(controller) ? dataClient : null;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
         }
 
         public static string EncodeStringForClient(this WebApiController controller, string value)
@@ -58,13 +66,13 @@ namespace Synapse.Network
             clientData.ValidateRequest(controller);
             return AESUtils.Decrypt(value, clientData.CipherKey);
         }
-        
+
         public static string EncodeStringForServer(this SynapseNetworkClient client, string value)
         {
             return AESUtils.Encrypt(value, client.ServerCipherKey);
         }
-        
-         
+
+
         public static string DecodeStringFromServer(this SynapseNetworkClient client, string value)
         {
             return AESUtils.Decrypt(value, client.CipherKey);

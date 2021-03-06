@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -15,10 +17,53 @@ namespace Synapse.Network
         public StatusedResponse Ping()
         {
             var clientData = this.GetClientData();
-            return new PingResponse()
+            return new PingResponse
             {
-                Authenticated = clientData != null
+                Authenticated = clientData != null,
+                Messages = clientData == null
+                    ? new List<InstanceMessage>()
+                    : SynapseNetworkServer.Instance.TakeAllMessages(clientData)
             };
+        }
+
+        [Route(HttpVerbs.Post, "/post")]
+        public async Task<StatusedResponse> Post()
+        {
+            var clientData = this.GetClientData();
+            if (clientData == null) return StatusedResponse.Unauthorized;
+            var msg = await HttpContext.GetRequestDataAsync<InstanceMessage>();
+            if (msg.Receiver == "@")
+            {
+                var recv = new List<string>();
+                foreach (var target in SynapseNetworkServer.Instance.TokenClientIDMap.Values.Where(x =>
+                    x != clientData.ClientUid))
+                {
+                    recv.Add(target);
+                    SynapseNetworkServer.Instance.AddMessage(target, msg);
+                }
+
+                return new InstanceMessageTransmission
+                {
+                    Receivers = recv
+                };
+            }
+            else
+            {
+                var results = SynapseNetworkServer.Instance.TokenClientIDMap.Values.Where(x => x == msg.Receiver);
+                if (!results.Any())
+                    return new InstanceMessageTransmission
+                    {
+                        Receivers = new List<string>()
+                    };
+                var recv = results.First();
+                SynapseNetworkServer.Instance.AddMessage(recv, msg);
+                return new InstanceMessageTransmission
+                {
+                    Receivers = new[] {recv}.ToList()
+                };
+            }
+
+            return StatusedResponse.Success;
         }
 
 
@@ -26,8 +71,9 @@ namespace Synapse.Network
         public async Task<StatusedResponse> Handshake()
         {
             var networkSyn = await HttpContext.GetRequestDataAsync<NetworkAuthSyn>();
-            Server.Get.Logger.Info($"Synapse-Network Handshake-Request from {networkSyn.ClientName}@{HttpContext.RemoteEndPoint}'");
-            ClientData data = new ClientData
+            Server.Get.Logger.Info(
+                $"Synapse-Network Handshake-Request from {networkSyn.ClientName}@{HttpContext.RemoteEndPoint}'");
+            var data = new ClientData
             {
                 Endpoint = HttpContext.RemoteEndPoint.Address.ToString(),
                 PublicKey = RSA.Create(),
@@ -38,7 +84,8 @@ namespace Synapse.Network
                 Valid = false
             };
             data.PublicKey.FromXmlString(networkSyn.PublicKey);
-            SynapseNetworkServer.Instance.ClientData.Add(data);
+            SynapseNetworkServer.Instance.AddClient(data);
+            Server.Get.Logger.Info("Synapse-Network Client to Cache'");
             return new NetworkAuthAck
             {
                 ClientIdentifier = data.ClientUid,
@@ -52,7 +99,8 @@ namespace Synapse.Network
         {
             var data = SynapseNetworkServer.Instance.DataById(id);
             data.ValidateEndpoint(this);
-            Server.Get.Logger.Info($"Synapse-Network KeyExchange-Request from {data.ClientName}:{data.ClientUid}@{HttpContext.RemoteEndPoint}");
+            Server.Get.Logger.Info(
+                $"Synapse-Network KeyExchange-Request from {data.ClientName}:{data.ClientUid}@{HttpContext.RemoteEndPoint}");
             var keyExchange = await HttpContext.GetRequestDataAsync<NetworkAuthKeyExchange>();
             keyExchange.DecodeWithPrivate(SynapseNetworkServer.Instance.PrivateKey);
             data.ClientCipherKey = keyExchange.Key;
@@ -70,25 +118,28 @@ namespace Synapse.Network
         {
             var clientData = SynapseNetworkServer.Instance.DataById(id);
             clientData.ValidateEndpoint(this);
-            Server.Get.Logger.Info($"Auth-Request from {clientData.ClientName}:{clientData.ClientUid}@{HttpContext.RemoteEndPoint}");
+            Server.Get.Logger.Info(
+                $"Auth-Request from {clientData.ClientName}:{clientData.ClientUid}@{HttpContext.RemoteEndPoint}");
             var raw = await HttpContext.GetRequestBodyAsStringAsync();
             var content = AESUtils.Decrypt(raw, clientData.CipherKey);
-            NetworkAuthReqAuth authAuthReq = Json.Deserialize<NetworkAuthReqAuth>(content);
+            var authAuthReq = Json.Deserialize<NetworkAuthReqAuth>(content);
             if (authAuthReq.ClientIdentifier != clientData.ClientUid)
             {
                 Server.Get.Logger.Error($"Auth-Request from {HttpContext.RemoteEndPoint} has invalid ClientId");
                 throw new HttpException(HttpStatusCode.Unauthorized);
             }
+
             if (SynapseNetworkServer.Instance.Secret == authAuthReq.Secret)
             {
                 clientData.SessionToken = TokenFactory.Instance.GenerateShortToken();
+                Server.Get.NetworkManager.Server.TokenClientIDMap[clientData.SessionToken] = clientData.ClientUid;
                 clientData.Valid = true;
                 Server.Get.Logger.Info($"Synapse-Network Auth-Request from {authAuthReq.ClientIdentifier} successful");
                 var responseContent = Json.Serialize(new NetworkAuthResAuth
                 {
                     SessionToken = clientData.SessionToken
                 });
-                
+
                 responseContent = AESUtils.Encrypt(responseContent, clientData.ClientCipherKey);
                 return responseContent;
             }

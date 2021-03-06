@@ -4,8 +4,11 @@ namespace Synapse.Network
 {
     public interface INetworkNode
     {
-        void RegisterWebserverWith(WebServer server);
-        void Reconfigure(InstanceAuthority authority);
-        void StartClient(SynapseNetworkClient client);
+        public void RegisterWebserverWith(WebServer server);
+        public void Reconfigure(InstanceAuthority authority);
+        public void StartClient(SynapseNetworkClient client);
+        public void ReceiveInstanceMessage(InstanceMessage message);
+
+        public void Hearthbeat();
     }
 }

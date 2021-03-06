@@ -12,21 +12,21 @@ namespace Synapse.Network
 {
     public class SynapseNetworkClient
     {
+        public string CipherKey;
         private HttpClient Client;
+        public string ClientIdentifier;
+        public string ClientName = "SynapseServerClient";
+
+        public bool IsStarted;
+        public int MigrationPriority;
+        public RSA PrivateKey;
+        public string PublicKey;
+        public string Secret;
+        public string ServerCipherKey;
+        public RSA ServerPublicKey;
+        public string SessionToken;
 
         public string Url;
-        public string SessionToken;
-        public string Secret;
-        public string ClientName = "SynapseServerClient";
-        public string ClientIdentifier;
-        public RSA PrivateKey;
-        public RSA ServerPublicKey;
-        public string CipherKey;
-        public string ServerCipherKey;
-        public string PublicKey;
-        public int MigrationPriority;
-
-        public bool IsStarted = false;
 
         public void Init()
         {
@@ -37,41 +37,51 @@ namespace Synapse.Network
             PublicKey = PrivateKey.ToXmlString(false);
         }
 
+        public async Task<InstanceMessageTransmission> SendMessage(InstanceMessage message)
+        {
+            return await Post<InstanceMessageTransmission, InstanceMessage>("/synapse/post", message);
+        }
+
+
         [ItemCanBeNull]
         public async Task<TR> RequestNetworkVar<TR>(string key)
         {
             var hasException = false;
-            var entry = await Server.Get.NetworkManager.Client.Get<NetworkSyncEntry>($"/networksync?key={key}", exceptionHandler: x =>
-            {
-                hasException = true;
-                hasException = true;
+            var entry = await Server.Get.NetworkManager.Client.Get<NetworkSyncEntry>($"/networksync?key={key}",
+                exceptionHandler: x =>
+                {
+                    hasException = true;
+                    hasException = true;
 #if DEBUG
-                Server.Get.Logger.Info(x);
+                    Server.Get.Logger.Info(x);
 #endif
-            });
+                });
             if (entry != null && !hasException) return entry.Value<TR>();
             return (TR) await Task.FromResult<object>(null);
         }
-        
+
         public async Task<bool> SetNetworkVar<TR>(string key, TR value)
         {
-            var result = await Server.Get.NetworkManager.Client.Post<StatusedResponse, NetworkSyncEntry>($"/networksync?key={key}", NetworkSyncEntry.FromPair(key,value));
+            var result =
+                await Server.Get.NetworkManager.Client.Post<StatusedResponse, NetworkSyncEntry>(
+                    $"/networksync?key={key}", SerializableObjectWrapper.FromPair(key, value));
             return result?.Successful ?? false;
         }
-        
+
         public async Task<List<NetworkSyncEntry>> RequestAllNetworkVars()
         {
-            var entry = await Server.Get.NetworkManager.Client.Get<List<NetworkSyncEntry>>($"/networksync");
+            var entry = await Server.Get.NetworkManager.Client.Get<List<NetworkSyncEntry>>("/networksync");
             return entry ?? new List<NetworkSyncEntry>();
         }
-        
+
         [ItemCanBeNull]
-        public async Task<TR> Get<TR>(string path, bool authenticated = true, Action<Exception> exceptionHandler = null)
+        public async Task<TR> Get<TR>(string path, bool authenticated = true, Action<Exception> exceptionHandler = null,
+            Dictionary<string, string> headers = null)
         {
             var exc = exceptionHandler ?? (x => Server.Get.Logger.Error(x));
             try
             {
-                var content = await GetString(path, authenticated, exc);
+                var content = await GetString(path, authenticated, exc, headers);
                 try
                 {
                     var status = Json.Deserialize<StatusedResponse>(content);
@@ -80,8 +90,11 @@ namespace Synapse.Network
                         exc(new Exception($"Request failed: {status.Message}"));
                         return (TR) await Task.FromResult<object>(null);
                     }
-                } catch (Exception ignored) {}
-                
+                }
+                catch (Exception ignored)
+                {
+                }
+
                 return Json.Deserialize<TR>(content);
             }
             catch (Exception e)
@@ -92,7 +105,8 @@ namespace Synapse.Network
         }
 
         [ItemCanBeNull]
-        public async Task<string> GetString(string path, bool authenticated = true, Action<Exception> exceptionHandler = null)
+        public async Task<string> GetString(string path, bool authenticated = true,
+            Action<Exception> exceptionHandler = null, Dictionary<string, string> headers = null)
         {
             var exc = exceptionHandler ?? (x => Server.Get.Logger.Error(x));
             try
@@ -100,7 +114,11 @@ namespace Synapse.Network
                 var message = new HttpRequestMessage();
                 message.RequestUri = new Uri(Url + path);
                 message.Method = HttpMethod.Get;
-                if (authenticated) message.Headers.Authorization = new AuthenticationHeaderValue("Bearer",SessionToken);
+                if (authenticated)
+                    message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", SessionToken);
+                if (headers != null)
+                    foreach (var pair in headers)
+                        message.Headers.Add(pair.Key, pair.Value);
                 var result = await Client.SendAsync(message);
                 var content = await result.Content.ReadAsStringAsync();
 #if DEBUG
@@ -114,9 +132,11 @@ namespace Synapse.Network
                 return (string) await Task.FromResult<object>(null);
             }
         }
-        
+
         [ItemCanBeNull]
-        public async Task<string> PostString<TB>(string path, TB body, bool authenticated = true, bool encodeBody = true, Action<Exception> exceptionHandler = null)
+        public async Task<string> PostString<TB>(string path, TB body, bool authenticated = true,
+            bool encodeBody = true, Action<Exception> exceptionHandler = null,
+            Dictionary<string, string> headers = null)
         {
             // ReSharper disable once HeapView.PossibleBoxingAllocation
             var exc = exceptionHandler ?? (x => Server.Get.Logger.Error(x));
@@ -127,12 +147,16 @@ namespace Synapse.Network
                 message.RequestUri = new Uri(Url + path);
                 message.Method = HttpMethod.Post;
                 message.Content = new StringContent(data);
-                
+
 #if DEBUG
                 Server.Get.Logger.Info($"<<< {data}");
 #endif
-                
-                if (authenticated) message.Headers.Authorization = new AuthenticationHeaderValue("Bearer",SessionToken);
+
+                if (authenticated)
+                    message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", SessionToken);
+                if (headers != null)
+                    foreach (var pair in headers)
+                        message.Headers.Add(pair.Key, pair.Value);
                 var result = await Client.SendAsync(message);
                 var content = await result.Content.ReadAsStringAsync();
 #if DEBUG
@@ -146,15 +170,16 @@ namespace Synapse.Network
                 return (string) await Task.FromResult<object>(null);
             }
         }
-        
+
         [ItemCanBeNull]
-        public async Task<TR> Post<TR,TB>(string path, TB body, bool authenticated = true, bool encodeBody = true, Action<Exception> exceptionHandler = null)
+        public async Task<TR> Post<TR, TB>(string path, TB body, bool authenticated = true, bool encodeBody = true,
+            Action<Exception> exceptionHandler = null, Dictionary<string, string> headers = null)
         {
             // ReSharper disable once HeapView.PossibleBoxingAllocation
             var exc = exceptionHandler ?? (x => Server.Get.Logger.Error(x));
             try
             {
-                var content = await PostString(path, body, authenticated, encodeBody, exc);
+                var content = await PostString(path, body, authenticated, encodeBody, exc, headers);
                 try
                 {
                     var status = Json.Deserialize<StatusedResponse>(content);
@@ -163,7 +188,11 @@ namespace Synapse.Network
                         exc(new Exception($"Request failed: {status.Message}"));
                         return (TR) await Task.FromResult<object>(null);
                     }
-                } catch (Exception ignored) {}
+                }
+                catch (Exception ignored)
+                {
+                }
+
                 return Json.Deserialize<TR>(content);
             }
             catch (Exception e)
@@ -173,19 +202,24 @@ namespace Synapse.Network
             }
         }
 
-        public async Task<bool> CheckAvailability()
+        internal async Task<PingResponse> PollServer()
         {
             try
             {
-                var result = await Get<Dictionary<string,object>>("/synapse/ping", exceptionHandler: x => {});
-#if DEBUG
-                //Server.Get.Logger.Info($"Ping Result: {result?.Humanize().Insert(0, "\n")??"connection reset"}");
-#endif
-                return result != null;
+                var result = await Get<PingResponse>("/synapse/ping", exceptionHandler: x => { });
+                if (result != null)
+                {
+                    foreach (var message in result.Messages)
+                    foreach (var node in Server.Get.NetworkManager.NetworkNodes)
+                        node.ReceiveInstanceMessage(message);
+                    return result;
+                }
+
+                return (PingResponse) await Task.FromResult<object>(null);
             }
             catch (Exception e)
             {
-                return false;
+                return (PingResponse) await Task.FromResult<object>(null);
             }
         }
 
@@ -193,10 +227,12 @@ namespace Synapse.Network
         {
             var networkNodes = Server.Get.NetworkManager.NetworkNodes;
             networkNodes.ForEach(x => x.StartClient(this));
-            var authority = SynapseNetworkServer.Instance.Status == WebServerState.Stopped ? InstanceAuthority.Client : InstanceAuthority.Master;
+            var authority = SynapseNetworkServer.Instance.Status == WebServerState.Stopped
+                ? InstanceAuthority.Client
+                : InstanceAuthority.Master;
             networkNodes.ForEach(x => x.Reconfigure(authority));
         }
-        
+
         public async void Connect()
         {
             IsStarted = true;
@@ -206,7 +242,8 @@ namespace Synapse.Network
                 await SyncMaster();
                 await KeyExchange();
                 await AuthMaster();
-                Server.Get.Logger.Info($"Connected to Master-Server with MigrationPriority {MigrationPriority} and ClientUID{ClientIdentifier}");
+                Server.Get.Logger.Info(
+                    $"Connected to Master-Server with MigrationPriority {MigrationPriority} and ClientUID{ClientIdentifier}");
                 Server.Get.Logger.Send($"Synapse-Network Session-Token is {SessionToken}", ConsoleColor.Magenta);
                 OnConnected();
             }
@@ -248,6 +285,9 @@ namespace Synapse.Network
             var reqContent = Json.Serialize(obj);
             var req = await Client.PostAsync("/synapse/handshake", new StringContent(reqContent));
             var content = await req.Content.ReadAsStringAsync();
+#if DEBUG
+            Server.Get.Logger.Info($">>> {content}");
+#endif
             var ack = Json.Deserialize<NetworkAuthAck>(content);
             ServerPublicKey = RSA.Create();
             ServerPublicKey.FromXmlString(ack.PublicKey);
@@ -270,6 +310,5 @@ namespace Synapse.Network
             var res = Json.Deserialize<NetworkAuthResAuth>(content);
             SessionToken = res.SessionToken;
         }
-        
     }
 }

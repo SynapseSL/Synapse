@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using EmbedIO;
 using EmbedIO.Routing;
@@ -11,10 +10,9 @@ namespace Synapse.Network
     public class SynapseNetworkSyncController : WebApiController
     {
         [Route(HttpVerbs.Get, "/")]
-        public StatusedResponse Get([QueryField("key")] string key)
+        public IStatus Get([QueryField("key")] string key)
         {
             if (key == null)
-            {
                 try
                 {
                     var clientData = this.GetClientData();
@@ -25,12 +23,11 @@ namespace Synapse.Network
                 {
                     return StatusedResponse.NotFound;
                 }
-            }
-            
+
             try
             {
                 var clientData = this.GetClientData();
-                if (clientData == null) throw new HttpException(HttpStatusCode.Unauthorized);
+                if (clientData == null) return StatusedResponse.Unauthorized;
                 return SynapseNetworkServer.Instance.NetworkSyncEntries.First(x => x.Key == key);
             }
             catch (InvalidOperationException e)
@@ -38,7 +35,7 @@ namespace Synapse.Network
                 return StatusedResponse.NotFound;
             }
         }
-        
+
         [Route(HttpVerbs.Post, "/")]
         public async Task<StatusedResponse> Set([QueryField("key")] string key)
         {
@@ -53,7 +50,8 @@ namespace Synapse.Network
                 {
                     syncEntries.Remove(syncVar);
                     if (syncVar.Data.Trim() != "") syncEntries.Add(syncVar);
-                } 
+                }
+
                 return StatusedResponse.Success;
             }
             catch (Exception e)
