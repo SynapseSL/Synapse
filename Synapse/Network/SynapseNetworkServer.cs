@@ -2,9 +2,12 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
+using System.Threading;
+using System.Threading.Tasks;
 using EmbedIO;
 using EmbedIO.WebApi;
 using JetBrains.Annotations;
@@ -21,12 +24,15 @@ namespace Synapse.Network
         public readonly HashSet<NetworkSyncEntry> NetworkSyncEntries = new HashSet<NetworkSyncEntry>();
 
         private MemoryCache _cache;
+        private Task _heartbeat;
         private ConcurrentDictionary<string, ConcurrentBag<InstanceMessage>> _messageCaches;
         public int Port;
         public RSA PrivateKey;
 
         public string PublicKey;
         public string Secret;
+
+        public Dictionary<string, DateTimeOffset> SyncedClientList = new Dictionary<string, DateTimeOffset>();
         public Dictionary<string, string> TokenClientIDMap = new Dictionary<string, string>();
 
         public string Url;
@@ -42,6 +48,23 @@ namespace Synapse.Network
         public WebServer Server { get; private set; }
 
         public WebServerState Status => Server?.State ?? WebServerState.Stopped;
+
+        public void ServerHeartbeat()
+        {
+            var time = DateTimeOffset.Now;
+            var pollRate = Synapse.Server.Get.Configs.synapseConfiguration.NetworkPollRate;
+            var triplePoll = TimeSpan.FromMilliseconds(pollRate * 3);
+            foreach (var pair in SyncedClientList.ToList())
+            {
+                var diff = time.Subtract(pair.Value);
+                if (diff.CompareTo(triplePoll) == 1)
+                {
+                    Synapse.Server.Get.Logger.Warn($"Client {pair.Key} seems to be disconnected");
+                    SyncedClientList.Remove(pair.Key);
+                    _cache.Remove(pair.Key);
+                }
+            }
+        }
 
         public void AddMessage(string receiver, InstanceMessage message)
         {
@@ -80,7 +103,12 @@ namespace Synapse.Network
                 var found = _messageCaches.TryGetValue(data.ClientUid, out var messageBag);
                 if (!found) return new List<InstanceMessage>();
                 var list = new List<InstanceMessage>();
-                while (messageBag.TryTake(out var it)) list.Add(it);
+                while (!messageBag.IsEmpty)
+                {
+                    messageBag.TryTake(out var it);
+                    list.Add(it);
+                }
+
                 return list;
             }
             catch (Exception e)
@@ -158,6 +186,17 @@ namespace Synapse.Network
                     Synapse.Server.Get.Logger.Info($"HTTP-Server Module with BaseRoute {module.BaseRoute} hooked");
 #endif
                 Synapse.Server.Get.Logger.Info("Executing WebServer");
+                var configPollRate = Synapse.Server.Get.Configs.synapseConfiguration.NetworkPollRate;
+                _heartbeat = new Task(() =>
+                {
+                    while (true)
+                    {
+                        ServerHeartbeat();
+                        Thread.Sleep(TimeSpan.FromMilliseconds(100));
+                    }
+                });
+                _heartbeat.Start();
+
                 Server.RunAsync();
             }
             catch (Exception e)
@@ -170,6 +209,7 @@ namespace Synapse.Network
         {
             Synapse.Server.Get.Logger.Info("Disposing Network Server...");
             Server?.Dispose();
+            _heartbeat?.Dispose();
             _cache.Dispose();
             NetworkSyncEntries.Clear();
             NetworkSyncEntries.Add(SerializableObjectWrapper.FromPair("example", "Some string value"));

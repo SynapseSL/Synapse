@@ -17,6 +17,9 @@ namespace Synapse.Network
         public StatusedResponse Ping()
         {
             var clientData = this.GetClientData();
+            if (clientData != null)
+                SynapseNetworkServer.Instance.SyncedClientList[clientData.ClientUid] = DateTimeOffset.Now;
+
             return new PingResponse
             {
                 Authenticated = clientData != null,
@@ -25,6 +28,15 @@ namespace Synapse.Network
                     : SynapseNetworkServer.Instance.TakeAllMessages(clientData)
             };
         }
+
+        [Route(HttpVerbs.Get, "/clients")]
+        public StatusedResponse Clients()
+        {
+            var clientData = this.GetClientData();
+            if (clientData == null) return StatusedResponse.Unauthorized;
+            return new StatusListWrapper<string>(SynapseNetworkServer.Instance.SyncedClientList.Keys);
+        }
+
 
         [Route(HttpVerbs.Post, "/post")]
         public async Task<StatusedResponse> Post()
@@ -36,7 +48,8 @@ namespace Synapse.Network
             {
                 var recv = new List<string>();
                 foreach (var target in SynapseNetworkServer.Instance.TokenClientIDMap.Values.Where(x =>
-                    x != clientData.ClientUid))
+                    x != clientData.ClientUid)
+                )
                 {
                     recv.Add(target);
                     SynapseNetworkServer.Instance.AddMessage(target, msg);
@@ -139,8 +152,8 @@ namespace Synapse.Network
                 {
                     SessionToken = clientData.SessionToken
                 });
-
                 responseContent = AESUtils.Encrypt(responseContent, clientData.ClientCipherKey);
+                SynapseNetworkServer.Instance.SyncedClientList[clientData.ClientUid] = DateTimeOffset.Now;
                 return responseContent;
             }
 

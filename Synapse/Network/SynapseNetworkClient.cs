@@ -6,12 +6,14 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using EmbedIO;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Caching.Memory;
 using Swan.Formatters;
 
 namespace Synapse.Network
 {
     public class SynapseNetworkClient
     {
+        private MemoryCache _requestMemCache;
         public string CipherKey;
         private HttpClient Client;
         public string ClientIdentifier;
@@ -35,11 +37,53 @@ namespace Synapse.Network
             PrivateKey = RSA.Create();
             CipherKey = TokenFactory.Instance.GenerateShortToken();
             PublicKey = PrivateKey.ToXmlString(false);
+            _requestMemCache = new MemoryCache(new MemoryCacheOptions
+            {
+                SizeLimit = 64
+            });
         }
+
+        public void AddRequestToCache(string reference, string subject, Action<InstanceMessage> action)
+        {
+            var key = $"{reference}{subject}";
+            var options = new MemoryCacheEntryOptions
+            {
+                Size = 1,
+                Priority = CacheItemPriority.Normal,
+                SlidingExpiration = TimeSpan.FromMinutes(1)
+            };
+            options.RegisterPostEvictionCallback(EvictMessageRequest);
+            _requestMemCache.Set(key, new Action<InstanceMessage>(x =>
+            {
+                if (x != null) _requestMemCache.Remove(key); //Assume it's expired
+                action(x);
+            }), options);
+        }
+
+        private static void EvictMessageRequest(object key, object value, EvictionReason reason, object state)
+        {
+            ((Action<InstanceMessage>) value).Invoke(null);
+        }
+
 
         public async Task<InstanceMessageTransmission> SendMessage(InstanceMessage message)
         {
             return await Post<InstanceMessageTransmission, InstanceMessage>("/synapse/post", message);
+        }
+
+        public async Task<InstanceMessage> SendMessageAndAwaitResponse(InstanceMessage message, string responseSubject)
+        {
+            InstanceMessage result = null;
+            var completer = new TaskCompletionSource<InstanceMessage>();
+            AddRequestToCache(message.ReferenceId, responseSubject, x =>
+            {
+                if (x == null && result != null) return;
+                result = x;
+                Server.Get.Logger.Warn($"Response? {x}");
+                completer.TrySetResult(x);
+            });
+            await Post<InstanceMessageTransmission, InstanceMessage>("/synapse/post", message);
+            return await completer.Task;
         }
 
 
@@ -210,8 +254,14 @@ namespace Synapse.Network
                 if (result != null)
                 {
                     foreach (var message in result.Messages)
-                    foreach (var node in Server.Get.NetworkManager.NetworkNodes)
-                        node.ReceiveInstanceMessage(message);
+                    {
+                        foreach (var node in Server.Get.NetworkManager.NetworkNodes)
+                            node.ReceiveInstanceMessage(message);
+                        var key = $"{message.ReferenceId}{message.Subject}";
+                        var existsReq = _requestMemCache.TryGetValue(key, out var obj);
+                        if (existsReq) ((Action<InstanceMessage>) obj).Invoke(message);
+                    }
+
                     return result;
                 }
 
@@ -223,17 +273,20 @@ namespace Synapse.Network
             }
         }
 
-        private void OnConnected()
+        private async Task OnConnected()
         {
+            await Server.Get.NetworkManager.ReconnectLoop.AwaitOneClientPollCycle();
+            Server.Get.Logger.Info("Continuing OnConnected");
             var networkNodes = Server.Get.NetworkManager.NetworkNodes;
             networkNodes.ForEach(x => x.StartClient(this));
             var authority = SynapseNetworkServer.Instance.Status == WebServerState.Stopped
                 ? InstanceAuthority.Client
                 : InstanceAuthority.Master;
             networkNodes.ForEach(x => x.Reconfigure(authority));
+            Server.Get.Logger.Info("Finished OnConnected");
         }
 
-        public async void Connect()
+        public async Task Connect()
         {
             IsStarted = true;
             try

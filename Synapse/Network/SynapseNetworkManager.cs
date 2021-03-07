@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using EmbedIO;
 using Synapse.Network.nodes;
@@ -8,15 +7,15 @@ namespace Synapse.Network
 {
     public class SynapseNetworkManager
     {
-        public readonly List<INetworkNode> NetworkNodes = new List<INetworkNode>();
-        private Thread _reconnectLoop;
+        public readonly List<NetworkNodeBase> NetworkNodes = new List<NetworkNodeBase>();
 
         public SynapseNetworkClient Client;
+        public ReconnectLoop ReconnectLoop;
         public SynapseNetworkServer Server;
 
         public SynapseNetworkManager()
         {
-            NetworkNodes.Add(new SynapseNetworkNode());
+            NetworkNodes.Add(new SynapseNetworkNodeBase());
         }
 
         public void Start()
@@ -30,61 +29,17 @@ namespace Synapse.Network
                 Url = synapseConfig.NetworkUrl
             };
             Client.Init();
+            ReconnectLoop = new ReconnectLoop(synapseConfig);
             Synapse.Server.Get.Logger.Info("Synapse-Network Starting ClientLoop");
-            StartClientReconnectLoop(synapseConfig.NetworkPollRate);
+            ReconnectLoop.Start(true);
         }
 
         public void Shutdown()
         {
             Synapse.Server.Get.Logger.Info("Synapse-Network Shutdown");
-            _reconnectLoop.Abort();
+            ReconnectLoop.Stop();
             Client.Disconnect();
             Server.Stop();
-        }
-
-        private void StartClientReconnectLoop(long pollRate)
-        {
-            _reconnectLoop = new Thread(async () =>
-            {
-                while (true)
-                {
-                    // Wait for 5.0 seconds
-                    var poll = await Client.PollServer();
-                    if (poll == null)
-                    {
-                        Synapse.Server.Get.Logger.Warn("Master-Ping failed");
-
-                        if (Synapse.Server.Get.Configs.synapseConfiguration.MasterAuthority)
-                        {
-                            BoostrapServer();
-                            Thread.Sleep(250);
-                            continue;
-                        }
-
-                        if (Client.IsStarted)
-                        {
-                            Client.Disconnect();
-                            Synapse.Server.Get.Logger.Warn("Synapse-Network client can't connect to Synapse-Network");
-                            //Thread.Sleep(500 * Client.MigrationPriority);
-                        }
-                    }
-                    else if (!Client.IsStarted)
-                    {
-                        Client.Connect();
-                    }
-                    else
-                    {
-                        foreach (var node in NetworkNodes) node.Hearthbeat();
-                    }
-
-                    Thread.Sleep(TimeSpan.FromMilliseconds(pollRate));
-                }
-
-                // ReSharper disable once FunctionNeverReturns
-            });
-            _reconnectLoop.Name = "Synapse-Network ReconnectLoop";
-            _reconnectLoop.IsBackground = true;
-            _reconnectLoop.Start();
         }
 
         // ReSharper disable once MemberCanBePrivate.Global

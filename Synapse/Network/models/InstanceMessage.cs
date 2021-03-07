@@ -10,11 +10,11 @@ namespace Synapse.Network
         public string Subject { get; set; }
         public string ReferenceId { get; set; } = Guid.NewGuid().ToString();
 
-        public InstanceMessage CreateResponse<T>(string subject, T obj)
+        public InstanceMessage CreateResponse<T>(T obj, string subject = null)
         {
             var msg = new InstanceMessage
             {
-                Subject = subject,
+                Subject = subject ?? Subject + "Res",
                 Sender = Server.Get.NetworkManager.Client.ClientIdentifier,
                 Receiver = Sender,
                 ReferenceId = ReferenceId
