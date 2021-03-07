@@ -1,4 +1,5 @@
 ﻿using System;
+using Synapse.Network.Models;
 
 namespace Synapse.Network
 {

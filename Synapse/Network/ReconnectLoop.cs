@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using EmbedIO;
 using Synapse.Config;
+using Synapse.Reactive;
 
 namespace Synapse.Network
 {

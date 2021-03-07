@@ -9,7 +9,7 @@ using EmbedIO.Routing;
 using EmbedIO.WebApi;
 using Swan.Formatters;
 
-namespace Synapse.Network
+namespace Synapse.Network.Routes
 {
     public class SynapseSynapseRouteController : WebApiController
     {

@@ -5,7 +5,7 @@ using EmbedIO;
 using EmbedIO.Routing;
 using EmbedIO.WebApi;
 
-namespace Synapse.Network
+namespace Synapse.Network.Routes
 {
     public class SynapseNetworkSyncController : WebApiController
     {

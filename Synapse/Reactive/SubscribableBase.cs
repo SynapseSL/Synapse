@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Synapse.Network
+namespace Synapse.Reactive
 {
     public abstract class SubscribableBase<T> : IObservable<T>
     {

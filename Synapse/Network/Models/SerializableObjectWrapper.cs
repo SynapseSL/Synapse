@@ -1,7 +1,7 @@
 ﻿using System;
 using Swan.Formatters;
 
-namespace Synapse.Network
+namespace Synapse.Network.Models
 {
     [Serializable]
     public class SerializableObjectWrapper

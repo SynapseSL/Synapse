@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Synapse.Network
+namespace Synapse.Reactive
 {
     public abstract class ObserverBase<T> : IObserver<T>
     {

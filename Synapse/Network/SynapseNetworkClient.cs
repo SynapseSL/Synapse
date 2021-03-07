@@ -8,6 +8,7 @@ using EmbedIO;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Caching.Memory;
 using Swan.Formatters;
+using Synapse.Network.Models;
 
 namespace Synapse.Network
 {

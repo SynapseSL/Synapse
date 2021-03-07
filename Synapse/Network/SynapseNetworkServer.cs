@@ -14,6 +14,8 @@ using JetBrains.Annotations;
 using Microsoft.Extensions.Caching.Memory;
 using Swan;
 using Swan.Logging;
+using Synapse.Network.Models;
+using Synapse.Network.Routes;
 
 namespace Synapse.Network
 {

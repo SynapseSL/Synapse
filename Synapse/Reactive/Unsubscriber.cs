@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Synapse.Network
+namespace Synapse.Reactive
 {
     public class Unsubscriber<T> : IDisposable
     {

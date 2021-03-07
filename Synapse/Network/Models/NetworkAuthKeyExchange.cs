@@ -13,7 +13,7 @@ namespace Synapse.Network
         {
             Key = rsa.Encrypt(Key.ToBytes(), RSAEncryptionPadding.Pkcs1).ToLowerHex();
         }
-        
+
         public void DecodeWithPrivate(RSA rsa)
         {
             Key = rsa.Decrypt(Key.ConvertHexadecimalToBytes(), RSAEncryptionPadding.Pkcs1)
