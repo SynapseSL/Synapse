@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using EmbedIO;
+using Synapse.Network.Models;
 
 namespace Synapse.Network
 {

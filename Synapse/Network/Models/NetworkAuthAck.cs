@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Synapse.Network
+namespace Synapse.Network.Models
 {
     [Serializable]
     public class NetworkAuthAck : SuccessfulStatus

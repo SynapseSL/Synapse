@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using Swan;
 
-namespace Synapse.Network
+namespace Synapse.Network.Models
 {
     [Serializable]
     public class NetworkAuthKeyExchange : SuccessfulStatus

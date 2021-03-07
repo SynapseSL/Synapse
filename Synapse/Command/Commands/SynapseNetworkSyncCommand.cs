@@ -1,16 +1,17 @@
 ﻿using System.Linq;
 using Swan;
 using Synapse.Network;
+using Synapse.Network.Models;
 
 namespace Synapse.Command.Commands
 {
     [CommandInformation(
         Name = "NetworkSync",
-        Aliases = new[] { "ns", "netsync", "nets"},
+        Aliases = new[] {"ns", "netsync", "nets"},
         Description = "A command to interact with the NetworkSync System",
         Usage = "GET = <?key>, SET = <key> <class> <json>",
         Permission = "synapse.command.networksync",
-        Platforms = new[] { Platform.RemoteAdmin,Platform.ServerConsole }
+        Platforms = new[] {Platform.RemoteAdmin, Platform.ServerConsole}
     )]
     public class SynapseNetworkSyncCommand : ISynapseCommand
     {
@@ -20,7 +21,7 @@ namespace Synapse.Command.Commands
 
             if (context.Arguments.Count == 0)
             {
-                var awaiter =    Server.Get.NetworkManager.Client.RequestAllNetworkVars().GetAwaiter();
+                var awaiter = Server.Get.NetworkManager.Client.RequestAllNetworkVars().GetAwaiter();
                 awaiter.OnCompleted(() =>
                 {
                     var entry = awaiter.GetResult();
@@ -28,7 +29,8 @@ namespace Synapse.Command.Commands
                 });
                 result.Message = "Sending Get-Request...";
                 result.State = CommandResultState.Ok;
-            } else if (context.Arguments.Count == 1)
+            }
+            else if (context.Arguments.Count == 1)
             {
                 var key = context.Arguments.At(0);
                 var awaiter = Server.Get.NetworkManager.Client.RequestNetworkVar<NetworkSyncEntry>(key).GetAwaiter();
@@ -39,7 +41,8 @@ namespace Synapse.Command.Commands
                 });
                 result.Message = "Sending Get-Request...";
                 result.State = CommandResultState.Ok;
-            } else if (context.Arguments.Count >= 3)
+            }
+            else if (context.Arguments.Count >= 3)
             {
                 var data = string.Join(" ", context.Arguments.Where((x, i) => i >= 2));
                 var entry = new NetworkSyncEntry
@@ -50,7 +53,8 @@ namespace Synapse.Command.Commands
                 };
                 Server.Get.Logger.Info(entry.Humanize());
 
-                var awaiter = Server.Get.NetworkManager.Client.Post<StatusedResponse,NetworkSyncEntry>($"/networksync?key={entry.Key}", entry).GetAwaiter(); 
+                var awaiter = Server.Get.NetworkManager.Client
+                    .Post<StatusedResponse, NetworkSyncEntry>($"/networksync?key={entry.Key}", entry).GetAwaiter();
                 awaiter.OnCompleted(() =>
                 {
                     var r = awaiter.GetResult();
@@ -59,6 +63,7 @@ namespace Synapse.Command.Commands
                 result.Message = $"Sending Set-Request with data {data}";
                 result.State = CommandResultState.Ok;
             }
+
             return result;
         }
     }

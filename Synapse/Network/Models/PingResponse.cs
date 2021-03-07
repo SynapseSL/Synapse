@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Synapse.Network
+namespace Synapse.Network.Models
 {
     [Serializable]
     public class PingResponse : SuccessfulStatus

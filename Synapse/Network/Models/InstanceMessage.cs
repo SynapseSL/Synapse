@@ -1,7 +1,6 @@
 ﻿using System;
-using Synapse.Network.Models;
 
-namespace Synapse.Network
+namespace Synapse.Network.Models
 {
     [Serializable]
     public class InstanceMessage : SerializableObjectWrapper
