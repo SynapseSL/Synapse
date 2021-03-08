@@ -30,18 +30,46 @@ namespace Synapse.Api.Roles
             return CustomRoles.Values.First(x => x.Value == id).Key;
         }
 
-        public IRole GetCustomRole(string name) => (IRole)Activator.CreateInstance(CustomRoles.FirstOrDefault(x => x.Value.Key.ToLower() == name.ToLower()).Key);
+        public IRole GetCustomRole(string name)
+        {
+            var roletype = CustomRoles.FirstOrDefault(x => x.Value.Key.ToLower() == name.ToLower());
 
-        public IRole GetCustomRole(int id) => (IRole)Activator.CreateInstance(CustomRoles.FirstOrDefault(x => x.Value.Value == id).Key);
+            if (roletype.Key.GetConstructors().Any(x => x.GetParameters().Count() == 1 && x.GetParameters().First().ParameterType == typeof(int)))
+                return (IRole)Activator.CreateInstance(roletype.Key, new object[] { roletype.Value.Value });
+
+            return (IRole)Activator.CreateInstance(roletype.Key);
+        }
+
+        public IRole GetCustomRole(int id)
+        {
+            var roletype = CustomRoles.FirstOrDefault(x => x.Value.Value == id);
+
+            if (roletype.Key.GetConstructors().Any(x => x.GetParameters().Count() == 1 && x.GetParameters().First().ParameterType == typeof(int)))
+                return (IRole)Activator.CreateInstance(roletype.Key, new object[] { roletype.Value.Value });
+
+            return (IRole)Activator.CreateInstance(roletype.Key);
+        }
 
         public void RegisterCustomRole<TRole>() where TRole : IRole
         {
             var role = (IRole)Activator.CreateInstance(typeof(TRole));
 
             if (role.GetRoleID() >= 0 && role.GetRoleID() <= HighestRole) throw new Exception("A Plugin tried to register a CustomRole with an Id of a vanilla RoleType");
+            if (IsIDRegistered(role.GetRoleID())) throw new Exception("A Plugin tried to register a CustomRole with an already registered CustomRole");
             if (!Server.Get.TeamManager.IsIDRegistered(role.GetTeamID())) Logger.Get.Warn($"The role {role.GetRoleName()} is using a not registered Team");
 
             var pair = new KeyValuePair<string, int>(role.GetRoleName(), role.GetRoleID());
+
+            CustomRoles.Add(typeof(TRole), pair);
+        }
+
+        public void RegisterCustomRole<TRole>(int id, string name) where TRole : IRole
+        {
+            if (id >= 0 && id <= HighestRole) throw new Exception("A Plugin tried to register a CustomRole with an Id of a vanilla RoleType");
+            if (IsIDRegistered(id)) throw new Exception("A Plugin tried to register a CustomRole with an already registered CustomRole");
+            if (!Server.Get.TeamManager.IsIDRegistered(id)) Logger.Get.Warn($"The role {name} is using a not registered Team");
+
+            var pair = new KeyValuePair<string, int>(name, id);
 
             CustomRoles.Add(typeof(TRole), pair);
         }
