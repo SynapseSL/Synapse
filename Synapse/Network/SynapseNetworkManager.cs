@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using EmbedIO;
-using Synapse.Network.nodes;
 
 namespace Synapse.Network
 {
@@ -15,7 +14,7 @@ namespace Synapse.Network
 
         public SynapseNetworkManager()
         {
-            NetworkNodes.Add(new SynapseNetworkNodeBase());
+            NetworkNodes.Add(new SynapseNetworkNode());
         }
 
         public void Start()

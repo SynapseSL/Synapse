@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Linq;
 using EmbedIO;
-using Swan;
 using Synapse.Network.Models;
 using Synapse.Network.Routes;
 
-namespace Synapse.Network.nodes
+namespace Synapse.Network
 {
-    public class SynapseNetworkNodeBase : NetworkNodeBase
+    public class SynapseNetworkNode : NetworkNodeBase
     {
         private bool _checked;
 
@@ -39,14 +39,31 @@ namespace Synapse.Network.nodes
 
         public override void StartClient(SynapseNetworkClient client)
         {
+            //Debug
             CheckPings();
         }
 
         public override void ReceiveInstanceMessage(InstanceMessage message)
         {
-            Server.Get.Logger.Info("Received InstanceMessage: " + message.Humanize());
+            switch (message.Subject)
+            {
+                case "Echo":
+                    Server.Get.Logger.Send($"'{message.Value()}' from {message.Sender}", ConsoleColor.White);
+                    break;
+                case "Ping":
+                    RespondMessage(message, DateTimeOffset.Now.ToString());
+                    break;
+                case "GetPlayer":
+                    var netPlayerId = message.Value<string>();
+                    var results = Server.Get.GetPlayers(x => x.UserId == netPlayerId);
+                    if (!results.IsEmpty()) RespondMessage(message, NetworkPlayer.FromLocalPlayer(results.First()));
+                    break;
+                case "GetPlayers":
+                    RespondMessage(message, Server.Get.Players.Select(NetworkPlayer.FromLocalPlayer).ToList());
+                    break;
+            }
 
-            if (message.Subject == "Echo") Server.Get.Logger.Info($"{message.Value()} from {message.Sender}");
+            //Debug
             if (message.Subject == "Ping") RespondMessage(message, DateTimeOffset.Now.ToString());
         }
 

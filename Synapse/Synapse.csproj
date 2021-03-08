@@ -109,6 +109,7 @@
     <Compile Include="Command\CommandInformation.cs" />
     <Compile Include="Command\Commands\SynapseGccCommand.cs" />
     <Compile Include="Command\Commands\SynapseNetworkSyncCommand.cs" />
+    <Compile Include="Command\Commands\SynapsePlayerCommand.cs" />
     <Compile Include="Command\Commands\SynapseRespawnCommand.cs" />
     <Compile Include="Command\Commands\SynapseMapPointCommand.cs" />
     <Compile Include="Command\Commands\SynapseSetClassCommand.cs" />
@@ -144,13 +145,15 @@
     <Compile Include="Network\Models\NetworkSyncEntry.cs" />
     <Compile Include="Network\Models\PingResponse.cs" />
     <Compile Include="Network\Models\SerializableObjectWrapper.cs" />
-    <Compile Include="Network\nodes\SynapseNetworkNodeBase.cs" />
+    <Compile Include="Network\NetworkPlayer.cs" />
     <Compile Include="Network\ReconnectLoop.cs" />
     <Compile Include="Network\Routes\SynapseSynapseRouteController.cs" />
     <Compile Include="Network\Routes\SynapseNetworkSyncController.cs" />
     <Compile Include="Network\SecurityExtensions.cs" />
+    <Compile Include="Network\ServerHeartbeat.cs" />
     <Compile Include="Network\SynapseNetworkClient.cs" />
     <Compile Include="Network\SynapseNetworkManager.cs" />
+    <Compile Include="Network\SynapseNetworkNode.cs" />
     <Compile Include="Network\SynapseNetworkServer.cs" />
     <Compile Include="Network\TokenFactory.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\914ActivatePatch.cs" />

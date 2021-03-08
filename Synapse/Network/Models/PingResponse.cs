@@ -7,6 +7,8 @@ namespace Synapse.Network.Models
     public class PingResponse : SuccessfulStatus
     {
         public bool Authenticated { get; set; }
-        public List<InstanceMessage> Messages { get; set; } = new List<InstanceMessage>();
+        public List<InstanceMessage> Messages { get; set; }
+
+        public List<string> ConnectedClients { get; set; }
     }
 }

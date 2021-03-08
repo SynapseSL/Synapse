@@ -17,7 +17,9 @@ namespace Synapse.Network.Models
 
         public static bool CheckIsCoreType(Type type)
         {
-            return type?.AssemblyQualifiedName?.Contains("mscorlib") ?? true;
+            if (type == null || type.AssemblyQualifiedName == null) return false;
+            if (type.AssemblyQualifiedName.Contains("mscorlib")) return type.IsPrimitive;
+            return false;
         }
 
         public T Value<T>()

@@ -31,6 +31,7 @@ namespace Synapse.Command
             RegisterCommand(new SynapseRespawnCommand(), false);
             RegisterCommand(new SynapseNetworkSyncCommand(), false);
             RegisterCommand(new SynapseGccCommand(), false);
+            RegisterCommand(new SynapsePlayerCommand(), false);
         }
 
         internal static void RegisterCommand(ISynapseCommand iSynapseCommand, bool awaitPluginInitialisation)

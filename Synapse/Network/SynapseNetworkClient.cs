@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
@@ -8,6 +9,7 @@ using EmbedIO;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Caching.Memory;
 using Swan.Formatters;
+using Synapse.Api;
 using Synapse.Network.Models;
 
 namespace Synapse.Network
@@ -28,6 +30,7 @@ namespace Synapse.Network
         public string ServerCipherKey;
         public RSA ServerPublicKey;
         public string SessionToken;
+        public List<string> SyncedClientList = new List<string>();
 
         public string Url;
 
@@ -43,6 +46,120 @@ namespace Synapse.Network
                 SizeLimit = 64
             });
         }
+
+        [ItemCanBeNull]
+        public async Task<NetworkPlayer> GetPlayer(string uid)
+        {
+            var message = await SendMessageAndAwaitResponse(InstanceMessage.CreateBroadcast("GetPlayer", uid));
+            return message?.Value<NetworkPlayer>();
+        }
+
+        public async Task<List<NetworkPlayer>> GetAllPlayers()
+        {
+            var players = Server.Get.Players.Select(NetworkPlayer.FromLocalPlayer).ToList();
+            var tasks = new List<Task<InstanceMessage>>();
+            foreach (var client in SyncedClientList)
+            {
+                if (client == ClientIdentifier) continue;
+                tasks.Add(SendMessageAndAwaitResponse(InstanceMessage.CreateSend("GetPlayers", "", client)));
+            }
+
+            if (!tasks.IsEmpty())
+            {
+                await Task.WhenAll(tasks);
+                Logger.Get.Warn("All tasks completed");
+                players.AddRange(tasks.Select(x => x.Result).Select(x =>
+                {
+                    if (x == null) return new List<NetworkPlayer>();
+                    return x.Value<List<NetworkPlayer>>();
+                }).Aggregate((x, y) =>
+                {
+                    var list = x.ToList();
+                    list.AddRange(y);
+                    return list;
+                }));
+            }
+
+            return players;
+        }
+
+        internal async Task<PingResponse> PollServer()
+        {
+            try
+            {
+                var result = await Get<PingResponse>("/synapse/ping", exceptionHandler: x => { });
+                if (result != null)
+                {
+                    try
+                    {
+                        foreach (var message in result.Messages)
+                        {
+                            foreach (var node in Server.Get.NetworkManager.NetworkNodes)
+                                node.ReceiveInstanceMessage(message);
+                            var key = $"{message.ReferenceId}{message.Subject}";
+                            var existsReq = _requestMemCache.TryGetValue(key, out var obj);
+                            if (existsReq) ((Action<InstanceMessage>) obj).Invoke(message);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Get.Error(e);
+                    }
+
+                    SyncedClientList = result.ConnectedClients;
+
+                    return result;
+                }
+
+                return (PingResponse) await Task.FromResult<object>(null);
+            }
+            catch (Exception e)
+            {
+                return (PingResponse) await Task.FromResult<object>(null);
+            }
+        }
+
+        private async Task OnConnected()
+        {
+            Server.Get.Logger.Info("Continuing OnConnected");
+            var networkNodes = Server.Get.NetworkManager.NetworkNodes;
+            networkNodes.ForEach(x => x.StartClient(this));
+            var authority = SynapseNetworkServer.Instance.Status == WebServerState.Stopped
+                ? InstanceAuthority.Client
+                : InstanceAuthority.Master;
+            networkNodes.ForEach(x => x.Reconfigure(authority));
+            Server.Get.Logger.Info("Finished OnConnected");
+        }
+
+        public async Task Connect()
+        {
+            IsStarted = true;
+            try
+            {
+                Server.Get.Logger.Info("Connecting to Synapse-Network...");
+                await SyncMaster();
+                await KeyExchange();
+                await AuthMaster();
+                Server.Get.Logger.Info(
+                    $"Connected to Master-Server with MigrationPriority {MigrationPriority} and ClientUID{ClientIdentifier}");
+                Server.Get.Logger.Send($"Synapse-Network Session-Token is {SessionToken}", ConsoleColor.Magenta);
+                OnConnected();
+            }
+            catch (Exception e)
+            {
+                IsStarted = false;
+                Server.Get.Logger.Error(e);
+            }
+        }
+
+        public async void Disconnect()
+        {
+            IsStarted = false;
+            Client.Dispose();
+            _requestMemCache.Dispose();
+        }
+
+        #region InstanceMessaging
 
         public void AddRequestToCache(string reference, string subject, Action<InstanceMessage> action)
         {
@@ -72,6 +189,7 @@ namespace Synapse.Network
             return await Post<InstanceMessageTransmission, InstanceMessage>("/synapse/post", message);
         }
 
+        [ItemCanBeNull]
         public async Task<InstanceMessage> SendMessageAndAwaitResponse(InstanceMessage message, string responseSubject)
         {
             InstanceMessage result = null;
@@ -80,13 +198,21 @@ namespace Synapse.Network
             {
                 if (x == null && result != null) return;
                 result = x;
-                Server.Get.Logger.Warn($"Response? {x}");
-                completer.TrySetResult(x);
+                completer.TrySetResult(result);
             });
             await Post<InstanceMessageTransmission, InstanceMessage>("/synapse/post", message);
             return await completer.Task;
         }
 
+        [ItemCanBeNull]
+        public async Task<InstanceMessage> SendMessageAndAwaitResponse(InstanceMessage message)
+        {
+            return await SendMessageAndAwaitResponse(message, message.Subject + "Res");
+        }
+
+        #endregion
+
+        #region NetworkVars
 
         [ItemCanBeNull]
         public async Task<TR> RequestNetworkVar<TR>(string key)
@@ -118,6 +244,10 @@ namespace Synapse.Network
             var entry = await Server.Get.NetworkManager.Client.Get<List<NetworkSyncEntry>>("/networksync");
             return entry ?? new List<NetworkSyncEntry>();
         }
+
+        #endregion
+
+        #region HttpMethods
 
         [ItemCanBeNull]
         public async Task<TR> Get<TR>(string path, bool authenticated = true, Action<Exception> exceptionHandler = null,
@@ -247,72 +377,9 @@ namespace Synapse.Network
             }
         }
 
-        internal async Task<PingResponse> PollServer()
-        {
-            try
-            {
-                var result = await Get<PingResponse>("/synapse/ping", exceptionHandler: x => { });
-                if (result != null)
-                {
-                    foreach (var message in result.Messages)
-                    {
-                        foreach (var node in Server.Get.NetworkManager.NetworkNodes)
-                            node.ReceiveInstanceMessage(message);
-                        var key = $"{message.ReferenceId}{message.Subject}";
-                        var existsReq = _requestMemCache.TryGetValue(key, out var obj);
-                        if (existsReq) ((Action<InstanceMessage>) obj).Invoke(message);
-                    }
+        #endregion
 
-                    return result;
-                }
-
-                return (PingResponse) await Task.FromResult<object>(null);
-            }
-            catch (Exception e)
-            {
-                return (PingResponse) await Task.FromResult<object>(null);
-            }
-        }
-
-        private async Task OnConnected()
-        {
-            await Server.Get.NetworkManager.ReconnectLoop.AwaitOneClientPollCycle();
-            Server.Get.Logger.Info("Continuing OnConnected");
-            var networkNodes = Server.Get.NetworkManager.NetworkNodes;
-            networkNodes.ForEach(x => x.StartClient(this));
-            var authority = SynapseNetworkServer.Instance.Status == WebServerState.Stopped
-                ? InstanceAuthority.Client
-                : InstanceAuthority.Master;
-            networkNodes.ForEach(x => x.Reconfigure(authority));
-            Server.Get.Logger.Info("Finished OnConnected");
-        }
-
-        public async Task Connect()
-        {
-            IsStarted = true;
-            try
-            {
-                Server.Get.Logger.Info("Connecting to Synapse-Network...");
-                await SyncMaster();
-                await KeyExchange();
-                await AuthMaster();
-                Server.Get.Logger.Info(
-                    $"Connected to Master-Server with MigrationPriority {MigrationPriority} and ClientUID{ClientIdentifier}");
-                Server.Get.Logger.Send($"Synapse-Network Session-Token is {SessionToken}", ConsoleColor.Magenta);
-                OnConnected();
-            }
-            catch (Exception e)
-            {
-                IsStarted = false;
-                Server.Get.Logger.Error(e);
-            }
-        }
-
-        public async void Disconnect()
-        {
-            //TODO
-        }
-
+        #region Authentication
 
         private async Task KeyExchange()
         {
@@ -364,5 +431,7 @@ namespace Synapse.Network
             var res = Json.Deserialize<NetworkAuthResAuth>(content);
             SessionToken = res.SessionToken;
         }
+
+        #endregion
     }
 }

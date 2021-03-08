@@ -6,16 +6,15 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
-using System.Threading;
-using System.Threading.Tasks;
 using EmbedIO;
 using EmbedIO.WebApi;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Caching.Memory;
 using Swan;
-using Swan.Logging;
+using Synapse.Api;
 using Synapse.Network.Models;
 using Synapse.Network.Routes;
+using Synapse.Reactive;
 
 namespace Synapse.Network
 {
@@ -26,13 +25,14 @@ namespace Synapse.Network
         public readonly HashSet<NetworkSyncEntry> NetworkSyncEntries = new HashSet<NetworkSyncEntry>();
 
         private MemoryCache _cache;
-        private Task _heartbeat;
+        private IDisposable _hearthbeatSubscriber;
         private ConcurrentDictionary<string, ConcurrentBag<InstanceMessage>> _messageCaches;
+
         public int Port;
         public RSA PrivateKey;
-
         public string PublicKey;
         public string Secret;
+        public ServerHeartbeat ServerHeartbeatLoop = new ServerHeartbeat();
 
         public Dictionary<string, DateTimeOffset> SyncedClientList = new Dictionary<string, DateTimeOffset>();
         public Dictionary<string, string> TokenClientIDMap = new Dictionary<string, string>();
@@ -188,17 +188,9 @@ namespace Synapse.Network
                     Synapse.Server.Get.Logger.Info($"HTTP-Server Module with BaseRoute {module.BaseRoute} hooked");
 #endif
                 Synapse.Server.Get.Logger.Info("Executing WebServer");
-                var configPollRate = Synapse.Server.Get.Configs.synapseConfiguration.NetworkPollRate;
-                _heartbeat = new Task(() =>
-                {
-                    while (true)
-                    {
-                        ServerHeartbeat();
-                        Thread.Sleep(TimeSpan.FromMilliseconds(100));
-                    }
-                });
-                _heartbeat.Start();
-
+                _hearthbeatSubscriber =
+                    ServerHeartbeatLoop.HeartbeatSubject.Subscribe(new Consumer<object>(x => ServerHeartbeat()));
+                ServerHeartbeatLoop.Start(true);
                 Server.RunAsync();
             }
             catch (Exception e)
@@ -211,7 +203,8 @@ namespace Synapse.Network
         {
             Synapse.Server.Get.Logger.Info("Disposing Network Server...");
             Server?.Dispose();
-            _heartbeat?.Dispose();
+            ServerHeartbeatLoop.Stop();
+            _hearthbeatSubscriber.Dispose();
             _cache.Dispose();
             NetworkSyncEntries.Clear();
             NetworkSyncEntries.Add(SerializableObjectWrapper.FromPair("example", "Some string value"));
@@ -219,29 +212,21 @@ namespace Synapse.Network
         }
 
 
-        // Create and configure our web server.
         private static WebServer CreateWebServer(string url)
         {
             var server = new WebServer(o => o
                     .WithUrlPrefix(url)
                     .WithMode(HttpListenerMode.EmbedIO))
-                // First, we will configure our web server by adding Modules.
                 .WithLocalSessionManager()
                 .WithWebApi("/synapse", m => m
                     .WithController<SynapseSynapseRouteController>()
                 );
-            // .WithModule(new ActionModule("/", HttpVerbs.Any, ctx => ctx.SendDataAsync(new { Message = "Error" })));
 
 
             // Listen for state changes.
-            server.StateChanged += (s, e) => $"WebServer New State - {e.NewState}".Info();
+            server.StateChanged += (s, e) => Logger.Get.Info($"WebServer New State - {e.NewState}");
 
             return server;
-        }
-
-        public static long CurrentMillis()
-        {
-            return new DateTime().Millisecond;
         }
 
         public static bool CheckServerPortAvailable(int port)
@@ -258,10 +243,6 @@ namespace Synapse.Network
             {
                 return false;
             }
-        }
-
-        public class CacheKey
-        {
         }
     }
 

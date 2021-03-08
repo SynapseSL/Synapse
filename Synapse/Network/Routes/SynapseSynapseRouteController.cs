@@ -24,6 +24,9 @@ namespace Synapse.Network.Routes
             return new PingResponse
             {
                 Authenticated = clientData != null,
+                ConnectedClients = clientData == null
+                    ? new List<string>()
+                    : SynapseNetworkServer.Instance.SyncedClientList.Keys.ToList(),
                 Messages = clientData == null
                     ? new List<InstanceMessage>()
                     : SynapseNetworkServer.Instance.TakeAllMessages(clientData)

@@ -55,6 +55,7 @@ namespace Synapse.Network
                             //Thread.Sleep(500 * Client.MigrationPriority);
                             break;
                         case false:
+                            networkClient.Init();
                             await networkClient.Connect();
                             break;
                     }
