@@ -34,6 +34,13 @@ namespace Synapse.Network
 
         public string Url;
 
+        public SynapseNetworkClient()
+        {
+            GetClient = this;
+        }
+
+        public static SynapseNetworkClient GetClient { get; private set; }
+
         public void Init()
         {
             Client = new HttpClient();
@@ -53,6 +60,7 @@ namespace Synapse.Network
             var message = await SendMessageAndAwaitResponse(InstanceMessage.CreateBroadcast("GetPlayer", uid));
             return message?.Value<NetworkPlayer>();
         }
+
 
         public async Task<List<NetworkPlayer>> GetAllPlayers()
         {
@@ -124,7 +132,7 @@ namespace Synapse.Network
             Server.Get.Logger.Info("Continuing OnConnected");
             var networkNodes = Server.Get.NetworkManager.NetworkNodes;
             networkNodes.ForEach(x => x.StartClient(this));
-            var authority = SynapseNetworkServer.Instance.Status == WebServerState.Stopped
+            var authority = SynapseNetworkServer.GetServer.Status == WebServerState.Stopped
                 ? InstanceAuthority.Client
                 : InstanceAuthority.Master;
             networkNodes.ForEach(x => x.Reconfigure(authority));

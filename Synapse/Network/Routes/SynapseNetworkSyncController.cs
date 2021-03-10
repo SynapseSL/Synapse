@@ -18,7 +18,7 @@ namespace Synapse.Network.Routes
                 {
                     var clientData = this.GetClientData();
                     if (clientData == null) return new NotFoundStatus();
-                    return new StatusListWrapper<NetworkSyncEntry>(SynapseNetworkServer.Instance.NetworkSyncEntries);
+                    return new StatusListWrapper<NetworkSyncEntry>(SynapseNetworkServer.GetServer.NetworkSyncEntries);
                 }
                 catch (InvalidOperationException e)
                 {
@@ -29,7 +29,7 @@ namespace Synapse.Network.Routes
             {
                 var clientData = this.GetClientData();
                 if (clientData == null) return StatusedResponse.Unauthorized;
-                return SynapseNetworkServer.Instance.NetworkSyncEntries.First(x => x.Key == key);
+                return SynapseNetworkServer.GetServer.NetworkSyncEntries.First(x => x.Key == key);
             }
             catch (InvalidOperationException e)
             {
@@ -46,7 +46,7 @@ namespace Synapse.Network.Routes
                 if (clientData == null) return StatusedResponse.Unauthorized;
                 var syncVar = await HttpContext.GetRequestDataAsync<NetworkSyncEntry>();
                 syncVar.Key = key;
-                var syncEntries = SynapseNetworkServer.Instance.NetworkSyncEntries;
+                var syncEntries = SynapseNetworkServer.GetServer.NetworkSyncEntries;
                 if (syncEntries.Contains(syncVar))
                 {
                     syncEntries.Remove(syncVar);

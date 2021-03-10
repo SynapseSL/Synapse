@@ -132,6 +132,7 @@
     <Compile Include="Database\Repository.cs" />
     <Compile Include="Network\AESUtils.cs" />
     <Compile Include="Network\ClientData.cs" />
+    <Compile Include="Network\InstanceDetails.cs" />
     <Compile Include="Network\JavaLikeThread.cs" />
     <Compile Include="Network\NetworkNodeBase.cs" />
     <Compile Include="Network\InstanceAuthority.cs" />

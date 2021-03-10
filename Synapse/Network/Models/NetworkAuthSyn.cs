@@ -6,6 +6,8 @@ namespace Synapse.Network.Models
     public class NetworkAuthSyn
     {
         public string ClientName { get; set; }
+
+        public int Port { get; set; }
         public string PublicKey { get; set; }
     }
 }

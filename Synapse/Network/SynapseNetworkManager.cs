@@ -6,16 +6,15 @@ namespace Synapse.Network
 {
     public class SynapseNetworkManager
     {
-        public readonly List<NetworkNodeBase> NetworkNodes = new List<NetworkNodeBase>();
-
-        public SynapseNetworkClient Client;
-        public ReconnectLoop ReconnectLoop;
-        public SynapseNetworkServer Server;
-
         public SynapseNetworkManager()
         {
             NetworkNodes.Add(new SynapseNetworkNode());
         }
+
+        public List<NetworkNodeBase> NetworkNodes { get; } = new List<NetworkNodeBase>();
+        public SynapseNetworkClient Client { get; private set; }
+        public ReconnectLoop ReconnectLoop { get; private set; }
+        public SynapseNetworkServer Server { get; private set; }
 
         public void Start()
         {
@@ -47,7 +46,7 @@ namespace Synapse.Network
             var synapseConfig = Synapse.Server.Get.Configs.synapseConfiguration;
             if (!synapseConfig.NetworkEnable || !synapseConfig.MasterAuthority) return;
             Synapse.Server.Get.Logger.Info("Starting Synapse-Network Server");
-            Server = SynapseNetworkServer.Instance;
+            Server = SynapseNetworkServer.GetServer;
             Server.Secret = synapseConfig.NetworkSecret;
             Server.Port = synapseConfig.NetworkPort;
             Server.Url = synapseConfig.NetworkUrl;

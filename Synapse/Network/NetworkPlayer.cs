@@ -12,6 +12,7 @@ namespace Synapse.Network
         public string DisplayName { get; set; }
         public string UserId { get; set; }
         public string RoleName { get; set; }
+        public string CurrentServerId { get; set; }
 
         [CanBeNull]
         public Player ToLocalPlayer()
@@ -27,7 +28,8 @@ namespace Synapse.Network
                 Endpoint = player.IpAddress,
                 DisplayName = player.DisplayName,
                 UserId = player.UserId,
-                RoleName = player.RoleName
+                RoleName = player.RoleName,
+                CurrentServerId = SynapseNetworkClient.GetClient.ClientIdentifier
             };
         }
     }

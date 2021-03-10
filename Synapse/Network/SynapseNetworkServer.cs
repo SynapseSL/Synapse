@@ -21,23 +21,9 @@ namespace Synapse.Network
     public class SynapseNetworkServer
     {
         private static SynapseNetworkServer _instance;
-
-        public readonly HashSet<NetworkSyncEntry> NetworkSyncEntries = new HashSet<NetworkSyncEntry>();
-
         private MemoryCache _cache;
         private IDisposable _hearthbeatSubscriber;
         private ConcurrentDictionary<string, ConcurrentBag<InstanceMessage>> _messageCaches;
-
-        public int Port;
-        public RSA PrivateKey;
-        public string PublicKey;
-        public string Secret;
-        public ServerHeartbeat ServerHeartbeatLoop = new ServerHeartbeat();
-
-        public Dictionary<string, DateTimeOffset> SyncedClientList = new Dictionary<string, DateTimeOffset>();
-        public Dictionary<string, string> TokenClientIDMap = new Dictionary<string, string>();
-
-        public string Url;
 
 
         public SynapseNetworkServer()
@@ -45,7 +31,17 @@ namespace Synapse.Network
             _instance = this;
         }
 
-        public static SynapseNetworkServer Instance => _instance ?? new SynapseNetworkServer();
+        public RSA PrivateKey { get; private set; }
+        public string PublicKey { get; private set; }
+        public string Secret { get; internal set; }
+        public string Url { get; internal set; }
+        public int Port { get; internal set; }
+        public ServerHeartbeat ServerHeartbeatLoop { get; } = new ServerHeartbeat();
+
+        public Dictionary<string, DateTimeOffset> SyncedClientList { get; } = new Dictionary<string, DateTimeOffset>();
+        public Dictionary<string, string> TokenClientIDMap { get; } = new Dictionary<string, string>();
+        public HashSet<NetworkSyncEntry> NetworkSyncEntries { get; } = new HashSet<NetworkSyncEntry>();
+        public static SynapseNetworkServer GetServer => _instance ?? new SynapseNetworkServer();
 
         public WebServer Server { get; private set; }
 
@@ -123,8 +119,8 @@ namespace Synapse.Network
         {
             Synapse.Server.Get.Logger.Warn("Evicted inactive ClientData & Messages");
             var clientDat = (ClientData) value;
-            Instance._messageCaches.TryRemove(clientDat.ClientUid, out var ignored);
-            Instance.TokenClientIDMap.Remove(clientDat.SessionToken);
+            GetServer._messageCaches.TryRemove(clientDat.ClientUid, out var ignored);
+            GetServer.TokenClientIDMap.Remove(clientDat.SessionToken);
         }
 
         public void Init()

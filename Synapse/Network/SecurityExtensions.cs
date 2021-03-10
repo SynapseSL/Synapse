@@ -37,7 +37,7 @@ namespace Synapse.Network
             {
                 var authHeader = controller.Request.Headers.Get("Authorization");
                 if (authHeader == null) return null;
-                var dataClient = SynapseNetworkServer.Instance.DataByToken(authHeader.Replace("Bearer ", ""));
+                var dataClient = SynapseNetworkServer.GetServer.DataByToken(authHeader.Replace("Bearer ", ""));
                 if (dataClient == null) return null;
                 return dataClient.ValidateRequestSafe(controller) ? dataClient : null;
             }
@@ -52,7 +52,7 @@ namespace Synapse.Network
             var authHeader = controller.Request.Headers.Get("Authorization");
             if (authHeader == null) throw new HttpException(HttpStatusCode.Unauthorized);
             var token = authHeader.Replace("Bearer ", "");
-            var clientData = SynapseNetworkServer.Instance.DataById(token);
+            var clientData = SynapseNetworkServer.GetServer.DataById(token);
             clientData.ValidateRequest(controller);
             return AESUtils.Encrypt(value, clientData.ClientCipherKey);
         }
@@ -62,7 +62,7 @@ namespace Synapse.Network
             var authHeader = controller.Request.Headers.Get("Authorization");
             if (authHeader == null) throw new HttpException(HttpStatusCode.Unauthorized);
             var token = authHeader.Replace("Bearer ", "");
-            var clientData = SynapseNetworkServer.Instance.DataById(token);
+            var clientData = SynapseNetworkServer.GetServer.DataById(token);
             clientData.ValidateRequest(controller);
             return AESUtils.Decrypt(value, clientData.CipherKey);
         }

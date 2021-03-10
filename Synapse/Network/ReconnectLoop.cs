@@ -38,8 +38,8 @@ namespace Synapse.Network
                     Server.Get.Logger.Warn("Master-Ping failed");
 
                     if (Server.Get.Configs.synapseConfiguration.MasterAuthority
-                        && SynapseNetworkServer.Instance.Status != WebServerState.Loading
-                        && SynapseNetworkServer.Instance.Status != WebServerState.Listening
+                        && SynapseNetworkServer.GetServer.Status != WebServerState.Loading
+                        && SynapseNetworkServer.GetServer.Status != WebServerState.Listening
                         && SynapseNetworkServer.CheckServerPortAvailable(_configuration.NetworkPort))
                     {
                         Server.Get.NetworkManager.BoostrapServer();
