@@ -28,16 +28,16 @@ namespace Synapse.Network
         private IDisposable _hearthbeatSubscriber;
         private ConcurrentDictionary<string, ConcurrentBag<InstanceMessage>> _messageCaches;
 
-        public int Port;
-        public RSA PrivateKey;
-        public string PublicKey;
-        public string Secret;
-        public ServerHeartbeat ServerHeartbeatLoop = new ServerHeartbeat();
+        public int Port { get; set; }
+        public RSA PrivateKey { get; set; }
+        public string PublicKey { get; set; }
+        public string Secret { get; set; }
+        public ServerHeartbeat ServerHeartbeatLoop { get; set; } = new ServerHeartbeat();
 
-        public Dictionary<string, DateTimeOffset> SyncedClientList = new Dictionary<string, DateTimeOffset>();
-        public Dictionary<string, string> TokenClientIDMap = new Dictionary<string, string>();
+        public Dictionary<string, DateTimeOffset> SyncedClientList { get; set; } = new Dictionary<string, DateTimeOffset>();
+        public Dictionary<string, string> TokenClientIDMap { get; set; } = new Dictionary<string, string>();
 
-        public string Url;
+        public string Url { get; set; }
 
 
         public SynapseNetworkServer()

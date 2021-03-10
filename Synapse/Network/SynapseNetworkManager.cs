@@ -8,9 +8,9 @@ namespace Synapse.Network
     {
         public readonly List<NetworkNodeBase> NetworkNodes = new List<NetworkNodeBase>();
 
-        public SynapseNetworkClient Client;
-        public ReconnectLoop ReconnectLoop;
-        public SynapseNetworkServer Server;
+        public SynapseNetworkClient Client { get; set; }
+        public ReconnectLoop ReconnectLoop { get; set; }
+        public SynapseNetworkServer Server { get; set; }
 
         public SynapseNetworkManager()
         {

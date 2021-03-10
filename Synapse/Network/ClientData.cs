@@ -10,14 +10,14 @@ namespace Synapse.Network
     [Serializable]
     public class ClientData
     {
-        public string Endpoint;
-        public string ClientName;
-        public string ClientUid;
-        public string CipherKey;
-        public string ClientCipherKey;
-        public string SessionToken;
-        public bool Valid;
-        public RSA PublicKey;
+        public string Endpoint { get; set; }
+        public string ClientName { get; set; }
+        public string ClientUid { get; set; }
+        public string CipherKey { get; set; }
+        public string ClientCipherKey { get; set; }
+        public string SessionToken { get; set; }
+        public bool Valid { get; set; }
+        public RSA PublicKey { get; set; }
 
         public bool ValidateRequest(WebApiController controller)
         {

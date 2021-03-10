@@ -17,22 +17,22 @@ namespace Synapse.Network
     public class SynapseNetworkClient
     {
         private MemoryCache _requestMemCache;
-        public string CipherKey;
+        public string CipherKey { get; set; }
         private HttpClient Client;
-        public string ClientIdentifier;
-        public string ClientName = "SynapseServerClient";
+        public string ClientIdentifier { get; set; }
+        public string ClientName { get; set; } = "SynapseServerClient";
 
-        public bool IsStarted;
-        public int MigrationPriority;
-        public RSA PrivateKey;
-        public string PublicKey;
-        public string Secret;
-        public string ServerCipherKey;
-        public RSA ServerPublicKey;
-        public string SessionToken;
-        public List<string> SyncedClientList = new List<string>();
+        public bool IsStarted { get; set; }
+        public int MigrationPriority { get; set; }
+        public RSA PrivateKey { get; set; }
+        public string PublicKey { get; set; }
+        public string Secret { get; set; }
+        public string ServerCipherKey { get; set; }
+        public RSA ServerPublicKey { get; set; }
+        public string SessionToken { get; set; }
+        public List<string> SyncedClientList { get; set; } = new List<string>();
 
-        public string Url;
+        public string Url { get; set; }
 
         public void Init()
         {
