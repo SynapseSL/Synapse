@@ -25,7 +25,7 @@ public class SynapseController
     internal SynapseController()
     {
         CustomNetworkManager.Modded = true;
-        BuildInfoCommand.ModDescription = "A heavily modded server software using extensive runtime patching to make development faster and the usage more accessible to end-users";
+        BuildInfoCommand.ModDescription = "Synapse is a heavily modded server software using extensive runtime patching to make development faster and the usage more accessible to end-users";
         
         PatchMethods();
         Server.Configs.Init();

@@ -54,8 +54,7 @@ namespace Synapse.Api.Roles
             var role = (IRole)Activator.CreateInstance(typeof(TRole));
 
             if (role.GetRoleID() >= 0 && role.GetRoleID() <= HighestRole) throw new Exception("A Plugin tried to register a CustomRole with an Id of a vanilla RoleType");
-            if (IsIDRegistered(role.GetRoleID())) throw new Exception("A Plugin tried to register a CustomRole with an already registered CustomRole");
-            if (!Server.Get.TeamManager.IsIDRegistered(role.GetTeamID())) Logger.Get.Warn($"The role {role.GetRoleName()} is using a not registered Team");
+            if (IsIDRegistered(role.GetRoleID())) throw new Exception("A Plugin tried to register a CustomRole with an already registered ID");
 
             var info = new RoleInformation(role.GetRoleName(), role.GetRoleID(), typeof(TRole));
 
@@ -65,8 +64,7 @@ namespace Synapse.Api.Roles
         public void RegisterCustomRole(RoleInformation role)
         {
             if (role.ID >= 0 && role.ID <= HighestRole) throw new Exception("A Plugin tried to register a CustomRole with an Id of a vanilla RoleType");
-            if (IsIDRegistered(role.ID)) throw new Exception("A Plugin tried to register a CustomRole with an already registered CustomRole");
-            if (!Server.Get.TeamManager.IsIDRegistered(role.ID)) Logger.Get.Warn($"The role {role.Name} is using a not registered Team");
+            if (IsIDRegistered(role.ID)) throw new Exception("A Plugin tried to register a CustomRole with an already registered ID");
 
             CustomRoles.Add(role);
         }
