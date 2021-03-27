@@ -16,12 +16,12 @@ Synapse itself has a ton of features some of these include:
 The installation of Synapse is very easy.
 
 Download the newest release from the [Releases](https://github.com/SynapseSL/Synapse/releases) page.
-Then follow the instructions under the Wiki: [Hosting Guides](https://github.com/SynapseSL/Synapse/wiki#hosting-guides)
+Then follow the instructions under the Wiki: [Hosting Guides](https://docs.synapsesl.xyz/setup/setup)
 
 ## **Developers**
 
 Developing for Synapse is just as easy as the Installation.
-Please check our [example plugin](https://github.com/GrafDimenzio/Example-Plugin) and our [Wiki](https://github.com/SynapseSl/Synapse/wiki#developer-guides) for a full API documentation.
+Please check our [example plugin](https://github.com/GrafDimenzio/Example-Plugin) and our [Wiki](https://docs.synapsesl.xyz/) for a full API documentation.
 
 ## **Support & Credits**
 In need of Support please join our [Discord](https://discord.gg/wSBHXwy)!
