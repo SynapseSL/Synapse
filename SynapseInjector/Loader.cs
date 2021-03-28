@@ -13,24 +13,30 @@ namespace SynapseInjector
         /// </summary>
         public static void LoadSystem()
         {
-            var localpath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Synapse");
-            ServerConsole.AddLog("Path: " + localpath);
-            var synapsepath = Directory.Exists(localpath) ? localpath : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Synapse");
-
-            if (!Directory.Exists(synapsepath)) Directory.CreateDirectory(synapsepath);
-            
-            var dependencyAssemblies = new List<Assembly>();
-            foreach (var depend in Directory.GetFiles(Path.Combine(synapsepath, "dependencies")))
+            try
             {
-                var assembly = Assembly.Load(File.ReadAllBytes(depend));
-                dependencyAssemblies.Add(assembly);
-            };
+                var localpath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Synapse");
+                var synapsepath = Directory.Exists(localpath) ? localpath : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Synapse");
 
-            var synapseAssembly = Assembly.Load(File.ReadAllBytes(Path.Combine(synapsepath, "Synapse.dll")));
-            
-            printBanner(synapseAssembly, dependencyAssemblies);
-            
-            InvokeAssembly(synapseAssembly);
+                if (!Directory.Exists(synapsepath)) Directory.CreateDirectory(synapsepath);
+
+                var dependencyAssemblies = new List<Assembly>();
+                foreach (var depend in Directory.GetFiles(Path.Combine(synapsepath, "dependencies"),"*.dll"))
+                {
+                    var assembly = Assembly.Load(File.ReadAllBytes(depend));
+                    dependencyAssemblies.Add(assembly);
+                };
+
+                var synapseAssembly = Assembly.Load(File.ReadAllBytes(Path.Combine(synapsepath, "Synapse.dll")));
+
+                printBanner(synapseAssembly, dependencyAssemblies);
+
+                InvokeAssembly(synapseAssembly);
+            }
+            catch(Exception e)
+            {
+                ServerConsole.AddLog($"SynapseLoader: Error occured while loading Synapse please fix it and restart your Server:\n{e}", ConsoleColor.Red);
+            }
         }
 
         /// <summary>
