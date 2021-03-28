@@ -128,7 +128,8 @@ namespace Synapse.Api
             Player.transform.localScale = Vector3.one;
             Player.transform.position = pos;
             Player.transform.rotation = rot;
-            Player.QueryProcessor.NetworkPlayerId = QueryProcessor._idIterator++;
+            Player.PlayerMovementSync.RealModelPosition = pos;
+            Player.QueryProcessor.NetworkPlayerId = QueryProcessor._idIterator;
             Player.QueryProcessor._ipAddress = Server.Get.Host.IpAddress;
             Player.ClassManager.CurClass = role;
             Player.Health = Player.ClassManager.Classes.SafeGet((int)Player.RoleType).maxHP;

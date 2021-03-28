@@ -2,7 +2,6 @@
 using Synapse.Config;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using Logger = Synapse.Api.Logger;
@@ -75,8 +74,6 @@ namespace Synapse
             set => CustomNetworkManager.slots = value;
         }
 
-        [SuppressMessage("ReSharper", "UnusedMember.Global")]
-        [SuppressMessage("ReSharper", "InconsistentNaming")]
         public bool FF
         {
             get => ServerConsole.FriendlyFire;
@@ -343,7 +340,8 @@ namespace Synapse
             internal FileLocations() => Refresh();
             public void Refresh()
             {
-                SynapseDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Synapse");
+                var localpath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Synapse");
+                SynapseDirectory = Directory.Exists(localpath) ? localpath : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Synapse");
                 DatabaseDirectory = Path.Combine(SynapseDirectory, "database");
                 
                 MainPluginDirectory = Path.Combine(SynapseDirectory, "plugins");

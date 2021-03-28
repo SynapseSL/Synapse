@@ -19,7 +19,7 @@ public class SynapseController
         ServerConsole.AddLog("Welcome to Synapse! :)", ConsoleColor.Cyan);
         if (IsLoaded) return;
         IsLoaded = true;
-        var synapse = new SynapseController();
+        new SynapseController();
     }
 
     internal SynapseController()
@@ -28,12 +28,20 @@ public class SynapseController
         BuildInfoCommand.ModDescription = "Synapse is a heavily modded server software using extensive runtime patching to make development faster and the usage more accessible to end-users";
         
         PatchMethods();
-        Server.Configs.Init();
-        Server.PermissionHandler.Init();
-        Server.RoleManager.Init();
-        CommandHandlers.RegisterSynapseCommands();
+        try
+        {
+            Server.Configs.Init();
+            Server.PermissionHandler.Init();
+            Server.RoleManager.Init();
+            CommandHandlers.RegisterSynapseCommands();
 
-        PluginLoader.ActivatePlugins();
+            PluginLoader.ActivatePlugins();
+        }
+        catch(Exception e)
+        {
+            Server.Logger.Error($"Error while Initialising Synapse! Please fix the Issue and restart your Server:\n{e}");
+            return;
+        }
 
         Server.Logger.Info("Synapse is now ready!");
     } 

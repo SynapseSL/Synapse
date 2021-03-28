@@ -1,4 +1,5 @@
 ﻿using System;
+using Synapse.Api;
 using System.Linq;
 using HarmonyLib;
 
@@ -15,6 +16,9 @@ namespace Synapse.Patches.SynapsePatches
                 var target = c.GetPlayer();
 
                 __result = true;
+
+                if (Map.Get.Round.RoundEnded && Server.Get.Configs.synapseConfiguration.AutoFF)
+                    return false;
 
                 if (shooter.CustomRole == null && target.CustomRole == null)
                 {

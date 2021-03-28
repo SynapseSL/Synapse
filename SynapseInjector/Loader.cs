@@ -13,17 +13,20 @@ namespace SynapseInjector
         /// </summary>
         public static void LoadSystem()
         {
-            var synapse = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Synapse");
-            if (!Directory.Exists(synapse)) Directory.CreateDirectory(synapse);
+            var localpath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Synapse");
+            ServerConsole.AddLog("Path: " + localpath);
+            var synapsepath = Directory.Exists(localpath) ? localpath : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Synapse");
+
+            if (!Directory.Exists(synapsepath)) Directory.CreateDirectory(synapsepath);
             
             var dependencyAssemblies = new List<Assembly>();
-            foreach (var depend in Directory.GetFiles(Path.Combine(synapse, "dependencies")))
+            foreach (var depend in Directory.GetFiles(Path.Combine(synapsepath, "dependencies")))
             {
                 var assembly = Assembly.Load(File.ReadAllBytes(depend));
                 dependencyAssemblies.Add(assembly);
             };
 
-            var synapseAssembly = Assembly.Load(File.ReadAllBytes(Path.Combine(synapse, "Synapse.dll")));
+            var synapseAssembly = Assembly.Load(File.ReadAllBytes(Path.Combine(synapsepath, "Synapse.dll")));
             
             printBanner(synapseAssembly, dependencyAssemblies);
             
@@ -43,7 +46,7 @@ namespace SynapseInjector
                 " __)  \\/  | |  (_|  |_)  _>  (/_ \n" +
                 "      /             |            \n\n" +
                 $"SynapseVersion {syn.GetName().Version}\n" +
-                $"LoaderVersion: 1.0.0.0\n" +
+                $"LoaderVersion: 1.0.1.0\n" +
                 $"RuntimeVersion: {Assembly.GetExecutingAssembly().ImageRuntimeVersion}\n\n" +
                 string.Join("\n", dep.Select(assembly => $"{assembly.GetName().Name}: {assembly.GetName().Version}").ToList()) + "\n" +
                 "-------------------===Loader===-------------------", ConsoleColor.Yellow);

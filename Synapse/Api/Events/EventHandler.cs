@@ -2,6 +2,9 @@
 using UnityEngine;
 using System.Linq;
 using MEC;
+using RemoteAdmin;
+using System.Collections.Generic;
+using System;
 
 namespace Synapse.Api.Events
 {
@@ -21,13 +24,7 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    foreach (var ply in SynapseController.Server.Players)
-                        ply.Scp173Controller.TurnedPlayers.Add(ev.Player);
-                    break;
-
-                case KeyCode.Alpha2:
-                    foreach (var ply in SynapseController.Server.Players)
-                        ply.Scp173Controller.TurnedPlayers.Remove(ev.Player);
+                    var dummy = new Dummy(ev.Player.Position, ev.Player.transform.rotation, ev.Player.RoleType);
                     break;
             }
         }
@@ -51,14 +48,14 @@ namespace Synapse.Api.Events
         }
 
 #region HookedEvents
-        private SynapseConfiguration conf => SynapseController.Server.Configs.synapseConfiguration;
+        private SynapseConfiguration Conf => SynapseController.Server.Configs.synapseConfiguration;
 
         private void PlayerJoin(SynapseEventArguments.PlayerJoinEventArgs ev)
         {
-            ev.Player.Broadcast(conf.JoinMessagesDuration, conf.JoinBroadcast);
-            ev.Player.GiveTextHint(conf.JoinTextHint, conf.JoinMessagesDuration);
-            if (!string.IsNullOrWhiteSpace(conf.JoinWindow))
-                ev.Player.OpenReportWindow(conf.JoinWindow.Replace("\\n","\n"));
+            ev.Player.Broadcast(Conf.JoinMessagesDuration, Conf.JoinBroadcast);
+            ev.Player.GiveTextHint(Conf.JoinTextHint, Conf.JoinMessagesDuration);
+            if (!string.IsNullOrWhiteSpace(Conf.JoinWindow))
+                ev.Player.OpenReportWindow(Conf.JoinWindow.Replace("\\n","\n"));
         }
 
         private void PlayerSyncData(SynapseEventArguments.PlayerSyncDataEventArgs ev)
