@@ -28,12 +28,21 @@ public class SynapseController
         BuildInfoCommand.ModDescription = "A heavily modded server software using extensive runtime patching to make development faster and the usage more accessible to end-users";
         
         PatchMethods();
-        Server.Configs.Init();
-        Server.PermissionHandler.Init();
-        Server.RoleManager.Init();
-        CommandHandlers.RegisterSynapseCommands();
-        PluginLoader.ActivatePlugins();
-        Server.NetworkManager.Start();
+        try
+        {
+            Server.Configs.Init();
+            Server.PermissionHandler.Init();
+            Server.RoleManager.Init();
+            CommandHandlers.RegisterSynapseCommands();
+            Server.NetworkManager.Start();
+
+            PluginLoader.ActivatePlugins();
+        }
+        catch(Exception e)
+        {
+            Server.Logger.Error($"Error while Initialising Synapse! Please fix the Issue and restart your Server:\n{e}");
+            return;
+        }
 
         Server.Logger.Info("Synapse is now ready!");
     } 

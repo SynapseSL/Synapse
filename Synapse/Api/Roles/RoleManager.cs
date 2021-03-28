@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Synapse.Api.Events.SynapseEventArguments;
 
 namespace Synapse.Api.Roles
 {
@@ -17,8 +16,7 @@ namespace Synapse.Api.Roles
             SynapseController.Server.Events.Server.RemoteAdminCommandEvent += OnRa;
         }
 
-        public Dictionary<Type, KeyValuePair<string, int>> CustomRoles = new Dictionary<Type, KeyValuePair<string, int>>();
-
+        public List<RoleInformation> CustomRoles { get; } = new List<RoleInformation>();
 
         public string GetRoleName(int id)
         {
@@ -27,30 +25,61 @@ namespace Synapse.Api.Roles
 
             if (!IsIDRegistered(id)) throw new Exception("Plugin tried to get the Name of a non registered Role");
 
-            return CustomRoles.Values.First(x => x.Value == id).Key;
+            return CustomRoles.FirstOrDefault(x => x.ID == id).Name;
         }
 
-        public IRole GetCustomRole(string name) => (IRole)Activator.CreateInstance(CustomRoles.FirstOrDefault(x => x.Value.Key.ToLower() == name.ToLower()).Key);
+        public IRole GetCustomRole(string name)
+        {
+            var roleinformation = CustomRoles.FirstOrDefault(x => x.Name.ToLower() == name.ToLower());
 
-        public IRole GetCustomRole(int id) => (IRole)Activator.CreateInstance(CustomRoles.FirstOrDefault(x => x.Value.Value == id).Key);
+            if (roleinformation.RoleScript.GetConstructors().Any(x => x.GetParameters().Count() == 1 && x.GetParameters().First().ParameterType == typeof(int)))
+                return (IRole)Activator.CreateInstance(roleinformation.RoleScript, new object[] { roleinformation.ID });
+
+            return (IRole)Activator.CreateInstance(roleinformation.RoleScript);
+        }
+
+        public IRole GetCustomRole(int id)
+        {
+            var roleinformation = CustomRoles.FirstOrDefault(x => x.ID == id);
+
+            if (roleinformation.RoleScript.GetConstructors().Any(x => x.GetParameters().Count() == 1 && x.GetParameters().First().ParameterType == typeof(int)))
+                return (IRole)Activator.CreateInstance(roleinformation.RoleScript, new object[] { roleinformation.ID });
+
+            return (IRole)Activator.CreateInstance(roleinformation.RoleScript);
+        }
 
         public void RegisterCustomRole<TRole>() where TRole : IRole
         {
             var role = (IRole)Activator.CreateInstance(typeof(TRole));
 
             if (role.GetRoleID() >= 0 && role.GetRoleID() <= HighestRole) throw new Exception("A Plugin tried to register a CustomRole with an Id of a vanilla RoleType");
-            if (!Server.Get.TeamManager.IsIDRegistered(role.GetTeamID())) Logger.Get.Warn($"The role {role.GetRoleName()} is using a not registered Team");
+            if (IsIDRegistered(role.GetRoleID())) throw new Exception("A Plugin tried to register a CustomRole with an already registered ID");
 
-            var pair = new KeyValuePair<string, int>(role.GetRoleName(), role.GetRoleID());
+            var info = new RoleInformation(role.GetRoleName(), role.GetRoleID(), typeof(TRole));
 
-            CustomRoles.Add(typeof(TRole), pair);
+            CustomRoles.Add(info);
+        }
+
+        public void RegisterCustomRole(RoleInformation role)
+        {
+            if (role.ID >= 0 && role.ID <= HighestRole) throw new Exception("A Plugin tried to register a CustomRole with an Id of a vanilla RoleType");
+            if (IsIDRegistered(role.ID)) throw new Exception("A Plugin tried to register a CustomRole with an already registered ID");
+
+            CustomRoles.Add(role);
+        }
+
+        public void UnRegisterCustomRole(int id)
+        {
+            var role = CustomRoles.FirstOrDefault(x => x.ID == id);
+            if (role != null)
+                CustomRoles.Remove(role);
         }
 
         public bool IsIDRegistered(int id)
         {
             if (id >= 0 && id <= HighestRole) return true;
 
-            if (CustomRoles.Any(x => x.Value.Value == id)) return true;
+            if (CustomRoles.Any(x => x.ID == id)) return true;
 
             return false;
         }

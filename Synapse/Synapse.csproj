@@ -39,6 +39,7 @@
     <Compile Include="Api\Enum\ElevatorType.cs" />
     <Compile Include="Api\Plugin\Processors\TranslationInjector.cs" />
     <Compile Include="Api\Prefabs.cs" />
+    <Compile Include="Api\Roles\RoleInformation.cs" />
     <Compile Include="Api\Scp173Controller.cs" />
     <Compile Include="Api\Scp096Controller.cs" />
     <Compile Include="Api\Enum\ScpAttackType.cs" />
@@ -201,6 +202,7 @@
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp173\Scp173BlinkingPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp939\Scp939AttackPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\Dummy\MirrorPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\DoorSpawnpointPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ShootPermissionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\InvisiblePatch.cs" />

@@ -11,7 +11,7 @@ using Event = Synapse.Api.Events.EventHandler;
 namespace Synapse.Patches.EventsPatches.MapPatches
 {
     [HarmonyPatch(typeof(Scp914.Scp914Machine),nameof(Scp914.Scp914Machine.ProcessItems))]
-    internal static class Class1
+    internal static class Scp914ActivatePatch
     {
         private static bool Prefix(Scp914.Scp914Machine __instance)
         {
