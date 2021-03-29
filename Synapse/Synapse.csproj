@@ -35,6 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Api\Broadcast.cs" />
+    <Compile Include="Api\Enum\MovementDirection.cs" />
     <Compile Include="Api\Enum\ElevatorType.cs" />
     <Compile Include="Api\Plugin\Processors\TranslationInjector.cs" />
     <Compile Include="Api\Prefabs.cs" />

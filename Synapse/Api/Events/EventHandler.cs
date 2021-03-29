@@ -1,10 +1,5 @@
 ﻿using Synapse.Config;
 using UnityEngine;
-using System.Linq;
-using MEC;
-using RemoteAdmin;
-using System.Collections.Generic;
-using System;
 
 namespace Synapse.Api.Events
 {
@@ -26,12 +21,31 @@ namespace Synapse.Api.Events
                 case KeyCode.Alpha1:
                     var dummy = new Dummy(ev.Player.Position, ev.Player.transform.rotation, ev.Player.RoleType,"");
                     dummy.Rotation = ev.Player.Rotation;
-                    dummy.Speed = 2f;
+                    dummy.Direction = Enum.MovementDirection.BackWards;
                     break;
 
                 case KeyCode.Alpha2:
                     dummy = new Dummy(ev.Player.Position, ev.Player.transform.rotation, ev.Player.RoleType);
                     MEC.Timing.CallDelayed(2f, () => dummy.RotateToPosition(ev.Player.Position));
+                    break;
+
+                case KeyCode.Alpha3:
+                    dummy = new Dummy(ev.Player.Position, ev.Player.transform.rotation, ev.Player.RoleType, "");
+                    dummy.Rotation = ev.Player.Rotation;
+                    dummy.Movement = PlayerMovementState.Sprinting;
+                    dummy.Direction = Enum.MovementDirection.Forward;
+                    break;
+
+                case KeyCode.Alpha4:
+                    dummy = new Dummy(ev.Player.Position, ev.Player.transform.rotation, ev.Player.RoleType, "");
+                    dummy.Rotation = ev.Player.Rotation;
+                    dummy.Direction = Enum.MovementDirection.Left;
+                    break;
+
+                case KeyCode.Alpha5:
+                    dummy = new Dummy(ev.Player.Position, ev.Player.transform.rotation, ev.Player.RoleType, "");
+                    dummy.Rotation = ev.Player.Rotation;
+                    dummy.Direction = Enum.MovementDirection.Right;
                     break;
             }
         }

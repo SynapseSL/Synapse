@@ -3,6 +3,7 @@ using RemoteAdmin;
 using System.Linq;
 using UnityEngine;
 using System.Collections.Generic;
+using Synapse.Api.Enum;
 
 namespace Synapse.Api
 {
@@ -102,27 +103,66 @@ namespace Synapse.Api
             set => Player.AnimationController.Network_curMoveState = (byte)value;
         }
 
-        public float Speed { get; set; } = 0f;
+        public MovementDirection Direction { get; set; }
 
+        public float WalkSpeed { get; set; }
+
+        public float RunSpeed { get; set; }
+
+        //Thanks to GameHunt.I used some of his code for the Dummy API https://github.com/gamehunt/CustomNPCs
         private IEnumerator<float> Update()
         {
             for(; ; )
             {
                 yield return MEC.Timing.WaitForSeconds(0.1f);
                 if (GameObject == null) yield break;
-                if (Speed == 0f) continue;
+                if (Direction == MovementDirection.Stop) continue;
 
-                Player.AnimationController.Networkspeed = new Vector2(Speed, 0f);
+                var wall = false;
+                var speed = Movement == PlayerMovementState.Sprinting ? RunSpeed : WalkSpeed;
 
-                var pos = Position + Player.CameraReference.forward / 10 * Speed;
-                
-                if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
+                switch (Direction)
                 {
-                    Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
+                    case MovementDirection.Forward:
+                        Player.AnimationController.Networkspeed = new Vector2(speed, 0f);
+                        var pos = Position + Player.CameraReference.forward / 10 * speed;
+
+                        if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
+                            Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
+                        else wall = true;
+                        break;
+
+                    case MovementDirection.BackWards:
+                        Player.AnimationController.Networkspeed = new Vector2(-speed, 0f);
+                        pos = Position - Player.CameraReference.forward / 10 * speed;
+
+                        if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
+                            Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
+                        else wall = true;
+                        break;
+
+                    case MovementDirection.Right:
+                        Player.AnimationController.Networkspeed = new Vector2(0f, speed);
+                        pos = Position + Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed;
+
+                        if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
+                            Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
+                        else wall = true;
+                        break;
+
+                    case MovementDirection.Left:
+                        Player.AnimationController.Networkspeed = new Vector2(0f, -speed);
+                        pos = Position - Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed;
+
+                        if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
+                            Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
+                        else wall = true;
+                        break;
                 }
-                else
+
+                if (wall)
                 {
-                    Speed = 0f;
+                    Direction = MovementDirection.Stop;
                     Player.AnimationController.Networkspeed = new Vector2(0f, 0f);
                 }
             }
@@ -163,6 +203,8 @@ namespace Synapse.Api
             Player.RankColor = badgecolor;
             Player.Health = 100f;
             Player.GodMode = true;
+            RunSpeed = CharacterClassManager._staticClasses[(int)role].runSpeed;
+            WalkSpeed = CharacterClassManager._staticClasses[(int)role].walkSpeed;
             MEC.Timing.RunCoroutine(Update());
 
             NetworkServer.Spawn(GameObject);
