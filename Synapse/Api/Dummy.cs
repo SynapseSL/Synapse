@@ -161,6 +161,8 @@ namespace Synapse.Api
             Player.NicknameSync.Network_myNickSync = name;
             Player.RankName = badgetext;
             Player.RankColor = badgecolor;
+            Player.Health = 100f;
+            Player.GodMode = true;
             MEC.Timing.RunCoroutine(Update());
 
             NetworkServer.Spawn(GameObject);
