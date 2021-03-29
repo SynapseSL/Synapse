@@ -2,6 +2,7 @@
 using RemoteAdmin;
 using System.Linq;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace Synapse.Api
 {
@@ -40,24 +41,14 @@ namespace Synapse.Api
         /// </summary>
         public Vector3 Position
         {
-            get => GameObject.transform.position;
-            set
-            {
-                Despawn();
-                GameObject.transform.position = value;
-                Spawn();
-            }
+            get => Player.Position;
+            set => Player.Position = value;
         }
 
-        public Quaternion Rotation
+        public Vector2 Rotation
         {
-            get => GameObject.transform.rotation;
-            set
-            {
-                Despawn();
-                GameObject.transform.rotation = value;
-                Spawn();
-            }
+            get => Player.Rotation;
+            set => Player.Rotation = value;
         }
 
         /// <summary>
@@ -105,6 +96,40 @@ namespace Synapse.Api
             set => GameObject.GetComponent<ServerRoles>().SetColor(value);
         }
 
+        public PlayerMovementState Movement
+        {
+            get => (PlayerMovementState)Player.AnimationController.Network_curMoveState;
+            set => Player.AnimationController.Network_curMoveState = (byte)value;
+        }
+
+        public float Speed { get; set; } = 0f;
+
+        private IEnumerator<float> Update()
+        {
+            for(; ; )
+            {
+                yield return MEC.Timing.WaitForSeconds(0.1f);
+                if (GameObject == null) yield break;
+                if (Speed == 0f) continue;
+
+                Player.AnimationController.Networkspeed = new Vector2(Speed, 0f);
+
+                var pos = Position + Player.CameraReference.forward / 10 * Speed;
+                
+                if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
+                {
+                    Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
+                }
+                else
+                {
+                    Speed = 0f;
+                    Player.AnimationController.Networkspeed = new Vector2(0f, 0f);
+                }
+            }
+        }
+
+        public Dummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "") : this(pos, new Vector2(rot.eulerAngles.x, rot.eulerAngles.y),role,name,badgetext,badgecolor) { }
+
         /// <summary>
         /// Creates a new Dummy and spawns it
         /// </summary>
@@ -114,7 +139,7 @@ namespace Synapse.Api
         /// <param name="name">The Name of the Dummy</param>
         /// <param name="badgetext">The displayed BadgeText of the Dummy</param>
         /// <param name="badgecolor">The displayed BadgeColor of the Dummy</param>
-        public Dummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "")
+        public Dummy(Vector3 pos, Vector2 rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "")
         {
             GameObject obj =
                 Object.Instantiate(
@@ -127,8 +152,8 @@ namespace Synapse.Api
 
             Player.transform.localScale = Vector3.one;
             Player.transform.position = pos;
-            Player.transform.rotation = rot;
             Player.PlayerMovementSync.RealModelPosition = pos;
+            Rotation = rot;
             Player.QueryProcessor.NetworkPlayerId = QueryProcessor._idIterator;
             Player.QueryProcessor._ipAddress = Server.Get.Host.IpAddress;
             Player.ClassManager.CurClass = role;
@@ -136,12 +161,17 @@ namespace Synapse.Api
             Player.NicknameSync.Network_myNickSync = name;
             Player.RankName = badgetext;
             Player.RankColor = badgecolor;
+            MEC.Timing.RunCoroutine(Update());
 
             NetworkServer.Spawn(GameObject);
             Map.Get.Dummies.Add(this);
         }
 
-        public void RotateToPosition(Vector3 pos) => Rotation = Quaternion.LookRotation((pos - Position).normalized);
+        public void RotateToPosition(Vector3 pos)
+        {
+            var rot = Quaternion.LookRotation((pos - Position).normalized);
+            Rotation = new Vector2(rot.eulerAngles.x, rot.eulerAngles.y);
+        }
 
         /// <summary>
         /// Despawns the Dummy

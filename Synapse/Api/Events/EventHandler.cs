@@ -24,32 +24,15 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    var dummy = new Dummy(ev.Player.Position, ev.Player.transform.rotation, ev.Player.RoleType);
+                    var dummy = new Dummy(ev.Player.Position, ev.Player.transform.rotation, ev.Player.RoleType,"");
+                    dummy.Rotation = ev.Player.Rotation;
+                    dummy.Speed = 2f;
                     break;
-            }
-        }
 
-        private IEnumerator<float> Walk(Dummy dummy, float speed)
-        {
-            yield return Timing.WaitForSeconds(1f);
-
-            dummy.Player.AnimationController.Networkspeed = new Vector2(speed, 0f);
-            dummy.Player.AnimationController.Network_curMoveState = (byte)PlayerMovementState.Walking;
-            for (; ; )
-            {
-                try
-                {
-                    var pos = dummy.Position + dummy.Player.CameraReference.forward / 10 * speed;
-                    if (!Physics.Linecast(dummy.Position, pos, dummy.Player.PlayerMovementSync.CollidableSurfaces))
-                    {
-                        dummy.Player.PlayerMovementSync.OverridePosition(pos, dummy.Player.PlayerMovementSync.Rotations.y, true);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Logger.Get.Error(e);
-                }
-                yield return Timing.WaitForSeconds(0.1f);
+                case KeyCode.Alpha2:
+                    dummy = new Dummy(ev.Player.Position, ev.Player.transform.rotation, ev.Player.RoleType);
+                    MEC.Timing.CallDelayed(2f, () => dummy.RotateToPosition(ev.Player.Position));
+                    break;
             }
         }
 
