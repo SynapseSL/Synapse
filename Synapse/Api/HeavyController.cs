@@ -2,6 +2,8 @@
 {
     public class HeavyController
     {
+        public static HeavyController Get => Map.Get.HeavyController;
+
         internal HeavyController() { }
 
         public bool ForcedOvercharge => Generator079.mainGenerator.forcedOvercharge;

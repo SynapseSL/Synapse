@@ -29,7 +29,7 @@ namespace SynapseInjector
 
                 var synapseAssembly = Assembly.Load(File.ReadAllBytes(Path.Combine(synapsepath, "Synapse.dll")));
 
-                printBanner(synapseAssembly, dependencyAssemblies);
+                PrintBanner(synapseAssembly, dependencyAssemblies);
 
                 InvokeAssembly(synapseAssembly);
             }
@@ -42,7 +42,7 @@ namespace SynapseInjector
         /// <summary>
         /// Print Synapse Banner and Version Information
         /// </summary>
-        private static void printBanner(Assembly syn, List<Assembly> dep)
+        private static void PrintBanner(Assembly syn, List<Assembly> dep)
         {
             ServerConsole.AddLog(
                 "\nLoading Synapse...\n" +

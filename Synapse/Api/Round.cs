@@ -7,6 +7,8 @@ namespace Synapse.Api
 {
     public class Round
     {
+        public static Round Get => Map.Get.Round;
+
         internal Round() { }
 
         private RoundSummary Rs => RoundSummary.singleton;

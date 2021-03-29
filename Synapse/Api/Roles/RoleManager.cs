@@ -6,6 +6,8 @@ namespace Synapse.Api.Roles
 {
     public class RoleManager
     {
+        public static RoleManager Get => Server.Get.RoleManager;
+
         public static readonly int HighestRole = (int)RoleType.Scp93989;
 
         internal RoleManager() { }
