@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using EmbedIO;
 using EmbedIO.WebApi;
 using EmbedIO.WebSockets;
+using Synapse.Network.Models;
 
 namespace Synapse.Network
 {
@@ -20,6 +23,9 @@ namespace Synapse.Network
         public int Port { get; set; }
         public RSA PublicKey { get; set; }
 
+        public HashSet<KeyValueObjectWrapper> SyncEntries { get; set; }
+        public string SyncEntriesHash { get; set; }
+
         public InstanceDetails ReduceToDetails()
         {
             return new InstanceDetails
@@ -27,7 +33,8 @@ namespace Synapse.Network
                 Endpoint = Endpoint,
                 Port = Port,
                 ClientName = ClientName,
-                ClientUid = ClientUid
+                ClientUid = ClientUid,
+                SyncEntries = SyncEntries.ToList()
             };
         }
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using EmbedIO;
 using Synapse.Network.Models;
 using Synapse.Network.Routes;
@@ -40,7 +39,7 @@ namespace Synapse.Network
         public override void StartClient(SynapseNetworkClient client)
         {
             //Debug
-            CheckPings();
+            //CheckPings();
         }
 
         public override void ReceiveInstanceMessage(InstanceMessage message)
@@ -52,14 +51,6 @@ namespace Synapse.Network
                     break;
                 case "Ping":
                     RespondMessage(message, DateTimeOffset.Now.ToString());
-                    break;
-                case "GetPlayer":
-                    var netPlayerId = message.Value<string>();
-                    var results = Server.Get.GetPlayers(x => x.UserId == netPlayerId);
-                    if (!results.IsEmpty()) RespondMessage(message, NetworkPlayer.FromLocalPlayer(results.First()));
-                    break;
-                case "GetPlayers":
-                    RespondMessage(message, Server.Get.Players.Select(NetworkPlayer.FromLocalPlayer).ToList());
                     break;
             }
 

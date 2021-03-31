@@ -8,7 +8,7 @@ namespace Synapse.Network.Models
     {
         public bool Authenticated { get; set; }
         public List<InstanceMessage> Messages { get; set; }
-
+        public string LatestVarHash { get; set; }
         public List<string> ConnectedClients { get; set; }
     }
 }

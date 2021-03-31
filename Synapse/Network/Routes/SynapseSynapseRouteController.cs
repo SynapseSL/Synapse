@@ -29,7 +29,8 @@ namespace Synapse.Network.Routes
                     : SynapseNetworkServer.GetServer.SyncedClientList.Keys.ToList(),
                 Messages = clientData == null
                     ? new List<InstanceMessage>()
-                    : SynapseNetworkServer.GetServer.TakeAllMessages(clientData)
+                    : SynapseNetworkServer.GetServer.TakeAllMessages(clientData),
+                LatestVarHash = clientData == null ? "\r\n" : clientData.SyncEntriesHash
             };
         }
 
@@ -99,6 +100,8 @@ namespace Synapse.Network.Routes
                 ClientUid = Guid.NewGuid().ToString(),
                 SessionToken = TokenFactory.Instance.GenerateShortToken(),
                 CipherKey = TokenFactory.Instance.GenerateShortToken(),
+                SyncEntriesHash = "\r\n",
+                SyncEntries = new HashSet<KeyValueObjectWrapper>(),
                 Valid = false
             };
             data.PublicKey.FromXmlString(networkSyn.PublicKey);
@@ -115,9 +118,17 @@ namespace Synapse.Network.Routes
         [Route(HttpVerbs.Get, "/client/{id}/details")]
         public StatusedResponse GetDetails(string id)
         {
-            var data = SynapseNetworkServer.GetServer.DataById(id);
-            var successful = data.ValidateRequestSafe(this);
-            if (!successful) return StatusedResponse.Unauthorized;
+            var data = this.GetClientData();
+            if (data == null) return StatusedResponse.Unauthorized;
+            if (id == "all")
+            {
+                var wrapper = new InstanceDetailsListTransmission
+                {
+                    Details = SynapseNetworkServer.GetServer.AllClientData().Select(x => x.ReduceToDetails()).ToArray()
+                };
+                return wrapper;
+            }
+
             var target = SynapseNetworkServer.GetServer.DataById(id);
             if (target == null) return StatusedResponse.NotFound;
             return new InstanceDetailsTransmission

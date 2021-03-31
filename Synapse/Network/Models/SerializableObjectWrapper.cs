@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using JetBrains.Annotations;
 using Swan.Formatters;
 
 namespace Synapse.Network.Models
@@ -45,7 +48,18 @@ namespace Synapse.Network.Models
             Class = obj.GetType().AssemblyQualifiedName;
         }
 
-        public static NetworkSyncEntry FromPair<T>(string key, T value)
+        public static KeyValueObjectWrapper FromPair<T>(string key, T value)
+        {
+            var type = value.GetType();
+            return new KeyValueObjectWrapper
+            {
+                Key = key,
+                Data = Serialize(value),
+                Class = type.AssemblyQualifiedName.Contains("mscorlib") ? type.Name : type.AssemblyQualifiedName
+            };
+        }
+
+        public static NetworkSyncEntry NetFromPair<T>(string key, T value)
         {
             var type = value.GetType();
             return new NetworkSyncEntry
@@ -89,6 +103,39 @@ namespace Synapse.Network.Models
             }
 
             return Json.Serialize(obj);
+        }
+    }
+
+    public class KeyValueObjectWrapper : SerializableObjectWrapper
+    {
+        public string Key { get; set; }
+    }
+
+    internal static class SOWExtension
+    {
+        public static List<string> Keys(this HashSet<KeyValueObjectWrapper> set)
+        {
+            return set.Select(x => x.Key).ToList();
+        }
+
+        [CanBeNull]
+        public static object Get(this HashSet<KeyValueObjectWrapper> set, string key)
+        {
+            var list = set.Where(x => x.Key == key).ToList();
+            return list.IsEmpty() ? null : list[0];
+        }
+
+        [CanBeNull]
+        public static T Get<T>(this HashSet<KeyValueObjectWrapper> set, string key)
+        {
+            return (T) set.Get(key);
+        }
+
+        public static void Set(this HashSet<KeyValueObjectWrapper> set, string key, object obj)
+        {
+            var list = set.Where(x => x.Key == key).ToList();
+            if (!list.IsEmpty()) set.Remove(list[0]);
+            set.Add(SerializableObjectWrapper.FromPair(key, obj));
         }
     }
 }

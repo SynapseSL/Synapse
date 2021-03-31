@@ -109,6 +109,7 @@
     <Compile Include="Command\CommandHandler.cs" />
     <Compile Include="Command\CommandInformation.cs" />
     <Compile Include="Command\Commands\SynapseGccCommand.cs" />
+    <Compile Include="Command\Commands\SynapseNetworkClientsCommand.cs" />
     <Compile Include="Command\Commands\SynapseNetworkSyncCommand.cs" />
     <Compile Include="Command\Commands\SynapsePlayerCommand.cs" />
     <Compile Include="Command\Commands\SynapseRespawnCommand.cs" />
@@ -133,6 +134,7 @@
     <Compile Include="Database\Repository.cs" />
     <Compile Include="Network\AESUtils.cs" />
     <Compile Include="Network\ClientData.cs" />
+    <Compile Include="Network\ClientSyncEntryThread.cs" />
     <Compile Include="Network\InstanceDetails.cs" />
     <Compile Include="Network\JavaLikeThread.cs" />
     <Compile Include="Network\NetworkNodeBase.cs" />

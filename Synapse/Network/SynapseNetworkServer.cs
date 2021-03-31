@@ -7,13 +7,11 @@ using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using EmbedIO;
-using EmbedIO.WebApi;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Caching.Memory;
 using Swan;
 using Synapse.Api;
 using Synapse.Network.Models;
-using Synapse.Network.Routes;
 using Synapse.Reactive;
 
 namespace Synapse.Network
@@ -24,7 +22,6 @@ namespace Synapse.Network
         private MemoryCache _cache;
         private IDisposable _hearthbeatSubscriber;
         private ConcurrentDictionary<string, ConcurrentBag<InstanceMessage>> _messageCaches;
-
 
         public SynapseNetworkServer()
         {
@@ -127,8 +124,8 @@ namespace Synapse.Network
         {
             Synapse.Server.Get.Logger.Info("Preparing Server");
             PrivateKey = RSA.Create();
-            NetworkSyncEntries.Add(SerializableObjectWrapper.FromPair("example", "Some string value"));
-            NetworkSyncEntries.Add(SerializableObjectWrapper.FromPair("example2", 6969));
+            NetworkSyncEntries.Add(SerializableObjectWrapper.NetFromPair("example", "Some string value"));
+            NetworkSyncEntries.Add(SerializableObjectWrapper.NetFromPair("example2", 6969));
             PublicKey = PrivateKey.ToXmlString(false);
             Synapse.Server.Get.Logger.Info("\n" + NetworkSyncEntries.Humanize());
             Synapse.Server.Get.Logger.Info("Init MemCache");
@@ -138,6 +135,11 @@ namespace Synapse.Network
             });
             _messageCaches = new ConcurrentDictionary<string, ConcurrentBag<InstanceMessage>>();
             Synapse.Server.Get.Logger.Info("Done Init MemCache");
+        }
+
+        public List<ClientData> AllClientData()
+        {
+            return SyncedClientList.Keys.Select(x => _cache.Get<ClientData>(x)).ToList();
         }
 
 
@@ -203,8 +205,8 @@ namespace Synapse.Network
             _hearthbeatSubscriber.Dispose();
             _cache.Dispose();
             NetworkSyncEntries.Clear();
-            NetworkSyncEntries.Add(SerializableObjectWrapper.FromPair("example", "Some string value"));
-            NetworkSyncEntries.Add(SerializableObjectWrapper.FromPair("example2", 6969));
+            NetworkSyncEntries.Add(SerializableObjectWrapper.NetFromPair("example", "Some string value"));
+            NetworkSyncEntries.Add(SerializableObjectWrapper.NetFromPair("example2", 6969));
         }
 
 
@@ -213,10 +215,7 @@ namespace Synapse.Network
             var server = new WebServer(o => o
                     .WithUrlPrefix(url)
                     .WithMode(HttpListenerMode.EmbedIO))
-                .WithLocalSessionManager()
-                .WithWebApi("/synapse", m => m
-                    .WithController<SynapseSynapseRouteController>()
-                );
+                .WithLocalSessionManager();
 
 
             // Listen for state changes.

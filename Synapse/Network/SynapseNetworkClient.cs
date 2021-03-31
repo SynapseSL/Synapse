@@ -23,6 +23,7 @@ namespace Synapse.Network
         public string ClientName = "SynapseServerClient";
 
         public bool IsStarted;
+        public string LastSyncEntriesHash = "__";
         public int MigrationPriority;
         public RSA PrivateKey;
         public string PublicKey;
@@ -31,6 +32,11 @@ namespace Synapse.Network
         public RSA ServerPublicKey;
         public string SessionToken;
         public List<string> SyncedClientList = new List<string>();
+
+        public HashSet<KeyValueObjectWrapper>
+            SyncEntries = new HashSet<KeyValueObjectWrapper>(); //Own ClientSync (Only client has write permissions)
+
+        public ClientSyncEntryThread SyncVarThread;
 
         public string Url;
 
@@ -52,6 +58,23 @@ namespace Synapse.Network
             {
                 SizeLimit = 64
             });
+        }
+
+        /// <summary>
+        ///     Gets the InstanceDetails of one specific other Instance including its ClientVars
+        /// </summary>
+        /// <param name="uid">The id of the other Distance</param>
+        public async Task<InstanceDetails> Details(string uid)
+        {
+            return (await Get<InstanceDetailsTransmission>($"/synapse/client/{uid}/details")).Details;
+        }
+
+        /// <summary>
+        ///     Gets the InstanceDetails of all server instances including their ClientVars
+        /// </summary>
+        public async Task<List<InstanceDetails>> Details()
+        {
+            return (await Get<InstanceDetailsListTransmission>("/synapse/client/all/details")).Details.ToList();
         }
 
         [ItemCanBeNull]
@@ -98,6 +121,7 @@ namespace Synapse.Network
                 var result = await Get<PingResponse>("/synapse/ping", exceptionHandler: x => { });
                 if (result != null)
                 {
+                    LastSyncEntriesHash = result.LatestVarHash;
                     try
                     {
                         foreach (var message in result.Messages)
@@ -136,6 +160,9 @@ namespace Synapse.Network
                 ? InstanceAuthority.Client
                 : InstanceAuthority.Master;
             networkNodes.ForEach(x => x.Reconfigure(authority));
+            var configuration = Server.Get.Configs.synapseConfiguration;
+            SyncVarThread = new ClientSyncEntryThread(configuration);
+            SyncVarThread.Start();
             Server.Get.Logger.Info("Finished OnConnected");
         }
 
@@ -163,6 +190,7 @@ namespace Synapse.Network
         public async void Disconnect()
         {
             IsStarted = false;
+            SyncVarThread.Stop();
             Client.Dispose();
             _requestMemCache.Dispose();
         }
@@ -230,7 +258,6 @@ namespace Synapse.Network
                 exceptionHandler: x =>
                 {
                     hasException = true;
-                    hasException = true;
 #if DEBUG
                     Server.Get.Logger.Info(x);
 #endif
@@ -243,7 +270,7 @@ namespace Synapse.Network
         {
             var result =
                 await Server.Get.NetworkManager.Client.Post<StatusedResponse, NetworkSyncEntry>(
-                    $"/networksync?key={key}", SerializableObjectWrapper.FromPair(key, value));
+                    $"/networksync?key={key}", SerializableObjectWrapper.NetFromPair(key, value));
             return result?.Successful ?? false;
         }
 
@@ -274,8 +301,10 @@ namespace Synapse.Network
                         return (TR) await Task.FromResult<object>(null);
                     }
                 }
-                catch (Exception ignored)
+                catch (Exception e)
                 {
+                    Logger.Get.Error("Json parse error?");
+                    exc(e);
                 }
 
                 return Json.Deserialize<TR>(content);
@@ -409,7 +438,8 @@ namespace Synapse.Network
             var obj = new NetworkAuthSyn
             {
                 ClientName = ClientName,
-                PublicKey = PublicKey
+                PublicKey = PublicKey,
+                Port = Server.Get.Port
             };
             var reqContent = Json.Serialize(obj);
             var req = await Client.PostAsync("/synapse/handshake", new StringContent(reqContent));
