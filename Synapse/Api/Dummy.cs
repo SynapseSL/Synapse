@@ -57,13 +57,8 @@ namespace Synapse.Api
         /// </summary>
         public Vector3 Scale
         {
-            get => GameObject.transform.localScale;
-            set
-            {
-                Despawn();
-                GameObject.transform.localScale = value;
-                Spawn();
-            }
+            get => Player.Scale;
+            set => Player.Scale = value;
         }
 
         /// <summary>
@@ -116,7 +111,11 @@ namespace Synapse.Api
             {
                 yield return MEC.Timing.WaitForSeconds(0.1f);
                 if (GameObject == null) yield break;
-                if (Direction == MovementDirection.Stop) continue;
+                if (Direction == MovementDirection.Stop)
+                {
+                    Player.AnimationController.Networkspeed = new Vector2(0f, 0f);
+                    continue;
+                }
 
                 var wall = false;
                 var speed = Movement == PlayerMovementState.Sprinting ? RunSpeed : WalkSpeed;
@@ -197,11 +196,11 @@ namespace Synapse.Api
             Player.QueryProcessor.NetworkPlayerId = QueryProcessor._idIterator;
             Player.QueryProcessor._ipAddress = Server.Get.Host.IpAddress;
             Player.ClassManager.CurClass = role;
-            Player.Health = Player.ClassManager.Classes.SafeGet((int)Player.RoleType).maxHP;
+            Player.MaxHealth = Player.ClassManager.Classes.SafeGet((int)Player.RoleType).maxHP;
+            Player.Health = Player.MaxHealth;
             Player.NicknameSync.Network_myNickSync = name;
             Player.RankName = badgetext;
             Player.RankColor = badgecolor;
-            Player.Health = 100f;
             Player.GodMode = true;
             RunSpeed = CharacterClassManager._staticClasses[(int)role].runSpeed;
             WalkSpeed = CharacterClassManager._staticClasses[(int)role].walkSpeed;
@@ -229,7 +228,11 @@ namespace Synapse.Api
         /// <summary>
         /// Spawns the Dummy again after Despawning
         /// </summary>
-        public void Spawn() => NetworkServer.Spawn(GameObject);
+        public void Spawn()
+        {
+            NetworkServer.Spawn(GameObject);
+            Map.Get.Dummies.Add(this);
+        }
 
         /// <summary>
         /// Destroys the Object
