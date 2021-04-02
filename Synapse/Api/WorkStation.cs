@@ -16,6 +16,7 @@ namespace Synapse.Api
             var bench = Object.Instantiate(NetworkManager.singleton.spawnPrefabs.Find(p => p.gameObject.name == "Work Station"));
             bench.gameObject.transform.localScale = scale;
             bench.gameObject.transform.position = position;
+            bench.gameObject.transform.rotation = Quaternion.Euler(rotation);
 
             NetworkServer.Spawn(bench);
             workStation = bench.GetComponent<global::WorkStation>();

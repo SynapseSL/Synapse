@@ -35,6 +35,22 @@ namespace Synapse.Api
         }
 
         #region Methods
+        public int GetSightPreference(ItemType item) => GetPreference(item, 0);
+
+        public int GetBarrelPreference(ItemType item) => GetPreference(item, 1);
+
+        public int GetOtherPreference(ItemType item) => GetPreference(item, 2);
+
+        private int GetPreference(ItemType item,int type)
+        {
+            for (int i = 0; i < WeaponManager.weapons.Length; i++)
+            {
+                if (WeaponManager.weapons[i].inventoryID == item)
+                    return WeaponManager.modPreferences[i, type];
+            }
+            return 0;
+        }
+
         public void Kick(string message) => ServerConsole.Disconnect(gameObject, message);
 
         public void Ban(int duration, string reason, string issuer = "Plugin") => SynapseController.Server.GetObjectOf<BanPlayer>().BanUser(gameObject, duration, reason, issuer);
