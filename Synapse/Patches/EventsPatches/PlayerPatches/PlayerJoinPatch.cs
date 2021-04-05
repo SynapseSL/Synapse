@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using HarmonyLib;
-using Synapse.Api;
-using Synapse.Config;
 using Synapse.Database;
 
 // ReSharper disable All
@@ -41,15 +38,16 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                         DatabaseManager.PlayerRepository.Save(dbo);
                     }
                 });
-                
-                if(!string.IsNullOrEmpty(player.UserId))
+
+                if (!string.IsNullOrEmpty(player.UserId))
                 {
-                   SynapseController.Server.Events.Player.InvokePlayerJoinEvent(player, ref n);
+                    SynapseController.Server.Events.Player.InvokePlayerJoinEvent(player, ref n);
                 }
             }
             catch (Exception e)
             {
-                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerJoin failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                SynapseController.Server.Logger.Error(
+                    $"Synapse-Event: PlayerJoin failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }
         }
     }

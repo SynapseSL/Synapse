@@ -33,6 +33,7 @@ namespace Synapse.Network
         public string Secret { get; internal set; }
         public string Url { get; internal set; }
         public int Port { get; internal set; }
+        public string PublicEndpoint { get; internal set; }
         public ServerHeartbeat ServerHeartbeatLoop { get; } = new ServerHeartbeat();
 
         public Dictionary<string, DateTimeOffset> SyncedClientList { get; } = new Dictionary<string, DateTimeOffset>();
@@ -215,7 +216,8 @@ namespace Synapse.Network
             var server = new WebServer(o => o
                     .WithUrlPrefix(url)
                     .WithMode(HttpListenerMode.EmbedIO))
-                .WithLocalSessionManager();
+                .WithLocalSessionManager()
+                .WithCors();
 
 
             // Listen for state changes.

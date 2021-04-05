@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using EmbedIO;
+using Synapse.Network.Models;
 
 namespace Synapse.Network
 {
@@ -16,8 +17,12 @@ namespace Synapse.Network
         public ReconnectLoop ReconnectLoop { get; private set; }
         public SynapseNetworkServer Server { get; private set; }
 
+        public Dictionary<string, ClientSession> ClientSessionTokens { get; set; } =
+            new Dictionary<string, ClientSession>();
+
         public void Start()
         {
+            ClientSessionTokens.Clear();
             var synapseConfig = Synapse.Server.Get.Configs.synapseConfiguration;
             if (!synapseConfig.NetworkEnable) return;
             Client = new SynapseNetworkClient
@@ -41,12 +46,13 @@ namespace Synapse.Network
         }
 
         // ReSharper disable once MemberCanBePrivate.Global
-        public void BoostrapServer()
+        public void BoostrapServer(string publicIp)
         {
             var synapseConfig = Synapse.Server.Get.Configs.synapseConfiguration;
             if (!synapseConfig.NetworkEnable || !synapseConfig.MasterAuthority) return;
             Synapse.Server.Get.Logger.Info("Starting Synapse-Network Server");
             Server = SynapseNetworkServer.GetServer;
+            Server.PublicEndpoint = publicIp;
             Server.Secret = synapseConfig.NetworkSecret;
             Server.Port = synapseConfig.NetworkPort;
             Server.Url = synapseConfig.NetworkUrl;

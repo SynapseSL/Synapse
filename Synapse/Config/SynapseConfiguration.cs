@@ -30,6 +30,9 @@ namespace Synapse.Config
         [Description("If disabled Chaos must kill all Scps to end the round")]
         public bool ChaosScpEnd = true;
 
+        [Description("Enables storing bans in the database persisting them over the network")]
+        public bool DatabaseBans = true;
+
         [Description(
             "Enables or disables the embedded Database. Warning: Disabling this option can break plugins and is not recommended")]
         public bool DatabaseEnabled = true;

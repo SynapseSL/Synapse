@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using EmbedIO;
 using JetBrains.Annotations;
+using MEC;
 using Microsoft.Extensions.Caching.Memory;
 using Swan.Formatters;
 using Synapse.Api;
@@ -163,7 +164,23 @@ namespace Synapse.Network
             var configuration = Server.Get.Configs.synapseConfiguration;
             SyncVarThread = new ClientSyncEntryThread(configuration);
             SyncVarThread.Start();
+
+            //prepare one-shot sync entries
+            SyncEntries.Set("plugins",
+                SynapseController.PluginLoader.Plugins.Select(SerializablePlugin.FromAttribute).ToList());
+
+            Timing.RunCoroutine(UpdateNetworkVars());
+
             Server.Get.Logger.Info("Finished OnConnected");
+        }
+
+        public IEnumerator<float> UpdateNetworkVars()
+        {
+            while (true)
+            {
+                SyncEntries.Set("round", NetRound.Get());
+                yield return Timing.WaitForSeconds(5);
+            }
         }
 
         public async Task Connect()

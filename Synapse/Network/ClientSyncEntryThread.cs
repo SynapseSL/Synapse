@@ -28,15 +28,16 @@ namespace Synapse.Network
                     var client = SynapseNetworkClient.GetClient;
                     client.SyncEntries.Set("players",
                         Server.Get.Players.Select(NetworkPlayer.FromLocalPlayer).ToList());
+                    client.SyncEntries.Set("maxplayers", Server.Get.Slots);
 
                     var sha256 = SHA256.Create();
-                    var hash = sha256.ComputeHash(Json.Serialize(client.SyncEntries).ToBytes()).ToLowerHex();
+                    var entriesClone = client.SyncEntries.ToList();
+                    var hash = sha256.ComputeHash(Json.Serialize(entriesClone).ToBytes()).ToLowerHex();
                     sha256.Dispose();
                     if (client.LastSyncEntriesHash != hash)
                     {
-                        var response = await client.Post<StatusedResponse, HashSet<KeyValueObjectWrapper>>(
-                            "/networksync/client",
-                            client.SyncEntries);
+                        var response = await client.Post<StatusedResponse, List<KeyValueObjectWrapper>>(
+                            "/networksync/client", entriesClone);
                     }
 
                     await Task.Delay(TimeSpan.FromMilliseconds(_configuration.NetworkPollRate));

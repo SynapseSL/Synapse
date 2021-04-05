@@ -26,11 +26,14 @@ namespace Synapse.Network
         public HashSet<KeyValueObjectWrapper> SyncEntries { get; set; }
         public string SyncEntriesHash { get; set; }
 
+        public string PublicEndpoint =>
+            Endpoint == "127.0.0.1" ? SynapseNetworkServer.GetServer.PublicEndpoint : Endpoint;
+
         public InstanceDetails ReduceToDetails()
         {
             return new InstanceDetails
             {
-                Endpoint = Endpoint,
+                Endpoint = PublicEndpoint,
                 Port = Port,
                 ClientName = ClientName,
                 ClientUid = ClientUid,

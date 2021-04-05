@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using EmbedIO;
 using Synapse.Config;
@@ -42,7 +43,10 @@ namespace Synapse.Network
                         && SynapseNetworkServer.GetServer.Status != WebServerState.Listening
                         && SynapseNetworkServer.CheckServerPortAvailable(_configuration.NetworkPort))
                     {
-                        Server.Get.NetworkManager.BoostrapServer();
+                        var checkIpClient = new HttpClient();
+                        var ownIp = await checkIpClient.GetStringAsync("https://checkip.amazonaws.com/");
+                        ownIp = ownIp.Replace("\n", "");
+                        Server.Get.NetworkManager.BoostrapServer(ownIp);
                         await Task.Delay(TimeSpan.FromMilliseconds(250));
                         continue;
                     }
