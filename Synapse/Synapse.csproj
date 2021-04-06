@@ -146,6 +146,7 @@
     <Compile Include="Network\Models\NetBan.cs" />
     <Compile Include="Network\Models\NetBroadcast.cs" />
     <Compile Include="Network\Models\NetConfig.cs" />
+    <Compile Include="Network\Models\NetHealthData.cs" />
     <Compile Include="Network\Models\NetKick.cs" />
     <Compile Include="Network\Models\NetRound.cs" />
     <Compile Include="Network\Models\SerializablePlugin.cs" />
@@ -164,6 +165,7 @@
     <Compile Include="Network\NetworkPlayer.cs" />
     <Compile Include="Network\ReconnectLoop.cs" />
     <Compile Include="Network\Routes\SynapseClientController.cs" />
+    <Compile Include="Network\Routes\SynapseMetricsController.cs" />
     <Compile Include="Network\Routes\SynapseSynapseRouteController.cs" />
     <Compile Include="Network\Routes\SynapseNetworkSyncController.cs" />
     <Compile Include="Network\SecurityExtensions.cs" />

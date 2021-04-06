@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using EmbedIO;
 using Synapse.Network.Models;
@@ -16,12 +17,14 @@ namespace Synapse.Network
         public SynapseNetworkClient Client { get; private set; }
         public ReconnectLoop ReconnectLoop { get; private set; }
         public SynapseNetworkServer Server { get; private set; }
-
+        
+        public DateTime Startup { get; private set; }
         public Dictionary<string, ClientSession> ClientSessionTokens { get; set; } =
             new Dictionary<string, ClientSession>();
 
         public void Start()
         {
+            Startup = DateTime.Now;
             ClientSessionTokens.Clear();
             var synapseConfig = Synapse.Server.Get.Configs.synapseConfiguration;
             if (!synapseConfig.NetworkEnable) return;

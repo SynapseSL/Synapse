@@ -9,6 +9,7 @@ using EmbedIO;
 using JetBrains.Annotations;
 using MEC;
 using Microsoft.Extensions.Caching.Memory;
+using Swan;
 using Swan.Formatters;
 using Synapse.Api;
 using Synapse.Network.Models;
@@ -168,7 +169,13 @@ namespace Synapse.Network
             //prepare one-shot sync entries
             SyncEntries.Set("plugins",
                 SynapseController.PluginLoader.Plugins.Select(SerializablePlugin.FromAttribute).ToList());
-
+            SyncEntries.Set("startupTimestamp", new NetHealthData
+            {
+                ClientId = ClientIdentifier,
+                ClientName = ClientName,
+                StartupTimestamp = Server.Get.NetworkManager.Startup.ToUnixEpochDate()
+            });
+            
             Timing.RunCoroutine(UpdateNetworkVars());
 
             Server.Get.Logger.Info("Finished OnConnected");

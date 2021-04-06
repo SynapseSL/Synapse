@@ -76,7 +76,7 @@ namespace Synapse.Network.Models
             if (IsCoreType)
             {
 #if DEBUG
-                Server.Get.Logger.Info("Primitive DataType Deserialization");
+                Server.Get.Logger.Info($"Primitive DataType Deserialization");
 #endif
                 if (t == typeof(string)) return Data;
                 if (t == typeof(int)) return int.Parse(Data);
@@ -122,7 +122,7 @@ namespace Synapse.Network.Models
         public static object Get(this HashSet<KeyValueObjectWrapper> set, string key)
         {
             var list = set.Where(x => x.Key == key).ToList();
-            return list.IsEmpty() ? null : list[0];
+            return list.IsEmpty() ? null : list[0].Parse();
         }
 
         [CanBeNull]

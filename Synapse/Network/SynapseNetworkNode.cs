@@ -3,10 +3,13 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using EmbedIO;
+using Swan;
 using Synapse.Api;
 using Synapse.Database;
 using Synapse.Network.Models;
 using Synapse.Network.Routes;
+using Telepathy;
+using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Network
 {
@@ -19,6 +22,7 @@ namespace Synapse.Network
             server.WithWebApi("/synapse", x => x.RegisterController<SynapseSynapseRouteController>());
             server.WithWebApi("/networksync", x => x.RegisterController<SynapseNetworkSyncController>());
             server.WithWebApi("/client", x => x.RegisterController<SynapseClientController>());
+            server.WithWebApi("/metrics", x => x.RegisterController<SynapseMetricsController>());
         }
 
         public override void Reconfigure(InstanceAuthority authority)
@@ -124,7 +128,9 @@ namespace Synapse.Network
                             await RespondMessage(message, "");
                             break;
                     }
-
+                    break;
+                case "Uptime":
+                    await RespondMessage(message, Server.Get.NetworkManager.Startup.ToUnixEpochDate());
                     break;
             }
 

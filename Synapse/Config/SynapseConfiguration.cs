@@ -65,7 +65,7 @@ namespace Synapse.Config
         public bool NetworkEnable = true;
 
         [Description("The name of the client which will be visible in logs")]
-        public string NetworkName = "Synapse Server";
+        public string NetworkName = $"SynapseServer-{TokenFactory.Instance.GenerateToken(4)}";
 
         [Description(
             "The pollrate of the network-client in milliseconds. A lower value result in faster synchronization but increased traffic. Default: 2500")]
