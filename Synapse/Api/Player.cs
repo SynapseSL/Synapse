@@ -32,6 +32,8 @@ namespace Synapse.Api
             GrenadeManager = GetComponent<Grenades.GrenadeManager>();
             GameConsoleTransmission = this.GetComponent<GameConsoleTransmission>();
             MicroHID = GetComponent<MicroHID>();
+            DissonanceUserSetup = this.GetComponent<Assets._Scripts.Dissonance.DissonanceUserSetup>();
+            Radio = this.GetComponent<Radio>();
         }
 
         #region Methods
@@ -768,6 +770,10 @@ namespace Synapse.Api
         public Transform CameraReference => Hub.PlayerCameraReference;
 
         public NetworkIdentity NetworkIdentity => Hub.networkIdentity;
+
+        public Assets._Scripts.Dissonance.DissonanceUserSetup DissonanceUserSetup { get; }
+
+        public Radio Radio { get; }
 
         public MicroHID MicroHID { get; }
 

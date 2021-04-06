@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Synapse.Api.Exceptions;
 
 namespace Synapse.Api.Roles
 {
@@ -25,7 +26,7 @@ namespace Synapse.Api.Roles
             if (id >= -1 && id <= HighestRole)
                 return ((RoleType)id).ToString();
 
-            if (!IsIDRegistered(id)) throw new Exception("Plugin tried to get the Name of a non registered Role");
+            if (!IsIDRegistered(id)) throw new SynapseRoleNotFoundException("A Role was requested that is not registered in Synapse.Please check your configs and plugins", id);
 
             return CustomRoles.FirstOrDefault(x => x.ID == id).Name;
         }
@@ -33,6 +34,9 @@ namespace Synapse.Api.Roles
         public IRole GetCustomRole(string name)
         {
             var roleinformation = CustomRoles.FirstOrDefault(x => x.Name.ToLower() == name.ToLower());
+
+            if(roleinformation == null)
+                throw new SynapseRoleNotFoundException("A Role was requested that is not registered in Synapse.Please check your configs and plugins", name);
 
             if (roleinformation.RoleScript.GetConstructors().Any(x => x.GetParameters().Count() == 1 && x.GetParameters().First().ParameterType == typeof(int)))
                 return (IRole)Activator.CreateInstance(roleinformation.RoleScript, new object[] { roleinformation.ID });
@@ -42,6 +46,8 @@ namespace Synapse.Api.Roles
 
         public IRole GetCustomRole(int id)
         {
+            if (!IsIDRegistered(id)) throw new SynapseRoleNotFoundException("A Role was requested that is not registered in Synapse.Please check your configs and plugins", id);
+
             var roleinformation = CustomRoles.FirstOrDefault(x => x.ID == id);
 
             if (roleinformation.RoleScript.GetConstructors().Any(x => x.GetParameters().Count() == 1 && x.GetParameters().First().ParameterType == typeof(int)))
@@ -53,19 +59,18 @@ namespace Synapse.Api.Roles
         public void RegisterCustomRole<TRole>() where TRole : IRole
         {
             var role = (IRole)Activator.CreateInstance(typeof(TRole));
-
-            if (role.GetRoleID() >= 0 && role.GetRoleID() <= HighestRole) throw new Exception("A Plugin tried to register a CustomRole with an Id of a vanilla RoleType");
-            if (IsIDRegistered(role.GetRoleID())) throw new Exception("A Plugin tried to register a CustomRole with an already registered ID");
-
             var info = new RoleInformation(role.GetRoleName(), role.GetRoleID(), typeof(TRole));
+
+            if (role.GetRoleID() >= 0 && role.GetRoleID() <= HighestRole) throw new SynapseRoleAlreadyRegisteredException("A Plugin tried to register a CustomRole with an Id of a vanilla RoleType", info);
+            if (IsIDRegistered(role.GetRoleID())) throw new SynapseRoleAlreadyRegisteredException("A Role was registered with an already registered ID", info);
 
             CustomRoles.Add(info);
         }
 
         public void RegisterCustomRole(RoleInformation role)
         {
-            if (role.ID >= 0 && role.ID <= HighestRole) throw new Exception("A Plugin tried to register a CustomRole with an Id of a vanilla RoleType");
-            if (IsIDRegistered(role.ID)) throw new Exception("A Plugin tried to register a CustomRole with an already registered ID");
+            if (role.ID >= 0 && role.ID <= HighestRole) throw new SynapseRoleAlreadyRegisteredException("A Plugin tried to register a CustomRole with an Id of a vanilla RoleType", role);
+            if (IsIDRegistered(role.ID)) throw new SynapseRoleAlreadyRegisteredException("A Role was registered with an already registered ID", role);
 
             CustomRoles.Add(role);
         }
