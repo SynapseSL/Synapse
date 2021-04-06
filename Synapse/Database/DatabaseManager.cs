@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Runtime.CompilerServices;
 using LiteDB;
 using Swan;
 using Synapse.Api;
@@ -66,6 +67,9 @@ namespace Synapse.Database
 
     public class PunishmentRepository : Repository<PunishmentDbo>
     {
+        public static bool Enabled => Server.Get.Configs.synapseConfiguration.DatabaseBans &&
+                                           Server.Get.Configs.synapseConfiguration.DatabaseEnabled;
+        
         public List<PunishmentDbo> GetCurrentPunishments(string player)
         {
             return Find(LiteDB.Query.And(
@@ -82,11 +86,29 @@ namespace Synapse.Database
         {
             return Find(LiteDB.Query.EQ("Issuer", player));
         }
+
+        public static void CreateBan(string player, string reason, string issuer, int duration, string name = "Unknown Name")
+        {
+            var time = DateTime.Now;
+            var dbo = new PunishmentDbo
+            {
+                NameSnapshot = name,
+                Receiver = player,
+                Issuer = issuer,
+                Type = PunishmentType.Ban,
+                Timestamp = time.ToUnixEpochDate(),
+                Expire = time.AddSeconds(duration).ToUnixEpochDate(),
+                Message = reason ?? "",
+                Note = ""
+            };
+            DatabaseManager.PunishmentRepository.Insert(dbo);
+        }
     }
 
     public class PunishmentDbo : IDatabaseEntity
     {
         public int Id { get; set; }
+        public string NameSnapshot { get; set; }
         public PunishmentType Type { get; set; }
         public string Message { get; set; }
         public string Note { get; set; } = "";

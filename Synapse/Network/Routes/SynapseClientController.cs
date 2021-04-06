@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using EmbedIO;
 using EmbedIO.Routing;
@@ -46,7 +47,7 @@ namespace Synapse.Network.Routes
         public async Task<object> Servers([QueryField("user", true)] string encodedUser,
             [QueryField("token", true)] string encodedToken)
         {
-            var session = ClientSession.Validate(encodedUser, encodedToken);
+            var session = ClientSession.Validate(encodedUser, encodedToken, out var user);
             if (session == null) return StatusedResponse.Unauthorized;
             var body = Json.Serialize(new InstanceDetailsListTransmission
             {
@@ -62,7 +63,7 @@ namespace Synapse.Network.Routes
             [QueryField("target", true)] string target,
             [QueryField("file", true)] string file)
         {
-            var session = ClientSession.Validate(encodedUser, encodedToken);
+            var session = ClientSession.Validate(encodedUser, encodedToken, out var user);
             if (session == null) return StatusedResponse.Unauthorized;
             var response = await SynapseNetworkClient.GetClient.SendMessageAndAwaitResponse(InstanceMessage.CreateSend(
                 "GetConfig",
@@ -80,9 +81,9 @@ namespace Synapse.Network.Routes
             [QueryField("user", true)] string encodedUser,
             [QueryField("token", true)] string encodedToken,
             [QueryField("target", true)] string target,
-            [QueryField("file", true)] string file)
+            [QueryField("file", true)] string file /* Reserved so future updates won't break possible PWAs */)
         {
-            var session = ClientSession.Validate(encodedUser, encodedToken);
+            var session = ClientSession.Validate(encodedUser, encodedToken, out var user);
             if (session == null) return StatusedResponse.Unauthorized;
             var content = await HttpContext.GetRequestBodyAsStringAsync();
             content = session.Decode(content);
@@ -93,6 +94,24 @@ namespace Synapse.Network.Routes
             {
                 Successful = true,
                 Message = "Updated"
+            };
+        }
+        
+        [Route(HttpVerbs.Post, "/ban")]
+        public async Task<object> Ban(
+            [QueryField("user", true)] string encodedUser,
+            [QueryField("token", true)] string encodedToken)
+        {
+            var session = ClientSession.Validate(encodedUser, encodedToken, out var user);
+            if (session == null) return StatusedResponse.Unauthorized;
+            var content = await HttpContext.GetRequestBodyAsStringAsync();
+            content = session.Decode(content);
+            var netBan = Json.Deserialize<NetBan>(content);
+            await netBan.Player.Ban(netBan.Message, user, netBan.Duration);
+            return new StatusedResponse
+            {
+                Successful = true,
+                Message = "Ok"
             };
         }
     }

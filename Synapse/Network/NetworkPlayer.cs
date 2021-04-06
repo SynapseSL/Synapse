@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Synapse.Api;
+using Synapse.Database;
 using Synapse.Network.Models;
 
 namespace Synapse.Network
@@ -55,6 +56,26 @@ namespace Synapse.Network
                     Player = this,
                     Message = message
                 }));
+        }
+
+        //Durations is in seconds
+        public async Task Ban(string message, string issuer, int duration)
+        {
+            if (PunishmentRepository.Enabled)
+            {
+                PunishmentRepository.CreateBan(UserId, message, issuer??"Server", duration, DisplayName??"Unknown Name");
+                await Kick(message);
+            }
+            else
+            {
+                await SynapseNetworkClient.GetClient.SendMessageAndAwaitResponse(InstanceMessage.CreateBroadcast("Ban",
+                    new NetBan
+                    {
+                        Player = this,
+                        Message = message,
+                        Duration = duration
+                    })); 
+            }
         }
 
         public static NetworkPlayer FromLocalPlayer(Player player)

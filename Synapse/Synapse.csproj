@@ -143,6 +143,7 @@
     <Compile Include="Network\Models\ClientLoginRequest.cs" />
     <Compile Include="Network\Models\ClientLoginResponse.cs" />
     <Compile Include="Network\Models\ClientSession.cs" />
+    <Compile Include="Network\Models\NetBan.cs" />
     <Compile Include="Network\Models\NetBroadcast.cs" />
     <Compile Include="Network\Models\NetConfig.cs" />
     <Compile Include="Network\Models\NetKick.cs" />

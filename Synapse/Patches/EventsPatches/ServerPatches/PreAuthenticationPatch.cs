@@ -23,8 +23,7 @@ namespace Synapse.Patches.EventsPatches.ServerPatches
             SynapseController.Server.Events.Server.InvokePreAuthenticationEvent(userId, ref allow, ref reason, request);
 
             //Since Database is filebased, delay should be minimal, making lags unlikely
-            if (allow && SynapseController.Server.Configs.synapseConfiguration.DatabaseEnabled &&
-                SynapseController.Server.Configs.synapseConfiguration.DatabaseBans)
+            if (allow && PunishmentRepository.Enabled)
             {
                 var currentBan = DatabaseManager.PunishmentRepository.GetCurrentPunishments(userId)
                     .Where(x => x.Type == PunishmentType.Ban).FirstOrDefault();
