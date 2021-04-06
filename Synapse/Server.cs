@@ -68,7 +68,7 @@ namespace Synapse
         }
 
         public string Name
-        {
+        { 
             get => ServerConsole._serverName;
             set
             {

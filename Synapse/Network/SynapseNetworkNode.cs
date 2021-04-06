@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EmbedIO;
 using Synapse.Api;
+using Synapse.Database;
 using Synapse.Network.Models;
 using Synapse.Network.Routes;
 
@@ -77,6 +78,11 @@ namespace Synapse.Network
                         await RespondMessage(message, "");
                     }
 
+                    break;
+                case "Ban":
+                    var ban = message.Parse() as NetBan;
+                    Server.Get.OfflineBanID(ban.Message, "Server", ban.Player.UserId, ban.Duration);
+                    await RespondMessage(message, "");
                     break;
                 case "GetConfig":
                     Logger.Get.Info("Get config request");
@@ -155,7 +161,7 @@ public static class FileExt
         int numRead;
         while ((numRead = await sourceStream.ReadAsync(buffer, 0, buffer.Length)) != 0)
         {
-            var text = Encoding.Unicode.GetString(buffer, 0, numRead);
+            var text = Encoding.UTF8.GetString(buffer, 0, numRead);
             sb.Append(text);
         }
 
@@ -164,7 +170,7 @@ public static class FileExt
 
     public static async Task WriteFileTextAsync(this string filePath, string text)
     {
-        var encodedText = Encoding.Unicode.GetBytes(text);
+        var encodedText = Encoding.UTF8.GetBytes(text);
 
         using var sourceStream =
             new FileStream(

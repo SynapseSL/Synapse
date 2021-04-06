@@ -1,4 +1,6 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using System.Runtime.InteropServices;
+using JetBrains.Annotations;
 
 namespace Synapse.Network.Models
 {
@@ -19,13 +21,15 @@ namespace Synapse.Network.Models
         }
 
         [CanBeNull]
-        public static ClientSession Validate(string hexUser, string encToken)
+        public static ClientSession Validate(string hexUser, string encToken, out string userOut)
         {
+            userOut = null;
             var user = hexUser.FromHex();
             var exists = Server.Get.NetworkManager.ClientSessionTokens.TryGetValue(user, out var session);
             if (!exists) return null;
             var token = AESUtils.Decrypt(encToken, session.InCipher);
             if (token != session.Token) return null;
+            userOut = user;
             return session;
         }
     }
