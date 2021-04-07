@@ -476,6 +476,12 @@ namespace Synapse.Api
             set => ClassManager.DeathTime = value;
         }
 
+        public PlayerMovementState MovementState
+        {
+            get => (PlayerMovementState)AnimationController.Network_curMoveState;
+            set => AnimationController.Network_curMoveState = (byte)value;
+        }
+
         public Vector3 Scale
         {
             get => transform.localScale;
