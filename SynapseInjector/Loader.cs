@@ -75,7 +75,7 @@ namespace SynapseInjector
             }
             catch (Exception e)
             {
-                Console.Error.WriteLine(e);
+                ServerConsole.AddLog(e.ToString(), ConsoleColor.Red);
             }
         }
     }

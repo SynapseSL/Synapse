@@ -148,6 +148,7 @@
     <Compile Include="Network\Models\NetConfig.cs" />
     <Compile Include="Network\Models\NetHealthData.cs" />
     <Compile Include="Network\Models\NetKick.cs" />
+    <Compile Include="Network\Models\NetMessage.cs" />
     <Compile Include="Network\Models\NetRound.cs" />
     <Compile Include="Network\Models\SerializablePlugin.cs" />
     <Compile Include="Network\NetworkNodeBase.cs" />

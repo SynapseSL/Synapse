@@ -72,9 +72,11 @@ namespace Synapse.Database
         
         public List<PunishmentDbo> GetCurrentPunishments(string player)
         {
+            var t = DateTime.Now.ToUnixEpochDate();
+            Logger.Get.Info(t);
             return Find(LiteDB.Query.And(
                 LiteDB.Query.EQ("Receiver", player),
-                LiteDB.Query.GT("Expire", DateTime.Now.ToUnixEpochDate())));
+                LiteDB.Query.GT("Expire", t)));
         }
 
         public List<PunishmentDbo> GetPunishments(string player)
@@ -87,7 +89,7 @@ namespace Synapse.Database
             return Find(LiteDB.Query.EQ("Issuer", player));
         }
 
-        public static void CreateBan(string player, string reason, string issuer, int duration, string name = "Unknown Name")
+        public static void CreateBan(string player, string reason, string issuer, int duration, string name = "Unknown Name", string note = "")
         {
             var time = DateTime.Now;
             var dbo = new PunishmentDbo
@@ -99,7 +101,24 @@ namespace Synapse.Database
                 Timestamp = time.ToUnixEpochDate(),
                 Expire = time.AddSeconds(duration).ToUnixEpochDate(),
                 Message = reason ?? "",
-                Note = ""
+                Note = note ?? ""
+            };
+            DatabaseManager.PunishmentRepository.Insert(dbo);
+        }
+        
+        public static void CreateKick(string player, string reason, string issuer, string name = "Unknown Name", string note = "")
+        {
+            var time = DateTime.Now;
+            var dbo = new PunishmentDbo
+            {
+                NameSnapshot = name,
+                Receiver = player,
+                Issuer = issuer,
+                Type = PunishmentType.Kick,
+                Timestamp = time.ToUnixEpochDate(),
+                Expire = time.ToUnixEpochDate(),
+                Message = reason ?? "",
+                Note = note ?? ""
             };
             DatabaseManager.PunishmentRepository.Insert(dbo);
         }

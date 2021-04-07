@@ -264,6 +264,8 @@ namespace Synapse.Network
         public StatusListWrapper(IEnumerable<T> enumerable)
         {
             Enumerable = enumerable;
+            Message = "Ok";
+            Successful = true;
         }
 
         private IEnumerable<T> Enumerable { get; }
@@ -277,6 +279,7 @@ namespace Synapse.Network
         {
             return Enumerable.GetEnumerator();
         }
+        
     }
 
     public class SuccessfulStatus : StatusedResponse

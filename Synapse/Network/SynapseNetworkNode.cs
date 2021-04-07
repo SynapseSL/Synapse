@@ -129,9 +129,6 @@ namespace Synapse.Network
                             break;
                     }
                     break;
-                case "Uptime":
-                    await RespondMessage(message, Server.Get.NetworkManager.Startup.ToUnixEpochDate());
-                    break;
             }
 
             //Debug

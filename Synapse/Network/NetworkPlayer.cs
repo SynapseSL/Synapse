@@ -41,11 +41,18 @@ namespace Synapse.Network
                 }));
         }
 
-        public async Task Kick(string message)
+        public async Task Kick(string message, string issuer = null, string note = null, bool log = true)
         {
+
+            if (PunishmentRepository.Enabled)
+            {
+                PunishmentRepository.CreateKick(UserId, message, issuer ?? "Server", DisplayName ?? "Unknown", note ?? "");
+            }
+            
             var local = ToLocalPlayer();
             if (local != null)
             {
+                
                 local.Kick(message);
                 return;
             }
@@ -54,16 +61,18 @@ namespace Synapse.Network
                 new NetKick
                 {
                     Player = this,
-                    Message = message
+                    Message = message,
+                    Issuer = issuer,
+                    Note = note
                 }));
         }
 
         //Durations is in seconds
-        public async Task Ban(string message, string issuer, int duration)
+        public async Task Ban(string message, string issuer, int duration, string note = "")
         {
             if (PunishmentRepository.Enabled)
             {
-                PunishmentRepository.CreateBan(UserId, message, issuer??"Server", duration, DisplayName??"Unknown Name");
+                PunishmentRepository.CreateBan(UserId, message, issuer??"Server", duration, DisplayName??"Unknown Name", note);
                 await Kick(message);
             }
             else
@@ -73,7 +82,8 @@ namespace Synapse.Network
                     {
                         Player = this,
                         Message = message,
-                        Duration = duration
+                        Duration = duration,
+                        Note = note
                     })); 
             }
         }

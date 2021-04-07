@@ -21,7 +21,7 @@ namespace Synapse.Network.Models
         }
 
         [CanBeNull]
-        public static ClientSession Validate(string hexUser, string encToken, out string userOut)
+        public static ClientSession Validate(string hexUser, string encToken, out string userOut, string permission = null)
         {
             userOut = null;
             var user = hexUser.FromHex();
@@ -30,6 +30,12 @@ namespace Synapse.Network.Models
             var token = AESUtils.Decrypt(encToken, session.InCipher);
             if (token != session.Token) return null;
             userOut = user;
+            if (permission != null)
+            {
+                var group = Server.Get.PermissionHandler.GetPlayerGroup(user);
+                if (!group.HasPermission(permission)) return null;
+            }
+            
             return session;
         }
     }

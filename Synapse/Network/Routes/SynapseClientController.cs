@@ -6,6 +6,7 @@ using EmbedIO.Routing;
 using EmbedIO.WebApi;
 using Swan;
 using Swan.Formatters;
+using Synapse.Api;
 using Synapse.Database;
 using Synapse.Network.Models;
 
@@ -63,7 +64,8 @@ namespace Synapse.Network.Routes
             [QueryField("target", true)] string target,
             [QueryField("file", true)] string file)
         {
-            var session = ClientSession.Validate(encodedUser, encodedToken, out var user);
+            var session = ClientSession.Validate(encodedUser, encodedToken, out var user, 
+                "synapse.webclient.getconfig");
             if (session == null) return StatusedResponse.Unauthorized;
             var response = await SynapseNetworkClient.GetClient.SendMessageAndAwaitResponse(InstanceMessage.CreateSend(
                 "GetConfig",
@@ -83,8 +85,10 @@ namespace Synapse.Network.Routes
             [QueryField("target", true)] string target,
             [QueryField("file", true)] string file /* Reserved so future updates won't break possible PWAs */)
         {
-            var session = ClientSession.Validate(encodedUser, encodedToken, out var user);
+            var session = ClientSession.Validate(encodedUser, encodedToken, out var user, 
+                "synapse.webclient.setconfig");
             if (session == null) return StatusedResponse.Unauthorized;
+
             var content = await HttpContext.GetRequestBodyAsStringAsync();
             content = session.Decode(content);
             var netConfig = Json.Deserialize<NetConfig>(content);
@@ -97,17 +101,76 @@ namespace Synapse.Network.Routes
             };
         }
         
+        [Route(HttpVerbs.Get, "/playerdb")]
+        public async Task<object> GetDB(
+            [QueryField("user", true)] string encodedUser,
+            [QueryField("token", true)] string encodedToken)
+        {
+            var session = ClientSession.Validate(encodedUser, encodedToken, out var user, 
+                "synapse.webclient.playerdb");
+            if (session == null) return StatusedResponse.Unauthorized;
+            var body = Json.Serialize(new StatusListWrapper<PlayerDbo>(DatabaseManager.PlayerRepository.All().Select(
+                x =>
+                {
+                    x.Data = null;
+                    return x;
+                })));
+            return session.Encode(body);
+        }
+        
+        
         [Route(HttpVerbs.Post, "/ban")]
         public async Task<object> Ban(
             [QueryField("user", true)] string encodedUser,
             [QueryField("token", true)] string encodedToken)
         {
-            var session = ClientSession.Validate(encodedUser, encodedToken, out var user);
+            var session = ClientSession.Validate(encodedUser, encodedToken, out var user, 
+                "synapse.webclient.ban");
             if (session == null) return StatusedResponse.Unauthorized;
             var content = await HttpContext.GetRequestBodyAsStringAsync();
             content = session.Decode(content);
             var netBan = Json.Deserialize<NetBan>(content);
-            await netBan.Player.Ban(netBan.Message, user, netBan.Duration);
+            await netBan.Player.Ban(netBan.Message, user, netBan.Duration, netBan.Note);
+            return new StatusedResponse
+            {
+                Successful = true,
+                Message = "Ok"
+            };
+        }
+        
+        [Route(HttpVerbs.Post, "/kick")]
+        public async Task<object> Kick(
+            [QueryField("user", true)] string encodedUser,
+            [QueryField("token", true)] string encodedToken)
+        {
+            var session = ClientSession.Validate(encodedUser, encodedToken, out var user, 
+                "synapse.webclient.kick");
+            if (session == null) return StatusedResponse.Unauthorized;
+            var content = await HttpContext.GetRequestBodyAsStringAsync();
+            content = session.Decode(content);
+            var netBan = Json.Deserialize<NetBan>(content);
+            Logger.Get.Error(netBan.Humanize());
+            await netBan.Player.Kick(netBan.Message, user, netBan.Note);
+            return new StatusedResponse
+            {
+                Successful = true,
+                Message = "Ok"
+            };
+        }
+
+        [Route(HttpVerbs.Post, "/sendMessage")]
+        public async Task<object> SendMessage(
+            [QueryField("user", true)] string encodedUser,
+            [QueryField("token", true)] string encodedToken)
+        {
+            var session = ClientSession.Validate(encodedUser, encodedToken, out var user, 
+                "synapse.webclient.sendmessage");
+            if (session == null) return StatusedResponse.Unauthorized;
+            var content = await HttpContext.GetRequestBodyAsStringAsync();
+            content = session.Decode(content);
+            var netMessage = Json.Deserialize<NetMessage>(content);
+            Logger.Get.Error(netMessage.Humanize());
+            await netMessage.Player.SendBroadcastMessage(netMessage.Message);
             return new StatusedResponse
             {
                 Successful = true,

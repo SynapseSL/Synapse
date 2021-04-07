@@ -23,25 +23,17 @@ namespace Synapse.Network.Routes
             {
                 try
                 {
-                    Logger.Get.Info("[1]");
-                    var clientData = SynapseNetworkServer.GetServer.DataById(key);
-                    Logger.Get.Warn(clientData.Humanize());
-                    Logger.Get.Warn(key);
-                    Logger.Get.Info("[2]");
-                    var entry = clientData.SyncEntries.Get("startupTimestamp");
-                    Logger.Get.Info("[3]");
-                    var up = clientData.SyncEntries.Get<NetHealthData>("startupTimestamp");
-                    Logger.Get.Info(entry.Humanize());
-                    nodes.Add(up);
+                    var clientData = SynapseNetworkServer.GetServer.DataById(key);;
+                    if (clientData != null)
+                    {
+                        var healthData = clientData.SyncEntries.Get<NetHealthData>("startupTimestamp");
+                        nodes.Add(healthData);
+                    }
                 }
                 catch (Exception e)
                 {
                     Logger.Get.Error(e.ToString());
                 }
-
-                // var response = await SynapseNetworkClient.GetClient.SendMessageAndAwaitResponse(InstanceMessage.CreateSend("Uptime", "", key));
-                // var up = (int)response.Parse();
-
             }
 
             return new StatusListWrapper<NetHealthData>(nodes);
