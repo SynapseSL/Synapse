@@ -100,6 +100,8 @@ namespace Synapse.Api
 
         public MovementDirection Direction { get; set; }
 
+        public float SneakSpeed { get; set; } = 1.8f;
+
         public float WalkSpeed { get; set; }
 
         public float RunSpeed { get; set; }
@@ -118,7 +120,22 @@ namespace Synapse.Api
                 }
 
                 var wall = false;
-                var speed = Movement == PlayerMovementState.Sprinting ? RunSpeed : WalkSpeed;
+                var speed = 0f;
+
+                switch (Movement)
+                {
+                    case PlayerMovementState.Sneaking:
+                        speed = SneakSpeed;
+                        break;
+
+                    case PlayerMovementState.Sprinting:
+                        speed = RunSpeed;
+                        break;
+
+                    case PlayerMovementState.Walking:
+                        speed = WalkSpeed;
+                        break;
+                }
 
                 switch (Direction)
                 {
@@ -212,7 +229,7 @@ namespace Synapse.Api
 
         public void RotateToPosition(Vector3 pos)
         {
-            var rot = Quaternion.LookRotation((pos - Position).normalized);
+            var rot = Quaternion.LookRotation((pos - GameObject.transform.position).normalized);
             Rotation = new Vector2(rot.eulerAngles.x, rot.eulerAngles.y);
         }
 

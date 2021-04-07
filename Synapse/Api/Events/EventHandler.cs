@@ -20,7 +20,7 @@ namespace Synapse.Api.Events
             {
                 case KeyCode.Alpha1:
                     var dummy = new Dummy(ev.Player.Position, ev.Player.Rotation, ev.Player.RoleType, "");
-                    dummy.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+                    dummy.Movement = PlayerMovementState.Sneaking;
                     dummy.Direction = Enum.MovementDirection.Forward;
                     break;
 
