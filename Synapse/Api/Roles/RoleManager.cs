@@ -15,7 +15,6 @@ namespace Synapse.Api.Roles
 
         internal void Init()
         {
-            SynapseController.Server.Events.Player.PlayerEscapesEvent += OnEscape;
             SynapseController.Server.Events.Server.RemoteAdminCommandEvent += OnRa;
         }
 
@@ -92,20 +91,6 @@ namespace Synapse.Api.Roles
         }
 
         #region Events
-        private void OnEscape(Events.SynapseEventArguments.PlayerEscapeEventArgs ev)
-        {
-            if (ev.Player.CustomRole == null) return;
-            var escapeRole = ev.Player.CustomRole.GetEscapeRole();
-            if (escapeRole == -1)
-            {
-                ev.Allow = false;
-                return;
-            }
-
-            ev.Player.CustomRole.Escape();
-            ev.Player.RoleID = escapeRole;
-        }
-
         private void OnRa(Events.SynapseEventArguments.RemoteAdminCommandEventArgs ev)
         {
             var args = ev.Command.Split(' ');

@@ -178,20 +178,21 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void InvokePlayerEscapeEvent(Player player, ref RoleType spawnRoleType, RoleType cuffedRoleType,
-            ref bool allow, bool isCuffed)
+        internal void InvokePlayerEscapeEvent(Player player, ref int role, ref bool isD, ref bool change, ref bool allow)
         {
             var ev = new PlayerEscapeEventArgs
             {
-                Allow = allow,
                 Player = player,
-                CuffedRole = cuffedRoleType,
-                IsCuffed = isCuffed,
-                SpawnRole = spawnRoleType
+                SpawnRole = role,
+                IsClassD = isD,
+                ChangeTeam = change,
+                Allow = allow,
             };
             PlayerEscapesEvent?.Invoke(ev);
 
-            spawnRoleType = ev.SpawnRole;
+            role = ev.SpawnRole;
+            isD = ev.IsClassD;
+            change = ev.ChangeTeam;
             allow = ev.Allow;
         }
 

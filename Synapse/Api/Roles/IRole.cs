@@ -16,8 +16,6 @@ namespace Synapse.Api.Roles
 
         List<int> GetEnemiesID();
 
-        int GetEscapeRole();
-
         void Escape();
 
         void Spawn();

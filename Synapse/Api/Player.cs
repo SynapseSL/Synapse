@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Hints;
@@ -34,6 +33,7 @@ namespace Synapse.Api
             MicroHID = GetComponent<MicroHID>();
             DissonanceUserSetup = this.GetComponent<Assets._Scripts.Dissonance.DissonanceUserSetup>();
             Radio = this.GetComponent<Radio>();
+            Escape = this.GetComponent<Escape>();
         }
 
         #region Methods
@@ -781,6 +781,8 @@ namespace Synapse.Api
 
         public Grenades.GrenadeManager GrenadeManager { get; }
 
+        public Escape Escape { get; }
+
         public LocalCurrentRoomEffects LocalCurrentRoomEffects => Hub.localCurrentRoomEffects;
 
         public WeaponManager WeaponManager => Hub.weaponManager;
@@ -843,5 +845,96 @@ namespace Synapse.Api
         #endregion
 
         public override string ToString() => NickName;
+
+        public void TriggerEscape()
+        {
+            if (CustomRole == null)
+            {
+                var newRole = -1;
+                var allow = true;
+                var changeTeam = false;
+
+                if (Handcuffs.ForceCuff && CharacterClassManager.ForceCuffedChangeTeam)
+                    changeTeam = true;
+
+                if (IsCuffed && CharacterClassManager.CuffedChangeTeam)
+                {
+                    switch (RoleID)
+                    {
+                        case (int)RoleType.Scientist when Cuffer.Fraction == Fraction.FoundationEnemy:
+                            changeTeam = true;
+                            break;
+
+                        case (int)RoleType.ClassD when Cuffer.Fraction == Fraction.FoundationStaff:
+                            changeTeam = true;
+                            break;
+                    }
+                }
+
+                switch (RoleID)
+                {
+                    case (int)RoleType.ClassD when changeTeam:
+                        newRole = (int)RoleType.NtfCadet;
+                        break;
+
+                    case (int)RoleType.ClassD:
+                    case (int)RoleType.Scientist when changeTeam:
+                        newRole = (int)RoleType.ChaosInsurgency;
+                        break;
+
+                    case (int)RoleType.Scientist:
+                        newRole = (int)RoleType.NtfScientist;
+                        break;
+                }
+
+                if (newRole < 0) allow = false;
+
+                var isClassD = newRole == (int)RoleType.ClassD;
+
+                Server.Get.Events.Player.InvokePlayerEscapeEvent(this, ref newRole, ref isClassD, ref changeTeam, ref allow);
+
+                if (newRole < 0 || !allow) return;
+
+                if (newRole >= -1 && newRole <= RoleManager.HighestRole)
+                    ClassManager.SetPlayersClass((RoleType)newRole, gameObject, false, true);
+                else
+                    RoleID = newRole;
+
+                Escape.TargetShowEscapeMessage(Connection, isClassD, changeTeam);
+
+                var tickets = Respawning.RespawnTickets.Singleton;
+                switch (RealTeam)
+                {
+                    case Team.MTF when changeTeam:
+                        RoundSummary.escaped_scientists++;
+                        tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
+                            GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_mtf_classd_cuffed_count", 1), false);
+                        break;
+
+                    case Team.MTF:
+                        RoundSummary.escaped_scientists++;
+                        tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
+                            GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_mtf_scientist_count", 1), false);
+                        break;
+
+                    case Team.CHI when changeTeam:
+                        RoundSummary.escaped_ds++;
+                        tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
+                            GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_ci_scientist_cuffed_count", 1), false);
+                        break;
+
+                    case Team.CHI:
+                        RoundSummary.escaped_ds++;
+                        tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
+                            GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_ci_classd_count", 1), false);
+                        break;
+                }
+            }
+            else
+            {
+                CustomRole.Escape();
+                return;
+            }
+        }
     }
 }
