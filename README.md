@@ -1,10 +1,9 @@
 ![discord badge](https://img.shields.io/discord/716698782317805629?color=7289DA&label=discord)
 # **Synapse**
-### **The new SCP: Secret Laboratory Plugin loader**
-Synapse is a new found project created by two german official community Server-Hosters. We used Harmony to create a framework which makes us easier to implement new functions, game updates and overall a new experience a player.
+### **What is Synapse?**
+Synapse is a project created by two german official community Server-Hosters. We used Harmony to create a framework which makes us easier to implement new functions, game updates and overall a new experience a player.
 
 ## **Features & Configs**
-
 Synapse itself has a ton of features some of these include:
 * Permission System which replaces the Permission System of Scp:Sl
 * Api to create own Roles 
