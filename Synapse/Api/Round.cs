@@ -52,6 +52,18 @@ namespace Synapse.Api
             set => RoundSummary.kills_by_scp = value;
         }
 
+        public int MtfTickets
+        {
+            get => RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox);
+            set => RespawnTickets.Singleton._tickets[SpawnableTeamType.NineTailedFox] = value;
+        }
+
+        public int ChaosTickets
+        {
+            get => RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.ChaosInsurgency);
+            set => RespawnTickets.Singleton._tickets[SpawnableTeamType.ChaosInsurgency] = value;
+        }
+
         internal bool Forceend { get; set; } = false;
 
         public TimeSpan RoundLength => RoundStart.RoundLenght;
