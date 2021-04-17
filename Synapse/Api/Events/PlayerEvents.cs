@@ -65,6 +65,8 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<PlayerWalkOnSinkholeEventArgs> PlayerWalkOnSinkholeEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerReportEventArgs> PlayerReportEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerDamagePermissionEventArgs> PlayerDamagePermissionEvent;
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -400,6 +402,20 @@ namespace Synapse.Api.Events
 
             global = ev.GlobalReport;
             allow = ev.Allow;
+        }
+
+        internal void InvokePlayerDamagePermissions(Player victim, Player attacker, ref bool allow)
+        {
+            var ev = new PlayerDamagePermissionEventArgs
+            {
+                Victim = victim,
+                Attacker = attacker,
+                AllowDamage = allow
+            };
+
+            PlayerDamagePermissionEvent?.Invoke(ev);
+
+            allow = ev.AllowDamage;
         }
         #endregion
     }

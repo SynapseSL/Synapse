@@ -319,4 +319,13 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public bool Allow { get; set; } = true;
     }
+
+    public class PlayerDamagePermissionEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Victim { get; internal set; }
+
+        public Player Attacker { get; internal set; }
+
+        public bool AllowDamage { get; set; }
+    }
 }

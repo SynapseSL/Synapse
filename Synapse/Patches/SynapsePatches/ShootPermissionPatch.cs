@@ -49,6 +49,9 @@ namespace Synapse.Patches.SynapsePatches
                         }
                     }
                 }
+
+                Server.Get.Events.Player.InvokePlayerDamagePermissions(target, shooter, ref __result);
+
                 return false;
             }
             catch(Exception e)
