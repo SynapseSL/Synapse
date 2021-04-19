@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 using System.Reflection;
 using Hints;
 using Mirror;
@@ -451,6 +452,10 @@ namespace Synapse.Api
         }
 
         public bool Invisible { get; set; }
+
+        public bool CustomInvisible { get; set; }
+
+        public List<Player> CustomInvisiblePlayers { get; } = new List<Player>();
 
         public Vector3 Position
         {
