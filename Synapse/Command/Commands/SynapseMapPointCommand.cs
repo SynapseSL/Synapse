@@ -20,11 +20,11 @@ namespace Synapse.Command.Commands
             Physics.Raycast(context.Player.CameraReference.transform.position, context.Player.CameraReference.transform.forward, out RaycastHit raycastthit, 100f);
 
             var point = new MapPoint(context.Player.Room, raycastthit.point + (Vector3.up * 0.1f));
-            result.Message = "\nThe Position you are looking at as MapPoint:" +
+            result.Message = "\nThe Position you are looking at as MapPoint (change , to . in the syml config):" +
                 $"\n  room: {point.Room.RoomName}" +
-                $"\n  x: {point.RelativePosition.x.ToString().Replace(",",".")}" +
-                $"\n  y: {point.RelativePosition.y.ToString().Replace(",", ".")}" +
-                $"\n  z: {point.RelativePosition.z.ToString().Replace(",", ".")}";
+                $"\n  x: {point.RelativePosition.x}" +
+                $"\n  y: {point.RelativePosition.y}" +
+                $"\n  z: {point.RelativePosition.z}";
             result.State = CommandResultState.Ok;
             return result;
         }

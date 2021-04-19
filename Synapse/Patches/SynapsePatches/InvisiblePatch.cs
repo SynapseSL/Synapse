@@ -46,39 +46,33 @@ namespace Synapse.Patches.SynapsePatches
                     for (int k = 0; k < __instance._usedData; k++)
                     {
                         var showinvoid = false;
-                        var playerToShow = players[k];
+                        var newplayer = players[k];
                         var vector = __instance._transmitBuffer[k].position - player.Position;
 
                         if (player.RoleType == RoleType.Scp173)
                         {
-                            if (player.Scp173Controller.IgnoredPlayers.Contains(playerToShow))
+                            if (player.Scp173Controller.IgnoredPlayers.Contains(newplayer))
                             {
                                 showinvoid = true;
                                 goto AA_001;
                             }
-                            else if ((playerToShow.RealTeam == Team.SCP && !Server.Get.Configs.synapseConfiguration.ScpTrigger173) || Server.Get.Configs.synapseConfiguration.CantLookAt173.Contains(playerToShow.RoleID) || player.Scp173Controller.TurnedPlayers.Contains(playerToShow) || playerToShow.Invisible)
+                            else if ((newplayer.RealTeam == Team.SCP && !Server.Get.Configs.synapseConfiguration.ScpTrigger173) || Server.Get.Configs.synapseConfiguration.CantLookAt173.Contains(newplayer.RoleID) || player.Scp173Controller.TurnedPlayers.Contains(newplayer) || newplayer.Invisible)
                             {
                                 var posinfo = __instance._transmitBuffer[k];
-                                var rot = Quaternion.LookRotation(playerToShow.Position - player.Position).eulerAngles.y;
+                                var rot = Quaternion.LookRotation(newplayer.Position - player.Position).eulerAngles.y;
                                 __instance._transmitBuffer[k] = new PlayerPositionData(posinfo.position, rot, posinfo.playerID);
                             }
                         }
                         else if (player.RoleID == (int)RoleType.Scp93953 || player.RoleID == (int)RoleType.Scp93989)
                         {
-                            if (__instance._transmitBuffer[k].position.y < 800f && SynapseExtensions.CanHarmScp(playerToShow, false) && playerToShow.RealTeam != Team.RIP && !playerToShow.GetComponent<Scp939_VisionController>().CanSee(player.ClassManager.Scp939))
+                            if (__instance._transmitBuffer[k].position.y < 800f && SynapseExtensions.CanHarmScp(newplayer, false) && newplayer.RealTeam != Team.RIP && !newplayer.GetComponent<Scp939_VisionController>().CanSee(player.ClassManager.Scp939))
                             {
                                 showinvoid = true;
                                 goto AA_001;
                             }
                         }
 
-                        if (playerToShow.Invisible && !player.HasPermission("synapse.see.invisible"))
-                        {
-                            showinvoid = true;
-                            goto AA_001;
-                        }
-
-                        if(playerToShow.CustomInvisible && !playerToShow.CustomInvisiblePlayers.Contains(player))
+                        if (newplayer.Invisible && !player.HasPermission("synapse.see.invisible"))
                         {
                             showinvoid = true;
                             goto AA_001;
@@ -109,20 +103,20 @@ namespace Synapse.Patches.SynapsePatches
                                 goto AA_001;
                             }
 
-                            if (playerToShow != null)
+                            if (newplayer != null)
                             {
                                 var scp = player.Hub.scpsController.CurrentScp as Scp096;
 
-                                if (scp != null && scp.Enraged && !scp.HasTarget(playerToShow.Hub) && SynapseExtensions.CanHarmScp(playerToShow, false))
+                                if (scp != null && scp.Enraged && !scp.HasTarget(newplayer.Hub) && SynapseExtensions.CanHarmScp(newplayer, false))
                                 {
                                     showinvoid = true;
                                     goto AA_001;
                                 }
-                                if (playerToShow.Hub.playerEffectsController.GetEffect<Scp268>().Enabled)
+                                if (newplayer.Hub.playerEffectsController.GetEffect<Scp268>().Enabled)
                                 {
                                     var flag = false;
                                     if (scp != null)
-                                        flag = scp.HasTarget(playerToShow.Hub);
+                                        flag = scp.HasTarget(newplayer.Hub);
 
                                     if (player.RoleType == RoleType.Scp079 || flag)
                                     {
@@ -138,7 +132,7 @@ namespace Synapse.Patches.SynapsePatches
 
                     AA_001:
                         if (showinvoid)
-                            __instance._transmitBuffer[k] = new PlayerPositionData(Vector3.up * 6000f, 0.0f, playerToShow.PlayerId);
+                            __instance._transmitBuffer[k] = new PlayerPositionData(Vector3.up * 6000f, 0.0f, newplayer.PlayerId);
                     }
 
 
