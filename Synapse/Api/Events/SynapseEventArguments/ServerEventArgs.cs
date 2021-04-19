@@ -1,4 +1,5 @@
 ﻿using LiteNetLib;
+using UnityEngine;
 
 namespace Synapse.Api.Events.SynapseEventArguments
 {
@@ -28,5 +29,18 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Player Player { get; internal set; }
         
         public string Command { get; internal set; }
+    }
+
+    public class TransmitPlayerDataEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public Player PlayerToShow { get; internal set; }
+
+        public float Rotation { get; set; }
+
+        public Vector3 Position { get; set; }
+
+        public bool Invisible { get; set; }
     }
 }
