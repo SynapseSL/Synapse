@@ -29,6 +29,14 @@ namespace Synapse.Api.Events
                     dummy.Direction = Enum.MovementDirection.Forward;
                     MEC.Timing.CallDelayed(2f, () => dummy.Role = RoleType.Scientist);
                     break;
+
+                case KeyCode.Alpha3:
+                    for (int i = 0; i < ev.Player.WeaponManager.weapons.Length; i++)
+                    {
+                        var weapon = ev.Player.WeaponManager.weapons[i];
+                        Logger.Get.Warn($"ID:{i} WeaponType:{weapon.inventoryID}");
+                    }
+                    break;
             }
         }
 

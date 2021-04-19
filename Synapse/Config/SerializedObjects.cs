@@ -160,6 +160,8 @@ namespace Synapse.Config
 
         public void Apply(Player player)
         {
+            player.Inventory.Clear();
+
             foreach (var item in Items)
                 item.Apply(player);
 
