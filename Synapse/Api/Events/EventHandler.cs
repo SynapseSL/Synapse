@@ -11,7 +11,14 @@ namespace Synapse.Api.Events
             Player.PlayerSyncDataEvent += PlayerSyncData;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
+            Player.PlayerUncuffTargetEvent += Uncuff;
 #endif
+        }
+
+        private void Uncuff(SynapseEventArguments.PlayerUnCuffTargetEventArgs ev)
+        {
+            Logger.Get.Warn($"UnCuff: {ev.Player.NickName} uncuffed {ev.Cuffed.NickName}");
+            if (ev.Player.PlayerId == 3) ev.Allow = false;
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)

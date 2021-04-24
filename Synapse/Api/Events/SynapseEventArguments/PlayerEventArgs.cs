@@ -328,4 +328,15 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public bool AllowDamage { get; set; }
     }
+
+    public class PlayerUnCuffTargetEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public Player Cuffed { get; internal set; }
+
+        public bool FreeWithDisarmer { get; internal set; }
+
+        public bool Allow { get; set; }
+    }
 }

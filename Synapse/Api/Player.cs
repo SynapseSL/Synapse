@@ -572,10 +572,6 @@ namespace Synapse.Api
             get => Handcuffs.CufferId == -1 && Hub.handcuffs.NetworkForceCuff ? Server.Get.Host : SynapseController.Server.GetPlayer(Handcuffs.CufferId);
             set
             {
-                var handcuff = value.Handcuffs;
-
-                if (handcuff == null) return;
-
                 if (value == null)
                 {
                     Handcuffs.NetworkCufferId = -1;

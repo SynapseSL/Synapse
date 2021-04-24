@@ -67,6 +67,8 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<PlayerReportEventArgs> PlayerReportEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerDamagePermissionEventArgs> PlayerDamagePermissionEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerUnCuffTargetEventArgs> PlayerUncuffTargetEvent;
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -416,6 +418,21 @@ namespace Synapse.Api.Events
             PlayerDamagePermissionEvent?.Invoke(ev);
 
             allow = ev.AllowDamage;
+        }
+
+        internal void InvokeUncuff(Player player, Player cuffed, bool mate, out bool allow)
+        {
+            var ev = new PlayerUnCuffTargetEventArgs
+            {
+                Allow = true,
+                Cuffed = cuffed,
+                Player = player,
+                FreeWithDisarmer = mate
+            };
+
+            PlayerUncuffTargetEvent?.Invoke(ev);
+
+            allow = ev.Allow;
         }
         #endregion
     }
