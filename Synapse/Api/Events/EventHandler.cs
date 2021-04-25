@@ -26,23 +26,11 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    var dummy = new Dummy(ev.Player.Position, ev.Player.Rotation, ev.Player.RoleType, "");
-                    dummy.Movement = PlayerMovementState.Sneaking;
-                    dummy.Direction = Enum.MovementDirection.Forward;
-                    break;
-
-                case KeyCode.Alpha2:
-                    dummy = new Dummy(ev.Player.Position, ev.Player.transform.rotation, ev.Player.RoleType);
-                    dummy.Direction = Enum.MovementDirection.Forward;
-                    MEC.Timing.CallDelayed(2f, () => dummy.Role = RoleType.Scientist);
-                    break;
-
-                case KeyCode.Alpha3:
-                    for (int i = 0; i < ev.Player.WeaponManager.weapons.Length; i++)
+                    var dummy = new Dummy(ev.Player.Position, ev.Player.Rotation, ev.Player.RoleType, "")
                     {
-                        var weapon = ev.Player.WeaponManager.weapons[i];
-                        Logger.Get.Warn($"ID:{i} WeaponType:{weapon.inventoryID}");
-                    }
+                        Scale = new Vector3(0.3f, 1.3f, 0.3f)
+                    };
+                    dummy.Direction = Enum.MovementDirection.Forward;
                     break;
             }
         }

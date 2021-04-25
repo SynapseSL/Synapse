@@ -176,6 +176,7 @@
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp939\Scp939AttackPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Dummy\MirrorPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\Dummy\OverridePositionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\DoorSpawnpointPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ShootPermissionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\InvisiblePatch.cs" />
