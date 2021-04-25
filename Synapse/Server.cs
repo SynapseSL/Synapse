@@ -10,6 +10,7 @@ using Synapse.Api.Plugin;
 using Synapse.Api.Roles;
 using Synapse.Api.Items;
 using Synapse.Api.Teams;
+using Synapse.Api.Modules;
 
 namespace Synapse
 {
@@ -37,6 +38,8 @@ namespace Synapse
         public ItemManager ItemManager { get; } = new ItemManager();
 
         public ConfigHandler Configs { get; } = new ConfigHandler();
+
+        public ModuleManager ModuleManager { get; } = new ModuleManager();
 
         public Synapse.Permission.PermissionHandler PermissionHandler { get; } = new Synapse.Permission.PermissionHandler();
 
@@ -111,6 +114,7 @@ namespace Synapse
         {
             Configs.Reload();
             PermissionHandler.Reload();
+            ModuleManager.Reload();
             SynapseController.PluginLoader.ReloadConfigs();
         }
         
@@ -217,6 +221,7 @@ namespace Synapse
             private string _permissionFile;
 
             private string _configFile;
+
             //Synapse
             public string SynapseDirectory
             {
@@ -312,6 +317,8 @@ namespace Synapse
                 }
                 private set => _sharedConfigDirectory = value;
             }
+            //Currently should it not be auto generated
+            public string ModuleDirectory { get; set; }
             public string PermissionFile
             {
                 get
@@ -352,6 +359,7 @@ namespace Synapse
                 ConfigDirectory = Path.Combine(MainConfigDirectory, $"server-{ServerStatic.ServerPort}");
                 SharedConfigDirectory = Path.Combine(MainConfigDirectory, "server-shared");
 
+                ModuleDirectory = Path.Combine(SynapseDirectory, "modules");
 
                 var configpath = Path.Combine(ConfigDirectory, "config.syml");
                 ConfigFile = File.Exists(configpath) ? configpath : Path.Combine(SharedConfigDirectory, "config.syml");

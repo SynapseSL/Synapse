@@ -43,6 +43,8 @@
     <Compile Include="Api\Exceptions\SynapseRoleAlreadyRegisteredException.cs" />
     <Compile Include="Api\Exceptions\SynapseRoleNotFoundException.cs" />
     <Compile Include="Api\Exceptions\SynapseException.cs" />
+    <Compile Include="Api\Modules\ISynapseModule.cs" />
+    <Compile Include="Api\Modules\ModuleManager.cs" />
     <Compile Include="Api\Plugin\Processors\TranslationInjector.cs" />
     <Compile Include="Api\Prefabs.cs" />
     <Compile Include="Api\Roles\RoleInformation.cs" />
