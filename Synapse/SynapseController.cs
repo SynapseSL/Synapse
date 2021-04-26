@@ -35,7 +35,6 @@ public class SynapseController
             Server.RoleManager.Init();
             CommandHandlers.RegisterSynapseCommands();
 
-            Server.ModuleManager.Load();
             PluginLoader.ActivatePlugins();
         }
         catch(Exception e)

@@ -10,7 +10,6 @@ using Synapse.Api.Plugin;
 using Synapse.Api.Roles;
 using Synapse.Api.Items;
 using Synapse.Api.Teams;
-using Synapse.Api.Modules;
 
 namespace Synapse
 {
@@ -38,8 +37,6 @@ namespace Synapse
         public ItemManager ItemManager { get; } = new ItemManager();
 
         public ConfigHandler Configs { get; } = new ConfigHandler();
-
-        public ModuleManager ModuleManager { get; } = new ModuleManager();
 
         public Synapse.Permission.PermissionHandler PermissionHandler { get; } = new Synapse.Permission.PermissionHandler();
 
@@ -114,7 +111,6 @@ namespace Synapse
         {
             Configs.Reload();
             PermissionHandler.Reload();
-            ModuleManager.Reload();
             SynapseController.PluginLoader.ReloadConfigs();
         }
         

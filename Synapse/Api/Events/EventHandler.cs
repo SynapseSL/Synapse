@@ -32,6 +32,18 @@ namespace Synapse.Api.Events
                     };
                     dummy.Direction = Enum.MovementDirection.Forward;
                     break;
+
+                case KeyCode.Alpha2:
+                    SynapseController.Server.Map.Round.SpawnVehicle();
+                    break;
+
+                case KeyCode.Alpha3:
+                    SynapseController.Server.Map.Round.SpawnVehicle(true);
+                    break;
+
+                case KeyCode.Alpha4:
+                    SynapseController.Server.Map.Round.PlayerChaosSpawnSound();
+                    break;
             }
         }
 

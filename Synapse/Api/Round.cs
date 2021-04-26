@@ -78,6 +78,10 @@ namespace Synapse.Api
 
         public void RestartRound() => Server.Get.Host.PlayerStats.Roundrestart();
 
+        public void SpawnVehicle(bool IsCI = false) => RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.Selection, IsCI ? SpawnableTeamType.ChaosInsurgency : SpawnableTeamType.NineTailedFox);
+
+        public void PlayerChaosSpawnSound() => RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.UponRespawn, SpawnableTeamType.ChaosInsurgency);
+
         public void DimScreens() => Rs.RpcDimScreen();
 
         public void ShowRoundSummary(RoundSummary.SumInfo_ClassList remainingPlayers,RoundSummary.LeadingTeam team)
