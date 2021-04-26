@@ -42,7 +42,7 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha4:
-                    SynapseController.Server.Map.Round.PlayerChaosSpawnSound();
+                    SynapseController.Server.Map.Round.PlayChaosSpawnSound();
                     break;
             }
         }
