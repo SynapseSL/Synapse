@@ -339,4 +339,13 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public bool Allow { get; set; }
     }
+
+    public class PlayerChangeItemEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public SynapseItem OldItem { get; internal set; }
+
+        public SynapseItem NewItem { get; internal set; }
+    }
 }

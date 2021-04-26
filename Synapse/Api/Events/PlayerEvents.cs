@@ -69,6 +69,8 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<PlayerDamagePermissionEventArgs> PlayerDamagePermissionEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerUnCuffTargetEventArgs> PlayerUncuffTargetEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerChangeItemEventArgs> PlayerChangeItemEvent;
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -433,6 +435,18 @@ namespace Synapse.Api.Events
             PlayerUncuffTargetEvent?.Invoke(ev);
 
             allow = ev.Allow;
+        }
+
+        internal void InvokeChangeItem(Player player, SynapseItem old, SynapseItem newitem)
+        {
+            var ev = new PlayerChangeItemEventArgs
+            {
+                Player = player,
+                OldItem = old,
+                NewItem = newitem
+            };
+
+            PlayerChangeItemEvent?.Invoke(ev);
         }
         #endregion
     }
