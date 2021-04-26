@@ -75,7 +75,7 @@ namespace SynapseInjector
             }
             catch (Exception e)
             {
-                Console.Error.WriteLine(e);
+                ServerConsole.AddLog($"Error while Loading Synapse! Please check your synapse and game version. If you can't fix it join our Discord and show us this Error:\n{e}");
             }
         }
     }
