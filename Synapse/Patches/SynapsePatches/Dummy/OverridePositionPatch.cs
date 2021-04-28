@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System;
-using Logger = Synapse.Api.Logger;
 using HarmonyLib;
 
 namespace Synapse.Patches.SynapsePatches.Dummy
@@ -20,10 +18,7 @@ namespace Synapse.Patches.SynapsePatches.Dummy
                 __instance.TargetSetRotation(__instance.connectionToClient, rot);
                 __instance.PlayScp173SoundIfTeleported();
             }
-            catch(Exception e)
-            {
-                Logger.Get.Error($"Synapse-Dummy: OverridePosition failed!!\n{e}");
-            }
+            catch { }
 
             return false;
         }
