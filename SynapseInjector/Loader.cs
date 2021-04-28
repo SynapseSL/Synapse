@@ -35,7 +35,7 @@ namespace SynapseInjector
             }
             catch(Exception e)
             {
-                ServerConsole.AddLog($"SynapseLoader: Error occured while loading Synapse please fix it and restart your Server:\n{e}", ConsoleColor.Red);
+                ServerConsole.AddLog($"SynapseLoader: Error occured while loading the assemblies. Please check if all required dll are installed. If you can't fix it join our Discord and show us this Error:\n{e}", ConsoleColor.Red);
             }
         }
 
@@ -75,7 +75,7 @@ namespace SynapseInjector
             }
             catch (Exception e)
             {
-                ServerConsole.AddLog($"Error while Loading Synapse! Please check your synapse and game version. If you can't fix it join our Discord and show us this Error:\n{e}");
+                ServerConsole.AddLog($"SynapseLoader: Error while Loading Synapse! Please check your synapse and game version. If you can't fix it join our Discord and show us this Error:\n{e}", ConsoleColor.Red);
             }
         }
     }
