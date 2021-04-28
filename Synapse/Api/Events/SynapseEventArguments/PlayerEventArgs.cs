@@ -132,14 +132,18 @@ namespace Synapse.Api.Events.SynapseEventArguments
     public class PlayerEscapeEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Player { get; internal set; }
-        
-        public RoleType SpawnRole { get; set; }
-        
+
+        public int SpawnRole { get; set; }
+
         public bool Allow { get; set; }
-        
-        public RoleType CuffedRole { get; internal set; }
-        
-        public bool IsCuffed { get; internal set; }
+
+        public bool ChangeTeam { get; set; }
+
+        public bool IsClassD { get; set; }
+
+        public bool IsCuffed => Player.IsCuffed;
+
+        public Player Cuffer => Player.Cuffer;
     }
 
     public class PlayerSyncDataEventArgs : EventHandler.ISynapseEventArgs
@@ -314,5 +318,34 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool GlobalReport { get; set; }
 
         public bool Allow { get; set; } = true;
+    }
+
+    public class PlayerDamagePermissionEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Victim { get; internal set; }
+
+        public Player Attacker { get; internal set; }
+
+        public bool AllowDamage { get; set; }
+    }
+
+    public class PlayerUnCuffTargetEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public Player Cuffed { get; internal set; }
+
+        public bool FreeWithDisarmer { get; internal set; }
+
+        public bool Allow { get; set; }
+    }
+
+    public class PlayerChangeItemEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public SynapseItem OldItem { get; internal set; }
+
+        public SynapseItem NewItem { get; internal set; }
     }
 }

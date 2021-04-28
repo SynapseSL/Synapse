@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Synapse.Api.Exceptions;
 
 namespace Synapse.Api.Items
 {
     public class ItemManager
     {
+        public static ItemManager Get => Server.Get.ItemManager;
+
         public const int HighestItem = (int)ItemType.Coin;
 
         private readonly List<CustomItemInformation> customItems = new List<CustomItemInformation>();
@@ -15,8 +18,9 @@ namespace Synapse.Api.Items
             if (id >= 0 && id <= 35)
                 return (ItemType)id;
 
+            if (!IsIDRegistered(id)) throw new SynapseItemNotFoundException("The BaseType was requested from an not registered Item ID", id);
+
             var item = customItems.FirstOrDefault(x => x.ID == id);
-            if (item == null) throw new System.Exception("BaseItemType was requested from a CustomItem which is not registered");
             return item.BasedItemType;
         }
 
@@ -25,8 +29,9 @@ namespace Synapse.Api.Items
             if (id >= 0 && id <= HighestItem)
                 return ((ItemType)id).ToString();
 
+            if (!IsIDRegistered(id)) throw new SynapseItemNotFoundException("The name was requested from an not registered Item ID", id);
+
             var item = customItems.FirstOrDefault(x => x.ID == id);
-            if (item == null) throw new System.Exception("Name was requested from a CustomItem which is not registered");
             return item.Name;
         }
 
@@ -35,10 +40,10 @@ namespace Synapse.Api.Items
         public void RegisterCustomItem(CustomItemInformation info)
         {
             if (info.ID >= 0 && info.ID <= HighestItem)
-                throw new Exception("A plugin tried to register a CustomItem with an ID of a BaseGame Item");
+                throw new SynapseItemAlreadyRegisteredException("A Item was registered with an ID of a Vanilla Item", info);
 
             if (customItems.Select(x => x.ID).Contains(info.ID))
-                throw new Exception("A plugin tried to register a CustomItem with an ID which was already registered");
+                throw new SynapseItemAlreadyRegisteredException("A Item was registered with an already registered Item ID", info);
 
             customItems.Add(info);
         }

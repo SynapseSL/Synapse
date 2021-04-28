@@ -4,6 +4,8 @@ namespace Synapse.Api
 {
     public class Nuke
     {
+        public static Nuke Get => Map.Get.Nuke;
+
         internal Nuke() { }
 
         private AlphaWarheadController WarheadController => AlphaWarheadController.Host;
@@ -38,6 +40,8 @@ namespace Synapse.Api
 
         public class NukeInsidePanel
         {
+            public static NukeInsidePanel Get => Nuke.Get.InsidePanel;
+
             internal NukeInsidePanel() { }
 
             private AlphaWarheadNukesitePanel Panel => AlphaWarheadOutsitePanel.nukeside;
@@ -62,6 +66,8 @@ namespace Synapse.Api
 
         public class NukeOutsidePanel
         {
+            public static NukeOutsidePanel Get => Nuke.Get.OutsidePanel;
+
             internal NukeOutsidePanel() { }
 
             private AlphaWarheadOutsitePanel Panel => Server.Get.Host.GetComponent<AlphaWarheadOutsitePanel>();

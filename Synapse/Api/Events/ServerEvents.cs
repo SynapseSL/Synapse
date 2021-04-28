@@ -1,6 +1,7 @@
 ﻿using LiteNetLib;
 using Synapse.Api.Events.SynapseEventArguments;
 using System;
+using UnityEngine;
 
 namespace Synapse.Api.Events
 {
@@ -13,6 +14,8 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<RemoteAdminCommandEventArgs> RemoteAdminCommandEvent;
 
         public event EventHandler.OnSynapseEvent<ConsoleCommandEventArgs> ConsoleCommandEvent;
+
+        public event EventHandler.OnSynapseEvent<TransmitPlayerDataEventArgs> TransmitPlayerDataEvent;
 
         public event Action UpdateEvent;
 
@@ -40,5 +43,23 @@ namespace Synapse.Api.Events
         }
 
         internal void InvokeUpdateEvent() => UpdateEvent?.Invoke();
+
+        internal void InvokeTransmitPlayerDataEvent(Player player, Player playerToShow,ref Vector3 pos,ref float rot,ref bool invisible)
+        {
+            var ev = new TransmitPlayerDataEventArgs
+            {
+                Player = player,
+                PlayerToShow = playerToShow,
+                Position = pos,
+                Rotation = rot,
+                Invisible = invisible
+            };
+
+            TransmitPlayerDataEvent?.Invoke(ev);
+
+            pos = ev.Position;
+            rot = ev.Rotation;
+            invisible = ev.Invisible;
+        }
     }
 }

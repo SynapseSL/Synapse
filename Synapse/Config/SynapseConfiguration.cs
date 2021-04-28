@@ -62,6 +62,9 @@ namespace Synapse.Config
             (int)RoleType.Tutorial
         };
 
+        [Description("If Enabled FF will be enabled for all Roles at the Round End")]
+        public bool AutoFF = true;
+
         [Description("The default Language that is used for translations")]
         public string Language = "ENGLISH";
     }

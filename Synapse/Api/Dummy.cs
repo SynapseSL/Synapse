@@ -2,6 +2,8 @@
 using RemoteAdmin;
 using System.Linq;
 using UnityEngine;
+using System.Collections.Generic;
+using Synapse.Api.Enum;
 
 namespace Synapse.Api
 {
@@ -40,24 +42,14 @@ namespace Synapse.Api
         /// </summary>
         public Vector3 Position
         {
-            get => GameObject.transform.position;
-            set
-            {
-                Despawn();
-                GameObject.transform.position = value;
-                Spawn();
-            }
+            get => Player.Position;
+            set => Player.Position = value;
         }
 
-        public Quaternion Rotation
+        public Vector2 Rotation
         {
-            get => GameObject.transform.rotation;
-            set
-            {
-                Despawn();
-                GameObject.transform.rotation = value;
-                Spawn();
-            }
+            get => Player.Rotation;
+            set => Player.Rotation = value;
         }
 
         /// <summary>
@@ -65,13 +57,8 @@ namespace Synapse.Api
         /// </summary>
         public Vector3 Scale
         {
-            get => GameObject.transform.localScale;
-            set
-            {
-                Despawn();
-                GameObject.transform.localScale = value;
-                Spawn();
-            }
+            get => Player.Scale;
+            set => Player.Scale = value;
         }
 
         /// <summary>
@@ -105,6 +92,100 @@ namespace Synapse.Api
             set => GameObject.GetComponent<ServerRoles>().SetColor(value);
         }
 
+        public PlayerMovementState Movement
+        {
+            get => (PlayerMovementState)Player.AnimationController.Network_curMoveState;
+            set => Player.AnimationController.Network_curMoveState = (byte)value;
+        }
+
+        public MovementDirection Direction { get; set; }
+
+        public float SneakSpeed { get; set; } = 1.8f;
+
+        public float WalkSpeed { get; set; }
+
+        public float RunSpeed { get; set; }
+
+        //Thanks to GameHunt.I used some of his code for the Dummy API https://github.com/gamehunt/CustomNPCs
+        private IEnumerator<float> Update()
+        {
+            for(; ; )
+            {
+                yield return MEC.Timing.WaitForSeconds(0.1f);
+                if (GameObject == null) yield break;
+                if (Direction == MovementDirection.Stop)
+                {
+                    Player.AnimationController.Networkspeed = new Vector2(0f, 0f);
+                    continue;
+                }
+
+                var wall = false;
+                var speed = 0f;
+
+                switch (Movement)
+                {
+                    case PlayerMovementState.Sneaking:
+                        speed = SneakSpeed;
+                        break;
+
+                    case PlayerMovementState.Sprinting:
+                        speed = RunSpeed;
+                        break;
+
+                    case PlayerMovementState.Walking:
+                        speed = WalkSpeed;
+                        break;
+                }
+
+                switch (Direction)
+                {
+                    case MovementDirection.Forward:
+                        Player.AnimationController.Networkspeed = new Vector2(speed, 0f);
+                        var pos = Position + Player.CameraReference.forward / 10 * speed;
+
+                        if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
+                            Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
+                        else wall = true;
+                        break;
+
+                    case MovementDirection.BackWards:
+                        Player.AnimationController.Networkspeed = new Vector2(-speed, 0f);
+                        pos = Position - Player.CameraReference.forward / 10 * speed;
+
+                        if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
+                            Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
+                        else wall = true;
+                        break;
+
+                    case MovementDirection.Right:
+                        Player.AnimationController.Networkspeed = new Vector2(0f, speed);
+                        pos = Position + Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed;
+
+                        if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
+                            Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
+                        else wall = true;
+                        break;
+
+                    case MovementDirection.Left:
+                        Player.AnimationController.Networkspeed = new Vector2(0f, -speed);
+                        pos = Position - Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed;
+
+                        if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
+                            Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
+                        else wall = true;
+                        break;
+                }
+
+                if (wall)
+                {
+                    Direction = MovementDirection.Stop;
+                    Player.AnimationController.Networkspeed = new Vector2(0f, 0f);
+                }
+            }
+        }
+
+        public Dummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "") : this(pos, new Vector2(rot.eulerAngles.x, rot.eulerAngles.y),role,name,badgetext,badgecolor) { }
+
         /// <summary>
         /// Creates a new Dummy and spawns it
         /// </summary>
@@ -114,7 +195,7 @@ namespace Synapse.Api
         /// <param name="name">The Name of the Dummy</param>
         /// <param name="badgetext">The displayed BadgeText of the Dummy</param>
         /// <param name="badgecolor">The displayed BadgeColor of the Dummy</param>
-        public Dummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "")
+        public Dummy(Vector3 pos, Vector2 rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "")
         {
             GameObject obj =
                 Object.Instantiate(
@@ -127,20 +208,30 @@ namespace Synapse.Api
 
             Player.transform.localScale = Vector3.one;
             Player.transform.position = pos;
-            Player.transform.rotation = rot;
-            Player.QueryProcessor.NetworkPlayerId = QueryProcessor._idIterator++;
+            Player.PlayerMovementSync.RealModelPosition = pos;
+            Rotation = rot;
+            Player.QueryProcessor.NetworkPlayerId = QueryProcessor._idIterator;
             Player.QueryProcessor._ipAddress = Server.Get.Host.IpAddress;
             Player.ClassManager.CurClass = role;
-            Player.Health = Player.ClassManager.Classes.SafeGet((int)Player.RoleType).maxHP;
+            Player.MaxHealth = Player.ClassManager.Classes.SafeGet((int)Player.RoleType).maxHP;
+            Player.Health = Player.MaxHealth;
             Player.NicknameSync.Network_myNickSync = name;
             Player.RankName = badgetext;
             Player.RankColor = badgecolor;
+            Player.GodMode = true;
+            RunSpeed = CharacterClassManager._staticClasses[(int)role].runSpeed;
+            WalkSpeed = CharacterClassManager._staticClasses[(int)role].walkSpeed;
+            MEC.Timing.RunCoroutine(Update());
 
             NetworkServer.Spawn(GameObject);
             Map.Get.Dummies.Add(this);
         }
 
-        public void RotateToPosition(Vector3 pos) => Rotation = Quaternion.LookRotation((pos - Position).normalized);
+        public void RotateToPosition(Vector3 pos)
+        {
+            var rot = Quaternion.LookRotation((pos - GameObject.transform.position).normalized);
+            Rotation = new Vector2(rot.eulerAngles.x, rot.eulerAngles.y);
+        }
 
         /// <summary>
         /// Despawns the Dummy
@@ -154,7 +245,11 @@ namespace Synapse.Api
         /// <summary>
         /// Spawns the Dummy again after Despawning
         /// </summary>
-        public void Spawn() => NetworkServer.Spawn(GameObject);
+        public void Spawn()
+        {
+            NetworkServer.Spawn(GameObject);
+            Map.Get.Dummies.Add(this);
+        }
 
         /// <summary>
         /// Destroys the Object

@@ -18,11 +18,11 @@ namespace Synapse.Translation
         {
             get
             {
-                var serverTranslation = translationSYML.Sections.FirstOrDefault(x => x.Key.ToUpper() == Server.Get.Configs.synapseConfiguration.Language.ToUpper()).Value.LoadAs<TPluginTranslation>();
-                if (serverTranslation != null) return serverTranslation;
+                if (translationSYML.Sections.Keys.Any(x => x == Server.Get.Configs.synapseConfiguration.Language.ToUpper()))
+                    return translationSYML.Sections.First(x => x.Key.ToUpper() == Server.Get.Configs.synapseConfiguration.Language.ToUpper()).Value.LoadAs<TPluginTranslation>();
 
-                var englishTranslation = translationSYML.Sections.FirstOrDefault(x => x.Key.ToUpper() == "ENGLISH").Value.LoadAs<TPluginTranslation>();
-                if (englishTranslation != null) return englishTranslation;
+                if (translationSYML.Sections.Keys.Any(x => x == "ENGLISH"))
+                    return translationSYML.Sections.First(x => x.Key.ToUpper() == "ENGLISH").Value.LoadAs<TPluginTranslation>();
 
                 return translationSYML.Sections.FirstOrDefault().Value.LoadAs<TPluginTranslation>();
             }

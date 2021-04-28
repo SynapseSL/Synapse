@@ -1,7 +1,5 @@
 ﻿using Synapse.Config;
 using UnityEngine;
-using System.Linq;
-using MEC;
 
 namespace Synapse.Api.Events
 {
@@ -13,7 +11,14 @@ namespace Synapse.Api.Events
             Player.PlayerSyncDataEvent += PlayerSyncData;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
+            Player.PlayerUncuffTargetEvent += Uncuff;
 #endif
+        }
+
+        private void Uncuff(SynapseEventArguments.PlayerUnCuffTargetEventArgs ev)
+        {
+            Logger.Get.Warn($"UnCuff: {ev.Player.NickName} uncuffed {ev.Cuffed.NickName}");
+            if (ev.Player.PlayerId == 3) ev.Allow = false;
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
@@ -21,13 +26,23 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    foreach (var ply in SynapseController.Server.Players)
-                        ply.Scp173Controller.TurnedPlayers.Add(ev.Player);
+                    var dummy = new Dummy(ev.Player.Position, ev.Player.Rotation, ev.Player.RoleType, "")
+                    {
+                        Scale = new Vector3(0.3f, 1.3f, 0.3f)
+                    };
+                    dummy.Direction = Enum.MovementDirection.Forward;
                     break;
 
                 case KeyCode.Alpha2:
-                    foreach (var ply in SynapseController.Server.Players)
-                        ply.Scp173Controller.TurnedPlayers.Remove(ev.Player);
+                    SynapseController.Server.Map.Round.SpawnVehicle();
+                    break;
+
+                case KeyCode.Alpha3:
+                    SynapseController.Server.Map.Round.SpawnVehicle(true);
+                    break;
+
+                case KeyCode.Alpha4:
+                    SynapseController.Server.Map.Round.PlayChaosSpawnSound();
                     break;
             }
         }
@@ -51,22 +66,20 @@ namespace Synapse.Api.Events
         }
 
 #region HookedEvents
-        private SynapseConfiguration conf => SynapseController.Server.Configs.synapseConfiguration;
+        private SynapseConfiguration Conf => SynapseController.Server.Configs.synapseConfiguration;
 
         private void PlayerJoin(SynapseEventArguments.PlayerJoinEventArgs ev)
         {
-            ev.Player.Broadcast(conf.JoinMessagesDuration, conf.JoinBroadcast);
-            ev.Player.GiveTextHint(conf.JoinTextHint, conf.JoinMessagesDuration);
-            if (!string.IsNullOrWhiteSpace(conf.JoinWindow))
-                ev.Player.OpenReportWindow(conf.JoinWindow.Replace("\\n","\n"));
+            ev.Player.Broadcast(Conf.JoinMessagesDuration, Conf.JoinBroadcast);
+            ev.Player.GiveTextHint(Conf.JoinTextHint, Conf.JoinMessagesDuration);
+            if (!string.IsNullOrWhiteSpace(Conf.JoinWindow))
+                ev.Player.OpenReportWindow(Conf.JoinWindow.Replace("\\n","\n"));
         }
 
         private void PlayerSyncData(SynapseEventArguments.PlayerSyncDataEventArgs ev)
         {
-            if (ev.Player.RoleType != RoleType.ClassD &&
-                ev.Player.RoleType != RoleType.Scientist &&
-                !(Vector3.Distance(ev.Player.Position, ev.Player.GetComponent<Escape>().worldPosition) >= Escape.radius))
-                ev.Player.ClassManager.CmdRegisterEscape();
+            if (Vector3.Distance(ev.Player.Position, ev.Player.Escape.worldPosition) < Escape.radius)
+                ev.Player.TriggerEscape();
         }
 #endregion
     }

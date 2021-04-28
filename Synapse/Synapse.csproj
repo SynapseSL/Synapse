@@ -35,9 +35,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Api\Broadcast.cs" />
+    <Compile Include="Api\Enum\MovementDirection.cs" />
     <Compile Include="Api\Enum\ElevatorType.cs" />
+    <Compile Include="Api\Enum\WeaponType.cs" />
+    <Compile Include="Api\Exceptions\SynapseItemAlreadyRegisteredException.cs" />
+    <Compile Include="Api\Exceptions\SynapseItemNotFoundException.cs" />
+    <Compile Include="Api\Exceptions\SynapseRoleAlreadyRegisteredException.cs" />
+    <Compile Include="Api\Exceptions\SynapseRoleNotFoundException.cs" />
+    <Compile Include="Api\Exceptions\SynapseException.cs" />
     <Compile Include="Api\Plugin\Processors\TranslationInjector.cs" />
     <Compile Include="Api\Prefabs.cs" />
+    <Compile Include="Api\Roles\RoleInformation.cs" />
     <Compile Include="Api\Scp173Controller.cs" />
     <Compile Include="Api\Scp096Controller.cs" />
     <Compile Include="Api\Enum\ScpAttackType.cs" />
@@ -127,7 +135,9 @@
     <Compile Include="Patches\EventsPatches\MapPatches\DoorInteractPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\TriggerTeslaPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\WarheadDetonationPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerChangeItemPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerReportPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerUnCuffEvent.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerWalkOnSinkholePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerUseMicroPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDisarmPatch.cs" />
@@ -166,6 +176,9 @@
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp173\Scp173BlinkingPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp939\Scp939AttackPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\Dummy\MirrorPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\Dummy\OverridePositionPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\ScalePatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\DoorSpawnpointPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ShootPermissionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\InvisiblePatch.cs" />

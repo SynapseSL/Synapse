@@ -14,7 +14,9 @@ namespace Synapse.Permission
 
         internal readonly Dictionary<string, SynapseGroup> groups = new Dictionary<string, SynapseGroup>();
         internal ServerSection serverSection;
-        
+
+        public static PermissionHandler Get => Server.Get.PermissionHandler;
+
         public Dictionary<string, SynapseGroup> Groups { get => new Dictionary<string, SynapseGroup>(groups); }
 
         internal void Init()
@@ -54,6 +56,7 @@ namespace Synapse.Permission
                     Hidden = true,
                     KickPower = 254,
                     Members = new List<string> { "0000000@steam" },
+                    Inheritance = new List<string> { "User" },
                     Permissions = new List<string> { "*" },
                     RemoteAdmin = true,
                     RequiredKickPower = 255
@@ -74,11 +77,15 @@ namespace Synapse.Permission
             groups.Add(groupname,group);
         }
 
-        public SynapseGroup GetServerGroup(string groupname) => groups.FirstOrDefault(x => x.Key.ToLower() == groupname.ToLower()).Value;
+        public SynapseGroup GetServerGroup(string groupname)
+        {
+            if (!Groups.Keys.Any(x => x.ToLower() == groupname.ToLower())) return null;
+            return groups.FirstOrDefault(x => x.Key.ToLower() == groupname.ToLower()).Value;
+        }
 
         public SynapseGroup GetPlayerGroup(Player player)
         {
-            var group = groups.Values.FirstOrDefault(x => x.Members?.Contains(player.UserId) ?? false);
+            var group = groups.Values.FirstOrDefault(x => x.Members != null && x.Members.Contains(player.UserId));
 
             if (group != null)
                 return group;
@@ -93,7 +100,7 @@ namespace Synapse.Permission
 
         public SynapseGroup GetPlayerGroup(string UserID)
         {
-            var group = groups.Values.FirstOrDefault(x => x.Members == null ? false : x.Members.Contains(UserID));
+            var group = groups.Values.FirstOrDefault(x => x.Members != null && x.Members.Contains(UserID));
 
             if (group != null)
                 return group;

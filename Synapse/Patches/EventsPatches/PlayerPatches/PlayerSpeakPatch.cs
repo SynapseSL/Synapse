@@ -1,8 +1,6 @@
 ﻿using System;
 using Assets._Scripts.Dissonance;
-using GameCore;
 using HarmonyLib;
-using Synapse.Api;
 
 // ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
@@ -20,8 +18,6 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var scpChat = __instance.SCPChat;
                 var specChat = __instance.SpectatorChat;
                 var allow = true;
-                
-                
                 
                 SynapseController.Server.Events.Player.InvokePlayerSpeakEvent(__instance, ref intercom, ref radio, ref scp939, ref scpChat, ref specChat, ref allow);
 

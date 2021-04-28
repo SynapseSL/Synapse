@@ -34,8 +34,14 @@ namespace Synapse.Command.Commands
                         $"\nKickPower: {group.KickPower}" +
                         $"\nRequiredKickPower: {group.RequiredKickPower}" +
                         $"\nPermissions:";
+
                     foreach (var perm in group.Permissions)
                         result.Message += $"\n    - {perm}";
+
+                    result.Message += $"\nInheritance:";
+                    foreach (var inherit in group.Inheritance)
+                        result.Message += $"\n    - {inherit}";
+
                     break;
 
                 case "GROUPS":

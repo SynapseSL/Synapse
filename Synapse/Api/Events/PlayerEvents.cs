@@ -65,6 +65,12 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<PlayerWalkOnSinkholeEventArgs> PlayerWalkOnSinkholeEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerReportEventArgs> PlayerReportEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerDamagePermissionEventArgs> PlayerDamagePermissionEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerUnCuffTargetEventArgs> PlayerUncuffTargetEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerChangeItemEventArgs> PlayerChangeItemEvent;
         
         #region PlayerEventsInvoke
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
@@ -178,20 +184,21 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void InvokePlayerEscapeEvent(Player player, ref RoleType spawnRoleType, RoleType cuffedRoleType,
-            ref bool allow, bool isCuffed)
+        internal void InvokePlayerEscapeEvent(Player player, ref int role, ref bool isD, ref bool change, ref bool allow)
         {
             var ev = new PlayerEscapeEventArgs
             {
-                Allow = allow,
                 Player = player,
-                CuffedRole = cuffedRoleType,
-                IsCuffed = isCuffed,
-                SpawnRole = spawnRoleType
+                SpawnRole = role,
+                IsClassD = isD,
+                ChangeTeam = change,
+                Allow = allow,
             };
             PlayerEscapesEvent?.Invoke(ev);
 
-            spawnRoleType = ev.SpawnRole;
+            role = ev.SpawnRole;
+            isD = ev.IsClassD;
+            change = ev.ChangeTeam;
             allow = ev.Allow;
         }
 
@@ -399,6 +406,47 @@ namespace Synapse.Api.Events
 
             global = ev.GlobalReport;
             allow = ev.Allow;
+        }
+
+        internal void InvokePlayerDamagePermissions(Player victim, Player attacker, ref bool allow)
+        {
+            var ev = new PlayerDamagePermissionEventArgs
+            {
+                Victim = victim,
+                Attacker = attacker,
+                AllowDamage = allow
+            };
+
+            PlayerDamagePermissionEvent?.Invoke(ev);
+
+            allow = ev.AllowDamage;
+        }
+
+        internal void InvokeUncuff(Player player, Player cuffed, bool mate, out bool allow)
+        {
+            var ev = new PlayerUnCuffTargetEventArgs
+            {
+                Allow = true,
+                Cuffed = cuffed,
+                Player = player,
+                FreeWithDisarmer = mate
+            };
+
+            PlayerUncuffTargetEvent?.Invoke(ev);
+
+            allow = ev.Allow;
+        }
+
+        internal void InvokeChangeItem(Player player, SynapseItem old, SynapseItem newitem)
+        {
+            var ev = new PlayerChangeItemEventArgs
+            {
+                Player = player,
+                OldItem = old,
+                NewItem = newitem
+            };
+
+            PlayerChangeItemEvent?.Invoke(ev);
         }
         #endregion
     }

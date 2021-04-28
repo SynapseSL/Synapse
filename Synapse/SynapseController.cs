@@ -19,21 +19,29 @@ public class SynapseController
         ServerConsole.AddLog("Welcome to Synapse! :)", ConsoleColor.Cyan);
         if (IsLoaded) return;
         IsLoaded = true;
-        var synapse = new SynapseController();
+        new SynapseController();
     }
 
     internal SynapseController()
     {
         CustomNetworkManager.Modded = true;
-        BuildInfoCommand.ModDescription = "A heavily modded server software using extensive runtime patching to make development faster and the usage more accessible to end-users";
+        BuildInfoCommand.ModDescription = "Synapse is a heavily modded server software using extensive runtime patching to make development faster and the usage more accessible to end-users";
         
         PatchMethods();
-        Server.Configs.Init();
-        Server.PermissionHandler.Init();
-        Server.RoleManager.Init();
-        CommandHandlers.RegisterSynapseCommands();
+        try
+        {
+            Server.Configs.Init();
+            Server.PermissionHandler.Init();
+            Server.RoleManager.Init();
+            CommandHandlers.RegisterSynapseCommands();
 
-        PluginLoader.ActivatePlugins();
+            PluginLoader.ActivatePlugins();
+        }
+        catch(Exception e)
+        {
+            Server.Logger.Error($"Error while Initialising Synapse! Please fix the Issue and restart your Server:\n{e}");
+            return;
+        }
 
         Server.Logger.Info("Synapse is now ready!");
     } 
@@ -53,7 +61,7 @@ public class SynapseController
     }
 
     public const int SynapseMajor = 2;
-    public const int SynapseMinor = 5;
-    public const int SynapsePatch = 3;
-    public const string SynapseVersion = "2.5.3";
+    public const int SynapseMinor = 6;
+    public const int SynapsePatch = 0;
+    public const string SynapseVersion = "2.6.0";
 }

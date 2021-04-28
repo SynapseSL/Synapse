@@ -33,8 +33,6 @@ namespace Synapse.Api.Roles
 
         public virtual List<int> GetEnemiesID() => GetEnemys().Select(x => (int)x).ToList();
 
-        public virtual int GetEscapeRole() => -1;
-
         public abstract void Spawn();
 
         public virtual void DeSpawn() { }
@@ -42,6 +40,8 @@ namespace Synapse.Api.Roles
         public virtual void Escape() { }
 
         #region Obsolete
+        [Obsolete("CustomRoles will now be ignored when Escape and the Escape method is called so use it instead")]
+        public virtual int GetEscapeRole() => -1;
         [Obsolete("Use GetTeamID()",false)]
         public virtual Team GetTeam() => Team.RIP;
         [Obsolete("Use GetFriendsID()", false)]
