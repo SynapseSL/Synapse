@@ -77,6 +77,21 @@ namespace Synapse.Permission
             groups.Add(groupname,group);
         }
 
+        public bool DeleteServerGroup(string groupname)
+        {
+            if(groupname.ToLower() == "server")
+                return false;
+
+            if (!_permissionSYML.Sections.Any(x => x.Key.ToLower() == groupname.ToLower()))
+                return false;
+
+            _permissionSYML.Sections.Remove(_permissionSYML.Sections.First(x => x.Key.ToLower() == groupname.ToLower()).Key);
+            _permissionSYML.Store();
+            Reload();
+
+            return true;
+        }
+
         public SynapseGroup GetServerGroup(string groupname)
         {
             if (!Groups.Keys.Any(x => x.ToLower() == groupname.ToLower())) return null;
