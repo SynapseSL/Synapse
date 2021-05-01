@@ -75,6 +75,7 @@ namespace Synapse.Permission
         {
             group = _permissionSYML.GetOrSetDefault(groupname, group);
             groups.Add(groupname,group);
+            Reload();
         }
 
         public bool DeleteServerGroup(string groupname)
