@@ -891,7 +891,7 @@ namespace Synapse.Api
 
                 if (newRole < 0) allow = false;
 
-                var isClassD = newRole == (int)RoleType.ClassD;
+                var isClassD = RoleID == (int)RoleType.ClassD;
 
                 Server.Get.Events.Player.InvokePlayerEscapeEvent(this, ref newRole, ref isClassD, ref changeTeam, ref allow);
 
