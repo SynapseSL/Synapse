@@ -93,6 +93,21 @@ namespace Synapse.Permission
             return true;
         }
 
+        public bool ModifyServerGroup(string groupname, SynapseGroup group)
+        {
+            if (groupname.ToLower() == "server")
+                return false;
+
+            if (!_permissionSYML.Sections.Any(x => x.Key.ToLower() == groupname.ToLower()))
+                return false;
+
+            _permissionSYML.Sections.First(x => x.Key.ToLower() == groupname.ToLower()).Value.Import(group);
+            _permissionSYML.Store();
+            Reload();
+
+            return true;
+        }
+
         public SynapseGroup GetServerGroup(string groupname)
         {
             if (!Groups.Keys.Any(x => x.ToLower() == groupname.ToLower())) return null;
