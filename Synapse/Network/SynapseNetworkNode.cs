@@ -73,6 +73,14 @@ namespace Synapse.Network
                     }
 
                     break;
+                case "RestartRound":
+                    Server.Get.Map.Round.RestartRound();
+                    await RespondMessage(message, "");
+                    break;
+                case "StartRound":
+                    Server.Get.Map.Round.StartRound();    
+                    await RespondMessage(message, "");
+                    break;
                 case "Kick":
                     var kick = message.Parse() as NetKick;
                     local = kick.Player.ToLocalPlayer();
@@ -96,7 +104,7 @@ namespace Synapse.Network
                     switch (getMessage.FileName)
                     {
                         case "config.syml":
-                            content = await Server.Get.Files.PermissionFile.ReadFileTextAsync();
+                            content = await Server.Get.Files.ConfigFile.ReadFileTextAsync();
                             await RespondMessage(message, new NetConfig
                             {
                                 Content = content,

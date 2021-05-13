@@ -117,7 +117,40 @@ namespace Synapse.Network.Routes
                 })));
             return session.Encode(body);
         }
+       
+        [Route(HttpVerbs.Post, "/restartRound")]
+        public async Task<object> RestartRound(
+            [QueryField("user", true)] string encodedUser,
+            [QueryField("token", true)] string encodedToken,
+            [QueryField("client", badRequestIfMissing: true)] string clientId)
+        {
+            var session = ClientSession.Validate(encodedUser, encodedToken, out var user, 
+                "synapse.webclient.restartRound");
+            if (session == null) return StatusedResponse.Unauthorized;
+            await SynapseNetworkClient.GetClient.SendMessage(InstanceMessage.CreateSend("RestartRound", "", clientId));
+            return new StatusedResponse
+            {
+                Successful = true,
+                Message = "Ok"
+            };
+        }
         
+        [Route(HttpVerbs.Post, "/startRound")]
+        public async Task<object> StartRound(
+            [QueryField("user", true)] string encodedUser,
+            [QueryField("token", true)] string encodedToken,
+            [QueryField("client", badRequestIfMissing: true)] string clientId)
+        {
+            var session = ClientSession.Validate(encodedUser, encodedToken, out var user, 
+                "synapse.webclient.restartRound");
+            if (session == null) return StatusedResponse.Unauthorized;
+            await SynapseNetworkClient.GetClient.SendMessage(InstanceMessage.CreateSend("StartRound", "", clientId));
+            return new StatusedResponse
+            {
+                Successful = true,
+                Message = "Ok"
+            };
+        }
         
         [Route(HttpVerbs.Post, "/ban")]
         public async Task<object> Ban(

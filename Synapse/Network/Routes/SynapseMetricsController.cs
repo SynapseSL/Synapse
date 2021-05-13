@@ -23,7 +23,7 @@ namespace Synapse.Network.Routes
             {
                 try
                 {
-                    var clientData = SynapseNetworkServer.GetServer.DataById(key);;
+                    var clientData = SynapseNetworkServer.GetServer.DataById(key);
                     if (clientData != null)
                     {
                         var healthData = clientData.SyncEntries.Get<NetHealthData>("startupTimestamp");

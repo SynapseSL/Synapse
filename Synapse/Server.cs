@@ -125,16 +125,10 @@ namespace Synapse
 
 
         public void Reload()
-        {
+        {      
             Configs.Reload();
             PermissionHandler.Reload();
             SynapseController.PluginLoader.ReloadConfigs();
-            NetworkManager.Shutdown();
-            new Thread(() =>
-            {
-                Thread.Sleep(1000); // Wait for 1.0 seconds
-                NetworkManager.Start();
-            }).Start();
         }
 
         /// <summary>
