@@ -1,21 +1,28 @@
-﻿using Synapse.Api;
-using Synapse.Config;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Logger = Synapse.Api.Logger;
-using EventHandler = Synapse.Api.Events.EventHandler;
+using System.Threading;
+using Synapse.Api;
+using Synapse.Api.Items;
 using Synapse.Api.Plugin;
 using Synapse.Api.Roles;
-using Synapse.Api.Items;
 using Synapse.Api.Teams;
+using Synapse.Config;
+using Synapse.Network;
+using Synapse.Permission;
+using Console = GameCore.Console;
+using EventHandler = Synapse.Api.Events.EventHandler;
+using Logger = Synapse.Api.Logger;
+using Object = UnityEngine.Object;
 
 namespace Synapse
 {
     public class Server
     {
-        internal Server() { }
+        internal Server()
+        {
+        }
 
         public static Server Get => SynapseController.Server;
 
@@ -38,7 +45,9 @@ namespace Synapse
 
         public ConfigHandler Configs { get; } = new ConfigHandler();
 
-        public Synapse.Permission.PermissionHandler PermissionHandler { get; } = new Synapse.Permission.PermissionHandler();
+        public SynapseNetworkManager NetworkManager { get; } = new SynapseNetworkManager();
+
+        public PermissionHandler PermissionHandler { get; } = new PermissionHandler();
 
         public Player Host
         {
@@ -59,7 +68,7 @@ namespace Synapse
         }
 
         public string Name
-        {
+        { 
             get => ServerConsole._serverName;
             set
             {
@@ -80,7 +89,7 @@ namespace Synapse
             set => ServerConsole.FriendlyFire = value;
         }
 
-        public string[] Colors { get; } = new string[]
+        public string[] Colors { get; } =
         {
             "silver",
             "pink",
@@ -103,19 +112,27 @@ namespace Synapse
             "aqua",
             "cyan",
             "mint",
-            "nickel",
+            "nickel"
         };
+
+        public List<Player> Players =>
+            PlayerManager.players.Select(x => x.GetComponent<Player>()).Where(x => !x.IsDummy).ToList();
+
+        //Vanilla Objects
+        public ServerConsole ServerConsole => ServerConsole.singleton;
+
+        public Console GameConsole => Console.singleton;
 
 
         public void Reload()
-        {
+        {      
             Configs.Reload();
             PermissionHandler.Reload();
             SynapseController.PluginLoader.ReloadConfigs();
         }
-        
+
         /// <summary>
-        /// Bans a player that is not on the server
+        ///     Bans a player that is not on the server
         /// </summary>
         /// <param name="reason">The reason for the ban</param>
         /// <param name="issuer">The person/SCP that banned the player</param>
@@ -123,7 +140,7 @@ namespace Synapse
         /// <param name="duration">The duration for the ban  in seconds</param>
         public void OfflineBanID(string reason, string issuer, string id, int duration)
         {
-            BanHandler.IssueBan(new BanDetails()
+            BanHandler.IssueBan(new BanDetails
             {
                 Reason = reason,
                 Issuer = issuer,
@@ -135,7 +152,7 @@ namespace Synapse
         }
 
         /// <summary>
-        /// Bans a IP 
+        ///     Bans a IP
         /// </summary>
         /// <param name="reason">The reason for the ban</param>
         /// <param name="issuer">The person/SCP that banned the player</param>
@@ -143,7 +160,7 @@ namespace Synapse
         /// <param name="duration">The duration for the ban in seconds</param>
         public void OfflineBanIP(string reason, string issuer, string ip, int duration)
         {
-            BanHandler.IssueBan(new BanDetails()
+            BanHandler.IssueBan(new BanDetails
             {
                 Reason = reason,
                 Issuer = issuer,
@@ -154,13 +171,20 @@ namespace Synapse
             }, BanHandler.BanType.IP);
         }
 
-        public List<TObject> GetObjectsOf<TObject>() where TObject : UnityEngine.Object => UnityEngine.Object.FindObjectsOfType<TObject>().ToList();
+        public List<TObject> GetObjectsOf<TObject>() where TObject : Object
+        {
+            return Object.FindObjectsOfType<TObject>().ToList();
+        }
 
-        public TObject GetObjectOf<TObject>() where TObject : UnityEngine.Object => UnityEngine.Object.FindObjectOfType<TObject>();
+        public TObject GetObjectOf<TObject>() where TObject : Object
+        {
+            return Object.FindObjectOfType<TObject>();
+        }
 
-        public List<Player> Players => PlayerManager.players.Select(x => x.GetComponent<Player>()).Where(x => !x.IsDummy).ToList();
-
-        public List<Player> GetPlayers(Func<Player,bool> func) => Players.Where(func).ToList();
+        public List<Player> GetPlayers(Func<Player, bool> func)
+        {
+            return Players.Where(func).ToList();
+        }
 
         public Player GetPlayer(string argument)
         {
@@ -175,7 +199,7 @@ namespace Synapse
                 return player;
             }
 
-            else if (argument.Contains("@"))
+            if (argument.Contains("@"))
             {
                 var player = players.FirstOrDefault(x => x.UserId.ToLower() == argument);
                 if (player == null)
@@ -184,39 +208,49 @@ namespace Synapse
                 return player;
             }
 
-        AA_001:
+            AA_001:
             return players.FirstOrDefault(x => x.NickName.ToLower() == argument.ToLower());
         }
 
-        public Player GetPlayer(int playerid) => Players.FirstOrDefault(x => x.PlayerId == playerid);
+        public Player GetPlayer(int playerid)
+        {
+            return Players.FirstOrDefault(x => x.PlayerId == playerid);
+        }
 
-
-        //Vanilla Objects
-        public ServerConsole ServerConsole => ServerConsole.singleton;
-
-        public GameCore.Console GameConsole => GameCore.Console.singleton;
+        public Player GetPlayerByUID(string uid)
+        {
+            return Players.FirstOrDefault(x => x.UserId == uid || x.SecondUserID != null && x.SecondUserID == uid);
+        }
 
 
         public class FileLocations
         {
-            //synapse
-            private string _synapseDirectory;
-            
+            private string _configDirectory;
+
+            private string _configFile;
+
             //database
             private string _databaseDirectory;
 
-            //plugin
-            private string _mainPluginDirectory;
-            private string _pluginDirectory;
-            private string _sharedPluginDirectory;
-
             //config
             private string _mainConfigDirectory;
-            private string _configDirectory;
-            private string _sharedConfigDirectory;
-            private string _permissionFile;
 
-            private string _configFile;
+            //plugin
+            private string _mainPluginDirectory;
+            private string _permissionFile;
+            private string _pluginDirectory;
+            private string _sharedConfigDirectory;
+
+            private string _sharedPluginDirectory;
+
+            //synapse
+            private string _synapseDirectory;
+
+
+            internal FileLocations()
+            {
+                Refresh();
+            }
 
             //Synapse
             public string SynapseDirectory
@@ -230,7 +264,7 @@ namespace Synapse
                 }
                 private set => _synapseDirectory = value;
             }
-            
+
             public string DatabaseDirectory
             {
                 get
@@ -242,8 +276,9 @@ namespace Synapse
                 }
                 private set => _databaseDirectory = value;
             }
-            public string DatabaseFile { get => Path.Combine(DatabaseDirectory, "database.db"); }
-            
+
+            public string DatabaseFile => Path.Combine(DatabaseDirectory, "database.db");
+
             //Plugin
             public string MainPluginDirectory
             {
@@ -256,6 +291,7 @@ namespace Synapse
                 }
                 private set => _mainPluginDirectory = value;
             }
+
             public string PluginDirectory
             {
                 get
@@ -267,6 +303,7 @@ namespace Synapse
                 }
                 private set => _pluginDirectory = value;
             }
+
             public string SharedPluginDirectory
             {
                 get
@@ -291,6 +328,7 @@ namespace Synapse
                 }
                 private set => _mainConfigDirectory = value;
             }
+
             public string ConfigDirectory
             {
                 get
@@ -302,6 +340,7 @@ namespace Synapse
                 }
                 private set => _configDirectory = value;
             }
+
             public string SharedConfigDirectory
             {
                 get
@@ -339,14 +378,14 @@ namespace Synapse
                 internal set => _configFile = value;
             }
 
-
-            internal FileLocations() => Refresh();
             public void Refresh()
             {
                 var localpath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Synapse");
-                SynapseDirectory = Directory.Exists(localpath) ? localpath : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Synapse");
+                SynapseDirectory = Directory.Exists(localpath)
+                    ? localpath
+                    : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Synapse");
                 DatabaseDirectory = Path.Combine(SynapseDirectory, "database");
-                
+
                 MainPluginDirectory = Path.Combine(SynapseDirectory, "plugins");
                 PluginDirectory = Path.Combine(MainPluginDirectory, $"server-{ServerStatic.ServerPort}");
                 SharedPluginDirectory = Path.Combine(MainPluginDirectory, "server-shared");
@@ -361,8 +400,10 @@ namespace Synapse
                 ConfigFile = File.Exists(configpath) ? configpath : Path.Combine(SharedConfigDirectory, "config.syml");
 
 
-                string permissionspath = Path.Combine(ConfigDirectory, "permission.syml");
-                PermissionFile = File.Exists(permissionspath) ? permissionspath : Path.Combine(SharedConfigDirectory, "permission.syml");
+                var permissionspath = Path.Combine(ConfigDirectory, "permission.syml");
+                PermissionFile = File.Exists(permissionspath)
+                    ? permissionspath
+                    : Path.Combine(SharedConfigDirectory, "permission.syml");
             }
 
             public string GetOldTranslationFile(PluginInformation infos)
@@ -376,7 +417,9 @@ namespace Synapse
             public string GetTranslationPath(string name)
             {
                 var translationpath = Path.Combine(ConfigDirectory, name + "-translation.syml");
-                return File.Exists(translationpath) ? translationpath : Path.Combine(SharedConfigDirectory, name + "-translation.syml");
+                return File.Exists(translationpath)
+                    ? translationpath
+                    : Path.Combine(SharedConfigDirectory, name + "-translation.syml");
             }
 
             public string GetPluginDirectory(PluginInformation infos)

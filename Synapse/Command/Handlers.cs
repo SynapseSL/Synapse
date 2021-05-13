@@ -1,13 +1,15 @@
-﻿using Synapse.Command.Commands;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Synapse.Command.Commands;
 
 namespace Synapse.Command
 {
     public class Handlers
     {
-        internal Handlers() { }
-
         private static readonly List<ISynapseCommand> AwaitingFinalization = new List<ISynapseCommand>();
+
+        internal Handlers()
+        {
+        }
 
         public CommandHandler RemoteAdminHandler { get; } = new CommandHandler();
 
@@ -27,6 +29,13 @@ namespace Synapse.Command
             RegisterCommand(new SynapseSetClassCommand(), false);
             RegisterCommand(new SynapseMapPointCommand(), false);
             RegisterCommand(new SynapseRespawnCommand(), false);
+            RegisterCommand(new SynapseNetworkSyncCommand(), false);
+            RegisterCommand(new SynapseGccCommand(), false);
+            RegisterCommand(new SynapsePlayerCommand(), false);
+            RegisterCommand(new SynapseNetworkClientsCommand(), false);
+            RegisterCommand(new SynapseNetworkBroadcastCommand(), false);
+            RegisterCommand(new SynapseNetworkKickCommand(), false);
+            RegisterCommand(new SynapseNetworkPasswordCommand(), false);
         }
 
         internal static void RegisterCommand(ISynapseCommand iSynapseCommand, bool awaitPluginInitialisation)
@@ -36,10 +45,9 @@ namespace Synapse.Command
                 AwaitingFinalization.Add(iSynapseCommand);
                 return;
             }
-            
+
             var command = GeneratedCommand.FromSynapseCommand(iSynapseCommand);
             foreach (var platform in command.Platforms)
-            {
                 switch (platform)
                 {
                     case Platform.ClientConsole:
@@ -52,16 +60,14 @@ namespace Synapse.Command
                         SynapseController.CommandHandlers.ServerConsoleHandler.RegisterCommand(command);
                         break;
                 }
-            }
         }
-        
+
         internal static void FinalizePluginsCommands()
         {
             foreach (var iSynapseCommand in AwaitingFinalization)
             {
                 var command = GeneratedCommand.FromSynapseCommand(iSynapseCommand);
                 foreach (var platform in command.Platforms)
-                {
                     switch (platform)
                     {
                         case Platform.ClientConsole:
@@ -74,8 +80,8 @@ namespace Synapse.Command
                             SynapseController.CommandHandlers.ServerConsoleHandler.RegisterCommand(command);
                             break;
                     }
-                }
             }
+
             AwaitingFinalization.Clear();
         }
     }

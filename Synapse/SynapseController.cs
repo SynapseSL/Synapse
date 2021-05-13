@@ -19,7 +19,7 @@ public class SynapseController
         ServerConsole.AddLog("Welcome to Synapse! :)", ConsoleColor.Cyan);
         if (IsLoaded) return;
         IsLoaded = true;
-        new SynapseController();
+        var synapse = new SynapseController();
     }
 
     internal SynapseController()
@@ -34,6 +34,7 @@ public class SynapseController
             Server.PermissionHandler.Init();
             Server.RoleManager.Init();
             CommandHandlers.RegisterSynapseCommands();
+            Server.NetworkManager.Start();
 
             PluginLoader.ActivatePlugins();
         }
