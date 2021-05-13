@@ -156,6 +156,7 @@ namespace Synapse.Permission
                 Default = true,
                 Permissions = new List<string> { "synapse.command.help", "synapse.command.plugins" },
                 Members = null,
+                Inheritance = null,
             };
         }
 
