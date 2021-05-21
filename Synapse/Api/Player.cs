@@ -43,7 +43,7 @@ namespace Synapse.Api
 
         public int GetOtherPreference(ItemType item) => GetPreference(item, 2);
 
-        private int GetPreference(ItemType item,int type)
+        private int GetPreference(ItemType item, int type)
         {
             for (int i = 0; i < WeaponManager.weapons.Length; i++)
             {
@@ -761,9 +761,25 @@ namespace Synapse.Api
 
         public Fraction RealFraction => Misc.GetFraction(RealTeam);
 
-        public Items.SynapseItem ItemInHand => Map.Get.Items.FirstOrDefault(x => x.State == ItemState.Inventory && x.itemInfo.uniq == VanillaInventory.itemUniq);
+        public Items.SynapseItem ItemInHand
+        {
+            get => Map.Get.Items.FirstOrDefault(x => x.State == ItemState.Inventory && x.itemInfo.uniq == VanillaInventory.itemUniq);
+            set
+            {
+                if (value != null && value.ItemHolder != this) return;
+                
+                for(int i = 0; i < 50; i++)
+                {
+                    MEC.Timing.CallDelayed(i / 100, () =>
+                      {
+                          VanillaInventory.NetworkitemUniq = value == null? -1 : value.itemInfo.uniq;
+                          VanillaInventory.Network_curItemSynced = value == null? ItemType.None : value.ItemType;
+                      });
+                }
+            }
+        }
 
-        public NetworkConnection Connection => ClassManager.Connection;
+    public NetworkConnection Connection => ClassManager.Connection;
 
         public string IpAddress => QueryProcessor._ipAddress;
         #endregion

@@ -27,15 +27,15 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha2:
-                    SynapseController.Server.Map.Round.SpawnVehicle();
+                    ev.Player.ItemInHand = ev.Player.Inventory.Items[1];
                     break;
 
                 case KeyCode.Alpha3:
-                    SynapseController.Server.Map.Round.SpawnVehicle(true);
+                    ev.Player.ItemInHand = null;
                     break;
 
                 case KeyCode.Alpha4:
-                    SynapseController.Server.Map.Round.PlayChaosSpawnSound();
+                    ev.Player.ItemInHand = new Items.SynapseItem(0, 0f, 0, 0, 0);
                     break;
             }
         }

@@ -213,8 +213,9 @@ namespace Synapse.Network
 
         private static WebServer CreateWebServer(string url)
         {
+            Logger.Get.Info("Binding on " + url.Split(';').Humanize());
             var server = new WebServer(o => o
-                    .WithUrlPrefix(url)
+                    .WithUrlPrefixes(url.Split(';'))
                     .WithMode(HttpListenerMode.EmbedIO))
                 .WithLocalSessionManager()
                 .WithCors();
