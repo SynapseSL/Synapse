@@ -41,9 +41,7 @@ namespace Synapse.Api
         public MapPoint(Room room, Vector3 position)
         {
             if (position == null) throw new ArgumentNullException("position", "The Argument position of the Constructor MapPoint(Room room,Vector3 position) is null");
-            if (room == null) throw new ArgumentNullException("room", "The Argument Room of the Constructor MapPoint(Room room,Vector3 position) is null");
-
-            Room = room;
+            Room = room ?? throw new ArgumentNullException("room", "The Argument Room of the Constructor MapPoint(Room room,Vector3 position) is null");
             RelativePosition = Room.GameObject.transform.InverseTransformPoint(position);
         }
 
@@ -56,13 +54,11 @@ namespace Synapse.Api
             string[] args = mappointstring.Split(':');
             if (args.Count() < 4) throw new IndexOutOfRangeException("Parsing of string to MapPoint failed because there was missing information!It needs to look like this: \"Roomname:1,434:-2,346456:1,6554\"");
             var room = SynapseController.Server.Map.Rooms.FirstOrDefault(r => r.RoomName.ToLower() == args[0].ToLower());
-            if (room == null) throw new Exception("Parsing of string to MapPoint failed because of the roomname");
-
             if (!float.TryParse(args[1], out var x)) throw new Exception("Parsing of string to MapPoint failed because of the Relative x Position!");
             if (!float.TryParse(args[2], out var y)) throw new Exception("Parsing of string to MapPoint failed because of the Relative y Position!");
             if (!float.TryParse(args[3], out var z)) throw new Exception("Parsing of string to MapPoint failed because of the Relative z Position!");
 
-            Room = room;
+            Room = room ?? throw new Exception("Parsing of string to MapPoint failed because of the roomname");
             RelativePosition = new Vector3(x, y, z);
         }
 

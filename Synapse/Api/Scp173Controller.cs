@@ -6,7 +6,7 @@ namespace Synapse.Api
     {
         internal Scp173Controller(Player _player) => player = _player;
 
-        private Player player;
+        private readonly Player player;
 
         public HashSet<Player> IgnoredPlayers { get; internal set; } = new HashSet<Player>();
 

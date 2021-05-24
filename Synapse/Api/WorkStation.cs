@@ -90,7 +90,7 @@ namespace Synapse.Api
 
         public Player TabletOwner
         {
-            get => workStation.Network_playerConnected == null ? null : workStation.Network_playerConnected.GetPlayer();
+            get => workStation.Network_playerConnected?.GetPlayer();
             set
             {
                 if (value == null)

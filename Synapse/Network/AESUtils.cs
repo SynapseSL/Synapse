@@ -35,15 +35,11 @@ namespace Synapse.Network
 
                 using (var encryptor = cipher.CreateEncryptor(keyBytes, vectorBytes))
                 {
-                    using (var to = new MemoryStream())
-                    {
-                        using (var writer = new CryptoStream(to, encryptor, CryptoStreamMode.Write))
-                        {
-                            writer.Write(valueBytes, 0, valueBytes.Length);
-                            writer.FlushFinalBlock();
-                            encrypted = to.ToArray();
-                        }
-                    }
+                    using var to = new MemoryStream();
+                    using var writer = new CryptoStream(to, encryptor, CryptoStreamMode.Write);
+                    writer.Write(valueBytes, 0, valueBytes.Length);
+                    writer.FlushFinalBlock();
+                    encrypted = to.ToArray();
                 }
 
                 cipher.Clear();
@@ -77,19 +73,13 @@ namespace Synapse.Network
 
                 try
                 {
-                    using (var decryptor = cipher.CreateDecryptor(keyBytes, vectorBytes))
-                    {
-                        using (var from = new MemoryStream(valueBytes))
-                        {
-                            using (var reader = new CryptoStream(from, decryptor, CryptoStreamMode.Read))
-                            {
-                                decrypted = new byte[valueBytes.Length];
-                                decryptedByteCount = reader.Read(decrypted, 0, decrypted.Length);
-                            }
-                        }
-                    }
+                    using var decryptor = cipher.CreateDecryptor(keyBytes, vectorBytes);
+                    using var from = new MemoryStream(valueBytes);
+                    using var reader = new CryptoStream(from, decryptor, CryptoStreamMode.Read);
+                    decrypted = new byte[valueBytes.Length];
+                    decryptedByteCount = reader.Read(decrypted, 0, decrypted.Length);
                 }
-                catch (Exception ex)
+                catch
                 {
                     return string.Empty;
                 }
@@ -108,7 +98,7 @@ namespace Synapse.Network
         // I dont care about if or if not the salt & vector are secure since I am just
         // using this cipher is short lived and the key is encrypted with RSA.
         // But I will make them session generated at a later point ~Helight
-        private static string _hash = "SHA1";
+        private readonly static string _hash = "SHA1";
         private static readonly string _salt = "aselrias38490a32"; // Static
         private static readonly string _vector = "8947az34awl34kjq"; // Static
 

@@ -87,8 +87,6 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 				}
 				float num2 = Time.time - initialTime;
 				relativeVelocity = (localTransform.position - initialPosition) / num2;
-				localTransform = null;
-				initialPosition = default(Vector3);
 			}
 			else
 			{

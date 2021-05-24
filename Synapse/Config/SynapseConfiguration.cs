@@ -5,8 +5,6 @@ using Synapse.Network;
 
 namespace Synapse.Config
 {
-    [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
-    [SuppressMessage("ReSharper", "ConvertToConstant.Global")]
     public class SynapseConfiguration : AbstractConfigSection
     {
         [Description("If Enabled FF will be enabled for all Roles at the Round End")]

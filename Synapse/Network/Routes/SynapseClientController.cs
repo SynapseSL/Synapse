@@ -64,7 +64,7 @@ namespace Synapse.Network.Routes
             [QueryField("target", true)] string target,
             [QueryField("file", true)] string file)
         {
-            var session = ClientSession.Validate(encodedUser, encodedToken, out var user, 
+            var session = ClientSession.Validate(encodedUser, encodedToken, out _, 
                 "synapse.webclient.getconfig");
             if (session == null) return StatusedResponse.Unauthorized;
             var response = await SynapseNetworkClient.GetClient.SendMessageAndAwaitResponse(InstanceMessage.CreateSend(
@@ -85,7 +85,7 @@ namespace Synapse.Network.Routes
             [QueryField("target", true)] string target,
             [QueryField("file", true)] string file /* Reserved so future updates won't break possible PWAs */)
         {
-            var session = ClientSession.Validate(encodedUser, encodedToken, out var user, 
+            var session = ClientSession.Validate(encodedUser, encodedToken, out _, 
                 "synapse.webclient.setconfig");
             if (session == null) return StatusedResponse.Unauthorized;
 
@@ -124,7 +124,7 @@ namespace Synapse.Network.Routes
             [QueryField("token", true)] string encodedToken,
             [QueryField("client", badRequestIfMissing: true)] string clientId)
         {
-            var session = ClientSession.Validate(encodedUser, encodedToken, out var user, 
+            var session = ClientSession.Validate(encodedUser, encodedToken, out _, 
                 "synapse.webclient.restartRound");
             if (session == null) return StatusedResponse.Unauthorized;
             await SynapseNetworkClient.GetClient.SendMessage(InstanceMessage.CreateSend("RestartRound", "", clientId));
@@ -141,7 +141,7 @@ namespace Synapse.Network.Routes
             [QueryField("token", true)] string encodedToken,
             [QueryField("client", badRequestIfMissing: true)] string clientId)
         {
-            var session = ClientSession.Validate(encodedUser, encodedToken, out var user, 
+            var session = ClientSession.Validate(encodedUser, encodedToken, out _, 
                 "synapse.webclient.restartRound");
             if (session == null) return StatusedResponse.Unauthorized;
             await SynapseNetworkClient.GetClient.SendMessage(InstanceMessage.CreateSend("StartRound", "", clientId));
@@ -196,7 +196,7 @@ namespace Synapse.Network.Routes
             [QueryField("user", true)] string encodedUser,
             [QueryField("token", true)] string encodedToken)
         {
-            var session = ClientSession.Validate(encodedUser, encodedToken, out var user, 
+            var session = ClientSession.Validate(encodedUser, encodedToken, out _, 
                 "synapse.webclient.sendmessage");
             if (session == null) return StatusedResponse.Unauthorized;
             var content = await HttpContext.GetRequestBodyAsStringAsync();

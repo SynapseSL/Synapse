@@ -41,7 +41,7 @@ namespace Synapse.Network
                 if (dataClient == null) return null;
                 return dataClient.ValidateRequestSafe(controller) ? dataClient : null;
             }
-            catch (Exception e)
+            catch
             {
                 return null;
             }

@@ -11,7 +11,7 @@ namespace Synapse.Api
             MainGenerator = main;
         }
 
-        private Generator079 generator;
+        private readonly Generator079 generator;
 
         public GameObject GameObject => generator.gameObject;
 

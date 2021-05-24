@@ -67,8 +67,10 @@ namespace Synapse.Network
             var exists = _messageCaches.TryGetValue(receiver, out var messageList);
             if (!exists)
             {
-                var bag = new ConcurrentBag<InstanceMessage>();
-                bag.Add(message);
+                var bag = new ConcurrentBag<InstanceMessage>
+                {
+                    message
+                };
                 _messageCaches.TryAdd(receiver, bag);
             }
             else
@@ -107,7 +109,7 @@ namespace Synapse.Network
 
                 return list;
             }
-            catch (Exception e)
+            catch
             {
                 return new List<InstanceMessage>();
             }
@@ -117,7 +119,7 @@ namespace Synapse.Network
         {
             Synapse.Server.Get.Logger.Warn("Evicted inactive ClientData & Messages");
             var clientDat = (ClientData) value;
-            GetServer._messageCaches.TryRemove(clientDat.ClientUid, out var ignored);
+            GetServer._messageCaches.TryRemove(clientDat.ClientUid, out _);
             GetServer.TokenClientIDMap.Remove(clientDat.SessionToken);
         }
 
@@ -153,7 +155,7 @@ namespace Synapse.Network
                 if (!exists) return null;
                 return (ClientData) clientData;
             }
-            catch (Exception e)
+            catch
             {
                 return null;
             }
@@ -168,7 +170,7 @@ namespace Synapse.Network
                 if (user == null) return null;
                 return DataById(user);
             }
-            catch (Exception e)
+            catch
             {
                 return null;
             }
@@ -237,7 +239,7 @@ namespace Synapse.Network
                 tcpListener.Stop();
                 return true;
             }
-            catch (Exception e)
+            catch
             {
                 return false;
             }

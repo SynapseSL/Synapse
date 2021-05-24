@@ -44,8 +44,6 @@ namespace Synapse.Database
         }
     }
 
-    [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class PlayerDbo : IDatabaseEntity
     {
         public int Id { get; set; }

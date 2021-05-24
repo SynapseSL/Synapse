@@ -7,7 +7,7 @@ namespace Synapse.Api
     {
         internal Elevator(Lift lift) => Lift = lift;
 
-        private Lift Lift;
+        private readonly Lift Lift;
 
         public GameObject GameObject => Lift.gameObject;
 
@@ -27,17 +27,17 @@ namespace Synapse.Api
         {
             get
             {
-                switch (Name)
+                return Name switch
                 {
-                    case "GateB": return ElevatorType.GateB;
-                    case "GateA": return ElevatorType.GateA;
-                    case "SCP-049": return ElevatorType.Scp049;
-                    case "ElA": return ElevatorType.ElALeft;
-                    case "ElA2": return ElevatorType.ElARight;
-                    case "ElB": return ElevatorType.ElBLeft;
-                    case "ElB2": return ElevatorType.ElBRight;
-                    default: return ElevatorType.None;
-                }
+                    "GateB" => ElevatorType.GateB,
+                    "GateA" => ElevatorType.GateA,
+                    "SCP-049" => ElevatorType.Scp049,
+                    "ElA" => ElevatorType.ElALeft,
+                    "ElA2" => ElevatorType.ElARight,
+                    "ElB" => ElevatorType.ElBLeft,
+                    "ElB2" => ElevatorType.ElBRight,
+                    _ => ElevatorType.None,
+                };
             }
         }
 

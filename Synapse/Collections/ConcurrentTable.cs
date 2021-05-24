@@ -62,14 +62,14 @@ namespace Synapse.Collections
         {
             var b1 = _dictionary.TryGetValue(x, out var yDict);
             if (!b1) return false;
-            if (!yDict.TryRemove(y, out var ignored)) return false;
-            if (yDict.Count == 0) _dictionary.TryRemove(x, out var ignored1);
+            if (!yDict.TryRemove(y, out _)) return false;
+            if (yDict.Count == 0) _dictionary.TryRemove(x, out _);
             return true;
         }
 
         public bool TryRemove(TA x)
         {
-            return _dictionary.TryRemove(x, out var ignored);
+            return _dictionary.TryRemove(x, out _);
         }
 
         public bool ContainsKey(TA x)

@@ -5,7 +5,7 @@ namespace Synapse.Api.Items
 {
     public class PlayerInventory
     {
-        private Player player;
+        private readonly Player player;
 
         internal PlayerInventory(Player player1) => player = player1;
 

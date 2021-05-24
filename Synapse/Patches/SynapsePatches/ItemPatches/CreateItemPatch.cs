@@ -42,8 +42,10 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
         {
             try
             {
-                var item = new Synapse.Api.Items.SynapseItem(__result.itemId, __result.durability, __result.weaponMods[0], __result.weaponMods[1], __result.weaponMods[2]);
-                item.pickup = __result;
+                var item = new Synapse.Api.Items.SynapseItem(__result.itemId, __result.durability, __result.weaponMods[0], __result.weaponMods[1], __result.weaponMods[2])
+                {
+                    pickup = __result
+                };
             }
             catch(Exception e)
             {

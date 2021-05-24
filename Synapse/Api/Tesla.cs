@@ -6,7 +6,7 @@ namespace Synapse.Api
     {
         internal Tesla(TeslaGate gate) => Gate = gate;
 
-        private TeslaGate Gate;
+        private readonly TeslaGate Gate;
 
         public GameObject GameObject => Gate.gameObject;
 

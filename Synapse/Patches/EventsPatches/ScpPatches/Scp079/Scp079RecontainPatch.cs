@@ -88,17 +88,16 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 			{
 				foreach (var door in Synapse.Api.Map.Get.Doors)
 				{
-					Scp079Interactable scp079Interactable;
-					if (door.VDoor is Interactables.Interobjects.BasicDoor && door.VDoor.TryGetComponent(out scp079Interactable))
-					{
-						var zone = scp079Interactable.currentZonesAndRooms.FirstOrDefault();
-						if (zone == null || zone.currentZone != "HeavyRooms") continue;
+                    if (door.VDoor is Interactables.Interobjects.BasicDoor && door.VDoor.TryGetComponent(out Scp079Interactable scp079Interactable))
+                    {
+                        var zone = scp079Interactable.currentZonesAndRooms.FirstOrDefault();
+                        if (zone == null || zone.currentZone != "HeavyRooms") continue;
 
-						lockedDoors.Add(door.VDoor);
-						door.VDoor.NetworkTargetState = false;
-						door.VDoor.ServerChangeLock(Interactables.Interobjects.DoorUtils.DoorLockReason.NoPower, true);
-					}
-				}
+                        lockedDoors.Add(door.VDoor);
+                        door.VDoor.NetworkTargetState = false;
+                        door.VDoor.ServerChangeLock(Interactables.Interobjects.DoorUtils.DoorLockReason.NoPower, true);
+                    }
+                }
 			}
 			catch (Exception e)
 			{
