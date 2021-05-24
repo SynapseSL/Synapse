@@ -62,7 +62,7 @@ public class SynapseController
     }
 
     public const int SynapseMajor = 2;
-    public const int SynapseMinor = 6;
-    public const int SynapsePatch = 1;
-    public const string SynapseVersion = "2.6.1";
+    public const int SynapseMinor = 7;
+    public const int SynapsePatch = 0;
+    public const string SynapseVersion = "2.7.0-networking";
 }
