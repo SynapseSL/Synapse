@@ -27,7 +27,7 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha2:
-                    ev.Player.ItemInHand = ev.Player.Inventory.Items[1];
+                    Synapse.Api.Logger.Get.Warn(Synapse.Api.Map.Get.Items.Count);
                     break;
 
                 case KeyCode.Alpha3:

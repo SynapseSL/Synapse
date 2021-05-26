@@ -779,7 +779,7 @@ namespace Synapse.Api
             }
         }
 
-    public NetworkConnection Connection => ClassManager.Connection;
+        public NetworkConnection Connection => ClassManager.Connection;
 
         public string IpAddress => QueryProcessor._ipAddress;
         #endregion
