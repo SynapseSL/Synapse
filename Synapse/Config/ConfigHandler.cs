@@ -22,6 +22,12 @@ namespace Synapse.Config
                 sameTeam = "<b>Du kannst diese Person nicht verletzen!</b>",
                 scpTeam = "Als deine jetzige Rolle kannst du nichts machen was ein SCP verletzen würde!",
             }, "GERMAN");
+            synapseTranslation.AddTranslation(new Translation.Translation
+            {
+                noPermissions = "Vous ne disposez pas de la permission requise pour cette commande ! (%perm%)",
+                scpTeam = "Vous ne pouvez pas nuire à un SCP en cette classe !",
+                sameTeam = "Vous ne pouvez pas nuire à cette personne !",
+            }, "FRENCH");
 
             _syml = new SYML(SynapseController.Server.Files.ConfigFile);
             _syml.Load();
