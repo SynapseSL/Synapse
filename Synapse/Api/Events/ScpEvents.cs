@@ -1,5 +1,7 @@
 ﻿using Synapse.Api.Events.SynapseEventArguments;
 using Synapse.Api.Enum;
+using System.Collections.Generic;
+using Interactables.Interobjects.DoorUtils;
 
 namespace Synapse.Api.Events
 {
@@ -119,6 +121,8 @@ namespace Synapse.Api.Events
 
             public event EventHandler.OnSynapseEvent<Scp079RoomLockdownEventArgs> Scp079RoomLockdown;
 
+            public event EventHandler.OnSynapseEvent<Scp079TeslaInteractEventArgs> Scp079TeslaInteract;
+
             internal void Invoke079RecontainEvent(Recontain079Status status, out bool allow)
             {
                 var ev = new Scp079RecontainEventArgs
@@ -198,6 +202,7 @@ namespace Synapse.Api.Events
                 Player player,
                 float energyNeeded,
                 Room room,
+                ref bool lightsOut,
                 Scp079EventMisc.InteractionResult intendedResult,
                 out Scp079EventMisc.InteractionResult actualResult
                 )
@@ -207,10 +212,34 @@ namespace Synapse.Api.Events
                     Scp079 = player,
                     Result = intendedResult,
                     EnergyNeeded = energyNeeded,
-                    Room = room
+                    Room = room,
+                    LightsOut = lightsOut
                 };
 
                 Scp079RoomLockdown?.Invoke(ev);
+
+                actualResult = ev.Result;
+            }
+
+            internal void Invoke079TeslaInteract(
+                Player player,
+                float energyNeeded,
+                Room room,
+                Tesla tesla,
+                Scp079EventMisc.InteractionResult intendedResult,
+                out Scp079EventMisc.InteractionResult actualResult
+                )
+            {
+                var ev = new Scp079TeslaInteractEventArgs
+                {
+                    Scp079 = player,
+                    Result = intendedResult,
+                    EnergyNeeded = energyNeeded,
+                    Room = room,
+                    Tesla = tesla
+                };
+
+                Scp079TeslaInteract?.Invoke(ev);
 
                 actualResult = ev.Result;
             }

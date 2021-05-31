@@ -1,12 +1,19 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 namespace Synapse.Api
 {
     public class Tesla
     {
-        internal Tesla(TeslaGate gate) => Gate = gate;
+        internal Tesla(TeslaGate gate)
+        {
+            Gate = gate;
+            Room = Server.Get.Map.Rooms.OrderBy(room => Vector3.Distance(room.Position, gate.localPosition)).First();
+        }
 
-        private readonly TeslaGate Gate;
+        internal TeslaGate Gate { get; }
+
+        public Room Room { get; internal set; }
 
         public GameObject GameObject => Gate.gameObject;
 

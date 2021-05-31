@@ -49,18 +49,46 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                     case "TESLA":
                         {
                             float manaFromLabel = __instance.GetManaFromLabel("Tesla Gate Burst", __instance.abilities);
-                            if (manaFromLabel > __instance.curMana)
+                            GameObject gameObject = GameObject.Find(__instance.currentZone + "/" + __instance.currentRoom + "/Gate");
+                            Tesla tesla = null;
+                            if (gameObject == null)
                             {
-                                __instance.RpcNotEnoughMana(manaFromLabel, __instance.curMana);
                                 return false;
                             }
-                            GameObject gameObject = GameObject.Find(__instance.currentZone + "/" + __instance.currentRoom + "/Gate");
-                            if (gameObject != null)
+                            else
                             {
-                                gameObject.GetComponent<TeslaGate>().RpcInstantBurst();
-                                __instance.AddInteractionToHistory(gameObject, array[0], true);
-                                __instance.Mana -= manaFromLabel;
-                                return false;
+                                tesla = Server.Get.Map.Teslas.Find(_ => _.Gate == gameObject.GetComponent<TeslaGate>());
+                            }
+
+                            var intendedResult = manaFromLabel <= __instance.curMana ? Scp079EventMisc.InteractionResult.Allow : Scp079EventMisc.InteractionResult.NoEnergy;
+                            
+                            SynapseController.Server.Events.Scp.Scp079.Invoke079TeslaInteract(
+                                __instance.gameObject.GetPlayer(),
+                                manaFromLabel,
+                                tesla.Room,
+                                tesla,
+                                intendedResult,
+                                out var actualResult
+                                );
+
+                            switch (actualResult)
+                            {
+                                case Scp079EventMisc.InteractionResult.Allow:
+                                    {
+                                        tesla.InstantTrigger();
+                                        __instance.AddInteractionToHistory(gameObject, array[0], true);
+                                        __instance.Mana -= manaFromLabel;
+                                        return false;
+                                    }
+                                case Scp079EventMisc.InteractionResult.Disallow:
+                                    {
+                                        return false;
+                                    }
+                                case Scp079EventMisc.InteractionResult.NoEnergy:
+                                    {
+                                        __instance.RpcNotEnoughMana(manaFromLabel, __instance.curMana);
+                                        return false;
+                                    }
                             }
                             break;
                         }
@@ -72,15 +100,9 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                 return false;
                             }
                             float manaFromLabel = __instance.GetManaFromLabel("Room Lockdown", __instance.abilities);
-                            if (manaFromLabel > __instance.curMana)
-                            {
-                                __instance.RpcNotEnoughMana(manaFromLabel, __instance.curMana);
-                                GameCore.Console.AddDebugLog("SCP079", "Lockdown cannot commence, not enough mana.", MessageImportance.LessImportant, false);
-                                return false;
-                            }
                             GameCore.Console.AddDebugLog("SCP079", "Attempting lockdown...", MessageImportance.LeastImportant, false);
-                            GameObject gameObject2 = GameObject.Find(__instance.currentZone + "/" + __instance.currentRoom);
-                            if (gameObject2 != null)
+                            GameObject roomGameObject = GameObject.Find(__instance.currentZone + "/" + __instance.currentRoom);
+                            if (roomGameObject != null)
                             {
                                 List<Scp079Interactable> localInteractableList = ListPool<Scp079Interactable>.Shared.Rent();
                                 try
@@ -104,7 +126,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                 {
                                     GameCore.Console.AddDebugLog("SCP079", "Failed to load interactables.", MessageImportance.LeastImportant, false);
                                 }
-                                GameObject gameObject3 = null;
+                                GameObject interactableLockdownGameObject = null;
                                 foreach (Scp079Interactable interactable in localInteractableList)
                                 {
                                     Scp079Interactable.InteractableType interactableType = interactable.type;
@@ -112,7 +134,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                     {
                                         if (interactableType == Scp079Interactable.InteractableType.Lockdown)
                                         {
-                                            gameObject3 = interactable.gameObject;
+                                            interactableLockdownGameObject = interactable.gameObject;
                                         }
                                     }
                                     else
@@ -128,12 +150,13 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                         }
                                     }
                                 }
-                                if (localInteractableList.Count == 0 || gameObject3 == null || __instance._scheduledUnlocks.Count > 0)
+                                if (localInteractableList.Count == 0 || interactableLockdownGameObject == null || __instance._scheduledUnlocks.Count > 0)
                                 {
                                     GameCore.Console.AddDebugLog("SCP079", "This room can't be locked down.", MessageImportance.LessImportant, false);
                                     return false;
                                 }
-                                HashSet<DoorVariant> hashSet = new HashSet<DoorVariant>();
+
+                                HashSet<DoorVariant> doorHashSet = new HashSet<DoorVariant>();
                                 GameCore.Console.AddDebugLog("SCP079", "Looking for doors to lock...", MessageImportance.LeastImportant, false);
                                 for (int i = 0; i < localInteractableList.Count; i++)
                                 {
@@ -147,38 +170,87 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                         }
                                         if (flag2)
                                         {
-                                            if (doorVariant3.TargetState)
-                                            {
-                                                doorVariant3.NetworkTargetState = false;
-                                            }
-                                            doorVariant3.ServerChangeLock(Interactables.Interobjects.DoorUtils.DoorLockReason.Lockdown079, true);
-                                            hashSet.Add(doorVariant3);
+                                            doorHashSet.Add(doorVariant3);
                                         }
                                     }
                                 }
-                                if (hashSet.Count > 0)
+
+                                List<DoorVariant> affectedDoors = doorHashSet.ToList();
+                                var intendedResult = manaFromLabel <= __instance.curMana ? Scp079EventMisc.InteractionResult.Allow : Scp079EventMisc.InteractionResult.NoEnergy;
+                                bool lightsOut = true;
+
+                                SynapseController.Server.Events.Scp.Scp079.Invoke079RoomLockdown(
+                                    __instance.gameObject.GetPlayer(),
+                                    manaFromLabel,
+                                    Server.Get.Map.Rooms.Find(_ => _.GameObject == roomGameObject),
+                                    ref lightsOut,
+                                    intendedResult,
+                                    out var actualResult
+                                    );
+
+                                switch (actualResult)
                                 {
-                                    __instance._scheduledUnlocks.Add(Time.realtimeSinceStartup + 10f, hashSet);
-                                    GameCore.Console.AddDebugLog("SCP079", "Locking " + hashSet.Count + " doors", MessageImportance.LeastImportant, false);
+                                    case Scp079EventMisc.InteractionResult.Allow:
+                                        {
+                                            if (lightsOut)
+                                            {
+                                                foreach (FlickerableLightController flickerableLightController in roomGameObject.GetComponentsInChildren<FlickerableLightController>())
+                                                {
+                                                    if (flickerableLightController != null)
+                                                    {
+                                                        flickerableLightController.ServerFlickerLights(8f);
+                                                    }
+                                                }
+                                            }
+
+                                            for (int i = 0; i < affectedDoors.Count; i++)
+                                            {
+                                                bool flag2 = affectedDoors[i].ActiveLocks == 0;
+                                                if (!flag2)
+                                                {
+                                                    DoorLockMode mode = DoorLockUtils.GetMode((DoorLockReason)affectedDoors[i].ActiveLocks);
+                                                    flag2 = (mode.HasFlagFast(DoorLockMode.CanClose) || mode.HasFlagFast(DoorLockMode.ScpOverride));
+                                                }
+                                                if (flag2)
+                                                {
+                                                    if (affectedDoors[i].TargetState)
+                                                    {
+                                                        affectedDoors[i].NetworkTargetState = false;
+                                                    }
+                                                    affectedDoors[i].ServerChangeLock(DoorLockReason.Lockdown079, true);
+                                                }
+                                            }
+
+                                            if (doorHashSet.Count > 0)
+                                            {
+                                                __instance._scheduledUnlocks.Add(Time.realtimeSinceStartup + 10f, doorHashSet);
+                                                GameCore.Console.AddDebugLog("SCP079", "Locking " + doorHashSet.Count + " doors", MessageImportance.LeastImportant, false);
+                                            }
+                                            else
+                                            {
+                                                GameCore.Console.AddDebugLog("SCP079", "No doors to lock found, code " + (from x in localInteractableList
+                                                                                                                          where x.type == Scp079Interactable.InteractableType.Door
+                                                                                                                          select x).Count(), MessageImportance.LessImportant, false);
+                                            }
+                                            ListPool<Scp079Interactable>.Shared.Return(localInteractableList);
+
+                                            GameCore.Console.AddDebugLog("SCP079", "Lockdown initiated.", MessageImportance.LessImportant, false);
+                                            __instance.AddInteractionToHistory(interactableLockdownGameObject, array[0], true);
+                                            __instance.Mana -= __instance.GetManaFromLabel("Room Lockdown", __instance.abilities);
+                                            return false;
+                                        }
+                                    case Scp079EventMisc.InteractionResult.Disallow:
+                                        {
+                                            return false;
+                                        }
+                                    case Scp079EventMisc.InteractionResult.NoEnergy:
+                                        {
+                                            __instance.RpcNotEnoughMana(manaFromLabel, __instance.curMana);
+                                            GameCore.Console.AddDebugLog("SCP079", "Lockdown cannot commence, not enough mana.", MessageImportance.LessImportant, false);
+                                            return false;
+                                        }
                                 }
-                                else
-                                {
-                                    GameCore.Console.AddDebugLog("SCP079", "No doors to lock found, code " + (from x in localInteractableList
-                                                                                                              where x.type == Scp079Interactable.InteractableType.Door
-                                                                                                              select x).Count(), MessageImportance.LessImportant, false);
-                                }
-                                ListPool<Scp079Interactable>.Shared.Return(localInteractableList);
-                                foreach (FlickerableLightController flickerableLightController in gameObject2.GetComponentsInChildren<FlickerableLightController>())
-                                {
-                                    if (flickerableLightController != null)
-                                    {
-                                        flickerableLightController.ServerFlickerLights(8f);
-                                    }
-                                }
-                                GameCore.Console.AddDebugLog("SCP079", "Lockdown initiated.", MessageImportance.LessImportant, false);
-                                __instance.AddInteractionToHistory(gameObject3, array[0], true);
-                                __instance.Mana -= __instance.GetManaFromLabel("Room Lockdown", __instance.abilities);
-                                return false;
+
                             }
                             else
                             {

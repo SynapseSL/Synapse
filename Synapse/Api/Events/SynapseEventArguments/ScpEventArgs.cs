@@ -115,6 +115,15 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Player Scp079 { get; internal set; }
         public float EnergyNeeded { get; internal set; }
         public Room Room { get; internal set; }
+        public bool LightsOut { get; set; }
+        public Scp079EventMisc.InteractionResult Result { get; set; }
+    }
+    public class Scp079TeslaInteractEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Scp079 { get; internal set; }
+        public float EnergyNeeded { get; internal set; }
+        public Room Room { get; internal set; }
+        public Tesla Tesla { get; internal set; }
         public Scp079EventMisc.InteractionResult Result { get; set; }
     }
 }
