@@ -7,7 +7,7 @@ namespace Synapse.Api
     {
         internal Elevator(Lift lift) => Lift = lift;
 
-        private readonly Lift Lift;
+        internal Lift Lift { get; }
 
         public GameObject GameObject => Lift.gameObject;
 
@@ -19,9 +19,11 @@ namespace Synapse.Api
 
         public bool Locked { get => Lift._locked; set => Lift.SetLock(value); }
 
+        public bool Operative { get => Lift.operative; }
+
         public float MaxDistance { get => Lift.maxDistance; set => Lift.maxDistance = value; }
 
-        public void Use() => Lift.UseLift();
+        public bool Use() => Lift.UseLift();
 
         public ElevatorType ElevatorType
         {

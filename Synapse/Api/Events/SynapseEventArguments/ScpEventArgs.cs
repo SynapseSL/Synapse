@@ -17,16 +17,16 @@ namespace Synapse.Api.Events.SynapseEventArguments
     public class Scp106ContainmentEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Player { get; internal set; }
-        
+
         public bool Allow { get; set; }
     }
 
     public class PocketDimensionEnterEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Player { get; internal set; }
-        
+
         public Player Scp106 { get; internal set; }
-        
+
         public bool Allow { get; set; }
     }
 
@@ -35,7 +35,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Player Player { get; internal set; }
 
         public Vector3 ExitPosition { get; set; }
-        
+
         public PocketDimensionTeleport.PDTeleportType TeleportType { get; set; }
 
         public bool Allow { get; set; } = true;
@@ -69,5 +69,52 @@ namespace Synapse.Api.Events.SynapseEventArguments
     public class Scp173BlinkEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Scp173 { get; internal set; }
+    }
+
+
+    public class Scp079EventMisc
+    {
+        public enum InteractionResult
+        {
+            Allow,
+            Disallow,
+            NoEnergy
+        }
+        public enum DoorAction
+        {
+            Opening,
+            Closing,
+            Locking,
+            Unlocking
+        }
+    }
+    public class Scp079DoorInteractEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Scp079 { get; internal set; }
+        public Scp079EventMisc.DoorAction Action { get; internal set; }
+        public float EnergyNeeded { get; internal set; }
+        public Door Door { get; internal set; }
+        public Scp079EventMisc.InteractionResult Result { get; set; }
+
+    }
+    public class Scp079SpeakerInteractEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Scp079 { get; internal set; }
+        public float EnergyNeeded { get; internal set; }
+        public Scp079EventMisc.InteractionResult Result { get; set; }
+    }
+    public class Scp079ElevatorUseEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Scp079 { get; internal set; }
+        public float EnergyNeeded { get; internal set; }
+        public Elevator Elevator { get; internal set; }
+        public Scp079EventMisc.InteractionResult Result { get; set; }
+    }
+    public class Scp079RoomLockdownEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Scp079 { get; internal set; }
+        public float EnergyNeeded { get; internal set; }
+        public Room Room { get; internal set; }
+        public Scp079EventMisc.InteractionResult Result { get; set; }
     }
 }
