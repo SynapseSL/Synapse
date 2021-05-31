@@ -40,7 +40,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                     return false;
                 }
                 DoorVariant doorVariant = null;
-                bool flag = target != null && target.TryGetComponent<DoorVariant>(out doorVariant);
+                bool flag = target != null && target.TryGetComponent(out doorVariant);
                 List<string> list = GameCore.ConfigFile.ServerConfig.GetStringList("scp079_door_blacklist") ?? new List<string>();
                 string text = array[0];
 
@@ -65,7 +65,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                             SynapseController.Server.Events.Scp.Scp079.Invoke079TeslaInteract(
                                 __instance.gameObject.GetPlayer(),
                                 manaFromLabel,
-                                tesla.Room,
+                                tesla?.Room,
                                 tesla,
                                 intendedResult,
                                 out var actualResult
@@ -579,6 +579,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 
                             var action = doorVariant.TargetState ? Scp079EventMisc.DoorAction.Closing : Scp079EventMisc.DoorAction.Opening;
                             var intendedResult = manaFromLabel <= __instance.curMana ? Scp079EventMisc.InteractionResult.Allow : Scp079EventMisc.InteractionResult.NoEnergy;
+                            
                             SynapseController.Server.Events.Scp.Scp079.Invoke079DoorInteract(
                                 __instance.gameObject.GetPlayer(),
                                 action,

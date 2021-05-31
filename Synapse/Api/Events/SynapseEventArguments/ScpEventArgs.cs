@@ -103,7 +103,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public float EnergyNeeded { get; internal set; }
         public Scp079EventMisc.InteractionResult Result { get; set; }
     }
-    public class Scp079ElevatorUseEventArgs : EventHandler.ISynapseEventArgs
+    public class Scp079ElevatorInteractEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Scp079 { get; internal set; }
         public float EnergyNeeded { get; internal set; }
@@ -125,5 +125,13 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Room Room { get; internal set; }
         public Tesla Tesla { get; internal set; }
         public Scp079EventMisc.InteractionResult Result { get; set; }
+    }
+    public class Scp079CameraSwitchEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Scp079 { get; internal set; }
+        public Camera079 Camera { get; internal set; }
+        public bool Spawning { get; internal set; }
+        public bool MapSwitch { get; internal set; }
+        public bool Allow { get; set; }
     }
 }

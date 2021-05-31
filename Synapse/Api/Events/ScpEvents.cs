@@ -111,17 +111,19 @@ namespace Synapse.Api.Events
         {
             internal Scp079Events() { }
 
-            public event EventHandler.OnSynapseEvent<Scp079RecontainEventArgs> Scp079RecontainEvent;
+            public event EventHandler.OnSynapseEvent<Scp079RecontainEventArgs> RecontainEvent;
 
-            public event EventHandler.OnSynapseEvent<Scp079DoorInteractEventArgs> Scp079DoorInteract;
+            public event EventHandler.OnSynapseEvent<Scp079DoorInteractEventArgs> DoorInteract;
 
-            public event EventHandler.OnSynapseEvent<Scp079SpeakerInteractEventArgs> Scp079SpeakerInteract;
+            public event EventHandler.OnSynapseEvent<Scp079SpeakerInteractEventArgs> SpeakerInteract;
 
-            public event EventHandler.OnSynapseEvent<Scp079ElevatorUseEventArgs> Scp079ElevatorUse;
+            public event EventHandler.OnSynapseEvent<Scp079ElevatorInteractEventArgs> ElevatorInteract;
 
-            public event EventHandler.OnSynapseEvent<Scp079RoomLockdownEventArgs> Scp079RoomLockdown;
+            public event EventHandler.OnSynapseEvent<Scp079RoomLockdownEventArgs> RoomLockdown;
 
-            public event EventHandler.OnSynapseEvent<Scp079TeslaInteractEventArgs> Scp079TeslaInteract;
+            public event EventHandler.OnSynapseEvent<Scp079TeslaInteractEventArgs> TeslaInteract;
+
+            public event EventHandler.OnSynapseEvent<Scp079CameraSwitchEventArgs> CameraSwitch;
 
             internal void Invoke079RecontainEvent(Recontain079Status status, out bool allow)
             {
@@ -130,7 +132,7 @@ namespace Synapse.Api.Events
                     Status = status
                 };
 
-                Scp079RecontainEvent?.Invoke(ev);
+                RecontainEvent?.Invoke(ev);
 
                 allow = ev.Allow;
             }
@@ -153,7 +155,7 @@ namespace Synapse.Api.Events
                     Door = door
                 };
 
-                Scp079DoorInteract?.Invoke(ev);
+                DoorInteract?.Invoke(ev);
 
                 actualResult = ev.Result;
             }
@@ -172,7 +174,7 @@ namespace Synapse.Api.Events
                     EnergyNeeded = energyNeeded
                 };
 
-                Scp079SpeakerInteract?.Invoke(ev);
+                SpeakerInteract?.Invoke(ev);
 
                 actualResult = ev.Result;
             }
@@ -185,7 +187,7 @@ namespace Synapse.Api.Events
                 out Scp079EventMisc.InteractionResult actualResult
                 )
             {
-                var ev = new Scp079ElevatorUseEventArgs
+                var ev = new Scp079ElevatorInteractEventArgs
                 {
                     Scp079 = player,
                     Result = intendedResult,
@@ -193,7 +195,7 @@ namespace Synapse.Api.Events
                     Elevator = elevator
                 };
 
-                Scp079ElevatorUse?.Invoke(ev);
+                ElevatorInteract?.Invoke(ev);
 
                 actualResult = ev.Result;
             }
@@ -216,7 +218,7 @@ namespace Synapse.Api.Events
                     LightsOut = lightsOut
                 };
 
-                Scp079RoomLockdown?.Invoke(ev);
+                RoomLockdown?.Invoke(ev);
 
                 actualResult = ev.Result;
             }
@@ -239,9 +241,32 @@ namespace Synapse.Api.Events
                     Tesla = tesla
                 };
 
-                Scp079TeslaInteract?.Invoke(ev);
+                TeslaInteract?.Invoke(ev);
 
                 actualResult = ev.Result;
+            }
+
+            internal void Invoke079CameraSwitch(
+                Player player,
+                Camera079 cam,
+                bool mapSwitch,
+                bool spawning,
+                out bool allow
+                )
+            {
+                var ev = new Scp079CameraSwitchEventArgs
+                {
+                    Scp079 = player,
+                    MapSwitch = mapSwitch,
+                    Camera = cam,
+                    Spawning = spawning,
+                    Allow = true
+                };
+
+                CameraSwitch?.Invoke(ev);
+
+                //If allowed by the event methods, or if this is the first spawning
+                allow = ev.Allow || ev.Spawning;
             }
         }
 

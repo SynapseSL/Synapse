@@ -26,7 +26,7 @@ public class SynapseController
     {
         CustomNetworkManager.Modded = true;
         BuildInfoCommand.ModDescription = $"Plugin Framework: Synapse\nSynapse Version: {SynapseVersion}\nDescription: Synapse is a heavily modded server software using extensive runtime patching to make development faster and the usage more accessible to end-users";
-        
+
         PatchMethods();
         try
         {
@@ -38,15 +38,15 @@ public class SynapseController
 
             PluginLoader.ActivatePlugins();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Server.Logger.Error($"Error while Initialising Synapse! Please fix the Issue and restart your Server:\n{e}");
             return;
         }
 
         Server.Logger.Info("Synapse is now ready!");
-    } 
-    
+    }
+
     private void PatchMethods()
     {
         try
@@ -55,7 +55,7 @@ public class SynapseController
             instance.PatchAll();
             Server.Logger.Info("Harmony Patching was sucessfully!");
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Server.Logger.Error($"Harmony Patching threw an error:\n\n {e}");
         }
