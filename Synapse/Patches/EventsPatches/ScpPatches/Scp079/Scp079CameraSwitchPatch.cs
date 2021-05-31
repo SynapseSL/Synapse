@@ -8,7 +8,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
     {
         private static bool Prefix(Scp079PlayerScript __instance, ushort camId, bool lookatRotation)
         {
-            Camera079 camera = Server.Get.Map.Cameras.Find(cam => cam.cameraId == camId);
+            var camera = Server.Get.Map.Cameras.Find(cam => cam.ID == camId);
             Player player = __instance.GetPlayer();
             bool spawning = false;
             if (!player.Scp079Controller.Spawned)

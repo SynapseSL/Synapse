@@ -248,7 +248,7 @@ namespace Synapse.Api.Events
 
             internal void Invoke079CameraSwitch(
                 Player player,
-                Camera079 cam,
+                SynapseCamera cam,
                 bool mapSwitch,
                 bool spawning,
                 out bool allow
