@@ -219,6 +219,8 @@
     <Compile Include="Patches\EventsPatches\RoundPatches\WaitingandEndPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp049\Scp049AttackPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp049\Scp0492AttackPatch.cs" />
+    <Compile Include="Patches\EventsPatches\ScpPatches\Scp079\Scp079BulkPatch.cs" />
+    <Compile Include="Patches\EventsPatches\ScpPatches\Scp079\Scp079CameraSwitchPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp079\Scp079RecontainPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp096\Scp096AttackPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp096\Scp096TargetPatches.cs" />
@@ -282,9 +284,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Refs\Assembly-CSharp-Publicized.dll</HintPath>
     </Reference>
-    <Reference Include="EmbedIO, Version=3.4.3.0, Culture=neutral, PublicKeyToken=5e5f048b6e04267e">
+    <Reference Include="EmbedIO, Version=3.4.3.0, Culture=neutral, PublicKeyToken=5e5f048b6e04267e, processorArchitecture=MSIL">
       <HintPath>..\packages\EmbedIO.3.4.3\lib\netstandard2.0\EmbedIO.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="LiteDB, Version=5.0.9.0, Culture=neutral, PublicKeyToken=4ee40123013c9f27, processorArchitecture=MSIL">
       <HintPath>..\packages\LiteDB.5.0.9\lib\net45\LiteDB.dll</HintPath>

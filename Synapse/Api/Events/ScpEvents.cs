@@ -1,5 +1,7 @@
 ﻿using Synapse.Api.Events.SynapseEventArguments;
 using Synapse.Api.Enum;
+using System.Collections.Generic;
+using Interactables.Interobjects.DoorUtils;
 
 namespace Synapse.Api.Events
 {
@@ -8,7 +10,7 @@ namespace Synapse.Api.Events
         internal ScpEvents() { }
 
         public Scp096Events Scp096 { get; } = new Scp096Events();
-        
+
         public Scp106Events Scp106 { get; } = new Scp106Events();
 
         public Scp079Events Scp079 { get; } = new Scp079Events();
@@ -51,7 +53,7 @@ namespace Synapse.Api.Events
             public event EventHandler.OnSynapseEvent<Scp106ContainmentEventArgs> Scp106ContainmentEvent;
 
             public event EventHandler.OnSynapseEvent<PocketDimensionEnterEventArgs> PocketDimensionEnterEvent;
-            
+
             public event EventHandler.OnSynapseEvent<PocketDimensionLeaveEventArgs> PocketDimensionLeaveEvent;
 
             public event EventHandler.OnSynapseEvent<PortalCreateEventArgs> PortalCreateEvent;
@@ -60,7 +62,7 @@ namespace Synapse.Api.Events
 
             internal void InvokeScp106ContainmentEvent(Player player, ref bool allow)
             {
-                var ev = new Scp106ContainmentEventArgs {Allow = allow, Player = player};
+                var ev = new Scp106ContainmentEventArgs { Allow = allow, Player = player };
                 Scp106ContainmentEvent?.Invoke(ev);
                 allow = ev.Allow;
             }
@@ -68,13 +70,13 @@ namespace Synapse.Api.Events
             internal void InvokePocketDimensionEnterEvent(Player player, Player scp106, ref bool allow)
             {
                 var ev = new PocketDimensionEnterEventArgs
-                    {Allow = allow, Scp106 = scp106, Player = player};
+                { Allow = allow, Scp106 = scp106, Player = player };
                 PocketDimensionEnterEvent?.Invoke(ev);
 
                 allow = ev.Allow;
             }
-            
-            internal void InvokePocketDimensionLeaveEvent(Player player,ref UnityEngine.Vector3 pos, ref PocketDimensionTeleport.PDTeleportType teleportType, out bool allow)
+
+            internal void InvokePocketDimensionLeaveEvent(Player player, ref UnityEngine.Vector3 pos, ref PocketDimensionTeleport.PDTeleportType teleportType, out bool allow)
             {
                 var ev = new PocketDimensionLeaveEventArgs
                 {
@@ -109,21 +111,164 @@ namespace Synapse.Api.Events
         {
             internal Scp079Events() { }
 
-            public event EventHandler.OnSynapseEvent<Scp079RecontainEventArgs> Scp079RecontainEvent;
+            public event EventHandler.OnSynapseEvent<Scp079RecontainEventArgs> RecontainEvent;
 
-            internal void Invoke079RecontainEvent(Recontain079Status status,out bool allow)
+            public event EventHandler.OnSynapseEvent<Scp079DoorInteractEventArgs> DoorInteract;
+
+            public event EventHandler.OnSynapseEvent<Scp079SpeakerInteractEventArgs> SpeakerInteract;
+
+            public event EventHandler.OnSynapseEvent<Scp079ElevatorInteractEventArgs> ElevatorInteract;
+
+            public event EventHandler.OnSynapseEvent<Scp079RoomLockdownEventArgs> RoomLockdown;
+
+            public event EventHandler.OnSynapseEvent<Scp079TeslaInteractEventArgs> TeslaInteract;
+
+            public event EventHandler.OnSynapseEvent<Scp079CameraSwitchEventArgs> CameraSwitch;
+
+            internal void Invoke079RecontainEvent(Recontain079Status status, out bool allow)
             {
                 var ev = new Scp079RecontainEventArgs
                 {
                     Status = status
                 };
 
-                Scp079RecontainEvent?.Invoke(ev);
+                RecontainEvent?.Invoke(ev);
 
                 allow = ev.Allow;
             }
-        }
 
+            internal void Invoke079DoorInteract(
+                Player player,
+                Scp079EventMisc.DoorAction action,
+                Scp079EventMisc.InteractionResult intendedResult,
+                float energyNeeded,
+                Door door,
+                out Scp079EventMisc.InteractionResult actualResult
+                )
+            {
+                var ev = new Scp079DoorInteractEventArgs
+                {
+                    Scp079 = player,
+                    Action = action,
+                    EnergyNeeded = energyNeeded,
+                    Result = intendedResult,
+                    Door = door
+                };
+
+                DoorInteract?.Invoke(ev);
+
+                actualResult = ev.Result;
+            }
+
+            internal void Invoke079SpeakerInteract(
+                Player player,
+                float energyNeeded,
+                Scp079EventMisc.InteractionResult intendedResult,
+                out Scp079EventMisc.InteractionResult actualResult
+                )
+            {
+                var ev = new Scp079SpeakerInteractEventArgs
+                {
+                    Scp079 = player,
+                    Result = intendedResult,
+                    EnergyNeeded = energyNeeded
+                };
+
+                SpeakerInteract?.Invoke(ev);
+
+                actualResult = ev.Result;
+            }
+
+            internal void Invoke079ElevatorUse(
+                Player player,
+                float energyNeeded,
+                Elevator elevator,
+                Scp079EventMisc.InteractionResult intendedResult,
+                out Scp079EventMisc.InteractionResult actualResult
+                )
+            {
+                var ev = new Scp079ElevatorInteractEventArgs
+                {
+                    Scp079 = player,
+                    Result = intendedResult,
+                    EnergyNeeded = energyNeeded,
+                    Elevator = elevator
+                };
+
+                ElevatorInteract?.Invoke(ev);
+
+                actualResult = ev.Result;
+            }
+
+            internal void Invoke079RoomLockdown(
+                Player player,
+                float energyNeeded,
+                Room room,
+                ref bool lightsOut,
+                Scp079EventMisc.InteractionResult intendedResult,
+                out Scp079EventMisc.InteractionResult actualResult
+                )
+            {
+                var ev = new Scp079RoomLockdownEventArgs
+                {
+                    Scp079 = player,
+                    Result = intendedResult,
+                    EnergyNeeded = energyNeeded,
+                    Room = room,
+                    LightsOut = lightsOut
+                };
+
+                RoomLockdown?.Invoke(ev);
+
+                actualResult = ev.Result;
+            }
+
+            internal void Invoke079TeslaInteract(
+                Player player,
+                float energyNeeded,
+                Room room,
+                Tesla tesla,
+                Scp079EventMisc.InteractionResult intendedResult,
+                out Scp079EventMisc.InteractionResult actualResult
+                )
+            {
+                var ev = new Scp079TeslaInteractEventArgs
+                {
+                    Scp079 = player,
+                    Result = intendedResult,
+                    EnergyNeeded = energyNeeded,
+                    Room = room,
+                    Tesla = tesla
+                };
+
+                TeslaInteract?.Invoke(ev);
+
+                actualResult = ev.Result;
+            }
+
+            internal void Invoke079CameraSwitch(
+                Player player,
+                Camera079 cam,
+                bool mapSwitch,
+                bool spawning,
+                out bool allow
+                )
+            {
+                var ev = new Scp079CameraSwitchEventArgs
+                {
+                    Scp079 = player,
+                    MapSwitch = mapSwitch,
+                    Camera = cam,
+                    Spawning = spawning,
+                    Allow = true
+                };
+
+                CameraSwitch?.Invoke(ev);
+
+                //If allowed by the event methods, or if this is the first spawning
+                allow = ev.Allow || ev.Spawning;
+            }
+        }
 
         public class Scp173Events
         {
@@ -141,7 +286,8 @@ namespace Synapse.Api.Events
                 Scp173BlinkEvent?.Invoke(ev);
             }
         }
-        internal void InvokeScpAttack(Player scp,Player target,Enum.ScpAttackType attackType , out bool allow)
+
+        internal void InvokeScpAttack(Player scp, Player target, Enum.ScpAttackType attackType, out bool allow)
         {
             var ev = new ScpAttackEventArgs
             {

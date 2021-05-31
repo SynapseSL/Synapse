@@ -8,6 +8,7 @@
 
         private Scp079PlayerScript Script => player.ClassManager.Scp079;
 
+        internal bool Spawned { get; set; }
 
         public bool Is079 => player.RoleType == RoleType.Scp079;
 
@@ -25,7 +26,6 @@
         /// The current camera the player uses (Scp079 only, if not null)
         /// </summary>
         public Camera079 Camera { get => Script.currentCamera; set => Script?.RpcSwitchCamera(value.cameraId, false); }
-
 
         public void GiveExperience(float amount) => Script.AddExperience(amount);
 

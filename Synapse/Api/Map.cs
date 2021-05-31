@@ -45,6 +45,8 @@ namespace Synapse.Api
 
         public List<Dummy> Dummies { get; } = new List<Dummy>();
 
+        public List<Camera079> Cameras { get; } = new List<Camera079>();
+
         public string IntercomText
         {
             get => Server.Get.Host.GetComponent<Intercom>().CustomContent;
@@ -81,13 +83,13 @@ namespace Synapse.Api
 
         public int Seed => MapGeneration.SeedSynchronizer.Seed;
 
-        public Room GetRoom(RoomInformation.RoomType roomType) 
+        public Room GetRoom(RoomInformation.RoomType roomType)
             => Rooms.FirstOrDefault(x => x.RoomType == roomType);
 
-        public Door GetDoor(Enum.DoorType doorType) 
+        public Door GetDoor(Enum.DoorType doorType)
             => Doors.FirstOrDefault(x => x.DoorType == doorType);
 
-        public Elevator GetElevator(Enum.ElevatorType elevatorType) 
+        public Elevator GetElevator(Enum.ElevatorType elevatorType)
             => Elevators.FirstOrDefault(x => x.ElevatorType == elevatorType);
 
         public void SendBroadcast(ushort time, string message, bool instant = false)
@@ -102,7 +104,7 @@ namespace Synapse.Api
             GlitchedCassie(text);
         }
 
-        public void Cassie(string words, bool makehold = true, bool makenoise = true) 
+        public void Cassie(string words, bool makehold = true, bool makenoise = true)
             => Respawning.RespawnEffectsController.PlayCassieAnnouncement(words, makehold, makenoise);
 
         public void GlitchedCassie(string words)
@@ -145,11 +147,11 @@ namespace Synapse.Api
             => new Dummy(pos, rot, role, name, badgetext, badgecolor);
 
         [Obsolete("Moved to Workstation.CreateWorkStation()", true)]
-        public WorkStation CreateWorkStation(Vector3 position, Vector3 rotation, Vector3 scale) 
+        public WorkStation CreateWorkStation(Vector3 position, Vector3 rotation, Vector3 scale)
             => new WorkStation(position, rotation, scale);
 
         [Obsolete("Moved to Ragdoll.CreateRagdoll()", true)]
-        public Ragdoll CreateRagdoll(RoleType roletype, Vector3 pos, Quaternion rot, Vector3 velocity, PlayerStats.HitInfo info, bool allowRecall, Player owner) 
+        public Ragdoll CreateRagdoll(RoleType roletype, Vector3 pos, Quaternion rot, Vector3 velocity, PlayerStats.HitInfo info, bool allowRecall, Player owner)
             => new Ragdoll(roletype, pos, rot, velocity, info, allowRecall, owner);
 
         [Obsolete("Moved to Door.SpawnDoorVariant()", true)]
@@ -169,11 +171,15 @@ namespace Synapse.Api
 
         internal void AddObjects()
         {
+            foreach (var room in SynapseController.Server.GetObjectsOf<Transform>().Where(x => x.CompareTag("Room") || x.name == "Root_*&*Outside Cams" || x.name == "PocketWorld"))
+            {
+                var synRoom = new Room(room.gameObject);
+                Rooms.Add(synRoom);
+                Cameras.AddRange(synRoom.Cameras);
+            }
+
             foreach (var tesla in SynapseController.Server.GetObjectsOf<TeslaGate>())
                 Teslas.Add(new Tesla(tesla));
-
-            foreach (var room in SynapseController.Server.GetObjectsOf<Transform>().Where(x => x.CompareTag("Room") || x.name == "Root_*&*Outside Cams" || x.name == "PocketWorld"))
-                Rooms.Add(new Room(room.gameObject));
 
             foreach (var station in Server.Get.GetObjectsOf<global::WorkStation>())
                 WorkStations.Add(new WorkStation(station));
