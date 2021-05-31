@@ -15,7 +15,7 @@ namespace Synapse.Api
             LightController = GameObject.GetComponentInChildren<FlickerableLightController>();
 
             foreach (var cam in GameObject.GetComponentsInChildren<Camera079>())
-                Cameras.Add(new SynapseCamera(cam,this));
+                Cameras.Add(new Camera(cam,this));
         }
 
         internal FlickerableLightController LightController { get; set; }
@@ -34,7 +34,7 @@ namespace Synapse.Api
 
         public List<Door> Doors { get; } = new List<Door>();
 
-        public List<SynapseCamera> Cameras { get; } = new List<SynapseCamera>();
+        public List<Camera> Cameras { get; } = new List<Camera>();
 
         public ZoneType Zone
         {

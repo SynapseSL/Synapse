@@ -45,7 +45,7 @@ namespace Synapse.Api
 
         public List<Dummy> Dummies { get; } = new List<Dummy>();
 
-        public List<SynapseCamera> Cameras { get; } = new List<SynapseCamera>();
+        public List<Camera> Cameras { get; } = new List<Camera>();
 
         public string IntercomText
         {

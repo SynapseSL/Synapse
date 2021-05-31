@@ -2,13 +2,12 @@
 
 namespace Synapse.Api
 {
-    public class SynapseCamera
+    public class Camera
     {
-        internal SynapseCamera(Camera079 camera,Room room)
+        internal Camera(Camera079 camera,Room room)
         {
             cam = camera;
             Room = room;
-            Map.Get.Cameras.Add(this);
         }
 
         private readonly Camera079 cam;

@@ -129,7 +129,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
     public class Scp079CameraSwitchEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Scp079 { get; internal set; }
-        public SynapseCamera Camera { get; internal set; }
+        public Camera Camera { get; internal set; }
         public bool Spawning { get; internal set; }
         public bool MapSwitch { get; internal set; }
         public bool Allow { get; set; }

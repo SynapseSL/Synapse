@@ -58,7 +58,7 @@
     <Compile Include="Api\Enum\ItemState.cs" />
     <Compile Include="Api\Ragdoll.cs" />
     <Compile Include="Api\Scp914.cs" />
-    <Compile Include="Api\SynapseCamera.cs" />
+    <Compile Include="Api\Camera.cs" />
     <Compile Include="Api\Teams\SynapseTeamInformation.cs" />
     <Compile Include="Api\Teams\SynapseTeam.cs" />
     <Compile Include="Api\Teams\ISynapseTeam.cs" />

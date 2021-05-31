@@ -55,7 +55,7 @@ public static class SynapseExtensions
 
     public static Synapse.Api.WorkStation GetWorkStation(this WorkStation station) => Map.Get.WorkStations.FirstOrDefault(x => x.GameObject == station.gameObject);
 
-    public static SynapseCamera GetSynapseCamera(this Camera079 camera) => Map.Get.Cameras.FirstOrDefault(x => x.GameObject == camera.gameObject);
+    public static Synapse.Api.Camera GetSynapseCamera(this Camera079 camera) => Map.Get.Cameras.FirstOrDefault(x => x.GameObject == camera.gameObject);
 
     public static Synapse.Api.Items.SynapseItem GetSynapseItem(this Inventory.SyncItemInfo info) => Map.Get.Items.FirstOrDefault(x => x.itemInfo == info);
     public static Synapse.Api.Items.SynapseItem GetSynapseItem(this Pickup pickup) => Map.Get.Items.FirstOrDefault(x => x.pickup == pickup);
