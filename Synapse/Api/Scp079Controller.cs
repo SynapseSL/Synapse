@@ -25,7 +25,7 @@
         /// <summary>
         /// The current camera the player uses (Scp079 only, if not null)
         /// </summary>
-        public Camera079 Camera { get => Script.currentCamera; set => Script?.RpcSwitchCamera(value.cameraId, false); }
+        public Camera Camera { get => Script.currentCamera.GetSynapseCamera(); set => Script?.RpcSwitchCamera(value.ID, false); }
 
         public void GiveExperience(float amount) => Script.AddExperience(amount);
 
