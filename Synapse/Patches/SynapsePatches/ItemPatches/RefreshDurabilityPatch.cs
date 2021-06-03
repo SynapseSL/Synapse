@@ -26,6 +26,9 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
                 if (!itembyid.noEquipable || allowAmmoRenew)
                     item.Durabillity = itembyid.durability;
 
+                if (item.IsCustomItem)
+                    item.Durabillity = 0;
+
                 if (!setupAttachments) return false;
 
                 foreach (var weapon in Pickup.Inv.GetComponent<WeaponManager>().weapons)

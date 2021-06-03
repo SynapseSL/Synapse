@@ -32,7 +32,15 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
                 };
                 newitem.Position = newitem.pickup.transform.position;
                 newitem.pickup.RefreshDurability();
-                if(newitem.ItemType == ItemType.GunLogicer)
+
+                var itemByID = Pickup.Inv.GetItemByID(newitem.ItemType);
+
+                if (newitem.Durabillity > itemByID.durability)
+                    newitem.Durabillity = itemByID.durability;
+
+                if (newitem.IsCustomItem) newitem.Durabillity = 0;
+
+                if (newitem.ItemType == ItemType.GunLogicer)
                 {
                     newitem.Sight = 0;
                     newitem.Barrel = 0;
@@ -65,7 +73,15 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
                     {
                         var newitem = new SynapseItem(type, item.Durabillity, item.Sight, item.Barrel, item.Other);
                         item.Destroy();
-                        if(newitem.ItemType == ItemType.GunLogicer)
+
+                        var itemByID = Pickup.Inv.GetItemByID(newitem.ItemType);
+
+                        if (newitem.Durabillity > itemByID.durability)
+                            newitem.Durabillity = itemByID.durability;
+
+                        if (newitem.IsCustomItem) newitem.Durabillity = 0;
+
+                        if (newitem.ItemType == ItemType.GunLogicer)
                         {
                             newitem.Sight = 0;
                             newitem.Barrel = 0;
@@ -105,13 +121,25 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
 
                 var item = splayer.ItemInHand;
                 var newitem = new SynapseItem(type, item.Durabillity, item.Sight, item.Barrel, item.Other);
-                if(newitem.ItemType == ItemType.GunLogicer)
+                item.Destroy();
+
+                var itemByID = Pickup.Inv.GetItemByID(newitem.ItemType);
+
+                if (newitem.Durabillity > itemByID.durability)
+                    newitem.Durabillity = itemByID.durability;
+
+                if (newitem.IsCustomItem) newitem.Durabillity = 0;
+
+                if (newitem.ItemType == ItemType.MicroHID)
+                    splayer.MicroHID.NetworkEnergy = 1f;
+
+                if (newitem.ItemType == ItemType.GunLogicer)
                 {
                     newitem.Barrel = 0;
                     newitem.Sight = 0;
                     newitem.Other = 0;
                 }
-                item.Destroy();
+
                 newitem.PickUp(splayer);
 
                 Scp914Machine.TryFriendshipAchievement(newitem.ItemType, player, players);
