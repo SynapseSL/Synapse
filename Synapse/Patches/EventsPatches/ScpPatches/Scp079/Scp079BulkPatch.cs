@@ -624,7 +624,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
             }
             catch (System.Exception e)
             {
-                Synapse.Api.Logger.Get.Warn($"{e}");
+                Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp079BulkEvent failed!!\n{e}");
             }
 
             return false;
