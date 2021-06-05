@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Mirror;
 
 namespace Synapse.Api
 {
@@ -27,6 +26,8 @@ namespace Synapse.Api
                 Scp096.ShieldAmount = value;
             }
         }
+
+        public float MaxShield { get; set; } = 350f;
 
         public float CurMaxShield
         {

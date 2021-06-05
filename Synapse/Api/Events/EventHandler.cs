@@ -19,23 +19,9 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    var dummy = new Dummy(ev.Player.Position, ev.Player.Rotation, ev.Player.RoleType, "")
-                    {
-                        Scale = new Vector3(0.3f, 1.3f, 0.3f)
-                    };
-                    dummy.Direction = Enum.MovementDirection.Forward;
-                    break;
-
-                case KeyCode.Alpha2:
-                    Synapse.Api.Logger.Get.Warn(Synapse.Api.Map.Get.Items.Count);
-                    break;
-
-                case KeyCode.Alpha3:
-                    ev.Player.ItemInHand = null;
-                    break;
-
-                case KeyCode.Alpha4:
-                    ev.Player.ItemInHand = new Items.SynapseItem(0, 0f, 0, 0, 0);
+                    ev.Player.Scp096Controller.MaxShield = 10000;
+                    ev.Player.Scp096Controller.CurMaxShield = 10000;
+                    ev.Player.Scp096Controller.ShieldAmount = 10000;
                     break;
             }
         }
