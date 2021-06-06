@@ -15,12 +15,7 @@ public static class SynapseExtensions
 
     public static Player GetPlayer(this PlayableScps.PlayableScp scp) => scp?.Hub?.GetPlayer();
 
-    public static Player GetPlayer(this CommandSender sender)
-    {
-        return sender?.SenderId == "SERVER CONSOLE" || sender?.SenderId == "GAME CONSOLE"
-        ? Server.Get.Host
-        : Server.Get.GetPlayer(sender.SenderId);
-    }
+    public static Player GetPlayer(this CommandSender sender) => Server.Get.Players.FirstOrDefault(x => x.CommandSender == sender);
 
     public static List<Player> GetPlayers(this RoleType role) => SynapseController.Server.Players.Where(x => x.RoleType == role).ToList();
 

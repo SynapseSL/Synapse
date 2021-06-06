@@ -123,17 +123,19 @@ namespace Synapse.Patches.SynapsePatches
 
             if (SynapseController.CommandHandlers.RemoteAdminHandler.TryGetCommand(args[0], out var command))
             {
+                Logger.Get.Warn(player == null);
                 //If sender has no permission and permission is not null or empty
-                if (!sender.GetPlayer().HasPermission(command.Permission) && !string.IsNullOrWhiteSpace(command.Permission))
+                if (!player.HasPermission(command.Permission) && !string.IsNullOrWhiteSpace(command.Permission))
                 {
                     player.SendRAConsoleMessage(Server.Get.Configs.synapseTranslation.ActiveTranslation.noPermissions.Replace("%perm%", command.Permission), false);
                     return false;
                 }
+                Logger.Get.Warn("RemoteCommand2");
 
                 try
                 {
                     var flag = command.Execute(new Command.CommandContext { Arguments = args.Segment(1), Player = player, Platform = Command.Platform.RemoteAdmin });
-
+                    Logger.Get.Warn("RemoteCommand3");
                     player.SendRAConsoleMessage(flag.Message, flag.State == CommandResultState.Ok);
                 }
                 catch (Exception e)
