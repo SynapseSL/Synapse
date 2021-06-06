@@ -10,7 +10,7 @@ namespace Synapse.Patches.SynapsePatches
     [HarmonyPatch(typeof(GameCore.Console), nameof(GameCore.Console.TypeCommand))]
     internal static class ServerCommandPatch
     {
-        private static bool Prefix(string cmd, CommandSender sender = null)
+        private static bool Prefix(string cmd)
         {
             var args = cmd.Split(' ');
 

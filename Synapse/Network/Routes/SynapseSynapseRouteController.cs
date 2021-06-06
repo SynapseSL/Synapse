@@ -80,8 +80,6 @@ namespace Synapse.Network.Routes
                     Receivers = new[] {recv}.ToList()
                 };
             }
-
-            return StatusedResponse.Success;
         }
 
 

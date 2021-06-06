@@ -13,7 +13,7 @@ namespace Synapse.Patches.EventsPatches.ServerPatches
         nameof(CustomLiteNetLib4MirrorTransport.ProcessConnectionRequest))]
     internal class PreAuthenticationPatch
     {
-        private static void Postfix(CustomLiteNetLib4MirrorTransport __instance, ConnectionRequest request)
+        private static void Postfix(ConnectionRequest request)
         {
             var allow = true;
             var reason = "No Reason";

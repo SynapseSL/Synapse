@@ -234,9 +234,7 @@ namespace Synapse.Config
 
         public CommentGatheringTypeInspector(ITypeInspector innerTypeDescriptor)
         {
-            if (innerTypeDescriptor == null) throw new ArgumentNullException("innerTypeDescriptor");
-
-            _innerTypeDescriptor = innerTypeDescriptor;
+            _innerTypeDescriptor = innerTypeDescriptor ?? throw new ArgumentNullException("innerTypeDescriptor");
         }
 
         public override IEnumerable<IPropertyDescriptor> GetProperties(Type type, object container)
@@ -286,7 +284,6 @@ namespace Synapse.Config
                 return _baseDescriptor.GetCustomAttribute<T>();
             }
 
-            [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
             public IObjectDescriptor Read(object target)
             {
                 var description = _baseDescriptor.GetCustomAttribute<DescriptionAttribute>();
@@ -324,8 +321,7 @@ namespace Synapse.Config
 
         public override bool EnterMapping(IPropertyDescriptor key, IObjectDescriptor value, IEmitter context)
         {
-            var commentsDescriptor = value as CommentsObjectDescriptor;
-            if (commentsDescriptor != null && commentsDescriptor.Comment != null)
+            if (value is CommentsObjectDescriptor commentsDescriptor && commentsDescriptor.Comment != null)
                 context.Emit(new Comment(commentsDescriptor.Comment, false));
 
             return base.EnterMapping(key, value, context);

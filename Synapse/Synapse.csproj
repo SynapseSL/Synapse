@@ -36,7 +36,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Api\Broadcast.cs" />
+    <Compile Include="Api\Enum\MovementDirection.cs" />
     <Compile Include="Api\Enum\ElevatorType.cs" />
+    <Compile Include="Api\Enum\WeaponType.cs" />
+    <Compile Include="Api\Exceptions\SynapseItemAlreadyRegisteredException.cs" />
+    <Compile Include="Api\Exceptions\SynapseItemNotFoundException.cs" />
+    <Compile Include="Api\Exceptions\SynapseRoleAlreadyRegisteredException.cs" />
+    <Compile Include="Api\Exceptions\SynapseRoleNotFoundException.cs" />
+    <Compile Include="Api\Exceptions\SynapseException.cs" />
     <Compile Include="Api\Plugin\Processors\TranslationInjector.cs" />
     <Compile Include="Api\Prefabs.cs" />
     <Compile Include="Api\Roles\RoleInformation.cs" />
@@ -51,6 +58,7 @@
     <Compile Include="Api\Enum\ItemState.cs" />
     <Compile Include="Api\Ragdoll.cs" />
     <Compile Include="Api\Scp914.cs" />
+    <Compile Include="Api\Camera.cs" />
     <Compile Include="Api\Teams\SynapseTeamInformation.cs" />
     <Compile Include="Api\Teams\SynapseTeam.cs" />
     <Compile Include="Api\Teams\ISynapseTeam.cs" />
@@ -187,7 +195,9 @@
     <Compile Include="Patches\EventsPatches\MapPatches\DoorInteractPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\TriggerTeslaPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\WarheadDetonationPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerChangeItemPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerReportPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerUnCuffEvent.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerWalkOnSinkholePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerUseMicroPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDisarmPatch.cs" />
@@ -216,6 +226,8 @@
     <Compile Include="Patches\EventsPatches\RoundPatches\WaitingandEndPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp049\Scp049AttackPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp049\Scp0492AttackPatch.cs" />
+    <Compile Include="Patches\EventsPatches\ScpPatches\Scp079\Scp079BulkPatch.cs" />
+    <Compile Include="Patches\EventsPatches\ScpPatches\Scp079\Scp079CameraSwitchPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp079\Scp079RecontainPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp096\Scp096AttackPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp096\Scp096TargetPatches.cs" />
@@ -227,6 +239,9 @@
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp939\Scp939AttackPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Dummy\MirrorPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\Dummy\OverridePositionPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\ItemPatches\ChangeGrenadePatch.cs" />
+    <Compile Include="Patches\SynapsePatches\ScalePatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\DoorSpawnpointPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ShootPermissionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\InvisiblePatch.cs" />
@@ -242,6 +257,7 @@
     <Compile Include="Patches\SynapsePatches\ItemPatches\ModifyPatch.cs" />
     <Compile Include="Patches\SynapsePatches\PermissionSystem\RefreshPermissionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\PermissionSystem\SetGroupPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\Wrapper\Scp096MaxShieldPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\Scp914StartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\RagdollPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\GeneratorStartPatch.cs" />
@@ -281,7 +297,6 @@
     </Reference>
     <Reference Include="EmbedIO, Version=3.4.3.0, Culture=neutral, PublicKeyToken=5e5f048b6e04267e">
       <HintPath>..\packages\EmbedIO.3.4.3\lib\netstandard2.0\EmbedIO.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="JWT, Version=8.0.0.0, Culture=neutral, PublicKeyToken=6f98bca0f40f2ecf">
       <HintPath>..\packages\JWT.8.2.2\lib\net46\JWT.dll</HintPath>

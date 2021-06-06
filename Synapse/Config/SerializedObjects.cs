@@ -1,6 +1,8 @@
 ﻿using Synapse.Api;
 using UnityEngine;
 using System;
+using Synapse.Api.Items;
+using System.Collections.Generic;
 
 namespace Synapse.Config
 {
@@ -9,10 +11,10 @@ namespace Synapse.Config
     {
         public SerializedMapPoint(string room, float x, float y, float z)
         {
-            this.Room = room;
-            this.X = x;
-            this.Y = y;
-            this.Z = z;
+            Room = room;
+            X = x;
+            Y = y;
+            Z = z;
         }
 
         public SerializedMapPoint(MapPoint point)
@@ -77,7 +79,94 @@ namespace Synapse.Config
         public float YSize { get; set; }
         public float ZSize { get; set; }
 
-        public Synapse.Api.Items.SynapseItem Parse() => new Api.Items.SynapseItem(ID, Durabillity, Sight, Barrel, Other) { Scale = new Vector3(XSize,YSize,ZSize)};
+        public Synapse.Api.Items.SynapseItem Parse() => new SynapseItem(ID, Durabillity, Sight, Barrel, Other) { Scale = new Vector3(XSize,YSize,ZSize)};
+    }
+
+    [Serializable]
+    public class SerializedPlayerItem : SerializedItem
+    {
+        public SerializedPlayerItem() { }
+
+        public SerializedPlayerItem(Synapse.Api.Items.SynapseItem item, short chance, bool preference) : this(item.ID, item.Durabillity, item.Barrel, item.Sight, item.Other, item.Scale, chance, preference) { }
+
+        public SerializedPlayerItem(int id, float durabillity, int barrel, int sight, int other, Vector3 scale, short chance, bool preference)
+        {
+            ID = id;
+            Durabillity = durabillity;
+            Barrel = barrel;
+            Sight = sight;
+            Other = other;
+            XSize = scale.x;
+            YSize = scale.y;
+            ZSize = scale.z;
+            Chance = chance;
+            UsePreferences = preference;
+        }
+
+        public short Chance { get; set; }
+        public bool UsePreferences { get; set; }
+
+        public SynapseItem Apply(Player player)
+        {
+            var item = new Api.Items.SynapseItem(ID, Durabillity, Sight, Barrel, Other) 
+            { 
+                Scale = new Vector3(XSize, YSize, ZSize) 
+            };
+
+            if (UsePreferences)
+            {
+                item.Sight = player.GetSightPreference(item.ItemType);
+                item.Barrel = player.GetBarrelPreference(item.ItemType);
+                item.Other = player.GetOtherPreference(item.ItemType);
+            }
+
+            if(UnityEngine.Random.Range(1f,100f) <= Chance)
+                item.PickUp(player);
+
+            return item;
+        }
+    }
+
+    [Serializable]
+    public class SerializedAmmo
+    {
+        public SerializedAmmo() { }
+
+        public SerializedAmmo(uint ammo5, uint ammo7, uint ammo9)
+        {
+            Ammo5 = ammo5;
+            Ammo7 = ammo7;
+            Ammo9 = ammo9;
+        }
+
+        public uint Ammo5 { get; set; }
+        public uint Ammo7 { get; set; }
+        public uint Ammo9 { get; set; }
+
+        public void Apply(Player player)
+        {
+            player.Ammo5 = Ammo5;
+            player.Ammo7 = Ammo7;
+            player.Ammo9 = Ammo9;
+        }
+    }
+
+    [Serializable]
+    public class SerializedPlayerInventory
+    {
+        public List<SerializedPlayerItem> Items { get; set; }
+
+        public SerializedAmmo Ammo { get; set; }
+
+        public void Apply(Player player)
+        {
+            player.Inventory.Clear();
+
+            foreach (var item in Items)
+                item.Apply(player);
+
+            Ammo.Apply(player);
+        }
     }
 
     [Serializable]

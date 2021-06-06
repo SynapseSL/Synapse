@@ -6,25 +6,25 @@ using Synapse.Api.Enum;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 {
-    [HarmonyPatch(typeof(Recontainer079),nameof(Recontainer079._Recontain))]
-    internal static class Scp079RecontainPatch
-    {
-        private static bool Prefix(out IEnumerator<float> __result, bool forced)
-        {
+	[HarmonyPatch(typeof(Recontainer079), nameof(Recontainer079._Recontain))]
+	internal static class Scp079RecontainPatch
+	{
+		private static bool Prefix(out IEnumerator<float> __result, bool forced)
+		{
 			__result = OverrideRecontain(forced);
 			return false;
 		}
 
-        private static IEnumerator<float> OverrideRecontain(bool forced)
-        {
+		private static IEnumerator<float> OverrideRecontain(bool forced)
+		{
 			var ev = SynapseController.Server.Events.Scp.Scp079;
-            try
-            {
+			try
+			{
 				ev.Invoke079RecontainEvent(Recontain079Status.Initialize, out var allow);
 				if (!allow) yield break;
-            }
-			catch(Exception e)
-            {
+			}
+			catch (Exception e)
+			{
 				Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp079RecontainEvent initializing failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
 			}
 
@@ -88,20 +88,19 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 			{
 				foreach (var door in Synapse.Api.Map.Get.Doors)
 				{
-					Scp079Interactable scp079Interactable;
-					if (door.VDoor is Interactables.Interobjects.BasicDoor && door.VDoor.TryGetComponent(out scp079Interactable))
-					{
-						var zone = scp079Interactable.currentZonesAndRooms.FirstOrDefault();
-						if (zone == null || zone.currentZone != "HeavyRooms") continue;
+                    if (door.VDoor is Interactables.Interobjects.BasicDoor && door.VDoor.TryGetComponent(out Scp079Interactable scp079Interactable))
+                    {
+                        var zone = scp079Interactable.currentZonesAndRooms.FirstOrDefault();
+                        if (zone == null || zone.currentZone != "HeavyRooms") continue;
 
-						lockedDoors.Add(door.VDoor);
-						door.VDoor.NetworkTargetState = false;
-						door.VDoor.ServerChangeLock(Interactables.Interobjects.DoorUtils.DoorLockReason.NoPower, true);
-					}
-				}
+                        lockedDoors.Add(door.VDoor);
+                        door.VDoor.NetworkTargetState = false;
+                        door.VDoor.ServerChangeLock(Interactables.Interobjects.DoorUtils.DoorLockReason.NoPower, true);
+                    }
+                }
 			}
-			catch(Exception e)
-            {
+			catch (Exception e)
+			{
 				Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp079RecontainEvent lock Door failed!!\n{e}");
 			}
 
@@ -116,13 +115,13 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 				j = i;
 			}
 
-            try
-            {
+			try
+			{
 				foreach (Interactables.Interobjects.DoorUtils.DoorVariant doorVariant2 in lockedDoors)
 					doorVariant2.ServerChangeLock(Interactables.Interobjects.DoorUtils.DoorLockReason.NoPower, false);
 			}
-			catch(Exception e)
-            {
+			catch (Exception e)
+			{
 				Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp079RecontainEvent unlock door failed!!\n{e}");
 			}
 
@@ -140,5 +139,5 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 
 			yield break;
 		}
-    }
+	}
 }

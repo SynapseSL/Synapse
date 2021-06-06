@@ -34,8 +34,14 @@ namespace Synapse.Command.Commands
                         $"\nKickPower: {group.KickPower}" +
                         $"\nRequiredKickPower: {group.RequiredKickPower}" +
                         $"\nPermissions:";
+
                     foreach (var perm in group.Permissions)
                         result.Message += $"\n    - {perm}";
+
+                    result.Message += $"\nInheritance:";
+                    foreach (var inherit in group.Inheritance)
+                        result.Message += $"\n    - {inherit}";
+
                     break;
 
                 case "GROUPS":
@@ -100,11 +106,39 @@ namespace Synapse.Command.Commands
                     }
                     break;
 
+                case "DELETE":
+                    if (!context.Player.HasPermission("synapse.permission.delete"))
+                    {
+                        result.Message = "You don't have permission to delete groups (synapse.permission.delete)";
+                        result.State = CommandResultState.NoPermission;
+                        break;
+                    }
+
+                    if (context.Arguments.Count < 2) return new CommandResult
+                    {
+                        Message = "Missing group name",
+                        State = CommandResultState.Error
+                    };
+
+                    if (Server.Get.PermissionHandler.DeleteServerGroup(context.Arguments.At(1)))
+                        return new CommandResult
+                        {
+                            Message = "Group successfully deleted",
+                            State = CommandResultState.Ok
+                        };
+                    else
+                        return new CommandResult
+                        {
+                            Message = "No Group with that Name was found",
+                            State = CommandResultState.Error
+                        };
+
                 default:
                     result.Message = "All Permission Commands:" +
                         "\nPermission me - Gives you information about your Role" +
                         "\nPermission groups - Gives you a List of All Groups" + 
-                        "\nPermission setgroup {Group} {UserID} - Sets a User group";
+                        "\nPermission setgroup {Group} {UserID} - Sets a User group" +
+                        "\nPermission delte {Group}";
                     result.State = CommandResultState.Ok;
                     break;
             }

@@ -7,6 +7,8 @@ namespace Synapse.Api
 {
     public class Round
     {
+        public static Round Get => Map.Get.Round;
+
         internal Round() { }
 
         private RoundSummary Rs => RoundSummary.singleton;
@@ -50,6 +52,18 @@ namespace Synapse.Api
             set => RoundSummary.kills_by_scp = value;
         }
 
+        public int MtfTickets
+        {
+            get => RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox);
+            set => RespawnTickets.Singleton._tickets[SpawnableTeamType.NineTailedFox] = value;
+        }
+
+        public int ChaosTickets
+        {
+            get => RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.ChaosInsurgency);
+            set => RespawnTickets.Singleton._tickets[SpawnableTeamType.ChaosInsurgency] = value;
+        }
+
         internal bool Forceend { get; set; } = false;
 
         public TimeSpan RoundLength => RoundStart.RoundLenght;
@@ -63,6 +77,10 @@ namespace Synapse.Api
         public void EndRound() => Forceend = true;
 
         public void RestartRound() => Server.Get.Host.PlayerStats.Roundrestart();
+
+        public void SpawnVehicle(bool IsCI = false) => RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.Selection, IsCI ? SpawnableTeamType.ChaosInsurgency : SpawnableTeamType.NineTailedFox);
+
+        public void PlayChaosSpawnSound() => RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.UponRespawn, SpawnableTeamType.ChaosInsurgency);
 
         public void DimScreens() => Rs.RpcDimScreen();
 

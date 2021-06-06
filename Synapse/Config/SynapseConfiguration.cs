@@ -5,8 +5,6 @@ using Synapse.Network;
 
 namespace Synapse.Config
 {
-    [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
-    [SuppressMessage("ReSharper", "ConvertToConstant.Global")]
     public class SynapseConfiguration : AbstractConfigSection
     {
         [Description("If Enabled FF will be enabled for all Roles at the Round End")]
@@ -62,7 +60,7 @@ namespace Synapse.Config
         public bool NameTracking = true;
 
         [Description("Enables the Networking Capabilites of Synapse")]
-        public bool NetworkEnable = true;
+        public bool NetworkEnable = false;
 
         [Description("The name of the client which will be visible in logs")]
         public string NetworkName = $"SynapseServer-{TokenFactory.Instance.GenerateToken(4)}";

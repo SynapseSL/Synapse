@@ -8,6 +8,8 @@ namespace Synapse.Api
 {
     public class Scp914
     {
+        public static Scp914 Get => Map.Get.Scp914;
+
         internal Scp914() { }
 
         public Scp914Knob KnobState

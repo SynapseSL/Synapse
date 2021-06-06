@@ -14,7 +14,9 @@ namespace Synapse.Permission
 
         internal readonly Dictionary<string, SynapseGroup> groups = new Dictionary<string, SynapseGroup>();
         internal ServerSection serverSection;
-        
+
+        public static PermissionHandler Get => Server.Get.PermissionHandler;
+
         public Dictionary<string, SynapseGroup> Groups { get => new Dictionary<string, SynapseGroup>(groups); }
 
         internal void Init()
@@ -54,6 +56,7 @@ namespace Synapse.Permission
                     Hidden = true,
                     KickPower = 254,
                     Members = new List<string> { "0000000@steam" },
+                    Inheritance = new List<string> { "User" },
                     Permissions = new List<string> { "*" },
                     RemoteAdmin = true,
                     RequiredKickPower = 255
@@ -72,9 +75,44 @@ namespace Synapse.Permission
         {
             group = _permissionSYML.GetOrSetDefault(groupname, group);
             groups.Add(groupname,group);
+            Reload();
         }
 
-        public SynapseGroup GetServerGroup(string groupname) => groups.FirstOrDefault(x => x.Key.ToLower() == groupname.ToLower()).Value;
+        public bool DeleteServerGroup(string groupname)
+        {
+            if(groupname.ToLower() == "server")
+                return false;
+
+            if (!_permissionSYML.Sections.Any(x => x.Key.ToLower() == groupname.ToLower()))
+                return false;
+
+            _permissionSYML.Sections.Remove(_permissionSYML.Sections.First(x => x.Key.ToLower() == groupname.ToLower()).Key);
+            _permissionSYML.Store();
+            Reload();
+
+            return true;
+        }
+
+        public bool ModifyServerGroup(string groupname, SynapseGroup group)
+        {
+            if (groupname.ToLower() == "server")
+                return false;
+
+            if (!_permissionSYML.Sections.Any(x => x.Key.ToLower() == groupname.ToLower()))
+                return false;
+
+            _permissionSYML.Sections.First(x => x.Key.ToLower() == groupname.ToLower()).Value.Import(group);
+            _permissionSYML.Store();
+            Reload();
+
+            return true;
+        }
+
+        public SynapseGroup GetServerGroup(string groupname)
+        {
+            if (!Groups.Keys.Any(x => x.ToLower() == groupname.ToLower())) return null;
+            return groups.FirstOrDefault(x => x.Key.ToLower() == groupname.ToLower()).Value;
+        }
 
         public SynapseGroup GetPlayerGroup(Player player)
         {
@@ -118,6 +156,7 @@ namespace Synapse.Permission
                 Default = true,
                 Permissions = new List<string> { "synapse.command.help", "synapse.command.plugins" },
                 Members = null,
+                Inheritance = null,
             };
         }
 

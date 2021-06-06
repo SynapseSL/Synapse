@@ -5,7 +5,7 @@ namespace Synapse.Api.Items
 {
     public class PlayerInventory
     {
-        private Player player;
+        private readonly Player player;
 
         internal PlayerInventory(Player player1) => player = player1;
 
@@ -14,7 +14,7 @@ namespace Synapse.Api.Items
             get => player.VanillaInventory.items[index].GetSynapseItem();
         }
 
-        public List<Items.SynapseItem> Items => Map.Get.Items.Where(x => x.ItemHolder == player).ToList();
+        public List<Items.SynapseItem> Items => player.VanillaInventory.items.Select(x => x.GetSynapseItem()).ToList();
 
         public void AddItem(Items.SynapseItem item)
         {

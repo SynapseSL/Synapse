@@ -32,7 +32,7 @@ namespace Synapse.Network
             {
                 ClientName = synapseConfig.NetworkName,
                 Secret = synapseConfig.NetworkSecret,
-                Url = synapseConfig.NetworkUrl
+                Url = synapseConfig.NetworkUrl.Split(';')[0]
             };
             Client.Init();
             ReconnectLoop = new ReconnectLoop(synapseConfig);

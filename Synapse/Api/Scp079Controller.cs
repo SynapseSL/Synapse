@@ -6,31 +6,31 @@
 
         private readonly Player player;
 
-        private Scp079PlayerScript script => player.ClassManager.Scp079;
+        private Scp079PlayerScript Script => player.ClassManager.Scp079;
 
+        internal bool Spawned { get; set; }
 
         public bool Is079 => player.RoleType == RoleType.Scp079;
 
-        public byte Level { get => (byte)(script.Lvl + 1); set => script.Lvl = (byte)(value - 1); }
+        public byte Level { get => (byte)(Script.Lvl + 1); set => Script.Lvl = (byte)(value - 1); }
 
-        public string Speaker { get => script.Speaker; set => script.Speaker = value; }
+        public string Speaker { get => Script.Speaker; set => Script.Speaker = value; }
 
-        public float Exp { get => script.Exp; set => script.Exp = value; }
+        public float Exp { get => Script.Exp; set => Script.Exp = value; }
 
-        public float Energy { get => script.Mana; set => script.Mana = value; }
+        public float Energy { get => Script.Mana; set => Script.Mana = value; }
 
-        public float MaxEnergy { get => script.maxMana; set => script.NetworkmaxMana = value; }
+        public float MaxEnergy { get => Script.maxMana; set => Script.NetworkmaxMana = value; }
 
         /// <summary>
         /// The current camera the player uses (Scp079 only, if not null)
         /// </summary>
-        public Camera079 Camera { get => script.currentCamera; set => script?.RpcSwitchCamera(value.cameraId, false); }
+        public Camera Camera { get => Script.currentCamera.GetSynapseCamera(); set => Script?.RpcSwitchCamera(value.ID, false); }
 
+        public void GiveExperience(float amount) => Script.AddExperience(amount);
 
-        public void GiveExperience(float amount) => script.AddExperience(amount);
+        public void ForceLevel(byte levelToForce, bool notifiyUser) => Script.ForceLevel(levelToForce, notifiyUser);
 
-        public void ForceLevel(byte levelToForce, bool notifiyUser) => script.ForceLevel(levelToForce, notifiyUser);
-
-        public void UnlockDoors() => script.CmdResetDoors();
+        public void UnlockDoors() => Script.CmdResetDoors();
     }
 }

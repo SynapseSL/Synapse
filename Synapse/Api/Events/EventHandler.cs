@@ -1,10 +1,5 @@
 ﻿using Synapse.Config;
 using UnityEngine;
-using System.Linq;
-using MEC;
-using RemoteAdmin;
-using System.Collections.Generic;
-using System;
 
 namespace Synapse.Api.Events
 {
@@ -24,32 +19,10 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    var dummy = new Dummy(ev.Player.Position, ev.Player.transform.rotation, ev.Player.RoleType);
+                    ev.Player.Scp096Controller.MaxShield = 10000;
+                    ev.Player.Scp096Controller.CurMaxShield = 10000;
+                    ev.Player.Scp096Controller.ShieldAmount = 10000;
                     break;
-            }
-        }
-
-        private IEnumerator<float> Walk(Dummy dummy, float speed)
-        {
-            yield return Timing.WaitForSeconds(1f);
-
-            dummy.Player.AnimationController.Networkspeed = new Vector2(speed, 0f);
-            dummy.Player.AnimationController.Network_curMoveState = (byte)PlayerMovementState.Walking;
-            for (; ; )
-            {
-                try
-                {
-                    var pos = dummy.Position + dummy.Player.CameraReference.forward / 10 * speed;
-                    if (!Physics.Linecast(dummy.Position, pos, dummy.Player.PlayerMovementSync.CollidableSurfaces))
-                    {
-                        dummy.Player.PlayerMovementSync.OverridePosition(pos, dummy.Player.PlayerMovementSync.Rotations.y, true);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Logger.Get.Error(e);
-                }
-                yield return Timing.WaitForSeconds(0.1f);
             }
         }
 
@@ -84,10 +57,8 @@ namespace Synapse.Api.Events
 
         private void PlayerSyncData(SynapseEventArguments.PlayerSyncDataEventArgs ev)
         {
-            if (ev.Player.RoleType != RoleType.ClassD &&
-                ev.Player.RoleType != RoleType.Scientist &&
-                !(Vector3.Distance(ev.Player.Position, ev.Player.GetComponent<Escape>().worldPosition) >= Escape.radius))
-                ev.Player.ClassManager.CmdRegisterEscape();
+            if (Vector3.Distance(ev.Player.Position, ev.Player.Escape.worldPosition) < Escape.radius)
+                ev.Player.TriggerEscape();
         }
 #endregion
     }

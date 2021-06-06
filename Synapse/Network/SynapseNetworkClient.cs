@@ -51,8 +51,10 @@ namespace Synapse.Network
 
         public void Init()
         {
-            Client = new HttpClient();
-            Client.BaseAddress = new Uri(Url);
+            Client = new HttpClient
+            {
+                BaseAddress = new Uri(Url)
+            };
             PrivateKey = RSA.Create();
             CipherKey = TokenFactory.Instance.GenerateShortToken();
             PublicKey = PrivateKey.ToXmlString(false);
@@ -147,7 +149,7 @@ namespace Synapse.Network
 
                 return (PingResponse) await Task.FromResult<object>(null);
             }
-            catch (Exception e)
+            catch
             {
                 return (PingResponse) await Task.FromResult<object>(null);
             }
@@ -211,7 +213,7 @@ namespace Synapse.Network
             }
         }
 
-        public async void Disconnect()
+        public void Disconnect()
         {
             IsStarted = false;
             SyncVarThread.Stop();
@@ -347,9 +349,11 @@ namespace Synapse.Network
             var exc = exceptionHandler ?? (x => Server.Get.Logger.Error(x));
             try
             {
-                var message = new HttpRequestMessage();
-                message.RequestUri = new Uri(Url + path);
-                message.Method = HttpMethod.Get;
+                var message = new HttpRequestMessage
+                {
+                    RequestUri = new Uri(Url + path),
+                    Method = HttpMethod.Get
+                };
                 if (authenticated)
                     message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", SessionToken);
                 if (headers != null)
@@ -379,10 +383,12 @@ namespace Synapse.Network
             try
             {
                 var data = encodeBody ? Json.Serialize(body) : body.ToString();
-                var message = new HttpRequestMessage();
-                message.RequestUri = new Uri(Url + path);
-                message.Method = HttpMethod.Post;
-                message.Content = new StringContent(data);
+                var message = new HttpRequestMessage
+                {
+                    RequestUri = new Uri(Url + path),
+                    Method = HttpMethod.Post,
+                    Content = new StringContent(data)
+                };
 
 #if DEBUG
                 Server.Get.Logger.Info($"<<< {data}");
@@ -425,7 +431,7 @@ namespace Synapse.Network
                         return (TR) await Task.FromResult<object>(null);
                     }
                 }
-                catch (Exception ignored)
+                catch
                 {
                 }
 

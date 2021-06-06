@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Hints;
@@ -32,9 +31,28 @@ namespace Synapse.Api
             GrenadeManager = GetComponent<Grenades.GrenadeManager>();
             GameConsoleTransmission = this.GetComponent<GameConsoleTransmission>();
             MicroHID = GetComponent<MicroHID>();
+            DissonanceUserSetup = this.GetComponent<Assets._Scripts.Dissonance.DissonanceUserSetup>();
+            Radio = this.GetComponent<Radio>();
+            Escape = this.GetComponent<Escape>();
         }
 
         #region Methods
+        public int GetSightPreference(ItemType item) => GetPreference(item, 0);
+
+        public int GetBarrelPreference(ItemType item) => GetPreference(item, 1);
+
+        public int GetOtherPreference(ItemType item) => GetPreference(item, 2);
+
+        private int GetPreference(ItemType item, int type)
+        {
+            for (int i = 0; i < WeaponManager.weapons.Length; i++)
+            {
+                if (WeaponManager.weapons[i].inventoryID == item)
+                    return WeaponManager.modPreferences[i, type];
+            }
+            return 0;
+        }
+
         public void Kick(string message) => ServerConsole.Disconnect(gameObject, message);
 
         public void Ban(int duration, string reason, string issuer = "Plugin") => SynapseController.Server.GetObjectOf<BanPlayer>().BanUser(gameObject, duration, reason, issuer);
@@ -102,7 +120,11 @@ namespace Synapse.Api
 
         public void AddDisplayInfo(PlayerInfoArea playerInfo) => NicknameSync.Network_playerInfoToShow |= playerInfo;
 
-        public void ExecuteCommand(string command, bool RA = true) => GameCore.Console.singleton.TypeCommand(RA ? "/" : "" + command, CommandSender);
+        public void ExecuteCommand(string command, bool RA = true)
+        {
+            if (RA) RemoteAdmin.CommandProcessor.ProcessQuery(command, CommandSender);
+            else QueryProcessor.ProcessGameConsoleQuery(command, true);
+        }
 
         public void SendToServer(ushort port)
         {
@@ -458,6 +480,12 @@ namespace Synapse.Api
             set => ClassManager.DeathTime = value;
         }
 
+        public PlayerMovementState MovementState
+        {
+            get => (PlayerMovementState)AnimationController.Network_curMoveState;
+            set => AnimationController.Network_curMoveState = (byte)value;
+        }
+
         public Vector3 Scale
         {
             get => transform.localScale;
@@ -548,10 +576,6 @@ namespace Synapse.Api
             get => Handcuffs.CufferId == -1 && Hub.handcuffs.NetworkForceCuff ? Server.Get.Host : SynapseController.Server.GetPlayer(Handcuffs.CufferId);
             set
             {
-                var handcuff = value.Handcuffs;
-
-                if (handcuff == null) return;
-
                 if (value == null)
                 {
                     Handcuffs.NetworkCufferId = -1;
@@ -741,7 +765,23 @@ namespace Synapse.Api
 
         public Fraction RealFraction => Misc.GetFraction(RealTeam);
 
-        public Items.SynapseItem ItemInHand => Map.Get.Items.FirstOrDefault(x => x.State == ItemState.Inventory && x.itemInfo.uniq == VanillaInventory.itemUniq);
+        public Items.SynapseItem ItemInHand
+        {
+            get => Map.Get.Items.FirstOrDefault(x => x.State == ItemState.Inventory && x.itemInfo.uniq == VanillaInventory.itemUniq);
+            set
+            {
+                if (value != null && value.ItemHolder != this) return;
+                
+                for(int i = 0; i < 50; i++)
+                {
+                    MEC.Timing.CallDelayed(i / 100, () =>
+                      {
+                          VanillaInventory.NetworkitemUniq = value == null? -1 : value.itemInfo.uniq;
+                          VanillaInventory.Network_curItemSynced = value == null? ItemType.None : value.ItemType;
+                      });
+                }
+            }
+        }
 
         public NetworkConnection Connection => ClassManager.Connection;
 
@@ -753,11 +793,17 @@ namespace Synapse.Api
 
         public NetworkIdentity NetworkIdentity => Hub.networkIdentity;
 
+        public Assets._Scripts.Dissonance.DissonanceUserSetup DissonanceUserSetup { get; }
+
+        public Radio Radio { get; }
+
         public MicroHID MicroHID { get; }
 
         public GameConsoleTransmission GameConsoleTransmission { get; }
 
         public Grenades.GrenadeManager GrenadeManager { get; }
+
+        public Escape Escape { get; }
 
         public LocalCurrentRoomEffects LocalCurrentRoomEffects => Hub.localCurrentRoomEffects;
 
@@ -821,5 +867,96 @@ namespace Synapse.Api
         #endregion
 
         public override string ToString() => NickName;
+
+        public void TriggerEscape()
+        {
+            if (CustomRole == null)
+            {
+                var newRole = -1;
+                var allow = true;
+                var changeTeam = false;
+
+                if (Handcuffs.ForceCuff && CharacterClassManager.ForceCuffedChangeTeam)
+                    changeTeam = true;
+
+                if (IsCuffed && CharacterClassManager.CuffedChangeTeam)
+                {
+                    switch (RoleID)
+                    {
+                        case (int)RoleType.Scientist when Cuffer.Fraction == Fraction.FoundationEnemy:
+                            changeTeam = true;
+                            break;
+
+                        case (int)RoleType.ClassD when Cuffer.Fraction == Fraction.FoundationStaff:
+                            changeTeam = true;
+                            break;
+                    }
+                }
+
+                switch (RoleID)
+                {
+                    case (int)RoleType.ClassD when changeTeam:
+                        newRole = (int)RoleType.NtfCadet;
+                        break;
+
+                    case (int)RoleType.ClassD:
+                    case (int)RoleType.Scientist when changeTeam:
+                        newRole = (int)RoleType.ChaosInsurgency;
+                        break;
+
+                    case (int)RoleType.Scientist:
+                        newRole = (int)RoleType.NtfScientist;
+                        break;
+                }
+
+                if (newRole < 0) allow = false;
+
+                var isClassD = RoleID == (int)RoleType.ClassD;
+
+                Server.Get.Events.Player.InvokePlayerEscapeEvent(this, ref newRole, ref isClassD, ref changeTeam, ref allow);
+
+                if (newRole < 0 || !allow) return;
+
+                if (newRole >= -1 && newRole <= RoleManager.HighestRole)
+                    ClassManager.SetPlayersClass((RoleType)newRole, gameObject, false, true);
+                else
+                    RoleID = newRole;
+
+                Escape.TargetShowEscapeMessage(Connection, isClassD, changeTeam);
+
+                var tickets = Respawning.RespawnTickets.Singleton;
+                switch (RealTeam)
+                {
+                    case Team.MTF when changeTeam:
+                        RoundSummary.escaped_scientists++;
+                        tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
+                            GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_mtf_classd_cuffed_count", 1), false);
+                        break;
+
+                    case Team.MTF:
+                        RoundSummary.escaped_scientists++;
+                        tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
+                            GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_mtf_scientist_count", 1), false);
+                        break;
+
+                    case Team.CHI when changeTeam:
+                        RoundSummary.escaped_ds++;
+                        tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
+                            GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_ci_scientist_cuffed_count", 1), false);
+                        break;
+
+                    case Team.CHI:
+                        RoundSummary.escaped_ds++;
+                        tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
+                            GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_ci_classd_count", 1), false);
+                        break;
+                }
+            }
+            else
+            {
+                CustomRole.Escape();
+                return;
+            }
+        }
     }
 }

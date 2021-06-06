@@ -29,20 +29,20 @@ namespace SynapseInjector
 
                 var synapseAssembly = Assembly.Load(File.ReadAllBytes(Path.Combine(synapsepath, "Synapse.dll")));
 
-                printBanner(synapseAssembly, dependencyAssemblies);
+                PrintBanner(synapseAssembly, dependencyAssemblies);
 
                 InvokeAssembly(synapseAssembly);
             }
             catch(Exception e)
             {
-                ServerConsole.AddLog($"SynapseLoader: Error occured while loading Synapse please fix it and restart your Server:\n{e}", ConsoleColor.Red);
+                ServerConsole.AddLog($"SynapseLoader: Error occured while loading the assemblies. Please check if all required dll are installed. If you can't fix it join our Discord and show us this Error:\n{e}", ConsoleColor.Red);
             }
         }
 
         /// <summary>
         /// Print Synapse Banner and Version Information
         /// </summary>
-        private static void printBanner(Assembly syn, List<Assembly> dep)
+        private static void PrintBanner(Assembly syn, List<Assembly> dep)
         {
             ServerConsole.AddLog(
                 "\nLoading Synapse...\n" +
@@ -75,7 +75,7 @@ namespace SynapseInjector
             }
             catch (Exception e)
             {
-                ServerConsole.AddLog(e.ToString(), ConsoleColor.Red);
+                ServerConsole.AddLog($"SynapseLoader: Error while Loading Synapse! Please check your synapse and game version. If you can't fix it join our Discord and show us this Error:\n{e}", ConsoleColor.Red);
             }
         }
     }

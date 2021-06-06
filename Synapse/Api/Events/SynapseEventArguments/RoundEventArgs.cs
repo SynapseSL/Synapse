@@ -27,27 +27,21 @@ namespace Synapse.Api.Events.SynapseEventArguments
         {
             get
             {
-                switch (team)
+                return team switch
                 {
-                    case 1: return Respawning.SpawnableTeamType.NineTailedFox;
-                    case 2: return Respawning.SpawnableTeamType.ChaosInsurgency;
-                    default: return Respawning.SpawnableTeamType.None;
-                }
+                    1 => Respawning.SpawnableTeamType.NineTailedFox,
+                    2 => Respawning.SpawnableTeamType.ChaosInsurgency,
+                    _ => Respawning.SpawnableTeamType.None,
+                };
             }
             set
             {
-                switch (value)
+                team = value switch
                 {
-                    case Respawning.SpawnableTeamType.NineTailedFox:
-                        team = 1;
-                        break;
-                    case Respawning.SpawnableTeamType.ChaosInsurgency:
-                        team = 2;
-                        break;
-                    default:
-                        team = -1;
-                        break;
-                }
+                    Respawning.SpawnableTeamType.NineTailedFox => 1,
+                    Respawning.SpawnableTeamType.ChaosInsurgency => 2,
+                    _ => -1,
+                };
             }
         }
 

@@ -8,7 +8,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     [HarmonyPatch(typeof(AnimationController), nameof(AnimationController.CallCmdSyncData))]
     public class SyncDataPatch
     {
-        public static bool Prefix(AnimationController __instance, int state, ref Vector2 v2)
+        public static bool Prefix(AnimationController __instance)
         {
             try
             {

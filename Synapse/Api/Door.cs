@@ -83,6 +83,8 @@ namespace Synapse.Api
 
         public bool IsBreakable => VDoor is BreakableDoor;
 
+        public bool IsDestroyed => VDoor is BreakableDoor bd && bd.IsDestroyed;
+
         public bool IsPryable => VDoor is PryableDoor;
 
         public bool Open

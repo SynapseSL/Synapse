@@ -7,6 +7,8 @@ namespace Synapse.Api.Teams
 {
     public class TeamManager
     {
+        public static TeamManager Get => Server.Get.TeamManager;
+
         internal TeamManager() { }
 
         private readonly List<ISynapseTeam> teams = new List<ISynapseTeam>();

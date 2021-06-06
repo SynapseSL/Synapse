@@ -1,6 +1,7 @@
 ﻿using Synapse.Api.Enum;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Synapse.Api
 {
@@ -12,6 +13,9 @@ namespace Synapse.Api
             RoomType = info.CurrentRoomType;
             GameObject = gameObject;
             LightController = GameObject.GetComponentInChildren<FlickerableLightController>();
+
+            foreach (var cam in GameObject.GetComponentsInChildren<Camera079>())
+                Cameras.Add(new Camera(cam,this));
         }
 
         internal FlickerableLightController LightController { get; set; }
@@ -29,6 +33,8 @@ namespace Synapse.Api
         public string RoomName => GameObject.name;
 
         public List<Door> Doors { get; } = new List<Door>();
+
+        public List<Camera> Cameras { get; } = new List<Camera>();
 
         public ZoneType Zone
         {

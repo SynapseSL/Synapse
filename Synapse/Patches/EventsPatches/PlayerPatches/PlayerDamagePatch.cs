@@ -314,6 +314,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 					victim.CustomRole = null;
 					foreach (var larry in Server.Get.Players.Where(x => x.Scp106Controller.PocketPlayers.Contains(victim)))
 						larry.Scp106Controller.PocketPlayers.Remove(victim);
+
+					if (victim.IsDummy)
+						Map.Get.Dummies.FirstOrDefault(x => x.Player == victim).Destroy();
 				}
 				else
 				{

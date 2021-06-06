@@ -25,7 +25,7 @@ namespace Synapse.Network.Routes
                     if (clientData == null) return StatusedResponse.Unauthorized;
                     return new StatusListWrapper<NetworkSyncEntry>(SynapseNetworkServer.GetServer.NetworkSyncEntries);
                 }
-                catch (InvalidOperationException e)
+                catch
                 {
                     return StatusedResponse.Unauthorized;
                 }
@@ -36,7 +36,7 @@ namespace Synapse.Network.Routes
                 if (clientData == null) return StatusedResponse.Unauthorized;
                 return SynapseNetworkServer.GetServer.NetworkSyncEntries.First(x => x.Key == key);
             }
-            catch (InvalidOperationException e)
+            catch
             {
                 return StatusedResponse.NotFound;
             }
@@ -60,7 +60,7 @@ namespace Synapse.Network.Routes
 
                 return StatusedResponse.Success;
             }
-            catch (Exception e)
+            catch
             {
                 return new ErrorStatus("");
             }
@@ -78,7 +78,7 @@ namespace Synapse.Network.Routes
                     if (target == null) return new NotFoundStatus();
                     return new StatusListWrapper<KeyValueObjectWrapper>(target.SyncEntries);
                 }
-                catch (InvalidOperationException e)
+                catch
                 {
                     return StatusedResponse.NotFound;
                 }
@@ -89,7 +89,7 @@ namespace Synapse.Network.Routes
                 if (clientData == null) return StatusedResponse.Unauthorized;
                 return SynapseNetworkServer.GetServer.NetworkSyncEntries.First(x => x.Key == key);
             }
-            catch (InvalidOperationException e)
+            catch
             {
                 return StatusedResponse.NotFound;
             }
@@ -117,7 +117,7 @@ namespace Synapse.Network.Routes
 #endif
                 return StatusedResponse.Success;
             }
-            catch (Exception e)
+            catch
             {
                 return new ErrorStatus("");
             }

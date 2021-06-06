@@ -352,7 +352,8 @@ namespace Synapse
                 }
                 private set => _sharedConfigDirectory = value;
             }
-
+            //Currently should it not be auto generated
+            public string ModuleDirectory { get; set; }
             public string PermissionFile
             {
                 get
@@ -393,6 +394,7 @@ namespace Synapse
                 ConfigDirectory = Path.Combine(MainConfigDirectory, $"server-{ServerStatic.ServerPort}");
                 SharedConfigDirectory = Path.Combine(MainConfigDirectory, "server-shared");
 
+                ModuleDirectory = Path.Combine(SynapseDirectory, "modules");
 
                 var configpath = Path.Combine(ConfigDirectory, "config.syml");
                 ConfigFile = File.Exists(configpath) ? configpath : Path.Combine(SharedConfigDirectory, "config.syml");

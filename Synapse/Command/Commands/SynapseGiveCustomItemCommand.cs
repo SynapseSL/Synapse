@@ -109,8 +109,10 @@ namespace Synapse.Command.Commands
                 return result;
             }
 
-            var item = new Api.Items.SynapseItem(id, durabillity, sight, barrel, other);
-            item.Scale = new UnityEngine.Vector3(xsize, ysize, zsize);
+            var item = new Api.Items.SynapseItem(id, durabillity, sight, barrel, other)
+            {
+                Scale = new UnityEngine.Vector3(xsize, ysize, zsize)
+            };
             player.Inventory.AddItem(item);
 
 

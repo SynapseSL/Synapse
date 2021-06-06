@@ -104,19 +104,17 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 			          "!"
 					}), ServerLogs.ServerLogType.GameEvent, false);
 					RespawnTickets.Singleton.GrantTickets(__instance.NextKnownTeam, -list2.Count * spawnableTeam.TicketRespawnCost, false);
-					Respawning.NamingRules.UnitNamingRule unitNamingRule;
-					if (Respawning.NamingRules.UnitNamingRules.TryGetNamingRule(__instance.NextKnownTeam, out unitNamingRule))
-					{
-						string text;
-						unitNamingRule.GenerateNew(__instance.NextKnownTeam, out text);
-						foreach (ReferenceHub referenceHub2 in list2)
-						{
-							referenceHub2.characterClassManager.NetworkCurSpawnableTeamType = (byte)__instance.NextKnownTeam;
-							referenceHub2.characterClassManager.NetworkCurUnitName = text;
-						}
-						unitNamingRule.PlayEntranceAnnouncement(text);
-					}
-					RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.UponRespawn, __instance.NextKnownTeam);
+                    if (Respawning.NamingRules.UnitNamingRules.TryGetNamingRule(__instance.NextKnownTeam, out var unitNamingRule))
+                    {
+                        unitNamingRule.GenerateNew(__instance.NextKnownTeam, out string text);
+                        foreach (ReferenceHub referenceHub2 in list2)
+                        {
+                            referenceHub2.characterClassManager.NetworkCurSpawnableTeamType = (byte)__instance.NextKnownTeam;
+                            referenceHub2.characterClassManager.NetworkCurUnitName = text;
+                        }
+                        unitNamingRule.PlayEntranceAnnouncement(text);
+                    }
+                    RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.UponRespawn, __instance.NextKnownTeam);
 				}
 				ListPool<ReferenceHub>.Shared.Return(list2);
 				__instance.NextKnownTeam = SpawnableTeamType.None;

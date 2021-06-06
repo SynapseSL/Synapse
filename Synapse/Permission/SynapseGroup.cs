@@ -38,34 +38,53 @@ namespace Synapse.Permission
         [Description("The Permissions which the group has")]
         public List<string> Permissions = new List<string> { };
 
+        [Description("Gives the Group the Permissions of all Groups in this List")]
+        public List<string> Inheritance = new List<string> { };
+
         [Description("The UserID's of the Players in the Group")]
         public List<string> Members = new List<string> { };
 
-        public bool HasPermission(string permission)
+        public bool HasPermission(string permission) => HasPermission(permission, 0);
+
+        public bool HasPermission(string permission,int count)
         {
-            if (permission == null || Permissions == null) return false;
+            if(count > 50) return false;
 
+            if (permission != null && Permissions != null)
+                foreach (var perm in Permissions)
+                {
+                    if (perm == "*" || perm == "*.*" || perm == ".*") return true;
 
-            foreach(var perm in Permissions)
+                    if (permission.ToUpper() == perm.ToUpper()) return true;
+
+                    var args = permission.Split('.');
+                    var args2 = perm.Split('.');
+
+                    if (args.Length == 1 || args2.Length == 1) continue;
+
+                    if (args2[0].ToUpper() == args[0].ToUpper())
+                        for (int i = 1; i < args.Length; i++)
+                        {
+                            if (args.Length < i + 1 || args2.Length < i + 1) break;
+
+                            if (args2[i] == "*") return true;
+
+                            if (args[i].ToUpper() != args2[i].ToUpper()) break;
+                        }
+                }
+
+            if (Inheritance == null) return false;
+
+            foreach (var groupname in Inheritance)
             {
-                if (perm == "*" || perm == "*.*" || perm == ".*") return true;
+                if (groupname == null) continue;
 
-                if (permission.ToUpper() == perm.ToUpper()) return true;
+                var group = PermissionHandler.Get.GetServerGroup(groupname);
+                if (group == null)
+                    continue;
 
-                var args = permission.Split('.');
-                var args2 = perm.Split('.');
-
-                if (args.Length == 1 || args2.Length == 1) continue;
-
-                if (args2[0].ToUpper() == args[0].ToUpper())
-                    for (int i = 1; i < args.Length; i++)
-                    {
-                        if (args.Length < i + 1 || args2.Length < i + 1) break;
-
-                        if (args2[i] == "*") return true;
-
-                        if (args[i].ToUpper() != args2[i].ToUpper()) break;
-                    }
+                if (group.HasPermission(permission, count + 1))
+                    return true;
             }
 
             return false;
@@ -77,30 +96,14 @@ namespace Synapse.Permission
         {
             if (Permissions == null) return 0;
 
-            if (Permissions.Any(x => x == "*" || x == ".*" || x == "*.*" || x == $"{VanillaPrefix}.*"))
-                return FullVanillaPerms();
+            var value = 0ul;
+            foreach(var perm in (PlayerPermissions[])Enum.GetValues(typeof(PlayerPermissions)))
+            {
+                if (HasPermission($"{VanillaPrefix}.{perm}"))
+                    value += (ulong)perm;
+            }
 
-            var vanillaperms = Permissions.Where(x => x.Split('.')[0].ToLower() == VanillaPrefix);
-
-            List<PlayerPermissions> perms = new List<PlayerPermissions>();
-            foreach(var perm in vanillaperms)
-                if (Enum.TryParse<PlayerPermissions>(perm.Split('.')[1], out var permenum))
-                    perms.Add(permenum);
-
-            ulong Permission = 0;
-            foreach (var perm in perms)
-                Permission += (ulong)perm;
-
-            return Permission;
-        }
-
-        private ulong FullVanillaPerms()
-        {
-            ulong fullperm = 0;
-            foreach (var perm in (PlayerPermissions[])Enum.GetValues(typeof(PlayerPermissions)))
-                fullperm += (ulong)perm;
-
-            return fullperm;
+            return value;
         }
 
         private const string VanillaPrefix = "vanilla";

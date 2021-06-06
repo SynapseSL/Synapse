@@ -17,9 +17,20 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 if (!NetworkServer.active)
                     return false;
 
-                if (__instance.refHub.inventory.curItem == ItemType.MicroHID && __instance.GetEnergy() != __instance.Energy)
-                    __instance.ChangeEnergy(__instance.Energy);
-
+                if (__instance.refHub.inventory.curItem == ItemType.MicroHID)
+                {
+                    // The GetEnergy Method can throw a Error when GetItemIndex returns -1.
+                    //This can happen when equiping a micro and drop it so that curItem and itemuniq are not synced for a frame or something like this
+                    try
+                    {
+                        if (__instance.GetEnergy() != __instance.Energy)
+                            __instance.ChangeEnergy(__instance.Energy);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
                 else
                     foreach (var item in __instance.refHub.inventory.items)
                         if (item.id == ItemType.MicroHID)
