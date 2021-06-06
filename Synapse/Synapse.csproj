@@ -113,6 +113,9 @@
     <Compile Include="Client\ClientManager.cs" />
     <Compile Include="Client\ClientPipeline.cs" />
     <Compile Include="Client\Packets.cs" />
+    <Compile Include="Client\Patches\CentralServerCommandPatch.cs" />
+    <Compile Include="Client\Patches\CmdSendTokenPatch.cs" />
+    <Compile Include="Client\Patches\CreateLobbyPatch.cs" />
     <Compile Include="Client\Patches\PipelinePatch.cs" />
     <Compile Include="Client\Patches\PlayerJoinPatch.cs" />
     <Compile Include="Client\Patches\PreAuthenticationPatch.cs" />

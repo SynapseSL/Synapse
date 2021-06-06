@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using JWT.Algorithms;
 using JWT.Builder;
@@ -14,7 +13,6 @@ using Org.BouncyCastle.Utilities.Encoders;
 using Swan;
 using Swan.Formatters;
 using Synapse.Api;
-using Synapse.Api.Events;
 using Synapse.Client.Packets;
 using Synapse.Network;
 using UnityEngine;
@@ -26,9 +24,7 @@ namespace Synapse.Client
 {
     public class ClientManager
     {
-        public static bool isSynapseClientEnabled = true;
-
-        public static ClientManager Singleton = new ClientManager();
+        public static bool IsSynapseClientEnabled { get; private set; }
 
         public static GameObject debugPrefab;
         public static GameObject debugPrefab2;
@@ -49,50 +45,53 @@ namespace Synapse.Client
             return payload;
         }
 
-        public static void Initialise()
+        public void Initialise()
         {
+            IsSynapseClientEnabled = Server.Get.Configs.synapseConfiguration.SynapseServerList;
+
             new SynapseServerListThread().Run();
-            
-            Logger.Get.Info("Loading Bundle");
-            var stream = File.OpenRead("firstaid.bundle");
-            var stream2 = File.OpenRead("environment.bundle");
+
+            Logger.Get.Warn(File.Exists(Path.Combine(Server.Get.Files.BundleDirectory, "firstaid.bundle")));
+            var stream = File.OpenRead(Path.Combine(Server.Get.Files.BundleDirectory,"firstaid.bundle"));
+            var stream2 = File.OpenRead(Path.Combine(Server.Get.Files.BundleDirectory,"environment.bundle"));
             var bundle = AssetBundle.LoadFromStream(stream);
             var bundle2 = AssetBundle.LoadFromStream(stream2);
+
             debugPrefab = bundle.LoadAsset<GameObject>("FirstAidKit_Green.prefab");
             debugPrefab2 = bundle2.LoadAsset<GameObject>("ExampleEnvironment.prefab");
-            
+
             Server.Get.Events.Round.RoundStartEvent += delegate
             {
                 Logger.Get.Info("Spawning Networked Prefab");
-                
+
                 var pos = new Vector3(30, 10, 40);
                 var rot = Quaternion.identity;
                 var obj = Object.Instantiate(debugPrefab, pos, rot);
                 obj.name = "FirstAidTest(1)";
-                
+
                 var pos1 = new Vector3(15, 1000, 60);
                 var rot1 = Quaternion.identity;
                 var obj1 = Object.Instantiate(debugPrefab2, pos1, rot1);
                 obj1.name = "Environment(1)";
-                
+
                 foreach (var player in Server.Get.Players)
                 {
                     ClientPipeline.invoke(player, SpawnPacket.Encode(pos, rot, "FirstAidTest(1)", "FirstAid"));
                     ClientPipeline.invoke(player, SpawnPacket.Encode(pos1, rot1, "Environment(1)", "Environment"));
                 }
-                
+
                 Logger.Get.Info("Spawned Networked Prefab");
             };
-            
+
             Logger.Get.Info("Loading Complete");
-            
-            ClientPipeline.DataReceivedEvent += delegate(Player player, PipelinePacket ev)
+
+            ClientPipeline.DataReceivedEvent += delegate (Player player, PipelinePacket ev)
             {
                 switch (ev.PacketId)
                 {
                     case 1:
                         break;
-                    
+
                     case 10:
                         break;
                     case 11:
@@ -106,16 +105,16 @@ namespace Synapse.Client
         public class SynapseServerListThread : JavaLikeThread
         {
             private WebClient _webClient = new WebClient();
-            
+
             public override async void Run()
             {
-                for (;;)
+                for (; ; )
                 {
                     try
                     {
-                        if (File.Exists("serverlist.token"))
+                        if (File.Exists(Server.Get.Files.ServerTokenFile))
                         {
-                            var token = File.ReadAllText("serverlist.token");
+                            var token = File.ReadAllText(Server.Get.Files.ServerTokenFile);
                             _webClient.Headers.Clear();
                             _webClient.Headers.Add("User-Agent", "SynapseServerClient");
                             _webClient.Headers.Add("Content-Type", "application/json");
@@ -134,7 +133,6 @@ namespace Synapse.Client
                         Logger.Get.Error("Error when trying to mark server to serverlist: " + e.ToString());
                     }
                     await Task.Delay(1000 * 10);
-                    
                 }
             }
         }
@@ -145,12 +143,12 @@ namespace Synapse.Client
             public int maxPlayers { get; set; }
             public string info { get; set; }
         }
-        
+
         public Dictionary<String, ClientConnectionData> Clients { get; set; } =
             new Dictionary<string, ClientConnectionData>();
     }
-    
-    
+
+
     public class ClientConnectionData
     {
         //JWT Subject == Name

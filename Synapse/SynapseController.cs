@@ -15,6 +15,8 @@ public class SynapseController
 
     public static Handlers CommandHandlers { get; } = new Handlers();
 
+    public static ClientManager ClientManager { get; } = new ClientManager();
+
     public static void Init()
     {
         ServerConsole.AddLog("Welcome to Synapse! :)", ConsoleColor.Cyan);
@@ -32,13 +34,11 @@ public class SynapseController
         try
         {
             Server.Configs.Init();
-            Synapse.Client.ClientManager.Initialise();
+            ClientManager.Initialise();
             Server.PermissionHandler.Init();
             Server.RoleManager.Init();
             CommandHandlers.RegisterSynapseCommands();
             Server.NetworkManager.Start();
-            
-            ClientManager.Initialise();
 
             PluginLoader.ActivatePlugins();
         }

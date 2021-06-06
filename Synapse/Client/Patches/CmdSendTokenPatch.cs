@@ -8,7 +8,7 @@ namespace Synapse.Client.Patches
     {
         private static bool Prefix()
         {
-            if (ClientManager.isSynapseClientEnabled) return false;
+            if (ClientManager.IsSynapseClientEnabled) return false;
             return true;
         }
     }
