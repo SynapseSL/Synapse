@@ -31,6 +31,7 @@ public class SynapseController
         try
         {
             Server.Configs.Init();
+            Synapse.Client.ClientManager.Initialise();
             Server.PermissionHandler.Init();
             Server.RoleManager.Init();
             CommandHandlers.RegisterSynapseCommands();

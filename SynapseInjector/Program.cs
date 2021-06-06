@@ -100,14 +100,14 @@ namespace SynapseInjector
             {
                 foreach (var type in module.Types)
                 {
-                    if (type.Name == "CustomNetworkManager")
+                    if (type.Name == "ServerStatic")
                     {
-                        startMethod = type.Methods.First(t => t.Name == "CreateMatch");
+                        startMethod = type.Methods.First(t => t.Name == "OnSceneWasLoaded");
                     }
                 }
             }
                 
-            startMethod?.Body.Instructions.Insert(0, OpCodes.Call.ToInstruction(callable));
+            startMethod?.Body.Instructions.Insert(12, OpCodes.Call.ToInstruction(callable));
         }
         
     }
