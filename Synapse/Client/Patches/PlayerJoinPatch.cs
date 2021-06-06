@@ -10,7 +10,7 @@ namespace Synapse.Client.Patches
             var player = __instance.GetPlayer();
             if (ClientManager.isSynapseClientEnabled)
             {
-                ClientPipeline.invoke(player, "Test Message".ToBytes());
+                ClientPipeline.invoke(player, PipelinePacket.from(0, "Login successful"));
             }
         }
     }

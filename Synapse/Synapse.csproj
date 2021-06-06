@@ -111,7 +111,8 @@
     <Compile Include="Api\Scp106Controller.cs" />
     <Compile Include="Api\Tesla.cs" />
     <Compile Include="Client\ClientManager.cs" />
-    <Compile Include="Client\DataUtils.cs" />
+    <Compile Include="Client\ClientPipeline.cs" />
+    <Compile Include="Client\Packets.cs" />
     <Compile Include="Client\Patches\PipelinePatch.cs" />
     <Compile Include="Client\Patches\PlayerJoinPatch.cs" />
     <Compile Include="Client\Patches\PreAuthenticationPatch.cs" />
@@ -381,6 +382,9 @@
     <Reference Include="UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Refs\UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\Refs\UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

@@ -2,6 +2,7 @@
 using CommandSystem.Commands;
 using HarmonyLib;
 using Synapse.Api.Plugin;
+using Synapse.Client;
 using Synapse.Command;
 
 public class SynapseController
@@ -35,6 +36,8 @@ public class SynapseController
             Server.RoleManager.Init();
             CommandHandlers.RegisterSynapseCommands();
             Server.NetworkManager.Start();
+            
+            ClientManager.Initialise();
 
             PluginLoader.ActivatePlugins();
         }

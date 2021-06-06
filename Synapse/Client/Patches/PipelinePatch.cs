@@ -11,12 +11,11 @@ namespace Synapse.Client.Patches
         {
             if (!encrypted && ClientManager.isSynapseClientEnabled)
             {
-                Logger.Get.Warn("___GameConsoleTransmission incomming");
                 if (DataUtils.isData(data))
                 {
                     Logger.Get.Warn("Received DataTransmission");
                     var unpacked = DataUtils.unpack(data);
-                    ClientPipeline.receive(__instance.gameObject.GetPlayer(), data);
+                    ClientPipeline.receive(__instance.gameObject.GetPlayer(), DataUtils.unpack(data));
                     return false;
                 }
             }
