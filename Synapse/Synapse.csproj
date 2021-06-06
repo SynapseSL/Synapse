@@ -112,6 +112,7 @@
     <Compile Include="Api\Tesla.cs" />
     <Compile Include="Client\ClientManager.cs" />
     <Compile Include="Client\DataUtils.cs" />
+    <Compile Include="Client\Patches\CentralServerCommandPatch.cs" />
     <Compile Include="Client\Patches\CmdSendTokenPatch.cs" />
     <Compile Include="Client\Patches\CreateLobbyPatch.cs" />
     <Compile Include="Client\Patches\PipelinePatch.cs" />
