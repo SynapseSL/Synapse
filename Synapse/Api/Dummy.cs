@@ -261,6 +261,6 @@ namespace Synapse.Api
         }
 
         public static Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "")
-            => new Dummy(pos, rot, role, name, badgetext, badgecolor);
+            => new(pos, rot, role, name, badgetext, badgecolor);
     }
 }

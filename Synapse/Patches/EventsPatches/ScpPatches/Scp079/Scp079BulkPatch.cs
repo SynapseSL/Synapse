@@ -156,7 +156,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                     return false;
                                 }
 
-                                HashSet<DoorVariant> doorHashSet = new HashSet<DoorVariant>();
+                                HashSet<DoorVariant> doorHashSet = new();
                                 GameCore.Console.AddDebugLog("SCP079", "Looking for doors to lock...", MessageImportance.LeastImportant, false);
                                 for (int i = 0; i < localInteractableList.Count; i++)
                                 {
@@ -281,11 +281,10 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                 __instance.AddInteractionToHistory(target, array[0], true);
                                 return false;
                             }
-                            Color32 color;
-                            if (ConsoleDebugMode.CheckImportance("SCP079", MessageImportance.LeastImportant, out color))
+                            if (ConsoleDebugMode.CheckImportance("SCP079", MessageImportance.LeastImportant, out Color32 color))
                             {
                                 Scp079Interactable scp079Interactable2 = null;
-                                Dictionary<Scp079Interactable.InteractableType, byte> dictionary = new Dictionary<Scp079Interactable.InteractableType, byte>();
+                                Dictionary<Scp079Interactable.InteractableType, byte> dictionary = new();
                                 foreach (Scp079Interactable scp079Interactable3 in __instance.nearbyInteractables)
                                 {
                                     if (dictionary.ContainsKey(scp079Interactable3.type))

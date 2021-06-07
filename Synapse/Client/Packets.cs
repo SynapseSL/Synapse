@@ -29,7 +29,7 @@ namespace Synapse.Client.Packets
             for (var i = 0; i < 4; i++) bytes[i + (4 * 6)] = rzb[i];
             for (var i = 0; i < 4; i++) bytes[i + (4 * 7)] = nlb[i];
             for (var i = 0; i < name.Length; i++) bytes[i + (4 * 8)] = nb[i];
-            return PipelinePacket.from(12, bytes);
+            return PipelinePacket.From(12, bytes);
         }
 
         public static void Decode(PipelinePacket packet, out Vector3 pos, out Quaternion rot, out string name)
@@ -55,7 +55,7 @@ namespace Synapse.Client.Packets
 
         public static PipelinePacket Encode(Vector3 pos, Quaternion rot, string name, string blueprint)
         {
-            return PipelinePacket.from(10, new Pack
+            return PipelinePacket.From(10, new Pack
             {
                 Blueprint = blueprint,
                 Name = name,
@@ -97,7 +97,7 @@ namespace Synapse.Client.Packets
 
         public static PipelinePacket Encode(string name, string blueprint)
         {
-            return PipelinePacket.from(11, new Pack
+            return PipelinePacket.From(11, new Pack
             {
                 Name = name,
                 Blueprint = blueprint

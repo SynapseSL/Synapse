@@ -33,10 +33,10 @@ namespace Synapse.Network
         public string ServerCipherKey;
         public RSA ServerPublicKey;
         public string SessionToken;
-        public List<string> SyncedClientList = new List<string>();
+        public List<string> SyncedClientList = new();
 
         public HashSet<KeyValueObjectWrapper>
-            SyncEntries = new HashSet<KeyValueObjectWrapper>(); //Own ClientSync (Only client has write permissions)
+            SyncEntries = new(); //Own ClientSync (Only client has write permissions)
 
         public ClientSyncEntryThread SyncVarThread;
 

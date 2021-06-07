@@ -10,7 +10,7 @@ namespace Synapse.Api.Plugin
         internal Translation(PluginInformation info) => Information = info;
 
         private Dictionary<string, string> _rawtranslation;
-        private Dictionary<string, string> _translation = new Dictionary<string, string>();
+        private Dictionary<string, string> _translation = new();
         internal PluginInformation Information { private get; set; }
 
         public void CreateTranslations(Dictionary<string, string> translations)

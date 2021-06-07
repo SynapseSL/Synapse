@@ -10,10 +10,9 @@ namespace Synapse.Client.Patches
         {
             if (!encrypted && ClientManager.IsSynapseClientEnabled)
             {
-                if (DataUtils.isData(data))
+                if (DataUtils.IsData(data))
                 {
-                    var unpacked = DataUtils.unpack(data);
-                    ClientPipeline.receive(__instance.gameObject.GetPlayer(), DataUtils.unpack(data));
+                    ClientPipeline.Receive(__instance.gameObject.GetPlayer(), DataUtils.Unpack(data));
                     return false;
                 }
             }

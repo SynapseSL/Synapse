@@ -41,7 +41,7 @@ namespace Synapse.Network
                 }));
         }
 
-        public async Task Kick(string message, string issuer = null, string note = null, bool log = true)
+        public async Task Kick(string message, string issuer = null, string note = null)
         {
 
             if (PunishmentRepository.Enabled)

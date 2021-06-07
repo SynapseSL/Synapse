@@ -153,6 +153,7 @@
     <Compile Include="Config\SynapseConfiguration.cs" />
     <Compile Include="Database\DatabaseManager.cs" />
     <Compile Include="Database\Repository.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Network\AESUtils.cs" />
     <Compile Include="Network\ClientData.cs" />
     <Compile Include="Network\ClientSyncEntryThread.cs" />

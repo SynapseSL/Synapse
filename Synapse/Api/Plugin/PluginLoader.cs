@@ -10,13 +10,13 @@ namespace Synapse.Api.Plugin
 {
     public class PluginLoader
     {
-        private readonly List<IContextProcessor> _processors = new List<IContextProcessor> { new ConfigInjector(),new CommandProcessor(),new TranslationInjector()};
+        private readonly List<IContextProcessor> _processors = new() { new ConfigInjector(),new CommandProcessor(),new TranslationInjector()};
 
-        private readonly List<IPlugin> _plugins = new List<IPlugin>();
+        private readonly List<IPlugin> _plugins = new();
 
-        private readonly List<PluginLoadContext> _contexts = new List<PluginLoadContext>();
+        private readonly List<PluginLoadContext> _contexts = new();
 
-        public readonly List<PluginInformation> Plugins = new List<PluginInformation>(); 
+        public readonly List<PluginInformation> Plugins = new(); 
         
         internal void ActivatePlugins() 
         {

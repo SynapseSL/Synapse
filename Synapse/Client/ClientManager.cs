@@ -49,9 +49,10 @@ namespace Synapse.Client
         {
             IsSynapseClientEnabled = Server.Get.Configs.synapseConfiguration.SynapseServerList;
 
+            if (!IsSynapseClientEnabled) return;
+
             new SynapseServerListThread().Run();
 
-            Logger.Get.Warn(File.Exists(Path.Combine(Server.Get.Files.BundleDirectory, "firstaid.bundle")));
             var stream = File.OpenRead(Path.Combine(Server.Get.Files.BundleDirectory,"firstaid.bundle"));
             var stream2 = File.OpenRead(Path.Combine(Server.Get.Files.BundleDirectory,"environment.bundle"));
             var bundle = AssetBundle.LoadFromStream(stream);
@@ -76,14 +77,12 @@ namespace Synapse.Client
 
                 foreach (var player in Server.Get.Players)
                 {
-                    ClientPipeline.invoke(player, SpawnPacket.Encode(pos, rot, "FirstAidTest(1)", "FirstAid"));
-                    ClientPipeline.invoke(player, SpawnPacket.Encode(pos1, rot1, "Environment(1)", "Environment"));
+                    ClientPipeline.Invoke(player, SpawnPacket.Encode(pos, rot, "FirstAidTest(1)", "FirstAid"));
+                    ClientPipeline.Invoke(player, SpawnPacket.Encode(pos1, rot1, "Environment(1)", "Environment"));
                 }
 
                 Logger.Get.Info("Spawned Networked Prefab");
             };
-
-            Logger.Get.Info("Loading Complete");
 
             ClientPipeline.DataReceivedEvent += delegate (Player player, PipelinePacket ev)
             {
@@ -104,7 +103,7 @@ namespace Synapse.Client
 
         public class SynapseServerListThread : JavaLikeThread
         {
-            private WebClient _webClient = new WebClient();
+            private readonly WebClient _webClient = new();
 
             public override async void Run()
             {
@@ -125,7 +124,6 @@ namespace Synapse.Client
                                 maxPlayers = 30,
                                 info = Base64.ToBase64String("=====> Nordholz.Games <=====\nSynapse Modded Client Server\nFriendlyFire: Active".ToBytes())
                             }));
-                            Logger.Get.Info("Sent mark to serverlist");
                         }
                     }
                     catch (Exception e)

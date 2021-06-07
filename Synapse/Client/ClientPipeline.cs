@@ -11,16 +11,20 @@ namespace Synapse.Client
     {
         public static event DataEvent<PipelinePacket> DataReceivedEvent;
         
-        public static void receive(Player player, PipelinePacket data)
+        public static void Receive(Player player, PipelinePacket data)
         {
-            Logger.Get.Info($"=pipeline=>  {data.ToString()}");
+#if DEBUG
+            Logger.Get.Info($"=pipeline=>  {data}");
+#endif
             DataReceivedEvent?.Invoke(player, data);
         }
 
-        public static void invoke(Player player, PipelinePacket packet)
+        public static void Invoke(Player player, PipelinePacket packet)
         {
-            var packed = DataUtils.pack(packet);
+            var packed = DataUtils.Pack(packet);
+#if DEBUG
             Logger.Get.Info($"<=pipeline=  {Base64.ToBase64String(packed)}"); 
+#endif
             player.GameConsoleTransmission.TargetPrintOnConsole(player.Connection, packed, false);
         }
 
@@ -29,7 +33,7 @@ namespace Synapse.Client
     
  public static class DataUtils
     {
-        public static byte[] pack(PipelinePacket packet)
+        public static byte[] Pack(PipelinePacket packet)
         {
             var data = packet.Data;
             var buffer = new byte[data.Length + 5];
@@ -43,7 +47,7 @@ namespace Synapse.Client
             return buffer;
         }
         
-        public static PipelinePacket unpack(byte[] encoded)
+        public static PipelinePacket Unpack(byte[] encoded)
         {
             var packetId = BitConverter.ToUInt16(encoded, 2);
             var buffer = new byte[encoded.Length - 5];
@@ -59,7 +63,7 @@ namespace Synapse.Client
             };
         }
 
-        public static bool isData(byte[] bytes)
+        public static bool IsData(byte[] bytes)
         {
             if (bytes.Length < 2) return false;
             return bytes[0] == byte.MinValue && bytes[1] == byte.MaxValue;
@@ -117,7 +121,7 @@ namespace Synapse.Client
             return JsonConvert.DeserializeObject<T>(s);
         }
 
-        public static PipelinePacket from(uint id, byte[] payload)
+        public static PipelinePacket From(uint id, byte[] payload)
         {
             return new PipelinePacket
             {
@@ -126,7 +130,7 @@ namespace Synapse.Client
             };
         }
         
-        public static PipelinePacket from(uint id, string payload)
+        public static PipelinePacket From(uint id, string payload)
         {
             return new PipelinePacket
             {
@@ -135,10 +139,10 @@ namespace Synapse.Client
             };
         }
 
-        public static PipelinePacket from<T>(uint id, T payload)
+        public static PipelinePacket From<T>(uint id, T payload)
         {
             var encoded = JsonConvert.SerializeObject(payload);
-            return from(id, encoded);
+            return From(id, encoded);
         }
     }
 }
