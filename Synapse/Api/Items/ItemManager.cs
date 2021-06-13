@@ -11,7 +11,7 @@ namespace Synapse.Api.Items
 
         public const int HighestItem = (int)ItemType.Coin;
 
-        private readonly List<CustomItemInformation> customItems = new List<CustomItemInformation>();
+        private readonly List<CustomItemInformation> customItems = new();
 
         public ItemType GetBaseType(int id)
         {

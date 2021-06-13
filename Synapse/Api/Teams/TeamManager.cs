@@ -11,7 +11,7 @@ namespace Synapse.Api.Teams
 
         internal TeamManager() { }
 
-        private readonly List<ISynapseTeam> teams = new List<ISynapseTeam>();
+        private readonly List<ISynapseTeam> teams = new();
 
         public void RegisterTeam<TTeam>() where TTeam : ISynapseTeam
         {

@@ -24,7 +24,7 @@ namespace Synapse.Api
             Scp106Controller = new Scp106Controller(this);
             Scp079Controller = new Scp079Controller(this);
             Scp096Controller = new Scp096Controller(this);
-            Scp173Controller = new Scp173Controller(this);
+            Scp173Controller = new Scp173Controller();
             Jail = new Jail(this);
             ActiveBroadcasts = new BroadcastList(this);
             Inventory = new PlayerInventory(this);
@@ -561,7 +561,7 @@ namespace Synapse.Api
 
         public MapPoint MapPoint
         {
-            get => new MapPoint(Room, Position);
+            get => new(Room, Position);
             set => Position = value.Position;
         }
 

@@ -115,6 +115,9 @@
     <Compile Include="Client\ClientPipeline.cs" />
     <Compile Include="Client\DataUtils.cs" />
     <Compile Include="Client\Packets.cs" />
+    <Compile Include="Client\Patches\CentralServerCommandPatch.cs" />
+    <Compile Include="Client\Patches\CmdSendTokenPatch.cs" />
+    <Compile Include="Client\Patches\CreateLobbyPatch.cs" />
     <Compile Include="Client\Patches\PipelinePatch.cs" />
     <Compile Include="Client\Patches\PlayerJoinPatch.cs" />
     <Compile Include="Client\Patches\PreAuthenticationPatch.cs" />
@@ -155,6 +158,7 @@
     <Compile Include="Config\SynapseConfiguration.cs" />
     <Compile Include="Database\DatabaseManager.cs" />
     <Compile Include="Database\Repository.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Network\AESUtils.cs" />
     <Compile Include="Network\ClientData.cs" />
     <Compile Include="Network\ClientSyncEntryThread.cs" />

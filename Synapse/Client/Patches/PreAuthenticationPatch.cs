@@ -16,7 +16,7 @@ namespace Synapse.Client.Patches
         {
             try
             {
-                if (ClientManager.isSynapseClientEnabled)
+                if (ClientManager.IsSynapseClientEnabled)
                 {
                     var exists = request.Data.TryGetByte(out var packetId);
                     if (!exists)
@@ -31,17 +31,18 @@ namespace Synapse.Client.Patches
                         if (packetId == 5)
                         {
                             request.Data.GetByte();
+#if DEBUG
                             Logger.Get.Info("Prefix!!");
-                            byte[] uidBytes;
-                            byte[] jwtBytes;
-                            byte[] nonceBytes;
                             Logger.Get.Info(request.Data._dataSize);
                             Logger.Get.Info("Next Int:" + request.Data.PeekInt());
-                            if (!request.Data.TryGetBytesWithLength(out uidBytes) ||
-                                !request.Data.TryGetBytesWithLength(out jwtBytes) ||
-                                !request.Data.TryGetBytesWithLength(out nonceBytes))
+#endif
+                            if (!request.Data.TryGetBytesWithLength(out byte[] uidBytes) ||
+                                !request.Data.TryGetBytesWithLength(out byte[] jwtBytes) ||
+                                !request.Data.TryGetBytesWithLength(out byte[] nonceBytes))
                             {
+                                #if DEBUG
                                 Logger.Get.Info("Rejecting!");
+#endif
                                 CustomLiteNetLib4MirrorTransport.RequestWriter.Reset();
                                 CustomLiteNetLib4MirrorTransport.RequestWriter.Put(2);
                                 request.RejectForce(CustomLiteNetLib4MirrorTransport.RequestWriter);
@@ -55,10 +56,14 @@ namespace Synapse.Client.Patches
                             Logger.Get.Info(jwt);
                             Logger.Get.Info(nonce);
 
+#if DEBUG
                             Logger.Get.Info("Decoding JWT Token");
-                            var clientConnectionData = ClientManager.Singleton.DecodeJWT(jwt);
+#endif
+                            var clientConnectionData = SynapseController.ClientManager.DecodeJWT(jwt);
 
+#if DEBUG
                             Logger.Get.Warn("ClientConnectionData: " + clientConnectionData.Humanize());
+#endif
 
                             int num = CustomNetworkManager.slots;
                             if (LiteNetLib4MirrorCore.Host.ConnectedPeersCount < num)
@@ -69,7 +74,7 @@ namespace Synapse.Client.Patches
                                     CustomLiteNetLib4MirrorTransport.UserIds.Add(request.RemoteEndPoint,
                                         new PreauthItem(uid));
 
-                                ClientManager.Singleton.Clients[clientConnectionData.uuid] = clientConnectionData;
+                                SynapseController.ClientManager.Clients[clientConnectionData.uuid] = clientConnectionData;
 
                                 request.Accept();
                                 ServerConsole.AddLog(

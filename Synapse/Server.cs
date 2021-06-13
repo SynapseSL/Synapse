@@ -240,12 +240,10 @@ namespace Synapse
 
             //synapse
             private string _synapseDirectory;
+            private string _bundleDirectory;
 
 
-            internal FileLocations()
-            {
-                Refresh();
-            }
+            internal FileLocations() => Refresh();
 
             //Synapse
             public string SynapseDirectory
@@ -349,6 +347,19 @@ namespace Synapse
             }
             //Currently should it not be auto generated
             public string ModuleDirectory { get; set; }
+
+            public string BundleDirectory
+            {
+                get
+                {
+                    if (!Directory.Exists(_bundleDirectory))
+                        Directory.CreateDirectory(_bundleDirectory);
+
+                    return _bundleDirectory;
+                }
+                private set => _bundleDirectory = value;
+            }
+
             public string PermissionFile
             {
                 get
@@ -373,6 +384,8 @@ namespace Synapse
                 internal set => _configFile = value;
             }
 
+            public string ServerTokenFile { get; private set; }
+
             public void Refresh()
             {
                 var localpath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Synapse");
@@ -390,6 +403,7 @@ namespace Synapse
                 SharedConfigDirectory = Path.Combine(MainConfigDirectory, "server-shared");
 
                 ModuleDirectory = Path.Combine(SynapseDirectory, "modules");
+                BundleDirectory = Path.Combine(SynapseDirectory, "bundles");
 
                 var configpath = Path.Combine(ConfigDirectory, "config.syml");
                 ConfigFile = File.Exists(configpath) ? configpath : Path.Combine(SharedConfigDirectory, "config.syml");
@@ -399,6 +413,8 @@ namespace Synapse
                 PermissionFile = File.Exists(permissionspath)
                     ? permissionspath
                     : Path.Combine(SharedConfigDirectory, "permission.syml");
+
+                ServerTokenFile = Path.Combine(SynapseDirectory, "serverlist.token");
             }
 
             public string GetOldTranslationFile(PluginInformation infos)

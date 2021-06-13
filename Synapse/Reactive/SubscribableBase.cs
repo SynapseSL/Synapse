@@ -6,27 +6,27 @@ namespace Synapse.Reactive
 {
     public abstract class SubscribableBase<T> : IObservable<T>
     {
-        private List<IObserver<T>> _observers { get; } = new List<IObserver<T>>();
+        private List<IObserver<T>> Observers { get; } = new List<IObserver<T>>();
 
         public IDisposable Subscribe(IObserver<T> observer)
         {
-            _observers.Add(observer);
-            return new Unsubscriber<T>(_observers, observer);
+            Observers.Add(observer);
+            return new Unsubscriber<T>(Observers, observer);
         }
 
         public void Publish(T evt)
         {
-            foreach (var observer in _observers.ToList()) observer.OnNext(evt);
+            foreach (var observer in Observers.ToList()) observer.OnNext(evt);
         }
 
         public void Complete()
         {
-            foreach (var observer in _observers.ToList()) observer.OnCompleted();
+            foreach (var observer in Observers.ToList()) observer.OnCompleted();
         }
 
         public void Error(Exception exception)
         {
-            foreach (var observer in _observers.ToList()) observer.OnError(exception);
+            foreach (var observer in Observers.ToList()) observer.OnError(exception);
         }
     }
 

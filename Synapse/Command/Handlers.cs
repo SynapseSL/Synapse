@@ -5,7 +5,7 @@ namespace Synapse.Command
 {
     public class Handlers
     {
-        private static readonly List<ISynapseCommand> AwaitingFinalization = new List<ISynapseCommand>();
+        private static readonly List<ISynapseCommand> AwaitingFinalization = new();
 
         internal Handlers()
         {

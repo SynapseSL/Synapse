@@ -45,9 +45,9 @@ namespace Synapse.Api.Roles
         [Obsolete("Use GetTeamID()",false)]
         public virtual Team GetTeam() => Team.RIP;
         [Obsolete("Use GetFriendsID()", false)]
-        public virtual List<Team> GetFriends() => new List<Team>();
+        public virtual List<Team> GetFriends() => new();
         [Obsolete("Use GetEnemiesID()", false)]
-        public virtual List<Team> GetEnemys() => new List<Team>();
+        public virtual List<Team> GetEnemys() => new();
         #endregion
     }
 }

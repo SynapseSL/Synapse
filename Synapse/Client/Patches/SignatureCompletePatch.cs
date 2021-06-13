@@ -14,12 +14,11 @@ namespace Synapse.Client.Patches
     {
         public static bool Prefix(ServerRoles __instance, string challenge, string response, string publickey, bool hide)
         {
-            if (challenge.Equals("synapse-client-authentication") && ClientManager.isSynapseClientEnabled)
+            if (challenge.Equals("synapse-client-authentication") && ClientManager.IsSynapseClientEnabled)
             {
                 try
                 {
-                    var payload = ClientManager.Singleton.DecodeJWT(response);
-                    Logger.Get.Warn($"{payload.Humanize()}, logging in");
+                    var payload = SynapseController.ClientManager.DecodeJWT(response);
                     __instance._ccm.UserId = payload.uuid;
                     __instance._ccm.SyncedUserId = payload.uuid;
                     __instance.PublicKeyAccepted = true;
@@ -42,9 +41,8 @@ namespace Synapse.Client.Patches
                     queryProcessor._clientSalt = queryProcessor.ClientSalt;
                     queryProcessor._key = queryProcessor.Key;
                     queryProcessor.CryptoManager.EncryptionKey = queryProcessor.Key;
-                    Logger.Get.Info("Updated Crypto Details");
                     __instance.RefreshPermissions(false); //Just since its done in base code
-                    Timing.RunCoroutine(_RefreshPermissionLate(__instance.GetPlayer()));
+                    Timing.RunCoroutine(RefreshPermissionLate(__instance.GetPlayer()));
 
                 }
                 catch (Exception e)
@@ -58,7 +56,7 @@ namespace Synapse.Client.Patches
         }
         
 
-        private static IEnumerator<float> _RefreshPermissionLate(Player player)
+        private static IEnumerator<float> RefreshPermissionLate(Player player)
         {
             yield return Timing.WaitForOneFrame;
             player.RefreshPermission(true);

@@ -82,7 +82,7 @@ namespace Synapse.Api
 
         private readonly Player _player;
 
-        private List<Broadcast> bcs = new List<Broadcast>();
+        private List<Broadcast> bcs = new();
 
         public void Add(Broadcast bc,bool instant = false)
         {

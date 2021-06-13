@@ -19,7 +19,7 @@ namespace Synapse.Config
     {
         private readonly string _path;
 
-        public Dictionary<string, ConfigSection> Sections = new Dictionary<string, ConfigSection>();
+        public Dictionary<string, ConfigSection> Sections = new();
 
         public SYML(string path)
         {

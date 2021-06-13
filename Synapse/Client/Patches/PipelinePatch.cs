@@ -3,19 +3,16 @@ using Synapse.Api;
 
 namespace Synapse.Client.Patches
 {
-    //  public void CallCmdCommandToServer(byte[] data, bool encrypted)
     [HarmonyPatch(typeof(GameConsoleTransmission), nameof(GameConsoleTransmission.CallCmdCommandToServer))]
     internal static class PipelinePatch
     {
         private static bool Prefix(GameConsoleTransmission __instance, byte[] data, bool encrypted)
         {
-            if (!encrypted && ClientManager.isSynapseClientEnabled)
+            if (!encrypted && ClientManager.IsSynapseClientEnabled)
             {
-                if (DataUtils.isData(data))
+                if (DataUtils.IsData(data))
                 {
-                    Logger.Get.Warn("Received DataTransmission");
-                    var unpacked = DataUtils.unpack(data);
-                    ClientPipeline.receive(__instance.gameObject.GetPlayer(), DataUtils.unpack(data));
+                    ClientPipeline.Receive(__instance.gameObject.GetPlayer(), DataUtils.Unpack(data));
                     return false;
                 }
             }
