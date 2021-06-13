@@ -12,8 +12,8 @@ namespace Synapse.Database
 {
     public class DatabaseManager
     {
-        public static PlayerRepository PlayerRepository = new();
-        public static PunishmentRepository PunishmentRepository = new();
+        public static PlayerRepository PlayerRepository = new PlayerRepository();
+        public static PunishmentRepository PunishmentRepository = new PunishmentRepository();
 
         public static LiteDatabase LiteDatabase =>
             !SynapseController.Server.Configs.synapseConfiguration.DatabaseEnabled

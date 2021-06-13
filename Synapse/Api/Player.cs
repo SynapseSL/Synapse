@@ -561,7 +561,7 @@ namespace Synapse.Api
 
         public MapPoint MapPoint
         {
-            get => new(Room, Position);
+            get => new MapPoint(Room, Position);
             set => Position = value.Position;
         }
 

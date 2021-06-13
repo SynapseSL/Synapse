@@ -82,7 +82,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 
 			Generator079.Generators[0].ServerOvercharge(10f, true);
 
-			HashSet<Interactables.Interobjects.DoorUtils.DoorVariant> lockedDoors = new();
+			HashSet<Interactables.Interobjects.DoorUtils.DoorVariant> lockedDoors = new HashSet<Interactables.Interobjects.DoorUtils.DoorVariant>();
 
 			try
 			{

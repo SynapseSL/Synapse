@@ -36,13 +36,13 @@ namespace Synapse.Permission
         public byte RequiredKickPower = 1;
 
         [Description("The Permissions which the group has")]
-        public List<string> Permissions = new() { };
+        public List<string> Permissions = new List<string>() { };
 
         [Description("Gives the Group the Permissions of all Groups in this List")]
-        public List<string> Inheritance = new() { };
+        public List<string> Inheritance = new List<string>() { };
 
         [Description("The UserID's of the Players in the Group")]
-        public List<string> Members = new() { };
+        public List<string> Members = new List<string>() { };
 
         public bool HasPermission(string permission) => HasPermission(permission, 0);
 

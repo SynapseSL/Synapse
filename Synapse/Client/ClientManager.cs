@@ -87,7 +87,7 @@ namespace Synapse.Client
 
         public class SynapseServerListThread : JavaLikeThread
         {
-            private readonly WebClient webClient = new();
+            private readonly WebClient webClient = new WebClient();
 
             public override async void Run()
             {

@@ -5,9 +5,9 @@ namespace Synapse.Command
 {
     public class CommandHandler : ICommandHandler
     {
-        private readonly Dictionary<string, string> commandAliases = new();
+        private readonly Dictionary<string, string> commandAliases = new Dictionary<string, string>();
 
-        private readonly Dictionary<string, ICommand> commands = new();
+        private readonly Dictionary<string, ICommand> commands = new Dictionary<string, ICommand>();
 
         
         public List<ICommand> Commands => commands.Values.ToList();

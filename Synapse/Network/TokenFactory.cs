@@ -9,7 +9,7 @@ namespace Synapse.Network
         private static TokenFactory _instance;
         public static TokenFactory Instance => _instance ?? new TokenFactory();
 
-        private readonly Random _random = new();
+        private readonly Random _random = new Random();
 
         private TokenFactory()
         {

@@ -71,6 +71,6 @@ namespace Synapse.Api
         }
         
         public static Ragdoll CreateRagdoll(RoleType roletype, Vector3 pos, Quaternion rot, Vector3 velocity, PlayerStats.HitInfo info, bool allowRecall, Player owner) 
-            => new(roletype, pos, rot, velocity, info, allowRecall, owner);
+            => new Ragdoll(roletype, pos, rot, velocity, info, allowRecall, owner);
     }
 }

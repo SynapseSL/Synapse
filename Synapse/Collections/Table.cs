@@ -4,7 +4,7 @@ namespace Synapse.Collections
 {
     public class Table<TA, TB, TC> : ITable<TA, TB, TC>
     {
-        private readonly Dictionary<TA, Dictionary<TB, TC>> _dictionary = new();
+        private readonly Dictionary<TA, Dictionary<TB, TC>> _dictionary = new Dictionary<TA, Dictionary<TB, TC>>();
 
         public bool TryGet(TA x, TB y, out TC result)
         {

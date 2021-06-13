@@ -25,7 +25,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp173
                     return false;
                 }
 
-                HashSet<Player> players = new();
+                HashSet<Player> players = new HashSet<Player>();
 
                 //Get all players looking at Scp173
                 foreach (GameObject gameObject in PlayerManager.players)

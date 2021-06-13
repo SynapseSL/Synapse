@@ -79,7 +79,7 @@ namespace Synapse.Config
         public float YSize { get; set; }
         public float ZSize { get; set; }
 
-        public Synapse.Api.Items.SynapseItem Parse() => new(ID, Durabillity, Sight, Barrel, Other) { Scale = new Vector3(XSize,YSize,ZSize)};
+        public Synapse.Api.Items.SynapseItem Parse() => new SynapseItem(ID, Durabillity, Sight, Barrel, Other) { Scale = new Vector3(XSize,YSize,ZSize)};
     }
 
     [Serializable]
@@ -188,7 +188,7 @@ namespace Synapse.Config
 
         public SerializedVector3() { }
 
-        public Vector3 Parse() => new(X, Y, Z);
+        public Vector3 Parse() => new Vector3(X, Y, Z);
 
         public float X { get; set; }
         public float Y { get; set; }
