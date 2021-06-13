@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Reflection;
+using Synapse;
 
 namespace UnityEngine
 {
@@ -17,7 +18,7 @@ namespace UnityEngine
                 return;
             }
             var descriptor = GetType().GetCustomAttribute(typeof(BundleDescriptor)) as BundleDescriptor;
-            var loc = Path.Combine("bundles", descriptor.Bundle);
+            var loc = Path.Combine(Server.Get.Files.BundleDirectory, descriptor.Bundle);
             Synapse.Api.Logger.Get.Info(loc);
             if (!File.Exists(loc) && descriptor.Source != null)
             {
@@ -40,8 +41,7 @@ namespace UnityEngine
         {
             foreach (var field in GetType().GetFields())
             {
-                var ad = field.GetCustomAttribute(typeof(AssetDescriptor)) as AssetDescriptor;
-                if (ad == null) continue;
+                if (field.GetCustomAttribute(typeof(AssetDescriptor)) is not AssetDescriptor ad) continue;
                 field.SetValue(this, bundle.LoadAsset<GameObject>(ad.Asset));
             }
         }

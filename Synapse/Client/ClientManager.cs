@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using JWT.Algorithms;
 using JWT.Builder;
-using Org.BouncyCastle.Bcpg;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
@@ -16,23 +13,19 @@ using Org.BouncyCastle.Utilities.Encoders;
 using Swan;
 using Swan.Formatters;
 using Synapse.Api;
-using Synapse.Api.Events;
-using Synapse.Api.Events.SynapseEventArguments;
 using Synapse.Client.Packets;
 using Synapse.Network;
-using UnityEngine;
 using Logger = Synapse.Api.Logger;
-using Object = UnityEngine.Object;
 using Random = System.Random;
 
 namespace Synapse.Client
 {
-    
+
     public class ClientManager
     {
-        public static bool isSynapseClientEnabled = true;
+        internal ClientManager() { }
 
-        public static ClientManager Singleton = new ClientManager();
+        public static bool IsSynapseClientEnabled { get; private set; } = false;
 
         public SpawnController SpawnController { get; set; } = new SpawnController();
 
@@ -52,31 +45,35 @@ namespace Synapse.Client
             return payload;
         }
 
-        public void Initialise()
+        internal void Initialise()
         {
+            IsSynapseClientEnabled = Server.Get.Configs.synapseConfiguration.SynapseServerList;
+
+            if (!IsSynapseClientEnabled) return;
+
             new SynapseServerListThread().Run();
-            if (!Directory.Exists("bundles")) Directory.CreateDirectory("bundles");
+
             Server.Get.Events.Round.RoundStartEvent += delegate
             {
-                ClientPipeline.invokeBroadcast(PipelinePacket.@from(RoundStartPacket.ID, new byte[0]));
+                ClientPipeline.InvokeBroadcast(PipelinePacket.From(RoundStartPacket.ID, new byte[0]));
             };
-            
-            ClientPipeline.ClientConnectionCompleteEvent += delegate(Player player, ClientConnectionComplete ev)
+
+            ClientPipeline.ClientConnectionCompleteEvent += delegate (Player player, ClientConnectionComplete ev)
             {
                 if (Round.Get.RoundIsActive)
                 {
                     SpawnController.SpawnLate(ev.Player);
                 }
             };
-            
+
             SynapseController.Server.Events.Round.RoundEndEvent += delegate
             {
                 SpawnController.SpawnedObjects.Clear();
             };
-            
+
             Logger.Get.Info("Loading Complete");
-            
-            ClientPipeline.DataReceivedEvent += delegate(Player player, PipelinePacket ev)
+
+            ClientPipeline.DataReceivedEvent += delegate (Player player, PipelinePacket ev)
             {
                 switch (ev.PacketId)
                 {
@@ -90,22 +87,22 @@ namespace Synapse.Client
 
         public class SynapseServerListThread : JavaLikeThread
         {
-            private WebClient _webClient = new WebClient();
-            
+            private readonly WebClient webClient = new();
+
             public override async void Run()
             {
-                for (;;)
+                for (; ; )
                 {
                     try
                     {
-                        if (File.Exists("serverlist.token"))
+                        if (File.Exists(Server.Get.Files.ServerTokenFile))
                         {
                             var token = File.ReadAllText("serverlist.token");
-                            _webClient.Headers.Clear();
-                            _webClient.Headers.Add("User-Agent", "SynapseServerClient");
-                            _webClient.Headers.Add("Content-Type", "application/json");
-                            _webClient.Headers.Add("Api-Key", token);
-                            _webClient.UploadString("https://servers.synapsesl.xyz/serverlist", Json.Serialize(new SynapseServerListMark
+                            webClient.Headers.Clear();
+                            webClient.Headers.Add("User-Agent", "SynapseServerClient");
+                            webClient.Headers.Add("Content-Type", "application/json");
+                            webClient.Headers.Add("Api-Key", token);
+                            webClient.UploadString("https://servers.synapsesl.xyz/serverlist", Json.Serialize(new SynapseServerListMark
                             {
                                 onlinePlayers = new Random().Next(0, 31),
                                 maxPlayers = 30,
@@ -118,7 +115,7 @@ namespace Synapse.Client
                         Logger.Get.Error("Error when trying to mark server to serverlist: " + e.ToString());
                     }
                     await Task.Delay(1000 * 10);
-                    
+
                 }
             }
         }
@@ -129,12 +126,12 @@ namespace Synapse.Client
             public int maxPlayers { get; set; }
             public string info { get; set; }
         }
-        
+
         public Dictionary<String, ClientConnectionData> Clients { get; set; } =
             new Dictionary<string, ClientConnectionData>();
     }
-    
-    
+
+
     public class ClientConnectionData
     {
         //JWT Subject == Name

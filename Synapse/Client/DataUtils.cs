@@ -4,7 +4,7 @@ namespace Synapse.Client
 {
     public static class DataUtils
     {
-        public static byte[] pack(PipelinePacket packet)
+        public static byte[] Pack(PipelinePacket packet)
         {
             var data = packet.Data;
             var buffer = new byte[data.Length + 5];
@@ -18,7 +18,7 @@ namespace Synapse.Client
             return buffer;
         }
         
-        public static PipelinePacket unpack(byte[] encoded)
+        public static PipelinePacket Unpack(byte[] encoded)
         {
             var packetId = BitConverter.ToUInt16(encoded, 2);
             var buffer = new byte[encoded.Length - 5];
@@ -34,7 +34,7 @@ namespace Synapse.Client
             };
         }
 
-        public static bool isData(byte[] bytes)
+        public static bool IsData(byte[] bytes)
         {
             if (bytes.Length < 2) return false;
             return bytes[0] == byte.MinValue && bytes[1] == byte.MaxValue;

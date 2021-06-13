@@ -69,14 +69,14 @@ namespace Synapse.Client
         {
             var handler = Blueprints[blueprint];
             var transform = gameObject.transform; 
-            ClientPipeline.invoke(player, SpawnPacket.Encode(transform.position, transform.rotation, gameObject.name, blueprint));
+            ClientPipeline.Invoke(player, SpawnPacket.Encode(transform.position, transform.rotation, gameObject.name, blueprint));
             handler.AfterSpawnPacket(player, gameObject);
         }
         
         public void DestroyFor(Player player, GameObject gameObject, string blueprint)
         {
             var handler = Blueprints[blueprint];
-            ClientPipeline.invoke(player, DestroyPacket.Encode(gameObject.name, blueprint));
+            ClientPipeline.Invoke(player, DestroyPacket.Encode(gameObject.name, blueprint));
         }
     }
 

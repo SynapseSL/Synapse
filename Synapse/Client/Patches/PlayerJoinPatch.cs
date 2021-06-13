@@ -6,13 +6,13 @@ namespace Synapse.Client.Patches
 {
     [HarmonyPatch(typeof(NicknameSync), nameof(NicknameSync.UpdateNickname))]
     internal static class PlayerJoinPatch {
-        private static void Prefix(NicknameSync __instance, ref string n)
+        private static void Prefix(NicknameSync __instance)
         {
             var player = __instance.GetPlayer();
-            if (ClientManager.isSynapseClientEnabled)
+            if (ClientManager.IsSynapseClientEnabled)
             {
-                ClientPipeline.invoke(player, PipelinePacket.from(ConnectionSuccessfulPacket.ID, new byte[0]));
-                ClientPipeline.invokeConnectionComplete(player);
+                ClientPipeline.Invoke(player, PipelinePacket.From(ConnectionSuccessfulPacket.ID, new byte[0]));
+                ClientPipeline.InvokeConnectionComplete(player);
             }
         }
     }

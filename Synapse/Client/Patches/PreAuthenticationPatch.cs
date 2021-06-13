@@ -3,7 +3,6 @@ using System.Text;
 using HarmonyLib;
 using LiteNetLib;
 using Mirror.LiteNetLib4Mirror;
-using Swan;
 using Synapse.Api;
 
 namespace Synapse.Client.Patches
@@ -106,7 +105,7 @@ namespace Synapse.Client.Patches
             }
             catch (Exception e)
             {
-                Logger.Get.Error(e);
+                Logger.Get.Error($"Synapse-Client: PreAuthentication Patch failed:\n{e}");
             }
 
             return true;

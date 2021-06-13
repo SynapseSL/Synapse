@@ -41,7 +41,7 @@ namespace Synapse.Client.Packets
             for (var i = 0; i < 4; i++) bytes[i + (4 * 6)] = rzb[i];
             for (var i = 0; i < 4; i++) bytes[i + (4 * 7)] = nlb[i];
             for (var i = 0; i < name.Length; i++) bytes[i + (4 * 8)] = nb[i];
-            return PipelinePacket.from(ID, bytes);
+            return PipelinePacket.From(ID, bytes);
         }
 
         public static void Decode(PipelinePacket packet, out Vector3 pos, out Quaternion rot, out string name)
@@ -67,7 +67,7 @@ namespace Synapse.Client.Packets
         public const ushort ID = 10;
         public static PipelinePacket Encode(Vector3 pos, Quaternion rot, string name, string blueprint)
         {
-            return PipelinePacket.from(ID, new Pack
+            return PipelinePacket.From(ID, new Pack
             {
                 Blueprint = blueprint,
                 Name = name,
@@ -109,7 +109,7 @@ namespace Synapse.Client.Packets
         public const ushort ID = 11;
         public static PipelinePacket Encode(string name, string blueprint)
         {
-            return PipelinePacket.from(ID, new Pack
+            return PipelinePacket.From(ID, new Pack
             {
                 Name = name,
                 Blueprint = blueprint
@@ -135,7 +135,7 @@ namespace Synapse.Client.Packets
         public const ushort ID = 20;
         public static PipelinePacket Encode(string target)
         {
-            return PipelinePacket.from(ID, new Pack
+            return PipelinePacket.From(ID, new Pack
             {
                 Target = target
             });
@@ -159,7 +159,7 @@ namespace Synapse.Client.Packets
         public const ushort ID = 21;
         public static PipelinePacket Encode(string name, Vector3 pos)
         {
-            return PipelinePacket.from(ID, new Pack
+            return PipelinePacket.From(ID, new Pack
             {
                 Name = name,
                 X = pos.x,

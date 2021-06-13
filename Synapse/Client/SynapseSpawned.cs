@@ -33,14 +33,14 @@ namespace Synapse.Client
 
         public void DestroyGlobal()
         {
-            ClientManager.Singleton.SpawnController.Destroy(gameObject, Blueprint);
+            SynapseController.ClientManager.SpawnController.Destroy(gameObject, Blueprint);
         }
 
         public void SynchronizePosition() {   
             _transform = transform;
             _lastPos = _transform.position;
             _lastRot = _transform.rotation;
-            ClientPipeline.invokeBroadcast(PositionPacket.Encode(_transform.position, _transform.rotation, name));
+            ClientPipeline.InvokeBroadcast(PositionPacket.Encode(_transform.position, _transform.rotation, name));
         }
 
         public static SynapseSpawned ForObject(GameObject gameObject)
