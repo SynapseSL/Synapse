@@ -3,6 +3,7 @@ using System.Text;
 using HarmonyLib;
 using LiteNetLib;
 using Mirror.LiteNetLib4Mirror;
+using Swan;
 using Synapse.Api;
 
 namespace Synapse.Client.Patches

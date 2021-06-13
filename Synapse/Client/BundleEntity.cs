@@ -41,7 +41,7 @@ namespace UnityEngine
         {
             foreach (var field in GetType().GetFields())
             {
-                if (field.GetCustomAttribute(typeof(AssetDescriptor)) is not AssetDescriptor ad) continue;
+                if (!(field.GetCustomAttribute(typeof(AssetDescriptor)) is AssetDescriptor ad)) continue;
                 field.SetValue(this, bundle.LoadAsset<GameObject>(ad.Asset));
             }
         }

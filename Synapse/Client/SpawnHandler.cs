@@ -15,7 +15,7 @@ namespace Synapse.Client
 
         public string GetBlueprint()
         {
-            if (GetType().GetCustomAttribute(typeof(Blueprint)) is not Blueprint blueprint)
+            if (!(GetType().GetCustomAttribute(typeof(Blueprint)) is Blueprint blueprint))
             {
                 throw new Exception("SpawnHandler subclass is not annotated with [Blueprint]");
             }

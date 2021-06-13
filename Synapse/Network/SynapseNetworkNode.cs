@@ -98,7 +98,7 @@ namespace Synapse.Network
                     break;
                 case "GetConfig":
                     Logger.Get.Info("Get config request");
-                    if (message.Parse() is not NetConfig getMessage) return;
+                    if (!(message.Parse() is NetConfig getMessage)) return;
                     string content;
                     switch (getMessage.FileName)
                     {
@@ -122,7 +122,7 @@ namespace Synapse.Network
 
                     break;
                 case "SetConfig":
-                    if (message.Parse() is not NetConfig setMessage) return;
+                    if (!(message.Parse() is NetConfig setMessage)) return;
                     switch (setMessage.FileName)
                     {
                         case "config.syml":
