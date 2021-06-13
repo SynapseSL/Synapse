@@ -97,7 +97,7 @@ namespace Synapse.Client
                     {
                         if (File.Exists(Server.Get.Files.ServerTokenFile))
                         {
-                            var token = File.ReadAllText("serverlist.token");
+                            var token = File.ReadAllText(Server.Get.Files.ServerTokenFile);
                             webClient.Headers.Clear();
                             webClient.Headers.Add("User-Agent", "SynapseServerClient");
                             webClient.Headers.Add("Content-Type", "application/json");
