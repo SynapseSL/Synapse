@@ -16,10 +16,24 @@ namespace Synapse.Command.Commands
         public CommandResult Execute(CommandContext context)
         {
             var result = new CommandResult();
-
-            Physics.Raycast(context.Player.CameraReference.transform.position, context.Player.CameraReference.transform.forward, out RaycastHit raycastthit, 100f);
-
-            var point = new MapPoint(context.Player.Room, raycastthit.point + (Vector3.up * 0.1f));
+            
+            MapPoint point;
+            if (context.Arguments.Count == 1)
+            {
+                var posParts = context.Arguments.At(0).Split(':');
+                var global = new Vector3(
+                    float.Parse(posParts[0]),
+                    float.Parse(posParts[1]),
+                    float.Parse(posParts[2])
+                );
+                point = new MapPoint(context.Player.Room, global);
+            }
+            else
+            {
+                Physics.Raycast(context.Player.CameraReference.transform.position, context.Player.CameraReference.transform.forward, out RaycastHit raycastthit, 100f);
+                point = new MapPoint(context.Player.Room, raycastthit.point + (Vector3.up * 0.1f));
+            }
+            
             result.Message = "\nThe Position you are looking at as MapPoint (change , to . in the syml config):" +
                 $"\n  room: {point.Room.RoomName}" +
                 $"\n  x: {point.RelativePosition.x}" +

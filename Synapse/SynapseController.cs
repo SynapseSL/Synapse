@@ -32,13 +32,11 @@ public class SynapseController
         try
         {
             Server.Configs.Init();
-            Synapse.Client.ClientManager.Initialise();
+            ClientManager.Singleton.Initialise();
             Server.PermissionHandler.Init();
             Server.RoleManager.Init();
             CommandHandlers.RegisterSynapseCommands();
             Server.NetworkManager.Start();
-            
-            ClientManager.Initialise();
 
             PluginLoader.ActivatePlugins();
         }

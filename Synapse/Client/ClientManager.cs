@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using JWT.Algorithms;
 using JWT.Builder;
+using Org.BouncyCastle.Bcpg;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
@@ -15,6 +17,7 @@ using Swan;
 using Swan.Formatters;
 using Synapse.Api;
 using Synapse.Api.Events;
+using Synapse.Api.Events.SynapseEventArguments;
 using Synapse.Client.Packets;
 using Synapse.Network;
 using UnityEngine;
@@ -24,14 +27,14 @@ using Random = System.Random;
 
 namespace Synapse.Client
 {
+    
     public class ClientManager
     {
         public static bool isSynapseClientEnabled = true;
 
         public static ClientManager Singleton = new ClientManager();
 
-        public static GameObject debugPrefab;
-        public static GameObject debugPrefab2;
+        public SpawnController SpawnController { get; set; } = new SpawnController();
 
         public ClientConnectionData DecodeJWT(string jwt)
         {
@@ -49,39 +52,26 @@ namespace Synapse.Client
             return payload;
         }
 
-        public static void Initialise()
+        public void Initialise()
         {
             new SynapseServerListThread().Run();
-            
-            Logger.Get.Info("Loading Bundle");
-            var stream = File.OpenRead("firstaid.bundle");
-            var stream2 = File.OpenRead("environment.bundle");
-            var bundle = AssetBundle.LoadFromStream(stream);
-            var bundle2 = AssetBundle.LoadFromStream(stream2);
-            debugPrefab = bundle.LoadAsset<GameObject>("FirstAidKit_Green.prefab");
-            debugPrefab2 = bundle2.LoadAsset<GameObject>("ExampleEnvironment.prefab");
-            
+            if (!Directory.Exists("bundles")) Directory.CreateDirectory("bundles");
             Server.Get.Events.Round.RoundStartEvent += delegate
             {
-                Logger.Get.Info("Spawning Networked Prefab");
-                
-                var pos = new Vector3(30, 10, 40);
-                var rot = Quaternion.identity;
-                var obj = Object.Instantiate(debugPrefab, pos, rot);
-                obj.name = "FirstAidTest(1)";
-                
-                var pos1 = new Vector3(15, 1000, 60);
-                var rot1 = Quaternion.identity;
-                var obj1 = Object.Instantiate(debugPrefab2, pos1, rot1);
-                obj1.name = "Environment(1)";
-                
-                foreach (var player in Server.Get.Players)
+                ClientPipeline.invokeBroadcast(PipelinePacket.@from(RoundStartPacket.ID, new byte[0]));
+            };
+            
+            ClientPipeline.ClientConnectionCompleteEvent += delegate(Player player, ClientConnectionComplete ev)
+            {
+                if (Round.Get.RoundIsActive)
                 {
-                    ClientPipeline.invoke(player, SpawnPacket.Encode(pos, rot, "FirstAidTest(1)", "FirstAid"));
-                    ClientPipeline.invoke(player, SpawnPacket.Encode(pos1, rot1, "Environment(1)", "Environment"));
+                    SpawnController.SpawnLate(ev.Player);
                 }
-                
-                Logger.Get.Info("Spawned Networked Prefab");
+            };
+            
+            SynapseController.Server.Events.Round.RoundEndEvent += delegate
+            {
+                SpawnController.SpawnedObjects.Clear();
             };
             
             Logger.Get.Info("Loading Complete");
@@ -90,15 +80,10 @@ namespace Synapse.Client
             {
                 switch (ev.PacketId)
                 {
-                    case 1:
-                        break;
-                    
-                    case 10:
-                        break;
-                    case 11:
-                        break;
-                    case 12:
-                        break;
+                    case 1: break;
+                    case 10: break; //Ignore as Server
+                    case 11: break; //Ignore as Server
+                    case 12: break; //Ignore as Server
                 }
             };
         }
@@ -126,7 +111,6 @@ namespace Synapse.Client
                                 maxPlayers = 30,
                                 info = Base64.ToBase64String("=====> Nordholz.Games <=====\nSynapse Modded Client Server\nFriendlyFire: Active".ToBytes())
                             }));
-                            Logger.Get.Info("Sent mark to serverlist");
                         }
                     }
                     catch (Exception e)

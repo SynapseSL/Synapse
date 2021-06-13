@@ -1,5 +1,6 @@
 ﻿using System;
 using HarmonyLib;
+using Synapse.Api;
 
 namespace Synapse.Patches.EventsPatches.RoundPatches
 {
@@ -10,6 +11,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
         {
             try
             {
+                Logger.Get.Warn("Round Start !");
                 SynapseController.Server.Events.Round.InvokeRoundStartEvent();
             }
             catch (Exception e)
