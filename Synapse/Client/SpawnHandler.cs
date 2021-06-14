@@ -13,7 +13,7 @@ namespace Synapse.Client
         
         public abstract void Destroy(GameObject gameObject);
 
-        public string GetBlueprint()
+        public virtual string GetBlueprint()
         {
             if (!(GetType().GetCustomAttribute(typeof(Blueprint)) is Blueprint blueprint))
             {
