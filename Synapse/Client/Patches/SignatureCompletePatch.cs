@@ -44,6 +44,20 @@ namespace Synapse.Client.Patches
                     __instance.RefreshPermissions(false); //Just since its done in base code
                     Timing.RunCoroutine(RefreshPermissionLate(__instance.GetPlayer()));
 
+                    if (!ServerRoles.AllowSameAccountJoining)
+                    {
+                        var playerid = __instance.GetComponent<QueryProcessor>().PlayerId;
+
+                        foreach(var ply in Server.Get.Players)
+                        {
+                            if(ply.UserId == __instance._ccm.UserId && playerid != ply.PlayerId && !ply.Hub.isDedicatedServer && !ply.Hub.isLocalPlayer)
+                            {
+                                ServerConsole.AddLog($"Player {__instance._ccm.UserId} ({ply.PlayerId}, {ply.IpAddress}) has been kicked from the server," +
+                                    $"because he has just joined the server again from IP address {__instance.connectionToClient.address}");
+                                ply.Kick("Only one player instance of the same player is allowed.");
+                            }
+                        }
+                    }
                 }
                 catch (Exception e)
                 {
