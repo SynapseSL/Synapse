@@ -114,6 +114,7 @@
     <Compile Include="Client\ClientManager.cs" />
     <Compile Include="Client\ClientPipeline.cs" />
     <Compile Include="Client\DataUtils.cs" />
+    <Compile Include="Client\DefaultSpawnHandler.cs" />
     <Compile Include="Client\Packets.cs" />
     <Compile Include="Client\Patches\CentralServerCommandPatch.cs" />
     <Compile Include="Client\Patches\CmdSendTokenPatch.cs" />

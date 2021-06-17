@@ -68,7 +68,7 @@ namespace Synapse.Client
     
     public class PipelinePacket
     {
-        public ushort PacketId { get; set; }
+        public uint PacketId { get; set; }
         public byte[] Data { get; set; }
 
         public byte StreamStatus { get; set; } = 0x00;
