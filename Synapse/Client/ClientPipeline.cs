@@ -95,7 +95,7 @@ namespace Synapse.Client
             return JsonConvert.DeserializeObject<T>(s);
         }
 
-        public static PipelinePacket From(ushort id, byte[] payload)
+        public static PipelinePacket From(uint id, byte[] payload)
         {
             return new PipelinePacket
             {
@@ -104,7 +104,7 @@ namespace Synapse.Client
             };
         }
         
-        public static PipelinePacket From(ushort id, string payload)
+        public static PipelinePacket From(uint id, string payload)
         {
             return new PipelinePacket
             {
@@ -113,7 +113,7 @@ namespace Synapse.Client
             };
         }
 
-        public static PipelinePacket From<T>(ushort id, T payload)
+        public static PipelinePacket From<T>(uint id, T payload)
         {
             var encoded = JsonConvert.SerializeObject(payload);
             return From(id, encoded);
