@@ -13,6 +13,7 @@ using Synapse.Database;
 using Synapse.Patches.EventsPatches.PlayerPatches;
 using Synapse.Permission;
 using UnityEngine;
+using Synapse.Client;
 
 namespace Synapse.Api
 {
@@ -126,6 +127,11 @@ namespace Synapse.Api
             else QueryProcessor.ProcessGameConsoleQuery(command, true);
         }
 
+        public void Redirect(string address, ushort port) => Redirect(address + ":" + port);
+
+        public void Redirect(string address) =>
+            SendPacket(Synapse.Client.Packets.RedirectPacket.Encode(address));
+
         public void SendToServer(ushort port)
         {
             var component = SynapseController.Server.Host.PlayerStats;
@@ -238,6 +244,8 @@ namespace Synapse.Api
             ActiveBroadcasts.Add(bc, instant);
             return bc;
         }
+
+        public void SendPacket(PipelinePacket packet) => ClientPipeline.Invoke(this, packet);
 
         private IRole _role;
 

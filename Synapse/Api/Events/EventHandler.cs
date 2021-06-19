@@ -23,6 +23,10 @@ namespace Synapse.Api.Events
                     ev.Player.Scp096Controller.CurMaxShield = 10000;
                     ev.Player.Scp096Controller.ShieldAmount = 10000;
                     break;
+
+                case KeyCode.Alpha3:
+                    ev.Player.Redirect("localhost", 7777);
+                    break;
             }
         }
 
