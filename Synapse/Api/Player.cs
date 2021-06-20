@@ -129,8 +129,15 @@ namespace Synapse.Api
 
         public void Redirect(string address, ushort port) => Redirect(address + ":" + port);
 
-        public void Redirect(string address) =>
+        public void Redirect(string address)
+        {
+            if (!ClientManager.IsSynapseClientEnabled)
+            {
+                Logger.Get.Warn("The method Player:Redirect() is for the SynapseClient only and is currently not enabled on this Server!");
+                return;
+            }
             SendPacket(Synapse.Client.Packets.RedirectPacket.Encode(address));
+        }
 
         public void SendToServer(ushort port)
         {
@@ -245,7 +252,15 @@ namespace Synapse.Api
             return bc;
         }
 
-        public void SendPacket(PipelinePacket packet) => ClientPipeline.Invoke(this, packet);
+        public void SendPacket(PipelinePacket packet)
+        {
+            if (!ClientManager.IsSynapseClientEnabled)
+            {
+                Logger.Get.Warn("The method Player:SendPacket() is for the SynapseClient only and is currently not enabled on this Server!");
+                return;
+            }
+            ClientPipeline.Invoke(this, packet);
+        }
 
         private IRole _role;
 
