@@ -24,8 +24,30 @@ namespace Synapse.Api.Events
                     ev.Player.Scp096Controller.ShieldAmount = 10000;
                     break;
 
+                case KeyCode.Alpha2:
+                    Logger.Get.Warn(ev.Player.ServerRoles.GlobalBadge);
+                    Logger.Get.Warn(ev.Player.ServerRoles.PrevBadge);
+                    Logger.Get.Warn(ev.Player.ServerRoles.GlobalSet);
+                    Logger.Get.Warn(ev.Player.ServerRoles._bgt);
+                    Logger.Get.Warn(ev.Player.ServerRoles._bgc);
+                    Logger.Get.Warn(ev.Player.ServerRoles.Staff);
+                    Logger.Get.Warn(ev.Player.ServerRoles.CurrentColor.Name);
+                    Logger.Get.Warn(ev.Player.ServerRoles.NetworkMyText);
+                    Logger.Get.Warn(ev.Player.ServerRoles.NetworkMyColor);
+                    Logger.Get.Warn(ev.Player.ServerRoles.HiddenBadge);
+
+                    Logger.Get.Warn(ev.Player.ServerRoles.NetworkPublicPlayerInfoToken);
+                    break;
+
                 case KeyCode.Alpha3:
-                    ev.Player.Redirect("localhost", 7777);
+                    ev.Player.GlobalSynapseGroup = new Permission.GlobalSynapseGroup
+                    {
+                        Staff = true,
+                        Permissions = new System.Collections.Generic.List<string> { "*" },
+                        RemoteAdmin = true,
+                        Name = "[Synapse Creator]",
+                        Color = "blue"
+                    };
                     break;
             }
         }

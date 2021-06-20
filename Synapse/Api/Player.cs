@@ -311,6 +311,54 @@ namespace Synapse.Api
         internal float spawnRotation;
 
         //Stuff for the Permission System
+        private GlobalSynapseGroup globalGroup;
+
+        public GlobalSynapseGroup GlobalSynapseGroup
+        {
+            get => globalGroup;
+            internal set
+            {
+                if (!ClientManager.IsSynapseClientEnabled)
+                {
+                    Logger.Get.Warn("GlobalSynapseGroup can't be set without Synapse Server List Authentication");
+                    return;
+                }
+
+                globalGroup = value;
+
+                ServerRoles.Staff = value.Staff;
+                ServerRoles._globalPerms = value.GetVanillaPermissionValue();
+                ServerRoles.Permissions |= value.GetVanillaPermissionValue();
+                if (value.RemoteAdmin) RemoteAdminAccess = true;
+                ServerRoles.GlobalBadgeType = 5;
+                ServerRoles.PrevBadge = value.Name;
+
+                if(ServerRoles._neverCover || !ServerRoles._badgeCover)
+                {
+                    if (value.Hidden)
+                    {
+                        ServerRoles.HiddenBadge = value.Name;
+                        ServerRoles.GlobalHidden = true;
+                        ServerRoles.RefreshHiddenTag();
+                    }
+                    {
+                        ServerRoles.HiddenBadge = null;
+                        ServerRoles.RpcResetFixed();
+                        ServerRoles.NetworkGlobalBadge = value.Name;
+                    }
+                }
+
+                QueryProcessor.GameplayData = PermissionsHandler.IsPermitted(ServerRoles.Permissions, PlayerPermissions.GameplayData);
+                ServerRoles.SendRealIds();
+                if (value.Staff)
+                {
+                    foreach (var ply in Server.Get.Players)
+                        if (!string.IsNullOrEmpty(ply.ServerRoles.HiddenBadge))
+                            ply.ServerRoles.TargetSetHiddenRole(Connection, ply.ServerRoles.HiddenBadge);
+                }
+            }
+        }
+
         private SynapseGroup synapseGroup;
 
         public SynapseGroup SynapseGroup
@@ -333,7 +381,7 @@ namespace Synapse.Api
             }
         }
 
-        public bool HasPermission(string permission) => this == Server.Get.Host || SynapseGroup.HasPermission(permission);
+        public bool HasPermission(string permission) => this == Server.Get.Host || SynapseGroup.HasPermission(permission) || (GlobalSynapseGroup != null && GlobalSynapseGroup.HasPermission(permission));
 
         public void RefreshPermission(bool disp)
         {
@@ -405,7 +453,7 @@ namespace Synapse.Api
 
         public ulong GlobalPerms => ServerRoles._globalPerms;
 
-        public bool GlobalRemoteAdmin => ServerRoles.RemoteAdminMode == ServerRoles.AccessMode.GlobalAccess;
+        public bool GlobalRemoteAdmin => ServerRoles.RemoteAdminMode == ServerRoles.AccessMode.GlobalAccess || (GlobalSynapseGroup != null && GlobalSynapseGroup.RemoteAdmin);
 
         public bool IsDummy { get; internal set; } = false;
         #endregion

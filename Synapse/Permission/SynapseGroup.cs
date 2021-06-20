@@ -106,6 +106,6 @@ namespace Synapse.Permission
             return value;
         }
 
-        private const string VanillaPrefix = "vanilla";
+        internal const string VanillaPrefix = "vanilla";
     }
 }

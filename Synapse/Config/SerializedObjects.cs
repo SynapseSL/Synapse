@@ -194,4 +194,25 @@ namespace Synapse.Config
         public float Y { get; set; }
         public float Z { get; set; }
     }
+
+    [Serializable]
+    public class SerializedVector2
+    {
+        public float X { get; set; }
+        public float Y { get; set; }
+    }
+
+    [Serializable]
+    public class SerializedPlayerState
+    {
+        public int RoleID { get; set; }
+        public SerializedAmmo Ammo { get; set; }
+        public List<SerializedItem> Items { get; set; }
+        public SerializedVector2 Rotation { get; set; }
+        public SerializedVector3 Position { get; set; }
+        public float HP { get; set; }
+        public float MaxHP { get; set; }
+        public float ArtificalHealth { get; set; }
+        public float MaxArtificalHealth { get; set; }
+    }
 }
