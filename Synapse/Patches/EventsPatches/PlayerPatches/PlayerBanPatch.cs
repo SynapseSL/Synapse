@@ -23,6 +23,13 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 SynapseController.Server.Events.Player.InvokePlayerBanEvent(player, banIssuer, ref duration, ref reason,
                     ref allow);
                 var finalizedAllow = isGlobalBan && ConfigFile.ServerConfig.GetBool("gban_ban_ip") || allow;
+
+                if(player.GlobalSynapseGroup != null)
+                {
+                    if (duration < 1 && !player.GlobalSynapseGroup.Kickable) finalizedAllow = false;
+                    else if (!player.GlobalSynapseGroup.Bannable) finalizedAllow = false;
+                }
+
                 if (finalizedAllow && PunishmentRepository.Enabled)
                 {
                     var time = DateTime.Now;

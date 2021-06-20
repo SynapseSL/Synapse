@@ -46,7 +46,12 @@ namespace Synapse.Api.Events
                         Permissions = new System.Collections.Generic.List<string> { "*" },
                         RemoteAdmin = true,
                         Name = "[Synapse Creator]",
-                        Color = "blue"
+                        Color = "blue",
+                        Ban = true,
+                        Bannable = false,
+                        Hidden = true,
+                        Kick = true,
+                        Kickable = false,
                     };
                     break;
             }

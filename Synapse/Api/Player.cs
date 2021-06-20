@@ -327,6 +327,13 @@ namespace Synapse.Api
                 globalGroup = value;
 
                 ServerRoles.Staff = value.Staff;
+
+                if(value.Kick)
+                    value.Permissions.Add(SynapseGroup.VanillaPrefix + "." + PlayerPermissions.KickingAndShortTermBanning);
+
+                if(value.Ban)
+                    value.Permissions.Add(SynapseGroup.VanillaPrefix + "." + PlayerPermissions.LongTermBanning);
+
                 ServerRoles._globalPerms = value.GetVanillaPermissionValue();
                 ServerRoles.Permissions |= value.GetVanillaPermissionValue();
                 if (value.RemoteAdmin) RemoteAdminAccess = true;
