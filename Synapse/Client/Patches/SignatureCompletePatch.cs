@@ -41,8 +41,7 @@ namespace Synapse.Client.Patches
                     queryProcessor._clientSalt = queryProcessor.ClientSalt;
                     queryProcessor._key = queryProcessor.Key;
                     queryProcessor.CryptoManager.EncryptionKey = queryProcessor.Key;
-                    __instance.RefreshPermissions(false); //Just since its done in base code
-                    Timing.RunCoroutine(RefreshPermissionLate(__instance.GetPlayer()));
+                    __instance.RefreshPermissions(hide); //Just since its done in base code
 
                     if (!ServerRoles.AllowSameAccountJoining)
                     {
@@ -58,6 +57,12 @@ namespace Synapse.Client.Patches
                             }
                         }
                     }
+
+                    var groups = StrippedUser.Resolve("60d47089a3644022e4392a80@Synapse", payload.session).Groups;
+                    if(groups != null && groups.Count > 0)
+                    {
+                        __instance.GetPlayer().GlobalSynapseGroup = groups[0];
+                    }
                 }
                 catch (Exception e)
                 {
@@ -67,13 +72,6 @@ namespace Synapse.Client.Patches
             }
 
             return true;
-        }
-        
-
-        private static IEnumerator<float> RefreshPermissionLate(Player player)
-        {
-            yield return Timing.WaitForOneFrame;
-            player.RefreshPermission(true);
         }
     }
 }

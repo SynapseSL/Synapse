@@ -25,6 +25,8 @@ namespace Synapse.Client
     {
         internal ClientManager() { }
 
+        public const string CentralServer = "https://central.synapsesl.xyz";
+
         public static bool IsSynapseClientEnabled { get; private set; } = false;
 
         public SpawnController SpawnController { get; set; } = new SpawnController();
@@ -32,7 +34,7 @@ namespace Synapse.Client
         public ClientConnectionData DecodeJWT(string jwt)
         {
             var webClient = new WebClient();
-            var pem = webClient.DownloadString("https://central.synapsesl.xyz/session/verificationKey");
+            var pem = webClient.DownloadString(CentralServer + "/session/verificationKey");
             var pr = new PemReader(new StringReader(pem));
             var publicKey = (AsymmetricKeyParameter)pr.ReadObject();
             var rsaParams = DotNetUtilities.ToRSAParameters((RsaKeyParameters)publicKey);

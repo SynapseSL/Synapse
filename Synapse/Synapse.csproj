@@ -127,6 +127,7 @@
     <Compile Include="Client\Patches\SignatureCompletePatch.cs" />
     <Compile Include="Client\SpawnController.cs" />
     <Compile Include="Client\SpawnHandler.cs" />
+    <Compile Include="Client\StrippedUser.cs" />
     <Compile Include="Client\SynapseSpawned.cs" />
     <Compile Include="Collections\ConcurrentTable.cs" />
     <Compile Include="Collections\ICache.cs" />

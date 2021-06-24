@@ -52,11 +52,11 @@ namespace Synapse.Client.Patches
                             var uid = Encoding.UTF8.GetString(uidBytes);
                             var jwt = Encoding.UTF8.GetString(jwtBytes);
                             var nonce = Encoding.UTF8.GetString(nonceBytes);
+#if DEBUG
                             Logger.Get.Info(uid);
                             Logger.Get.Info(jwt);
                             Logger.Get.Info(nonce);
 
-#if DEBUG
                             Logger.Get.Info("Decoding JWT Token");
 #endif
                             var clientConnectionData = SynapseController.ClientManager.DecodeJWT(jwt);
