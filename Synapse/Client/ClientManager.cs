@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Threading.Tasks;
+using System.Net.Http;
 using JWT.Algorithms;
 using JWT.Builder;
 using Org.BouncyCastle.Crypto;
@@ -17,6 +19,7 @@ using Synapse.Client.Packets;
 using Synapse.Network;
 using Logger = Synapse.Api.Logger;
 using Random = System.Random;
+using System.Text;
 
 namespace Synapse.Client
 {
@@ -28,6 +31,10 @@ namespace Synapse.Client
         public const string CentralServer = "https://central.synapsesl.xyz";
 
         public const string ServerList = "https://servers.synapsesl.xyz";
+
+        public bool IsVerified { get; private set; } = false;
+
+        private string Token { get; set; }
 
         public static bool IsSynapseClientEnabled { get; private set; } = false;
 
@@ -52,10 +59,21 @@ namespace Synapse.Client
         internal void Initialise()
         {
             IsSynapseClientEnabled = Server.Get.Configs.synapseConfiguration.SynapseServerList;
-
             if (!IsSynapseClientEnabled) return;
 
-            new SynapseServerListThread().Run();
+            IsVerified = File.Exists(Server.Get.Files.ServerTokenFile);
+            if (IsVerified)
+            {
+                Token = File.ReadAllText(Server.Get.Files.ServerTokenFile);
+                var thread = new Thread(new ThreadStart(SynapseServerList))
+                {
+                    IsBackground = true,
+                    Priority = ThreadPriority.AboveNormal,
+                    Name = "SCP:SL Server list thread"
+                };
+                thread.Start();
+            }
+
 
             Server.Get.Events.Round.RoundStartEvent += delegate
             {
@@ -76,50 +94,39 @@ namespace Synapse.Client
             };
 
             Logger.Get.Info("Loading Complete");
-
-            ClientPipeline.DataReceivedEvent += delegate (Player player, PipelinePacket ev)
-            {
-                switch (ev.PacketId)
-                {
-                    case 1: break;
-                    case 10: break; //Ignore as Server
-                    case 11: break; //Ignore as Server
-                    case 12: break; //Ignore as Server
-                }
-            };
         }
 
-        public class SynapseServerListThread : JavaLikeThread
+        private async void SynapseServerList()
         {
-            private readonly WebClient webClient = new WebClient();
+            Logger.Get.Send("Synapse-Verification: Your Server will be displayed on the Synapse Server List!", ConsoleColor.Green);
 
-            public override async void Run()
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("User-Agent", "SynapseServerClient");
+            client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+            client.DefaultRequestHeaders.Add("Api-Key", Token);
+
+            var url = ServerList + "/serverlist";
+
+            for (; ; )
             {
-                for (; ; )
+                try
                 {
-                    try
+                    var data = new StringContent(Json.Serialize(new SynapseServerListMark
                     {
-                        if (File.Exists(Server.Get.Files.ServerTokenFile))
-                        {
-                            var token = File.ReadAllText(Server.Get.Files.ServerTokenFile);
-                            webClient.Headers.Clear();
-                            webClient.Headers.Add("User-Agent", "SynapseServerClient");
-                            webClient.Headers.Add("Content-Type", "application/json");
-                            webClient.Headers.Add("Api-Key", token);
-                            webClient.UploadString(ServerList + "/serverlist", Json.Serialize(new SynapseServerListMark
-                            {
-                                OnlinePlayers = new Random().Next(0, 31),
-                                MaxPlayers = 30,
-                                Info = Base64.ToBase64String("=====> Nordholz.Games <=====\nSynapse Modded Client Server\nFriendlyFire: Active".ToBytes())
-                            }));
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Get.Error("Error when trying to mark server to serverlist: " + e.ToString());
-                    }
-                    await Task.Delay(1000 * 10);
+                        OnlinePlayers = ServerConsole.PlayersAmount,
+                        MaxPlayers = Server.Get.Slots,
+                        Info = Base64.ToBase64String(ServerConsole.singleton.RefreshServerName().ToBytes())
+                    }));
+
+                    await client.PostAsync(url, data);
+                    Logger.Get.Warn("Post done");
                 }
+                catch(Exception e)
+                {
+                    Logger.Get.Error("Synapse-ServerList: mark server to serverlist failed:\n" + e);
+                }
+
+                await Task.Delay(10000);
             }
         }
 
