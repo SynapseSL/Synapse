@@ -16,7 +16,7 @@ namespace Synapse.Client.ServerList
     {
         internal SynapseServerListManager() { }
 
-        public event Synapse.Api.Events.EventHandler.OnSynapseEvent<RefreshServerListEventArguments> RefreshServerListEvent;
+        public ServerListInfo Info { get; } = new ServerListInfo();
 
         public bool IsVerified { get; private set; } = false;
 
@@ -57,19 +57,7 @@ namespace Synapse.Client.ServerList
                 {
                     try
                     {
-                        var mark = new SynapseServerListMark
-                        {
-                            OnlinePlayers = ServerConsole.PlayersAmount,
-                            MaxPlayers = Server.Get.Slots,
-                            Info = Base64.ToBase64String(ServerConsole.singleton.RefreshServerName().ToBytes())
-                        };
-
-                        RefreshServerListEvent?.Invoke(new RefreshServerListEventArguments()
-                        {
-                            Data = mark,
-                            Url = url
-                        });
-
+                        var mark = Info.GetMark();
                         var data = new StringContent(Json.Serialize(mark), Encoding.UTF8, "application/json");
 
                         await client.PostAsync(url, data);

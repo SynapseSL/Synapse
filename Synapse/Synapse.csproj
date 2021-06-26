@@ -127,7 +127,7 @@
     <Compile Include="Client\Patches\PreAuthenticationPatch.cs" />
     <Compile Include="Client\Patches\ServerRoleUpdatePatch.cs" />
     <Compile Include="Client\Patches\SignatureCompletePatch.cs" />
-    <Compile Include="Client\ServerList\RefreshServerListEventArguments.cs" />
+    <Compile Include="Client\ServerList\ServerListInfo.cs" />
     <Compile Include="Client\ServerList\SynapseServerListManager.cs" />
     <Compile Include="Client\SpawnController.cs" />
     <Compile Include="Client\SpawnHandler.cs" />
