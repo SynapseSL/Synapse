@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Org.BouncyCastle.Utilities.Encoders;
@@ -43,34 +44,37 @@ namespace Synapse.Client.ServerList
         private async void SynapseServerList()
         {
             Logger.Get.Send("Synapse-Verification: Your Server will be displayed on the Synapse Server List!", ConsoleColor.Green);
-
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("User-Agent", "SynapseServerClient");
-            client.DefaultRequestHeaders.Add("Content-Type", "application/json");
-            client.DefaultRequestHeaders.Add("Api-Key", Token);
-
-            var url = ClientManager.ServerList + "/serverlist";
-
-            for (; ; )
+            try
             {
-                try
+                var client = new HttpClient();
+                client.DefaultRequestHeaders.Add("Api-Key", Token);
+
+                var url = ClientManager.ServerList + "/serverlist";
+
+                for (; ; )
                 {
-                    var data = new StringContent(Json.Serialize(new SynapseServerListMark
+                    try
                     {
-                        OnlinePlayers = ServerConsole.PlayersAmount,
-                        MaxPlayers = Server.Get.Slots,
-                        Info = Base64.ToBase64String(ServerConsole.singleton.RefreshServerName().ToBytes())
-                    }));
+                        var data = new StringContent(Json.Serialize(new SynapseServerListMark
+                        {
+                            OnlinePlayers = ServerConsole.PlayersAmount,
+                            MaxPlayers = Server.Get.Slots,
+                            Info = Base64.ToBase64String(ServerConsole.singleton.RefreshServerName().ToBytes())
+                        }),Encoding.UTF8, "application/json");
 
-                    await client.PostAsync(url, data);
-                    Logger.Get.Warn("Post done");
-                }
-                catch (Exception e)
-                {
-                    Logger.Get.Error("Synapse-ServerList: mark server to serverlist failed:\n" + e);
-                }
+                        await client.PostAsync(url, data);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Get.Error("Synapse-ServerList: mark server to serverlist failed:\n" + e);
+                    }
 
-                await Task.Delay(30000);
+                    await Task.Delay(30000);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Get.Error("Synapse-ServerList: mark server to serverlist failed:\n" + e);
             }
         }
     }
