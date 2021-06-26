@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using HarmonyLib;
-using MEC;
 using Org.BouncyCastle.Utilities;
 using RemoteAdmin;
-using Swan;
 using Synapse.Api;
 
 namespace Synapse.Client.Patches
@@ -19,12 +16,12 @@ namespace Synapse.Client.Patches
                 try
                 {
                     var payload = SynapseController.ClientManager.DecodeJWT(response);
-                    __instance._ccm.UserId = payload.uuid;
-                    __instance._ccm.SyncedUserId = payload.uuid;
+                    __instance._ccm.UserId = payload.Uuid;
+                    __instance._ccm.SyncedUserId = payload.Uuid;
                     __instance.PublicKeyAccepted = true;
-                    __instance._hub.nicknameSync.UpdateNickname(payload.sub);
+                    __instance._hub.nicknameSync.UpdateNickname(payload.Sub);
                     ServerConsole.NewPlayers.Add(__instance._ccm);
-                    var sessionBytes = Utf8.GetBytes(payload.session);
+                    var sessionBytes = Utf8.GetBytes(payload.Session);
                     if (sessionBytes.Length != 24)
                     {
                         Logger.Get.Info("Wrong Session Token Length?");
@@ -58,7 +55,8 @@ namespace Synapse.Client.Patches
                             }
                         }
                     }
-                    var groups = StrippedUser.Resolve(uid, payload.session).Groups;
+
+                    var groups = StrippedUser.Resolve(uid, payload.Session).Groups;
                     if(groups != null && groups.Count > 0)
                     {
                         __instance.GetPlayer().GlobalSynapseGroup = groups[0];

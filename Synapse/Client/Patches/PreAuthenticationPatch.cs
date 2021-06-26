@@ -74,7 +74,7 @@ namespace Synapse.Client.Patches
                                     CustomLiteNetLib4MirrorTransport.UserIds.Add(request.RemoteEndPoint,
                                         new PreauthItem(uid));
 
-                                SynapseController.ClientManager.Clients[clientConnectionData.uuid] = clientConnectionData;
+                                SynapseController.ClientManager.Clients[clientConnectionData.Uuid] = clientConnectionData;
 
                                 request.Accept();
                                 ServerConsole.AddLog(

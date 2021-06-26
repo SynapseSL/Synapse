@@ -90,21 +90,21 @@ namespace Synapse.Client.Packets
             {
                 Blueprint = blueprint,
                 Name = name,
-                x = pos.x,
-                y = pos.y,
-                z = pos.z,
-                rx = rot.x,
-                ry = rot.y,
-                rz = rot.z,
-                rw = rot.w
+                X = pos.x,
+                Y = pos.y,
+                Z = pos.z,
+                Rx = rot.x,
+                Ry = rot.y,
+                Rz = rot.z,
+                Rw = rot.w
             });
         }
 
         public static void Decode(PipelinePacket packet, out Vector3 pos, out Quaternion rot, out string name, out string blueprint)
         {
             var pack = packet.As<Pack>();
-            pos = new Vector3(pack.x, pack.y, pack.z);
-            rot = new Quaternion(pack.rx, pack.ry, pack.rz, pack.rw);
+            pos = new Vector3(pack.X, pack.Y, pack.Z);
+            rot = new Quaternion(pack.Rx, pack.Ry, pack.Rz, pack.Rw);
             name = pack.Name;
             blueprint = pack.Blueprint;
         }
@@ -113,13 +113,20 @@ namespace Synapse.Client.Packets
         {
             public string Blueprint { get; set; }
             public string Name { get; set; }
-            public float x { get; set; }
-            public float y { get; set; }
-            public float z { get; set; }
-            public float rx { get; set; }
-            public float ry { get; set; }
-            public float rz { get; set; }
-            public float rw { get; set; }
+            [Newtonsoft.Json.JsonProperty("x")]
+            public float X { get; set; }
+            [Newtonsoft.Json.JsonProperty("y")]
+            public float Y { get; set; }
+            [Newtonsoft.Json.JsonProperty("z")]
+            public float Z { get; set; }
+            [Newtonsoft.Json.JsonProperty("rx")]
+            public float Rx { get; set; }
+            [Newtonsoft.Json.JsonProperty("ry")]
+            public float Ry { get; set; }
+            [Newtonsoft.Json.JsonProperty("rz")]
+            public float Rz { get; set; }
+            [Newtonsoft.Json.JsonProperty("rw")]
+            public float Rw { get; set; }
         }
     }
 

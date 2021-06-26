@@ -27,6 +27,8 @@ namespace Synapse.Client
 
         public const string CentralServer = "https://central.synapsesl.xyz";
 
+        public const string ServerList = "https://servers.synapsesl.xyz";
+
         public static bool IsSynapseClientEnabled { get; private set; } = false;
 
         public SpawnController SpawnController { get; set; } = new SpawnController();
@@ -104,11 +106,11 @@ namespace Synapse.Client
                             webClient.Headers.Add("User-Agent", "SynapseServerClient");
                             webClient.Headers.Add("Content-Type", "application/json");
                             webClient.Headers.Add("Api-Key", token);
-                            webClient.UploadString("https://servers.synapsesl.xyz/serverlist", Json.Serialize(new SynapseServerListMark
+                            webClient.UploadString(ServerList + "/serverlist", Json.Serialize(new SynapseServerListMark
                             {
-                                onlinePlayers = new Random().Next(0, 31),
-                                maxPlayers = 30,
-                                info = Base64.ToBase64String("=====> Nordholz.Games <=====\nSynapse Modded Client Server\nFriendlyFire: Active".ToBytes())
+                                OnlinePlayers = new Random().Next(0, 31),
+                                MaxPlayers = 30,
+                                Info = Base64.ToBase64String("=====> Nordholz.Games <=====\nSynapse Modded Client Server\nFriendlyFire: Active".ToBytes())
                             }));
                         }
                     }
@@ -117,16 +119,20 @@ namespace Synapse.Client
                         Logger.Get.Error("Error when trying to mark server to serverlist: " + e.ToString());
                     }
                     await Task.Delay(1000 * 10);
-
                 }
             }
         }
 
         public class SynapseServerListMark
         {
-            public int onlinePlayers { get; set; }
-            public int maxPlayers { get; set; }
-            public string info { get; set; }
+            [Swan.Formatters.JsonProperty("onlinePlayers")]
+            public int OnlinePlayers { get; set; }
+
+            [Swan.Formatters.JsonProperty("maxPlayers")]
+            public int MaxPlayers { get; set; }
+
+            [Swan.Formatters.JsonProperty("info")]
+            public string Info { get; set; }
         }
 
         public Dictionary<String, ClientConnectionData> Clients { get; set; } =
@@ -137,12 +143,17 @@ namespace Synapse.Client
     public class ClientConnectionData
     {
         //JWT Subject == Name
-        public string sub { get; set; }
+        [Newtonsoft.Json.JsonProperty("sub")]
+        public string Sub { get; set; }
         //JWT Audience == Connected Server
-        public string aud { get; set; }
+        [Newtonsoft.Json.JsonProperty("aud")]
+        public string Aud { get; set; }
         //JWT Issuer == Most likely Synapse
-        public string iss { get; set; }
-        public string uuid { get; set; }
-        public string session { get; set; }
+        [Newtonsoft.Json.JsonProperty("iss")]
+        public string Iss { get; set; }
+        [Newtonsoft.Json.JsonProperty("uuid")]
+        public string Uuid { get; set; }
+        [Newtonsoft.Json.JsonProperty("session")]
+        public string Session { get; set; }
     }
 }
