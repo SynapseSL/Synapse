@@ -413,7 +413,7 @@ namespace Synapse
                     ? permissionspath
                     : Path.Combine(SharedConfigDirectory, "permission.syml");
 
-                ServerTokenFile = Path.Combine(SynapseDirectory, "serverlist.token");
+                ServerTokenFile = Path.Combine(ConfigDirectory, "serverlist.token");
             }
 
             public string GetOldTranslationFile(PluginInformation infos)
