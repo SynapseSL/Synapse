@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using EmbedIO;
 using EmbedIO.Routing;
 using EmbedIO.WebApi;
-using Microsoft.Extensions.Logging;
-using Swan;
-using Swan.Formatters;
 using Synapse.Api;
 using Synapse.Network.Models;
 

@@ -98,7 +98,6 @@ namespace Synapse.Network
         // I dont care about if or if not the salt & vector are secure since I am just
         // using this cipher is short lived and the key is encrypted with RSA.
         // But I will make them session generated at a later point ~Helight
-        private readonly static string _hash = "SHA1";
         private static readonly string _salt = "aselrias38490a32"; // Static
         private static readonly string _vector = "8947az34awl34kjq"; // Static
 

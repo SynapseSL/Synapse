@@ -10,7 +10,7 @@ namespace Synapse.Client.Patches
         private static void Prefix(NicknameSync __instance)
         {
             var player = __instance.GetPlayer();
-            if (ClientManager.IsSynapseClientEnabled)
+            if (SynapseController.ClientManager.IsSynapseClientEnabled)
             {
                 var mods = SynapseController.PluginLoader.Plugins.SelectMany(x => x.ActivatedClientMods).ToArray();
                 ClientPipeline.Invoke(player, ConnectionSuccessfulPacket.Encode(mods));

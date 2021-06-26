@@ -9,13 +9,13 @@ namespace Synapse.Client.Patches
     [HarmonyPatch(typeof(ServerRoles), nameof(ServerRoles.CallCmdServerSignatureComplete))]
     public static class SignatureCompletePatch
     {
-        public static bool Prefix(ServerRoles __instance, string challenge, string response, string publickey, bool hide)
+        public static bool Prefix(ServerRoles __instance, string challenge, string response, bool hide)
         {
-            if (challenge.Equals("synapse-client-authentication") && ClientManager.IsSynapseClientEnabled)
+            if (challenge.Equals("synapse-client-authentication") && SynapseController.ClientManager.IsSynapseClientEnabled)
             {
                 try
                 {
-                    var payload = SynapseController.ClientManager.DecodeJWT(response);
+                    var payload = ClientConnectionData.DecodeJWT(response);
                     __instance._ccm.UserId = payload.Uuid;
                     __instance._ccm.SyncedUserId = payload.Uuid;
                     __instance.PublicKeyAccepted = true;

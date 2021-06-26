@@ -7,7 +7,7 @@ namespace Synapse.Client.Patches
     {
         private static bool Prefix()
         {
-            if (!ClientManager.IsSynapseClientEnabled) return true;
+            if (!SynapseController.ClientManager.IsSynapseClientEnabled) return true;
             Synapse.Api.Logger.Get.Info("The Synapse Central Server does not support Central Server Commands");
             return false;
         }

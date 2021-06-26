@@ -12,7 +12,7 @@ namespace Synapse.Client.Patches
     {
         private static bool Prefix(CustomNetworkManager __instance, ref IEnumerator<float> __result)
         {
-            if (!ClientManager.IsSynapseClientEnabled) return true;
+            if (!SynapseController.ClientManager.IsSynapseClientEnabled) return true;
 
             __result = CreateLobby(__instance);
             return false;

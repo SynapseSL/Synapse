@@ -8,7 +8,7 @@ namespace Synapse.Client.Patches
     {
         private static bool Prefix(GameConsoleTransmission __instance, byte[] data, bool encrypted)
         {
-            if (!encrypted && ClientManager.IsSynapseClientEnabled)
+            if (!encrypted && SynapseController.ClientManager.IsSynapseClientEnabled)
             {
                 if (DataUtils.IsData(data))
                 {

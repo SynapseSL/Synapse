@@ -131,7 +131,7 @@ namespace Synapse.Api
 
         public void Redirect(string address)
         {
-            if (!ClientManager.IsSynapseClientEnabled)
+            if (!SynapseController.ClientManager.IsSynapseClientEnabled)
             {
                 Logger.Get.Warn("The method Player:Redirect() is for the SynapseClient only and is currently not enabled on this Server!");
                 return;
@@ -254,7 +254,7 @@ namespace Synapse.Api
 
         public void SendPacket(PipelinePacket packet)
         {
-            if (!ClientManager.IsSynapseClientEnabled)
+            if (!SynapseController.ClientManager.IsSynapseClientEnabled)
             {
                 Logger.Get.Warn("The method Player:SendPacket() is for the SynapseClient only and is currently not enabled on this Server!");
                 return;
@@ -318,7 +318,7 @@ namespace Synapse.Api
             get => globalGroup;
             internal set
             {
-                if (!ClientManager.IsSynapseClientEnabled)
+                if (!SynapseController.ClientManager.IsSynapseClientEnabled)
                 {
                     Logger.Get.Warn("GlobalSynapseGroup can't be set without Synapse Server List Authentication");
                     return;

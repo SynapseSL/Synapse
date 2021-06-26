@@ -9,7 +9,7 @@ namespace Synapse.Client.Patches
     {
         private static bool Prefix(ServerRoles __instance)
         {
-            if (!ClientManager.IsSynapseClientEnabled) return true;
+            if (!SynapseController.ClientManager.IsSynapseClientEnabled) return true;
             try
             {
                 var player = __instance.GetPlayer();

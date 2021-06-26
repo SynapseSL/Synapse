@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
-using Mirror;
 using Synapse.Api;
 using Synapse.Client.Packets;
 using UnityEngine;
@@ -75,7 +73,7 @@ namespace Synapse.Client
         
         public void DestroyFor(Player player, GameObject gameObject, string blueprint)
         {
-            var handler = Blueprints[blueprint];
+            //var handler = Blueprints[blueprint];
             ClientPipeline.Invoke(player, DestroyPacket.Encode(gameObject.name, blueprint));
         }
     }
