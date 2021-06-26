@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Synapse.Api.Plugin
 {
@@ -12,7 +13,7 @@ namespace Synapse.Api.Plugin
         public string Description = "Unknown";
         public string Version = "Unknown";
         public int LoadPriority = 0;
-
+        public string[] ActivatedClientMods = new string[0];
         internal bool shared = false;
     }
 }

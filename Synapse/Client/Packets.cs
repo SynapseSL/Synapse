@@ -6,9 +6,28 @@ using UnityEngine;
 
 namespace Synapse.Client.Packets
 {
-     public static class ConnectionSuccessfulPacket
+    public static class ConnectionSuccessfulPacket
     {
         public const ushort ID = 0;
+
+        public static PipelinePacket Encode(string[] clientMods)
+        {
+            return PipelinePacket.From(ID, new Pack
+            {
+               ActivateClientMods = clientMods
+            });
+        }
+
+        public static void Decode(PipelinePacket packet, out string[] clientMods)
+        {
+            var pack = packet.As<Pack>();
+            clientMods = pack.ActivateClientMods;
+        }
+        
+        private class Pack
+        {
+            public string[] ActivateClientMods { get; set; }
+        }
     }
     
     public static class RoundStartPacket

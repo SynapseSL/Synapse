@@ -42,10 +42,11 @@ namespace Synapse.Client.Patches
                     queryProcessor._key = queryProcessor.Key;
                     queryProcessor.CryptoManager.EncryptionKey = queryProcessor.Key;
                     __instance.RefreshPermissions(hide); //Just since its done in base code
-
+                    var playerid = __instance.GetComponent<QueryProcessor>().PlayerId;
+                    var uid = __instance._ccm.UserId;
+                    
                     if (!ServerRoles.AllowSameAccountJoining)
                     {
-                        var playerid = __instance.GetComponent<QueryProcessor>().PlayerId;
 
                         foreach(var ply in Server.Get.Players)
                         {
@@ -57,8 +58,7 @@ namespace Synapse.Client.Patches
                             }
                         }
                     }
-
-                    var groups = StrippedUser.Resolve("60d47089a3644022e4392a80@Synapse", payload.session).Groups;
+                    var groups = StrippedUser.Resolve(uid, payload.session).Groups;
                     if(groups != null && groups.Count > 0)
                     {
                         __instance.GetPlayer().GlobalSynapseGroup = groups[0];
