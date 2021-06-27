@@ -76,6 +76,8 @@ namespace Synapse
             }
         }
 
+        public int PlayersAmount => ServerConsole.PlayersAmount;
+
         public int Slots
         {
             get => CustomNetworkManager.slots;

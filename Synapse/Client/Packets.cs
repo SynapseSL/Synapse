@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Text;
-using Org.BouncyCastle.Utilities;
-using Synapse.Client;
 using UnityEngine;
 
 namespace Synapse.Client.Packets

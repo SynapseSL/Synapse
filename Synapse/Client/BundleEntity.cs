@@ -19,7 +19,6 @@ namespace UnityEngine
             }
             var descriptor = GetType().GetCustomAttribute(typeof(BundleDescriptor)) as BundleDescriptor;
             var loc = Path.Combine(Server.Get.Files.BundleDirectory, descriptor.Bundle);
-            Synapse.Api.Logger.Get.Info(loc);
             if (!File.Exists(loc) && descriptor.Source != null)
             {
                 var client = new WebClient();

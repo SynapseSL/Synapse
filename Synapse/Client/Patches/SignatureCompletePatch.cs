@@ -24,7 +24,7 @@ namespace Synapse.Client.Patches
                     var sessionBytes = Utf8.GetBytes(payload.Session);
                     if (sessionBytes.Length != 24)
                     {
-                        Logger.Get.Info("Wrong Session Token Length?");
+                        Logger.Get.Info("Synapse-Authentication: Wrong Session Token Length?");
                         return true;
                     }
                     var paddedSessionToken = new byte[32];

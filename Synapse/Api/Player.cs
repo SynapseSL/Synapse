@@ -429,6 +429,12 @@ namespace Synapse.Api
             {
                 ServerRoles.SetColor(null);
                 ServerRoles.SetText(null);
+                if (!string.IsNullOrEmpty(ServerRoles.PrevBadge))
+                {
+                    ServerRoles.HiddenBadge = ServerRoles.PrevBadge;
+                    ServerRoles.GlobalHidden = true;
+                    ServerRoles.RefreshHiddenTag();
+                }
             }
             else
             {

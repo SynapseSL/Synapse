@@ -1,5 +1,8 @@
 ﻿namespace Synapse.Client
 {
+    /// <summary>
+    /// A object that can be serialized for sending it to the server list
+    /// </summary>
     public class SynapseServerListMark
     {
         [Swan.Formatters.JsonProperty("onlinePlayers")]

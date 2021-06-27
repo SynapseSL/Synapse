@@ -71,7 +71,6 @@ namespace Synapse.Database
         public List<PunishmentDbo> GetCurrentPunishments(string player)
         {
             var t = DateTime.Now.ToUnixEpochDate();
-            Logger.Get.Info(t);
             return Find(LiteDB.Query.And(
                 LiteDB.Query.EQ("Receiver", player),
                 LiteDB.Query.GT("Expire", t)));

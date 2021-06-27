@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Utilities.Encoders;
-using Swan;
 using Synapse.Api;
 
 namespace Synapse.Client
@@ -13,7 +12,6 @@ namespace Synapse.Client
         
         public static void Receive(Player player, PipelinePacket data)
         {
-            Logger.Get.Info($"=pipeline=>  {data}");
             DataReceivedEvent?.Invoke(player, data);
         }
 
@@ -30,7 +28,6 @@ namespace Synapse.Client
         public static void Invoke(Player player, PipelinePacket packet)
         {
             var packed = DataUtils.Pack(packet);
-            Logger.Get.Info($"<=pipeline=  {Base64.ToBase64String(packed)}"); 
             player.GameConsoleTransmission.TargetPrintOnConsole(player.Connection, packed, false);
         }
         

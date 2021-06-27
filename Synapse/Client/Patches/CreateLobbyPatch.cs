@@ -37,8 +37,6 @@ namespace Synapse.Client.Patches
 
             ServerConsole.AddLog("Synapse Verification is ENABLED");
 
-            //ServerConsole.RunRefreshPublicKey();
-
             //Query
             if (manager._queryEnabled)
             {
@@ -67,7 +65,7 @@ namespace Synapse.Client.Patches
                     ServerConsole.AddLog("Custom config detected. Your game-server IP will be " + CustomNetworkManager.Ip, ConsoleColor.Gray);
                 }
                 else CustomNetworkManager.Ip = "127.0.0.1";
-                //I don't think we need to get the IP with our current system and I would have to add a new reference
+                //I don't think we need to get the IP with our current system and I would have to add a new reference, but normally would be here a request to the sl api to get the own ip
             }
             else CustomNetworkManager.Ip = "127.0.0.1";
             ServerConsole.Ip = CustomNetworkManager.Ip;
