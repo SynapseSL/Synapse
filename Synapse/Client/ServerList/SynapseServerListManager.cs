@@ -57,33 +57,28 @@ namespace Synapse.Client.ServerList
             await Task.Delay(500);
 
             Logger.Get.Send("Synapse-Verification: Your Server will be displayed on the Synapse Server List!", ConsoleColor.Green);
-            try
+
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("Api-Key", Token);
+
+            var url = ClientManager.ServerList + "/serverlist";
+
+            for (; ; )
             {
-                var client = new HttpClient();
-                client.DefaultRequestHeaders.Add("Api-Key", Token);
-
-                var url = ClientManager.ServerList + "/serverlist";
-
-                for (; ; )
+                try
                 {
-                    try
-                    {
-                        var mark = Info.GetMark();
-                        var data = new StringContent(Json.Serialize(mark), Encoding.UTF8, "application/json");
+                    var mark = Info.GetMark();
+                    var data = new StringContent(Json.Serialize(mark), Encoding.UTF8, "application/json");
 
-                        await client.PostAsync(url, data);
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Get.Error("Synapse-ServerList: mark server to serverlist failed:\n" + e);
-                    }
+                    await client.PostAsync(url, data);
 
-                    await Task.Delay(30000);
                 }
-            }
-            catch (Exception e)
-            {
-                Logger.Get.Error("Synapse-ServerList: mark server to serverlist failed:\n" + e);
+                catch (Exception e)
+                {
+                    Logger.Get.Error("Synapse-ServerList: mark server to serverlist failed:\n" + e);
+                }
+
+                await Task.Delay(30000);
             }
         }
     }

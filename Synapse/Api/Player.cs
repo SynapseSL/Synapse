@@ -216,6 +216,8 @@ namespace Synapse.Api
 
             if (this == Server.Get.Host || HideRank || SynapseGroup.Color.ToUpper() != "RAINBOW") return;
 
+            if (!string.IsNullOrEmpty(ServerRoles.NetworkGlobalBadge)) return;
+
             if (Time.time >= delay)
             {
                 delay = Time.time + 1f;
