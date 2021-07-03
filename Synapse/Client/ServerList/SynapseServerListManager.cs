@@ -70,8 +70,12 @@ namespace Synapse.Client.ServerList
                     var mark = Info.GetMark();
                     var data = new StringContent(Json.Serialize(mark), Encoding.UTF8, "application/json");
 
-                    await client.PostAsync(url, data);
+                    var result = await client.PostAsync(url, data);
 
+                    if (!result.IsSuccessStatusCode)
+                    {
+                        Logger.Get.Warn("Synapse-ServerList: Error while marking to server list. Code: " + result.StatusCode.ToString());
+                    }
                 }
                 catch (Exception e)
                 {
