@@ -75,7 +75,7 @@ namespace Synapse.Config
         public bool DatabaseShared { get; set; } = true;
 
         [Description("Enables storing bans in the database persisting them over the network")]
-        public bool DatabaseBans { get; set; } = true;
+        public bool DatabaseBans { get; set; } = false;
         #endregion
 
         #region Networking

@@ -216,6 +216,8 @@ namespace Synapse.Api
 
             if (this == Server.Get.Host || HideRank || SynapseGroup.Color.ToUpper() != "RAINBOW") return;
 
+            if (!string.IsNullOrEmpty(ServerRoles.NetworkGlobalBadge)) return;
+
             if (Time.time >= delay)
             {
                 delay = Time.time + 1f;
@@ -429,6 +431,12 @@ namespace Synapse.Api
             {
                 ServerRoles.SetColor(null);
                 ServerRoles.SetText(null);
+                if (!string.IsNullOrEmpty(ServerRoles.PrevBadge))
+                {
+                    ServerRoles.HiddenBadge = ServerRoles.PrevBadge;
+                    ServerRoles.GlobalHidden = true;
+                    ServerRoles.RefreshHiddenTag();
+                }
             }
             else
             {

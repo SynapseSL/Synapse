@@ -35,4 +35,4 @@ First of all we need to thank [SCP: Secret Laboratory](https://scpslgame.com) an
 
 We also need to thank the [Harmony](https://github.com/pardeike/Harmony) guys for developing a Runtime .NET Patcher.
 
-#### **Created by Dimenzio and Helight**
+#### **Created by Dimenzio, Helight and SirRob**

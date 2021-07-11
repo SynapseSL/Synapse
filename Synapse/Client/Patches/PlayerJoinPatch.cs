@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using HarmonyLib;
 using Synapse.Client.Packets;
-using Synapse.Network;
 
 namespace Synapse.Client.Patches
 {
