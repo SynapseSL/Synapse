@@ -12,7 +12,7 @@ namespace Synapse.Client.Patches
             var player = __instance.GetPlayer();
             if (SynapseController.ClientManager.IsSynapseClientEnabled)
             {
-                var mods = SynapseController.PluginLoader.Plugins.SelectMany(x => x.ActivatedClientMods).ToArray();
+                var mods = SynapseController.PluginLoader.Plugins.SelectMany(x => x.ActivatedClientMods).Distinct().ToArray();
                 ClientPipeline.Invoke(player, ConnectionSuccessfulPacket.Encode(mods));
                 ClientPipeline.InvokeConnectionComplete(player);
             }
