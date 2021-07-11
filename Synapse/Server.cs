@@ -124,7 +124,7 @@ namespace Synapse
 
 
         public void Reload()
-        {      
+        {
             Configs.Reload();
             PermissionHandler.Reload();
             SynapseController.PluginLoader.ReloadConfigs();

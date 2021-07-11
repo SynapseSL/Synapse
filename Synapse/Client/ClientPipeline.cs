@@ -13,7 +13,7 @@ namespace Synapse.Client
         
         public static void Receive(Player player, PipelinePacket data)
         {
-            Logger.Get.Info($"=pipeline=>  {data}");
+            Logger.Get.Info($"=pipeline=> {data}");
             DataReceivedEvent?.Invoke(player, data);
         }
 
@@ -70,7 +70,6 @@ namespace Synapse.Client
     {
         public uint PacketId { get; set; }
         public byte[] Data { get; set; }
-
         public byte StreamStatus { get; set; } = 0x00;
  
         public override string ToString()
