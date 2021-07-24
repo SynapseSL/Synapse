@@ -77,6 +77,8 @@ namespace Synapse
             }
         }
 
+        public int PlayersAmount => ServerConsole.PlayersAmount;
+
         public int Slots
         {
             get => CustomNetworkManager.slots;
@@ -190,25 +192,20 @@ namespace Synapse
         {
             var players = Players;
 
+            if (argument.Contains("@"))
+            {
+                var player = players.FirstOrDefault(x => x.UserId == argument);
+                if (player != null)
+                    return player;
+            }
+
             if (int.TryParse(argument, out var playerid))
             {
                 var player = GetPlayer(playerid);
-                if (player == null)
-                    goto AA_001;
-
-                return player;
+                if (player != null)
+                    return player;
             }
 
-            if (argument.Contains("@"))
-            {
-                var player = players.FirstOrDefault(x => x.UserId.ToLower() == argument);
-                if (player == null)
-                    goto AA_001;
-
-                return player;
-            }
-
-            AA_001:
             return players.FirstOrDefault(x => x.NickName.ToLower() == argument.ToLower());
         }
 

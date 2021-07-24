@@ -124,7 +124,7 @@ namespace Synapse.Patches.SynapsePatches
             if (SynapseController.CommandHandlers.RemoteAdminHandler.TryGetCommand(args[0], out var command))
             {
                 //If sender has no permission and permission is not null or empty
-                if (!sender.GetPlayer().HasPermission(command.Permission) && !string.IsNullOrWhiteSpace(command.Permission))
+                if (!player.HasPermission(command.Permission) && !string.IsNullOrWhiteSpace(command.Permission))
                 {
                     player.SendRAConsoleMessage(Server.Get.Configs.synapseTranslation.ActiveTranslation.noPermissions.Replace("%perm%", command.Permission), false);
                     return false;

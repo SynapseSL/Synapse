@@ -24,7 +24,7 @@ namespace Synapse.Api
             Scp106Controller = new Scp106Controller(this);
             Scp079Controller = new Scp079Controller(this);
             Scp096Controller = new Scp096Controller(this);
-            Scp173Controller = new Scp173Controller(this);
+            Scp173Controller = new Scp173Controller();
             Jail = new Jail(this);
             ActiveBroadcasts = new BroadcastList(this);
             Inventory = new PlayerInventory(this);
@@ -203,6 +203,8 @@ namespace Synapse.Api
 
             if (this == Server.Get.Host || HideRank || SynapseGroup.Color.ToUpper() != "RAINBOW") return;
 
+            if (!string.IsNullOrEmpty(ServerRoles.NetworkGlobalBadge)) return;
+
             if (Time.time >= delay)
             {
                 delay = Time.time + 1f;
@@ -317,7 +319,7 @@ namespace Synapse.Api
             var group = new UserGroup
             {
                 BadgeText = SynapseGroup.Badge.ToUpper() == "NONE" ? null : SynapseGroup.Badge,
-                BadgeColor = SynapseGroup.Color.ToLower(),
+                BadgeColor = SynapseGroup.Color.ToUpper() == "NONE" ? null : SynapseGroup.Color,
                 Cover = SynapseGroup.Cover,
                 HiddenByDefault = SynapseGroup.Hidden,
                 KickPower = SynapseGroup.KickPower,
@@ -338,16 +340,50 @@ namespace Synapse.Api
                 group.Permissions |= GlobalPerms;
 
             ServerRoles.Group = group;
-
-            if (!ServerRoles.OverwatchPermitted && SynapseGroup.HasVanillaPermission(PlayerPermissions.Overwatch))
-                ServerRoles.OverwatchPermitted = true;
-
+            ServerRoles.Permissions = group.Permissions;
             RemoteAdminAccess = SynapseGroup.RemoteAdmin || GlobalRemoteAdmin;
+            ServerRoles.AdminChatPerms = PermissionsHandler.IsPermitted(group.Permissions, PlayerPermissions.AdminChat);
+            ServerRoles._badgeCover = group.Cover;
+            QueryProcessor.GameplayData = PermissionsHandler.IsPermitted(group.Permissions, PlayerPermissions.GameplayData);
+
+            //Since OverwatchPermitted is a seperate vanilla Central Server Permission it is only activated and never deactivated
+            if (!ServerRoles.OverwatchPermitted && PermissionsHandler.IsPermitted(group.Permissions, PlayerPermissions.AdminChat))
+                ServerRoles.OverwatchPermitted = true;
 
             ServerRoles.SendRealIds();
 
-            var flag = ServerRoles.Staff || SynapseGroup.HasVanillaPermission(PlayerPermissions.ViewHiddenBadges);
-            var flag2 = ServerRoles.Staff || SynapseGroup.HasVanillaPermission(PlayerPermissions.ViewHiddenGlobalBadges);
+            if (string.IsNullOrEmpty(group.BadgeText))
+            {
+                ServerRoles.SetColor(null);
+                ServerRoles.SetText(null);
+                if (!string.IsNullOrEmpty(ServerRoles.PrevBadge))
+                {
+                    ServerRoles.HiddenBadge = ServerRoles.PrevBadge;
+                    ServerRoles.GlobalHidden = true;
+                    ServerRoles.RefreshHiddenTag();
+                }
+            }
+            else
+            {
+                if (ServerRoles._hideLocalBadge || (group.HiddenByDefault && !disp && !ServerRoles._neverHideLocalBadge))
+                {
+                    ServerRoles.NetworkMyText = null;
+                    ServerRoles.NetworkMyColor = "default";
+                    ServerRoles.HiddenBadge = group.BadgeText;
+                    ServerRoles.RefreshHiddenTag();
+                    ServerRoles.TargetSetHiddenRole(Connection, group.BadgeText);
+                }
+                else
+                {
+                    ServerRoles.HiddenBadge = null;
+                    ServerRoles.RpcResetFixed();
+                    ServerRoles.NetworkMyText = group.BadgeText;
+                    ServerRoles.NetworkMyColor = group.BadgeColor;
+                }
+            }
+
+            var flag = ServerRoles.Staff || PermissionsHandler.IsPermitted(group.Permissions, PlayerPermissions.ViewHiddenBadges);
+            var flag2 = ServerRoles.Staff || PermissionsHandler.IsPermitted(group.Permissions, PlayerPermissions.ViewHiddenGlobalBadges);
 
             if (flag || flag2)
                 foreach (var player in Server.Get.Players)
@@ -355,29 +391,6 @@ namespace Synapse.Api
                     if (!string.IsNullOrEmpty(player.ServerRoles.HiddenBadge) && (!player.ServerRoles.GlobalHidden || flag2) && (player.ServerRoles.GlobalHidden || flag))
                         player.ServerRoles.TargetSetHiddenRole(Connection, player.ServerRoles.HiddenBadge);
                 }
-
-            if (group.BadgeColor == "none")
-                return;
-
-            if (ServerRoles._hideLocalBadge || (group.HiddenByDefault && !disp && !ServerRoles._neverHideLocalBadge))
-            {
-                ServerRoles._badgeCover = false;
-                if (!string.IsNullOrEmpty(RankName))
-                    return;
-
-                ServerRoles.NetworkMyText = null;
-                ServerRoles.NetworkMyColor = "default";
-                ServerRoles.HiddenBadge = group.BadgeText;
-                ServerRoles.RefreshHiddenTag();
-                ServerRoles.TargetSetHiddenRole(Connection, group.BadgeText);
-            }
-            else
-            {
-                ServerRoles.HiddenBadge = null;
-                ServerRoles.RpcResetFixed();
-                ServerRoles.NetworkMyText = group.BadgeText;
-                ServerRoles.NetworkMyColor = group.BadgeColor;
-            }
         }
 
         public ulong GlobalPerms => ServerRoles._globalPerms;

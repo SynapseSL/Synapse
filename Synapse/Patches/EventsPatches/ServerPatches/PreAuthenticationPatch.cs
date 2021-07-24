@@ -26,7 +26,6 @@ namespace Synapse.Patches.EventsPatches.ServerPatches
             //Since Database is filebased, delay should be minimal, making lags unlikely
             if (allow && PunishmentRepository.Enabled)
             {
-                Logger.Get.Info("=== PUNISHMENT PROXY ENABLED ===");
                 var currentBan = DatabaseManager.PunishmentRepository.GetCurrentPunishments(userId)
                     .Where(x => x.Type == PunishmentType.Ban).FirstOrDefault();
                 if (currentBan != null)
