@@ -46,11 +46,24 @@ namespace Synapse.Command
                 return;
             }
 
-            var command = GeneratedCommand.FromSynapseCommand(iSynapseCommand);
+            RegisterGeneratedCommand(GeneratedCommand.FromSynapseCommand(iSynapseCommand));
+        }
+
+        internal static void FinalizePluginsCommands()
+        {
+            foreach (var iSynapseCommand in AwaitingFinalization)
+                RegisterGeneratedCommand(GeneratedCommand.FromSynapseCommand(iSynapseCommand));
+
+            AwaitingFinalization.Clear();
+        }
+
+        internal static void RegisterGeneratedCommand(GeneratedCommand command)
+        {
             foreach (var platform in command.Platforms)
                 switch (platform)
                 {
                     case Platform.ClientConsole:
+
                         SynapseController.CommandHandlers.ClientCommandHandler.RegisterCommand(command);
                         break;
                     case Platform.RemoteAdmin:
@@ -60,29 +73,6 @@ namespace Synapse.Command
                         SynapseController.CommandHandlers.ServerConsoleHandler.RegisterCommand(command);
                         break;
                 }
-        }
-
-        internal static void FinalizePluginsCommands()
-        {
-            foreach (var iSynapseCommand in AwaitingFinalization)
-            {
-                var command = GeneratedCommand.FromSynapseCommand(iSynapseCommand);
-                foreach (var platform in command.Platforms)
-                    switch (platform)
-                    {
-                        case Platform.ClientConsole:
-                            SynapseController.CommandHandlers.ClientCommandHandler.RegisterCommand(command);
-                            break;
-                        case Platform.RemoteAdmin:
-                            SynapseController.CommandHandlers.RemoteAdminHandler.RegisterCommand(command);
-                            break;
-                        case Platform.ServerConsole:
-                            SynapseController.CommandHandlers.ServerConsoleHandler.RegisterCommand(command);
-                            break;
-                    }
-            }
-
-            AwaitingFinalization.Clear();
         }
     }
 }

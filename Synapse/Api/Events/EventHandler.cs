@@ -22,6 +22,11 @@ namespace Synapse.Api.Events
                     ev.Player.Scp096Controller.MaxShield = 10000;
                     ev.Player.Scp096Controller.CurMaxShield = 10000;
                     ev.Player.Scp096Controller.ShieldAmount = 10000;
+                    SerializedMapPoint point = ev.Player.MapPoint;
+                    ev.Player.MapPoint = (MapPoint)point;
+                    SerializedItem item = ev.Player.ItemInHand;
+                    ev.Player.ItemInHand = (Items.SynapseItem)item;
+                    ev.Player.Position = new SerializedVector3(ev.Player.Position);
                     break;
             }
         }

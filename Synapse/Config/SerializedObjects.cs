@@ -1,8 +1,8 @@
-﻿using Synapse.Api;
-using UnityEngine;
-using System;
-using Synapse.Api.Items;
+﻿using System;
 using System.Collections.Generic;
+using Synapse.Api;
+using Synapse.Api.Items;
+using UnityEngine;
 
 namespace Synapse.Config
 {
@@ -37,12 +37,15 @@ namespace Synapse.Config
         public MapPoint Parse() => MapPoint.Parse(ToString());
 
         public override string ToString() => $"{Room}:{X}:{Y}:{Z}";
+
+        public static explicit operator MapPoint(SerializedMapPoint point) => point.Parse();
+        public static implicit operator SerializedMapPoint(MapPoint point) => new SerializedMapPoint(point);
     }
 
     [Serializable]
     public class SerializedItem
     {
-        public SerializedItem(Synapse.Api.Items.SynapseItem item)
+        public SerializedItem(SynapseItem item)
         {
             ID = item.ID;
             Durabillity = item.Durabillity;
@@ -79,7 +82,10 @@ namespace Synapse.Config
         public float YSize { get; set; }
         public float ZSize { get; set; }
 
-        public Synapse.Api.Items.SynapseItem Parse() => new SynapseItem(ID, Durabillity, Sight, Barrel, Other) { Scale = new Vector3(XSize,YSize,ZSize)};
+        public SynapseItem Parse() => new SynapseItem(ID, Durabillity, Sight, Barrel, Other) { Scale = new Vector3(XSize,YSize,ZSize)};
+
+        public static explicit operator SynapseItem(SerializedItem item) => item.Parse();
+        public static implicit operator SerializedItem(SynapseItem item) => new SerializedItem(item);
     }
 
     [Serializable]
@@ -193,5 +199,8 @@ namespace Synapse.Config
         public float X { get; set; }
         public float Y { get; set; }
         public float Z { get; set; }
+
+        public static implicit operator Vector3(SerializedVector3 vector) => vector.Parse();
+        public static implicit operator SerializedVector3(Vector3 vector) => new SerializedVector3(vector);
     }
 }
