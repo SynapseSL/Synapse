@@ -137,6 +137,7 @@
     <Compile Include="Config\SynapseConfiguration.cs" />
     <Compile Include="Database\DatabaseManager.cs" />
     <Compile Include="Database\Repository.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\914ActivatePatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\LCZDecontaminationPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\DoorInteractPatch.cs" />
