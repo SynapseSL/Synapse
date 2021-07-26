@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using Synapse.Api;
 using Synapse.Api.Items;
 using Synapse.Api.Plugin;
 using Synapse.Api.Roles;
 using Synapse.Api.Teams;
 using Synapse.Config;
-using Synapse.Network;
 using Synapse.Permission;
 using Console = GameCore.Console;
 using EventHandler = Synapse.Api.Events.EventHandler;
@@ -44,8 +42,6 @@ namespace Synapse
         public ItemManager ItemManager { get; } = new ItemManager();
 
         public ConfigHandler Configs { get; } = new ConfigHandler();
-
-        public SynapseNetworkManager NetworkManager { get; } = new SynapseNetworkManager();
 
         public PermissionHandler PermissionHandler { get; } = new PermissionHandler();
 

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.ComponentModel;
-using Synapse.Network;
 
 namespace Synapse.Config
 {
@@ -75,30 +74,6 @@ namespace Synapse.Config
 
         [Description("Enables storing bans in the database persisting them over the network")]
         public bool DatabaseBans { get; set; } = false;
-        #endregion
-
-        #region Networking
-        [Description("Enables the Networking Capabilites of Synapse")]
-        public bool NetworkEnable { get; set; } = false;
-
-        [Description("Enables this server to start a master-webserver if none is present")]
-        public bool MasterAuthority { get; set; } = true;
-
-        [Description("The name of the client which will be visible in logs")]
-        public string NetworkName { get; set; } = $"SynapseServer-{TokenFactory.Instance.GenerateToken(4)}";
-
-        [Description(
-            "The pollrate of the network-client in milliseconds. A lower value result in faster synchronization but increased traffic. Default: 2500")]
-        public long NetworkPollRate { get; set; } = 2500;
-
-        [Description("The port used if this server tries to gain master authority")]
-        public int NetworkPort { get; set; } = 8880;
-
-        [Description("The shared secret for your synapse server network")]
-        public string NetworkSecret { get; set; } = TokenFactory.Instance.GenerateLongToken();
-
-        [Description("The url of master endpoints for the network")]
-        public string NetworkUrl { get; set; } = "http://localhost:8880";
         #endregion
     }
 }

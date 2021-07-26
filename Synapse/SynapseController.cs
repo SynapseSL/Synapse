@@ -34,7 +34,6 @@ public class SynapseController
             Server.PermissionHandler.Init();
             Server.RoleManager.Init();
             CommandHandlers.RegisterSynapseCommands();
-            Server.NetworkManager.Start();
 
             PluginLoader.ActivatePlugins();
         }
