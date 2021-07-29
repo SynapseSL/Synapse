@@ -1,5 +1,6 @@
 ﻿using Mirror;
 using UnityEngine;
+using System.Linq;
 
 namespace Synapse.Api
 {
@@ -17,6 +18,7 @@ namespace Synapse.Api
             ragdoll.NetworkallowRecall = allowRecall;
             ragdoll.NetworkPlayerVelo = velocity;
             Map.Get.Ragdolls.Add(this);
+            RoleId = owner.OldRoleID;
         }
 
         private readonly global::Ragdoll ragdoll;
@@ -24,6 +26,10 @@ namespace Synapse.Api
         public GameObject GameObject => ragdoll.gameObject;
 
         public string Name => ragdoll.name;
+
+        public RoleType RoleType => Server.Get.Host.ClassManager.Classes.FirstOrDefault(roleType => roleType.fullName == ragdoll.owner.FullName).roleId;
+
+        public int RoleId { get; private set; } = -1;
 
         public Vector3 Position
         {

@@ -248,6 +248,8 @@ namespace Synapse.Api
             get => _role;
             set
             {
+                OldRoleID = RoleID;
+
                 if (_role != null)
                     _role.DeSpawn();
 
@@ -259,6 +261,8 @@ namespace Synapse.Api
                 _role.Spawn();
             }
         }
+
+        public int OldRoleID { get; private set; } = -1;
 
         public int RoleID
         {
@@ -559,7 +563,13 @@ namespace Synapse.Api
         public RoleType RoleType
         {
             get => ClassManager.CurClass;
-            set => ClassManager.SetPlayersClass(value, gameObject);
+            set
+            {
+                if (CustomRole == null)
+                    OldRoleID = (int)RoleType;
+
+                ClassManager.SetPlayersClass(value, gameObject);
+            }
         }
 
         public Room Room
