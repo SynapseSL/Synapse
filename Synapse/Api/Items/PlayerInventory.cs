@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using InventorySystem;
 
 namespace Synapse.Api.Items
 {
@@ -11,37 +12,27 @@ namespace Synapse.Api.Items
 
         public SynapseItem this[int index]
         {
-            get => player.VanillaInventory.items[index].GetSynapseItem();
+            get => Items[index];
         }
 
-        public List<Items.SynapseItem> Items => player.VanillaInventory.items.Select(x => x.GetSynapseItem()).ToList();
+        public List<Items.SynapseItem> Items => player.VanillaInventory.UserInventory.Items.Select(x => SynapseItem.AllItems[x.Key]).ToList();
 
-        public void AddItem(Items.SynapseItem item)
+        public void AddItem(SynapseItem item) => item.PickUp(player);
+
+        public void AddItem(ItemType type) => new SynapseItem(type, player);
+
+        public void AddItem(int id) => new SynapseItem(id, player);
+
+        public void RemoveItem(SynapseItem item) => item.Destroy();
+
+        public void Drop(SynapseItem item) => item.Drop(player.Position);
+
+        public void DropAll() => player.VanillaInventory.ServerDropEverything();
+
+        public void Clear()
         {
-            if (item.ItemHolder == player) return;
-            if (item.ItemHolder != null)
-                item.Despawn();
-
-            item.PickUp(player);
+            foreach (var item in Items)
+                item.Destroy();
         }
-
-        public void AddItem(ItemType type, float dur, int sight, int barrel, int other) => new Items.SynapseItem(type, dur, sight, barrel, other).PickUp(player);
-
-        public void AddItem(int id, float dur, int sight, int barrel, int other) => new Items.SynapseItem(id, dur, sight, barrel, other).PickUp(player);
-
-
-
-        public void RemoveItem(Items.SynapseItem item)
-        {
-            if (item.ItemHolder != player) return;
-
-            item.Despawn();
-        }
-
-        public void Clear() => player.VanillaInventory.Clear();
-
-        public void Drop(Items.SynapseItem item) => item.Drop(player.Position);
-
-        public void DropAll() => player.VanillaInventory.ServerDropAll();
     }
 }

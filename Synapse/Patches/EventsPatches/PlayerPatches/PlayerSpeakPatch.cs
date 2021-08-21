@@ -1,11 +1,12 @@
 ﻿using System;
 using Assets._Scripts.Dissonance;
 using HarmonyLib;
+using Synapse.Api.Events.SynapseEventArguments;
 
 // ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(DissonanceUserSetup), nameof(DissonanceUserSetup.CallCmdAltIsActive))]
+    [HarmonyPatch(typeof(DissonanceUserSetup), nameof(DissonanceUserSetup.UserCode_CmdAltIsActive))]
     internal static class PlayerSpeakPatch
     {
         private static bool Prefix(DissonanceUserSetup __instance, bool value)
@@ -35,13 +36,12 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     if (__instance.RadioAsHuman)
                     {
                         var player = __instance.GetPlayer();
-                        var index = __instance.GetComponent<Radio>().myRadio;
+                        var item = __instance.GetComponent<Radio>().RadioItem;
 
-                        if (index != -1 && index < player.VanillaInventory.items.Count)
+                        if (item != null)
                         {
-                            var item = player.VanillaInventory.items[index].GetSynapseItem();
                             var allowradio = true;
-                            SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allowradio);
+                            SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(player, item.GetSynapseItem(), ItemInteractState.Finalizing, ref allowradio);
                             __instance.RadioAsHuman = allowradio;
                         }
                     }

@@ -1,32 +1,25 @@
 ﻿using System;
 using HarmonyLib;
+using InventorySystem;
+using Synapse.Api.Enum;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(AmmoBox),nameof(AmmoBox.CallCmdDrop))]
+    [HarmonyPatch(typeof(Inventory),nameof(Inventory.UserCode_CmdDropAmmo))]
     internal static class PlayerDropAmmoPatch
     {
-        private static bool Prefix(AmmoBox __instance, int type, uint toDrop)
+        private static bool Prefix(Inventory __instance, ref byte ammoType, ref ushort amount)
         {
             try
             {
-                if (!__instance._iawRateLimit.CanExecute(true)) return false;
-
-                toDrop = Math.Min(toDrop, __instance.amount[type]);
-                if (toDrop < 15u) return false;
-
                 var player = __instance.GetPlayer();
-                var item = player.ItemInHand;
+                var type = (AmmoType)ammoType;
 
-                SynapseController.Server.Events.Player.InvokePlayerDropAmmoEvent(player, item, ref toDrop, ref type, out var allow);
-                if (item != null)
-                    SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allow);
+                SynapseController.Server.Events.Player.
+                    InvokePlayerDropAmmoEvent(player, ref type, ref amount, out var allow);
 
-                if (!allow) return false;
-
-                __instance.amount[type] -= toDrop;
-                __instance._inv.SetPickup(__instance.types[type].inventoryID, toDrop, __instance.transform.position, __instance._inv.camera.transform.rotation, 0, 0, 0);
-                return false;
+                ammoType = (byte)type;
+                return allow;
             }
             catch(Exception e)
             {

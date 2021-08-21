@@ -29,7 +29,10 @@ namespace Synapse.Command
             RegisterCommand(new SynapseSetClassCommand(), false);
             RegisterCommand(new SynapseMapPointCommand(), false);
             RegisterCommand(new SynapseRespawnCommand(), false);
+#if DEBUG
             RegisterCommand(new SynapseGccCommand(), false);
+            RegisterCommand(new SynapseDebugCommand(), false);
+#endif
         }
 
         internal static void RegisterCommand(ISynapseCommand iSynapseCommand, bool awaitPluginInitialisation)

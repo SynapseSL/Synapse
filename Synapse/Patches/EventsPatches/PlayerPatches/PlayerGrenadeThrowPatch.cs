@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Grenades;
 using HarmonyLib;
 using Mirror;
 using Synapse.Api.Events.SynapseEventArguments;
@@ -11,7 +10,8 @@ using Object = UnityEngine.Object;
 // ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-
+	//TODO: Reimplement PlayerThrowGrenadeEvent
+	/*
     [HarmonyPatch(typeof(GrenadeManager), nameof(GrenadeManager._ServerThrowGrenade))]
     internal static class GrenadeThrowCompletePatch
     {
@@ -117,4 +117,5 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 		}
         
     }
+	*/
 }

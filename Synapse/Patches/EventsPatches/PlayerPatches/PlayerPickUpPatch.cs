@@ -1,7 +1,7 @@
 ﻿using System;
 using HarmonyLib;
+using InventorySystem.Searching;
 using Mirror;
-using Searching;
 using Synapse.Api;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
@@ -11,41 +11,45 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     {
         private static bool Prefix(SearchCoordinator __instance)
         {
-            var item = __instance.Completor.TargetPickup?.GetSynapseItem();
-
-            if (item == null) return true;
-
-            if (__instance.Completor.ValidateUpdate())
+            try
             {
-                if (!(NetworkTime.time >= __instance.SessionPipe.Session.FinishTime)) return false;
-                var player = __instance.GetPlayer();
+                var item = __instance.Completor.TargetPickup?.GetSynapseItem();
 
-                var allow = true;
-                try
-                {
-                    Server.Get.Events.Player.InvokePlayerPickUpEvent(player, item, out allow);
-                }
-                catch (Exception e)
-                {
-                    Logger.Get.Error($"Synapse-Event: PlayerPickUp failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
-                }
+                if (item == null) return true;
 
-                if (!allow)
+                if (__instance.Completor.ValidateUpdate())
                 {
-                    __instance.SessionPipe.Invalidate();
-                    return false;
-                }
+                    if (NetworkTime.time < __instance.SessionPipe.Session.FinishTime) return false;
 
-                if (item.ItemType == ItemType.Ammo556 || item.ItemType == ItemType.Ammo762 || item.ItemType == ItemType.Ammo9mm)
-                {
+                    var player = __instance.GetPlayer();
+                    var allow = true;
+
+                    try
+                    {
+                        Server.Get.Events.Player.InvokePlayerPickUpEvent(player, item, out allow);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Get.Error($"Synapse-Event: PlayerPickUp failed!!\n{e}");
+                    }
+
+                    if (!allow)
+                    {
+                        __instance.SessionPipe.Invalidate();
+                        return false;
+                    }
+
                     __instance.Completor.Complete();
-                    item.Destroy();
-                    return false;
                 }
-                item.PickUp(player);
-            }
+                else __instance.SessionPipe.Invalidate();
 
-            return false;
+                return false;
+            }
+            catch(Exception e)
+            {
+                Logger.Get.Error($"Synapse-Event: PlayerPickUp Patch failed!!\n{e}");
+                return true;
+            }
         }
     }
 }

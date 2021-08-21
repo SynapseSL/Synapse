@@ -66,11 +66,11 @@ namespace Synapse.Api
 
         internal bool Forceend { get; set; } = false;
 
-        public TimeSpan RoundLength => RoundStart.RoundLenght;
+        public TimeSpan RoundLength => RoundStart.RoundLength;
 
         public bool RoundIsActive => RoundSummary.RoundInProgress();
 
-        public bool RoundEnded => Rs._roundEnded;
+        public bool RoundEnded => Rs.RoundEnded;
 
         public void StartRound() => CharacterClassManager.ForceRoundStart();
 

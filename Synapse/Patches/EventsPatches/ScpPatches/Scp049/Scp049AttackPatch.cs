@@ -19,7 +19,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp049
                 var scp = __instance.GetPlayer();
                 var player = go.GetPlayer();
 
-                if (player == null || Vector3.Distance(scp.Position, player.Position) >= PlayableScps.Scp049.AttackDistance * 1.25f || !scp.WeaponManager.GetShootPermission(player.ClassManager))
+                if (player == null || Vector3.Distance(scp.Position, player.Position) >= PlayableScps.Scp049.AttackDistance * 1.25f || !HitboxIdentity.CheckFriendlyFire(scp.Hub, player.Hub)) 
                     return false;
 
                 ev.Get.Scp.InvokeScpAttack(scp, player, Api.Enum.ScpAttackType.Scp049_Touch, out var allow);

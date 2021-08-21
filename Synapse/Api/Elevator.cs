@@ -17,7 +17,7 @@ namespace Synapse.Api
 
         public Lift.Status Status { get => Lift.status; set => Lift.SetStatus((byte)value); }
 
-        public bool Locked { get => Lift._locked; set => Lift.SetLock(value); }
+        public bool Locked { get => Lift._locked; set => Lift.SetLock(Locked, value); }
 
         public bool Operative { get => Lift.operative; }
 

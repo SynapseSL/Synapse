@@ -1,4 +1,6 @@
-﻿namespace Synapse.Api
+﻿using System;
+
+namespace Synapse.Api
 {
     public class HeavyController
     {
@@ -6,28 +8,43 @@
 
         internal HeavyController() { }
 
-        public bool ForcedOvercharge => Generator079.mainGenerator.forcedOvercharge;
+        private Recontainer079 Container => Server.Get.GetObjectOf<Recontainer079>();
 
-        public byte ActiveGenerators { get => ForcedOvercharge ? (byte)5 : Generator079.mainGenerator.totalVoltage; internal set => Generator079.mainGenerator.totalVoltage = value; }
+        public byte ActiveGenerators { get => (byte)Container._prevEngaged; }
 
-        public bool Is079Recontained { get; internal set; } = false;
-
-        public void Recontain079(bool forced = true) => Recontainer079.BeginContainment(forced);
-
-        public void Overcharge(bool forced = true)
+        public bool Is079Recontained
         {
-            if (forced)
+            get
             {
-                NineTailedFoxAnnouncer.singleton.ServerOnlyAddGlitchyPhrase("ALLSECURED . SCP 0 7 9 RECONTAINMENT SEQUENCE COMMENCING . FORCEOVERCHARGE", 0.1f, 0.07f);
-                Generator079.mainGenerator.forcedOvercharge = true;
-                Recontain079(forced);
+                var container = Container;
+                return Container._alreadyRecontained && Container._delayStopwatch.Elapsed.TotalSeconds > container._activationDelay;
             }
-            else
-                foreach (var gen in Map.Get.Generators)
-                    if (!gen.IsOvercharged)
-                        gen.Overcharge();
         }
 
-        public void LightsOut(float duration, bool onlyHeavy = true) => Generator079.mainGenerator.ServerOvercharge(duration, onlyHeavy);
+        public void Recontain079()
+        {
+            var recontainer = Container;
+
+            recontainer.TryKill079();
+            recontainer.PlayAnnouncement(recontainer._announcementSuccess + " Unknown", 1f);
+        }
+
+        public void Overcharge() => Container.Recontain();
+
+        public void LightsOut(float duration, bool onlyHeavy = true)
+        {
+            foreach (var room in Map.Get.Rooms)
+                if (!onlyHeavy || room.Zone == Enum.ZoneType.HCZ)
+                    room.LightController?.ServerFlickerLights(duration);
+        }
+
+        [Obsolete("You don't need forced any more")]
+        public void Overcharge(bool forced = true) => Overcharge();
+
+        [Obsolete("You don't need forced any more")]
+        public void Recontain079(bool forced = true) => Recontain079();
+
+        [Obsolete("Removed Since 11.0.0")]
+        public bool ForcedOvercharge => false;
     }
 }

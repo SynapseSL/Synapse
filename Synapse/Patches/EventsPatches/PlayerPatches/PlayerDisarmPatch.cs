@@ -1,100 +1,60 @@
 ﻿using System;
-using UnityEngine;
 using HarmonyLib;
-using GameCore;
+using InventorySystem.Disarming;
+using Mirror;
+using InventorySystem.Items;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(Handcuffs),nameof(Handcuffs.CallCmdCuffTarget))]
+    [HarmonyPatch(typeof(DisarmingHandlers),nameof(DisarmingHandlers.ServerProcessDisarmMessage))]
     internal static class PlayerDisarmPatch
     {
-        private static bool Prefix(Handcuffs __instance, GameObject target)
+        private static bool Prefix(NetworkConnection conn, DisarmMessage msg)
         {
             try
             {
-                if (!__instance._interactRateLimit.CanExecute()) return false;
+                var cuffer = conn.GetPlayer();
+                var target = msg.PlayerToDisarm?.GetPlayer();
 
-                if (target == null || Vector3.Distance(target.transform.position, __instance.transform.position) >
-                    __instance.raycastDistance * 1.1f) return false;
-
-                var targetplayer = target.GetPlayer();
-                var player = __instance.GetPlayer();
-                var item = player.ItemInHand;
-
-                var handcuffs = targetplayer.Handcuffs;
-                if (item.ItemType != ItemType.Disarmer) return false;
-
-                if (handcuffs.CufferId >= 0 || __instance.ForceCuff || handcuffs.MyReferenceHub.inventory.curItem != ItemType.None)
-                    return false;
-
-
-                //Team of the person who cuffs someone
-                var team = player.Team;
-                //Team of the Person who will become cuffed
-                var team2 = targetplayer.Team;
-
-                var flag = false;
-
-                switch (team)
+                if (!msg.PlayerIsNull)
                 {
-                    //Check for When the Cuffer is a DBoy
-                    case Team.CDP:
-                        {
-                            if (team2 == Team.MTF || team2 == Team.RSC) flag = true;
-                            break;
-                        }
-                    //Check for when the Cuffer is a Nerd
-                    case Team.RSC:
-                        {
-                            if (team2 == Team.CHI || team2 == Team.CDP) flag = true;
-                            break;
-                        }
-                    //Check for when the Cuffer is a Chaos
-                    case Team.CHI:
-                        {
-                            switch (team2)
-                            {
-                                case Team.MTF:
-                                case Team.RSC:
-                                case Team.CDP when ConfigFile.ServerConfig.GetBool("ci_can_cuff_class_d"):
-                                    flag = true;
-                                    break;
-                            }
+                    if ((msg.PlayerToDisarm.transform.position - cuffer.Position).sqrMagnitude > 20f)
+                        return false;
 
-                            break;
-                        }
-                    //Check for when the Cuffer is a Mtf
-                    case Team.MTF:
-                        {
-                            switch (team2)
-                            {
-                                case Team.CHI:
-                                case Team.CDP:
-                                case Team.RSC when ConfigFile.ServerConfig.GetBool("mtf_can_cuff_researchers"):
-                                    flag = true;
-                                    break;
-                            }
-
-                            break;
-                        }
+                    if (msg.PlayerToDisarm.inventory.CurInstance != null && msg.PlayerToDisarm.inventory.CurInstance.TierFlags != ItemTierFlags.Common)
+                        return false;
                 }
 
-                //Event
-                var cuffer = __instance.GetPlayer();
-                var target2 = handcuffs.GetPlayer();
-                SynapseController.Server.Events.Player.InvokePlayerCuffTargetEvent(target2, cuffer, item, ref flag);
-                SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(cuffer, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref flag);
+                var flag = !msg.PlayerIsNull && msg.PlayerToDisarm.inventory.IsDisarmed();
+                var flag2 = !msg.PlayerIsNull && DisarmedPlayers.CanDisarm(cuffer.Hub, msg.PlayerToDisarm);
 
-                if (!flag) return false;
-
-                if (team2 == Team.MTF && team == global::Team.CDP)
+                if(flag && !msg.Disarm)
                 {
-                    __instance.MyReferenceHub.playerStats.TargetAchieve(__instance.MyReferenceHub.playerStats.connectionToClient, "tableshaveturned");
+                    if (!cuffer.IsCuffed)
+                    {
+                        SynapseController.Server.Events.Player.InvokeUncuff(cuffer, target, out var allow);
+                        if (!allow) return false;
+                        msg.PlayerToDisarm.inventory.SetDisarmedStatus(null);
+                    }
+                }
+                else
+                {
+                    if(flag || !flag2 || !msg.Disarm)
+                    {
+                        cuffer.NetworkIdentity.connectionToClient.Send(DisarmingHandlers.NewDisarmedList, 0);
+                        return false;
+                    }
+                    if(msg.PlayerToDisarm.inventory.CurInstance == null || msg.PlayerToDisarm.inventory.CurInstance.CanHolster())
+                    {
+                        SynapseController.Server.Events.Player.InvokePlayerCuffTargetEvent(target, cuffer, out var allow2);
+
+                        if (!allow2) return false;
+
+                        msg.PlayerToDisarm.inventory.SetDisarmedStatus(cuffer.VanillaInventory);
+                    }
                 }
 
-                __instance.ClearTarget();
-                handcuffs.NetworkCufferId = __instance.MyReferenceHub.queryProcessor.PlayerId;
-
+                NetworkServer.SendToAll(DisarmingHandlers.NewDisarmedList, 0, false);
                 return false;
             }
             catch (Exception e)

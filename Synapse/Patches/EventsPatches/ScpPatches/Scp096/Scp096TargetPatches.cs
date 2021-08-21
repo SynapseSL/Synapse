@@ -12,7 +12,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
         {
             try
             {
-                if (__instance._flash.Enabled)
+                if (__instance._flash.IsEnabled)
                 {
                     return false;
                 }

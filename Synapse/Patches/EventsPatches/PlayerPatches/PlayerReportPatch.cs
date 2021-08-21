@@ -3,7 +3,7 @@ using HarmonyLib;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(CheaterReport),nameof(CheaterReport.CallCmdReport))]
+    [HarmonyPatch(typeof(CheaterReport),nameof(CheaterReport.UserCode_CmdReport))]
     internal static class PlayerReportPatch
     {
         private static bool Prefix(CheaterReport __instance, int playerId, string reason, ref bool notifyGm)

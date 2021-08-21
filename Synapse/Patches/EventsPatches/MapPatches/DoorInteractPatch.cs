@@ -1,26 +1,19 @@
 ﻿using System;
-using HarmonyLib;
-using Logger = Synapse.Api.Logger;
-using EventHandler = Synapse.Api.Events.EventHandler;
-using UnityEngine;
-using Mirror;
-using Interactables.Interobjects.DoorUtils;
 using System.Linq;
+using HarmonyLib;
+using Interactables.Interobjects.DoorUtils;
+using EventHandler = Synapse.Api.Events.EventHandler;
+using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.MapPatches
 {
-	[HarmonyPatch(typeof(DoorVariant), nameof(DoorVariant.ServerInteract))]
+    [HarmonyPatch(typeof(DoorVariant), nameof(DoorVariant.ServerInteract))]
 	internal static class DoorInteractPatch
 	{
 		private static bool Prefix(DoorVariant __instance, ReferenceHub ply, byte colliderId)
 		{
 			try
 			{
-				if (!NetworkServer.active)
-				{
-					Debug.LogWarning("[Server] function 'System.Void Interactables.Interobjects.DoorUtils.DoorVariant::ServerInteract(ReferenceHub,System.Byte)' called on client");
-					return false;
-				}
 				if (__instance.ActiveLocks > 0)
 				{
 					DoorLockMode mode = DoorLockUtils.GetMode((DoorLockReason)__instance.ActiveLocks);
@@ -33,7 +26,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 				if (__instance.AllowInteracting(ply, colliderId))
 				{
 					var player = ply.GetPlayer();
-					var flag = __instance.RequiredPermissions.CheckPermissions(player.VanillaInventory.curItem,ply);
+					var flag = __instance.RequiredPermissions.CheckPermissions(player.VanillaInventory.CurInstance, ply);
 					var cardaccess = false;
 					var item = player.ItemInHand;
 
@@ -44,7 +37,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 					else if (Server.Get.Configs.synapseConfiguration.RemoteKeyCard)
 						foreach (var item2 in player.Inventory.Items.Where(x => x != item && x.ItemCategory == ItemCategory.Keycard))
 						{
-							var allowcard = __instance.RequiredPermissions.CheckPermissions(item2.ItemType, ply);
+							var allowcard = __instance.RequiredPermissions.CheckPermissions(item2.ItemBase, ply);
 
 							EventHandler.Get.Player.InvokePlayerItemUseEvent(player, item2, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allowcard);
 

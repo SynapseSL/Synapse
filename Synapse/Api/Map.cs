@@ -1,12 +1,12 @@
-﻿using Interactables.Interobjects;
-using Interactables.Interobjects.DoorUtils;
-using MapGeneration;
-using Mirror;
-using Synapse.Api.Enum;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Management.Instrumentation;
+using Interactables.Interobjects.DoorUtils;
+using InventorySystem.Items.Firearms.Attachments;
+using MapGeneration;
+using Mirror;
+using Scp914;
+using Synapse.Api.Items;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -41,7 +41,7 @@ namespace Synapse.Api
 
         public List<Ragdoll> Ragdolls { get; } = new List<Ragdoll>();
 
-        public List<Items.SynapseItem> Items { get; } = new List<Items.SynapseItem>();
+        public List<SynapseItem> Items => SynapseItem.AllItems.Values.ToList();
 
         public List<Dummy> Dummies { get; } = new List<Dummy>();
 
@@ -83,7 +83,7 @@ namespace Synapse.Api
 
         public int Seed => MapGeneration.SeedSynchronizer.Seed;
 
-        public Room GetRoom(RoomInformation.RoomType roomType)
+        public Room GetRoom(RoomName roomType)
             => Rooms.FirstOrDefault(x => x.RoomType == roomType);
 
         public Door GetDoor(Enum.DoorType doorType)
@@ -113,30 +113,14 @@ namespace Synapse.Api
             Server.Get.GetObjectOf<NineTailedFoxAnnouncer>().ServerOnlyAddGlitchyPhrase(words, UnityEngine.Random.Range(0.1f, 0.14f) * num2, UnityEngine.Random.Range(0.07f, 0.08f) * num2);
         }
 
-        public Grenades.Grenade SpawnGrenade(Vector3 position, Vector3 velocity, float fusetime = 3f, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null)
+        public void SpawnGrenade(Vector3 position, Vector3 velocity, float fusetime = 3f, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null)
         {
-            if (player == null)
-                player = Server.Get.Host;
-
-            var component = player.GrenadeManager;
-            var component2 = UnityEngine.Object.Instantiate(component.availableGrenades[(int)grenadeType].grenadeInstance).GetComponent<Grenades.Grenade>();
-            component2.FullInitData(component, position, Quaternion.Euler(component2.throwStartAngle), velocity, component2.throwAngularVelocity, player == Server.Get.Host ? Team.RIP : player.Team);
-            component2.NetworkfuseTime = NetworkTime.time + (double)fusetime;
-            NetworkServer.Spawn(component2.gameObject);
-
-            return component2;
+            //TODO: Reimplement this
         }
 
         public void Explode(Vector3 position, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null)
         {
-            if (player == null)
-                player = Server.Get.Host;
-
-            var component = player.GrenadeManager;
-            var component2 = UnityEngine.Object.Instantiate(component.availableGrenades[(int)grenadeType].grenadeInstance).GetComponent<Grenades.Grenade>();
-            component2.FullInitData(component, position, Quaternion.identity, Vector3.zero, Vector3.zero, Team.RIP);
-            component2.NetworkfuseTime = 0.10000000149011612;
-            NetworkServer.Spawn(component2.gameObject);
+            //TODO: Reimplement this
         }
 
         public void PlaceBlood(Vector3 pos, int type = 0, float size = 2)
@@ -171,9 +155,9 @@ namespace Synapse.Api
 
         internal void AddObjects()
         {
-            foreach (var room in SynapseController.Server.GetObjectsOf<Transform>().Where(x => x.CompareTag("Room") || x.name == "Root_*&*Outside Cams" || x.name == "PocketWorld"))
+            foreach (var room in RoomIdentifier.AllRoomIdentifiers)
             {
-                var synRoom = new Room(room.gameObject);
+                var synRoom = new Room(room);
                 Rooms.Add(synRoom);
                 Cameras.AddRange(synRoom.Cameras);
             }
@@ -181,20 +165,20 @@ namespace Synapse.Api
             foreach (var tesla in SynapseController.Server.GetObjectsOf<TeslaGate>())
                 Teslas.Add(new Tesla(tesla));
 
-            foreach (var station in Server.Get.GetObjectsOf<global::WorkStation>())
+            foreach (var station in WorkstationController.AllWorkstations)
                 WorkStations.Add(new WorkStation(station));
 
             foreach (var door in SynapseController.Server.GetObjectsOf<DoorVariant>())
                 Doors.Add(new Door(door));
 
-            foreach (var interactable in Interface079.singleton.allInteractables)
+            foreach (var pair in Scp079Interactable.InteractablesByRoomId)
             {
-                foreach (var zoneroom in interactable.currentZonesAndRooms)
+                foreach (var interactable in pair.Value)
                 {
                     try
                     {
-                        var room = Rooms.FirstOrDefault(x => x.RoomName == zoneroom.currentRoom);
-                        var door = interactable.GetComponentInParent<Interactables.Interobjects.DoorUtils.DoorVariant>();
+                        var room = Rooms.FirstOrDefault(x => x.ID == pair.Key);
+                        var door = interactable.GetComponentInParent<DoorVariant>();
                         if (room == null || door == null) continue;
                         var sdoor = door.GetDoor();
                         sdoor.Rooms.Add(room);
@@ -203,6 +187,8 @@ namespace Synapse.Api
                     catch { }
                 }
             }
+
+            Scp914.Scp914Controller = UnityEngine.Object.FindObjectOfType<Scp914Controller>();
         }
 
         internal void ClearObjects()
@@ -214,8 +200,7 @@ namespace Synapse.Api
             Generators.Clear();
             WorkStations.Clear();
             Ragdolls.Clear();
-            Items.Clear();
-            HeavyController.Is079Recontained = false;
+            SynapseItem.AllItems.Clear();
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿using Mirror;
+﻿using System;
+using InventorySystem.Items.Firearms.Attachments;
+using Mirror;
+using Synapse.Api.Enum;
 using Synapse.Api.Items;
 using UnityEngine;
 
@@ -6,35 +9,32 @@ namespace Synapse.Api
 {
     public class WorkStation
     {
-        internal WorkStation(global::WorkStation station)
-        {
-            workStation = station;
-        }
+        internal WorkStation(WorkstationController station) => workStation = station;
 
         public WorkStation(Vector3 position, Vector3 rotation, Vector3 scale)
         {
-            var bench = Object.Instantiate(NetworkManager.singleton.spawnPrefabs.Find(p => p.gameObject.name == "Work Station"));
+            //TODO: Check if this still functions
+            var bench = UnityEngine.Object.Instantiate(NetworkManager.singleton.spawnPrefabs.Find(p => p.gameObject.name == "Work Station"));
             bench.gameObject.transform.localScale = scale;
             bench.gameObject.transform.position = position;
             bench.gameObject.transform.rotation = Quaternion.Euler(rotation);
 
             NetworkServer.Spawn(bench);
-            workStation = bench.GetComponent<global::WorkStation>();
-            //bench.AddComponent<WorkStationUpgrader>();
+            workStation = bench.GetComponent<WorkstationController>();
 
             Map.Get.WorkStations.Add(this);
         }
 
-        private readonly global::WorkStation workStation;
+        public static WorkStation CreateWorkStation(Vector3 position, Vector3 rotation, Vector3 scale)
+            => new WorkStation(position, rotation, scale);
+
+        private readonly WorkstationController workStation;
 
         public GameObject GameObject => workStation.gameObject;
 
         public string Name => GameObject.name;
 
-        public Vector3 Position
-        {
-            get => GameObject.transform.position;
-        }
+        public Vector3 Position => GameObject.transform.position;
 
         public Vector3 Scale
         {
@@ -47,60 +47,33 @@ namespace Synapse.Api
             }
         }
 
+        public Player KnownUser
+        {
+            get => workStation._knownUser.GetPlayer();
+            set => workStation._knownUser = value.Hub;
+        }
+
+        public WorkstationState State
+        {
+            get => (WorkstationState)workStation.Status;
+            set => workStation.NetworkStatus = (byte)value;
+        }
+
+        [Obsolete("Tablets are removed from the Game")]
         public bool IsTabletConnected
         {
-            get => workStation.NetworkisTabletConnected;
-            set
-            {
-
-                if (value)
-                {
-                    workStation.NetworkisTabletConnected = true;
-                    workStation._animationCooldown = 6.5f;
-                }
-                else
-                {
-                    if (ConnectedTablet != null && TabletOwner != null)
-                        ConnectedTablet.PickUp(TabletOwner);
-                    TabletOwner = null;
-                    workStation.NetworkisTabletConnected = false;
-                    workStation._animationCooldown = 3.5f;
-                    
-                }
-            }
+            get => State == WorkstationState.Online;
+            set => State = value ? WorkstationState.Online : WorkstationState.Offline;
         }
 
-        private SynapseItem connectedtablet;
-        public SynapseItem ConnectedTablet
-        {
-            get => connectedtablet;
-            set
-            {
-                connectedtablet = value;
+        [Obsolete("Tablets are removed from the Game")]
+        public SynapseItem ConnectedTablet { get; set; }
 
-                if (value != null)
-                {
-                    IsTabletConnected = true;
-                    value.Despawn();
-                }
-                else
-                    IsTabletConnected = false;
-            }
-        }
-
+        [Obsolete("Tablets are removed from the Game")]
         public Player TabletOwner
         {
-            get => workStation.Network_playerConnected?.GetPlayer();
-            set
-            {
-                if (value == null)
-                    workStation.Network_playerConnected = null;
-                else
-                    workStation.Network_playerConnected = value.gameObject;
-            }
+            get => KnownUser;
+            set => KnownUser = value;
         }
-
-        public static WorkStation CreateWorkStation(Vector3 position, Vector3 rotation, Vector3 scale) 
-            => new WorkStation(position, rotation, scale);
     }
 }

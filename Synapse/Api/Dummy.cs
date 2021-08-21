@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using System.Collections.Generic;
 using Synapse.Api.Enum;
+using InventorySystem;
 
 namespace Synapse.Api
 {
@@ -69,7 +70,7 @@ namespace Synapse.Api
             get => helditem;
             set
             {
-                GameObject.GetComponent<Inventory>().SetCurItem(value);
+                GameObject.GetComponent<Inventory>().NetworkCurItem = new InventorySystem.Items.ItemIdentifier(value, 0);
                 helditem = value;
             }
         }

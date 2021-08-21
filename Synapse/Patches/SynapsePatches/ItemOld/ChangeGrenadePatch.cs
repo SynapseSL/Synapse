@@ -1,8 +1,9 @@
 ﻿using HarmonyLib;
-using Grenades;
 
 namespace Synapse.Patches.SynapsePatches.ItemPatches
 {
+    //TODO: Implement a Patch like this when Grenades are implemented
+    /*
     [HarmonyPatch(typeof(FragGrenade),nameof(FragGrenade.ChangeIntoGrenade))]
     internal static class ChangeGrenadePatch
     {
@@ -12,4 +13,5 @@ namespace Synapse.Patches.SynapsePatches.ItemPatches
             if (sitem != null) Synapse.Api.Map.Get.Items.Remove(sitem);
         }
     }
+    */
 }

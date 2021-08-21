@@ -4,7 +4,7 @@ using Synapse.Api;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
 {
-    [HarmonyPatch(typeof(Scp106PlayerScript), nameof(Scp106PlayerScript.CallCmdMakePortal))]
+    [HarmonyPatch(typeof(Scp106PlayerScript), nameof(Scp106PlayerScript.UserCode_CmdMakePortal))]
     internal static class Scp106PortalCreatePatch
     {
         private static bool Prefix(Scp106PlayerScript __instance)

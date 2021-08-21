@@ -11,7 +11,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
         public static bool Prefix(CharacterClassManager __instance, RoleType id)
         {
-            __instance.SetClassIDAdv(id, ForceLite, false);
+            __instance.SetClassIDAdv(id, ForceLite, CharacterClassManager.SpawnReason.None, true);
             ForceLite = false;
             return false;
         }

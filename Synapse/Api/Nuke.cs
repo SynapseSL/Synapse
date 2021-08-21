@@ -79,7 +79,7 @@ namespace Synapse.Api
             }
         }
 
-        [System.Obsolete("Use Detonate()")]
+        [System.Obsolete("Use Detonate()",true)]
         public void Detoante() => WarheadController.Detonate();
     }
 }

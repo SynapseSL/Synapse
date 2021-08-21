@@ -9,7 +9,7 @@ namespace Synapse.Api.Events
         internal RoundEvents() { }
 
         public event Action WaitingForPlayersEvent;
-        
+
         public event Action RoundStartEvent;
 
         public event Action RoundRestartEvent;

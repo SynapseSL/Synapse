@@ -1,22 +1,29 @@
 ﻿using System;
 using HarmonyLib;
+using InventorySystem.Items.Firearms;
+using InventorySystem.Items.Firearms.BasicMessages;
+using Mirror;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(WeaponManager), nameof(WeaponManager.CallCmdReload))]
     internal class PlayerReloadPatch
     {
-        private static bool Prefix(WeaponManager __instance, bool animationOnly)
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(FirearmBasicMessagesHandler), nameof(FirearmBasicMessagesHandler.ServerRequestReceived))]
+        private static bool Prefix(NetworkConnection conn, RequestMessage msg)
         {
             try
             {
+                if (msg.Request != RequestType.Reload) return true;
 
-                if (animationOnly) return true;
-                
+                var player = conn.GetPlayer();
+                var item = player.ItemInHand;
                 var allow = true;
-                var itemIndex = __instance._hub.inventory.GetItemIndex();
-                var item = __instance._hub.inventory.items[itemIndex].GetSynapseItem();
-                var player = __instance._hub.GetPlayer();
+
+                if (player == null || item == null) return false;
+                if (item.Serial != msg.Serial) return false;
+                if (!(item.ItemBase is Firearm)) return false;
+
 
                 SynapseController.Server.Events.Player.InvokePlayerReloadEvent(player, ref allow, item);
 
@@ -24,7 +31,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             catch (Exception e)
             {
-                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerReload failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerReload failed!!\n{e}");
                 return true;
             }
         }

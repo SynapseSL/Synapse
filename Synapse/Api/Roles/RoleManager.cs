@@ -9,7 +9,7 @@ namespace Synapse.Api.Roles
     {
         public static RoleManager Get => Server.Get.RoleManager;
 
-        public static readonly int HighestRole = (int)RoleType.Scp93989;
+        public static readonly int HighestRole = (int)RoleType.ChaosMarauder;
 
         internal RoleManager() { }
 

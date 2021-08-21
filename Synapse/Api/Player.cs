@@ -2,11 +2,17 @@
 using System.Linq;
 using System.Reflection;
 using Hints;
+using InventorySystem;
+using InventorySystem.Disarming;
+using InventorySystem.Items;
+using InventorySystem.Items.Firearms.Attachments;
+using InventorySystem.Searching;
+using MapGeneration;
 using Mirror;
 using Mirror.LiteNetLib4Mirror;
 using RemoteAdmin;
-using Searching;
 using Synapse.Api.Enum;
+using Synapse.Api.Events.SynapseEventArguments;
 using Synapse.Api.Items;
 using Synapse.Api.Roles;
 using Synapse.Database;
@@ -28,30 +34,28 @@ namespace Synapse.Api
             Jail = new Jail(this);
             ActiveBroadcasts = new BroadcastList(this);
             Inventory = new PlayerInventory(this);
-            GrenadeManager = GetComponent<Grenades.GrenadeManager>();
-            GameConsoleTransmission = this.GetComponent<GameConsoleTransmission>();
-            MicroHID = GetComponent<MicroHID>();
-            DissonanceUserSetup = this.GetComponent<Assets._Scripts.Dissonance.DissonanceUserSetup>();
-            Radio = this.GetComponent<Radio>();
-            Escape = this.GetComponent<Escape>();
+            GameConsoleTransmission = GetComponent<GameConsoleTransmission>();
+            DissonanceUserSetup = GetComponent<Assets._Scripts.Dissonance.DissonanceUserSetup>();
+            Radio = GetComponent<Radio>();
+            Escape = GetComponent<Escape>();
+            AmmoBox = new PlayerAmmoBox(this);
         }
 
         #region Methods
+        
+        [Obsolete("Use GetPreference()",true)]
         public int GetSightPreference(ItemType item) => GetPreference(item, 0);
 
+        [Obsolete("Use GetPreference()", true)]
         public int GetBarrelPreference(ItemType item) => GetPreference(item, 1);
 
+        [Obsolete("Use GetPreference()", true)]
         public int GetOtherPreference(ItemType item) => GetPreference(item, 2);
 
-        private int GetPreference(ItemType item, int type)
-        {
-            for (int i = 0; i < WeaponManager.weapons.Length; i++)
-            {
-                if (WeaponManager.weapons[i].inventoryID == item)
-                    return WeaponManager.modPreferences[i, type];
-            }
-            return 0;
-        }
+        [Obsolete("Use GetPreference(ItemType) without type", true)]
+        private int GetPreference(ItemType item, int type) => (int)GetPreference(item);
+
+        public uint GetPreference(ItemType item) => AttachmentsServerHandler.PlayerPreferences[Hub][item];
 
         public void Kick(string message) => ServerConsole.Disconnect(gameObject, message);
 
@@ -60,10 +64,10 @@ namespace Synapse.Api
         public void ChangeRoleAtPosition(RoleType role)
         {
             RoleChangeClassIdPatch.ForceLite = true;
-            Hub.characterClassManager.SetClassIDAdv(role, true);
+            Hub.characterClassManager.SetClassIDAdv(role, true,CharacterClassManager.SpawnReason.None);
         }
 
-        public void Kill(DamageTypes.DamageType damageType = default) => PlayerStats.HurtPlayer(new PlayerStats.HitInfo(-1f, "WORLD", damageType, 0), gameObject);
+        public void Kill(DamageTypes.DamageType damageType = default) => PlayerStats.HurtPlayer(new PlayerStats.HitInfo(-1f, "WORLD", damageType, 0, true), gameObject);
 
         public void GiveTextHint(string message, float duration = 5f)
         {
@@ -96,14 +100,14 @@ namespace Synapse.Api
             ServerRoles.RemoteAdminMode = GlobalRemoteAdmin ? ServerRoles.AccessMode.GlobalAccess : ServerRoles.AccessMode.PasswordOverride;
             if (!ServerRoles.AdminChatPerms)
                 ServerRoles.AdminChatPerms = SynapseGroup.HasVanillaPermission(PlayerPermissions.AdminChat);
-            ServerRoles.TargetOpenRemoteAdmin(Connection, false);
+            ServerRoles.TargetOpenRemoteAdmin(false);
         }
 
         public void RaLogout()
         {
             Hub.serverRoles.RemoteAdmin = false;
             Hub.serverRoles.RemoteAdminMode = ServerRoles.AccessMode.LocalAccess;
-            Hub.serverRoles.TargetCloseRemoteAdmin(Connection);
+            Hub.serverRoles.TargetCloseRemoteAdmin();
         }
 
         public void Heal(float hp) => PlayerStats.HealHPAmount(hp);
@@ -111,7 +115,7 @@ namespace Synapse.Api
         public void Hurt(int amount, DamageTypes.DamageType damagetype = default, Player attacker = null)
         {
             if (attacker == null) attacker = this;
-            attacker.PlayerStats.HurtPlayer(new PlayerStats.HitInfo(amount, attacker == null ? "WORLD" : attacker.NickName, damagetype, attacker == null ? 0 : attacker.PlayerId), gameObject);
+            attacker.PlayerStats.HurtPlayer(new PlayerStats.HitInfo(amount, attacker.NickName, damagetype, attacker.PlayerId, false), gameObject);
         }
 
         public void OpenReportWindow(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
@@ -123,7 +127,7 @@ namespace Synapse.Api
         public void ExecuteCommand(string command, bool RA = true)
         {
             if (RA) RemoteAdmin.CommandProcessor.ProcessQuery(command, CommandSender);
-            else QueryProcessor.ProcessGameConsoleQuery(command, true);
+            else QueryProcessor.ProcessGameConsoleQuery(command);
         }
 
         public void SendToServer(ushort port)
@@ -180,7 +184,7 @@ namespace Synapse.Api
             var component = ClassManager;
             var writer = NetworkWriterPool.GetWriter();
             writer.WriteVector3(pos);
-            writer.WritePackedInt32(type);
+            writer.WriteInt32(type);
             writer.WriteSingle(size);
             var msg = new RpcMessage
             {
@@ -285,9 +289,10 @@ namespace Synapse.Api
 
         public string RoleName => CustomRole == null ? RoleType.ToString() : CustomRole.GetRoleName();
 
-        internal Vector3 spawnPosition;
-
-        internal float spawnRotation;
+        /// <summary>
+        /// This field is just for storing some setclass information between multiple Harmony Patches
+        /// </summary>
+        internal PlayerSetClassEventArgs setClassEventArgs;
 
         //Stuff for the Permission System
         private SynapseGroup synapseGroup;
@@ -367,8 +372,8 @@ namespace Synapse.Api
             {
                 if (ServerRoles._hideLocalBadge || (group.HiddenByDefault && !disp && !ServerRoles._neverHideLocalBadge))
                 {
-                    ServerRoles.NetworkMyText = null;
-                    ServerRoles.NetworkMyColor = "default";
+                    ServerRoles.Network_myText = null;
+                    ServerRoles.Network_myColor = "default";
                     ServerRoles.HiddenBadge = group.BadgeText;
                     ServerRoles.RefreshHiddenTag();
                     ServerRoles.TargetSetHiddenRole(Connection, group.BadgeText);
@@ -377,8 +382,8 @@ namespace Synapse.Api
                 {
                     ServerRoles.HiddenBadge = null;
                     ServerRoles.RpcResetFixed();
-                    ServerRoles.NetworkMyText = group.BadgeText;
-                    ServerRoles.NetworkMyColor = group.BadgeColor;
+                    ServerRoles.Network_myText = group.BadgeText;
+                    ServerRoles.Network_myColor = group.BadgeColor;
                 }
             }
 
@@ -532,16 +537,23 @@ namespace Synapse.Api
             set => PlayerStats.maxHP = value;
         }
 
+        [Obsolete("Use ArtificialHP instead", false)]
         public float ArtificialHealth
         {
-            get => PlayerStats.unsyncedArtificialHealth;
-            set => PlayerStats.unsyncedArtificialHealth = value;
+            get => PlayerStats.ArtificialHealth;
+            set => PlayerStats.ArtificialHealth = (ushort)value;
+        }
+
+        public ushort ArtificialHP
+        {
+            get => PlayerStats.ArtificialHealth;
+            set => PlayerStats.ArtificialHealth = value;
         }
 
         public int MaxArtificialHealth
         {
-            get => PlayerStats.maxArtificialHealth;
-            set => PlayerStats.maxArtificialHealth = value;
+            get => PlayerStats.MaxArtificialHealth;
+            set => PlayerStats.MaxArtificialHealth = value;
         }
 
         public float Stamina
@@ -559,16 +571,12 @@ namespace Synapse.Api
         public RoleType RoleType
         {
             get => ClassManager.CurClass;
-            set => ClassManager.SetPlayersClass(value, gameObject);
+            set => ClassManager.SetPlayersClass(value, gameObject,CharacterClassManager.SpawnReason.None);
         }
 
         public Room Room
         {
-            get
-            {
-                if (Vector3.Distance(Vector3.up * -1997, Position) <= 50) return Map.Get.GetRoom(RoomInformation.RoomType.POCKET);
-                return Map.Get.Rooms.FirstOrDefault(x => x.GameObject == Hub.localCurrentRoomEffects.curRoom);
-            }
+            get => RoomIdUtils.RoomAtPosition(Position).GetSynapseRoom();
             set => Position = value.Position;
         }
 
@@ -578,25 +586,24 @@ namespace Synapse.Api
             set => Position = value.Position;
         }
 
-        internal Inventory.SyncListItemInfo VanillaItems
+        public Player CurrentlySpectating
         {
-            get => VanillaInventory.items;
-            set => VanillaInventory.items = value;
+            get => SpectatorManager.CurrentSpectatedPlayer?.GetPlayer();
+            set => SpectatorManager.CurrentSpectatedPlayer = value.Hub;
         }
 
         public Player Cuffer
         {
-            get => Handcuffs.CufferId == -1 && Hub.handcuffs.NetworkForceCuff ? Server.Get.Host : SynapseController.Server.GetPlayer(Handcuffs.CufferId);
-            set
+            get
             {
-                if (value == null)
-                {
-                    Handcuffs.NetworkCufferId = -1;
-                    return;
-                }
+                if (!DisarmedPlayers.Entries.Any(x => x.DisarmedPlayer == NetworkIdentity.netId)) return null;
 
-                Handcuffs.NetworkCufferId = value.PlayerId;
+                var id = DisarmedPlayers.Entries.FirstOrDefault(x => x.DisarmedPlayer == NetworkIdentity.netId).Disarmer;
+                if (id == 0)
+                    return ReferenceHub.LocalHub.GetPlayer();
+                return Server.Get.Players.FirstOrDefault(x => x.NetworkIdentity.netId == id);
             }
+            set => VanillaInventory.SetDisarmedStatus(value.VanillaInventory);
         }
 
         public GameObject LookingAt
@@ -610,78 +617,38 @@ namespace Synapse.Api
             }
         }
 
+        [Obsolete("Please use player.AmmoBox[AmmoType.Ammo556x45]",false)]
         public uint Ammo5
         {
-            get
-            {
-                try
-                {
-                    return AmmoBox[0];
-                }
-                catch
-                {
-                    return 0;
-                }
-            }
-            set
-            {
-                try
-                {
-                    AmmoBox[0] = value;
-                }
-                catch
-                {
-                }
-            }
+            get => AmmoBox[AmmoType.Ammo556x45];
+            set => AmmoBox[AmmoType.Ammo556x45] = (ushort)value;
         }
 
+        [Obsolete("Please use player.AmmoBox[AmmoType.Ammo762x39]", false)]
         public uint Ammo7
         {
-            get
-            {
-                try
-                {
-                    return AmmoBox[1];
-                }
-                catch
-                {
-                    return 0;
-                }
-            }
-            set
-            {
-                try
-                {
-                    AmmoBox[1] = value;
-                }
-                catch
-                {
-                }
-            }
+            get => AmmoBox[AmmoType.Ammo762x39];
+            set => AmmoBox[AmmoType.Ammo762x39] = (ushort)value;
         }
 
+        [Obsolete("Please use player.AmmoBox[AmmoType.Ammo9x19]", false)]
         public uint Ammo9
         {
-            get
+            get => AmmoBox[AmmoType.Ammo9x19];
+            set => AmmoBox[AmmoType.Ammo9x19] = (ushort)value;
+        }
+
+        public PlayerAmmoBox AmmoBox { get; }
+
+        public class PlayerAmmoBox
+        {
+            private readonly Player player;
+            internal PlayerAmmoBox(Player _player) => player = _player;
+
+            public ushort this[AmmoType ammo]
             {
-                try
-                {
-                    return AmmoBox[2];
-                }
-                catch
-                {
-                    return 0;
-                }
-            }
-            set
-            {
-                try
-                {
-                    AmmoBox[2] = value;
-                }
-                catch
-                {
-                }
+                get => player.VanillaInventory.UserInventory.ReserveAmmo[(ItemType)ammo];
+                set => player.VanillaInventory.UserInventory.ReserveAmmo[(ItemType)ammo] = value;
             }
         }
 
@@ -711,7 +678,7 @@ namespace Synapse.Api
                 if (value)
                     ClassManager.CmdRequestHideTag();
                 else
-                    ClassManager.CallCmdRequestShowTag(false);
+                    ClassManager.UserCode_CmdRequestShowTag(false);
             }
         }
 
@@ -754,11 +721,14 @@ namespace Synapse.Api
 
         public bool IsDead => Team == Team.RIP;
 
-        public bool IsZooming => WeaponManager.ZoomInProgress();
+        /*
+        //TODO: ReImplement this
+        public bool IsZooming => false;
 
-        public bool IsReloading => WeaponManager.IsReloading();
+        public bool IsReloading => false;
+        */
 
-        public bool IsCuffed => Cuffer != null;
+        public bool IsCuffed => DisarmedPlayers.IsDisarmed(VanillaInventory);
 
         public float AliveTime => ClassManager.AliveTime;
 
@@ -774,25 +744,25 @@ namespace Synapse.Api
 
         public Team RealTeam => Server.Get.TeamManager.IsDefaultID(TeamID) ? (Team)TeamID : Team.RIP;
 
-        public Fraction Fraction => ClassManager.Fraction;
+        public Faction Faction => ClassManager.Faction;
 
-        public Fraction RealFraction => Misc.GetFraction(RealTeam);
+        public Faction RealFraction => Misc.GetFaction(RealTeam);
 
-        public Items.SynapseItem ItemInHand
+        public SynapseItem ItemInHand
         {
-            get => Map.Get.Items.FirstOrDefault(x => x.State == ItemState.Inventory && x.itemInfo.uniq == VanillaInventory.itemUniq);
+            get => VanillaInventory.CurItem == ItemIdentifier.None ? SynapseItem.None : SynapseItem.AllItems[VanillaInventory.CurItem.SerialNumber];
             set
             {
-                if (value != null && value.ItemHolder != this) return;
-                
-                for(int i = 0; i < 50; i++)
+                if(value == null || !Inventory.Items.Contains(value))
                 {
-                    MEC.Timing.CallDelayed(i / 100, () =>
-                      {
-                          VanillaInventory.NetworkitemUniq = value == null? -1 : value.itemInfo.uniq;
-                          VanillaInventory.Network_curItemSynced = value == null? ItemType.None : value.ItemType;
-                      });
+                    VanillaInventory.NetworkCurItem = ItemIdentifier.None;
+                    VanillaInventory.CurInstance = null;
                 }
+
+                if (!ItemInHand.ItemBase.CanHolster() || !value.ItemBase.CanEquip()) return;
+
+                VanillaInventory.NetworkCurItem = new ItemIdentifier(value.ItemType, value.Serial);
+                VanillaInventory.CurInstance = value.ItemBase;
             }
         }
 
@@ -810,19 +780,12 @@ namespace Synapse.Api
 
         public Radio Radio { get; }
 
-        public MicroHID MicroHID { get; }
 
         public GameConsoleTransmission GameConsoleTransmission { get; }
-
-        public Grenades.GrenadeManager GrenadeManager { get; }
 
         public Escape Escape { get; }
 
         public LocalCurrentRoomEffects LocalCurrentRoomEffects => Hub.localCurrentRoomEffects;
-
-        public WeaponManager WeaponManager => Hub.weaponManager;
-
-        public AmmoBox AmmoBox => Hub.ammoBox;
 
         public HintDisplay HintDisplay => Hub.hints;
 
@@ -833,8 +796,6 @@ namespace Synapse.Api
         public PlayerEffectsController PlayerEffectsController => Hub.playerEffectsController;
 
         public PlayerInteract PlayerInteract => Hub.playerInteract;
-
-        public Handcuffs Handcuffs => Hub.handcuffs;
 
         public FallDamage FallDamage => Hub.falldamage;
 
@@ -860,7 +821,6 @@ namespace Synapse.Api
         #endregion
 
         #region Persistence
-
         public string GetData(string key)
         {
             DatabaseManager.CheckEnabledOrThrow();
@@ -889,36 +849,39 @@ namespace Synapse.Api
                 var allow = true;
                 var changeTeam = false;
 
-                if (Handcuffs.ForceCuff && CharacterClassManager.ForceCuffedChangeTeam)
-                    changeTeam = true;
 
-                if (IsCuffed && CharacterClassManager.CuffedChangeTeam)
-                {
-                    switch (RoleID)
+                foreach(var entry in DisarmedPlayers.Entries)
+                    if(entry.DisarmedPlayer == NetworkIdentity.netId)
                     {
-                        case (int)RoleType.Scientist when Cuffer.Fraction == Fraction.FoundationEnemy:
-                            changeTeam = true;
+                        if(entry.Disarmer == 0)
+                        {
+                            changeTeam = CharacterClassManager.ForceCuffedChangeTeam;
                             break;
+                        }
 
-                        case (int)RoleType.ClassD when Cuffer.Fraction == Fraction.FoundationStaff:
+                        var cuffer = Cuffer;
+
+                        if (RoleType == RoleType.Scientist && cuffer.Faction == Faction.FoundationEnemy)
                             changeTeam = true;
-                            break;
+                        else if (RoleType == RoleType.ClassD && cuffer.Faction == Faction.FoundationStaff)
+                            changeTeam = true;
                     }
-                }
 
-                switch (RoleID)
+                
+
+                switch (RoleType)
                 {
-                    case (int)RoleType.ClassD when changeTeam:
-                        newRole = (int)RoleType.NtfCadet;
+                    case RoleType.ClassD when changeTeam:
+                        newRole = (int)RoleType.NtfPrivate;
                         break;
 
-                    case (int)RoleType.ClassD:
-                    case (int)RoleType.Scientist when changeTeam:
-                        newRole = (int)RoleType.ChaosInsurgency;
+                    case RoleType.ClassD:
+                    case RoleType.Scientist when changeTeam:
+                        newRole = (int)RoleType.ChaosConscript;
                         break;
 
-                    case (int)RoleType.Scientist:
-                        newRole = (int)RoleType.NtfScientist;
+                    case RoleType.Scientist:
+                        newRole = (int)RoleType.NtfSpecialist;
                         break;
                 }
 
@@ -931,7 +894,7 @@ namespace Synapse.Api
                 if (newRole < 0 || !allow) return;
 
                 if (newRole >= -1 && newRole <= RoleManager.HighestRole)
-                    ClassManager.SetPlayersClass((RoleType)newRole, gameObject, false, true);
+                    ClassManager.SetPlayersClass((RoleType)newRole, gameObject, CharacterClassManager.SpawnReason.Escaped, false);
                 else
                     RoleID = newRole;
 
@@ -946,7 +909,7 @@ namespace Synapse.Api
                             GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_mtf_classd_cuffed_count", 1), false);
                         break;
 
-                    case Team.MTF:
+                    case Team.MTF when !changeTeam:
                         RoundSummary.escaped_scientists++;
                         tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
                             GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_mtf_scientist_count", 1), false);
@@ -958,7 +921,7 @@ namespace Synapse.Api
                             GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_ci_scientist_cuffed_count", 1), false);
                         break;
 
-                    case Team.CHI:
+                    case Team.CHI when !changeTeam:
                         RoundSummary.escaped_ds++;
                         tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
                             GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_ci_classd_count", 1), false);

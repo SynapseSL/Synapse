@@ -5,7 +5,7 @@ using EventHandler = Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
 {
-    [HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.CallCmdContain106))]
+    [HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.UserCode_CmdContain106))]
     internal class Scp106ContainmentPatch
     {
         private static bool Prefix(PlayerInteract __instance)

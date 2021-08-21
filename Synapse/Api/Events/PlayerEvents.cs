@@ -1,10 +1,10 @@
 ﻿using Assets._Scripts.Dissonance;
-using Grenades;
-using Synapse.Api;
 using Synapse.Api.Events.SynapseEventArguments;
 using Synapse.Api.Items;
-using System.Collections.Generic;
 using UnityEngine;
+using InventorySystem.Items.MicroHID;
+using System;
+using Synapse.Api.Enum;
 
 namespace Synapse.Api.Events
 {
@@ -52,8 +52,12 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<PlayerSetClassEventArgs> PlayerSetClassEvent;
 
+        public event EventHandler.OnSynapseEvent<PlayerStartWorkstationEventArgs> PlayerStartWorkstationEvent;
+
+        [Obsolete("Tablets are removed use PlayerStartWorkstationEvent")]
         public event EventHandler.OnSynapseEvent<PlayerConnectWorkstationEventArgs> PlayerConnectWorkstationEvent;
 
+        [Obsolete("Since the Workstation are now automatic disabled and tablets are no longer in the Game this event is never called",true)]
         public event EventHandler.OnSynapseEvent<PlayerUnconnectWorkstationEventArgs> PlayerUnconnectWorkstationEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerDropAmmoEventArgs> PlayerDropAmmoEvent;
@@ -86,13 +90,13 @@ namespace Synapse.Api.Events
             PlayerLeaveEvent?.Invoke(ev);
         }
 
-        internal void InvokePlayerBanEvent(Player bannedPlayer, Player issuer, ref int duration, ref string reason,
+        internal void InvokePlayerBanEvent(Player bannedPlayer, Player issuer, ref long duration, ref string reason,
             ref bool allow)
         {
-            var ev = new PlayerBanEventArgs {Allow = allow, Duration = duration, Issuer = issuer, Reason = reason, BannedPlayer = bannedPlayer};
+            var ev = new PlayerBanEventArgs {Allow = allow, BanDuration = duration, Issuer = issuer, Reason = reason, BannedPlayer = bannedPlayer};
             PlayerBanEvent?.Invoke(ev);
 
-            duration = ev.Duration;
+            duration = ev.BanDuration;
             reason = ev.Reason;
             allow = ev.Allow;
         }
@@ -156,7 +160,8 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
         
-        internal void InvokePlayerThrowGrenadeEvent(Player player, SynapseItem item,ref GrenadeSettings settings, ref float force, ref float delay, ref bool allow)
+        //TODO:
+        /*internal void InvokePlayerThrowGrenadeEvent(Player player, SynapseItem item,ref GrenadeSettings settings, ref float force, ref float delay, ref bool allow)
         {
             var ev = new PlayerThrowGrenadeEventArgs
             {
@@ -173,7 +178,7 @@ namespace Synapse.Api.Events
             force = ev.ForceMultiplier;
             delay = ev.Delay;
             allow = ev.Allow;
-        }
+        }*/
 
         internal void InvokePlayerHealEvent(Player player, ref float amount, ref bool allow)
         {
@@ -252,7 +257,7 @@ namespace Synapse.Api.Events
 
         internal void InvokePlayerKeyPressEvent(Player player, KeyCode keyCode) => PlayerKeyPressEvent?.Invoke(new PlayerKeyPressEventArgs { Player = player, KeyCode = keyCode });
 
-        internal void InvokePlayerDropItemPatch(Player player,Items.SynapseItem item,out bool allow)
+        internal void InvokePlayerDropItemPatch(Player player, Items.SynapseItem item, ref bool throwitem, out bool allow)
         {
             allow = true;
             if (PlayerDropItemEvent == null) return;
@@ -261,12 +266,14 @@ namespace Synapse.Api.Events
             {
                 Player = player,
                 Item = item,
+                Throw = throwitem,
                 Allow = true,
             };
 
             PlayerDropItemEvent.Invoke(ev);
 
             allow = ev.Allow;
+            throwitem = ev.Throw;
         }
 
         internal void InvokePlayerPickUpEvent(Player player,Items.SynapseItem item,out bool allow)
@@ -305,58 +312,50 @@ namespace Synapse.Api.Events
 
         internal void InvokeSetClassEvent(PlayerSetClassEventArgs ev) => PlayerSetClassEvent?.Invoke(ev);
 
-        internal void InvokePlayerConnectWorkstation(Player player,SynapseItem item,WorkStation station,out bool allow)
+        internal void InvokePlayerStartWorkstation(Player player, WorkStation station, out bool allow)
         {
-            var ev = new PlayerConnectWorkstationEventArgs
-            {
-                Player = player,
-                Item = item,
-                WorkStation = station
-            };
-
-            PlayerConnectWorkstationEvent?.Invoke(ev);
-
-            allow = ev.Allow;
-        }
-
-        internal void InvokePlayerUnonnectWorkstation(Player player,WorkStation station, out bool allow)
-        {
-            var ev = new PlayerUnconnectWorkstationEventArgs
+            var evold = new PlayerConnectWorkstationEventArgs
             {
                 Player = player,
                 WorkStation = station
             };
+            PlayerConnectWorkstationEvent?.Invoke(evold);
 
-            PlayerUnconnectWorkstationEvent?.Invoke(ev);
+            var ev = new PlayerStartWorkstationEventArgs
+            {
+                Player = player,
+                WorkStation = station,
+                Allow = evold.Allow
+            };
+
+            PlayerStartWorkstationEvent?.Invoke(ev);
 
             allow = ev.Allow;
         }
 
-        internal void InvokePlayerDropAmmoEvent(Player player, SynapseItem item, ref uint amount, ref int type, out bool allow)
+        internal void InvokePlayerDropAmmoEvent(Player player, ref AmmoType type,ref ushort amount, out bool allow)
         {
             var ev = new PlayerDropAmmoEventArgs
             {
-                Tablet = item,
-                AmmoType = (Enum.AmmoType)type,
+                AmmoType = type,
                 Amount = amount,
                 Player = player
             };
 
             PlayerDropAmmoEvent?.Invoke(ev);
 
-            amount = ev.Amount;
-            type = (int)ev.AmmoType;
+            amount = (ushort)ev.Amount;
+            type = ev.AmmoType;
             allow = ev.Allow;
         }
 
-        internal void InvokePlayerCuffTargetEvent(Player target,Player cuffer,SynapseItem disarmer,ref bool allow)
+        internal void InvokePlayerCuffTargetEvent(Player target, Player cuffer, out bool allow)
         {
             var ev = new PlayerCuffTargetEventArgs
             {
                 Cuffer = cuffer,
-                Disarmer = disarmer,
                 Target = target,
-                Allow = allow
+                Allow = true,
             };
 
             PlayerCuffTargetEvent?.Invoke(ev);
@@ -364,7 +363,7 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void InvokeMicroUse(Player player, SynapseItem micro, ref MicroHID.MicroHidState state)
+        internal void InvokeMicroUse(Player player, SynapseItem micro, ref HidState state)
         {
             var ev = new PlayerUseMicroEventArgs
             {
@@ -422,14 +421,13 @@ namespace Synapse.Api.Events
             allow = ev.AllowDamage;
         }
 
-        internal void InvokeUncuff(Player player, Player cuffed, bool mate, out bool allow)
+        internal void InvokeUncuff(Player player, Player cuffed, out bool allow)
         {
             var ev = new PlayerUnCuffTargetEventArgs
             {
                 Allow = true,
                 Cuffed = cuffed,
                 Player = player,
-                FreeWithDisarmer = mate
             };
 
             PlayerUncuffTargetEvent?.Invoke(ev);

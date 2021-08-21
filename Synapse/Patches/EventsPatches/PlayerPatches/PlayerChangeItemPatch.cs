@@ -1,25 +1,28 @@
 ﻿using System;
-using System.Linq;
 using HarmonyLib;
+using InventorySystem;
+using InventorySystem.Items;
+using Synapse.Api.Items;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(Inventory),nameof(Inventory.CallCmdSetUnic))]
+    [HarmonyPatch(typeof(Inventory),nameof(Inventory.ServerSelectItem))]
     internal static class PlayerChangeItemPatch
     {
-        private static bool Prefix(Inventory __instance, int i)
+        private static bool Prefix(Inventory __instance, ushort itemSerial)
         {
             try
             {
-                if (!__instance._iawRateLimit.CanExecute(true) || __instance._amnesia.Enabled) return false;
+                if (itemSerial == __instance.CurItem.SerialNumber) return false;
 
                 var player = __instance.GetPlayer();
                 var olditem = player.ItemInHand;
-                var newitem = player.VanillaInventory.items.FirstOrDefault(x => x.uniq == i).GetSynapseItem();
+                var newitem = itemSerial == 0 ? null : SynapseItem.AllItems[itemSerial];
+
+                if (newitem != null && (!olditem.ItemBase.CanHolster() || !newitem.ItemBase.CanEquip())) return false;
 
                 Server.Get.Events.Player.InvokeChangeItem(player, olditem, newitem);
 
-                __instance.NetworkitemUniq = i;
                 return false;
             }
             catch(Exception e)

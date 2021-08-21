@@ -162,7 +162,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 
                 if (endround || Map.Get.Round.Forceend)
                 {
-                    instance._roundEnded = true;
+                    instance.RoundEnded = true;
                     Map.Get.Round.Forceend = false;
                     FriendlyFireConfig.PauseDetector = true;
 

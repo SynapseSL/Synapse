@@ -31,7 +31,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     if (!allow) continue;
                     player.Hurt(10000, DamageTypes.Lure);
                     FemurBrokePeople++;
-                    if (closeFemur) __instance._lureSpj.SetState(true);
+                    if (closeFemur) __instance._lureSpj.SetState(__instance._lureSpj.allowContain, true);
                 }
 
                 return false;
