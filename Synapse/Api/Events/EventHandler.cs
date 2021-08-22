@@ -1,4 +1,5 @@
-﻿using Synapse.Config;
+﻿using Synapse.Api.Items;
+using Synapse.Config;
 using UnityEngine;
 
 namespace Synapse.Api.Events
@@ -27,6 +28,12 @@ namespace Synapse.Api.Events
                     SerializedItem item = ev.Player.ItemInHand;
                     ev.Player.ItemInHand = (Items.SynapseItem)item;
                     ev.Player.Position = new SerializedVector3(ev.Player.Position);
+                    break;
+
+                case KeyCode.Alpha2:
+                    Logger.Get.Warn("Alpha2");
+                    foreach (var item2 in SynapseItem.AllItems.Values)
+                        Logger.Get.Warn($"{item2.Serial} {item2.ItemType}");
                     break;
             }
         }

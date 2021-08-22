@@ -7,14 +7,14 @@ using UnityEngine;
 
 namespace Synapse.Patches.SynapsePatches.Item
 {
-    internal static class ItemDistributorPatches
+	[HarmonyPatch(typeof(ItemDistributor), nameof(ItemDistributor.CreatePickup))]
+	internal static class CreatePickUpPatch
     {
 		[HarmonyPrefix]
-		[HarmonyPatch(typeof(ItemDistributor), nameof(ItemDistributor.CreatePickup))]
 		private static bool CreatePickupPatch(ItemDistributor __instance, ItemType id, Transform t, string triggerDoor)
-        {
-            try
-            {
+		{
+			try
+			{
 				if (!InventorySystem.InventoryItemLoader.AvailableItems.TryGetValue(id, out var itemBase))
 					return false;
 
@@ -35,20 +35,23 @@ namespace Synapse.Patches.SynapsePatches.Item
 
 				__instance.RegisterUnspawnedObject(doorNametagExtension.TargetDoor, itemPickupBase.gameObject);
 				return false;
-            }
-			catch(Exception e)
-            {
-                Api.Logger.Get.Error($"Synapse-Items: CreatePickup failed!!\n{e}");
+			}
+			catch (Exception e)
+			{
+				Api.Logger.Get.Error($"Synapse-Items: CreatePickup failed!!\n{e}");
 				return true;
 			}
-        }
+		}
+	}
 
+	[HarmonyPatch(typeof(LockerChamber), nameof(LockerChamber.SpawnItem))]
+	internal static class LockerSpawnItemPatch
+    {
 		[HarmonyPrefix]
-		[HarmonyPatch(typeof(LockerChamber), nameof(LockerChamber.SpawnItem))]
 		private static bool SpawnItemPatch(LockerChamber __instance, ItemType id, int amount)
-        {
-            try
-            {
+		{
+			try
+			{
 				if (id == ItemType.None || !InventorySystem.InventoryItemLoader.AvailableItems.TryGetValue(id, out var itemBase))
 					return false;
 
@@ -61,11 +64,11 @@ namespace Synapse.Patches.SynapsePatches.Item
 					itemPickupBase.Info.Weight = itemBase.Weight;
 					itemPickupBase.Info.Locked = true;
 					__instance._content.Add(itemPickupBase);
-                    if ((object)itemPickupBase is IPickupDistributorTrigger pickupDistributorTrigger)
-                    {
-                        pickupDistributorTrigger.OnDistributed();
-                    }
-                    if (__instance._spawnOnFirstChamberOpening)
+					if ((object)itemPickupBase is IPickupDistributorTrigger pickupDistributorTrigger)
+					{
+						pickupDistributorTrigger.OnDistributed();
+					}
+					if (__instance._spawnOnFirstChamberOpening)
 					{
 						__instance._toBeSpawned.Add(itemPickupBase);
 					}
@@ -76,12 +79,12 @@ namespace Synapse.Patches.SynapsePatches.Item
 				}
 
 				return false;
-            }
-            catch(Exception e)
-            {
-                Api.Logger.Get.Error($"Synapse-Items: Locker SpawnItem failed!!\n{e}");
+			}
+			catch (Exception e)
+			{
+				Api.Logger.Get.Error($"Synapse-Items: Locker SpawnItem failed!!\n{e}");
 				return true;
-            }
-        }
-    }
+			}
+		}
+	}
 }

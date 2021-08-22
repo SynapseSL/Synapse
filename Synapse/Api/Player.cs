@@ -100,14 +100,14 @@ namespace Synapse.Api
             ServerRoles.RemoteAdminMode = GlobalRemoteAdmin ? ServerRoles.AccessMode.GlobalAccess : ServerRoles.AccessMode.PasswordOverride;
             if (!ServerRoles.AdminChatPerms)
                 ServerRoles.AdminChatPerms = SynapseGroup.HasVanillaPermission(PlayerPermissions.AdminChat);
-            ServerRoles.TargetOpenRemoteAdmin(false);
+            ServerRoles.TargetOpenRemoteAdmin(Connection,false);
         }
 
         public void RaLogout()
         {
             Hub.serverRoles.RemoteAdmin = false;
             Hub.serverRoles.RemoteAdminMode = ServerRoles.AccessMode.LocalAccess;
-            Hub.serverRoles.TargetCloseRemoteAdmin();
+            Hub.serverRoles.TargetCloseRemoteAdmin(Connection);
         }
 
         public void Heal(float hp) => PlayerStats.HealHPAmount(hp);
@@ -750,7 +750,13 @@ namespace Synapse.Api
 
         public SynapseItem ItemInHand
         {
-            get => VanillaInventory.CurItem == ItemIdentifier.None ? SynapseItem.None : SynapseItem.AllItems[VanillaInventory.CurItem.SerialNumber];
+            get
+            {
+                if (VanillaInventory.CurItem == ItemIdentifier.None) return SynapseItem.None;
+                Logger.Get.Warn(VanillaInventory.CurItem.SerialNumber);
+
+                return SynapseItem.AllItems[VanillaInventory.CurItem.SerialNumber];
+            }
             set
             {
                 if(value == null || !Inventory.Items.Contains(value))

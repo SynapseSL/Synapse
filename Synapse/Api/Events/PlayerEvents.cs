@@ -435,7 +435,7 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void InvokeChangeItem(Player player, SynapseItem old, SynapseItem newitem)
+        internal void InvokeChangeItem(Player player, SynapseItem old, SynapseItem newitem, out bool allow)
         {
             var ev = new PlayerChangeItemEventArgs
             {
@@ -445,6 +445,8 @@ namespace Synapse.Api.Events
             };
 
             PlayerChangeItemEvent?.Invoke(ev);
+
+            allow = ev.Allow;
         }
         #endregion
     }

@@ -29,7 +29,6 @@ namespace Synapse.Api.Items
         private SynapseItem()
         {
 #if DEBUG
-            Logger.Get.Info($"Registered Item: {Name} with ID: {ID}");
 #endif
         }
 
@@ -129,7 +128,9 @@ namespace Synapse.Api.Items
         /// <param name="itemBase"></param>
         public SynapseItem(ItemBase itemBase) : this()
         {
+            ItemBase = itemBase;
             Serial = itemBase.OwnerInventory.UserInventory.Items.FirstOrDefault(x => x.Value == itemBase).Key;
+            Logger.Get.Info($"Registered Item: {Serial}");
             AllItems[Serial] = this;
             ID = (int)itemBase.ItemTypeId;
             Name = itemBase.ItemTypeId.ToString();
@@ -137,10 +138,8 @@ namespace Synapse.Api.Items
             ItemType = itemBase.ItemTypeId;
             ItemCategory = itemBase.Category;
             TierFlags = itemBase.TierFlags;
-            ThrowSettings = ItemBase.ThrowSettings;
+            ThrowSettings = itemBase.ThrowSettings;
             Weight = itemBase.Weight;
-
-            ItemBase = itemBase;
         }
 
         /// <summary>
@@ -150,6 +149,8 @@ namespace Synapse.Api.Items
         public SynapseItem(ItemPickupBase pickupBase) : this()
         {
             Serial = pickupBase.Info.Serial;
+            PickupBase = pickupBase;
+            Logger.Get.Info($"Registered Item: {Serial}");
             AllItems[Serial] = this;
             ID = (int)pickupBase.Info.ItemId;
             Name = pickupBase.Info.ItemId.ToString();
@@ -162,8 +163,6 @@ namespace Synapse.Api.Items
                 ThrowSettings = ThrowSettings;
             }
             Weight = pickupBase.Info.Weight;
-
-            PickupBase = pickupBase;
         }
         #endregion
 

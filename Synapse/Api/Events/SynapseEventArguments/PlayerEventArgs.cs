@@ -371,6 +371,8 @@ namespace Synapse.Api.Events.SynapseEventArguments
     {
         public Player Player { get; internal set; }
 
+        public bool Allow { get; set; } = true;
+
         public SynapseItem OldItem { get; internal set; }
 
         public SynapseItem NewItem { get; internal set; }

@@ -13,17 +13,56 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                if (itemSerial == __instance.CurItem.SerialNumber) return false;
+				if (itemSerial == __instance.CurItem.SerialNumber) return false;
 
-                var player = __instance.GetPlayer();
-                var olditem = player.ItemInHand;
-                var newitem = itemSerial == 0 ? null : SynapseItem.AllItems[itemSerial];
+				bool flag = (__instance.UserInventory.Items.TryGetValue(__instance.CurItem.SerialNumber, out var oldItem) && __instance.CurInstance != null) || __instance.CurItem.SerialNumber == 0;
+				if (__instance.UserInventory.Items.TryGetValue(itemSerial, out var newItem) || itemSerial == 0)
+				{
+					if (__instance.CurItem.SerialNumber > 0 && flag && !oldItem.CanHolster()) return false;
 
-                if (newitem != null && (!olditem.ItemBase.CanHolster() || !newitem.ItemBase.CanEquip())) return false;
+					if (itemSerial != 0 && !newItem.CanEquip()) return false;
 
-                Server.Get.Events.Player.InvokeChangeItem(player, olditem, newitem);
+					if (itemSerial == 0)
+					{
+						var player = __instance._hub.GetPlayer();
+						Server.Get.Events.Player.InvokeChangeItem(player, player.ItemInHand, SynapseItem.None, out var allow);
 
-                return false;
+						if (!allow) return false;
+
+						__instance.NetworkCurItem = InventorySystem.Items.ItemIdentifier.None;
+						if (!__instance.isLocalPlayer)
+						{
+							__instance.CurInstance = null;
+							return false;
+						}
+					}
+					else
+					{
+						var player = __instance._hub.GetPlayer();
+						Server.Get.Events.Player.InvokeChangeItem(player, player.ItemInHand, SynapseItem.AllItems[newItem.ItemSerial], out var allow);
+
+						if (!allow) return false;
+
+						__instance.NetworkCurItem = new InventorySystem.Items.ItemIdentifier(newItem.ItemTypeId, itemSerial);
+						if (!__instance.isLocalPlayer)
+						{
+							__instance.CurInstance = newItem;
+							return false;
+						}
+					}
+				}
+				else if (!flag)
+				{
+					var player = __instance._hub.GetPlayer();
+					Server.Get.Events.Player.InvokeChangeItem(player, player.ItemInHand, SynapseItem.None, out var allow);
+
+					if (!allow) return false; 
+
+					__instance.NetworkCurItem = InventorySystem.Items.ItemIdentifier.None;
+					if (!__instance.isLocalPlayer) __instance.CurInstance = null;
+				}
+
+                return true;
             }
             catch(Exception e)
             {
