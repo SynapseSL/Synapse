@@ -104,6 +104,49 @@ namespace Synapse.Api
             GlitchedCassie(text);
         }
 
+        public void AnnounceScpDeath(string scp, PlayerStats.HitInfo hitInfo)
+        {
+
+            Player player = Server.Get.Players.FirstOrDefault(p => p.PlayerId == hitInfo.PlayerId);
+            DamageTypes.DamageType damageType = hitInfo.GetDamageType();
+            if (damageType == DamageTypes.Tesla)
+                NineTailedFoxAnnouncer.singleton.ServerOnlyAddGlitchyPhrase($". SCP {scp} SUCCESSFULLY TERMINATED BY AUTOMATIC SECURITY SYSTEM", 0, 0);
+            else if (damageType == DamageTypes.Nuke)
+                NineTailedFoxAnnouncer.singleton.ServerOnlyAddGlitchyPhrase($". SCP {scp} SUCCESSFULLY TERMINATED BY ALPHA WARHEAD", 0, 0);
+            else if (damageType == DamageTypes.Decont)
+                NineTailedFoxAnnouncer.singleton.ServerOnlyAddGlitchyPhrase($". SCP {scp} LOST IN DECONTAMINATION SEQUENCE", 0, 0);
+            else
+            {
+                string cause = "TERMINATION CAUSE UNSPECIFIED";
+                if (player != null)
+                {
+
+                    switch (player.RoleID)
+                    {
+                        case (int)Team.MTF:
+                            Respawning.NamingRules.UnitNamingRule rule;
+                            string Unit = Respawning.NamingRules.UnitNamingRules.TryGetNamingRule(Respawning.SpawnableTeamType.NineTailedFox, out rule) ? rule.GetCassieUnitName(player.UnitName) : "UNKNOWN";
+                            cause = "CONTAINEDSUCCESSFULLY CONTAINMENTUNIT " + Unit;
+                            break;
+                        case (int)Team.CHI:
+                            cause = "BY CHAOSINSURGENCY";
+                            break;
+                        case (int)Team.RSC:
+                            cause = "BY FACILITY PERSONNEL";
+                            break;
+                        case (int)Team.CDP:
+                            cause = " BY CLASSD PERSONNEL";
+                            break;
+                        default:
+                            cause = "CONTAINMENTUNIT UNKNOWN";
+                            break;
+                    }
+                }
+                GlitchedCassie($". SCP {scp} SUCCESSFULLY TERMINATED . {cause}");
+            }
+
+        }
+
         public void Cassie(string words, bool makehold = true, bool makenoise = true)
             => Respawning.RespawnEffectsController.PlayCassieAnnouncement(words, makehold, makenoise);
 
