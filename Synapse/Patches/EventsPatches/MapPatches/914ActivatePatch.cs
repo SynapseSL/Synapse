@@ -6,12 +6,15 @@ using Scp914;
 using Synapse.Api;
 using Synapse.Api.Items;
 using UnityEngine;
+using HarmonyLib;
 using Event = Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Patches.EventsPatches.MapPatches
 {
+	[HarmonyPatch(typeof(Scp914.Scp914Upgrader),nameof(Scp914.Scp914Upgrader.Upgrade))]
     internal static class Scp914ActivatePatch
     {
+		[HarmonyPrefix]
 		private static bool UpgradePatch(Collider[] intake, Vector3 moveVector, Scp914Mode mode, Scp914KnobSetting setting)
         {
 			try

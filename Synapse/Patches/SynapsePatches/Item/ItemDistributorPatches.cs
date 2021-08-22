@@ -13,6 +13,7 @@ namespace Synapse.Patches.SynapsePatches.Item
 		[HarmonyPrefix]
 		private static bool CreatePickupPatch(ItemDistributor __instance, ItemType id, Transform t, string triggerDoor)
 		{
+			Synapse.Api.Logger.Get.Warn("ItemDistributor create pickup");
 			try
 			{
 				if (!InventorySystem.InventoryItemLoader.AvailableItems.TryGetValue(id, out var itemBase))
@@ -50,6 +51,7 @@ namespace Synapse.Patches.SynapsePatches.Item
 		[HarmonyPrefix]
 		private static bool SpawnItemPatch(LockerChamber __instance, ItemType id, int amount)
 		{
+			Synapse.Api.Logger.Get.Warn("Spawn LockerChamber Item");
 			try
 			{
 				if (id == ItemType.None || !InventorySystem.InventoryItemLoader.AvailableItems.TryGetValue(id, out var itemBase))

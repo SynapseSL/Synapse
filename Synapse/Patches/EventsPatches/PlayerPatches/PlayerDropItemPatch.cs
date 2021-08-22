@@ -7,10 +7,10 @@ using InventorySystem.Items;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
+    [HarmonyPatch(typeof(Inventory), nameof(Inventory.UserCode_CmdDropAmmo))]
     internal static class DropItemPatch
     {
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(Inventory), nameof(Inventory.UserCode_CmdDropAmmo))]
         private static bool PlayerDropItemPatch(Inventory __instance, ushort itemSerial, ref bool tryThrow)
         {
             try

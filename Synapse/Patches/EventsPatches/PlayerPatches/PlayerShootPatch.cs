@@ -8,10 +8,10 @@ using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
+    [HarmonyPatch(typeof(IHitregModule), nameof(FirearmBasicMessagesHandler.ServerShotReceived))]
     internal static class PlayerShootPatch
     {
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(IHitregModule), nameof(FirearmBasicMessagesHandler.ServerShotReceived))]
         private static bool ServerProcessShotPatch(ShotMessage message)
         {
             try

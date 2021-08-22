@@ -8,10 +8,10 @@ using Synapse.Api.Events.SynapseEventArguments;
 // ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    internal static class UsableItemPatches
+    [HarmonyPatch(typeof(UsableItem), nameof(UsableItem.OnUsingStarted))]
+    internal static class UsableStartPatch
     {
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(UsableItem),nameof(UsableItem.OnUsingStarted))]
         private static bool StartPatch(UsableItem __instance)
         {
             try
@@ -24,15 +24,18 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 return allow;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: PlayerItemUseEvent Start failed!!\n{e}");
                 return true;
             }
         }
+    }
 
+    [HarmonyPatch(typeof(UsableItem), nameof(UsableItem.ServerOnUsingCompleted))]
+    internal static class UsableUsingCompletePatch
+    {
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(UsableItem), nameof(UsableItem.ServerOnUsingCompleted))]
         private static bool CompletePatch(UsableItem __instance)
         {
             try
@@ -58,9 +61,12 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 return true;
             }
         }
+    }
 
+    [HarmonyPatch(typeof(UsableItem), nameof(UsableItem.OnUsingCancelled))]
+    internal static class UsableCannelPatch
+    {
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(UsableItem), nameof(UsableItem.OnUsingCancelled))]
         private static bool CancelPatch(UsableItem __instance)
         {
             try

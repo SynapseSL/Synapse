@@ -6,10 +6,10 @@ using Mirror;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
+    [HarmonyPatch(typeof(FirearmBasicMessagesHandler), nameof(FirearmBasicMessagesHandler.ServerRequestReceived))]
     internal class PlayerReloadPatch
     {
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(FirearmBasicMessagesHandler), nameof(FirearmBasicMessagesHandler.ServerRequestReceived))]
         private static bool Prefix(NetworkConnection conn, RequestMessage msg)
         {
             try

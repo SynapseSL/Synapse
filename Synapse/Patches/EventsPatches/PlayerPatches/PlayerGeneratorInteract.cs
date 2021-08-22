@@ -11,10 +11,10 @@ using Interactables.Interobjects.DoorUtils;
 
 namespace Synapse.Events.Patches
 {
-    internal static class GeneratorInteractPatch
+	[HarmonyPatch(typeof(Scp079Generator), nameof(Scp079Generator.ServerInteract))]
+	internal static class GeneratorInteractPatch
     {
 		[HarmonyPrefix]
-		[HarmonyPatch(typeof(Scp079Generator), nameof(Scp079Generator.ServerInteract))]
 		private static bool OnInteract(Scp079Generator __instance, ReferenceHub ply, byte colliderId)
         {
             try

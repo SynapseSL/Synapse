@@ -16,11 +16,11 @@ using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    internal static class SetClassPatches
+    [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.SetPlayersClass))]
+    internal static class SetClassFirstpatch
     {
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(CharacterClassManager),nameof(CharacterClassManager.SetPlayersClass))]
-        private static bool FirstPatch(CharacterClassManager __instance ,ref RoleType classid, GameObject ply, bool lite = false, bool escape = false)
+        private static bool FirstPatch(CharacterClassManager __instance, ref RoleType classid, GameObject ply, bool lite = false, bool escape = false)
         {
             try
             {
@@ -47,14 +47,14 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 if (escape)
                     eventargs.EscapeItems = player.Inventory.Items;
 
-                if(classid != RoleType.Spectator && !lite)
+                if (classid != RoleType.Spectator && !lite)
                 {
                     var randomPosition = CharacterClassManager._spawnpointManager.GetRandomPosition(classid);
                     if (Map.Get.RespawnPoint != Vector3.zero)
                     {
                         eventargs.Position = Map.Get.RespawnPoint;
                     }
-                    else if(randomPosition != null)
+                    else if (randomPosition != null)
                     {
                         eventargs.Position = randomPosition.transform.position;
                         eventargs.Rotation = randomPosition.transform.rotation.eulerAngles.y;
@@ -71,15 +71,19 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 return eventargs.Allow;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: PlayerSetClass(first) failed!!\n{e}");
                 return true;
             }
         }
 
+    }
+
+    [HarmonyPatch(typeof(InventoryItemProvider), nameof(InventoryItemProvider.RoleChanged))]
+    internal static class SetClassSecondPatch
+    {
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(InventoryItemProvider),nameof(InventoryItemProvider.RoleChanged))]
         private static bool SpawnItemsPatch(ReferenceHub ply, RoleType newRole, bool escaped)
         {
             try
@@ -123,15 +127,18 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: PlayerSetClass(spawnitems) failed!!\n{e}");
                 return true;
             }
         }
+    }
 
+    [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.ApplyProperties))]
+    internal static class SetClassThirdPatch
+    {
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(CharacterClassManager),nameof(CharacterClassManager.ApplyProperties))]
         private static bool PositionPatch(CharacterClassManager __instance, bool lite = false, bool escape = false)
         {
             try

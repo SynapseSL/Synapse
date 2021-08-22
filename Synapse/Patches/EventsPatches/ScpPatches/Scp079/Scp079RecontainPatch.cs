@@ -5,11 +5,11 @@ using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 {
-	internal static class Scp079RecontainPatch
-	{
-		[HarmonyPatch(typeof(Recontainer079),nameof(Recontainer079.EndOvercharge))]
+	[HarmonyPatch(typeof(Recontainer079), nameof(Recontainer079.EndOvercharge))]
+	internal class EndOverchargePatch
+    {
 		private static void Postfix()
-        {
+		{
 			try
 			{
 				SynapseController.Server.Events.Scp.Scp079.Invoke079RecontainEvent(Recontain079Status.Finished, out var allow);
@@ -19,9 +19,12 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 				Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp079RecontainEvent Finished failed!!\n{e}");
 			}
 		}
+	}
 
+	[HarmonyPatch(typeof(Recontainer079), nameof(Recontainer079.RefreshActivator))]
+	internal static class Scp079RecontainPatch
+	{
 		[HarmonyPrefix]
-		[HarmonyPatch(typeof(Recontainer079),nameof(Recontainer079.RefreshActivator))]
 		private static bool OnActivator(Recontainer079 __instance)
         {
             try
