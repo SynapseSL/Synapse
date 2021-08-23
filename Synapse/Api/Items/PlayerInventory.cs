@@ -33,6 +33,9 @@ namespace Synapse.Api.Items
         {
             foreach (var item in Items)
                 item.Destroy();
+
+            player.VanillaInventory.UserInventory.ReserveAmmo.Clear();
+            player.VanillaInventory.SendAmmoNextFrame = true;
         }
     }
 }

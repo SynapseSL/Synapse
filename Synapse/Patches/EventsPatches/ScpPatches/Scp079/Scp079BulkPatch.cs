@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 {
-    [HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.UserCode_CmdInteract))]
+    //[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.UserCode_CmdInteract))]
     public static class Scp079BulkPatch
     {
         public static bool Prefix(Scp079PlayerScript __instance, Command079 command, string args, GameObject target)

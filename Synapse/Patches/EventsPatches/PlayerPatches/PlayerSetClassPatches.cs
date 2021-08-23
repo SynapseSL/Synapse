@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using HarmonyLib;
 using InventorySystem;
-using InventorySystem.Configs;
 using InventorySystem.Items.Armor;
-using Respawning;
-using Respawning.NamingRules;
 using Synapse.Api;
 using Synapse.Api.Enum;
 using Synapse.Api.Events.SynapseEventArguments;
@@ -17,38 +13,36 @@ using Logger = Synapse.Api.Logger;
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
     [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.SetPlayersClass))]
-    internal static class SetClassFirstpatch
+    internal static class SetPlayersClassPatch
     {
         [HarmonyPrefix]
-        private static bool FirstPatch(CharacterClassManager __instance, CharacterClassManager.SpawnReason spawnReason, ref RoleType classid, GameObject ply, bool lite = false)
+        private static bool OnSetClass(ref RoleType classid, GameObject ply, CharacterClassManager.SpawnReason spawnReason, bool lite = false)
         {
             try
             {
                 var player = ply.GetPlayer();
 
+                if (player.Hub.isDedicatedServer || !player.Hub.Ready) return false;
+
+                //Initialise eventargs
                 var eventargs = new PlayerSetClassEventArgs
                 {
-                    EscapeItems = new List<SynapseItem>(),
-                    IsEscaping = spawnReason == CharacterClassManager.SpawnReason.Escaped,
-                    SpawnReason = spawnReason,
                     Allow = true,
                     Player = player,
                     Role = classid,
+                    SpawnReason = spawnReason,
+                    EscapeItems = new List<SynapseItem>(),
+                    Position = Vector3.zero,
+                    Rotation = 0f,
                     Items = new List<SynapseItem>(),
                     Ammo = new Dictionary<AmmoType, ushort>(),
-                    Position = Vector3.zero,
-                    Rotation = 0f
                 };
 
-                //Normally all of these Things are set later in the code but since we need it know already for the event we get them earlier and store them in the Player for the other Patches
-                StartingInventories.DefinedInventories.TryGetValue(classid, out var roleinfo);
-                eventargs.Items = roleinfo.Items?.ToList().Select(x => new SynapseItem(x)).ToList();
-                eventargs.Ammo = (Dictionary<AmmoType, ushort>)roleinfo.Ammo?.Select(x => new KeyValuePair<AmmoType, ushort>((AmmoType)x.Key, x.Value));
+                //Set EscapeItems if the Player is escaping
+                if (eventargs.IsEscaping) eventargs.EscapeItems = player.Inventory.Items;
 
-                if (spawnReason == CharacterClassManager.SpawnReason.Escaped)
-                    eventargs.EscapeItems = player.Inventory.Items;
-
-                if (classid != RoleType.Spectator && !lite)
+                //Find the Position and Rotation if the player becomes a living Role
+                if(classid != RoleType.Spectator && classid != RoleType.None)
                 {
                     var randomPosition = CharacterClassManager._spawnpointManager.GetRandomPosition(classid);
                     if (Map.Get.RespawnPoint != Vector3.zero)
@@ -62,105 +56,126 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     }
                     else
                     {
-                        eventargs.Position = __instance.DeathPosition;
+                        eventargs.Position = player.ClassManager.DeathPosition;
                     }
                 }
 
+                //Find and create the Items that the Player should spawn with
+                if(InventorySystem.Configs.StartingInventories.DefinedInventories.TryGetValue(classid,out var roleitems))
+                {
+                    foreach (var ammo in roleitems.Ammo)
+                        eventargs.Ammo[(AmmoType)ammo.Key] = ammo.Value;
+
+                    foreach (var itemtype in roleitems.Items)
+                        eventargs.Items.Add(new SynapseItem(itemtype));
+                }
+
                 Server.Get.Events.Player.InvokeSetClassEvent(eventargs);
+
                 classid = eventargs.Role;
+
                 if (eventargs.Allow)
                     player.setClassEventArgs = eventargs;
 
                 return eventargs.Allow;
             }
-            catch (Exception e)
+            catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: PlayerSetClass(first) failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Event: PlayerSetClass(SetPlayersClass) failed!!\n{e}");
                 return true;
             }
         }
-
     }
 
-    [HarmonyPatch(typeof(InventoryItemProvider), nameof(InventoryItemProvider.RoleChanged))]
-    internal static class SetClassSecondPatch
+    [HarmonyPatch(typeof(InventoryItemProvider),nameof(InventoryItemProvider.RoleChanged))]
+    internal static class HandleItemPatch
     {
         [HarmonyPrefix]
-        private static bool SpawnItemsPatch(ReferenceHub ply, RoleType prevRole, RoleType newRole, CharacterClassManager.SpawnReason spawnReason)
+        private static bool OnRoleChanged(ReferenceHub ply, RoleType prevRole, RoleType newRole, bool lite, CharacterClassManager.SpawnReason spawnReason)
         {
             try
             {
                 var player = ply.GetPlayer();
+                var args = player.setClassEventArgs;
 
-                if (spawnReason == CharacterClassManager.SpawnReason.Escaped)
+                var inventory = ply.inventory;
+
+                if(args.IsEscaping)
                 {
-                    if (player.VanillaInventory.TryGetBodyArmor(out var bodyArmor))
-                        bodyArmor.DontRemoveExcessOnDrop = true;
-
-                    foreach (var item in player.setClassEventArgs.EscapeItems)
-                        item.Drop();
-
-                    InventoryItemProvider.PreviousInventoryPickups[ply] = player.setClassEventArgs.EscapeItems.Select(x => x.PickupBase).ToList();
+                    foreach (var item in player.Inventory.Items)
+                        item.Despawn();
                 }
-                else
-                {
-                    while (player.VanillaInventory.UserInventory.Items.Count > 0)
-                        player.VanillaInventory.ServerRemoveItem(player.VanillaInventory.UserInventory.Items.ElementAt(0).Key, null);
+                else player.Inventory.Clear();
 
-                    player.VanillaInventory.UserInventory.ReserveAmmo.Clear();
-                    player.VanillaInventory.SendAmmoNextFrame = true;
+                foreach (var ammo in args.Ammo)
+                    inventory.ServerAddAmmo((ItemType)ammo.Key, ammo.Value);
+
+                foreach (var item in args.Items)
+                {
+                    player.Inventory.AddItem(item);
+                    InventoryItemProvider.OnItemProvided.Invoke(ply, item.ItemBase);
                 }
 
-                if (StartingInventories.DefinedInventories.TryGetValue(newRole, out var inventoryRoleInfo))
+                if (args.IsEscaping)
                 {
-                    foreach (var pair in player.setClassEventArgs.Ammo)
-                        player.AmmoBox[pair.Key] = pair.Value;
-
-                    foreach (var item in player.setClassEventArgs.Items)
+                    foreach(var item in args.EscapeItems)
                     {
-                        item.PickUp(player);
-
-                        InventoryItemProvider.OnItemProvided?.Invoke(ply, item.ItemBase);
+                        if(inventory.UserInventory.Items.Count < 8 && item.ItemCategory != ItemCategory.Armor)
+                        {
+                            item.PickUp(player);
+                            InventorySystem.Items.Armor.BodyArmorUtils.RemoveEverythingExceedingLimits(inventory, 
+                                inventory.TryGetBodyArmor(out var bodyArmor) ? bodyArmor : null, true, true);
+                        }
+                        else item.Drop(args.Position);
                     }
                 }
 
+                args.CanBeDeleted = true;
+
                 return false;
             }
-            catch (Exception e)
+            catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: PlayerSetClass(spawnitems) failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Event: PlayerSetClass(Items) failed!!\n{e}");
                 return true;
             }
         }
     }
 
-    [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.ApplyProperties))]
-    internal static class SetClassThirdPatch
+    [HarmonyPatch(typeof(CharacterClassManager),nameof(CharacterClassManager.ApplyProperties))]
+    internal static class ApplyPropertiesPatch
     {
         [HarmonyPrefix]
-        private static bool PositionPatch(CharacterClassManager __instance, bool lite = false)
+        private static bool OnApplyProperties(CharacterClassManager __instance,bool lite, bool escape)
         {
             try
             {
                 var player = __instance.GetPlayer();
-                var role = __instance.CurRole;
 
+                var curRole = __instance.CurRole;
                 if (!__instance._wasAnytimeAlive && __instance.CurClass != RoleType.Spectator && __instance.CurClass != RoleType.None)
                     __instance._wasAnytimeAlive = true;
 
                 __instance.InitSCPs();
                 __instance.AliveTime = 0f;
 
-                if (role.team - Team.RSC <= 1)
+                var team = curRole.team;
+                if (team - Team.RSC <= 1)
                     __instance.EscapeStartTime = (int)Time.realtimeSinceStartup;
 
                 try
                 {
-                    player.FootstepSync.SetLoudness(role.team, role.roleId.Is939());
+                    __instance._hub.footstepSync.SetLoudness(curRole.team, curRole.roleId.Is939());
                 }
-                catch { }
+                catch
+                {
+                }
 
-                if (role.roleId != RoleType.Spectator && RespawnManager.CurrentSequence() != RespawnManager.RespawnSequencePhase.SpawningSelectedTeam && UnitNamingManager.RolesWithEnforcedDefaultName.TryGetValue(role.roleId, out var spawnableTeamType) && RespawnManager.Singleton.NamingManager.TryGetAllNamesFromGroup((byte)spawnableTeamType, out var array) && array.Length != 0)
+                if (curRole.roleId != RoleType.Spectator 
+                    && Respawning.RespawnManager.CurrentSequence() != Respawning.RespawnManager.RespawnSequencePhase.SpawningSelectedTeam 
+                    && Respawning.NamingRules.UnitNamingManager.RolesWithEnforcedDefaultName.TryGetValue(curRole.roleId, out var spawnableTeamType) 
+                    && Respawning.RespawnManager.Singleton.NamingManager.TryGetAllNamesFromGroup((byte)spawnableTeamType, out var array) 
+                    && array.Length != 0)
                 {
                     __instance.NetworkCurSpawnableTeamType = (byte)spawnableTeamType;
                     __instance.NetworkCurUnitName = array[0];
@@ -170,32 +185,34 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     __instance.NetworkCurSpawnableTeamType = 0;
                     __instance.NetworkCurUnitName = string.Empty;
                 }
-
-                if(role.roleId != RoleType.Spectator)
+                if (curRole.team != Team.RIP)
                 {
                     if (!lite)
                     {
                         var args = player.setClassEventArgs;
-                        //It's null when a person is revived by SCP049
+
+                        //It is null when SCP-049 "cures" a human to SCP-049-2
                         if (args == null)
-                        {
                             __instance._pms.OnPlayerClassChange(__instance.DeathPosition, 0f);
-                        }
                         else
                         {
                             __instance._pms.OnPlayerClassChange(args.Position, args.Rotation);
                             __instance._pms.IsAFK = true;
                         }
 
-                        if(!__instance.SpawnProtected && CharacterClassManager.EnableSP && CharacterClassManager.SProtectedTeam.Contains((int)role.team))
+                        if (!__instance.SpawnProtected && CharacterClassManager.EnableSP && CharacterClassManager.SProtectedTeam.Contains((int)curRole.team))
                         {
                             __instance.GodMode = true;
                             __instance.SpawnProtected = true;
                             __instance.ProtectedTime = Time.time;
                         }
+
+                        if (args.CanBeDeleted) player.setClassEventArgs = null;
                     }
                     if (!__instance.isLocalPlayer)
-                        player.MaxHealth = role.maxHP;
+                    {
+                        __instance._hub.playerStats.maxHP = curRole.maxHP;
+                    }
                 }
 
                 __instance.Scp0492.iAm049_2 = (__instance.CurClass == RoleType.Scp0492);
@@ -205,9 +222,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 return false;
             }
-            catch (Exception e)
+            catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: PlayerSetClass(position) failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Event: PlayerSetClass(ApplyProperties) failed!!\n{e}");
                 return true;
             }
         }

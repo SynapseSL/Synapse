@@ -241,7 +241,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public List<SynapseItem> EscapeItems { get; set; }
 
-        public bool IsEscaping { get; internal set; }
+        public bool IsEscaping => SpawnReason == CharacterClassManager.SpawnReason.Escaped;
 
         public CharacterClassManager.SpawnReason SpawnReason { get; internal set; }
 
@@ -250,6 +250,11 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public float Rotation { get; set; }
 
         public bool Allow { get; set; }
+
+        /// <summary>
+        /// This is only for Synapse to know if the object can be deleted by one of the patches
+        /// </summary>
+        internal bool CanBeDeleted { get; set; } = false;
     }
 
     public class PlayerStartWorkstationEventArgs : EventHandler.ISynapseEventArgs

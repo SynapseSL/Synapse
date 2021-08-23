@@ -1,5 +1,4 @@
-﻿using Synapse.Api.Items;
-using Synapse.Config;
+﻿using Synapse.Config;
 using UnityEngine;
 
 namespace Synapse.Api.Events
@@ -21,23 +20,6 @@ namespace Synapse.Api.Events
         {
             switch (ev.KeyCode)
             {
-                case KeyCode.Alpha1:
-                    ev.Player.Scp096Controller.MaxShield = 10000;
-                    ev.Player.Scp096Controller.CurMaxShield = 10000;
-                    ev.Player.Scp096Controller.ShieldAmount = 10000;
-                    SerializedMapPoint point = ev.Player.MapPoint;
-                    ev.Player.MapPoint = (MapPoint)point;
-                    SerializedItem item = ev.Player.ItemInHand;
-                    ev.Player.ItemInHand = (Items.SynapseItem)item;
-                    ev.Player.Position = new SerializedVector3(ev.Player.Position);
-                    break;
-
-                case KeyCode.Alpha2:
-                    Logger.Get.Warn("Alpha2");
-                    foreach (var item2 in SynapseItem.AllItems.Values)
-                        if (item2 != null)
-                            Logger.Get.Warn($"{item2.Serial} {item2.ItemType}");
-                    break;
             }
         }
 

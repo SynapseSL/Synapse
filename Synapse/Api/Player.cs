@@ -753,7 +753,6 @@ namespace Synapse.Api
             get
             {
                 if (VanillaInventory.CurItem == ItemIdentifier.None) return SynapseItem.None;
-                Logger.Get.Warn(VanillaInventory.CurItem.SerialNumber);
 
                 return VanillaInventory.CurInstance.GetSynapseItem();
             }
