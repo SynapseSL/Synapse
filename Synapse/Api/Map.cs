@@ -121,7 +121,7 @@ namespace Synapse.Api
                 if (player != null)
                 {
 
-                    switch (player.RoleID)
+                    switch (player.TeamID)
                     {
                         case (int)Team.MTF:
                             Respawning.NamingRules.UnitNamingRule rule;
