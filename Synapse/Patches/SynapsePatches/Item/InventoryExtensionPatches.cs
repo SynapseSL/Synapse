@@ -49,15 +49,18 @@ namespace Synapse.Patches.SynapsePatches.Item
     [HarmonyPatch(typeof(InventoryExtensions), nameof(InventoryExtensions.ServerRemoveItem))]
     internal static class RemoveItemPatch
     {
-        [HarmonyPostfix]
-        private static void ServerRemoveItemPatch(ushort itemSerial, InventorySystem.Items.Pickups.ItemPickupBase ipb)
+        [HarmonyPrefix]
+        private static bool ServerRemoveItemPatch(ushort itemSerial, InventorySystem.Items.Pickups.ItemPickupBase ipb)
         {
             //When ipb is null then this Method is used to destroy the entire object if not it is used to switch to a pickup
             if(ipb == null)
             {
                 var item = SynapseItem.AllItems[itemSerial];
                 item.Destroy();
+                return false;
             }
+
+            return true;
         }
     }
 

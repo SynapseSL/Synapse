@@ -120,10 +120,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     {
                         item.PickUp(player);
 
-                        var northwoodevent = InventoryItemProvider.OnItemProvided;
-
-                        if (northwoodevent != null)
-                            northwoodevent(ply, item.ItemBase);
+                        InventoryItemProvider.OnItemProvided?.Invoke(ply, item.ItemBase);
                     }
                 }
 

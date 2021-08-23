@@ -17,7 +17,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: LCZDecontamination failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Logger.Get.Error($"Synapse-Event: LCZDecontamination failed!!\n{e}");
                 return true;
             }
         }

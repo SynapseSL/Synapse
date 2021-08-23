@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
+using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items.Keycards;
 using MapGeneration.Distributors;
 using Synapse.Api.Enum;
 using Synapse.Api.Items;
 using Logger = Synapse.Api.Logger;
-using Interactables.Interobjects.DoorUtils;
 
 namespace Synapse.Events.Patches
 {
-	[HarmonyPatch(typeof(Scp079Generator), nameof(Scp079Generator.ServerInteract))]
+    [HarmonyPatch(typeof(Scp079Generator), nameof(Scp079Generator.ServerInteract))]
 	internal static class GeneratorInteractPatch
     {
 		[HarmonyPrefix]

@@ -1,6 +1,5 @@
 ﻿using System;
 using HarmonyLib;
-using Mirror;
 using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
@@ -14,16 +13,16 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                if (!NetworkServer.active) return false;
                 if (!NonFacilityCompatibility.currentSceneSettings.enableStandardGamplayItems) return false;
 
                 foreach (var player in Server.Get.Players)
                 {
-                    if (!(Vector3.Distance(player.Position, __instance._lureSpj.transform.position) <
-                          1.97f)) continue;
-                    if (player.RoleType == RoleType.Spectator || player.GodMode || !SynapseExtensions.CanHarmScp(player)) continue;
-                    var allow = player.Team != Team.SCP;
+                    if (player.Hub.isDedicatedServer || !player.Hub.Ready) continue;
+                    if (Vector3.Distance(player.Position, __instance._lureSpj.transform.position) >= 1.97f) continue;
+                    if (player.RoleType == RoleType.Spectator || player.Team == Team.SCP) continue;
+                    if (player.GodMode || !SynapseExtensions.CanHarmScp(player)) continue;
 
+                    var allow = true;
                     var closeFemur = FemurBrokePeople + 1 >= Server.Get.Configs.synapseConfiguration.RequiredForFemur;
 
                     SynapseController.Server.Events.Player.InvokePlayerEnterFemurEvent(player, ref allow, ref closeFemur);
@@ -38,7 +37,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             catch (Exception e)
             {
-                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerEnterFemur failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerEnterFemur failed!!\n{e}");
                 return true;
             }
         }

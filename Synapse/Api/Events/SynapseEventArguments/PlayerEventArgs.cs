@@ -112,9 +112,6 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Player Player { get; internal set; }
 
         public Items.SynapseItem Item { get; internal set; }
-        
-        //TODO:
-        //public GrenadeSettings Settings { get; set; }
 
         public float ForceMultiplier { get; set; }
         

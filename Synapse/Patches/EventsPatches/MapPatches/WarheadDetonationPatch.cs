@@ -14,7 +14,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
             }
             catch (Exception e)
             {
-                SynapseController.Server.Logger.Error($"Synapse-Event: WarheadDetonation failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                SynapseController.Server.Logger.Error($"Synapse-Event: WarheadDetonation failed!!\n{e}");
             }
         }
     }

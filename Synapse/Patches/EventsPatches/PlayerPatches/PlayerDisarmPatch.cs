@@ -1,8 +1,8 @@
 ﻿using System;
 using HarmonyLib;
 using InventorySystem.Disarming;
-using Mirror;
 using InventorySystem.Items;
+using Mirror;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
@@ -59,7 +59,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             catch (Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Event: PlayerCuffTarget event failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Synapse.Api.Logger.Get.Error($"Synapse-Event: PlayerCuffTarget event failed!!\n{e}");
                 return true;
             }
         }

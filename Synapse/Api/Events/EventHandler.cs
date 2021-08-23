@@ -10,6 +10,8 @@ namespace Synapse.Api.Events
         {
             Player.PlayerJoinEvent += PlayerJoin;
             Player.PlayerSyncDataEvent += PlayerSyncData;
+            Round.RoundRestartEvent += RounRestart;
+            Round.WaitingForPlayersEvent += Waiting;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
 #endif
@@ -36,10 +38,6 @@ namespace Synapse.Api.Events
                         if (item2 != null)
                             Logger.Get.Warn($"{item2.Serial} {item2.ItemType}");
                     break;
-
-                case KeyCode.Alpha3:
-                    Logger.Get.Warn(ev.Player.VanillaInventory.CurItem.SerialNumber);
-                    break;
             }
         }
 
@@ -63,6 +61,14 @@ namespace Synapse.Api.Events
 
 #region HookedEvents
         private SynapseConfiguration Conf => SynapseController.Server.Configs.synapseConfiguration;
+
+        private void Waiting()
+        {
+            SynapseController.Server.Map.AddObjects();
+            SynapseController.Server.Map.Round.CurrentRound++;
+        }
+
+        private void RounRestart() => Synapse.Api.Map.Get.ClearObjects();
 
         private void PlayerJoin(SynapseEventArguments.PlayerJoinEventArgs ev)
         {

@@ -21,7 +21,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp049
 
                 if (!__instance.iAm049_2 || Vector3.Distance(scp.Position, player.Position) > __instance.distance * 1.5f) return false;
 
-                if (!HitboxIdentity.CheckFriendlyFire(scp.Hub, player.Hub)) return false;
+                if (!SynapseExtensions.GetHarmPermission(scp, player)) return false;
 
                 ev.Get.Scp.InvokeScpAttack(scp, player, Api.Enum.ScpAttackType.Scp0492_Scratch, out var allow);
 
@@ -34,7 +34,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp049
             }
             catch(Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp049-2) failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Synapse.Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp049-2) failed!!\n{e}");
                 return true;
             }
         }

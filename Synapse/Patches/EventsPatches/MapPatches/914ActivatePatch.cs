@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using HarmonyLib;
 using InventorySystem.Items.Pickups;
 using NorthwoodLib.Pools;
 using Scp914;
 using Synapse.Api;
 using Synapse.Api.Items;
 using UnityEngine;
-using HarmonyLib;
 using Event = Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Patches.EventsPatches.MapPatches
 {
-	[HarmonyPatch(typeof(Scp914.Scp914Upgrader),nameof(Scp914.Scp914Upgrader.Upgrade))]
+    [HarmonyPatch(typeof(Scp914.Scp914Upgrader),nameof(Scp914.Scp914Upgrader.Upgrade))]
     internal static class Scp914ActivatePatch
     {
 		[HarmonyPrefix]

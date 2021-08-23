@@ -33,7 +33,6 @@ namespace Synapse.Patches.SynapsePatches.Item
                 ipb.NetworkInfo = info;
                 ipb.Info = info;
                 ipb.InfoReceived(default, info);
-                Synapse.Api.Logger.Get.Warn($"SpawnPickup - {serial} - {ipb.Info.Serial}");
                 new SynapseItem(ipb);
             }
             catch(Exception e)

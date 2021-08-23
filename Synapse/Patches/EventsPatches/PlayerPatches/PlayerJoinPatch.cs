@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using HarmonyLib;
 using Synapse.Database;
 
-// ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
     [HarmonyPatch(typeof(NicknameSync), nameof(NicknameSync.UpdateNickname))]
@@ -46,8 +45,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             catch (Exception e)
             {
-                SynapseController.Server.Logger.Error(
-                    $"Synapse-Event: PlayerJoin failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerJoin failed!!\n{e}");
             }
         }
     }

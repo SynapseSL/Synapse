@@ -25,7 +25,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Item: Connect Workstation Tablet failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Logger.Get.Error($"Synapse-Item: Connect Workstation Tablet failed!!\n{e}");
                 return false;
             }
         }

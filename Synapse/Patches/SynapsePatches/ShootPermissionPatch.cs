@@ -6,7 +6,7 @@ namespace Synapse.Patches.SynapsePatches
     [HarmonyPatch(typeof(HitboxIdentity), nameof(HitboxIdentity.CheckFriendlyFire),new[] { typeof(ReferenceHub), typeof(ReferenceHub) , typeof(bool) })]
     internal static class ShootPermissionPatch
     {
-        private static bool Prefix(bool __result,ReferenceHub attacker, ReferenceHub victim, bool ignoreConfig = false)
+        private static bool Prefix(out bool __result,ReferenceHub attacker, ReferenceHub victim, bool ignoreConfig = false)
         {
             try
             {

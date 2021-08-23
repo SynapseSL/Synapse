@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using HarmonyLib;
@@ -13,24 +14,31 @@ namespace Synapse.Patches.EventsPatches.ServerPatches
     {
         private static void Postfix(ConnectionRequest request)
         {
-            var allow = true;
-            var reason = "No Reason";
-
-            if (!request.Data.EndOfData) return;
-
-            var userId = CustomLiteNetLib4MirrorTransport.UserIds[request.RemoteEndPoint].UserId;
-            SynapseController.Server.Events.Server.InvokePreAuthenticationEvent(userId, ref allow, ref reason, request);
-
-            if (allow)
+            try
             {
-                request.Accept();
-                return;
-            }
+                var allow = true;
+                var reason = "No Reason";
 
-            var data = new NetDataWriter();
-            data.Put((byte) 10);
-            data.Put(reason);
-            request.RejectForce(data);
+                if (!request.Data.EndOfData) return;
+
+                var userId = CustomLiteNetLib4MirrorTransport.UserIds[request.RemoteEndPoint].UserId;
+                SynapseController.Server.Events.Server.InvokePreAuthenticationEvent(userId, ref allow, ref reason, request);
+
+                if (allow)
+                {
+                    request.Accept();
+                    return;
+                }
+
+                var data = new NetDataWriter();
+                data.Put((byte)10);
+                data.Put(reason);
+                request.RejectForce(data);
+            }
+            catch(Exception e)
+            {
+                Synapse.Api.Logger.Get.Error($"Synapse-Event: PreAuthenticationFailed failed!!\n{e}");
+            }
         }
 
         private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)

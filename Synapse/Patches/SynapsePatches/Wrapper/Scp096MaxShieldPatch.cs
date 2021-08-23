@@ -7,6 +7,7 @@ namespace Synapse.Patches.SynapsePatches.Wrapper
     [HarmonyPatch(typeof(PlayableScps.Scp096), "get_MaxShield")]
     internal static class Scp096MaxShieldPatch
     {
+        [HarmonyPostfix]
         private static void Postfix(PlayableScps.Scp096 __instance, ref float __result)
         {
             try

@@ -26,11 +26,11 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 				if (__instance.AllowInteracting(ply, colliderId))
 				{
 					var player = ply.GetPlayer();
-					var flag = __instance.RequiredPermissions.CheckPermissions(player.VanillaInventory.CurInstance, ply);
+					var flag = player.RoleType == RoleType.Scp079 || __instance.RequiredPermissions.CheckPermissions(player.VanillaInventory.CurInstance, ply);
 					var cardaccess = false;
 					var item = player.ItemInHand;
 
-					if (item != null && item.ItemCategory == ItemCategory.Keycard)
+					if (item.ItemCategory == ItemCategory.Keycard)
 						EventHandler.Get.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref flag);
 
 					if (flag) cardaccess = true;
@@ -50,7 +50,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 
 					EventHandler.Get.Map.InvokeDoorInteractEvent(player, __instance.GetDoor(), ref cardaccess);
 
-					if (ply.characterClassManager.CurClass == RoleType.Scp079 || cardaccess)
+					if (cardaccess)
 					{
 						__instance.NetworkTargetState = !__instance.TargetState;
 						__instance._triggerPlayer = ply;

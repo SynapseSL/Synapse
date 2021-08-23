@@ -1,22 +1,21 @@
 ﻿using System;
-using System.Linq;
-using HarmonyLib;
-using Synapse.Api;
-using UnityEngine;
-using Mirror;
-using Respawning;
-using CustomPlayerEffects;
 using System.Collections.Generic;
-using PlayableScps.Interfaces;
-using MapGeneration;
+using System.Linq;
+using CustomPlayerEffects;
+using Dissonance.Integrations.MirrorIgnorance;
+using HarmonyLib;
 using InventorySystem;
 using InventorySystem.Items.MicroHID;
-using Dissonance.Integrations.MirrorIgnorance;
+using MapGeneration;
+using PlayableScps.Interfaces;
+using Respawning;
+using Synapse.Api;
+using UnityEngine;
 
 // ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-	[HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.HurtPlayer))]
+    [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.HurtPlayer))]
 	internal static class PlayerDamagePatch
 	{
 		private static bool Prefix(PlayerStats __instance, out bool __result, PlayerStats.HitInfo info, GameObject go, bool noTeamDamage = false, bool IsValidDamage = true)
@@ -95,7 +94,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 				}
 				catch (Exception e)
 				{
-					SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDamage Event failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+					SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDamage Event failed!!\n{e}");
 				}
 
 				if (!allow)
@@ -301,15 +300,14 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
 					catch (Exception e)
 					{
-						SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDeath Event failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+						SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDeath Event failed!!\n{e}");
 					}
 
 					if (!__instance._pocketCleanup || info.Tool != DamageTypes.Pocket)
 					{
 						referenceHub.inventory.ServerDropEverything();
-						Vector3 vector;
-						bool flag7 = __instance.TryGet096SmackVelocity(info.RHub, referenceHub, out vector);
-						Vector3 vector2 = flag7 ? vector : referenceHub.playerMovementSync.PlayerVelocity;
+                        bool flag7 = __instance.TryGet096SmackVelocity(info.RHub, referenceHub, out Vector3 vector);
+                        Vector3 vector2 = flag7 ? vector : referenceHub.playerMovementSync.PlayerVelocity;
 						if (characterClassManager.Classes.CheckBounds(characterClassManager.CurClass) && damageType != DamageTypes.RagdollLess)
 						{
 							__instance.GetComponent<RagdollManager>().SpawnRagdoll(go.transform.position, go.transform.rotation, (referenceHub.playerMovementSync == null) ? Vector3.zero : vector2, (int)characterClassManager.CurClass, info, characterClassManager.CurRole.team > Team.SCP, go.GetComponent<MirrorIgnorancePlayer>().PlayerId, referenceHub.nicknameSync.DisplayName, referenceHub.queryProcessor.PlayerId, flag7);
@@ -422,7 +420,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 			}
 			catch (Exception e)
 			{
-				SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDamage Patch failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+				SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDamage Patch failed!!\n{e}");
 				__result = false;
 				return true;
 			}

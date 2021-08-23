@@ -1,6 +1,6 @@
 ﻿using System;
-using UnityEngine;
 using HarmonyLib;
+using UnityEngine;
 using ev = Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp049
@@ -14,13 +14,18 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp049
 
             try
             {
-                if (!__instance._interactRateLimit.CanExecute(true) || go == null) return false;
+                if (!__instance._interactRateLimit.CanExecute(true)) return false;
+                if (go == null || __instance.RemainingServerKillCooldown > 0f) return false;
 
                 var scp = __instance.GetPlayer();
                 var player = go.GetPlayer();
 
-                if (player == null || Vector3.Distance(scp.Position, player.Position) >= PlayableScps.Scp049.AttackDistance * 1.25f || !HitboxIdentity.CheckFriendlyFire(scp.Hub, player.Hub)) 
+                if (!SynapseExtensions.GetHarmPermission(scp, player)) return false;
+
+                if (Vector3.Distance(scp.Position, player.Position) >= PlayableScps.Scp049.AttackDistance * 1.25f) 
                     return false;
+
+                if (Physics.Linecast(scp.Position, player.Position, InventorySystem.Items.MicroHID.MicroHIDItem.WallMask)) return false;
 
                 ev.Get.Scp.InvokeScpAttack(scp, player, Api.Enum.ScpAttackType.Scp049_Touch, out var allow);
                 if (!allow) return false;
@@ -28,11 +33,12 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp049
                 player.Hurt(4949, DamageTypes.Scp049, scp);
                 GameCore.Console.AddDebugLog("SCPCTRL", "SCP-049 | Sent 'death time' RPC", MessageImportance.LessImportant, false);
                 scp.Hub.scpsController.RpcTransmit_Byte(0);
+                __instance.RemainingServerKillCooldown = PlayableScps.Scp049.KillCooldown;
                 return false;
             }
             catch(Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp049) failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Synapse.Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp049) failed!!\n{e}");
                 return true;
             }
         }

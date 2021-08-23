@@ -1,7 +1,6 @@
 ﻿using System;
 using HarmonyLib;
 using Synapse.Api;
-using Synapse.Patches.EventsPatches.PlayerPatches;
 
 namespace Synapse.Patches.EventsPatches.RoundPatches
 {
@@ -10,15 +9,13 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
     {
         private static void Prefix()
         {
-            Map.Get.ClearObjects();
-
             try
             {
                 Server.Get.Events.Round.InvokeRoundRestartEvent();
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: RoundRestartEvent failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Logger.Get.Error($"Synapse-Event: RoundRestartEvent failed!!\n{e}");
             }
         }
     }

@@ -759,7 +759,7 @@ namespace Synapse.Api
             }
             set
             {
-                if(value == null || !Inventory.Items.Contains(value))
+                if(value == null || value == SynapseItem.None || !Inventory.Items.Contains(value))
                 {
                     VanillaInventory.NetworkCurItem = ItemIdentifier.None;
                     VanillaInventory.CurInstance = null;

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using Logger = Synapse.Api.Logger;
 using HarmonyLib;
 using MEC;
 using Synapse.Api;
 using UnityEngine;
+using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.RoundPatches
 {
@@ -156,7 +156,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                 }
                 catch (Exception e)
                 {
-                    Logger.Get.Error($"Synapse-Event: RoundCheckEvent failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                    Logger.Get.Error($"Synapse-Event: RoundCheckEvent failed!!\n{e}");
                 }
 
 

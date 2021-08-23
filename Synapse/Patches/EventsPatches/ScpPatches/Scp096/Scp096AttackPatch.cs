@@ -50,7 +50,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                 }
                 catch (Exception e)
                 {
-                    Synapse.Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp096-Charge) failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                    Synapse.Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp096-Charge) failed!!\n{e}");
                 }
 
                 if(__instance.Hub.playerStats.HurtPlayer(new PlayerStats.HitInfo(9696f, __instance.Hub.LoggedNameFromRefHub(),

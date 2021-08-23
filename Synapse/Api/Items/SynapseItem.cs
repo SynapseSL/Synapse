@@ -24,19 +24,10 @@ namespace Synapse.Api.Items
 
         #region Constructors
         /// <summary>
-        /// This Constructor is called by any other SynapseItem Constructor so that this Code is always executed when creating a Synapse Item
-        /// </summary>
-        private SynapseItem()
-        {
-#if DEBUG
-#endif
-        }
-
-        /// <summary>
         /// This constructor creates a completely new Item from a ItemType but wont spawn it
         /// </summary>
         /// <param name="type"></param>
-        public SynapseItem(ItemType type) : this()
+        public SynapseItem(ItemType type)
         {
             Serial = ItemSerialGenerator.GenerateNext();
             AllItems[Serial] = this;
@@ -72,7 +63,7 @@ namespace Synapse.Api.Items
         /// This constructor creates a completely new Item from a ItemID but wont spawn it
         /// </summary>
         /// <param name="type"></param>
-        public SynapseItem(int id) : this()
+        public SynapseItem(int id)
         {
             if(id == -1 && None == null)
             {
@@ -126,11 +117,10 @@ namespace Synapse.Api.Items
         /// This Constructor should be used to register a ItemBase that is not already registered
         /// </summary>
         /// <param name="itemBase"></param>
-        public SynapseItem(ItemBase itemBase) : this()
+        public SynapseItem(ItemBase itemBase)
         {
             ItemBase = itemBase;
             Serial = itemBase.ItemSerial;
-            Logger.Get.Info($"Registered Item: {Serial}");
             AllItems[Serial] = this;
             ID = (int)itemBase.ItemTypeId;
             Name = itemBase.ItemTypeId.ToString();
@@ -146,11 +136,10 @@ namespace Synapse.Api.Items
         /// This Constructor should be used to register a ItemPickupBase that is not already registered
         /// </summary>
         /// <param name="pickupBase"></param>
-        public SynapseItem(ItemPickupBase pickupBase) : this()
+        public SynapseItem(ItemPickupBase pickupBase)
         {
             Serial = pickupBase.Info.Serial;
             PickupBase = pickupBase;
-            Logger.Get.Info($"Registered Item: {Serial}");
             AllItems[Serial] = this;
             ID = (int)pickupBase.Info.ItemId;
             Name = pickupBase.Info.ItemId.ToString();
@@ -440,13 +429,17 @@ namespace Synapse.Api.Items
         {
             if (ItemBase != null)
             {
-                ItemBase.OwnerInventory.ServerRemoveItem(Serial, null);
+                ItemBase.OnRemoved(null);
+                if (ItemHolder.ItemInHand == this)
+                    ItemHolder.ItemInHand = None;
+
+                UnityEngine.Object.Destroy(ItemBase.gameObject);
+
+                ItemHolder.VanillaInventory.UserInventory.Items.Remove(Serial);
+                ItemHolder.VanillaInventory.SendItemsNextFrame = true;
             }
 
-            if (PickupBase != null)
-            {
-                NetworkServer.Destroy(PickupBase.gameObject);
-            }
+            if (PickupBase != null) NetworkServer.Destroy(PickupBase.gameObject);
         }
 
         public void Destroy()

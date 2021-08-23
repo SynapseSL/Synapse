@@ -23,7 +23,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             catch(Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Event: PlayerAmmoDrop failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Synapse.Api.Logger.Get.Error($"Synapse-Event: PlayerAmmoDrop failed!!\n{e}");
                 return false;
             }
         }

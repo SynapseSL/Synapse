@@ -25,92 +25,72 @@ namespace Synapse.Database
         [API]
         public TK GetById(int id)
         {
-            using (var trc = Transaction)
-            {
-                return trc.Collection.FindById(id);
-            }
+            using var trc = Transaction;
+            return trc.Collection.FindById(id);
         }
 
         [API]
         public TR Query<TR>(Func<ILiteQueryable<TK>, TR> func)
         {
-            using (var trc = Transaction)
-            {
-                return func.Invoke(trc.Query());
-            }
+            using var trc = Transaction;
+            return func.Invoke(trc.Query());
         }
 
         [API]
         public TK Get(BsonExpression query)
         {
-            using (var trc = Transaction)
-            {
-                return trc.Collection.FindOne(query);
-            }
+            using var trc = Transaction;
+            return trc.Collection.FindOne(query);
         }
 
         [API]
         public bool Exists(BsonExpression query)
         {
-            using (var trc = Transaction)
-            {
-                return trc.Collection.Exists(query);
-            }
+            using var trc = Transaction;
+            return trc.Collection.Exists(query);
         }
 
         [API]
         public TK Insert(TK tk)
         {
-            using (var trc = Transaction)
-            {
-                trc.Collection.Insert(tk);
-                return tk;
-            }
+            using var trc = Transaction;
+            trc.Collection.Insert(tk);
+            return tk;
         }
 
         [API]
         public int Insert(IEnumerable<TK> list)
         {
-            using (var trc = Transaction)
-            {
-                return trc.Collection.InsertBulk(list);
-            }
+            using var trc = Transaction;
+            return trc.Collection.InsertBulk(list);
         }
 
         [API]
         public bool Delete(TK tk)
         {
-            using (var trc = Transaction)
-            {
-                return trc.Collection.Delete(tk.GetId());
-            }
+            using var trc = Transaction;
+            return trc.Collection.Delete(tk.GetId());
         }
 
         [API]
         public bool Save(TK tk)
         {
-            using (var trc = Transaction)
-            {
-                return trc.Collection.Update(tk);
-            }
+            using var trc = Transaction;
+            return trc.Collection.Update(tk);
         }
 
         [API]
         public List<TK> All()
         {
-            using (var trc = Transaction)
-            {
-                return trc.Collection.FindAll().ToList();
-            }
+            using var trc = Transaction;
+            return trc.Collection.FindAll().ToList();
         }
 
         [API]
         public List<TK> Find(BsonExpression query)
         {
-            using (var trc = Transaction)
-            {
-                return trc.Collection.Find(query).ToList();
-            }
+            using var trc = Transaction;
+            return trc.Collection.Find(query).ToList();
         }
 
     }

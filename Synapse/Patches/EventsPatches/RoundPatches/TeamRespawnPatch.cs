@@ -1,10 +1,10 @@
-﻿using HarmonyLib;
-using Respawning;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using HarmonyLib;
 using NorthwoodLib.Pools;
+using Respawning;
+using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.RoundPatches
 {
@@ -129,7 +129,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 			}
             catch(Exception e)
             {
-                SynapseController.Server.Logger.Error($"Synapse-Event: TeamRespawn failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                SynapseController.Server.Logger.Error($"Synapse-Event: TeamRespawn failed!!\n{e}");
                 return true;
             }
         }

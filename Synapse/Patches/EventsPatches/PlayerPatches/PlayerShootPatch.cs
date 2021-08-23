@@ -2,9 +2,7 @@
 using System.Linq;
 using HarmonyLib;
 using InventorySystem.Items.Firearms.BasicMessages;
-using InventorySystem.Items.Firearms.Modules;
 using Mirror;
-using Synapse.Api.Items;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches

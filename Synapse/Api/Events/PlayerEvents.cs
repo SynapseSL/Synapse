@@ -28,7 +28,7 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<PlayerItemInteractEventArgs> PlayerItemUseEvent;
 
-        public event EventHandler.OnSynapseEvent<PlayerThrowGrenadeEventArgs> PlayerThrowGrenadeEvent;
+        //public event EventHandler.OnSynapseEvent<PlayerThrowGrenadeEventArgs> PlayerThrowGrenadeEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerHealEventArgs> PlayerHealEvent;
 
@@ -56,9 +56,6 @@ namespace Synapse.Api.Events
 
         [Obsolete("Tablets are removed use PlayerStartWorkstationEvent")]
         public event EventHandler.OnSynapseEvent<PlayerConnectWorkstationEventArgs> PlayerConnectWorkstationEvent;
-
-        [Obsolete("Since the Workstation are now automatic disabled and tablets are no longer in the Game this event is never called",true)]
-        public event EventHandler.OnSynapseEvent<PlayerUnconnectWorkstationEventArgs> PlayerUnconnectWorkstationEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerDropAmmoEventArgs> PlayerDropAmmoEvent;
 
@@ -159,26 +156,6 @@ namespace Synapse.Api.Events
 
             allow = ev.Allow;
         }
-        
-        //TODO:
-        /*internal void InvokePlayerThrowGrenadeEvent(Player player, SynapseItem item,ref GrenadeSettings settings, ref float force, ref float delay, ref bool allow)
-        {
-            var ev = new PlayerThrowGrenadeEventArgs
-            {
-                Player = player,
-                Item = item,
-                ForceMultiplier = force,
-                Delay = delay,
-                Allow = allow,
-                Settings = settings,
-            };
-
-            PlayerThrowGrenadeEvent?.Invoke(ev);
-
-            force = ev.ForceMultiplier;
-            delay = ev.Delay;
-            allow = ev.Allow;
-        }*/
 
         internal void InvokePlayerHealEvent(Player player, ref float amount, ref bool allow)
         {

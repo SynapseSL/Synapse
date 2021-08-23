@@ -66,7 +66,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             catch(Exception e)
             {
-                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerChangeItem event failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerChangeItem event failed!!\n{e}");
                 return true;
             }
         }

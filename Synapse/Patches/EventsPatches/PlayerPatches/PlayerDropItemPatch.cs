@@ -1,9 +1,8 @@
 ﻿using System;
 using HarmonyLib;
 using InventorySystem;
-using Synapse.Api;
-using Synapse.Api.Items;
 using InventorySystem.Items;
+using Synapse.Api;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
