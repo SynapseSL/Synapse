@@ -98,6 +98,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var player = ply.GetPlayer();
                 var args = player.setClassEventArgs;
 
+                //If args is null he is SCP0492 and should not get any Items
+                if (args == null) return false;
+
                 var inventory = ply.inventory;
 
                 if(args.IsEscaping)
