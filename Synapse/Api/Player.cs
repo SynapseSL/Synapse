@@ -65,6 +65,7 @@ namespace Synapse.Api
         {
             RoleChangeClassIdPatch.ForceLite = true;
             Hub.characterClassManager.SetClassIDAdv(role, true,CharacterClassManager.SpawnReason.None);
+            RoleChangeClassIdPatch.ForceLite = false;
         }
 
         public void Kill(DamageTypes.DamageType damageType = default) => PlayerStats.HurtPlayer(new PlayerStats.HitInfo(-1f, "WORLD", damageType, 0, true), gameObject);

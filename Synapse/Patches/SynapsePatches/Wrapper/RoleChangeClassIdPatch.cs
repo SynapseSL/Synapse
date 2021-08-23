@@ -4,7 +4,7 @@
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
     
-    [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.SetClassID))]
+    [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.SetClassIDHook))]
     public class RoleChangeClassIdPatch
     {
         internal static bool ForceLite = false;
@@ -12,7 +12,6 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         public static bool Prefix(CharacterClassManager __instance, RoleType id)
         {
             __instance.SetClassIDAdv(id, ForceLite, CharacterClassManager.SpawnReason.None, true);
-            ForceLite = false;
             return false;
         }
     }

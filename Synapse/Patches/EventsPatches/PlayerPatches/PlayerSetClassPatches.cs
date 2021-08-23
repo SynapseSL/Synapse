@@ -149,10 +149,12 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     internal static class ApplyPropertiesPatch
     {
         [HarmonyPrefix]
-        private static bool OnApplyProperties(CharacterClassManager __instance,bool lite, bool escape)
+        private static bool OnApplyProperties(CharacterClassManager __instance,bool lite)
         {
             try
             {
+                if (lite) return true;
+
                 var player = __instance.GetPlayer();
 
                 var curRole = __instance.CurRole;
