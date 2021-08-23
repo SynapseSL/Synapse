@@ -14,14 +14,12 @@ namespace Synapse.Patches.SynapsePatches.Item
         [HarmonyPostfix]
         private static void ServerAddItemPatch(ItemBase __result, ushort itemSerial = 0, ItemPickupBase pickup = null)
         {
-            Logger.Get.Warn("Test");
-            if(__result == null) Logger.Get.Warn("NULL Base");
             try
             {
                 if (itemSerial == 0 || pickup == null) new SynapseItem(__result);
                 else
                 {
-                    var item = SynapseItem.AllItems[itemSerial];
+                    var item = pickup.GetSynapseItem();
                     item.ItemBase = __result;
                 }
             }
@@ -36,15 +34,15 @@ namespace Synapse.Patches.SynapsePatches.Item
     internal static class CreatePickupPatch
     {
         [HarmonyPostfix]
-        private static void ServerCreatePickupPatch(ItemPickupBase __result, ItemBase item, bool spawn = true)
+        private static void ServerCreatePickupPatch(ItemPickupBase __result, InventorySystem.Items.Pickups.PickupSyncInfo psi, bool spawn = true)
         {
-            var sitem = item.GetSynapseItem();
+            var item = SynapseItem.AllItems[psi.Serial];
 
-            if (sitem == null) sitem = new SynapseItem(__result);
-            else sitem.PickupBase = __result;
+            if (item == null) item = new SynapseItem(__result);
+            else item.PickupBase = __result;
 
-            if (!spawn) sitem.PickupBase.transform.localScale = sitem.Scale;
-            else sitem.Scale = sitem.Scale;
+            if (!spawn) item.PickupBase.transform.localScale = item.Scale;
+            else item.Scale = item.Scale;
         }
     }
 
@@ -61,5 +59,12 @@ namespace Synapse.Patches.SynapsePatches.Item
                 item.Destroy();
             }
         }
+    }
+
+    [HarmonyPatch(typeof(InventorySystem.Items.ItemSerialGenerator), nameof(InventorySystem.Items.ItemSerialGenerator.GenerateNext))]
+    internal static class GenerateSerialPatch
+    {
+        [HarmonyPostfix]
+        private static void GeneratePatch(ushort __result) => SynapseItem.AllItems[__result] = null;
     }
 }

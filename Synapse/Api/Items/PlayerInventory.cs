@@ -15,7 +15,7 @@ namespace Synapse.Api.Items
             get => Items[index];
         }
 
-        public List<Items.SynapseItem> Items => player.VanillaInventory.UserInventory.Items.Select(x => SynapseItem.AllItems[x.Key]).ToList();
+        public List<Items.SynapseItem> Items => player.VanillaInventory.UserInventory.Items.Select(x => x.Value.GetSynapseItem()).ToList();
 
         public void AddItem(SynapseItem item) => item.PickUp(player);
 

@@ -41,7 +41,7 @@ namespace Synapse.Api
 
         public List<Ragdoll> Ragdolls { get; } = new List<Ragdoll>();
 
-        public List<SynapseItem> Items => SynapseItem.AllItems.Values.ToList();
+        public List<SynapseItem> Items => SynapseItem.AllItems.Values.Where(x => x != null).ToList();
 
         public List<Dummy> Dummies { get; } = new List<Dummy>();
 

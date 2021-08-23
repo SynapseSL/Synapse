@@ -129,7 +129,7 @@ namespace Synapse.Api.Items
         public SynapseItem(ItemBase itemBase) : this()
         {
             ItemBase = itemBase;
-            Serial = itemBase.OwnerInventory.UserInventory.Items.FirstOrDefault(x => x.Value == itemBase).Key;
+            Serial = itemBase.ItemSerial;
             Logger.Get.Info($"Registered Item: {Serial}");
             AllItems[Serial] = this;
             ID = (int)itemBase.ItemTypeId;

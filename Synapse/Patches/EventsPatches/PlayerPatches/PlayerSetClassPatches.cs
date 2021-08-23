@@ -20,7 +20,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     internal static class SetClassFirstpatch
     {
         [HarmonyPrefix]
-        private static bool FirstPatch(CharacterClassManager __instance, ref RoleType classid, GameObject ply, bool lite = false, bool escape = false)
+        private static bool FirstPatch(CharacterClassManager __instance, CharacterClassManager.SpawnReason spawnReason, ref RoleType classid, GameObject ply, bool lite = false)
         {
             try
             {
@@ -29,7 +29,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var eventargs = new PlayerSetClassEventArgs
                 {
                     EscapeItems = new List<SynapseItem>(),
-                    IsEscaping = escape,
+                    IsEscaping = spawnReason == CharacterClassManager.SpawnReason.Escaped,
+                    SpawnReason = spawnReason,
                     Allow = true,
                     Player = player,
                     Role = classid,
@@ -41,10 +42,10 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 //Normally all of these Things are set later in the code but since we need it know already for the event we get them earlier and store them in the Player for the other Patches
                 StartingInventories.DefinedInventories.TryGetValue(classid, out var roleinfo);
-                eventargs.Items = roleinfo.Items.ToList().Select(x => new SynapseItem(x, player)).ToList();
-                eventargs.Ammo = (Dictionary<AmmoType, ushort>)roleinfo.Ammo.Select(x => new KeyValuePair<AmmoType, ushort>((AmmoType)x.Key, x.Value));
+                eventargs.Items = roleinfo.Items?.ToList().Select(x => new SynapseItem(x)).ToList();
+                eventargs.Ammo = (Dictionary<AmmoType, ushort>)roleinfo.Ammo?.Select(x => new KeyValuePair<AmmoType, ushort>((AmmoType)x.Key, x.Value));
 
-                if (escape)
+                if (spawnReason == CharacterClassManager.SpawnReason.Escaped)
                     eventargs.EscapeItems = player.Inventory.Items;
 
                 if (classid != RoleType.Spectator && !lite)
@@ -67,7 +68,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 Server.Get.Events.Player.InvokeSetClassEvent(eventargs);
                 classid = eventargs.Role;
-                player.setClassEventArgs = eventargs;
+                if (eventargs.Allow)
+                    player.setClassEventArgs = eventargs;
 
                 return eventargs.Allow;
             }
@@ -84,13 +86,13 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     internal static class SetClassSecondPatch
     {
         [HarmonyPrefix]
-        private static bool SpawnItemsPatch(ReferenceHub ply, RoleType newRole, bool escaped)
+        private static bool SpawnItemsPatch(ReferenceHub ply, RoleType prevRole, RoleType newRole, CharacterClassManager.SpawnReason spawnReason)
         {
             try
             {
                 var player = ply.GetPlayer();
 
-                if (escaped)
+                if (spawnReason == CharacterClassManager.SpawnReason.Escaped)
                 {
                     if (player.VanillaInventory.TryGetBodyArmor(out var bodyArmor))
                         bodyArmor.DontRemoveExcessOnDrop = true;
@@ -139,7 +141,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     internal static class SetClassThirdPatch
     {
         [HarmonyPrefix]
-        private static bool PositionPatch(CharacterClassManager __instance, bool lite = false, bool escape = false)
+        private static bool PositionPatch(CharacterClassManager __instance, bool lite = false)
         {
             try
             {

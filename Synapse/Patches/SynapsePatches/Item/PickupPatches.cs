@@ -10,7 +10,7 @@ namespace Synapse.Patches.SynapsePatches.Item
         [HarmonyPostfix]
         private static void DestroySelfPatch(ItemPickupBase __instance)
         {
-            var item = SynapseItem.AllItems[__instance.Info.Serial];
+            var item = __instance.GetSynapseItem();
             //Whenever the Item should be transformed to a Inventory Item a ItemBase will be created before
             //so that when ItemBase null is the game wants to destroy it
             if (item.ItemBase == null)

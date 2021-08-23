@@ -39,7 +39,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 					else
 					{
 						var player = __instance._hub.GetPlayer();
-						Server.Get.Events.Player.InvokeChangeItem(player, player.ItemInHand, SynapseItem.AllItems[newItem.ItemSerial], out var allow);
+						Server.Get.Events.Player.InvokeChangeItem(player, player.ItemInHand, newItem.GetSynapseItem(), out var allow);
 
 						if (!allow) return false;
 

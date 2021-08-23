@@ -246,6 +246,8 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public bool IsEscaping { get; internal set; }
 
+        public CharacterClassManager.SpawnReason SpawnReason { get; internal set; }
+
         public Vector3 Position { get; set; }
 
         public float Rotation { get; set; }

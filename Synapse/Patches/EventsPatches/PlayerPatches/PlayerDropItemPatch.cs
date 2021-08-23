@@ -7,7 +7,7 @@ using InventorySystem.Items;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(Inventory), nameof(Inventory.UserCode_CmdDropAmmo))]
+    [HarmonyPatch(typeof(Inventory), nameof(Inventory.UserCode_CmdDropItem))]
     internal static class DropItemPatch
     {
         [HarmonyPrefix]
@@ -15,10 +15,10 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                var item = SynapseItem.AllItems[itemSerial];
-
                 if (!__instance.UserInventory.Items.TryGetValue(itemSerial, out var itembase) || !itembase.CanHolster())
                     return false;
+
+                var item = itembase.GetSynapseItem();
 
                 Server.Get.Events.Player.InvokePlayerDropItemPatch(__instance.GetPlayer(), item, ref tryThrow, out var allow);
 
