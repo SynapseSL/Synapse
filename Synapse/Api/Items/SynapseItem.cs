@@ -23,11 +23,16 @@ namespace Synapse.Api.Items
         private bool deactivated = false;
 
         #region Constructors
+        private SynapseItem()
+        {
+            Throwable = new ThrowableAPI(this);
+        }
+
         /// <summary>
         /// This constructor creates a completely new Item from a ItemType but wont spawn it
         /// </summary>
         /// <param name="type"></param>
-        public SynapseItem(ItemType type)
+        public SynapseItem(ItemType type) : this()
         {
             Serial = ItemSerialGenerator.GenerateNext();
             AllItems[Serial] = this;
@@ -63,7 +68,7 @@ namespace Synapse.Api.Items
         /// This constructor creates a completely new Item from a ItemID but wont spawn it
         /// </summary>
         /// <param name="type"></param>
-        public SynapseItem(int id)
+        public SynapseItem(int id) : this()
         {
             if(id == -1 && None == null)
             {
@@ -117,7 +122,7 @@ namespace Synapse.Api.Items
         /// This Constructor should be used to register a ItemBase that is not already registered
         /// </summary>
         /// <param name="itemBase"></param>
-        public SynapseItem(ItemBase itemBase)
+        public SynapseItem(ItemBase itemBase) : this()
         {
             ItemBase = itemBase;
             Serial = itemBase.ItemSerial;
@@ -136,7 +141,7 @@ namespace Synapse.Api.Items
         /// This Constructor should be used to register a ItemPickupBase that is not already registered
         /// </summary>
         /// <param name="pickupBase"></param>
-        public SynapseItem(ItemPickupBase pickupBase)
+        public SynapseItem(ItemPickupBase pickupBase) : this()
         {
             Serial = pickupBase.Info.Serial;
             PickupBase = pickupBase;
@@ -153,6 +158,10 @@ namespace Synapse.Api.Items
             }
             Weight = pickupBase.Info.Weight;
         }
+        #endregion
+
+        #region API
+        public ThrowableAPI Throwable { get; }
         #endregion
 
         #region InitialValues
@@ -427,6 +436,13 @@ namespace Synapse.Api.Items
 
         public void Despawn()
         {
+            DespawnItemBase();
+            DespawnPickup();
+            Throwable.DestroyProjectile();
+        }
+
+        public void DespawnItemBase()
+        {
             if (ItemBase != null)
             {
                 ItemBase.OnRemoved(null);
@@ -438,7 +454,10 @@ namespace Synapse.Api.Items
                 ItemHolder.VanillaInventory.UserInventory.Items.Remove(Serial);
                 ItemHolder.VanillaInventory.SendItemsNextFrame = true;
             }
+        }
 
+        public void DespawnPickup()
+        {
             if (PickupBase != null) NetworkServer.Destroy(PickupBase.gameObject);
         }
 

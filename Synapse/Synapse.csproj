@@ -49,6 +49,7 @@
     <Compile Include="Api\Exceptions\SynapseRoleAlreadyRegisteredException.cs" />
     <Compile Include="Api\Exceptions\SynapseRoleNotFoundException.cs" />
     <Compile Include="Api\Exceptions\SynapseException.cs" />
+    <Compile Include="Api\Items\ThrowableAPI.cs" />
     <Compile Include="Api\Plugin\Processors\TranslationInjector.cs" />
     <Compile Include="Api\Prefabs.cs" />
     <Compile Include="Api\Roles\RoleInformation.cs" />
@@ -193,6 +194,7 @@
     <Compile Include="Patches\SynapsePatches\Item\ItemDistributorPatches.cs" />
     <Compile Include="Patches\SynapsePatches\Item\PickupPatches.cs" />
     <Compile Include="Patches\SynapsePatches\Item\InventoryExtensionPatches.cs" />
+    <Compile Include="Patches\SynapsePatches\Item\ThrowableItemPatches.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\DoorSpawnpointPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ShootPermissionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\InvisiblePatch.cs" />

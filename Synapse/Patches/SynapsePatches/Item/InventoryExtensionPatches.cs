@@ -36,13 +36,20 @@ namespace Synapse.Patches.SynapsePatches.Item
         [HarmonyPostfix]
         private static void ServerCreatePickupPatch(ItemPickupBase __result, InventorySystem.Items.Pickups.PickupSyncInfo psi, bool spawn = true)
         {
-            var item = SynapseItem.AllItems[psi.Serial];
+            try
+            {
+                var item = SynapseItem.AllItems[psi.Serial];
 
-            if (item == null) item = new SynapseItem(__result);
-            else item.PickupBase = __result;
+                if (item == null) item = new SynapseItem(__result);
+                else item.PickupBase = __result;
 
-            if (!spawn) item.PickupBase.transform.localScale = item.Scale;
-            else item.Scale = item.Scale;
+                if (!spawn) item.PickupBase.transform.localScale = item.Scale;
+                else item.Scale = item.Scale;
+            }
+            catch(Exception e)
+            {
+                Logger.Get.Error($"Synapse-Items: CreatePickup failed!!\n{e}");
+            }
         }
     }
 
@@ -52,15 +59,23 @@ namespace Synapse.Patches.SynapsePatches.Item
         [HarmonyPrefix]
         private static bool ServerRemoveItemPatch(ushort itemSerial, InventorySystem.Items.Pickups.ItemPickupBase ipb)
         {
-            //When ipb is null then this Method is used to destroy the entire object if not it is used to switch to a pickup
-            if(ipb == null)
+            try
             {
-                var item = SynapseItem.AllItems[itemSerial];
-                item.Destroy();
-                return false;
-            }
+                //When ipb is null then this Method is used to destroy the entire object if not it is used to switch to a pickup
+                if (ipb == null)
+                {
+                    var item = SynapseItem.AllItems[itemSerial];
+                    item.Destroy();
+                    return false;
+                }
 
-            return true;
+                return true;
+            }
+            catch(Exception e)
+            {
+                Logger.Get.Error($"Synapse-Items: RemoveItem failed!!\n{e}");
+                return true;
+            }
         }
     }
 
