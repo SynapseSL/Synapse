@@ -11,21 +11,42 @@ namespace Synapse.Patches.SynapsePatches.Item
     [HarmonyPatch(typeof(InventoryExtensions), nameof(InventoryExtensions.ServerAddItem))]
     internal static class AddItemPatch
     {
-        [HarmonyPostfix]
-        private static void ServerAddItemPatch(ItemBase __result, ushort itemSerial = 0, ItemPickupBase pickup = null)
+        [HarmonyPrefix]
+        private static bool ServerAddItem(ref ItemBase __result, Inventory inv, global::ItemType type, ushort itemSerial, InventorySystem.Items.Pickups.ItemPickupBase pickup)
         {
             try
             {
-                if (itemSerial == 0 || pickup == null) new SynapseItem(__result);
+                __result = null;
+                if (inv.UserInventory.Items.Count >= 8) return false;
+
+                if (itemSerial == 0)
+                    itemSerial = InventorySystem.Items.ItemSerialGenerator.GenerateNext();
+
+                var itembase = inv.CreateItemInstance(type, inv.isLocalPlayer);
+
+                if (itembase == null) return false;
+
+                inv.UserInventory.Items[itemSerial] = itembase;
+                itembase.ItemSerial = itemSerial;
+
+                if (pickup == null) new SynapseItem(itembase);
                 else
                 {
                     var item = pickup.GetSynapseItem();
-                    item.ItemBase = __result;
+                    item.ItemBase = itembase;
                 }
+
+                itembase.OnAdded(pickup);
+                if (inv.isLocalPlayer && itembase is InventorySystem.Items.IAcquisitionConfirmationTrigger trigger)
+                    trigger.ServerConfirmAcqusition();
+                inv.SendItemsNextFrame = true;
+                __result = itembase;
+                return false;
             }
             catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Items: AddItem failed!!\n{e}");
+                return false;
             }
         }
     }

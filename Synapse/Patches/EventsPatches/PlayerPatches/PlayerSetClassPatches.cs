@@ -115,8 +115,15 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 foreach (var item in args.Items)
                 {
-                    player.Inventory.AddItem(item);
-                    InventoryItemProvider.OnItemProvided.Invoke(ply, item.ItemBase);
+                    item.Drop();
+                    var arg = player.VanillaInventory.ServerAddItem(item.ItemType, item.Serial, item.PickupBase);
+
+                    var onItemProvided = InventoryItemProvider.OnItemProvided;
+
+                    if (onItemProvided != null)
+                    {
+                        onItemProvided(player.Hub, arg);
+                    }
                 }
 
                 if (args.IsEscaping)

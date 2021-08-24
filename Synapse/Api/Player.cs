@@ -55,7 +55,13 @@ namespace Synapse.Api
         [Obsolete("Use GetPreference(ItemType) without type", true)]
         private int GetPreference(ItemType item, int type) => (int)GetPreference(item);
 
-        public uint GetPreference(ItemType item) => AttachmentsServerHandler.PlayerPreferences[Hub][item];
+        public uint GetPreference(ItemType item)
+        {
+            if (AttachmentsServerHandler.PlayerPreferences.TryGetValue(Hub, out var dict) && dict.TryGetValue(item, out var result))
+                return result;
+
+            return 0;
+        }
 
         public void Kick(string message) => ServerConsole.Disconnect(gameObject, message);
 

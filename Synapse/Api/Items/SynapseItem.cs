@@ -9,6 +9,7 @@ using InventorySystem.Items.MicroHID;
 using InventorySystem.Items.Pickups;
 using InventorySystem.Items.Radio;
 using Mirror;
+using InventorySystem.Items.Firearms.Attachments;
 using Synapse.Api.Enum;
 using UnityEngine;
 
@@ -372,8 +373,7 @@ namespace Synapse.Api.Items
             {
                 if (ItemBase is Firearm arm)
                 {
-                    var newstatus = new FirearmStatus(arm.Status.Ammo, arm.Status.Flags, value);
-                    arm.OnStatusChanged(arm.Status, newstatus);
+                    arm.ApplyAttachmentsCode(value,true);
                 }
                 else if (PickupBase is FirearmPickup armpickup)
                 {
@@ -393,7 +393,8 @@ namespace Synapse.Api.Items
                     break;
 
                 case ItemState.Despawned:
-                    player.VanillaInventory.ServerAddItem(ItemType, Serial);
+                    Drop(Vector3.zero);
+                    player.VanillaInventory.ServerAddItem(ItemType, Serial, PickupBase);
                     break;
 
                 case ItemState.Inventory:
