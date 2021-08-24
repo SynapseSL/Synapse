@@ -9,7 +9,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     [HarmonyPatch(typeof(NicknameSync), nameof(NicknameSync.UpdateNickname))]
     internal static class PlayerJoinPatch
     {
-        private static void Prefix(NicknameSync __instance, ref string n)
+        [HarmonyPrefix]
+        private static void UpdateNickname(NicknameSync __instance, ref string n)
         {
             try
             {

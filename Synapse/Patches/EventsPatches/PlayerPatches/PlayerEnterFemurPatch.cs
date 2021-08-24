@@ -9,7 +9,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     {
         private static int FemurBrokePeople = 0;
 
-        private static bool Prefix(CharacterClassManager __instance)
+        [HarmonyPrefix]
+        private static bool OnContain(CharacterClassManager __instance)
         {
             try
             {

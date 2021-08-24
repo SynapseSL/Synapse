@@ -9,7 +9,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         typeof(string), typeof(bool))]
     internal static class PlayerBanPatch
     {
-        private static bool Prefix(GameObject user, long duration, string reason, string issuer, bool isGlobalBan)
+        [HarmonyPrefix]
+        private static bool BanUser(GameObject user, long duration, string reason, string issuer, bool isGlobalBan)
         {
             try
             {

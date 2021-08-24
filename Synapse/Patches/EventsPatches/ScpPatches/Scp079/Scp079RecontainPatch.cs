@@ -8,7 +8,8 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
     [HarmonyPatch(typeof(Recontainer079), nameof(Recontainer079.EndOvercharge))]
 	internal class EndOverchargePatch
     {
-		private static void Postfix()
+		[HarmonyPostfix]
+		private static void EndOvercharge()
 		{
 			try
 			{

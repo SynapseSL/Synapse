@@ -9,7 +9,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     [HarmonyPatch(typeof(DissonanceUserSetup), nameof(DissonanceUserSetup.UserCode_CmdAltIsActive))]
     internal static class PlayerSpeakPatch
     {
-        private static bool Prefix(DissonanceUserSetup __instance, bool value)
+        [HarmonyPrefix]
+        private static bool AltIsActive(DissonanceUserSetup __instance, bool value)
         {
             try
             {

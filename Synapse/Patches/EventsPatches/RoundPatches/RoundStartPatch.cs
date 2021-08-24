@@ -6,7 +6,8 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
     [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.RpcRoundStarted))]
     internal static class RoundStartPatch
     {
-        private static void Prefix()
+        [HarmonyPrefix]
+        private static void RoundStart()
         {
             try
             {

@@ -14,28 +14,31 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
     [HarmonyPatch(typeof(Scp106PlayerScript), nameof(Scp106PlayerScript.UserCode_CmdMovePlayer))]
     internal class PocketDimensionEnterPatch
     {
-        private static bool Prefix(Scp106PlayerScript __instance, GameObject ply, int t)
+        [HarmonyPrefix]
+        private static bool MovePlayer(Scp106PlayerScript __instance, GameObject ply, int t)
         {
             try
             {
-                if (!__instance._iawRateLimit.CanExecute(true) || ply == null) return false;
+                if (!__instance._iawRateLimit.CanExecute(true) || ply == null || !__instance.iAm106) return false;
+
                 var scp = __instance.GetPlayer();
                 var player = ply.GetPlayer();
+
                 if (player == null || player.GodMode || !ServerTime.CheckSynchronization(t) || !player.ClassManager.IsHuman()) 
                     return false;
 
-                if (!HitboxIdentity.CheckFriendlyFire(scp.Hub, player.Hub))
+                if (!SynapseExtensions.GetHarmPermission(scp, player))
                     return false;
 
                 var pos = player.Position;
                 var num = Vector3.Distance(scp.Position, pos);
                 var num2 = Math.Abs(scp.Position.y - pos.y);
-                if ((num >= 1.818f && num2 < 1.02f) || (num >= 2.1f && num2 < 1.95f) || (num >= 2.65f && num2 < 2.2f) || (num >= 3.2f && num2 < 3f) || num >= 3.64f)
+                if ((num >= 1.818f && num2 < 1.02f) || (num >= 3.4f && num2 < 1.95f) || (num >= 3.7f && num2 < 2.2f) || (num >= 3.9f && num2 < 3f) || num >= 4.2f)
                 {
                     __instance._hub.characterClassManager.TargetConsolePrint(scp.Connection, string.Format("106 MovePlayer command rejected - too big distance (code: T1). Distance: {0}, Y Diff: {1}.", num, num2), "gray");
                     return false;
                 }
-                if (Physics.Linecast(scp.Position, ply.transform.position, MicroHIDItem.WallMask))
+                if (Physics.Linecast(scp.Position, player.Position, MicroHIDItem.WallMask))
                 {
                     __instance._hub.characterClassManager.TargetConsolePrint(scp.Connection, string.Format("106 MovePlayer command rejected - collider found between you and the target (code: T2). Distance: {0}, Y Diff: {1}.", num, num2), "gray");
                     return false;
@@ -83,12 +86,11 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                         }
                     }
 
-                    if (player.RoleType == RoleType.Spectator) return false;
-
                     EventHandler.Get.Scp.Scp106.InvokePocketDimensionEnterEvent(player, scp, ref allow);
                     if (!allow) return false;
                     scp.Scp106Controller.PocketPlayers.Add(player);
-                    player.GiveEffect(Api.Enum.Effect.Corroding,0);
+
+                    player.PlayerEffectsController.EnableEffect<CustomPlayerEffects.Corroding>(0f, false);
                 }
 
                 return false;
@@ -104,19 +106,19 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
     [HarmonyPatch(typeof(PocketDimensionTeleport), nameof(PocketDimensionTeleport.OnTriggerEnter))]
     internal class PocketDimensionLeavePatch
     {
-        private static bool Prefix(PocketDimensionTeleport __instance, Collider other)
+        [HarmonyPrefix]
+        private static bool TriggerEnter(PocketDimensionTeleport __instance, Collider other)
         {
             try
             {
-                if (!NetworkServer.active) return false;
-
                 var component = other.GetComponent<NetworkIdentity>();
                 if (component == null) return false;
 
                 var type = __instance.type;
                 var player = component.GetPlayer();
-
                 if (player == null) return false;
+
+                var forceEscape = !SynapseExtensions.CanHarmScp(player, false);
 
                 __instance.tpPositions.Clear();
                 var stringList = GameCore.ConfigFile.ServerConfig.GetStringList(Synapse.Api.Map.Get.Decontamination.IsDecontaminationInProgress ? "pd_random_exit_rids_after_decontamination" : "pd_random_exit_rids");
@@ -162,7 +164,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
             } 
             catch (Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: PocketDimLeave failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Logger.Get.Error($"Synapse-Event: PocketDimLeave failed!!\n{e}");
                 return true;
             }
         }

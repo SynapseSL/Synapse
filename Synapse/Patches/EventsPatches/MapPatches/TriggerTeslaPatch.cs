@@ -7,7 +7,8 @@ namespace Synapse.Patches.EventsPatches.MapPatches
     [HarmonyPatch(typeof(TeslaGate), nameof(TeslaGate.PlayerInRange))]
     internal static class TriggerTeslaPatch
     {
-        private static bool Prefix(TeslaGate __instance, out bool __result, ReferenceHub player)
+        [HarmonyPrefix]
+        private static bool OnRange(TeslaGate __instance, out bool __result, ReferenceHub player)
         {
             __result = false;
             try

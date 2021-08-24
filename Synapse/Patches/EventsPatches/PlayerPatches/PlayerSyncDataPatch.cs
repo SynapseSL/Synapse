@@ -5,9 +5,10 @@ using Logger = Synapse.Api.Logger;
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
     [HarmonyPatch(typeof(AnimationController), nameof(AnimationController.UserCode_CmdSyncData))]
-    public class SyncDataPatch
+    internal static class SyncDataPatch
     {
-        public static bool Prefix(AnimationController __instance)
+        [HarmonyPrefix]
+        private static bool SyncData(AnimationController __instance)
         {
             try
             {

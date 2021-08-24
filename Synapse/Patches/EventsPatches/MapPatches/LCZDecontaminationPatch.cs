@@ -8,7 +8,8 @@ namespace Synapse.Patches.EventsPatches.MapPatches
     [HarmonyPatch(typeof(DecontaminationController),nameof(DecontaminationController.FinishDecontamination))]
     internal static class LCZDecontaminationPatch
     {
-        private static bool Prefix()
+        [HarmonyPrefix]
+        private static bool OnDecontamination()
         {
             try
             {

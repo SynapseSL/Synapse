@@ -197,6 +197,8 @@ namespace Synapse.Api.Items
             {
                 if (deactivated) return Enum.ItemState.Destroyed;
 
+                if (Throwable.ThrowableItem != null) return Enum.ItemState.Thrown;
+
                 if (ItemBase != null) return Enum.ItemState.Inventory;
 
                 if (PickupBase != null) return Enum.ItemState.Map;

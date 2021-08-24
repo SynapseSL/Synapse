@@ -8,7 +8,8 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp049
     [HarmonyPatch(typeof(Scp049_2PlayerScript),nameof(Scp049_2PlayerScript.UserCode_CmdHurtPlayer))]
     internal static class Scp0492AttackPatch
     {
-        private static bool Prefix(Scp049_2PlayerScript __instance, GameObject plyObj)
+        [HarmonyPrefix]
+        private static bool HurtPlayer(Scp049_2PlayerScript __instance, GameObject plyObj)
         {
             try
             {

@@ -6,7 +6,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     [HarmonyPatch(typeof(CheaterReport),nameof(CheaterReport.UserCode_CmdReport))]
     internal static class PlayerReportPatch
     {
-        private static bool Prefix(CheaterReport __instance, int playerId, string reason, ref bool notifyGm)
+        [HarmonyPrefix]
+        private static bool Report(CheaterReport __instance, int playerId, string reason, ref bool notifyGm)
         {
             try
             {

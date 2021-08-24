@@ -8,7 +8,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     [HarmonyPatch(typeof(Inventory),nameof(Inventory.UserCode_CmdDropAmmo))]
     internal static class PlayerDropAmmoPatch
     {
-        private static bool Prefix(Inventory __instance, ref byte ammoType, ref ushort amount)
+        [HarmonyPrefix]
+        private static bool DropAmmo(Inventory __instance, ref byte ammoType, ref ushort amount)
         {
             try
             {

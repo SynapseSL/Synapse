@@ -7,7 +7,8 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
     [HarmonyPatch(typeof(Scp106PlayerScript), nameof(Scp106PlayerScript.UserCode_CmdMakePortal))]
     internal static class Scp106PortalCreatePatch
     {
-        private static bool Prefix(Scp106PlayerScript __instance)
+        [HarmonyPrefix]
+        private static bool CreatePortal(Scp106PlayerScript __instance)
         {
             try
             {
@@ -16,7 +17,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: Scp106PortalCreate failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Logger.Get.Error($"Synapse-Event: Scp106PortalCreate failed!!\n{e}");
                 return true;
             }
         }

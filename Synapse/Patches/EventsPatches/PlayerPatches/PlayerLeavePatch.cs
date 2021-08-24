@@ -7,7 +7,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     [HarmonyPatch(typeof(CustomNetworkManager), nameof(CustomNetworkManager.OnServerDisconnect))]
     internal static class PlayerLeavePatch
     {
-        private static void Prefix(NetworkConnection conn)
+        [HarmonyPrefix]
+        private static void OnDisconnect(NetworkConnection conn)
         {
             try
             {

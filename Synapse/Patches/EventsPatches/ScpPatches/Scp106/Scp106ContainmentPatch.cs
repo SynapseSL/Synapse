@@ -8,12 +8,13 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
     [HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.UserCode_CmdContain106))]
     internal class Scp106ContainmentPatch
     {
-        private static bool Prefix(PlayerInteract __instance)
+        [HarmonyPrefix]
+        private static bool Contain106(PlayerInteract __instance)
         {
             try
             {
                 var player = __instance.GetPlayer();
-                if (!SynapseExtensions.CanHarmScp(player)) return false;
+                if (!SynapseExtensions.CanHarmScp(player) || !__instance.CanInteract) return false;
 
                 var allow = true;
                 EventHandler.Get.Scp.Scp106.InvokeScp106ContainmentEvent(player, ref allow);
@@ -21,7 +22,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
             }
             catch (Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: Scp106Containment failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Logger.Get.Error($"Synapse-Event: Scp106Containment failed!!\n{e}");
                 return true;
             }
         }

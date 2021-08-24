@@ -8,7 +8,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     [HarmonyPatch(typeof(SinkholeEnvironmentalHazard),nameof(SinkholeEnvironmentalHazard.DistanceChanged))]
     internal static class PlayerWalkOnSinkholePatch
     {
-        private static bool Prefix(SinkholeEnvironmentalHazard __instance, ReferenceHub player)
+        [HarmonyPrefix]
+        private static bool DistanceChanged(SinkholeEnvironmentalHazard __instance, ReferenceHub player)
         {
             try
             {

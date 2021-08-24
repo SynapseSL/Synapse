@@ -1,26 +1,25 @@
 ﻿using System;
 using HarmonyLib;
-using UnityEngine;
 using PlayableScps;
+using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
 {
     [HarmonyPatch(typeof(PlayableScps.Scp096), nameof(PlayableScps.Scp096.UpdateVision))]
     internal static class Scp096LookPatch
     {
-        private static bool Prefix(PlayableScps.Scp096 __instance)
+        [HarmonyPrefix]
+        private static bool UpdateVision(PlayableScps.Scp096 __instance)
         {
             try
             {
-                if (__instance._flash.IsEnabled)
-                {
-                    return false;
-                }
+                if (__instance._flash.IsEnabled) return false;
+
                 var vector = __instance.Hub.transform.TransformPoint(PlayableScps.Scp096._headOffset);
+
                 foreach (var player in Server.Get.Players)
                 {
-                    var characterClassManager = player.ClassManager;
-                    if (characterClassManager.CurClass != RoleType.Spectator && !(player.Hub == __instance.Hub) && !characterClassManager.IsAnyScp() && Vector3.Dot((player.CameraReference.position - vector).normalized, __instance.Hub.PlayerCameraReference.forward) >= 0.1f)
+                    if (player.RoleType != RoleType.Spectator && player.Hub != __instance.Hub && player.ClassManager.IsAnyScp() && Vector3.Dot((player.CameraReference.position - vector).normalized, __instance.Hub.PlayerCameraReference.forward) >= 0.1f)
                     {
                         var visionInformation = VisionInformation.GetVisionInformation(player.Hub, vector, -0.1f, 60f, true, true, __instance.Hub.localCurrentRoomEffects);
                         if (visionInformation.IsLooking)
@@ -45,11 +44,12 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                         }
                     }
                 }
+
                 return false;
             }
             catch (Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp096AddTargetEvent failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp096AddTargetEvent failed!!\n{e}");
                 return true;
             }
         }
@@ -58,11 +58,12 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
     [HarmonyPatch(typeof(PlayableScps.Scp096), nameof(PlayableScps.Scp096.OnDamage))]
     internal static class Scp096ShootPatch
     {
-        private static bool Prefix(PlayableScps.Scp096 __instance, PlayerStats.HitInfo info)
+        [HarmonyPrefix]
+        private static bool Damage(PlayableScps.Scp096 __instance, PlayerStats.HitInfo info)
         {
             try
             {
-                if (info == null || info.RHub == null) return false;
+                if (info == null || info.RHub == null || info.Tool?.Weapon != ItemType.None) return false;
 
                 var player = info.RHub.GetPlayer();
 

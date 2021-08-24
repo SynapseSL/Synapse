@@ -10,7 +10,8 @@ namespace Synapse.Patches.EventsPatches.MapPatches
     [HarmonyPatch(typeof(DoorVariant), nameof(DoorVariant.ServerInteract))]
 	internal static class DoorInteractPatch
 	{
-		private static bool Prefix(DoorVariant __instance, ReferenceHub ply, byte colliderId)
+		[HarmonyPrefix]
+		private static bool OnInteract(DoorVariant __instance, ReferenceHub ply, byte colliderId)
 		{
 			try
 			{

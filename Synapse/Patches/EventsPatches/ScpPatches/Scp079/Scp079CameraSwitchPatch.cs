@@ -7,7 +7,8 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
     [HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.RpcSwitchCamera))]
     internal static class Scp079CameraSwitchPatch
     {
-        private static bool Prefix(Scp079PlayerScript __instance, ushort camId, bool lookatRotation)
+        [HarmonyPrefix]
+        private static bool SwitchCamera(Scp079PlayerScript __instance, ushort camId, bool lookatRotation)
         {
             try
             {

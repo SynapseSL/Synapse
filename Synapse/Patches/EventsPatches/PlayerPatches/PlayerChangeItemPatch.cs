@@ -9,7 +9,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     [HarmonyPatch(typeof(Inventory),nameof(Inventory.ServerSelectItem))]
     internal static class PlayerChangeItemPatch
     {
-        private static bool Prefix(Inventory __instance, ushort itemSerial)
+		[HarmonyPrefix]
+        private static bool SelectItem(Inventory __instance, ushort itemSerial)
         {
             try
             {

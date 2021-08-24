@@ -18,7 +18,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.HurtPlayer))]
 	internal static class PlayerDamagePatch
 	{
-		private static bool Prefix(PlayerStats __instance, out bool __result, PlayerStats.HitInfo info, GameObject go, bool noTeamDamage = false, bool IsValidDamage = true)
+		[HarmonyPrefix]
+		private static bool HurtPlayer(PlayerStats __instance, out bool __result, PlayerStats.HitInfo info, GameObject go, bool noTeamDamage = false, bool IsValidDamage = true)
 		{
 			try
 			{

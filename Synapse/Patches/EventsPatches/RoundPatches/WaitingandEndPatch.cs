@@ -4,9 +4,10 @@ using HarmonyLib;
 namespace Synapse.Patches.EventsPatches.RoundPatches
 {
     [HarmonyPatch(typeof(ServerConsole), nameof(ServerConsole.AddLog))]
-	public class WaitingandEndPatch
+	internal class WaitingandEndPatch
 	{
-		public static void Prefix(ref string q)
+		[HarmonyPrefix]
+		private static void WaitForPlayers(ref string q)
 		{
 			if (q.StartsWith("Round finished! Anomalies: "))
             {

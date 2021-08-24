@@ -9,7 +9,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     [HarmonyPatch(typeof(SearchCoordinator), nameof(SearchCoordinator.ContinuePickupServer))]
     internal static class PlayerPickUpPatch
     {
-        private static bool Prefix(SearchCoordinator __instance)
+        [HarmonyPrefix]
+        private static bool OnPickup(SearchCoordinator __instance)
         {
             try
             {

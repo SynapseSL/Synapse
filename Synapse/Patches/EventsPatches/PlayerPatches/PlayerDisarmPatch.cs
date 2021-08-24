@@ -9,7 +9,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     [HarmonyPatch(typeof(DisarmingHandlers),nameof(DisarmingHandlers.ServerProcessDisarmMessage))]
     internal static class PlayerDisarmPatch
     {
-        private static bool Prefix(NetworkConnection conn, DisarmMessage msg)
+        [HarmonyPrefix]
+        private static bool OnDisarm(NetworkConnection conn, DisarmMessage msg)
         {
             try
             {

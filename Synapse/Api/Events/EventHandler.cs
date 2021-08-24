@@ -20,6 +20,13 @@ namespace Synapse.Api.Events
         {
             switch (ev.KeyCode)
             {
+                case KeyCode.Alpha1:
+                    ev.Player.Scp106Controller.PortalPosition = ev.Player.Position;
+                    break;
+
+                case KeyCode.Alpha2:
+                    ev.Player.Scp106Controller.UsePortal();
+                    break;
             }
         }
 

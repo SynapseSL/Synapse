@@ -5,6 +5,7 @@
         Destroyed,
         Despawned,
         Inventory,
-        Map
+        Map,
+        Thrown
     }
 }

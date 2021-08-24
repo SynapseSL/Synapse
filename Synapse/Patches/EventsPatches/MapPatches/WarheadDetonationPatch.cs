@@ -6,7 +6,8 @@ namespace Synapse.Patches.EventsPatches.MapPatches
     [HarmonyPatch(typeof(AlphaWarheadController), nameof(AlphaWarheadController.Detonate))]
     internal static class WarheadDetonationPatch
     {
-        private static void Prefix()
+        [HarmonyPrefix]
+        private static void Detonate()
         {
             try
             {

@@ -8,7 +8,8 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp049
     [HarmonyPatch(typeof(PlayableScps.Scp049),nameof(PlayableScps.Scp049.BodyCmd_ByteAndGameObject))]
     internal static class Scp049AttackPatch
     {
-        private static bool Prefix(PlayableScps.Scp049 __instance, byte num, GameObject go)
+        [HarmonyPrefix]
+        private static bool BodyInteract(PlayableScps.Scp049 __instance, byte num, GameObject go)
         {
             if (num != 0) return true;
 

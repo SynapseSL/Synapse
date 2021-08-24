@@ -10,7 +10,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     [HarmonyPatch(typeof(MicroHIDItem),nameof(MicroHIDItem.ExecuteServerside))]
     internal static class PlayerUseMicroPatch
     {
-        private static bool Prefix(MicroHIDItem __instance)
+        [HarmonyPrefix]
+        private static bool Execute(MicroHIDItem __instance)
         {
             try
             {

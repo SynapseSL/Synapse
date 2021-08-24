@@ -9,7 +9,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     [HarmonyPatch(typeof(WorkstationController),nameof(WorkstationController.ServerInteract))]
     internal static class WorkStationPatch
     {
-        private static bool Prefix(WorkstationController __instance, ReferenceHub ply, byte colliderId)
+        [HarmonyPrefix]
+        private static bool Interact(WorkstationController __instance, ReferenceHub ply, byte colliderId)
         {
             try
             {

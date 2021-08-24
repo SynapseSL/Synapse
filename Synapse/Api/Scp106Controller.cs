@@ -13,14 +13,14 @@ namespace Synapse.Api
 
         public bool Is106 => player.RoleType == RoleType.Scp106;
 
-        public Vector3 PortalPosition { get => Script.NetworkportalPosition; set => Script.SetPortalPosition(PortalPosition,value); }
+        public Vector3 PortalPosition { get => Script.NetworkportalPosition; set => Script.SetPortalPosition(Vector3.zero, value); }
 
         public bool IsUsingPortal => Script.goingViaThePortal;
 
         public HashSet<Player> PocketPlayers { get; } = new HashSet<Player>();
 
 
-        public void UsePortal() => Script.UseTeleport();
+        public void UsePortal() => Script.UserCode_CmdUsePortal();
 
         public void DeletePortal() => Script.DeletePortal();
 

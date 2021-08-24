@@ -11,7 +11,8 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
     [HarmonyPatch(typeof(CharacterClassManager),nameof(CharacterClassManager.SetRandomRoles))]
     internal static class SpawnPlayersPatch
     {
-        private static bool Prefix(CharacterClassManager __instance, bool first)
+        [HarmonyPrefix]
+        private static bool SetRandomRoles(CharacterClassManager __instance, bool first)
         {
             try
             {

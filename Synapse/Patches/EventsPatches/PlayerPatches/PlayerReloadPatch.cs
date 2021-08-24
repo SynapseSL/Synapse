@@ -10,7 +10,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     internal class PlayerReloadPatch
     {
         [HarmonyPrefix]
-        private static bool Prefix(NetworkConnection conn, RequestMessage msg)
+        private static bool ReloadRequest(NetworkConnection conn, RequestMessage msg)
         {
             try
             {
