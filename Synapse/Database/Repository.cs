@@ -6,11 +6,11 @@ using Synapse.Api;
 
 namespace Synapse.Database
 {
-    public abstract class Repository<TK> : IRawRepository where TK: IDatabaseEntity
+    public abstract class Repository<TK> : IRawRepository where TK : IDatabaseEntity
     {
         public Type GenericType => typeof(TK);
 
-        
+
         /// <summary>
         /// Creates a new Database transaction
         ///
@@ -41,51 +41,51 @@ namespace Synapse.Database
         {
             using var trc = Transaction;
             return trc.Collection.FindOne(query);
-        } 
-        
+        }
+
         [API]
         public bool Exists(BsonExpression query)
         {
             using var trc = Transaction;
             return trc.Collection.Exists(query);
-        } 
-        
+        }
+
         [API]
         public TK Insert(TK tk)
         {
             using var trc = Transaction;
             trc.Collection.Insert(tk);
             return tk;
-        } 
-        
+        }
+
         [API]
         public int Insert(IEnumerable<TK> list)
         {
             using var trc = Transaction;
             return trc.Collection.InsertBulk(list);
-        } 
-        
+        }
+
         [API]
         public bool Delete(TK tk)
         {
             using var trc = Transaction;
             return trc.Collection.Delete(tk.GetId());
-        } 
-        
+        }
+
         [API]
         public bool Save(TK tk)
         {
             using var trc = Transaction;
             return trc.Collection.Update(tk);
-        } 
-        
+        }
+
         [API]
         public List<TK> All()
         {
             using var trc = Transaction;
             return trc.Collection.FindAll().ToList();
         }
-        
+
         [API]
         public List<TK> Find(BsonExpression query)
         {
@@ -97,7 +97,7 @@ namespace Synapse.Database
 
     public interface IRawRepository { }
 
-    public class RepositoryTransaction<TK> : IDisposable where TK: IDatabaseEntity
+    public class RepositoryTransaction<TK> : IDisposable where TK : IDatabaseEntity
     {
         public LiteDatabase Database;
         public ILiteCollection<TK> Collection;
@@ -108,7 +108,7 @@ namespace Synapse.Database
             Collection = Database.GetCollection<TK>($"{typeof(TK).Assembly.GetName().Name.Replace(" ", "")}_{typeof(TK).Name}");
 
         }
-        
+
         public ILiteQueryable<TK> Query()
         {
             return Collection.Query();

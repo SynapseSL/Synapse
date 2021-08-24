@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using HarmonyLib;
 using LiteNetLib;
 using LiteNetLib.Utils;
-using Synapse.Api;
-using Synapse.Database;
 
 namespace Synapse.Patches.EventsPatches.ServerPatches
 {
@@ -15,36 +14,31 @@ namespace Synapse.Patches.EventsPatches.ServerPatches
     {
         private static void Postfix(ConnectionRequest request)
         {
-            var allow = true;
-            var reason = "No Reason";
-
-            if (!request.Data.EndOfData) return;
-
-            var userId = CustomLiteNetLib4MirrorTransport.UserIds[request.RemoteEndPoint].UserId;
-            SynapseController.Server.Events.Server.InvokePreAuthenticationEvent(userId, ref allow, ref reason, request);
-
-            //Since Database is filebased, delay should be minimal, making lags unlikely
-            if (allow && PunishmentRepository.Enabled)
+            try
             {
-                var currentBan = DatabaseManager.PunishmentRepository.GetCurrentPunishments(userId)
-                    .Where(x => x.Type == PunishmentType.Ban).FirstOrDefault();
-                if (currentBan != null)
+                var allow = true;
+                var reason = "No Reason";
+
+                if (!request.Data.EndOfData) return;
+
+                var userId = CustomLiteNetLib4MirrorTransport.UserIds[request.RemoteEndPoint].UserId;
+                SynapseController.Server.Events.Server.InvokePreAuthenticationEvent(userId, ref allow, ref reason, request);
+
+                if (allow)
                 {
-                    allow = false;
-                    reason = currentBan.ReasonString();
+                    request.Accept();
+                    return;
                 }
-            }
 
-            if (allow)
+                var data = new NetDataWriter();
+                data.Put((byte)10);
+                data.Put(reason);
+                request.RejectForce(data);
+            }
+            catch(Exception e)
             {
-                request.Accept();
-                return;
+                Synapse.Api.Logger.Get.Error($"Synapse-Event: PreAuthenticationFailed failed!!\n{e}");
             }
-
-            var data = new NetDataWriter();
-            data.Put((byte) 10);
-            data.Put(reason);
-            request.RejectForce(data);
         }
 
         private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)

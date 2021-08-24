@@ -1,50 +1,33 @@
 ﻿using System;
 using HarmonyLib;
+using InventorySystem;
+using InventorySystem.Items;
 using Synapse.Api;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(Inventory), nameof(Inventory.CallCmdDropItem))]
-    internal static class PlayerDropItemPatch
+    [HarmonyPatch(typeof(Inventory), nameof(Inventory.UserCode_CmdDropItem))]
+    internal static class DropItemPatch
     {
-        private static bool Prefix(Inventory __instance, int itemInventoryIndex)
+        [HarmonyPrefix]
+        private static bool PlayerDropItemPatch(Inventory __instance, ushort itemSerial, ref bool tryThrow)
         {
-            if (!__instance._iawRateLimit.CanExecute() || itemInventoryIndex < 0 ||
-                    itemInventoryIndex >= __instance.items.Count) return false;
-
-            var syncItemInfo = __instance.items[itemInventoryIndex];
-
-            if (__instance.items[itemInventoryIndex].id != syncItemInfo.id) return false;
-
-            var item = syncItemInfo.GetSynapseItem();
-
-            bool allow = true;
             try
             {
-                Server.Get.Events.Player.InvokePlayerDropItemPatch(__instance.GetPlayer(), item, out allow);
+                if (!__instance.UserInventory.Items.TryGetValue(itemSerial, out var itembase) || !itembase.CanHolster())
+                    return false;
+
+                var item = itembase.GetSynapseItem();
+
+                Server.Get.Events.Player.InvokePlayerDropItemPatch(__instance.GetPlayer(), item, ref tryThrow, out var allow);
+
+                return allow;
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: DropItem failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Logger.Get.Error($"Synapse-Event: DropItem failed!!\n{e}");
+                return true;
             }
-
-            if (!allow) return false;
-
-            if(item != null)
-            {
-                item.Drop();
-            }
-            else
-            {
-                //This code is a backup for the case a Plugin creates a item on its own
-                __instance.SetPickup(syncItemInfo.id, syncItemInfo.durability,
-                    __instance.transform.position, __instance.camera.transform.rotation, syncItemInfo.modSight,
-                    syncItemInfo.modBarrel, syncItemInfo.modOther);
-
-                __instance.items.RemoveAt(itemInventoryIndex);
-            }
-
-            return false;
         }
     }
 }

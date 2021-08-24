@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using Logger = Synapse.Api.Logger;
 using HarmonyLib;
 using MEC;
 using Synapse.Api;
 using UnityEngine;
+using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.RoundPatches
 {
@@ -17,7 +17,8 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
         private static readonly MethodInfo
             CustomProcess = SymbolExtensions.GetMethodInfo(() => ProcessServerSide(null));
         
-        static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
+        [HarmonyTranspiler]
+        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
         {
             var codes = new List<CodeInstruction>(instr);
 
@@ -35,7 +36,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
             return codes.AsEnumerable();
         }
 
-        public static IEnumerator<float> ProcessServerSide(RoundSummary instance)
+        private static IEnumerator<float> ProcessServerSide(RoundSummary instance)
         {
             while(instance != null)
             {
@@ -156,13 +157,13 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                 }
                 catch (Exception e)
                 {
-                    Logger.Get.Error($"Synapse-Event: RoundCheckEvent failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                    Logger.Get.Error($"Synapse-Event: RoundCheckEvent failed!!\n{e}");
                 }
 
 
                 if (endround || Map.Get.Round.Forceend)
                 {
-                    instance._roundEnded = true;
+                    instance.RoundEnded = true;
                     Map.Get.Round.Forceend = false;
                     FriendlyFireConfig.PauseDetector = true;
 

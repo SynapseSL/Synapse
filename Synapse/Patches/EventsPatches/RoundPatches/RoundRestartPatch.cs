@@ -1,24 +1,22 @@
 ﻿using System;
 using HarmonyLib;
 using Synapse.Api;
-using Synapse.Patches.EventsPatches.PlayerPatches;
 
 namespace Synapse.Patches.EventsPatches.RoundPatches
 {
     [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.Roundrestart))]
     internal static class RoundRestartPatch
     {
-        private static void Prefix()
+        [HarmonyPrefix]
+        private static void Restart()
         {
-            Map.Get.ClearObjects();
-
             try
             {
                 Server.Get.Events.Round.InvokeRoundRestartEvent();
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: RoundRestartEvent failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Logger.Get.Error($"Synapse-Event: RoundRestartEvent failed!!\n{e}");
             }
         }
     }

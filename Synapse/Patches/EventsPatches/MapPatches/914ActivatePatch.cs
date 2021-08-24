@@ -1,66 +1,61 @@
 ﻿using System;
-using Mirror;
-using UnityEngine;
-using HarmonyLib;
 using System.Collections.Generic;
-using System.Linq;
+using HarmonyLib;
+using InventorySystem.Items.Pickups;
+using NorthwoodLib.Pools;
+using Scp914;
 using Synapse.Api;
 using Synapse.Api.Items;
+using UnityEngine;
 using Event = Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Patches.EventsPatches.MapPatches
 {
-    [HarmonyPatch(typeof(Scp914.Scp914Machine),nameof(Scp914.Scp914Machine.ProcessItems))]
+    [HarmonyPatch(typeof(Scp914.Scp914Upgrader),nameof(Scp914.Scp914Upgrader.Upgrade))]
     internal static class Scp914ActivatePatch
     {
-        private static bool Prefix(Scp914.Scp914Machine __instance)
+		[HarmonyPrefix]
+		private static bool UpgradePatch(Collider[] intake, Vector3 moveVector, Scp914Mode mode, Scp914KnobSetting setting)
         {
-            try
-            {
-				if (!NetworkServer.active)
-					return false;
+			try
+			{
+				var objects = HashSetPool<GameObject>.Shared.Rent();
+				var upgradeDropped = (mode & Scp914Mode.Dropped) == Scp914Mode.Dropped;
+				var upgradeInventory = (mode & Scp914Mode.Inventory) == Scp914Mode.Inventory;
+				var heldOnly = upgradeInventory && (mode & Scp914Mode.Held) == Scp914Mode.Held;
 
-				var array = Physics.OverlapBox(__instance.intake.position, __instance.inputSize / 2f);
 				var players = new List<Player>();
 				var items = new List<SynapseItem>();
 
-				foreach (var collider in array)
-				{
-					var player = collider.GetComponent<Player>();
-					if (player != null)
-						players.Add(player);
-					else
-					{
-						var item = collider.GetComponent<Pickup>().GetSynapseItem();
-						if (item != null)
-							items.Add(item);
-					}
-				}
+				foreach(var collider in intake)
+                {
+					var gameObject = collider.transform.root.gameObject;
 
-				Event.Get.Map.Invoke914Activate(ref players, ref items, out var allow, out var move);
+                    if (objects.Add(gameObject))
+                    {
+						if (ReferenceHub.TryGetHub(gameObject, out var ply))
+							players.Add(ply.GetPlayer());
+						else if (gameObject.TryGetComponent<ItemPickupBase>(out var pickup))
+							items.Add(pickup.GetSynapseItem());
+                    }
+                }
 
-				if (!allow) return false;
+				Event.Get.Map.Invoke914Activate(ref players, ref items, ref moveVector, out var allow);
 
-				var vanillaitems = items.Where(x => x.State == Api.Enum.ItemState.Map).Select(x => x.pickup);
-				var vanillaplayers = players.Select(x => x.ClassManager);
+				foreach (var ply in players)
+					Scp914Upgrader.ProcessPlayer(ply.Hub, upgradeInventory, heldOnly, moveVector, setting);
 
-				try
-				{
-					if (move)
-						__instance.MoveObjects(vanillaitems, vanillaplayers);
-				}
-				finally
-				{
-					__instance.UpgradeObjects(vanillaitems, vanillaplayers.ToList());
-				}
+				foreach (var item in items)
+					Scp914Upgrader.ProcessPickup(item.PickupBase, upgradeDropped, moveVector, setting);
 
+				HashSetPool<GameObject>.Shared.Return(objects);
 				return false;
 			}
-            catch (Exception e)
-            {
-				Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp914 Activate Event failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+			catch (Exception e)
+			{
+				Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp914 Activate Event failed!!\n{e}");
 				return true;
-            }
+			}
         }
     }
 }

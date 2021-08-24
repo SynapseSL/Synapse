@@ -43,11 +43,13 @@
     <Compile Include="Api\Enum\MovementDirection.cs" />
     <Compile Include="Api\Enum\ElevatorType.cs" />
     <Compile Include="Api\Enum\WeaponType.cs" />
+    <Compile Include="Api\Enum\WorkstationState.cs" />
     <Compile Include="Api\Exceptions\SynapseItemAlreadyRegisteredException.cs" />
     <Compile Include="Api\Exceptions\SynapseItemNotFoundException.cs" />
     <Compile Include="Api\Exceptions\SynapseRoleAlreadyRegisteredException.cs" />
     <Compile Include="Api\Exceptions\SynapseRoleNotFoundException.cs" />
     <Compile Include="Api\Exceptions\SynapseException.cs" />
+    <Compile Include="Api\Items\ThrowableAPI.cs" />
     <Compile Include="Api\Plugin\Processors\TranslationInjector.cs" />
     <Compile Include="Api\Prefabs.cs" />
     <Compile Include="Api\Roles\RoleInformation.cs" />
@@ -116,6 +118,7 @@
     <Compile Include="Api\Tesla.cs" />
     <Compile Include="Command\CommandHandler.cs" />
     <Compile Include="Command\CommandInformation.cs" />
+    <Compile Include="Command\Commands\SynapseDebugCommand.cs" />
     <Compile Include="Command\Commands\SynapseGccCommand.cs" />
     <Compile Include="Command\Commands\SynapseRespawnCommand.cs" />
     <Compile Include="Command\Commands\SynapseMapPointCommand.cs" />
@@ -145,7 +148,6 @@
     <Compile Include="Patches\EventsPatches\MapPatches\WarheadDetonationPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerChangeItemPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerReportPatch.cs" />
-    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerUnCuffEvent.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerWalkOnSinkholePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerUseMicroPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDisarmPatch.cs" />
@@ -161,7 +163,6 @@
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerBasicItemUsePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDamagePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerEscapePatch.cs" />
-    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerGrenadeThrowPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerHealPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerJoinPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerLeavePatch.cs" />
@@ -188,25 +189,18 @@
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Dummy\MirrorPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Dummy\OverridePositionPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\ItemPatches\ChangeGrenadePatch.cs" />
-    <Compile Include="Patches\SynapsePatches\ScalePatch.cs" />
+    <Compile Include="Patches\SynapsePatches\Item\ItemDistributorPatches.cs" />
+    <Compile Include="Patches\SynapsePatches\Item\PickupPatches.cs" />
+    <Compile Include="Patches\SynapsePatches\Item\InventoryExtensionPatches.cs" />
+    <Compile Include="Patches\SynapsePatches\Item\ThrowableItemPatches.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\DoorSpawnpointPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ShootPermissionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\InvisiblePatch.cs" />
-    <Compile Include="Patches\SynapsePatches\ItemPatches\Scp914Patch.cs" />
-    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSetClassPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\ItemPatches\WorkStationPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\ItemPatches\SpawnItemPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\ItemPatches\InventoryClearPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\ItemPatches\GeneratorEjectPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\ItemPatches\RefreshDurabilityPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\ItemPatches\CreateItemPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\ItemPatches\DropAllPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\ItemPatches\ModifyPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSetClassPatches.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\WorkStationPatch.cs" />
     <Compile Include="Patches\SynapsePatches\PermissionSystem\RefreshPermissionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\PermissionSystem\SetGroupPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\Scp096MaxShieldPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\Wrapper\Scp914StartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\RagdollPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\GeneratorStartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\NukeLockPatch.cs" />
@@ -226,8 +220,8 @@
     <Compile Include="Translation\SynapseTranslation.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Lib.Harmony.2.0.4\lib\net472\0Harmony.dll</HintPath>
+    <Reference Include="0Harmony, Version=2.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Lib.Harmony.2.1.1\lib\net472\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -237,35 +231,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Refs\Assembly-CSharp-Publicized.dll</HintPath>
     </Reference>
-    <Reference Include="EmbedIO, Version=3.4.3.0, Culture=neutral, PublicKeyToken=5e5f048b6e04267e, processorArchitecture=MSIL">
-      <HintPath>..\packages\EmbedIO.3.4.3\lib\netstandard2.0\EmbedIO.dll</HintPath>
-    </Reference>
-    <Reference Include="LiteDB, Version=5.0.9.0, Culture=neutral, PublicKeyToken=4ee40123013c9f27, processorArchitecture=MSIL">
-      <HintPath>..\packages\LiteDB.5.0.9\lib\net45\LiteDB.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Caching.Abstractions, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
-      <HintPath>..\packages\Microsoft.Extensions.Caching.Abstractions.6.0.0-preview.1.21102.12\lib\net461\Microsoft.Extensions.Caching.Abstractions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Caching.Memory, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
-      <HintPath>..\packages\Microsoft.Extensions.Caching.Memory.6.0.0-preview.1.21102.12\lib\net461\Microsoft.Extensions.Caching.Memory.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
-      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.6.0.0-preview.1.21102.12\lib\net461\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
-      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0-preview.1.21102.12\lib\net461\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Options, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
-      <HintPath>..\packages\Microsoft.Extensions.Options.6.0.0-preview.1.21102.12\lib\net461\Microsoft.Extensions.Options.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Primitives, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
-      <HintPath>..\packages\Microsoft.Extensions.Primitives.6.0.0-preview.1.21102.12\lib\net461\Microsoft.Extensions.Primitives.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="LiteDB, Version=5.0.11.0, Culture=neutral, PublicKeyToken=4ee40123013c9f27, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiteDB.5.0.11\lib\net45\LiteDB.dll</HintPath>
     </Reference>
     <Reference Include="Mirror_publicized, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -276,38 +243,16 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Refs\NorthwoodLib.dll</HintPath>
     </Reference>
-    <Reference Include="Swan.Lite, Version=3.0.0.0, Culture=neutral, PublicKeyToken=30c707c872729fff">
-      <HintPath>..\packages\Unosquare.Swan.Lite.3.0.0\lib\net461\Swan.Lite.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
-      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
-      <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Runtime" />
     <Reference Include="System.Runtime.Caching" />
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0-preview.1.21102.12\lib\net45\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Refs\UnityEngine.dll</HintPath>
@@ -324,13 +269,15 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Refs\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
-    <Reference Include="YamlDotNet, Version=8.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
-      <HintPath>..\packages\YamlDotNet.8.1.2\lib\net45\YamlDotNet.dll</HintPath>
+    <Reference Include="YamlDotNet, Version=11.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
+      <HintPath>..\packages\YamlDotNet.11.2.1\lib\net45\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.

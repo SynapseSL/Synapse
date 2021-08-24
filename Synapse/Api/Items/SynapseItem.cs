@@ -1,123 +1,264 @@
-﻿using Mirror;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using InventorySystem;
+using InventorySystem.Items;
+using InventorySystem.Items.Firearms;
+using InventorySystem.Items.Firearms.Ammo;
+using InventorySystem.Items.MicroHID;
+using InventorySystem.Items.Pickups;
+using InventorySystem.Items.Radio;
+using Mirror;
+using Synapse.Api.Enum;
 using UnityEngine;
 
 namespace Synapse.Api.Items
 {
     public class SynapseItem
     {
+        public static SynapseItem None { get; } = new SynapseItem(-1);
+
+        public static Dictionary<ushort, SynapseItem> AllItems { get; } = new Dictionary<ushort, SynapseItem>();
+
         private bool deactivated = false;
 
-        public SynapseItem(int id, float durability, int sight, int barrel, int other)
+        #region Constructors
+        private SynapseItem()
         {
-            if(id >= 0 && id <= ItemManager.HighestItem)
+            Throwable = new ThrowableAPI(this);
+        }
+
+        /// <summary>
+        /// This constructor creates a completely new Item from a ItemType but wont spawn it
+        /// </summary>
+        /// <param name="type"></param>
+        public SynapseItem(ItemType type) : this()
+        {
+            Serial = ItemSerialGenerator.GenerateNext();
+            AllItems[Serial] = this;
+            ID = (int)type;
+            Name = type.ToString();
+            IsCustomItem = false;
+            ItemType = type;
+
+            if (InventoryItemLoader.AvailableItems.TryGetValue(type, out var examplebase))
             {
-                ID = id;
+                ItemCategory = examplebase.Category;
+                TierFlags = examplebase.TierFlags;
+                ThrowSettings = examplebase.ThrowSettings;
+                Weight = examplebase.Weight;
+            }
+        }
+
+        /// <summary>
+        /// This constructor creates a completely new Item from a ItemType and gives it a Player
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="player"></param>
+        public SynapseItem(ItemType type, Player player) : this(type) => PickUp(player);
+
+        /// <summary>
+        /// This constructor creates a completely new Item from a ItemType and Drops it
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="pos"></param>
+        public SynapseItem(ItemType type, Vector3 pos) : this(type) => Drop(pos);
+
+        /// <summary>
+        /// This constructor creates a completely new Item from a ItemID but wont spawn it
+        /// </summary>
+        /// <param name="type"></param>
+        public SynapseItem(int id) : this()
+        {
+            if(id == -1 && None == null)
+            {
+                ID = -1;
+                ItemType = ItemType.None;
+                Name = "None";
+                return;
+            }
+
+            Serial = ItemSerialGenerator.GenerateNext();
+            AllItems[Serial] = this;
+            ID = id;
+
+            if (id >= 0 && id <= ItemManager.HighestItem)
+            {
                 IsCustomItem = false;
                 ItemType = (ItemType)id;
                 Name = ItemType.ToString();
             }
             else
             {
-                ID = id;
                 IsCustomItem = true;
                 ItemType = Server.Get.ItemManager.GetBaseType(id);
                 Name = Server.Get.ItemManager.GetName(id);
             }
-            
-            Durabillity = durability;
-            Sight = sight;
-            Barrel = barrel;
-            Other = other;
-            ItemCategory = Server.Get.Host.VanillaInventory.GetItemByID(ItemType).itemCategory;
 
-            Map.Get.Items.Add(this);
+            if (InventoryItemLoader.AvailableItems.TryGetValue(ItemType, out var examplebase))
+            {
+                ItemCategory = examplebase.Category;
+                TierFlags = examplebase.TierFlags;
+                ThrowSettings = examplebase.ThrowSettings;
+                Weight = examplebase.Weight;
+            }
         }
 
-        public SynapseItem(ItemType item, float durability, int sight, int barrel, int other)
+        /// <summary>
+        /// This constructor creates a completely new Item from a ItemID and gives it a Player
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="player"></param>
+        public SynapseItem(int id, Player player) : this(id) => PickUp(player);
+
+        /// <summary>
+        /// This constructor creates a completely new Item from a ItemID and Drops it
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="pos"></param>
+        public SynapseItem(int id, Vector3 pos) : this(id) => Drop(pos);
+
+        /// <summary>
+        /// This Constructor should be used to register a ItemBase that is not already registered
+        /// </summary>
+        /// <param name="itemBase"></param>
+        public SynapseItem(ItemBase itemBase) : this()
         {
+            ItemBase = itemBase;
+            Serial = itemBase.ItemSerial;
+            AllItems[Serial] = this;
+            ID = (int)itemBase.ItemTypeId;
+            Name = itemBase.ItemTypeId.ToString();
             IsCustomItem = false;
-            ID = (int)item;
-            ItemType = item;
-            Name = ItemType.ToString();
-            Durabillity = durability;
-            Sight = sight;
-            Barrel = barrel;
-            Other = other;
-            ItemCategory = Server.Get.Host.VanillaInventory.GetItemByID(ItemType).itemCategory;
-
-            Map.Get.Items.Add(this);
+            ItemType = itemBase.ItemTypeId;
+            ItemCategory = itemBase.Category;
+            TierFlags = itemBase.TierFlags;
+            ThrowSettings = itemBase.ThrowSettings;
+            Weight = itemBase.Weight;
         }
 
+        /// <summary>
+        /// This Constructor should be used to register a ItemPickupBase that is not already registered
+        /// </summary>
+        /// <param name="pickupBase"></param>
+        public SynapseItem(ItemPickupBase pickupBase) : this()
+        {
+            Serial = pickupBase.Info.Serial;
+            PickupBase = pickupBase;
+            AllItems[Serial] = this;
+            ID = (int)pickupBase.Info.ItemId;
+            Name = pickupBase.Info.ItemId.ToString();
+            IsCustomItem = false;
+            ItemType = pickupBase.Info.ItemId;
+            if (InventoryItemLoader.AvailableItems.TryGetValue(ItemType, out var examplebase))
+            {
+                ItemCategory = examplebase.Category;
+                TierFlags = examplebase.TierFlags;
+                ThrowSettings = ThrowSettings;
+            }
+            Weight = pickupBase.Info.Weight;
+        }
+        #endregion
+
+        #region API
+        public ThrowableAPI Throwable { get; }
+        #endregion
+
+        #region InitialValues
         public readonly int ID;
+
+        public readonly string Name;
+
+        public readonly bool IsCustomItem;
 
         public readonly ItemType ItemType;
 
         public readonly ItemCategory ItemCategory;
 
-        public readonly bool IsCustomItem;
+        public ItemTierFlags TierFlags { get; }
 
-        public readonly string Name;
+        public ushort Serial { get; }
 
-        public Pickup pickup { get; internal set; }
-        public Inventory.SyncItemInfo itemInfo { get; internal set; }
+        public ItemThrowSettings ThrowSettings { get; set; }
 
+        public float Weight { get; }
+        #endregion
+
+        #region Gameobjects
+        public GameObject ItemGameObject => ItemBase == null ? PickupBase.gameObject : ItemBase.gameObject;
+        public ItemBase ItemBase { get; internal set; }
+        public ItemPickupBase PickupBase { get; internal set; }
+        #endregion
+
+        #region DynamicValues
         public Enum.ItemState State
         {
             get
             {
                 if (deactivated) return Enum.ItemState.Destroyed;
 
-                if (ItemHolder != null) return Enum.ItemState.Inventory;
+                if (Throwable.ThrowableItem != null) return Enum.ItemState.Thrown;
 
-                if (pickup != null) return Enum.ItemState.Map;
+                if (ItemBase != null) return Enum.ItemState.Inventory;
+
+                if (PickupBase != null) return Enum.ItemState.Map;
 
                 return Enum.ItemState.Despawned;
             }
         }
 
-        public Player ItemHolder { get; private set; }
+        public Player ItemHolder =>
+            PickupBase == null ? ItemBase.Owner.GetPlayer() : PickupBase.PreviousOwner.Hub.GetPlayer();
+        #endregion
 
-        private float durabillity;
-        public float Durabillity
+        #region ChangableAPIValues
+        private Vector3 position = Vector3.zero;
+        public Vector3 Position
         {
-            get => durabillity;
+            get
+            {
+                if (ItemBase != null)
+                    return ItemHolder.Position;
+
+                if (PickupBase != null)
+                    return PickupBase.Info.Position;
+
+                return position;
+            }
             set
             {
-                durabillity = value;
-                Refresh();
+                if (PickupBase != null)
+                {
+                    PickupBase.Rb.position = position;
+                    PickupBase.RefreshPositionAndRotation();
+                }
+
+                position = value;
             }
         }
 
-        private int sight;
-        public int Sight
+        private Quaternion rotation = default;
+        public Quaternion Rotation
         {
-            get => sight;
-            set
+            get
             {
-                sight = value;
-                Refresh();
-            }
-        }
+                if (ItemBase != null)
+                    return ItemHolder.transform.rotation;
 
-        private int barrel;
-        public int Barrel
-        {
-            get => barrel;
-            set
-            {
-                barrel = value;
-                Refresh();
-            }
-        }
+                if (PickupBase != null)
+                    return PickupBase.transform.rotation;
 
-        private int other;
-        public int Other
-        {
-            get => other;
+                return rotation;
+            }
             set
             {
-                other = value;
-                Refresh();
+                if (PickupBase != null)
+                {
+                    PickupBase.transform.rotation = rotation;
+                    PickupBase.RefreshPositionAndRotation();
+                }
+
+                rotation = value;
             }
         }
 
@@ -127,148 +268,224 @@ namespace Synapse.Api.Items
             get => scale;
             set
             {
+                if (PickupBase != null)
+                {
+                    PickupBase.transform.localScale = value;
+                    NetworkServer.UnSpawn(PickupBase.gameObject);
+                    NetworkServer.Spawn(PickupBase.gameObject);
+                }
+
                 scale = value;
-                Refresh();
             }
         }
 
-        private Vector3 position = Vector3.zero;
-        public Vector3 Position
+        public float Durabillity
         {
             get
             {
-                if (ItemHolder != null)
-                    return ItemHolder.Position;
+                switch (ItemCategory)
+                {
+                    case ItemCategory.Radio:
+                        if (State == ItemState.Inventory)
+                            return (ItemBase as RadioItem).BatteryPercent;
+                        else if (State == ItemState.Map)
+                            return (PickupBase as RadioPickup).SavedBattery * 100;
+                        break;
 
-                if (pickup != null)
-                    return pickup.position;
+                    case ItemCategory.MicroHID:
+                        if (State == ItemState.Inventory)
+                            return (ItemBase as MicroHIDItem).RemainingEnergy * 100;
+                        else if (State == ItemState.Map)
+                            return (PickupBase as MicroHIDPickup).Energy * 100;
+                        break;
 
-                return position;
+                    case ItemCategory.Firearm:
+                        if (State == ItemState.Inventory)
+                            return (ItemBase as Firearm).Status.Ammo;
+                        else if (State == ItemState.Map)
+                            return (PickupBase as FirearmPickup).Status.Ammo;
+                        break;
+
+                    case ItemCategory.Ammo:
+                        //Ammo can't be in the inventory as Item
+                        if (State == ItemState.Map)
+                            return (PickupBase as AmmoPickup).SavedAmmo;
+                        break;
+                }
+
+                return 0;
             }
             set
             {
-                if(pickup != null)
-                    pickup.SetupPickup(pickup.itemId, pickup.durability, pickup.ownerPlayer, pickup.weaponMods, value, pickup.rotation);
-
-                position = value;
-            }
-        }
-
-        private void Refresh()
-        {
-            if (pickup != null)
-            {
-                var qua = pickup.rotation;
-                var pos = Position;
-                var owner = pickup.ownerPlayer;
-
-                pickup.SetupPickup(ItemType, Durabillity, owner, new Pickup.WeaponModifiers(true, Sight, Barrel, Other), pos, qua);
-                if(pickup.transform.localScale != Scale)
+                switch (ItemCategory)
                 {
-                    NetworkServer.UnSpawn(pickup.gameObject);
-                    pickup.transform.localScale = Scale;
-                    NetworkServer.Spawn(pickup.gameObject);
-                }
-                return;
-            }
+                    case ItemCategory.Radio:
+                        if (State == ItemState.Inventory)
+                            (ItemBase as RadioItem)._battery = value / 100;
+                        else if (State == ItemState.Map)
+                            (PickupBase as RadioPickup).SavedBattery = value / 100;
+                        break;
 
-            if (ItemHolder != null)
-            {
-                var index = ItemHolder.VanillaInventory.items.IndexOf(itemInfo);
-                var item = ItemHolder.VanillaItems[index];
-                item.durability = Durabillity;
-                item.modSight = Sight;
-                item.modBarrel = Barrel;
-                item.modOther = Other;
-                itemInfo = item;
-                ItemHolder.VanillaItems[index] = item;
+                    case ItemCategory.MicroHID:
+                        if (State == ItemState.Inventory)
+                            (ItemBase as MicroHIDItem).RemainingEnergy = value / 100;
+                        else if (State == ItemState.Map)
+                            (PickupBase as MicroHIDPickup).Energy = value / 100;
+                        break;
+
+                    case ItemCategory.Firearm:
+                        if (State == ItemState.Inventory)
+                        {
+                            var arm = ItemBase as Firearm;
+                            arm.Status = new FirearmStatus((byte)value, arm.Status.Flags, arm.Status.Attachments);
+                        }
+                        else if (State == ItemState.Map)
+                        {
+                            var armpickup = PickupBase as FirearmPickup;
+                            armpickup.Status = new FirearmStatus((byte)value, armpickup.Status.Flags, armpickup.Status.Attachments);
+                        }
+                        break;
+
+                    case ItemCategory.Ammo:
+                        if (State == ItemState.Map)
+                            (PickupBase as AmmoPickup).SavedAmmo = (ushort)value;
+                        break;
+                }
             }
         }
 
+        public uint WeaponAttachments
+        {
+            get
+            {
+                if(ItemBase is Firearm arm)
+                {
+                    return arm.Status.Attachments;
+                }
+                else if (PickupBase is FirearmPickup armpickup)
+                {
+                    return armpickup.Status.Attachments;
+                }
+                return 0;
+            }
+            set
+            {
+                if (ItemBase is Firearm arm)
+                {
+                    var newstatus = new FirearmStatus(arm.Status.Ammo, arm.Status.Flags, value);
+                    arm.OnStatusChanged(arm.Status, newstatus);
+                }
+                else if (PickupBase is FirearmPickup armpickup)
+                {
+                    armpickup.NetworkStatus = new FirearmStatus(armpickup.Status.Ammo, armpickup.Status.Flags, value);
+                }
+            }
+        }
+        #endregion
+
+        #region Methods
         public void PickUp(Player player)
         {
-            if (deactivated) throw new System.Exception("Player tried to pickup a destroyed Item??");
-
-            if (ItemHolder != null) return;
-
-            if (!IsCustomItem && (ItemType == ItemType.Ammo556 || ItemType == ItemType.Ammo762 || ItemType == ItemType.Ammo9mm))
+            switch (State)
             {
-                switch (ItemType)
-                {
-                    case ItemType.Ammo556:
-                        player.Ammo5 += (uint)Durabillity;
-                        break;
+                case ItemState.Map:
+                    player.VanillaInventory.ServerAddItem(ItemType, Serial, PickupBase);
+                    break;
 
-                    case ItemType.Ammo762:
-                        player.Ammo7 += (uint)Durabillity;
-                        break;
+                case ItemState.Despawned:
+                    player.VanillaInventory.ServerAddItem(ItemType, Serial);
+                    break;
 
-                    case ItemType.Ammo9mm:
-                        player.Ammo9 += (uint)Durabillity;
-                        break;
-                }
-
-                Destroy();
-                return;
+                case ItemState.Inventory:
+                    Despawn();
+                    player.VanillaInventory.ServerAddItem(ItemType, Serial);
+                    break;
             }
-
-            if (player.VanillaItems.Count >= 8) return;
-
-            Inventory._uniqId++;
-            itemInfo = new Inventory.SyncItemInfo()
-            {
-                durability = Durabillity,
-                id = ItemType,
-                modSight = Sight,
-                modBarrel = Barrel,
-                modOther = Other,
-                uniq = Inventory._uniqId
-            };
-            if (pickup != null)
-                pickup.Delete();
-            pickup = null;
-            ItemHolder = player;
-            ItemHolder.VanillaItems.Add(itemInfo);
         }
 
         public void Drop(Vector3 position)
         {
-            if (deactivated) throw new System.Exception("Something tried to drop a destroyed Item??");
+            switch (State)
+            {
+                case ItemState.Map: Position = position; break;
 
-            if (pickup != null) return;
+                case ItemState.Inventory:
+                    Despawn();
+                    goto case ItemState.Despawned;
 
-            pickup = UnityEngine.Object.Instantiate(Server.Get.Host.VanillaInventory.pickupPrefab).GetComponent<Pickup>();
-            pickup.transform.localScale = Scale;
-            NetworkServer.Spawn(pickup.gameObject);
-            pickup.SetupPickup(ItemType, Durabillity, ItemHolder == null ? Server.Get.Host.gameObject : ItemHolder.gameObject, new Pickup.WeaponModifiers(true, Sight, Barrel, Other), position, ItemHolder != null ? ItemHolder.VanillaInventory.camera.transform.rotation : Quaternion.identity);
+                case ItemState.Despawned:
+                    if (InventoryItemLoader.AvailableItems.TryGetValue(ItemType, out var examplebase))
+                        ReferenceHub.LocalHub.inventory.ServerCreatePickup(examplebase, new PickupSyncInfo
+                        {
+                            ItemId = ItemType,
+                            Serial = Serial,
+                            Weight = Weight
+                        }, true);
 
-            if (ItemHolder != null)
-                ItemHolder.VanillaItems.Remove(itemInfo);
-            ItemHolder = null;
+                    Position = position;
+                    break;
+            }
         }
 
-        public void Drop() => Drop(Position);
+        public void Drop()
+        {
+            switch (State)
+            {
+                case ItemState.Inventory: ItemHolder.VanillaInventory.ServerDropItem(Serial); break;
+                case ItemState.Despawned: Drop(Position); break;
+            }
+        }
 
         public void Despawn()
         {
-            if(pickup != null)
-            {
-                pickup.Delete();
-                pickup = null;
-            }
+            DespawnItemBase();
+            DespawnPickup();
+            Throwable.DestroyProjectile();
+        }
 
-            if(ItemHolder != null)
+        public void DespawnItemBase()
+        {
+            if (ItemBase != null)
             {
-                ItemHolder.VanillaItems.Remove(itemInfo);
-                ItemHolder = null;
+                ItemBase.OnRemoved(null);
+                if (ItemHolder.ItemInHand == this)
+                    ItemHolder.ItemInHand = None;
+
+                UnityEngine.Object.Destroy(ItemBase.gameObject);
+
+                ItemHolder.VanillaInventory.UserInventory.Items.Remove(Serial);
+                ItemHolder.VanillaInventory.SendItemsNextFrame = true;
             }
+        }
+
+        public void DespawnPickup()
+        {
+            if (PickupBase != null) NetworkServer.Destroy(PickupBase.gameObject);
         }
 
         public void Destroy()
         {
             Despawn();
-            Map.Get.Items.Remove(this);
+            AllItems.Remove(Serial);
             deactivated = true;
         }
+        #endregion
+
+        #region Obsolete
+        [Obsolete("Since 11.0 only FireArms can be modified and they are using a new system", false)]
+        public int Sight { get; set; }
+
+        [Obsolete("Since 11.0 only FireArms can be modified and they are using a new system", false)]
+        public int Barrel { get; set; }
+
+        [Obsolete("Since 11.0 only FireArms can be modified and they are using a new system", false)]
+        public int Other { get; set; }
+
+        [Obsolete("Since 11.0 only FireArms can be modified and they are using a new system", false)]
+        public SynapseItem(int id, float durability, int sight, int barrel, int other) : this(id) => Durabillity = durability;
+
+        [Obsolete("Since 11.0 only FireArms can be modified and they are using a new system", false)]
+        public SynapseItem(ItemType item, float durability, int sight, int barrel, int other) : this(item) => Durabillity = durability;
+        #endregion
     }
 }

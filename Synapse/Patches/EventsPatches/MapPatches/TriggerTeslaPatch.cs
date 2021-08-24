@@ -1,6 +1,5 @@
 ﻿using System;
 using HarmonyLib;
-using UnityEngine;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.MapPatches
@@ -8,7 +7,8 @@ namespace Synapse.Patches.EventsPatches.MapPatches
     [HarmonyPatch(typeof(TeslaGate), nameof(TeslaGate.PlayerInRange))]
     internal static class TriggerTeslaPatch
     {
-        private static bool Prefix(TeslaGate __instance, out bool __result, ReferenceHub player)
+        [HarmonyPrefix]
+        private static bool OnRange(TeslaGate __instance, out bool __result, ReferenceHub player)
         {
             __result = false;
             try
@@ -16,7 +16,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
                 var synapseplayer = player.GetPlayer();
                 if (synapseplayer.Invisible) return false;
 
-                __result = Vector3.Distance(__instance.transform.position, player.playerMovementSync.RealModelPosition) < __instance.sizeOfTrigger;
+                __result = __instance.InRange(synapseplayer.Position);
 
                 if (__result)
                     Server.Get.Events.Map.InvokeTriggerTeslaEv(synapseplayer, __instance.GetTesla(), ref __result);
@@ -25,7 +25,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
             }
             catch (Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: TriggerTesla failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Logger.Get.Error($"Synapse-Event: TriggerTesla failed!!\n{e}");
                 return true;
             }
         }

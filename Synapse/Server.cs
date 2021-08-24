@@ -184,13 +184,71 @@ namespace Synapse
             return Players.Where(func).ToList();
         }
 
+        public bool TryGetPlayers(string arg, out List<Player> playerList, Player me = null)
+        {
+            var players = new List<Player>();
+            var args = arg.Split('.');
+
+            foreach (var parameter in args)
+            {
+                if (string.IsNullOrWhiteSpace(parameter)) continue;
+
+                switch (parameter.ToUpper())
+                {
+                    case "SELF":
+                    case "ME":
+                        if (me == null) continue;
+
+                        if (!players.Contains(me))
+                            players.Add(me);
+                        continue;
+
+                    case "REMOTEADMIN":
+                    case "ADMIN":
+                    case "STAFF":
+                        foreach (var player in Players)
+                            if (player.ServerRoles.RemoteAdmin)
+                                if (!players.Contains(player))
+                                    players.Add(player);
+                        continue;
+
+                    case "NW":
+                    case "NORTHWOOD":
+                        foreach (var player in Players)
+                            if (player.ServerRoles.Staff)
+                                if (!players.Contains(player))
+                                    players.Add(player);
+                        break;
+
+                    case "*":
+                    case "ALL":
+                    case "EVERYONE":
+                        foreach (var player2 in Server.Get.Players)
+                            if (!players.Contains(player2))
+                                players.Add(player2);
+                        continue;
+
+                    default:
+                        var player3 = GetPlayer(parameter);
+                        if (player3 == null) continue;
+                        if (!players.Contains(player3))
+                            players.Add(player3);
+                        continue;
+                }
+            }
+
+            playerList = players;
+
+            return players.Count != 0;
+        }
+
         public Player GetPlayer(string argument)
         {
             var players = Players;
 
             if (argument.Contains("@"))
             {
-                var player = players.FirstOrDefault(x => x.UserId == argument);
+                var player = GetPlayerByUID(argument);
                 if (player != null)
                     return player;
             }
@@ -210,9 +268,11 @@ namespace Synapse
             return Players.FirstOrDefault(x => x.PlayerId == playerid);
         }
 
+        public Player GetPlayer(uint netID) => Players.FirstOrDefault(x => x.NetworkIdentity.netId == netID);
+
         public Player GetPlayerByUID(string uid)
         {
-            return Players.FirstOrDefault(x => x.UserId == uid || x.SecondUserID != null && x.SecondUserID == uid);
+            return Players.FirstOrDefault(x => x.UserId == uid || x.SecondUserID == uid);
         }
 
 

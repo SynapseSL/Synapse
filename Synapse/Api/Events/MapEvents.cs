@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Synapse.Api.Events.SynapseEventArguments;
+using UnityEngine;
 
 namespace Synapse.Api.Events
 {
@@ -64,20 +65,21 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void Invoke914Activate(ref List<Player> players,ref List<Synapse.Api.Items.SynapseItem> items,out bool allow,out bool move)
+        internal void Invoke914Activate(ref List<Player> players, ref List<Synapse.Api.Items.SynapseItem> items, ref Vector3 moveVector, out bool allow)
         {
             var ev = new Scp914ActivateEventArgs
             {
                 Items = items,
-                Players = players
+                Players = players,
+                MoveVector = moveVector
             };
 
             Scp914ActivateEvent?.Invoke(ev);
 
             allow = ev.Allow;
-            move = ev.Move;
             players = ev.Players;
             items = ev.Items;
+            moveVector = ev.MoveVector;
         }
         #endregion
     }

@@ -2,6 +2,7 @@
 using Synapse.Api.Enum;
 using System.Collections.Generic;
 using Interactables.Interobjects.DoorUtils;
+using UnityEngine;
 
 namespace Synapse.Api.Events
 {
@@ -276,14 +277,18 @@ namespace Synapse.Api.Events
 
             public event EventHandler.OnSynapseEvent<Scp173BlinkEventArgs> Scp173BlinkEvent;
 
-            internal void InvokeScp173BlinkEvent(Player scp173)
+            internal void InvokeScp173BlinkEvent(Player scp173, ref Vector3 pos, out bool allow)
             {
                 var ev = new Scp173BlinkEventArgs
                 {
-                    Scp173 = scp173
+                    Scp173 = scp173,
+                    Position = pos
                 };
 
                 Scp173BlinkEvent?.Invoke(ev);
+
+                allow = ev.Allow;
+                pos = ev.Position;
             }
         }
 

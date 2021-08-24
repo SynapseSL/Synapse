@@ -21,7 +21,7 @@ namespace Synapse.Api
 
         public void Trigger() => Gate.RpcPlayAnimation();
 
-        public void InstantTrigger() => Gate.RpcInstantTesla();
+        public void InstantTrigger() => Gate.UserCode_RpcInstantBurst();
 
         public float SizeOfTrigger { get => Gate.sizeOfTrigger; set => Gate.sizeOfTrigger = value; }
     }

@@ -1,134 +1,126 @@
 ﻿using System;
 using HarmonyLib;
-using Mirror;
+using InventorySystem.Items.MicroHID;
 using UnityEngine;
-using Logger = Synapse.Api.Logger;
 using ItemState = Synapse.Api.Events.SynapseEventArguments.ItemInteractState;
+using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(MicroHID),nameof(MicroHID.UpdateServerside))]
+    [HarmonyPatch(typeof(MicroHIDItem),nameof(MicroHIDItem.ExecuteServerside))]
     internal static class PlayerUseMicroPatch
     {
-        private static bool Prefix(MicroHID __instance)
+        [HarmonyPrefix]
+        private static bool Execute(MicroHIDItem __instance)
         {
             try
             {
-                if (!NetworkServer.active)
-                    return false;
+                var state = __instance.State;
+                var energyToByte = __instance.EnergyToByte;
+                var num = 0f;
+                var allow = true;
+                var owner = __instance.Owner.GetPlayer();
+                var item = __instance.GetSynapseItem();
 
-                if (__instance.refHub.inventory.curItem == ItemType.MicroHID)
+                var itemstate = ItemState.Initiating;
+                switch (state)
                 {
-                    // The GetEnergy Method can throw a Error when GetItemIndex returns -1.
-                    //This can happen when equiping a micro and drop it so that curItem and itemuniq are not synced for a frame or something like this
-                    try
-                    {
-                        if (__instance.GetEnergy() != __instance.Energy)
-                            __instance.ChangeEnergy(__instance.Energy);
-                    }
-                    catch
-                    {
-                        return false;
-                    }
+                    case HidState.Firing: itemstate = ItemState.Finalizing; break;
+                    case HidState.Idle: itemstate = ItemState.Stopping; break;
+                    case HidState.PoweringDown: itemstate = ItemState.Stopping; break;
+                    case HidState.PoweringUp: itemstate = ItemState.Initiating; break;
+                    case HidState.Primed: itemstate = ItemState.Finalizing; break;
                 }
-                else
-                    foreach (var item in __instance.refHub.inventory.items)
-                        if (item.id == ItemType.MicroHID)
-                            __instance.NetworkEnergy = item.durability;
 
-                if (__instance.keyAntiSpamCooldown > 0f) __instance.keyAntiSpamCooldown -= Time.deltaTime;
+                Server.Get.Events.Player.InvokePlayerItemUseEvent(owner,item, itemstate, ref allow);
+                if (!allow)
+                    state = HidState.Idle;
 
-                if(__instance.refHub.inventory.curItem == ItemType.MicroHID || __instance.chargeup > 0f)
+                Server.Get.Events.Player.InvokeMicroUse(owner, item, ref state);
+
+                switch (state)
                 {
-                    if(__instance.CurrentHidState != MicroHID.MicroHidState.Idle)
-                    {
-                        __instance.refHub.weaponManager.scp268.ServerDisable();
-                        __instance._visionController.MakeNoise(__instance.CurrentHidState == MicroHID.MicroHidState.Discharge ? 20 : 75);
-                    }
-
-                    MicroHID.MicroHidState state = MicroHID.MicroHidState.Idle;
-
-                    if (__instance.refHub.inventory.curItem == ItemType.MicroHID)
-                    {
-                        if (__instance.Energy > 0f && __instance.chargeup >= 1f && __instance.SyncKeyCode == 2)
-                            state = MicroHID.MicroHidState.Discharge;
-                        else if (__instance.Energy > 0f && __instance.chargeup < 1f && __instance.SyncKeyCode != 0 && __instance.CurrentHidState != MicroHID.MicroHidState.RampDown)
-                            state = MicroHID.MicroHidState.RampUp;
-                        else if (__instance.chargeup > 0f && (__instance.SyncKeyCode == 0 || __instance.Energy <= 0f || __instance.CurrentHidState == MicroHID.MicroHidState.RampDown))
-                            state = MicroHID.MicroHidState.RampDown;
-                        else if (__instance.chargeup <= 0f && (__instance.SyncKeyCode == 0 || __instance.Energy <= 0f || __instance.CurrentHidState == MicroHID.MicroHidState.RampDown))
-                            state = MicroHID.MicroHidState.Idle;
-                        else if (__instance.chargeup >= 1f)
-                            state = MicroHID.MicroHidState.Spinning;
-                    }
-                    else state = MicroHID.MicroHidState.RampDown;
-
-                    var player = __instance.refHub.GetPlayer();
-                    var item = player.ItemInHand;
-
-                    SynapseController.Server.Events.Player.InvokeMicroUse(player, item, ref state);
-                    //ItemUseEvent Invoke
-                    if(state != MicroHID.MicroHidState.Idle)
-                    {
-                        var itemstate = ItemState.Initiating;
-                        switch (state)
+                    case HidState.Idle:
+                        if (__instance.RemainingEnergy > 0f && __instance.UserInput != HidUserInput.None)
                         {
-                            case MicroHID.MicroHidState.Spinning:
-                            case MicroHID.MicroHidState.Discharge:
-                                itemstate = ItemState.Finalizing;
-                                break;
-
-                            case MicroHID.MicroHidState.RampUp:
-                                itemstate = ItemState.Initiating;
-                                break;
-
-                            case MicroHID.MicroHidState.RampDown:
-                                itemstate = ItemState.Stopping;
-                                break;
+                            __instance.State = HidState.PoweringUp;
+                            __instance._stopwatch.Restart();
                         }
-                        var allow = true;
-                        if (item != null)
-                            SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(player, item, itemstate, ref allow);
-                        if (!allow) state = MicroHID.MicroHidState.Idle;
-                    }
+                        break;
 
-                    switch (state)
-                    {
-                        case MicroHID.MicroHidState.Discharge:
-                            if (__instance.soundEffectPause >= 1f)
+                    case HidState.PoweringUp:
+                        if ((__instance.UserInput == HidUserInput.None && __instance._stopwatch.Elapsed.TotalSeconds >= 0.35) || __instance.RemainingEnergy <= 0f)
+                        {
+                            __instance.State = HidState.PoweringDown;
+                            __instance._stopwatch.Restart();
+                        }
+                        else if (__instance._stopwatch.Elapsed.TotalSeconds >= 5.95)
+                        {
+                            __instance.State = ((__instance.UserInput == HidUserInput.Fire) ? HidState.Firing : HidState.Primed);
+                            __instance._stopwatch.Restart();
+                        }
+
+                        num = __instance._energyConsumtionCurve.Evaluate((float)(__instance._stopwatch.Elapsed.TotalSeconds / 5.95));
+                        break;
+
+                    case HidState.PoweringDown:
+                        if (__instance._stopwatch.Elapsed.TotalSeconds >= 3.1)
+                        {
+                            __instance.State = HidState.Idle;
+                            __instance._stopwatch.Stop();
+                            __instance._stopwatch.Reset();
+                        }
+                        break;
+
+                    case HidState.Primed:
+                        if ((__instance.UserInput != HidUserInput.Prime && __instance._stopwatch.Elapsed.TotalSeconds >= 0.34999999403953552) || __instance.RemainingEnergy <= 0f)
+                        {
+                            __instance.State = ((__instance.UserInput == HidUserInput.Fire && __instance.RemainingEnergy > 0f) ? HidState.Firing : HidState.PoweringDown);
+                            __instance._stopwatch.Restart();
+                        }
+                        else
+                        {
+                            num = __instance._energyConsumtionCurve.Evaluate(1f);
+                        }
+                        break;
+
+                    case HidState.Firing:
+                        if (__instance._stopwatch.Elapsed.TotalSeconds > 1.7000000476837158)
+                        {
+                            num = 0.13f;
+                            __instance.Fire();
+                            if (__instance.RemainingEnergy == 0f || (__instance.UserInput != HidUserInput.Fire && __instance._stopwatch.Elapsed.TotalSeconds >= 2.05))
                             {
-                                __instance.NetworkEnergy = Mathf.Clamp01(__instance.Energy - Time.deltaTime * __instance.dischargeEnergyLoss);
-                                __instance.DealDamage();
+                                __instance.State = ((__instance.RemainingEnergy > 0f && __instance.UserInput == HidUserInput.Prime) ? HidState.Primed : HidState.PoweringDown);
+                                __instance._stopwatch.Restart();
                             }
-                            else __instance.NetworkEnergy = Mathf.Clamp01(__instance.Energy - Time.deltaTime * __instance.speedBasedEnergyLoss.Evaluate(1f));
-                            break;
-
-                        case MicroHID.MicroHidState.RampUp:
-                            __instance.chargeup = Mathf.Clamp01(__instance.chargeup + Time.deltaTime / __instance.chargeupTime);
-                            __instance.NetworkEnergy = Mathf.Clamp01(__instance.Energy - Time.deltaTime * __instance.speedBasedEnergyLoss.Evaluate(__instance.chargeup));
-                            break;
-
-                        case MicroHID.MicroHidState.RampDown:
-                            __instance.chargeup = Mathf.Clamp01(__instance.chargeup - Time.deltaTime / __instance.chargedownTime);
-                            break;
-
-                        case MicroHID.MicroHidState.Spinning:
-                            __instance.NetworkEnergy = Mathf.Clamp01(__instance.Energy - Time.deltaTime * __instance.speedBasedEnergyLoss.Evaluate(__instance.chargeup));
-                            break;
-
-                        //Idle does nothing
-                    }
-
-                    __instance.NetworkCurrentHidState = state;
+                        }
+                        else
+                        {
+                            num = __instance._energyConsumtionCurve.Evaluate(1f);
+                        }
+                        break;
                 }
 
-                if (__instance.Energy <= 0.05f) __instance.NetworkEnergy = 0f;
+                if (state != __instance.State)
+                {
+                    __instance.ServerSendStatus(HidStatusMessageType.State, (byte)__instance.State);
+                }
+
+                if (num > 0f)
+                {
+                    __instance.RemainingEnergy = Mathf.Clamp01(__instance.RemainingEnergy - num * Time.deltaTime);
+                    if (energyToByte != __instance.EnergyToByte)
+                    {
+                        __instance.ServerSendStatus(HidStatusMessageType.EnergySync, __instance.EnergyToByte);
+                    }
+                }
 
                 return false;
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: PlayerUseMicro failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Logger.Get.Error($"Synapse-Event: PlayerUseMicro failed!!\n{e}");
                 return true;
             }
         }

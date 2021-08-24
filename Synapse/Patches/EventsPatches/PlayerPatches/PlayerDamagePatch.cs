@@ -1,17 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using CustomPlayerEffects;
+using Dissonance.Integrations.MirrorIgnorance;
 using HarmonyLib;
+using InventorySystem;
+using InventorySystem.Items.MicroHID;
+using MapGeneration;
+using PlayableScps.Interfaces;
+using Respawning;
 using Synapse.Api;
 using UnityEngine;
-using Mirror;
 
 // ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-	[HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.HurtPlayer))]
+    [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.HurtPlayer))]
 	internal static class PlayerDamagePatch
 	{
-		private static bool Prefix(PlayerStats __instance, out bool __result, PlayerStats.HitInfo info, GameObject go, bool noTeamDamage = false, bool IsValidDamage = true)
+		[HarmonyPrefix]
+		private static bool HurtPlayer(PlayerStats __instance, out bool __result, PlayerStats.HitInfo info, GameObject go, bool noTeamDamage = false, bool IsValidDamage = true)
 		{
 			try
 			{
@@ -20,9 +28,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 				var killer = __instance?.GetPlayer();
 				if (victim == null) return false;
 
-				if (info.GetDamageType() == DamageTypes.Grenade)
+				if (info.Tool == DamageTypes.Grenade)
 					killer = SynapseController.Server.GetPlayer(info.PlayerId);
-				else if (info.GetDamageType() == DamageTypes.Pocket)
+				else if (info.Tool == DamageTypes.Pocket)
                 {
 					killer = Server.Get.Players.FirstOrDefault(x => x.Scp106Controller.PocketPlayers.Contains(victim));
 
@@ -33,120 +41,126 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 				bool flag = false;
 				bool flag2 = false;
 				bool flag3 = go == null;
-				ReferenceHub referenceHub = flag3 ? null : ReferenceHub.GetHub(go);
+				var referenceHub = flag3 ? null : ReferenceHub.GetHub(go);
+				var damageType = info.Tool;
 
 				if (info.Amount < 0f)
 				{
 					if (flag3)
 						info.Amount = Mathf.Abs(999999f);
 					else
-						info.Amount = ((referenceHub.playerStats != null) ? Mathf.Abs(referenceHub.playerStats.Health + referenceHub.playerStats.syncArtificialHealth + 10f) : Mathf.Abs(999999f));
+						info.Amount = ((referenceHub.playerStats != null) ? Mathf.Abs(referenceHub.playerStats.Health + referenceHub.playerStats.ArtificialHealth + 10f) : Mathf.Abs(999999f));
 				}
 
 				if(referenceHub != null)
                 {
 					var effect = referenceHub.playerEffectsController.GetEffect<CustomPlayerEffects.Burned>();
-					if (effect != null && effect.Enabled)
-						info.Amount *= effect.DamageMult;
+					if (effect != null && effect.IsEnabled)
+						info.Amount *= effect.damageMultiplier;
                 }
 
 				if (info.Amount > 2.14748365E+09f)
 					info.Amount = 2.14748365E+09f;
 
-				if (info.GetDamageType().isWeapon && referenceHub.characterClassManager.IsAnyScp() && info.GetDamageType() != DamageTypes.MicroHid)
-					info.Amount *= __instance.weaponManager.weapons[(int)__instance.weaponManager.curWeapon].scpDamageMultiplier;
-
 				if (flag3)
-				{
-					__result = false; 
 					return false;
-				}
 
 				PlayerStats playerStats = referenceHub.playerStats;
 				CharacterClassManager characterClassManager = referenceHub.characterClassManager;
 
 				if (playerStats == null || characterClassManager == null)
-				{
-					__result = false; 
 					return false;
-				}
 
 				if (characterClassManager.GodMode)
-				{
-					__result = false; 
 					return false;
-				}
 
 				if (__instance.ccm.CurRole.team == Team.SCP && __instance.ccm.Classes.SafeGet(characterClassManager.CurClass).team == Team.SCP && __instance.ccm != characterClassManager)
-				{
-					__result = false; 
 					return false;
-				}
 
 				if (characterClassManager.SpawnProtected && !__instance._allowSPDmg)
-				{
-					__result = false; 
 					return false;
-				}
 
-				bool flag4 = !noTeamDamage && info.IsPlayer && referenceHub != info.RHub && referenceHub.characterClassManager.Fraction == info.RHub.characterClassManager.Fraction;
+				bool flag4 = !noTeamDamage && info.IsPlayer && referenceHub != info.RHub && referenceHub.characterClassManager.Faction == info.RHub.characterClassManager.Faction;
 
 				if (flag4)
 					info.Amount *= PlayerStats.FriendlyFireFactor;
 
 				float health = playerStats.Health;
+				var num = playerStats.GetAhpValue();
 
-				if (__instance.lastHitInfo.Attacker == "ARTIFICIALDEGEN")
+				var allow = true;
+				try
 				{
-					playerStats.unsyncedArtificialHealth -= info.Amount;
-					if (playerStats.unsyncedArtificialHealth < 0f)
-						playerStats.unsyncedArtificialHealth = 0f;
+					Server.Get.Events.Player.InvokePlayerDamageEvent(victim, killer, ref info, out allow);
+				}
+				catch (Exception e)
+				{
+					SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDamage Event failed!!\n{e}");
+				}
+
+				if (!allow)
+				{
+					__result = false;
+					return false;
+				}
+
+				if (num > 0f)
+				{
+					float num2 = info.Amount * playerStats.ArtificialNormalRatio;
+					float num3 = info.Amount - num2;
+					num -= num2;
+					if (num < 0f)
+					{
+						num3 += Mathf.Abs(num);
+					}
+					playerStats.SafeSetAhpValue(num);
+					playerStats.Health -= num3;
+					if (playerStats.Health > 0f && playerStats.Health - num2 <= 0f && characterClassManager.CurRole.team != Team.SCP)
+					{
+						__instance.TargetAchieve(characterClassManager.connectionToClient, "didntevenfeelthat");
+					}
 				}
 				else
-				{
-					var allow = true;
-					try
-					{
-						Server.Get.Events.Player.InvokePlayerDamageEvent(victim, killer, ref info, out allow);
-					}
-					catch(Exception e)
-                    {
-						SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDamage Event failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
-					}
+					playerStats.Health -= info.Amount;
 
-                    if (!allow)
-                    {
-						__result = false;
-						return false;
-                    }
+				if (playerStats.Health < 0f)
+					playerStats.Health = 0f;
 
-					if (playerStats.unsyncedArtificialHealth > 0f)
-					{
-						float num = info.Amount * playerStats.artificialNormalRatio;
-						float num2 = info.Amount - num;
-						playerStats.unsyncedArtificialHealth -= num;
-						if (playerStats.unsyncedArtificialHealth < 0f)
-						{
-							num2 += Mathf.Abs(playerStats.unsyncedArtificialHealth);
-							playerStats.unsyncedArtificialHealth = 0f;
-						}
-						playerStats.Health -= num2;
-						if (playerStats.Health > 0f && playerStats.Health - num <= 0f && characterClassManager.CurRole.team != Team.SCP)
-						{
-							__instance.TargetAchieve(characterClassManager.connectionToClient, "didntevenfeelthat");
-						}
-					}
-					else
-						playerStats.Health -= info.Amount;
+				playerStats.lastHitInfo = info;
 
-					if (playerStats.Health < 0f)
-						playerStats.Health = 0f;
-
-					playerStats.lastHitInfo = info;
-				}
 				PlayableScpsController component = go.GetComponent<PlayableScpsController>();
 				if (component != null && (object)component.CurrentScp is PlayableScps.Interfaces.IDamagable damagable)
 					damagable.OnDamage(info);
+
+				RespawnTickets singleton = RespawnTickets.Singleton;
+				if (characterClassManager.CurRole.team == Team.SCP && characterClassManager.CurRole.roleId != RoleType.Scp0492)
+				{
+					if (characterClassManager.CurRole.roleId != RoleType.Scp079)
+					{
+						for (float num4 = 1f; num4 > 0f; num4 -= __instance._respawn_tickets_mtf_scp_hurt_interval)
+						{
+							float num5 = (float)playerStats.maxHP * num4;
+							if (health > num5 && playerStats.Health < num5)
+							{
+								singleton.GrantTickets(SpawnableTeamType.NineTailedFox, __instance._respawn_tickets_mtf_scp_hurt_count, false);
+							}
+						}
+					}
+					if (playerStats.Health < 1f)
+					{
+						singleton.GrantTickets(SpawnableTeamType.NineTailedFox, __instance._respawn_tickets_mtf_scp_death_count, false);
+					}
+				}
+
+				byte damageTypeId = (byte)DamageTypes.ToIndex(damageType);
+				foreach (KeyValuePair<Type, PlayerEffect> keyValuePair in __instance.Hub.playerEffectsController.AllEffects)
+				{
+					PlayerEffect value = keyValuePair.Value;
+					if (value.IsEnabled && (object)value is IOnDamageTakenEffect effect && effect.AllowPulse(damageType))
+					{
+						__instance.RpcTriggerPostProcessing(damageTypeId);
+					}
+				}
 
 				if (playerStats.Health < 1f && characterClassManager.CurClass != RoleType.Spectator)
 				{
@@ -155,17 +169,24 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 						__result = false;
 						return false;
 					}
+
 					foreach (Scp079PlayerScript scp079PlayerScript in Scp079PlayerScript.instances)
 					{
-						Scp079Interactable.ZoneAndRoom otherRoom = go.GetComponent<Scp079PlayerScript>().GetOtherRoom();
 						bool flag5 = false;
-						foreach (Scp079Interaction scp079Interaction in scp079PlayerScript.ReturnRecentHistory(12f, __instance._filters))
-							foreach (Scp079Interactable.ZoneAndRoom zoneAndRoom in scp079Interaction.interactable.currentZonesAndRooms)
-								if (zoneAndRoom.currentZone == otherRoom.currentZone && zoneAndRoom.currentRoom == otherRoom.currentRoom)
+						using (IEnumerator<Scp079Interaction> enumerator3 = scp079PlayerScript.ReturnRecentHistory(12f, __instance._filters).GetEnumerator())
+						{
+							while (enumerator3.MoveNext())
+							{
+								if (RoomIdUtils.IsTheSameRoom(enumerator3.Current.interactable.transform.position, go.transform.position))
+								{
 									flag5 = true;
-
+								}
+							}
+						}
 						if (flag5)
+						{
 							scp079PlayerScript.RpcGainExp(ExpGainType.KillAssist, characterClassManager.CurClass);
+						}
 					}
 
 					if (RoundSummary.RoundInProgress() && RoundSummary.roundTime < 60 && IsValidDamage)
@@ -176,6 +197,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
 					flag = true;
 
+					if(info.RHub != null && info.RHub.Ready && IsValidDamage)
+						GameplayTickets.Singleton.TicketBasedKilling(characterClassManager.CurRole.team, info.RHub.characterClassManager.CurRole.team);
+
 					if (characterClassManager.CurClass == RoleType.Scp096)
 					{
 						ReferenceHub hub = ReferenceHub.GetHub(go);
@@ -183,19 +207,19 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 						if (hub != null && hub.scpsController.CurrentScp is PlayableScps.Scp096 && (hub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState == PlayableScps.Scp096PlayerState.Enraging)
 							__instance.TargetAchieve(characterClassManager.connectionToClient, "unvoluntaryragequit");
 					}
-					else if (info.GetDamageType() == DamageTypes.Pocket)
+					else if (info.Tool == DamageTypes.Pocket)
 						__instance.TargetAchieve(characterClassManager.connectionToClient, "newb");
-					else if (info.GetDamageType() == DamageTypes.Scp173)
+					else if (info.Tool == DamageTypes.Scp173)
 						__instance.TargetAchieve(characterClassManager.connectionToClient, "firsttime");
-					else if (info.GetDamageType() == DamageTypes.Grenade && info.PlayerId == referenceHub.queryProcessor.PlayerId)
+					else if (info.Tool == DamageTypes.Grenade && info.PlayerId == referenceHub.queryProcessor.PlayerId)
 						__instance.TargetAchieve(characterClassManager.connectionToClient, "iwanttobearocket");
-					else if (info.GetDamageType().isWeapon)
+					else if (info.Tool.Weapon != ItemType.None)
 					{
-						Inventory inventory = referenceHub.inventory;
-						if (characterClassManager.CurClass == RoleType.Scientist)
+						var inventory = referenceHub.inventory;
+						if (characterClassManager.CurClass == RoleType.Scientist && inventory.CurInstance != null &&
+							inventory.CurInstance.Category == ItemCategory.Keycard &&
+							__instance.GetComponent<CharacterClassManager>().CurClass == RoleType.ClassD)
 						{
-							Item itemByID = inventory.GetItemByID(inventory.curItem);
-							if (itemByID != null && itemByID.itemCategory == ItemCategory.Keycard && __instance.GetComponent<CharacterClassManager>().CurClass == RoleType.ClassD)
 								__instance.TargetAchieve(__instance.connectionToClient, "betrayal");
 						}
 
@@ -205,7 +229,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 							__instance._killStreakTime = Time.realtimeSinceStartup;
 						}
 
-						if (__instance.GetComponent<WeaponManager>().GetShootPermission(characterClassManager, true))
+						if (HitboxIdentity.CheckFriendlyFire(__instance.Hub, referenceHub, false))
 							__instance._killStreak++;
 
 						if (__instance._killStreak >= 5)
@@ -215,8 +239,21 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 							__instance.TargetStats(__instance.connectionToClient, "dboys_killed", "justresources", 50);
 
 					}
-					else if (__instance.ccm.CurRole.team == Team.SCP && go.GetComponent<MicroHID>().CurrentHidState != MicroHID.MicroHidState.Idle)
+					else if (__instance.ccm.CurRole.team == Team.SCP && referenceHub.inventory.CurInstance != null && referenceHub.inventory.CurInstance is MicroHIDItem microHIDItem && microHIDItem != null && microHIDItem.State != HidState.Idle)
+					{
 						__instance.TargetAchieve(__instance.connectionToClient, "illpassthanks");
+					}
+
+					Team team = characterClassManager.CurRole.team;
+					byte b = (byte)team;
+					if (b == 3 && flag && info.RHub != null)
+					{
+						Team team2 = __instance.ccm.Classes.SafeGet(info.RHub.characterClassManager.CurClass).team;
+						if (team2 == Team.CDP || team2 == Team.CHI)
+						{
+							singleton.GrantTickets(SpawnableTeamType.ChaosInsurgency, __instance._respawn_tickets_ci_scientist_died_count, false);
+						}
+					}
 
 					if (victim.RealTeam == Team.RSC && victim.RealTeam == Team.SCP)
 						__instance.TargetAchieve(__instance.connectionToClient, "timetodoitmyself");
@@ -232,7 +269,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 					" playing as ",
 					referenceHub.characterClassManager.CurRole.fullName,
 					" committed a suicide using ",
-					info.GetDamageName(),
+					info.Tool.Name,
 					"."
 						}), ServerLogs.ServerLogType.Suicide, false);
 					}
@@ -246,15 +283,15 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 					" has been killed by ",
 					info.Attacker,
 					" using ",
-					info.GetDamageName(),
+					info.Tool.Name,
 					info.IsPlayer ? (" playing as " + info.RHub.characterClassManager.CurRole.fullName + ".") : "."
 						}), flag2 ? ServerLogs.ServerLogType.Teamkill : ServerLogs.ServerLogType.KillLog, false);
 					}
 
-					if (info.GetDamageType().isScp || info.GetDamageType() == DamageTypes.Pocket)
+					if (info.Tool.Scp != RoleType.None || info.Tool == DamageTypes.Pocket)
 						RoundSummary.kills_by_scp++;
 
-					else if (info.GetDamageType() == DamageTypes.Grenade)
+					else if (info.Tool == DamageTypes.Grenade)
 						RoundSummary.kills_by_frag++;
 
 					try
@@ -264,52 +301,47 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
 					catch (Exception e)
 					{
-						SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDeath Event failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+						SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDeath Event failed!!\n{e}");
 					}
 
-					if (!__instance._pocketCleanup || info.GetDamageType() != DamageTypes.Pocket)
+					if (!__instance._pocketCleanup || info.Tool != DamageTypes.Pocket)
 					{
-						referenceHub.inventory.ServerDropAll();
-						PlayerMovementSync playerMovementSync = referenceHub.playerMovementSync;
-						if (characterClassManager.Classes.CheckBounds(characterClassManager.CurClass) && info.GetDamageType() != DamageTypes.RagdollLess)
-							__instance.GetComponent<RagdollManager>().SpawnRagdoll(go.transform.position, go.transform.rotation, (playerMovementSync == null) ? Vector3.zero : playerMovementSync.PlayerVelocity, (int)characterClassManager.CurClass, info, characterClassManager.CurRole.team > Team.SCP, go.GetComponent<Dissonance.Integrations.MirrorIgnorance.MirrorIgnorancePlayer>().PlayerId, referenceHub.nicknameSync.DisplayName, referenceHub.queryProcessor.PlayerId);
+						referenceHub.inventory.ServerDropEverything();
+                        bool flag7 = __instance.TryGet096SmackVelocity(info.RHub, referenceHub, out Vector3 vector);
+                        Vector3 vector2 = flag7 ? vector : referenceHub.playerMovementSync.PlayerVelocity;
+						if (characterClassManager.Classes.CheckBounds(characterClassManager.CurClass) && damageType != DamageTypes.RagdollLess)
+						{
+							__instance.GetComponent<RagdollManager>().SpawnRagdoll(go.transform.position, go.transform.rotation, (referenceHub.playerMovementSync == null) ? Vector3.zero : vector2, (int)characterClassManager.CurClass, info, characterClassManager.CurRole.team > Team.SCP, go.GetComponent<MirrorIgnorancePlayer>().PlayerId, referenceHub.nicknameSync.DisplayName, referenceHub.queryProcessor.PlayerId, flag7);
+						}
 					}
-					else
-						referenceHub.inventory.Clear();
+					characterClassManager.DeathPosition = go.transform.position;
 
-					characterClassManager.NetworkDeathPosition = go.transform.position;
-
-					if (characterClassManager.CurRole.team == Team.SCP)
+					if (characterClassManager.CurRole.team == Team.SCP && characterClassManager.CurClass != RoleType.Scp0492)
 					{
-						if (characterClassManager.CurClass == RoleType.Scp0492)
-							NineTailedFoxAnnouncer.CheckForZombies(go);
+						GameObject x = null;
+						foreach (GameObject gameObject in PlayerManager.players)
+						{
+							if (gameObject.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId == info.PlayerId)
+								x = gameObject;
+						}
+						if (x != null)
+							NineTailedFoxAnnouncer.AnnounceScpTermination(characterClassManager.CurRole, info, string.Empty);
 						else
 						{
-							GameObject x = null;
-							foreach (GameObject gameObject in PlayerManager.players)
-							{
-								if (gameObject.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId == info.PlayerId)
-									x = gameObject;
-							}
-							if (x != null)
-								NineTailedFoxAnnouncer.AnnounceScpTermination(characterClassManager.CurRole, info, string.Empty);
-							else
-							{
-								DamageTypes.DamageType damageType = info.GetDamageType();
-								if (damageType == DamageTypes.Tesla)
-									NineTailedFoxAnnouncer.AnnounceScpTermination(characterClassManager.CurRole, info, "TESLA");
-								else if (damageType == DamageTypes.Nuke)
-									NineTailedFoxAnnouncer.AnnounceScpTermination(characterClassManager.CurRole, info, "WARHEAD");
-								else if (damageType == DamageTypes.Decont)
-									NineTailedFoxAnnouncer.AnnounceScpTermination(characterClassManager.CurRole, info, "DECONTAMINATION");
-								else if (characterClassManager.CurClass != RoleType.Scp079)
-									NineTailedFoxAnnouncer.AnnounceScpTermination(characterClassManager.CurRole, info, "UNKNOWN");
-							}
+							DamageTypes.DamageType damageType2 = info.Tool;
+							if (damageType2 == DamageTypes.Tesla)
+								NineTailedFoxAnnouncer.AnnounceScpTermination(characterClassManager.CurRole, info, "TESLA");
+							else if (damageType2 == DamageTypes.Nuke)
+								NineTailedFoxAnnouncer.AnnounceScpTermination(characterClassManager.CurRole, info, "WARHEAD");
+							else if (damageType2 == DamageTypes.Decont)
+								NineTailedFoxAnnouncer.AnnounceScpTermination(characterClassManager.CurRole, info, "DECONTAMINATION");
+							else if (characterClassManager.CurClass != RoleType.Scp079)
+								NineTailedFoxAnnouncer.AnnounceScpTermination(characterClassManager.CurRole, info, "UNKNOWN");
 						}
 					}
 
 					playerStats.SetHPAmount(100);
-					characterClassManager.SetClassID(RoleType.Spectator);
+					characterClassManager.SetClassID(RoleType.Spectator, CharacterClassManager.SpawnReason.Died);
 
 					victim.CustomRole = null;
 					foreach (var larry in Server.Get.Players.Where(x => x.Scp106Controller.PocketPlayers.Contains(victim)))
@@ -321,113 +353,75 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 				else
 				{
 					Vector3 pos = Vector3.zero;
-					float num3 = 40f;
-					if (info.GetDamageType().isWeapon)
+					if (info.Tool.Weapon != ItemType.None)
 					{
 						GameObject playerOfID = __instance.GetPlayerOfID(info.PlayerId);
 						if (playerOfID != null)
 						{
 							pos = go.transform.InverseTransformPoint(playerOfID.transform.position).normalized;
-							num3 = 100f;
 						}
 					}
-					else if (info.GetDamageType() == DamageTypes.Pocket)
+					else if (info.Tool == DamageTypes.Pocket)
 					{
 						PlayerMovementSync component2 = __instance.ccm.GetComponent<PlayerMovementSync>();
 						if (component2.RealModelPosition.y > -1900f)
 							component2.OverridePosition(Vector3.down * 1998.5f, 0f, true);
 					}
-					__instance.TargetBloodEffect(go.GetComponent<NetworkIdentity>().connectionToClient, pos, Mathf.Clamp01(info.Amount / num3));
 				}
-				Respawning.RespawnTickets singleton = Respawning.RespawnTickets.Singleton;
-				Team team = characterClassManager.CurRole.team;
-				byte b = (byte)team;
-				if (b != 0)
-				{
-					if (b == 3)
-					{
-						if (flag)
-						{
-							Team team2 = __instance.ccm.Classes.SafeGet(characterClassManager.CurClass).team;
-							if (team2 == Team.CDP && team2 == Team.CHI)
-								singleton.GrantTickets(Respawning.SpawnableTeamType.ChaosInsurgency, __instance._respawn_tickets_ci_scientist_died_count, false);
-						}
-					}
-				}
-				else if (characterClassManager.CurClass != RoleType.Scp0492)
-					for (float num4 = 1f; num4 > 0f; num4 -= __instance._respawn_tickets_mtf_scp_hurt_interval)
-					{
-						float num5 = (float)playerStats.maxHP * num4;
-						if (health > num5 && playerStats.Health < num5)
-						{
-							singleton.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox, __instance._respawn_tickets_mtf_scp_hurt_count, false);
-						}
-					}
 
-				if (component != null && (object)component.CurrentScp is PlayableScps.Interfaces.IDamagable damagable2)
+				if (component != null && (object)component.CurrentScp is IDamagable damagable2 && damagable2 != null)
+				{
 					damagable2.OnDamage(info);
+				}
+
+				__result = flag;
 
 				if (!flag4 || FriendlyFireConfig.PauseDetector || PermissionsHandler.IsPermitted(info.RHub.serverRoles.Permissions, PlayerPermissions.FriendlyFireDetectorImmunity))
 				{
-					__result = flag;
 					return false;
 				}
-
 				if (FriendlyFireConfig.IgnoreClassDTeamkills && referenceHub.characterClassManager.CurRole.team == Team.CDP && info.RHub.characterClassManager.CurRole.team == Team.CDP)
 				{
-					__result = flag;
 					return false;
 				}
-
 				if (flag2)
 				{
 					if (info.RHub.FriendlyFireHandler.Respawn.RegisterKill())
 					{
-						__result = flag;
 						return false;
 					}
 					if (info.RHub.FriendlyFireHandler.Window.RegisterKill())
 					{
-						__result = flag;
 						return false;
 					}
 					if (info.RHub.FriendlyFireHandler.Life.RegisterKill())
 					{
-						__result = flag;
 						return false;
 					}
 					if (info.RHub.FriendlyFireHandler.Round.RegisterKill())
 					{
-						__result = flag;
 						return false;
 					}
 				}
-
 				if (info.RHub.FriendlyFireHandler.Respawn.RegisterDamage(info.Amount))
 				{
-					__result = flag;
 					return false;
 				}
-
 				if (info.RHub.FriendlyFireHandler.Window.RegisterDamage(info.Amount))
 				{
-					__result = flag;
 					return false;
 				}
-
 				if (info.RHub.FriendlyFireHandler.Life.RegisterDamage(info.Amount))
 				{
-					__result = flag;
 					return false;
 				}
-
 				info.RHub.FriendlyFireHandler.Round.RegisterDamage(info.Amount);
-				__result = flag;
+
 				return false;
 			}
 			catch (Exception e)
 			{
-				SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDamage Patch failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+				SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDamage Patch failed!!\n{e}");
 				__result = false;
 				return true;
 			}

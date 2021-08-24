@@ -1,14 +1,14 @@
 ﻿using System;
 using HarmonyLib;
-using UnityEngine;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(AnimationController), nameof(AnimationController.CallCmdSyncData))]
-    public class SyncDataPatch
+    [HarmonyPatch(typeof(AnimationController), nameof(AnimationController.UserCode_CmdSyncData))]
+    internal static class SyncDataPatch
     {
-        public static bool Prefix(AnimationController __instance)
+        [HarmonyPrefix]
+        private static bool SyncData(AnimationController __instance)
         {
             try
             {
@@ -18,7 +18,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             catch (Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: PlayerSyncData failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Logger.Get.Error($"Synapse-Event: PlayerSyncData failed!!\n{e}");
                 return true;
             }
         }

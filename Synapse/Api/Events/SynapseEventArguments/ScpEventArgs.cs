@@ -69,6 +69,10 @@ namespace Synapse.Api.Events.SynapseEventArguments
     public class Scp173BlinkEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Scp173 { get; internal set; }
+
+        public bool Allow { get; set; } = true;
+
+        public Vector3 Position { get; set; }
     }
 
 

@@ -16,7 +16,6 @@ namespace Synapse.Patches.SynapsePatches.Dummy
                 }
                 __instance.ForcePosition(pos);
                 __instance.TargetSetRotation(__instance.connectionToClient, rot);
-                __instance.PlayScp173SoundIfTeleported();
             }
             catch { }
 

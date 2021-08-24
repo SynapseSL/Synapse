@@ -71,9 +71,6 @@ namespace Synapse.Config
 
         [Description("Changes whether or not the instance should use a shared or an instance specific database")]
         public bool DatabaseShared { get; set; } = true;
-
-        [Description("Enables storing bans in the database persisting them over the network")]
-        public bool DatabaseBans { get; set; } = false;
         #endregion
     }
 }

@@ -9,6 +9,8 @@ namespace Synapse.Api.Events
         {
             Player.PlayerJoinEvent += PlayerJoin;
             Player.PlayerSyncDataEvent += PlayerSyncData;
+            Round.RoundRestartEvent += RounRestart;
+            Round.WaitingForPlayersEvent += Waiting;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
 #endif
@@ -19,14 +21,11 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    ev.Player.Scp096Controller.MaxShield = 10000;
-                    ev.Player.Scp096Controller.CurMaxShield = 10000;
-                    ev.Player.Scp096Controller.ShieldAmount = 10000;
-                    SerializedMapPoint point = ev.Player.MapPoint;
-                    ev.Player.MapPoint = (MapPoint)point;
-                    SerializedItem item = ev.Player.ItemInHand;
-                    ev.Player.ItemInHand = (Items.SynapseItem)item;
-                    ev.Player.Position = new SerializedVector3(ev.Player.Position);
+                    ev.Player.Scp106Controller.PortalPosition = ev.Player.Position;
+                    break;
+
+                case KeyCode.Alpha2:
+                    ev.Player.Scp106Controller.UsePortal();
                     break;
             }
         }
@@ -51,6 +50,14 @@ namespace Synapse.Api.Events
 
 #region HookedEvents
         private SynapseConfiguration Conf => SynapseController.Server.Configs.synapseConfiguration;
+
+        private void Waiting()
+        {
+            SynapseController.Server.Map.AddObjects();
+            SynapseController.Server.Map.Round.CurrentRound++;
+        }
+
+        private void RounRestart() => Synapse.Api.Map.Get.ClearObjects();
 
         private void PlayerJoin(SynapseEventArguments.PlayerJoinEventArgs ev)
         {

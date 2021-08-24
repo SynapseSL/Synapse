@@ -1,13 +1,13 @@
 ﻿using System;
 using HarmonyLib;
 
-// ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
     [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.HealHPAmount))]
-    public class PlayerHealPatch
+    internal static class PlayerHealPatch
     {
-        private static bool Prefix(PlayerStats __instance, ref float hp)
+        [HarmonyPrefix]
+        private static bool OnHeal(PlayerStats __instance, ref float hp)
         {
             try
             {
@@ -18,7 +18,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             catch (Exception e)
             {
-                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerHeal failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerHeal failed!!\n{e}");
             }
 
             return true;

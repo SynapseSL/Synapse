@@ -100,7 +100,7 @@ namespace Synapse.Api
                     case PlayableScps.Scp096PlayerState.Attacking:
                         if (RageState != PlayableScps.Scp096PlayerState.Enraged)
                             RageState = PlayableScps.Scp096PlayerState.Enraged;
-                        Scp096.Attack();
+                        Scp096.ServerDoAttack(player.Connection, default);
                         break;
 
                     case PlayableScps.Scp096PlayerState.Enraging:

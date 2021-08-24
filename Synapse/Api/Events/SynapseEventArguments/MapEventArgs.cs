@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Synapse.Api.Events.SynapseEventArguments
 {
@@ -31,8 +33,11 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public List<Synapse.Api.Items.SynapseItem> Items { get; set; }
 
-        public bool Move { get; set; } = true;
+        public Vector3 MoveVector { get; set; }
 
         public bool Allow { get; set; } = true;
+
+        [Obsolete("Use MoveVector instead and set it to Vector3.zero")]
+        public bool Move { get; set; } = true;
     }
 }

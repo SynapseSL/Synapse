@@ -2,13 +2,13 @@
 using HarmonyLib;
 using Mirror;
 
-// ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
     [HarmonyPatch(typeof(CustomNetworkManager), nameof(CustomNetworkManager.OnServerDisconnect))]
     internal static class PlayerLeavePatch
     {
-        private static void Prefix(NetworkConnection conn)
+        [HarmonyPrefix]
+        private static void OnDisconnect(NetworkConnection conn)
         {
             try
             {
@@ -17,11 +17,12 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 if (player.CustomRole != null)
                     player.CustomRole = null;
+
                 SynapseController.Server.Events.Player.InvokePlayerLeaveEvent(player);
             }
             catch (Exception e)
             {
-                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerLeave failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerLeave failed!!\n{e}");
             }
         }
     }

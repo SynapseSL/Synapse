@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
@@ -29,7 +28,7 @@ namespace SynapseInjector
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                Thread.Sleep(100000);
+                Thread.Sleep(10000);
             }
 
             Thread.Sleep(2000);

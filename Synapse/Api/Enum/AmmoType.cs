@@ -2,8 +2,10 @@
 {
     public enum AmmoType
     {
-        Ammo5,
-        Ammo7,
-        Ammo9
+        Ammo12gauge = 19,
+        Ammo556x45 = 22,
+        Ammo44cal = 27,
+        Ammo762x39,
+        Ammo9x19
     }
 }

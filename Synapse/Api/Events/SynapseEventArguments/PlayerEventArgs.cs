@@ -1,8 +1,10 @@
 ﻿using Assets._Scripts.Dissonance;
-using Grenades;
 using Synapse.Api.Items;
 using System.Collections.Generic;
 using UnityEngine;
+using InventorySystem.Items.MicroHID;
+using Synapse.Api.Enum;
+using System;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Synapse.Api.Events.SynapseEventArguments
@@ -27,7 +29,14 @@ namespace Synapse.Api.Events.SynapseEventArguments
         
         public Player Issuer { get; internal set; }
         
-        public int Duration { get; set; }
+        public long BanDuration { get; set; }
+
+        [Obsolete("Use BanDuration",true)]
+        public int Duration
+        {
+            get => (int)BanDuration;
+            set => BanDuration = value;
+        }
         
         public string Reason { get; set; }
     }
@@ -103,8 +112,6 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Player Player { get; internal set; }
 
         public Items.SynapseItem Item { get; internal set; }
-        
-        public GrenadeSettings Settings { get; set; }
 
         public float ForceMultiplier { get; set; }
         
@@ -195,6 +202,8 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public Items.SynapseItem Item { get; internal set; }
 
+        public bool Throw { get; set; }
+
         public bool Allow { get; set; }
     }
 
@@ -228,21 +237,40 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public List<SynapseItem> Items { get; set; }
 
+        public Dictionary<AmmoType, ushort> Ammo { get; set; }
+
         public List<SynapseItem> EscapeItems { get; set; }
 
-        public bool IsEscaping { get; internal set; }
+        public bool IsEscaping => SpawnReason == CharacterClassManager.SpawnReason.Escaped;
+
+        public CharacterClassManager.SpawnReason SpawnReason { get; internal set; }
 
         public Vector3 Position { get; set; }
 
         public float Rotation { get; set; }
 
         public bool Allow { get; set; }
+
+        /// <summary>
+        /// This is only for Synapse to know if the object can be deleted by one of the patches
+        /// </summary>
+        internal bool CanBeDeleted { get; set; } = false;
+    }
+
+    public class PlayerStartWorkstationEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public WorkStation WorkStation { get; internal set; }
+
+        public bool Allow { get; set; } = true;
     }
 
     public class PlayerConnectWorkstationEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
+        [Obsolete("Workstations no longer needs a Item")]
         public SynapseItem Item { get; internal set; }
 
         public WorkStation WorkStation { get; internal set; }
@@ -263,13 +291,14 @@ namespace Synapse.Api.Events.SynapseEventArguments
     {
         public Player Player { get; internal set; }
 
-        public SynapseItem Tablet { get; internal set; }
-
-        public Enum.AmmoType AmmoType { get; set; }
+        public AmmoType AmmoType { get; set; }
 
         public uint Amount { get; set; }
 
         public bool Allow { get; set; } = true;
+
+        [Obsolete("Tablets are no longer required to drop ammo")]
+        public SynapseItem Tablet { get; internal set; }
     }
 
     public class PlayerCuffTargetEventArgs : EventHandler.ISynapseEventArgs
@@ -278,9 +307,10 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public Player Cuffer { get; internal set; }
 
-        public SynapseItem Disarmer { get; internal set; }
-
         public bool Allow { get; set; } = true;
+
+        [Obsolete("Disarmer are removed from the game")]
+        public SynapseItem Disarmer { get; internal set; }
     }
 
     public class PlayerUseMicroEventArgs : EventHandler.ISynapseEventArgs
@@ -291,11 +321,11 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public float Energy
         {
-            get => Player.MicroHID.NetworkEnergy;
-            set => Player.MicroHID.NetworkEnergy = value;
+            get => Micro.Durabillity;
+            set => Micro.Durabillity = value;
         }
 
-        public MicroHID.MicroHidState State { get; set; }
+        public HidState State { get; set; }
     }
 
     public class PlayerWalkOnSinkholeEventArgs : EventHandler.ISynapseEventArgs
@@ -335,14 +365,17 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public Player Cuffed { get; internal set; }
 
-        public bool FreeWithDisarmer { get; internal set; }
-
         public bool Allow { get; set; }
+
+        [Obsolete("Disarmers does no longer exists")]
+        public bool FreeWithDisarmer { get; internal set; }
     }
 
     public class PlayerChangeItemEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Player { get; internal set; }
+
+        public bool Allow { get; set; } = true;
 
         public SynapseItem OldItem { get; internal set; }
 
