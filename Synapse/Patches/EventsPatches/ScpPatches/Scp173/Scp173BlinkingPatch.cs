@@ -3,10 +3,12 @@ using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp173
 {
+    //TODO: Check if this work
     [HarmonyPatch(typeof(PlayableScps.Scp173), nameof(PlayableScps.Scp173.ServerHandleBlinkMessage))]
     internal static class Scp173BlinkingPatch
     {
-        private static bool Prefix(PlayableScps.Scp173 __instance, ref Vector3 blinkPos)
+        [HarmonyPrefix]
+        private static bool Blink(PlayableScps.Scp173 __instance, ref Vector3 blinkPos)
         {
             try
             {

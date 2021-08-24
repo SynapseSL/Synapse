@@ -189,7 +189,6 @@
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Dummy\MirrorPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Dummy\OverridePositionPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\ItemOld\ChangeGrenadePatch.cs" />
     <Compile Include="Patches\SynapsePatches\Item\ItemDistributorPatches.cs" />
     <Compile Include="Patches\SynapsePatches\Item\PickupPatches.cs" />
     <Compile Include="Patches\SynapsePatches\Item\InventoryExtensionPatches.cs" />

@@ -3,10 +3,10 @@ using HarmonyLib;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp173
 {
+    [HarmonyPatch(typeof(PlayableScps.Scp173), nameof(PlayableScps.Scp173.ServerKillPlayer))]
     internal static class Scp173AttackPatch
     {
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(PlayableScps.Scp173), nameof(PlayableScps.Scp173.ServerKillPlayer))]
         private static bool ServerKillPlayerPatch(PlayableScps.Scp173 __instance, ReferenceHub target)
         {
             try
@@ -17,7 +17,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp173
                 if (target == __instance.Hub || player.ClassManager.IsAnyScp() || player.ClassManager.CurClass == RoleType.Spectator)
                     return false;
 
-                if (!HitboxIdentity.CheckFriendlyFire(scp.Hub, player.Hub))
+                if (!SynapseExtensions.GetHarmPermission(scp, player))
                     return false;
 
                 SynapseController.Server.Events.Scp.InvokeScpAttack(scp, player, Api.Enum.ScpAttackType.Scp173_Snap, out var allow);
