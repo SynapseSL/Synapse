@@ -5,6 +5,8 @@ using InventorySystem.Items;
 using InventorySystem.Items.Pickups;
 using Synapse.Api;
 using Synapse.Api.Items;
+using UnityEngine;
+using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.SynapsePatches.Item
 {
@@ -55,13 +57,13 @@ namespace Synapse.Patches.SynapsePatches.Item
     internal static class CreatePickupPatch
     {
         [HarmonyPostfix]
-        private static void ServerCreatePickupPatch(ItemPickupBase __result, InventorySystem.Items.Pickups.PickupSyncInfo psi, bool spawn = true)
+        private static void ServerCreatePickupPatch(ItemPickupBase __result, ushort serial = 0, bool spawn = true)
         {
             try
             {
-                if (!SynapseItem.AllItems.TryGetValue(psi.Serial, out var item))
+                if (!SynapseItem.AllItems.TryGetValue(serial, out var item))
                 {
-                    Logger.Get.Warn("Serial " + psi.Serial + "is missing in AllItems");
+                    Logger.Get.Warn("Serial " + serial + "is missing in AllItems");
                     return;
                 }
 
@@ -89,12 +91,12 @@ namespace Synapse.Patches.SynapsePatches.Item
                 //When ipb is null then this Method is used to destroy the entire object if not it is used to switch to a pickup
                 if (ipb == null)
                 {
-                    if (!SynapseItem.AllItems.TryGetValue(ipb.Info.Serial, out var item))
+                    if (!SynapseItem.AllItems.TryGetValue(itemSerial, out var item))
                     {
-                        Logger.Get.Warn("Serial " + ipb.Info.Serial + "is missing in AllItems");
+                        Logger.Get.Warn("Serial " + itemSerial + "is missing in AllItems");
                         return false;
                     }
-                    item.Destroy();
+                    item?.Destroy();
                     return false;
                 }
 

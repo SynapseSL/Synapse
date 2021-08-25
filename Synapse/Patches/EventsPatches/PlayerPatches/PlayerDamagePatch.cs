@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using CustomPlayerEffects;
 using Dissonance.Integrations.MirrorIgnorance;
 using HarmonyLib;
 using InventorySystem;
 using InventorySystem.Items.MicroHID;
-using MapGeneration;
-using PlayableScps.Interfaces;
 using Respawning;
 using Synapse.Api;
 using UnityEngine;
