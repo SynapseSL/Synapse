@@ -42,7 +42,7 @@ namespace Synapse.Patches.SynapsePatches.Item
             try
             {
                 if (__instance._destroyTime != 0 && Time.timeSinceLevelLoad >= __instance._destroyTime)
-                    __instance.GetSynapseItem().DespawnItemBase();
+                    __instance.GetSynapseItem()?.DespawnItemBase();
 
                 return false;
             }

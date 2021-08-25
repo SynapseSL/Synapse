@@ -21,11 +21,15 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    ev.Player.Scp106Controller.PortalPosition = ev.Player.Position;
+                    foreach(var item in Synapse.Api.Items.SynapseItem.AllItems)
+                    {
+                        if (item.Value == null) Logger.Get.Warn(item.Key + " - null");
+                        else Logger.Get.Warn($"{item.Key} - {item.Value.ItemType}");
+                    }
                     break;
 
                 case KeyCode.Alpha2:
-                    ev.Player.Scp106Controller.UsePortal();
+                    Logger.Get.Warn(ev.Player.ItemInHand.ID);
                     break;
             }
         }

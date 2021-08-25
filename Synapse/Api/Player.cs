@@ -107,14 +107,14 @@ namespace Synapse.Api
             ServerRoles.RemoteAdminMode = GlobalRemoteAdmin ? ServerRoles.AccessMode.GlobalAccess : ServerRoles.AccessMode.PasswordOverride;
             if (!ServerRoles.AdminChatPerms)
                 ServerRoles.AdminChatPerms = SynapseGroup.HasVanillaPermission(PlayerPermissions.AdminChat);
-            ServerRoles.TargetOpenRemoteAdmin(Connection,false);
+            ServerRoles.TargetOpenRemoteAdmin(false);
         }
 
         public void RaLogout()
         {
             Hub.serverRoles.RemoteAdmin = false;
             Hub.serverRoles.RemoteAdminMode = ServerRoles.AccessMode.LocalAccess;
-            Hub.serverRoles.TargetCloseRemoteAdmin(Connection);
+            Hub.serverRoles.TargetCloseRemoteAdmin();
         }
 
         public void Heal(float hp) => PlayerStats.HealHPAmount(hp);
@@ -544,17 +544,10 @@ namespace Synapse.Api
             set => PlayerStats.maxHP = value;
         }
 
-        [Obsolete("Use ArtificialHP instead", false)]
         public float ArtificialHealth
         {
-            get => PlayerStats.ArtificialHealth;
-            set => PlayerStats.ArtificialHealth = (ushort)value;
-        }
-
-        public ushort ArtificialHP
-        {
-            get => PlayerStats.ArtificialHealth;
-            set => PlayerStats.ArtificialHealth = value;
+            get => PlayerStats.GetAhpValue();
+            set => PlayerStats.SafeSetAhpValue(value);
         }
 
         public int MaxArtificialHealth

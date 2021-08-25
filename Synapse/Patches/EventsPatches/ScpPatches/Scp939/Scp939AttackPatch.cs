@@ -1,22 +1,32 @@
 ﻿using System;
 using HarmonyLib;
+using Mirror;
 using UnityEngine;
 using ev = Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp939
 {
-    [HarmonyPatch(typeof(Scp939PlayerScript),nameof(Scp939PlayerScript.UserCode_CmdShoot))]
+    [HarmonyPatch(typeof(PlayableScps.Scp939),nameof(PlayableScps.Scp939.ServerAttack))]
     internal static class Scp939AttackPatch
     {
         [HarmonyPrefix]
-        private static bool OnBite(Scp939PlayerScript __instance, GameObject target)
+        private static bool OnBite(PlayableScps.Scp939 __instance, PlayableScps.Messages.Scp939AttackMessage msg)
         {
             try
             {
-                if (target == null || !__instance.iAm939 || __instance.cooldown > 0f) return false;
                 var scp = __instance.GetPlayer();
-                var player = target.GetPlayer();
-                if (Vector3.Distance(player.Position, scp.Position) >= __instance.attackDistance * 1.2f) return false;
+
+                if (msg.Victim != null && msg.Victim.TryGetComponent<BreakableWindow>(out var window))
+                {
+                    __instance._currentBiteCooldown = 1f;
+                    scp.Connection.Send(new PlayableScps.Messages.ScpHitmarkerMessage(1.5f));
+                    NetworkServer.SendToAll(new PlayableScps.Messages.Scp939OnHitMessage(scp.PlayerId));
+                    window.Damage(50f, null, new Footprinting.Footprint(scp.Hub), Vector3.zero);
+                    return false;
+                }
+
+                var player = msg.Victim?.GetPlayer();
+                if (player == null) return false;
 
                 if (!SynapseExtensions.GetHarmPermission(scp, player)) return false;
 
@@ -24,12 +34,12 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp939
 
                 if (!allow) return false;
 
-                __instance.cooldown = 1f;
+                __instance._currentBiteCooldown = 1f;
+                scp.Connection.Send(new PlayableScps.Messages.ScpHitmarkerMessage(1.5f));
+                NetworkServer.SendToAll(new PlayableScps.Messages.Scp939OnHitMessage(scp.PlayerId));
                 player.Hurt(50, DamageTypes.Scp939, scp);
                 scp.ClassManager.RpcPlaceBlood(player.Position, 0, 2f);
                 player.PlayerEffectsController.EnableEffect<CustomPlayerEffects.Amnesia>(3f, true);
-                __instance.RpcShoot();
-
                 return false;
             }
             catch (Exception e)

@@ -67,5 +67,5 @@ public class SynapseController
     public const int SynapseMinor = 7;
     public const int SynapsePatch = 0;
     public const string SynapseVersion = "2.7.0-pre-1.2";
-    public const string BasedGameVersion = "11.0.0-parabellum-beta-9-e4b1e8f3";
+    public const string BasedGameVersion = "11.0.0-parabellum-public-2-755d2d49";
 }

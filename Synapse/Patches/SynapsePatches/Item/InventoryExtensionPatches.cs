@@ -59,7 +59,11 @@ namespace Synapse.Patches.SynapsePatches.Item
         {
             try
             {
-                var item = SynapseItem.AllItems[psi.Serial];
+                if (!SynapseItem.AllItems.TryGetValue(psi.Serial, out var item))
+                {
+                    Logger.Get.Warn("Serial " + psi.Serial + "is missing in AllItems");
+                    return;
+                }
 
                 if (item == null) item = new SynapseItem(__result);
                 else item.PickupBase = __result;
@@ -85,7 +89,11 @@ namespace Synapse.Patches.SynapsePatches.Item
                 //When ipb is null then this Method is used to destroy the entire object if not it is used to switch to a pickup
                 if (ipb == null)
                 {
-                    var item = SynapseItem.AllItems[itemSerial];
+                    if (!SynapseItem.AllItems.TryGetValue(ipb.Info.Serial, out var item))
+                    {
+                        Logger.Get.Warn("Serial " + ipb.Info.Serial + "is missing in AllItems");
+                        return false;
+                    }
                     item.Destroy();
                     return false;
                 }

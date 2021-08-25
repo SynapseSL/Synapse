@@ -12,6 +12,7 @@ using Mirror;
 using InventorySystem.Items.Firearms.Attachments;
 using Synapse.Api.Enum;
 using UnityEngine;
+using InventorySystem;
 
 namespace Synapse.Api.Items
 {
@@ -46,7 +47,6 @@ namespace Synapse.Api.Items
             {
                 ItemCategory = examplebase.Category;
                 TierFlags = examplebase.TierFlags;
-                ThrowSettings = examplebase.ThrowSettings;
                 Weight = examplebase.Weight;
             }
         }
@@ -100,7 +100,6 @@ namespace Synapse.Api.Items
             {
                 ItemCategory = examplebase.Category;
                 TierFlags = examplebase.TierFlags;
-                ThrowSettings = examplebase.ThrowSettings;
                 Weight = examplebase.Weight;
             }
         }
@@ -134,7 +133,6 @@ namespace Synapse.Api.Items
             ItemType = itemBase.ItemTypeId;
             ItemCategory = itemBase.Category;
             TierFlags = itemBase.TierFlags;
-            ThrowSettings = itemBase.ThrowSettings;
             Weight = itemBase.Weight;
         }
 
@@ -155,7 +153,6 @@ namespace Synapse.Api.Items
             {
                 ItemCategory = examplebase.Category;
                 TierFlags = examplebase.TierFlags;
-                ThrowSettings = ThrowSettings;
             }
             Weight = pickupBase.Info.Weight;
         }
@@ -179,8 +176,6 @@ namespace Synapse.Api.Items
         public ItemTierFlags TierFlags { get; }
 
         public ushort Serial { get; }
-
-        public ItemThrowSettings ThrowSettings { get; set; }
 
         public float Weight { get; }
         #endregion
@@ -416,12 +411,23 @@ namespace Synapse.Api.Items
 
                 case ItemState.Despawned:
                     if (InventoryItemLoader.AvailableItems.TryGetValue(ItemType, out var examplebase))
-                        ReferenceHub.LocalHub.inventory.ServerCreatePickup(examplebase, new PickupSyncInfo
+                    {
+                        PickupBase = UnityEngine.Object.Instantiate
+                            (examplebase.PickupDropModel, position, rotation);
+
+                        var info = new PickupSyncInfo
                         {
+                            Position = position,
+                            Rotation = new LowPrecisionQuaternion(rotation),
                             ItemId = ItemType,
                             Serial = Serial,
-                            Weight = Weight
-                        }, true);
+                            Weight = Weight,
+                        };
+                        PickupBase.NetworkInfo = info;
+                        PickupBase.transform.localScale = Scale;
+                        NetworkServer.Spawn(PickupBase.gameObject);
+                        PickupBase.InfoReceived(default, info);
+                    }
 
                     Position = position;
                     break;

@@ -229,7 +229,6 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 __instance.Scp0492.iAm049_2 = (__instance.CurClass == RoleType.Scp0492);
                 __instance.Scp106.iAm106 = (__instance.CurClass == RoleType.Scp106);
-                __instance.Scp939.iAm939 = __instance.CurClass.Is939();
                 __instance.RefreshPlyModel(RoleType.None);
 
                 return false;
