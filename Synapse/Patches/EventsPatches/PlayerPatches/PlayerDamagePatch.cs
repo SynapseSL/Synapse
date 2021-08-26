@@ -3,7 +3,6 @@ using System.Linq;
 using CustomPlayerEffects;
 using Dissonance.Integrations.MirrorIgnorance;
 using HarmonyLib;
-using InventorySystem;
 using InventorySystem.Items.MicroHID;
 using Respawning;
 using Synapse.Api;
@@ -133,8 +132,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 					if (component != null && component.CurrentScp is PlayableScps.Interfaces.IImmortalScp immortalScp && !immortalScp.OnDeath(info, __instance.gameObject))
 						return false;
 
-					foreach (Scp079PlayerScript scp079PlayerScript in Scp079PlayerScript.instances)
-						scp079PlayerScript.ServerProcessKillAssist(victim.Hub, ExpGainType.KillAssist);
+					//TODO:
+					//foreach (Scp079PlayerScript scp079PlayerScript in Scp079PlayerScript.instances)
+						//scp079PlayerScript.ServerProcessKillAssist(victim.Hub, ExpGainType.KillAssist);
 
 					if (RoundSummary.RoundInProgress() && RoundSummary.roundTime < 60 && IsValidDamage)
 						__instance.TargetAchieve(victim.Connection, "wowreally");
@@ -261,7 +261,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
 					if (!__instance._pocketCleanup || info.Tool != DamageTypes.Pocket)
 					{
-						victim.VanillaInventory.ServerDropEverything();
+						victim.Inventory.DropAll();
                         var flag6 = __instance.TryGet096SmackVelocity(killer.Hub, victim.Hub, out Vector3 vector);
                         var vector2 = flag6 ? vector : victim.PlayerMovementSync.PlayerVelocity;
 						if (victim.ClassManager.Classes.CheckBounds(victim.RoleType) && damageType != DamageTypes.RagdollLess)

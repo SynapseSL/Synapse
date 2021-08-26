@@ -192,6 +192,7 @@
     <Compile Include="Patches\SynapsePatches\Item\ItemDistributorPatches.cs" />
     <Compile Include="Patches\SynapsePatches\Item\PickupPatches.cs" />
     <Compile Include="Patches\SynapsePatches\Item\InventoryExtensionPatches.cs" />
+    <Compile Include="Patches\SynapsePatches\Item\SerialPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Item\ThrowableItemPatches.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\DoorSpawnpointPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ShootPermissionPatch.cs" />

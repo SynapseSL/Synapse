@@ -31,6 +31,14 @@ namespace Synapse.Api.Events
                 case KeyCode.Alpha2:
                     Logger.Get.Warn(ev.Player.ItemInHand.ID);
                     break;
+
+                case KeyCode.Alpha3:
+                    foreach (var item in ev.Player.VanillaInventory.UserInventory.Items)
+                    {
+                        Logger.Get.Warn($"Null: {item.Value == null}");
+                        Logger.Get.Warn($"Serial: {item.Key}");
+                    }
+                    break;
             }
         }
 

@@ -6,7 +6,8 @@ using ev = Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp939
 {
-    [HarmonyPatch(typeof(PlayableScps.Scp939),nameof(PlayableScps.Scp939.ServerAttack))]
+    /*
+    [HarmonyPatch(typeof(Scp939PlayerScript),nameof(PlayableScps.Scp939.ServerAttack))]
     internal static class Scp939AttackPatch
     {
         [HarmonyPrefix]
@@ -49,4 +50,5 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp939
             }
         }
     }
+    */
 }

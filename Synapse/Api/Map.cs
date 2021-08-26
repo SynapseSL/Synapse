@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Interactables.Interobjects.DoorUtils;
+using InventorySystem.Items;
 using InventorySystem.Items.Firearms.Attachments;
 using MapGeneration;
 using Mirror;
@@ -201,6 +202,7 @@ namespace Synapse.Api
             WorkStations.Clear();
             Ragdolls.Clear();
             SynapseItem.AllItems.Clear();
+            ItemSerialGenerator.Reset();
         }
     }
 }
