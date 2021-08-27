@@ -221,9 +221,7 @@ namespace Synapse.Api.Items
                 {
                     case ItemState.Map: return PickupBase.PreviousOwner.Hub.GetPlayer();
                     case ItemState.Inventory: return ItemBase.Owner.GetPlayer();
-                    default:
-                        Logger.Get.Warn("No ItemHolder");
-                        return null;
+                    default: return null;
                 }
             }
         }

@@ -24,8 +24,7 @@ public class SynapseController
 
     internal SynapseController()
     {
-        CustomNetworkManager.Modded = true;
-        BuildInfoCommand.ModDescription = $"Plugin Framework: Synapse\nSynapse Version: {SynapseVersion}\nDescription: Synapse is a heavily modded server software using extensive runtime patching to make development faster and the usage more accessible to end-users";
+        SynapseVersion.Init();
 
         PatchMethods();
         try
@@ -36,9 +35,6 @@ public class SynapseController
             CommandHandlers.RegisterSynapseCommands();
 
             PluginLoader.ActivatePlugins();
-
-            if(BasedGameVersion != GameCore.Version.VersionString)
-                Server.Logger.Warn("Synapse-Loader: Different Game Version than expected. Bugs may occurre");
         }
         catch (Exception e)
         {
@@ -63,9 +59,8 @@ public class SynapseController
         }
     }
 
-    public const int SynapseMajor = 2;
-    public const int SynapseMinor = 7;
-    public const int SynapsePatch = 0;
-    public const string SynapseVersion = "2.7.0-pre-1.2";
-    public const string BasedGameVersion = "11.0.0-parabellum-public-2.0-50ce37ef";
+    public const int SynapseMajor = SynapseVersion.Major;
+    public const int SynapseMinor = SynapseVersion.Minor;
+    public const int SynapsePatch = SynapseVersion.Patch;
+    public const string BasedGameVersion = SynapseVersion.BasedGameVersion;
 }

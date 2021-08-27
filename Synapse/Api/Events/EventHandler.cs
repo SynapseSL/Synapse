@@ -11,6 +11,7 @@ namespace Synapse.Api.Events
             Player.PlayerSyncDataEvent += PlayerSyncData;
             Round.RoundRestartEvent += RounRestart;
             Round.WaitingForPlayersEvent += Waiting;
+            Player.LoadComponentsEvent += LoadPlayer;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
 #endif
@@ -29,7 +30,8 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha2:
-                    Logger.Get.Warn(ev.Player.ItemInHand.ID);
+                    Logger.Get.Warn(ev.Player.ItemInHand.Serial);
+                    ev.Player.ItemInHand.Scale = Vector3.one * 3;
                     break;
 
                 case KeyCode.Alpha3:
@@ -62,6 +64,12 @@ namespace Synapse.Api.Events
 
 #region HookedEvents
         private SynapseConfiguration Conf => SynapseController.Server.Configs.synapseConfiguration;
+
+        private void LoadPlayer(SynapseEventArguments.LoadComponentEventArgs ev)
+        {
+            if (ev.Player.GetComponent<Player>() == null)
+                ev.Player.gameObject.AddComponent<Player>();
+        }
 
         private void Waiting()
         {

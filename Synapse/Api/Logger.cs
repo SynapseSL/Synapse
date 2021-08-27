@@ -45,6 +45,12 @@ namespace Synapse.Api
             Send($"{name}: {message}", ConsoleColor.Red);
         }
 
+        internal void Debug(object message)
+        {
+            if (SynapseVersion.Debug)
+                Send($"Synapse-Debug: {message}", ConsoleColor.DarkYellow);
+        }
+
         public void Send(string message, ConsoleColor color) => ServerConsole.AddLog(message, color);
     }
 }

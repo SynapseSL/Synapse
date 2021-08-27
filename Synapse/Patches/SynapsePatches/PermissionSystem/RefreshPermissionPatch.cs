@@ -7,7 +7,8 @@ namespace Synapse.Patches.SynapsePatches.PermissionSystem
     [HarmonyPatch(typeof(ServerRoles), nameof(ServerRoles.RefreshPermissions))]
     internal static class PermissionPatch2
     {
-        private static bool Prefix(ServerRoles __instance,bool disp = false)
+        [HarmonyPrefix]
+        private static bool RefreshPermission(ServerRoles __instance, bool disp = false)
         {
             try
             {
@@ -16,7 +17,7 @@ namespace Synapse.Patches.SynapsePatches.PermissionSystem
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Permission: RefreshPermissionPatch failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Logger.Get.Error($"Synapse-Permission: RefreshPermissionPatch failed!!\n{e}");
             }
             return false;
         }

@@ -16,10 +16,9 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                 if (__instance._flash.IsEnabled) return false;
 
                 var vector = __instance.Hub.transform.TransformPoint(PlayableScps.Scp096._headOffset);
-
                 foreach (var player in Server.Get.Players)
                 {
-                    if (player.RoleType != RoleType.Spectator && player.Hub != __instance.Hub && player.ClassManager.IsAnyScp() && Vector3.Dot((player.CameraReference.position - vector).normalized, __instance.Hub.PlayerCameraReference.forward) >= 0.1f)
+                    if (player.RoleType != RoleType.Spectator && player.Hub != __instance.Hub && !player.ClassManager.IsAnyScp() && Vector3.Dot((player.CameraReference.position - vector).normalized, __instance.Hub.PlayerCameraReference.forward) >= 0.1f)
                     {
                         var visionInformation = VisionInformation.GetVisionInformation(player.Hub, vector, -0.1f, 60f, true, true, __instance.Hub.localCurrentRoomEffects);
                         if (visionInformation.IsLooking)
@@ -34,8 +33,9 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                                     continue;
 
                                 Server.Get.Events.Scp.Scp096.InvokeScpTargetEvent(player, __instance.GetPlayer(), __instance.PlayerState, out var allow);
-                                __instance.AddTarget(player.gameObject);
                                 if (!allow) continue;
+
+                                __instance.AddTarget(player.gameObject);
                             }
                             if (__instance.CanEnrage && player.gameObject != null)
                             {
@@ -63,7 +63,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
         {
             try
             {
-                if (info == null || info.RHub == null || info.Tool?.Weapon != ItemType.None) return false;
+                if (info == null || info.RHub == null || info.Tool.Weapon == ItemType.None) return false;
 
                 var player = info.RHub.GetPlayer();
 

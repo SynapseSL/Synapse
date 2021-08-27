@@ -4,13 +4,13 @@ using Synapse.Command;
 using System;
 using Logger = Synapse.Api.Logger;
 
-// ReSharper disable All
 namespace Synapse.Patches.SynapsePatches
 {
     [HarmonyPatch(typeof(GameCore.Console), nameof(GameCore.Console.TypeCommand))]
     internal static class ServerCommandPatch
     {
-        private static bool Prefix(string cmd)
+        [HarmonyPrefix]
+        private static bool TypeCommand(string cmd)
         {
             var args = cmd.Split(' ');
 
@@ -51,7 +51,8 @@ namespace Synapse.Patches.SynapsePatches
     [HarmonyPatch(typeof(QueryProcessor), nameof(QueryProcessor.ProcessGameConsoleQuery))]
     internal static class ClientCommandPatch
     {
-        private static bool Prefix(QueryProcessor __instance, string query)
+        [HarmonyPrefix]
+        private static bool GameConsoleQuery(QueryProcessor __instance, string query)
         {
             if (__instance._sender == null) return false;
 
@@ -95,7 +96,7 @@ namespace Synapse.Patches.SynapsePatches
                 }
                 catch (Exception e)
                 {
-                    Logger.Get.Error($"Synapse-Commands: Command Execution failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                    Logger.Get.Error($"Synapse-Commands: Command Execution failed!!\n{e}");
                 }
                 return false;
             }
@@ -106,7 +107,8 @@ namespace Synapse.Patches.SynapsePatches
     [HarmonyPatch(typeof(CommandProcessor), nameof(CommandProcessor.ProcessQuery))]
     internal static class RACommandPatch
     {
-        private static bool Prefix(string q, CommandSender sender)
+        [HarmonyPrefix]
+        private static bool ProcessQuery(string q, CommandSender sender)
         {
             var player = sender.GetPlayer();
             var args = q.Split(' ');
@@ -138,7 +140,7 @@ namespace Synapse.Patches.SynapsePatches
                 }
                 catch (Exception e)
                 {
-                    Logger.Get.Error($"Synapse-Commands: Command Execution failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                    Logger.Get.Error($"Synapse-Commands: Command Execution failed!!\n{e}");
                 }
                 return false;
             }

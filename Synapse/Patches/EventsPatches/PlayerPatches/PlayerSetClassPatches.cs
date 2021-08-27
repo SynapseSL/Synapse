@@ -118,12 +118,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     item.Drop();
                     var arg = player.VanillaInventory.ServerAddItem(item.ItemType, item.Serial, item.PickupBase);
 
-                    var onItemProvided = InventoryItemProvider.OnItemProvided;
-
-                    if (onItemProvided != null)
-                    {
-                        onItemProvided(player.Hub, arg);
-                    }
+                    InventoryItemProvider.OnItemProvided?.Invoke(player.Hub, arg);
                 }
 
                 if (args.IsEscaping)
