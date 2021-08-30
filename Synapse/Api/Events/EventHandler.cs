@@ -11,6 +11,7 @@ namespace Synapse.Api.Events
             Player.PlayerSyncDataEvent += PlayerSyncData;
             Round.RoundRestartEvent += RounRestart;
             Round.WaitingForPlayersEvent += Waiting;
+            Player.LoadComponentsEvent += LoadPlayer;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
 #endif
@@ -21,11 +22,24 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    ev.Player.Scp106Controller.PortalPosition = ev.Player.Position;
+                    foreach(var item in Synapse.Api.Items.SynapseItem.AllItems)
+                    {
+                        if (item.Value == null) Logger.Get.Warn(item.Key + " - null");
+                        else Logger.Get.Warn($"{item.Key} - {item.Value.ItemType}");
+                    }
                     break;
 
                 case KeyCode.Alpha2:
-                    ev.Player.Scp106Controller.UsePortal();
+                    Logger.Get.Warn(ev.Player.ItemInHand.Serial);
+                    ev.Player.ItemInHand.Scale = Vector3.one * 3;
+                    break;
+
+                case KeyCode.Alpha3:
+                    foreach (var item in ev.Player.VanillaInventory.UserInventory.Items)
+                    {
+                        Logger.Get.Warn($"Null: {item.Value == null}");
+                        Logger.Get.Warn($"Serial: {item.Key}");
+                    }
                     break;
             }
         }
@@ -50,6 +64,12 @@ namespace Synapse.Api.Events
 
 #region HookedEvents
         private SynapseConfiguration Conf => SynapseController.Server.Configs.synapseConfiguration;
+
+        private void LoadPlayer(SynapseEventArguments.LoadComponentEventArgs ev)
+        {
+            if (ev.Player.GetComponent<Player>() == null)
+                ev.Player.gameObject.AddComponent<Player>();
+        }
 
         private void Waiting()
         {

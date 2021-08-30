@@ -115,8 +115,10 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 foreach (var item in args.Items)
                 {
-                    player.Inventory.AddItem(item);
-                    InventoryItemProvider.OnItemProvided.Invoke(ply, item.ItemBase);
+                    item.Drop();
+                    var arg = player.VanillaInventory.ServerAddItem(item.ItemType, item.Serial, item.PickupBase);
+
+                    InventoryItemProvider.OnItemProvided?.Invoke(player.Hub, arg);
                 }
 
                 if (args.IsEscaping)
@@ -222,7 +224,6 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 __instance.Scp0492.iAm049_2 = (__instance.CurClass == RoleType.Scp0492);
                 __instance.Scp106.iAm106 = (__instance.CurClass == RoleType.Scp106);
-                __instance.Scp939.iAm939 = __instance.CurClass.Is939();
                 __instance.RefreshPlyModel(RoleType.None);
 
                 return false;

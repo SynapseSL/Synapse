@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using InventorySystem;
 using InventorySystem.Items;
 using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Firearms.Ammo;
+using InventorySystem.Items.Firearms.Attachments;
 using InventorySystem.Items.MicroHID;
 using InventorySystem.Items.Pickups;
 using InventorySystem.Items.Radio;
@@ -45,7 +45,6 @@ namespace Synapse.Api.Items
             {
                 ItemCategory = examplebase.Category;
                 TierFlags = examplebase.TierFlags;
-                ThrowSettings = examplebase.ThrowSettings;
                 Weight = examplebase.Weight;
             }
         }
@@ -99,7 +98,6 @@ namespace Synapse.Api.Items
             {
                 ItemCategory = examplebase.Category;
                 TierFlags = examplebase.TierFlags;
-                ThrowSettings = examplebase.ThrowSettings;
                 Weight = examplebase.Weight;
             }
         }
@@ -133,7 +131,6 @@ namespace Synapse.Api.Items
             ItemType = itemBase.ItemTypeId;
             ItemCategory = itemBase.Category;
             TierFlags = itemBase.TierFlags;
-            ThrowSettings = itemBase.ThrowSettings;
             Weight = itemBase.Weight;
         }
 
@@ -154,7 +151,6 @@ namespace Synapse.Api.Items
             {
                 ItemCategory = examplebase.Category;
                 TierFlags = examplebase.TierFlags;
-                ThrowSettings = ThrowSettings;
             }
             Weight = pickupBase.Info.Weight;
         }
@@ -179,13 +175,23 @@ namespace Synapse.Api.Items
 
         public ushort Serial { get; }
 
-        public ItemThrowSettings ThrowSettings { get; set; }
-
         public float Weight { get; }
         #endregion
 
         #region Gameobjects
-        public GameObject ItemGameObject => ItemBase == null ? PickupBase.gameObject : ItemBase.gameObject;
+        public GameObject ItemGameObject
+        {
+            get
+            {
+                switch (State)
+                {
+                    case ItemState.Map: return PickupBase.gameObject;
+                    case ItemState.Inventory: return ItemBase.gameObject;
+                    case ItemState.Thrown: return Throwable.ThrowableItem.gameObject;
+                    default: return null;
+                }
+            }
+        }
         public ItemBase ItemBase { get; internal set; }
         public ItemPickupBase PickupBase { get; internal set; }
         #endregion
@@ -207,8 +213,18 @@ namespace Synapse.Api.Items
             }
         }
 
-        public Player ItemHolder =>
-            PickupBase == null ? ItemBase.Owner.GetPlayer() : PickupBase.PreviousOwner.Hub.GetPlayer();
+        public Player ItemHolder
+        {
+            get
+            {
+                switch (State)
+                {
+                    case ItemState.Map: return PickupBase.PreviousOwner.Hub.GetPlayer();
+                    case ItemState.Inventory: return ItemBase.Owner.GetPlayer();
+                    default: return null;
+                }
+            }
+        }
         #endregion
 
         #region ChangableAPIValues
@@ -372,8 +388,7 @@ namespace Synapse.Api.Items
             {
                 if (ItemBase is Firearm arm)
                 {
-                    var newstatus = new FirearmStatus(arm.Status.Ammo, arm.Status.Flags, value);
-                    arm.OnStatusChanged(arm.Status, newstatus);
+                    arm.ApplyAttachmentsCode(value,true);
                 }
                 else if (PickupBase is FirearmPickup armpickup)
                 {
@@ -390,6 +405,7 @@ namespace Synapse.Api.Items
             {
                 case ItemState.Map:
                     player.VanillaInventory.ServerAddItem(ItemType, Serial, PickupBase);
+                    PickupBase.DestroySelf();
                     break;
 
                 case ItemState.Despawned:
@@ -397,7 +413,7 @@ namespace Synapse.Api.Items
                     break;
 
                 case ItemState.Inventory:
-                    Despawn();
+                    DespawnItemBase();
                     player.VanillaInventory.ServerAddItem(ItemType, Serial);
                     break;
             }
@@ -410,19 +426,28 @@ namespace Synapse.Api.Items
                 case ItemState.Map: Position = position; break;
 
                 case ItemState.Inventory:
-                    Despawn();
-                    goto case ItemState.Despawned;
+                    ItemHolder.VanillaInventory.ServerDropItem(Serial);
+                    break;
 
                 case ItemState.Despawned:
                     if (InventoryItemLoader.AvailableItems.TryGetValue(ItemType, out var examplebase))
-                        ReferenceHub.LocalHub.inventory.ServerCreatePickup(examplebase, new PickupSyncInfo
+                    {
+                        PickupBase = UnityEngine.Object.Instantiate
+                            (examplebase.PickupDropModel, position, rotation);
+
+                        var info = new PickupSyncInfo
                         {
+                            Position = position,
+                            Rotation = new LowPrecisionQuaternion(rotation),
                             ItemId = ItemType,
                             Serial = Serial,
-                            Weight = Weight
-                        }, true);
-
-                    Position = position;
+                            Weight = Weight,
+                        };
+                        PickupBase.NetworkInfo = info;
+                        PickupBase.transform.localScale = Scale;
+                        NetworkServer.Spawn(PickupBase.gameObject);
+                        PickupBase.InfoReceived(default, info);
+                    }
                     break;
             }
         }
@@ -431,7 +456,7 @@ namespace Synapse.Api.Items
         {
             switch (State)
             {
-                case ItemState.Inventory: ItemHolder.VanillaInventory.ServerDropItem(Serial); break;
+                case ItemState.Inventory: Drop(ItemHolder.Position); break;
                 case ItemState.Despawned: Drop(Position); break;
             }
         }
@@ -447,14 +472,18 @@ namespace Synapse.Api.Items
         {
             if (ItemBase != null)
             {
-                ItemBase.OnRemoved(null);
-                if (ItemHolder.ItemInHand == this)
-                    ItemHolder.ItemInHand = None;
+                if(ItemHolder != null)
+                {
+                    ItemBase.OnRemoved(null);
+
+                    if (ItemHolder.ItemInHand == this)
+                        ItemHolder.ItemInHand = None;
+
+                    ItemHolder.VanillaInventory.UserInventory.Items.Remove(Serial);
+                    ItemHolder.VanillaInventory.SendItemsNextFrame = true;
+                }
 
                 UnityEngine.Object.Destroy(ItemBase.gameObject);
-
-                ItemHolder.VanillaInventory.UserInventory.Items.Remove(Serial);
-                ItemHolder.VanillaInventory.SendItemsNextFrame = true;
             }
         }
 

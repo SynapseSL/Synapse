@@ -6,7 +6,8 @@ namespace Synapse.Patches.SynapsePatches.Dummy
     [HarmonyPatch(typeof(PlayerMovementSync),nameof(PlayerMovementSync.OverridePosition))]
     internal static class OverridePositionPatch
     {
-        private static bool Prefix(PlayerMovementSync __instance, Vector3 pos, float rot, bool forceGround = false)
+        [HarmonyPrefix]
+        private static bool OverridePosition(PlayerMovementSync __instance, Vector3 pos, float rot, bool forceGround = false)
         {
             try
             {

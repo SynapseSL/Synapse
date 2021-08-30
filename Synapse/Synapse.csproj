@@ -192,6 +192,7 @@
     <Compile Include="Patches\SynapsePatches\Item\ItemDistributorPatches.cs" />
     <Compile Include="Patches\SynapsePatches\Item\PickupPatches.cs" />
     <Compile Include="Patches\SynapsePatches\Item\InventoryExtensionPatches.cs" />
+    <Compile Include="Patches\SynapsePatches\Item\SerialPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Item\ThrowableItemPatches.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\DoorSpawnpointPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ShootPermissionPatch.cs" />
@@ -216,6 +217,7 @@
     <Compile Include="Server.cs" />
     <Compile Include="SynapseController.cs" />
     <Compile Include="SynapseExtensions.cs" />
+    <Compile Include="SynapseVersion.cs" />
     <Compile Include="Translation\Translation.cs" />
     <Compile Include="Translation\SynapseTranslation.cs" />
   </ItemGroup>

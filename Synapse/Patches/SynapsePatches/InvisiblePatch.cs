@@ -11,7 +11,8 @@ namespace Synapse.Patches.SynapsePatches
     [HarmonyPatch(typeof(PlayerPositionManager), nameof(PlayerPositionManager.TransmitData))]
     internal static class InvisiblePatch
     {
-        private static bool Prefix(PlayerPositionManager __instance)
+        [HarmonyPrefix]
+        private static bool TransmitData(PlayerPositionManager __instance)
         {
             try
             {

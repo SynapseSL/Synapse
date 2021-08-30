@@ -8,52 +8,6 @@ using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.SynapsePatches.Item
 {
-    [HarmonyPatch(typeof(ThrowableItem),nameof(ThrowableItem.OnRemoved))]
-    internal static class OnRemovedPatch
-    {
-        [HarmonyPrefix]
-        private static bool OnRemoved(ThrowableItem __instance, ItemPickupBase pickup)
-        {
-            try
-            {
-                if (pickup == null) return false;
-                if (__instance._alreadyFired
-                    || __instance.ActivationStopwatch.Elapsed.TotalSeconds < __instance._pinPullTime) return false;
-
-                __instance.ServerThrow(0f, 0f, UnityEngine.Vector3.zero);
-                __instance.GetSynapseItem().DespawnPickup();
-
-                return false;
-            }
-            catch(Exception e)
-            {
-                Logger.Get.Error($"Synapse-Item: ThrowableItem.OnRemoved Patch failed:\n{e}");
-                return false;
-            }
-        }
-    }
-
-    [HarmonyPatch(typeof(ThrowableItem),nameof(ThrowableItem.UpdateServer))]
-    internal static class UpdateServerPatch
-    {
-        [HarmonyPrefix]
-        private static bool UpdateServer(ThrowableItem __instance)
-        {
-            try
-            {
-                if (__instance._destroyTime != 0 && Time.timeSinceLevelLoad >= __instance._destroyTime)
-                    __instance.GetSynapseItem().DespawnItemBase();
-
-                return false;
-            }
-            catch(Exception e)
-            {
-                Logger.Get.Error($"Synapse-Item: ThrowableItem.UpdateServer Patch failed:\n{e}");
-                return false;
-            }
-        }
-    }
-
     [HarmonyPatch(typeof(ThrowableItem),nameof(ThrowableItem.ServerThrow),new[] { typeof(float), typeof(float), typeof(Vector3) })]
     internal static class ServerThrowPatch
     {
@@ -64,7 +18,7 @@ namespace Synapse.Patches.SynapsePatches.Item
             {
                 __instance._destroyTime = Time.timeSinceLevelLoad + __instance._postThrownAnimationTime;
                 __instance._alreadyFired = true;
-                var newpickup = UnityEngine.Object.Instantiate<ThrownProjectile>(__instance.Projectile
+                var newpickup = UnityEngine.Object.Instantiate(__instance.Projectile
                     , __instance.Owner.PlayerCameraReference.position, __instance.Owner.PlayerCameraReference.rotation);
 
                 var info = new PickupSyncInfo

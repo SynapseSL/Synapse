@@ -1,25 +1,21 @@
 ﻿using System;
 using HarmonyLib;
-using Synapse.Api;
 
-// ReSharper disable All
 namespace Synapse.Patches.SynapsePatches
 {
     [HarmonyPatch(typeof(ReferenceHub), nameof(ReferenceHub.LoadComponents))]
     internal static class ComponentsPatch
     {
-        private static void Prefix(ReferenceHub __instance)
+        [HarmonyPrefix]
+        private static void LoadComponents(ReferenceHub __instance)
         {
-            if (__instance.GetComponent<Player>() == null) 
-                __instance.gameObject.AddComponent<Player>();
-
             try
             {
                 SynapseController.Server.Events.Player.InvokeLoadComponentsEvent(__instance.gameObject);
             }
             catch (Exception e)
             {
-                SynapseController.Server.Logger.Error($"Synapse-Event: LoadComponents failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                SynapseController.Server.Logger.Error($"Synapse-Event: LoadComponents failed!!\n{e}");
             }
         }
     }

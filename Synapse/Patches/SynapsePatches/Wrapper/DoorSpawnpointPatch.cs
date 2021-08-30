@@ -5,9 +5,10 @@ using Synapse.Api;
 namespace Synapse.Patches.SynapsePatches
 {
     [HarmonyPatch(typeof(DoorSpawnpoint), nameof(DoorSpawnpoint.Start))]
-    public class DoorSpawnpointPatch
+    internal static class DoorSpawnpointPatch
     {
-        private static bool Prefix(DoorSpawnpoint __instance)
+        [HarmonyPrefix]
+        private static bool Start(DoorSpawnpoint __instance)
         {
             try
             {
