@@ -107,14 +107,14 @@ namespace Synapse.Api
             ServerRoles.RemoteAdminMode = GlobalRemoteAdmin ? ServerRoles.AccessMode.GlobalAccess : ServerRoles.AccessMode.PasswordOverride;
             if (!ServerRoles.AdminChatPerms)
                 ServerRoles.AdminChatPerms = SynapseGroup.HasVanillaPermission(PlayerPermissions.AdminChat);
-            ServerRoles.TargetOpenRemoteAdmin(Connection, false);
+            ServerRoles.TargetOpenRemoteAdmin(false);
         }
 
         public void RaLogout()
         {
             Hub.serverRoles.RemoteAdmin = false;
             Hub.serverRoles.RemoteAdminMode = ServerRoles.AccessMode.LocalAccess;
-            Hub.serverRoles.TargetCloseRemoteAdmin(Connection);
+            Hub.serverRoles.TargetCloseRemoteAdmin();
         }
 
         public void Heal(float hp) => PlayerStats.HealHPAmount(hp);

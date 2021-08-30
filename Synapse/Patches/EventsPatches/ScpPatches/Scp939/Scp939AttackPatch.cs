@@ -6,49 +6,50 @@ using ev = Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp939
 {
-    /*
-    [HarmonyPatch(typeof(Scp939PlayerScript),nameof(PlayableScps.Scp939.ServerAttack))]
+    [HarmonyPatch(typeof(PlayableScps.Scp939),nameof(PlayableScps.Scp939.ServerAttack))]
     internal static class Scp939AttackPatch
     {
         [HarmonyPrefix]
-        private static bool OnBite(PlayableScps.Scp939 __instance, PlayableScps.Messages.Scp939AttackMessage msg)
+        private static bool Scp939Attack(PlayableScps.Scp939 __instance, PlayableScps.Messages.Scp939AttackMessage msg)
         {
             try
             {
-                var scp = __instance.GetPlayer();
+                var scp = Server.Get.GetPlayer(msg.PlayerID);
 
-                if (msg.Victim != null && msg.Victim.TryGetComponent<BreakableWindow>(out var window))
-                {
-                    __instance._currentBiteCooldown = 1f;
-                    scp.Connection.Send(new PlayableScps.Messages.ScpHitmarkerMessage(1.5f));
-                    NetworkServer.SendToAll(new PlayableScps.Messages.Scp939OnHitMessage(scp.PlayerId));
-                    window.Damage(50f, null, new Footprinting.Footprint(scp.Hub), Vector3.zero);
+                if (scp == null || msg.Victim == null || Vector3.Distance(scp.Position, msg.Victim.transform.position) >= 2.87)
                     return false;
+
+                if(msg.Victim.TryGetComponent<BreakableWindow>(out var window))
+                {
+                    window.Damage(50f, null, new Footprinting.Footprint(scp.Hub), Vector3.zero);
                 }
+                else
+                {
+                    var target = msg.Victim.GetPlayer();
 
-                var player = msg.Victim?.GetPlayer();
-                if (player == null) return false;
+                    if (!SynapseExtensions.GetHarmPermission(scp, target)) return false;
 
-                if (!SynapseExtensions.GetHarmPermission(scp, player)) return false;
+                    ev.Get.Scp.InvokeScpAttack(scp, target, Api.Enum.ScpAttackType.Scp939_Bite, out var allow);
 
-                ev.Get.Scp.InvokeScpAttack(scp, player, Api.Enum.ScpAttackType.Scp939_Bite, out var allow);
+                    if (!allow) return false;
 
-                if (!allow) return false;
+                    target.Hurt(50, DamageTypes.Scp939, scp);
+                    scp.ClassManager.RpcPlaceBlood(target.Position, 0, 2f);
 
+                    target.PlayerEffectsController.EnableEffect<CustomPlayerEffects.Amnesia>(3f, true);
+                }
                 __instance._currentBiteCooldown = 1f;
+
                 scp.Connection.Send(new PlayableScps.Messages.ScpHitmarkerMessage(1.5f));
                 NetworkServer.SendToAll(new PlayableScps.Messages.Scp939OnHitMessage(scp.PlayerId));
-                player.Hurt(50, DamageTypes.Scp939, scp);
-                scp.ClassManager.RpcPlaceBlood(player.Position, 0, 2f);
-                player.PlayerEffectsController.EnableEffect<CustomPlayerEffects.Amnesia>(3f, true);
+
                 return false;
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 Synapse.Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp939) failed!!\n{e}");
                 return true;
             }
         }
     }
-    */
 }

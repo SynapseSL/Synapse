@@ -1,5 +1,4 @@
 ﻿using System;
-using CommandSystem.Commands.Shared;
 using HarmonyLib;
 using Synapse.Api.Plugin;
 using Synapse.Command;
