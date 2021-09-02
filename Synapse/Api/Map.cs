@@ -7,6 +7,7 @@ using InventorySystem.Items.Firearms.Attachments;
 using MapGeneration;
 using Mirror;
 using Scp914;
+using Synapse.Api.Enum;
 using Synapse.Api.Items;
 using UnityEngine;
 
@@ -105,47 +106,41 @@ namespace Synapse.Api
             GlitchedCassie(text);
         }
 
-        public void AnnounceScpDeath(string scp, PlayerStats.HitInfo hitInfo)
+        public void AnnounceScpDeath(string scp, ScpReconfType deathType, string Unit = "UNKNOWN")
         {
-
-            Player player = Server.Get.Players.FirstOrDefault(p => p.PlayerId == hitInfo.PlayerId);
-            DamageTypes.DamageType damageType = hitInfo.GetDamageType();
-            if (damageType == DamageTypes.Tesla)
-                NineTailedFoxAnnouncer.singleton.ServerOnlyAddGlitchyPhrase($". SCP {scp} SUCCESSFULLY TERMINATED BY AUTOMATIC SECURITY SYSTEM", 0, 0);
-            else if (damageType == DamageTypes.Nuke)
-                NineTailedFoxAnnouncer.singleton.ServerOnlyAddGlitchyPhrase($". SCP {scp} SUCCESSFULLY TERMINATED BY ALPHA WARHEAD", 0, 0);
-            else if (damageType == DamageTypes.Decont)
-                NineTailedFoxAnnouncer.singleton.ServerOnlyAddGlitchyPhrase($". SCP {scp} LOST IN DECONTAMINATION SEQUENCE", 0, 0);
-            else
+            string cause;
+            switch (deathType)
             {
-                string cause = "TERMINATION CAUSE UNSPECIFIED";
-                if (player != null)
-                {
-
-                    switch (player.TeamID)
-                    {
-                        case (int)Team.MTF:
-                            Respawning.NamingRules.UnitNamingRule rule;
-                            string Unit = Respawning.NamingRules.UnitNamingRules.TryGetNamingRule(Respawning.SpawnableTeamType.NineTailedFox, out rule) ? rule.GetCassieUnitName(player.UnitName) : "UNKNOWN";
-                            cause = "CONTAINEDSUCCESSFULLY CONTAINMENTUNIT " + Unit;
-                            break;
-                        case (int)Team.CHI:
-                            cause = "BY CHAOSINSURGENCY";
-                            break;
-                        case (int)Team.RSC:
-                            cause = "BY FACILITY PERSONNEL";
-                            break;
-                        case (int)Team.CDP:
-                            cause = " BY CLASSD PERSONNEL";
-                            break;
-                        default:
-                            cause = "CONTAINMENTUNIT UNKNOWN";
-                            break;
-                    }
-                }
-                GlitchedCassie($". SCP {scp} SUCCESSFULLY TERMINATED . {cause}");
+                case ScpReconfType.Tesla:
+                    cause = $". SCP {scp} SUCCESSFULLY TERMINATED BY AUTOMATIC SECURITY SYSTEM";
+                    break;
+                case ScpReconfType.Nuke:
+                    cause = $". SCP {scp} SUCCESSFULLY TERMINATED BY ALPHA WARHEAD";
+                    break;
+                case ScpReconfType.Decontamination:
+                    cause = $". SCP {scp} LOST IN DECONTAMINATION SEQUENCE";
+                    break;
+                case ScpReconfType.ByMtf:
+                    cause = $". SCP {scp} SUCCESSFULLY TERMINATED . CONTAINEDSUCCESSFULLY CONTAINMENTUNIT {Unit}";
+                    break;
+                case ScpReconfType.ByChi:
+                    cause = $". SCP {scp} SUCCESSFULLY TERMINATED . BY CHAOSINSURGENCY";
+                    break;
+                case ScpReconfType.ByRsc:
+                    cause = $". SCP {scp} SUCCESSFULLY TERMINATED . BY SCIENCE PERSONNEL";
+                    break;
+                case ScpReconfType.ByCdp:
+                    cause = $". SCP {scp} SUCCESSFULLY TERMINATED . BY CLASSD PERSONNEL";
+                    break;
+                case ScpReconfType.ByUnknown:
+                    cause = $". SCP {scp} SUCCESSFULLY TERMINATED . CONTAINMENTUNIT UNKNOWN";
+                    break;
+                case ScpReconfType.Unspecified:
+                default:
+                    cause = $". SCP {scp} SUCCESSFULLY TERMINATED . TERMINATION CAUSE UNSPECIFIED";
+                    break;
             }
-
+            GlitchedCassie(cause);
         }
 
         public void Cassie(string words, bool makehold = true, bool makenoise = true)

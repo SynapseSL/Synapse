@@ -42,6 +42,7 @@
     <Compile Include="Api\Broadcast.cs" />
     <Compile Include="Api\Enum\MovementDirection.cs" />
     <Compile Include="Api\Enum\ElevatorType.cs" />
+    <Compile Include="Api\Enum\ScpReconfType.cs" />
     <Compile Include="Api\Enum\WeaponType.cs" />
     <Compile Include="Api\Enum\WorkstationState.cs" />
     <Compile Include="Api\Exceptions\SynapseItemAlreadyRegisteredException.cs" />
