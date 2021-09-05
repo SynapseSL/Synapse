@@ -1,15 +1,15 @@
 ﻿namespace Synapse.Api.Enum
 {
-    public enum ScpReconfType
+    public enum ScpRecontainmentType
     {
         Unspecified = 0,
-        ByMtf = 1,
-        ByChi = 2,
-        ByRsc = 3,
-        ByCdp = 4,
+        Mtf = 1,
+        Chi = 2,
+        Rsc = 3,
+        Cdp = 4,
         Tesla = 5,
         Nuke = 6,
         Decontamination = 7,
-        ByUnknown = 8
+        Unknown = 8
     }
 }

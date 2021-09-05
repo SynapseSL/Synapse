@@ -28,7 +28,7 @@ namespace Synapse.Api
 
         public RoleType RoleType
         {
-            get => Server.Get.Host.ClassManager.Classes.FirstOrDefault(role => role.classColor == ragdoll.owner.ClassColor).roleId;
+            get => Server.Get.Host.ClassManager.Classes.FirstOrDefault(role => role.fullName == ragdoll.owner.FullName).roleId;
         }
 
         public Vector3 Position

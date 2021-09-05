@@ -106,42 +106,19 @@ namespace Synapse.Api
             GlitchedCassie(text);
         }
 
-        public void AnnounceScpDeath(string scp, ScpReconfType deathType, string Unit = "UNKNOWN")
+        public void AnnounceScpDeath(string scp, ScpRecontainmentType deathType, string Unit = "UNKNOWN") =>
+        GlitchedCassie(deathType switch
         {
-            string cause;
-            switch (deathType)
-            {
-                case ScpReconfType.Tesla:
-                    cause = $". SCP {scp} SUCCESSFULLY TERMINATED BY AUTOMATIC SECURITY SYSTEM";
-                    break;
-                case ScpReconfType.Nuke:
-                    cause = $". SCP {scp} SUCCESSFULLY TERMINATED BY ALPHA WARHEAD";
-                    break;
-                case ScpReconfType.Decontamination:
-                    cause = $". SCP {scp} LOST IN DECONTAMINATION SEQUENCE";
-                    break;
-                case ScpReconfType.ByMtf:
-                    cause = $". SCP {scp} SUCCESSFULLY TERMINATED . CONTAINEDSUCCESSFULLY CONTAINMENTUNIT {Unit}";
-                    break;
-                case ScpReconfType.ByChi:
-                    cause = $". SCP {scp} SUCCESSFULLY TERMINATED . BY CHAOSINSURGENCY";
-                    break;
-                case ScpReconfType.ByRsc:
-                    cause = $". SCP {scp} SUCCESSFULLY TERMINATED . BY SCIENCE PERSONNEL";
-                    break;
-                case ScpReconfType.ByCdp:
-                    cause = $". SCP {scp} SUCCESSFULLY TERMINATED . BY CLASSD PERSONNEL";
-                    break;
-                case ScpReconfType.ByUnknown:
-                    cause = $". SCP {scp} SUCCESSFULLY TERMINATED . CONTAINMENTUNIT UNKNOWN";
-                    break;
-                case ScpReconfType.Unspecified:
-                default:
-                    cause = $". SCP {scp} SUCCESSFULLY TERMINATED . TERMINATION CAUSE UNSPECIFIED";
-                    break;
-            }
-            GlitchedCassie(cause);
-        }
+            ScpRecontainmentType.Tesla => $". SCP {scp} SUCCESSFULLY TERMINATED BY AUTOMATIC SECURITY SYSTEM",
+            ScpRecontainmentType.Nuke => $". SCP {scp} SUCCESSFULLY TERMINATED BY ALPHA WARHEAD",
+            ScpRecontainmentType.Decontamination => $". SCP {scp} LOST IN DECONTAMINATION SEQUENCE",
+            ScpRecontainmentType.Mtf => $". SCP {scp} SUCCESSFULLY TERMINATED . CONTAINEDSUCCESSFULLY CONTAINMENTUNIT {Unit}",
+            ScpRecontainmentType.Chi => $". SCP {scp} SUCCESSFULLY TERMINATED . BY CHAOSINSURGENCY",
+            ScpRecontainmentType.Rsc => $". SCP {scp} SUCCESSFULLY TERMINATED . BY SCIENCE PERSONNEL",
+            ScpRecontainmentType.Cdp => $". SCP {scp} SUCCESSFULLY TERMINATED . BY CLASSD PERSONNEL",
+            ScpRecontainmentType.Unknown => $". SCP {scp} SUCCESSFULLY TERMINATED . CONTAINMENTUNIT UNKNOWN",
+            _ => $". SCP {scp} SUCCESSFULLY TERMINATED . TERMINATION CAUSE UNSPECIFIED",
+        });
 
         public void Cassie(string words, bool makehold = true, bool makenoise = true)
             => Respawning.RespawnEffectsController.PlayCassieAnnouncement(words, makehold, makenoise);

@@ -97,19 +97,19 @@ public static class SynapseExtensions
         return item;
     }
 
-    public static ScpReconfType GetScpReconfType(this PlayerStats.HitInfo info)
+    public static ScpRecontainmentType GetScpRecontainmentType(this PlayerStats.HitInfo info)
     {
-        if (info.Tool == DamageTypes.Tesla) return ScpReconfType.Tesla;
-        else if (info.Tool == DamageTypes.Nuke) return ScpReconfType.Nuke;
-        else if (info.Tool == DamageTypes.Decont) return ScpReconfType.Decontamination;
+        if (info.Tool == DamageTypes.Tesla) return ScpRecontainmentType.Tesla;
+        else if (info.Tool == DamageTypes.Nuke) return ScpRecontainmentType.Nuke;
+        else if (info.Tool == DamageTypes.Decont) return ScpRecontainmentType.Decontamination;
         else if (info.IsPlayer)
         {
             var team = info.RHub.GetPlayer().Team;
             if ((int)team < 5 && (int)team > 0) 
-                 return (ScpReconfType)team;
-            else return ScpReconfType.ByUnknown;
+                 return (ScpRecontainmentType)team;
+            else return ScpRecontainmentType.Unknown;
         }
-        else return ScpReconfType.Unspecified;
+        else return ScpRecontainmentType.Unspecified;
     }
 
     public static bool CanHarmScp(Player player,bool message = true)
