@@ -50,7 +50,11 @@ namespace Synapse.Api
         public Vector2 Rotation
         {
             get => Player.Rotation;
-            set => Player.Rotation = value;
+            set
+            {
+                Player.Rotation = value;
+                Player.CameraReference.rotation = Quaternion.Euler(new Vector3(value.x, value.y, 90f));
+            }
         }
 
         /// <summary>
@@ -130,11 +134,11 @@ namespace Synapse.Api
                         break;
 
                     case PlayerMovementState.Sprinting:
-                        speed = RunSpeed;
+                        speed = RunSpeed * Map.Get.SprintSpeed;
                         break;
 
                     case PlayerMovementState.Walking:
-                        speed = WalkSpeed;
+                        speed = WalkSpeed * Map.Get.WalkSpeed;
                         break;
                 }
 
