@@ -571,7 +571,7 @@ namespace Synapse.Api
         public RoleType RoleType
         {
             get => ClassManager.CurClass;
-            set => ClassManager.SetPlayersClass(value, gameObject,CharacterClassManager.SpawnReason.None);
+            set => ClassManager.SetPlayersClass(value, gameObject, CharacterClassManager.SpawnReason.None);
         }
 
         public Room Room
