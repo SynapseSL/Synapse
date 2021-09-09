@@ -200,7 +200,7 @@ namespace Synapse.Api
         {
             GameObject obj =
                 Object.Instantiate(
-                    NetworkManager.singleton.spawnPrefabs.FirstOrDefault(p => p.gameObject.name == "Player"));
+                    NetworkManager.singleton.playerPrefab);
 
             GameObject = obj;
             Player = GameObject.GetPlayer();

@@ -647,7 +647,13 @@ namespace Synapse.Api
 
             public ushort this[AmmoType ammo]
             {
-                get => player.VanillaInventory.UserInventory.ReserveAmmo[(ItemType)ammo];
+                get
+                {
+                    if (player.VanillaInventory.UserInventory.ReserveAmmo.TryGetValue((ItemType)ammo, out var amount))
+                        return amount;
+
+                    return 0;
+                }
                 set => player.VanillaInventory.UserInventory.ReserveAmmo[(ItemType)ammo] = value;
             }
         }
