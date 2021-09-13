@@ -61,15 +61,13 @@ namespace SynapseInjector
                 {
                     bool isInter = type.IsInterface;
                     bool isAbstr = type.IsAbstract;
+
                     type.Attributes = type.IsNested ? TypeAttributes.NestedPublic : TypeAttributes.Public;
+
                     if (isInter)
-                    {
                         type.IsInterface = true;
-                    }
                     if (isAbstr)
-                    {
                         type.IsAbstract = true;
-                    }
                 }
                 if (type.CustomAttributes.Find("System.Runtime.CompilerServices.CompilerGeneratedAttribute") != null) continue;
                 nested.AddRange(type.NestedTypes.ToList());

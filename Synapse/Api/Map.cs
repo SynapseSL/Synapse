@@ -100,11 +100,7 @@ namespace Synapse.Api
                 ply.SendBroadcast(time, message, instant);
         }
 
-        public void AnnounceScpDeath(string scp)
-        {
-            var text = $"SCP {scp} SUCCESSFULLY TERMINATED . TERMINATION CAUSE UNSPECIFIED";
-            GlitchedCassie(text);
-        }
+        public void AnnounceScpDeath(string scp) => AnnounceScpDeath(scp, ScpRecontainmentType.Unknown);
 
         public void AnnounceScpDeath(string scp, ScpRecontainmentType deathType, string Unit = "UNKNOWN") =>
         GlitchedCassie(deathType switch
@@ -113,9 +109,9 @@ namespace Synapse.Api
             ScpRecontainmentType.Nuke => $". SCP {scp} SUCCESSFULLY TERMINATED BY ALPHA WARHEAD",
             ScpRecontainmentType.Decontamination => $". SCP {scp} LOST IN DECONTAMINATION SEQUENCE",
             ScpRecontainmentType.Mtf => $". SCP {scp} SUCCESSFULLY TERMINATED . CONTAINEDSUCCESSFULLY CONTAINMENTUNIT {Unit}",
-            ScpRecontainmentType.Chi => $". SCP {scp} SUCCESSFULLY TERMINATED . BY CHAOSINSURGENCY",
-            ScpRecontainmentType.Rsc => $". SCP {scp} SUCCESSFULLY TERMINATED . BY SCIENCE PERSONNEL",
-            ScpRecontainmentType.Cdp => $". SCP {scp} SUCCESSFULLY TERMINATED . BY CLASSD PERSONNEL",
+            ScpRecontainmentType.Chaos => $". SCP {scp} SUCCESSFULLY TERMINATED . BY CHAOSINSURGENCY",
+            ScpRecontainmentType.Scientist => $". SCP {scp} SUCCESSFULLY TERMINATED . BY SCIENCE PERSONNEL",
+            ScpRecontainmentType.ClassD => $". SCP {scp} SUCCESSFULLY TERMINATED . BY CLASSD PERSONNEL",
             ScpRecontainmentType.Unknown => $". SCP {scp} SUCCESSFULLY TERMINATED . CONTAINMENTUNIT UNKNOWN",
             _ => $". SCP {scp} SUCCESSFULLY TERMINATED . TERMINATION CAUSE UNSPECIFIED",
         });

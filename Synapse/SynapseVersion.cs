@@ -11,7 +11,7 @@ public static class SynapseVersion
 
     public const VersionType Type = VersionType.Pre;
 
-    public const string SubVersion = "1.4";
+    public const string SubVersion = "1.5";
 
     public const string BasedGameVersion = "11.0.0-parabellum-public-2.5-9dee09b1";
 

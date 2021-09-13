@@ -4,9 +4,9 @@
     {
         Unspecified = 0,
         Mtf = 1,
-        Chi = 2,
-        Rsc = 3,
-        Cdp = 4,
+        Chaos = 2,
+        Scientist = 3,
+        ClassD = 4,
         Tesla = 5,
         Nuke = 6,
         Decontamination = 7,
