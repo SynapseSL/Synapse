@@ -159,7 +159,7 @@ namespace Synapse.Permission
                 Inheritance = null,
             };
         }
-
+        
         public SynapseGroup GetNorthwoodGroup() => groups.Values.FirstOrDefault(x => x.Northwood);
 
         public bool AddPlayerToGroup(string groupname, string userid)
