@@ -211,5 +211,136 @@ namespace Synapse.Permission
 
             return true;
         }
+        
+        public bool AddPermissions(string groupName, string permission)
+        {
+            SynapseGroup group = GetServerGroup(groupName);
+
+            if (group == null)
+            {
+                Logger.Get.Warn($"Group {groupName} does not exist!");
+                return false;
+            }
+
+            if (group.Permissions == null) group.Permissions = new List<string>();
+
+            if (!group.Permissions.Contains(permission)) group.Permissions.Add(permission);
+
+            _permissionSYML.Sections.FirstOrDefault(x => x.Key.ToLower() == groupName.ToLower()).Value.Import(group);
+            _permissionSYML.Store();
+
+            Reload();
+
+            return true;
+        }
+        public bool AddPermissions(string groupName, List<string> addPerms)
+        {
+            SynapseGroup group = GetServerGroup(groupName);
+
+            if (group == null)
+            {
+                Logger.Get.Warn($"Group {groupName} does not exist!");
+                return false;
+            }
+
+            if (group.Permissions == null) group.Permissions = new List<string>();
+
+            foreach (var permission in addPerms)
+            {
+                if (!group.Permissions.Contains(permission)) group.Permissions.Add(permission);
+            }
+
+            _permissionSYML.Sections.FirstOrDefault(x => x.Key.ToLower() == groupName.ToLower()).Value.Import(group);
+            _permissionSYML.Store();
+
+            Reload();
+
+            return true;
+        }
+
+        public bool RemovePermissions(string groupName, string permission)
+        {
+            SynapseGroup group = GetServerGroup(groupName);
+
+            if (group == null)
+            {
+                Logger.Get.Warn($"Group {groupName} does not exist!");
+                return false;
+            }
+
+            if (group.Permissions == null || !group.Permissions.Contains(permission)) return true;
+            group.Permissions.Remove(permission);
+
+            _permissionSYML.Sections.FirstOrDefault(x => x.Key.ToLower() == groupName.ToLower()).Value.Import(group);
+            _permissionSYML.Store();
+
+            Reload();
+
+            return true;
+        }
+        public bool RemovePermissions(string groupName, List<string> remPerms)
+        {
+            SynapseGroup group = GetServerGroup(groupName);
+
+            if (group == null)
+            {
+                Logger.Get.Warn($"Group {groupName} does not exist!");
+                return false;
+            }
+
+            if (group.Permissions == null) return true;
+
+            foreach (var permission in remPerms)
+            {
+                group.Permissions.Remove(permission);
+            }
+
+            _permissionSYML.Sections.FirstOrDefault(x => x.Key.ToLower() == groupName.ToLower()).Value.Import(group);
+            _permissionSYML.Store();
+
+            Reload();
+
+            return true;
+        }
+
+        public bool SetKickPower(string groupName, int kickPower)
+        {
+            SynapseGroup group = GetServerGroup(groupName);
+
+            if (group == null)
+            {
+                Logger.Get.Warn($"Group {groupName} does not exist!");
+                return false;
+            }
+
+            group.KickPower = Convert.ToByte(kickPower);
+
+            _permissionSYML.Sections.FirstOrDefault(x => x.Key.ToLower() == groupName.ToLower()).Value.Import(group);
+            _permissionSYML.Store();
+
+            Reload();
+
+            return true;
+        }
+
+        public bool SetRequiredKickPower(string groupName, int requiredKickPower)
+        {
+            SynapseGroup group = GetServerGroup(groupName);
+
+            if (group == null)
+            {
+                Logger.Get.Warn($"Group {groupName} does not exist!");
+                return false;
+            }
+
+            group.RequiredKickPower = Convert.ToByte(requiredKickPower);
+
+            _permissionSYML.Sections.FirstOrDefault(x => x.Key.ToLower() == groupName.ToLower()).Value.Import(group);
+            _permissionSYML.Store();
+
+            Reload();
+
+            return true;
+        }
     }
 }
