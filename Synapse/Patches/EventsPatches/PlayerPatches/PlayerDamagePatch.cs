@@ -12,12 +12,13 @@ using UnityEngine;
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
     [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.HurtPlayer))]
-    internal static class PlayerDamagePatch
+    internal static class PlayerDamagePatch2
     {
         [HarmonyPrefix]
         private static bool HurtPlayer(PlayerStats __instance, out bool __result, PlayerStats.HitInfo info, GameObject go, bool noTeamDamage = false, bool IsValidDamage = true)
         {
             Synapse.Api.Logger.Get.Debug("Hurt");
+
             try
             {
                 __result = false;
@@ -35,9 +36,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 DamageTypes.DamageType damageType = default;
 
                 if (!TryPlayerDamageEvent(killer, victim, out (float artificialHealth, float health, bool friendlyFire, DamageTypes.DamageType damageType) temp))
-                {
                     return false;
-                }
+
                 (artificialHealth, health, friendlyFire, damageType) = (temp.artificialHealth, temp.health, temp.friendlyFire, temp.damageType);
 
                 HandleDamage(artificialHealth, victim);
@@ -74,10 +74,16 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     damagable2.OnDamage(info);
 
                 Synapse.Api.Logger.Get.Debug("15");
-                Synapse.Api.Logger.Get.Debug(killer.ServerRoles is null);
-                Synapse.Api.Logger.Get.Debug(killer.ServerRoles.Permissions);
-                Synapse.Api.Logger.Get.Debug(String.Join(", ", Enum.GetValues(typeof(PlayerPermissions)).Cast<PlayerPermissions>().Select(_ => _.ToString())));
-
+                Synapse.Api.Logger.Get.Debug(victim.Hub is null);
+                Synapse.Api.Logger.Get.Debug(victim.PlayerStats is null);
+                Synapse.Api.Logger.Get.Debug(killer.Hub is null);
+                Synapse.Api.Logger.Get.Debug(killer.PlayerStats is null);
+                //Synapse.Api.Logger.Get.Debug(friendlyFire);
+                //Synapse.Api.Logger.Get.Debug(killer.ServerRoles is null);
+                //Synapse.Api.Logger.Get.Debug(killer.ServerRoles.Permissions);
+                //Synapse.Api.Logger.Get.Debug(String.Join(", ", Enum.GetValues(typeof(PlayerPermissions)).Cast<PlayerPermissions>().Select(_ => _.ToString())));
+                
+                /*
                 if (!friendlyFire || FriendlyFireConfig.PauseDetector || PermissionsHandler.IsPermitted(killer.ServerRoles.Permissions, PlayerPermissions.FriendlyFireDetectorImmunity))
                     return false;
 
@@ -119,7 +125,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     return false;
                 }
                 info.RHub.FriendlyFireHandler.Round.RegisterDamage(info.Amount);
-
+                */
                 return false;
             }
             catch (Exception e)
@@ -167,7 +173,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 AnnounceScpDeath(victim, damageType);
 
-                victim.PlayerStats.SetHPAmount(100);
+                //victim.PlayerStats.SetHPAmount(100);
                 victim.ClassManager.SetClassID(RoleType.Spectator, CharacterClassManager.SpawnReason.Died);
 
                 victim.CustomRole = null;
