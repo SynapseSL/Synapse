@@ -45,7 +45,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         [HarmonyPrefix]
         private static bool FirearmPlaySound(this Firearm firearm, byte clipId)
         {
-            FirearmAudioClip firearmAudioClip = firearm.AudioClips[(int)clipId];
+            FirearmAudioClip firearmAudioClip = firearm.AudioClips[clipId];
             ReferenceHub owner = firearm.Owner;
 
             float num = firearmAudioClip.HasFlag(FirearmAudioFlags.ScaleDistance) ? (firearmAudioClip.MaxDistance * firearm.AttachmentsValue(AttachmentParam.GunshotLoudnessMultiplier)) : firearmAudioClip.MaxDistance;
