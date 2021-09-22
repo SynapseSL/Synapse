@@ -17,6 +17,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 		[HarmonyPrefix]
 		private static bool HurtPlayer(PlayerStats __instance, out bool __result, PlayerStats.HitInfo info, GameObject go, bool noTeamDamage = false, bool IsValidDamage = true)
 		{
+			Synapse.Api.Logger.Get.Debug("Hurt");
 			try
 			{
 				__result = false;
@@ -24,6 +25,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 				var killer = __instance.GetPlayer();
 				if (victim == null) return false;
 
+				Synapse.Api.Logger.Get.Debug("1");
 				if (info.Tool == DamageTypes.Grenade)
 					killer = SynapseController.Server.GetPlayer(info.PlayerId);
 				else if (info.Tool == DamageTypes.Pocket)
@@ -32,7 +34,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
 					if (!SynapseExtensions.CanHarmScp(victim, false))
 						return false;
-                }
+				}
+				Synapse.Api.Logger.Get.Debug("2");
 
 				if (killer == null  || killer.Hub.isDedicatedServer) killer = victim;
 
@@ -40,6 +43,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 				bool flag2 = false;
 				var damageType = info.Tool;
 
+				Synapse.Api.Logger.Get.Debug("3");
 				if (victim.RoleType == RoleType.Spectator) return false;
 
 				if (info.Amount < 0f)
@@ -48,6 +52,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 				var effect = victim.PlayerEffectsController.GetEffect<CustomPlayerEffects.Burned>();
 				if (effect != null && effect.IsEnabled)
 					info.Amount += effect.damageMultiplier;
+				Synapse.Api.Logger.Get.Debug("4");
 
 				if (info.Amount > 2.14748365E+09f)
 					info.Amount = 2.14748365E+09f;
@@ -59,6 +64,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
 				if (victim.ClassManager.SpawnProtected && !killer.PlayerStats._allowSPDmg)
 					return false;
+				Synapse.Api.Logger.Get.Debug("5");
 
 				var friendlyFire = !noTeamDamage && info.IsPlayer && victim != killer && victim.Faction == killer.Faction;
 				if (friendlyFire)
@@ -66,6 +72,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
 				float health = victim.Health;
 				var num = victim.ArtificialHealth;
+				Synapse.Api.Logger.Get.Debug("6");
 
 				try
 				{
