@@ -11,6 +11,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
         {
             try
             {
+                SynapseController.Server.Map.Elevators.RemoveAll(_ => _.GameObject == null);
                 SynapseController.Server.Events.Round.InvokeRoundStartEvent();
             }
             catch (Exception e)
