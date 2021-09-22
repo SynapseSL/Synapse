@@ -571,7 +571,7 @@ namespace Synapse.Api
         public RoleType RoleType
         {
             get => ClassManager.CurClass;
-            set => ClassManager.SetPlayersClass(value, gameObject,CharacterClassManager.SpawnReason.None);
+            set => ClassManager.SetPlayersClass(value, gameObject, CharacterClassManager.SpawnReason.None);
         }
 
         public Room Room
@@ -647,7 +647,13 @@ namespace Synapse.Api
 
             public ushort this[AmmoType ammo]
             {
-                get => player.VanillaInventory.UserInventory.ReserveAmmo[(ItemType)ammo];
+                get
+                {
+                    if (player.VanillaInventory.UserInventory.ReserveAmmo.TryGetValue((ItemType)ammo, out var amount))
+                        return amount;
+
+                    return 0;
+                }
                 set => player.VanillaInventory.UserInventory.ReserveAmmo[(ItemType)ammo] = value;
             }
         }

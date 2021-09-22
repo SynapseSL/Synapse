@@ -57,7 +57,18 @@ namespace SynapseInjector
             var nested = new List<TypeDef>();
             foreach (var type in types)
             {
-                type.Attributes = type.IsNested ? TypeAttributes.NestedPublic : TypeAttributes.Public;
+                if (!type.IsPublic)
+                {
+                    bool isInter = type.IsInterface;
+                    bool isAbstr = type.IsAbstract;
+
+                    type.Attributes = type.IsNested ? TypeAttributes.NestedPublic : TypeAttributes.Public;
+
+                    if (isInter)
+                        type.IsInterface = true;
+                    if (isAbstr)
+                        type.IsAbstract = true;
+                }
                 if (type.CustomAttributes.Find("System.Runtime.CompilerServices.CompilerGeneratedAttribute") != null) continue;
                 nested.AddRange(type.NestedTypes.ToList());
             }

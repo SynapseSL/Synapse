@@ -21,6 +21,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var item = itembase.GetSynapseItem();
 
                 var target = Server.Get.Players.FirstOrDefault(x => x.NetworkIdentity.netId == msg.TargetNetId);
+                if (target == null)
+                    target = Server.Get.Map.Dummies.FirstOrDefault(x => x.Player.NetworkIdentity.netId == msg.TargetNetId).Player;
 
                 Server.Get.Events.Player.InvokePlayerShootEvent(player, target, msg.TargetPosition, item, out var allow);
                 Server.Get.Events.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allow);

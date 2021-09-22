@@ -16,9 +16,6 @@ namespace Synapse.Patches.SynapsePatches
         {
             try
             {
-                if (!NetworkServer.active)
-                    return false;
-
                 __instance._frame++;
 
                 if (__instance._frame != __instance._syncFrequency)
@@ -48,7 +45,12 @@ namespace Synapse.Patches.SynapsePatches
                     {
                         var showinvoid = false;
                         var playerToShow = players[k];
+                        if (playerToShow == player) continue;
+
                         var vector = __instance._transmitBuffer[k].position - player.Position;
+
+                        if (player.RoleType == RoleType.Spectator)
+                            continue;
 
                         if (player.RoleType == RoleType.Scp173)
                         {
@@ -78,9 +80,6 @@ namespace Synapse.Patches.SynapsePatches
                             showinvoid = true;
                             goto AA_001;
                         }
-
-                        if (player.RoleType == RoleType.Spectator)
-                            continue;
 
                         if (Math.Abs(vector.y) > 35f)
                         {

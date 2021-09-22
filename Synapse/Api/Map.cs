@@ -7,6 +7,7 @@ using InventorySystem.Items.Firearms.Attachments;
 using MapGeneration;
 using Mirror;
 using Scp914;
+using Synapse.Api.Enum;
 using Synapse.Api.Items;
 using UnityEngine;
 
@@ -99,11 +100,21 @@ namespace Synapse.Api
                 ply.SendBroadcast(time, message, instant);
         }
 
-        public void AnnounceScpDeath(string scp)
+        public void AnnounceScpDeath(string scp) => AnnounceScpDeath(scp, ScpRecontainmentType.Unknown);
+
+        public void AnnounceScpDeath(string scp, ScpRecontainmentType deathType, string Unit = "UNKNOWN") =>
+        GlitchedCassie(deathType switch
         {
-            var text = $"SCP {scp} SUCCESSFULLY TERMINATED . TERMINATION CAUSE UNSPECIFIED";
-            GlitchedCassie(text);
-        }
+            ScpRecontainmentType.Tesla => $". SCP {scp} SUCCESSFULLY TERMINATED BY AUTOMATIC SECURITY SYSTEM",
+            ScpRecontainmentType.Nuke => $". SCP {scp} SUCCESSFULLY TERMINATED BY ALPHA WARHEAD",
+            ScpRecontainmentType.Decontamination => $". SCP {scp} LOST IN DECONTAMINATION SEQUENCE",
+            ScpRecontainmentType.Mtf => $". SCP {scp} SUCCESSFULLY TERMINATED . CONTAINEDSUCCESSFULLY CONTAINMENTUNIT {Unit}",
+            ScpRecontainmentType.Chaos => $". SCP {scp} SUCCESSFULLY TERMINATED . BY CHAOSINSURGENCY",
+            ScpRecontainmentType.Scientist => $". SCP {scp} SUCCESSFULLY TERMINATED . BY SCIENCE PERSONNEL",
+            ScpRecontainmentType.ClassD => $". SCP {scp} SUCCESSFULLY TERMINATED . BY CLASSD PERSONNEL",
+            ScpRecontainmentType.Unknown => $". SCP {scp} SUCCESSFULLY TERMINATED . CONTAINMENTUNIT UNKNOWN",
+            _ => $". SCP {scp} SUCCESSFULLY TERMINATED . TERMINATION CAUSE UNSPECIFIED",
+        });
 
         public void Cassie(string words, bool makehold = true, bool makenoise = true)
             => Respawning.RespawnEffectsController.PlayCassieAnnouncement(words, makehold, makenoise);
