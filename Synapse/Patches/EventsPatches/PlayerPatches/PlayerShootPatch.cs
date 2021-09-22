@@ -30,7 +30,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             {
                 referenceHub2.networkIdentity.connectionToClient.Send(new GunHitMessage
                 {
-                    Weapon = global::ItemType.None,
+                    Weapon = ItemType.None,
                     Damage = (byte)Mathf.Round(damage * 2.5f),
                     DamagePosition = origin
                 }, 0);
@@ -46,15 +46,14 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         private static bool FirearmPlaySound(this Firearm firearm, byte clipId)
         {
             FirearmAudioClip firearmAudioClip = firearm.AudioClips[(int)clipId];
-            global::ReferenceHub owner = firearm.Owner;
-            Synapse.Api.Logger.Get.Debug($"1");
+            ReferenceHub owner = firearm.Owner;
+
             float num = firearmAudioClip.HasFlag(FirearmAudioFlags.ScaleDistance) ? (firearmAudioClip.MaxDistance * firearm.AttachmentsValue(AttachmentParam.GunshotLoudnessMultiplier)) : firearmAudioClip.MaxDistance;
             if (firearmAudioClip.HasFlag(FirearmAudioFlags.IsGunshot) && owner.transform.position.y > 900f)
             {
                 num *= 2.3f;
             }
-            Synapse.Api.Logger.Get.Debug($"2");
-            Synapse.Api.Logger.Get.Debug(firearm is null);
+
             float soundReach = num * num;
             foreach (ReferenceHub referenceHub in ReferenceHub.GetAllHubs().Values)
             {
@@ -72,13 +71,13 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     }
                 }
             }
-            Synapse.Api.Logger.Get.Debug($"3");
+
             Action<Firearm, byte, float> serverSoundPlayed = FirearmExtensions.ServerSoundPlayed;
             if (serverSoundPlayed == null)
             {
                 return false;
             }
-            Synapse.Api.Logger.Get.Debug($"4");
+
             serverSoundPlayed.Invoke(firearm, clipId, num);
             return false;
         }
@@ -90,8 +89,6 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         [HarmonyPrefix]
         private static bool ServerProcessShotPatch(NetworkConnection conn, ShotMessage msg)
         {
-            Synapse.Api.Logger.Get.Debug("Shot");
-
             try
             {
                 var player = conn.GetPlayer();

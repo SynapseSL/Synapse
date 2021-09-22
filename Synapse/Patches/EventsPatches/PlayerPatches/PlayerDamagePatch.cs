@@ -17,8 +17,6 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         [HarmonyPrefix]
         private static bool HurtPlayer(PlayerStats __instance, out bool __result, PlayerStats.HitInfo info, GameObject go, bool noTeamDamage = false, bool IsValidDamage = true)
         {
-            Synapse.Api.Logger.Get.Debug("Hurt");
-
             try
             {
                 __result = false;
@@ -42,8 +40,6 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 HandleDamage(artificialHealth, victim);
 
-                Synapse.Api.Logger.Get.Debug("8");
-
                 PlayableScpsController component = go.GetComponent<PlayableScpsController>();
                 if (component != null && component.CurrentScp is PlayableScps.Interfaces.IDamagable damagable)
                     damagable.OnDamage(info);
@@ -51,8 +47,6 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 AddRespawnTickets(victim, health);
 
                 ApplyRpcEffects(damageType);
-
-                Synapse.Api.Logger.Get.Debug("9");
 
                 if (victim.Health < 1f)
                 {
@@ -68,26 +62,12 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 }
 
                 __result = died;
-                Synapse.Api.Logger.Get.Debug("14");
-
+                
                 if (component != null && component.CurrentScp is PlayableScps.Interfaces.IDamagable damagable2)
                     damagable2.OnDamage(info);
 
-                Synapse.Api.Logger.Get.Debug("15");
-                Synapse.Api.Logger.Get.Debug(victim.Hub is null);
-                Synapse.Api.Logger.Get.Debug(victim.PlayerStats is null);
-                Synapse.Api.Logger.Get.Debug(killer.Hub is null);
-                Synapse.Api.Logger.Get.Debug(killer.PlayerStats is null);
-                //Synapse.Api.Logger.Get.Debug(friendlyFire);
-                //Synapse.Api.Logger.Get.Debug(killer.ServerRoles is null);
-                //Synapse.Api.Logger.Get.Debug(killer.ServerRoles.Permissions);
-                //Synapse.Api.Logger.Get.Debug(String.Join(", ", Enum.GetValues(typeof(PlayerPermissions)).Cast<PlayerPermissions>().Select(_ => _.ToString())));
-                
-                /*
                 if (!friendlyFire || FriendlyFireConfig.PauseDetector || PermissionsHandler.IsPermitted(killer.ServerRoles.Permissions, PlayerPermissions.FriendlyFireDetectorImmunity))
                     return false;
-
-                Synapse.Api.Logger.Get.Debug("16");
 
                 //This just blocks any TeamKillReport that is connected with CustomRoles
                 if (victim.CustomRole != null || killer.CustomRole != null)
@@ -125,7 +105,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     return false;
                 }
                 info.RHub.FriendlyFireHandler.Round.RegisterDamage(info.Amount);
-                */
+                
                 return false;
             }
             catch (Exception e)
@@ -153,8 +133,6 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDeath Event failed!!\n{e}");
                 }
 
-                Synapse.Api.Logger.Get.Debug("12");
-
                 if (!__instance._pocketCleanup || info.Tool != DamageTypes.Pocket)
                 {
                     victim.Inventory.DropAll();
@@ -173,7 +151,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 AnnounceScpDeath(victim, damageType);
 
-                //victim.PlayerStats.SetHPAmount(100);
+                victim.PlayerStats.SetHPAmount(100);
                 victim.ClassManager.SetClassID(RoleType.Spectator, CharacterClassManager.SpawnReason.Died);
 
                 victim.CustomRole = null;
@@ -216,7 +194,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 if (RoundSummary.RoundInProgress() && RoundSummary.roundTime < 60 && IsValidDamage)
                     __instance.TargetAchieve(victim.Connection, "wowreally");
 
-                if (__instance.isLocalPlayer && info.PlayerId != victim.PlayerId) //TODO: victim.Hub.playerId
+                if (__instance.isLocalPlayer && info.PlayerId != victim.PlayerId)
                     RoundSummary.Kills++;
 
                 died = true;
@@ -275,14 +253,14 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     if (victim.Team == Team.CDP || victim.Team == Team.CHI)
                         RespawnTickets.Singleton.GrantTickets(SpawnableTeamType.ChaosInsurgency, __instance._respawn_tickets_ci_scientist_died_count, false);
                 }
-                Synapse.Api.Logger.Get.Debug("10");
+                
 
                 if (victim.RealTeam == Team.RSC && victim.RealTeam == Team.SCP)
                     __instance.TargetAchieve(__instance.connectionToClient, "timetodoitmyself");
 
                 ConsoleLogging(victim, killer, friendlyFire);
 
-                Synapse.Api.Logger.Get.Debug("11");
+                
 
                 if (info.Tool.Scp != RoleType.None || info.Tool == DamageTypes.Pocket)
                     RoundSummary.kills_by_scp++;
@@ -395,7 +373,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 paramInfo.Health = 0;
                 paramInfo.DamageType = null;
                 paramInfo.FriendlyFire = false;
-                Synapse.Api.Logger.Get.Debug("1");
+                
                 if (info.Tool == DamageTypes.Grenade)
                 {
                     killer = SynapseController.Server.GetPlayer(info.PlayerId);
@@ -407,14 +385,14 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     if (!SynapseExtensions.CanHarmScp(victim, false))
                         return false;
                 }
-                Synapse.Api.Logger.Get.Debug("2");
+                
 
                 if (killer == null || killer.Hub.isDedicatedServer)
                     killer = victim;
 
                 paramInfo.DamageType = info.Tool;
 
-                Synapse.Api.Logger.Get.Debug("3");
+                
                 if (victim.RoleType == RoleType.Spectator)
                     return false;
 
@@ -424,7 +402,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var effect = victim.PlayerEffectsController.GetEffect<CustomPlayerEffects.Burned>();
                 if (effect != null && effect.IsEnabled)
                     info.Amount += effect.damageMultiplier;
-                Synapse.Api.Logger.Get.Debug("4");
+                
 
                 if (info.Amount > 2.14748365E+09f)
                     info.Amount = 2.14748365E+09f;
@@ -436,16 +414,14 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 if (victim.ClassManager.SpawnProtected && !killer.PlayerStats._allowSPDmg)
                     return false;
-                Synapse.Api.Logger.Get.Debug("5");
-
+                
                 paramInfo.FriendlyFire = !noTeamDamage && info.IsPlayer && victim != killer && victim.Faction == killer.Faction;
                 if (paramInfo.FriendlyFire)
                     info.Amount += PlayerStats.FriendlyFireFactor;
 
                 paramInfo.Health = victim.Health;
                 paramInfo.ArtificialHealth = victim.ArtificialHealth;
-                Synapse.Api.Logger.Get.Debug("6");
-
+                
                 try
                 {
                     Server.Get.Events.Player.InvokePlayerDamageEvent(victim, killer, ref info, out var allow);
@@ -455,7 +431,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 {
                     SynapseController.Server.Logger.Error($"Synapse-Event: PlayerDamage Event failed!!\n{e}");
                 }
-                Synapse.Api.Logger.Get.Debug("7");
+                
                 return true;
             }
         }
