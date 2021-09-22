@@ -10,60 +10,6 @@ using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 {
-    [HarmonyPatch(typeof(Lift), nameof(Lift._LiftAnimation))]
-    internal static class Bar
-    {
-        [HarmonyPrefix]
-        private static bool Foo(Lift __instance)
-        {
-            Timing.RunCoroutine(Baz(__instance));
-            return false;
-        }
-        private static IEnumerator<float> Baz(Lift __instance)
-        {
-            Synapse.Api.Logger.Get.Debug("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-            Transform target = null;
-            foreach (global::Lift.Elevator elevator in __instance.elevators)
-            {
-                if (!elevator.door.GetBool(global::Lift.IsOpen))
-                {
-                    target = elevator.target;
-                }
-            }
-            global::Lift.Status previousStatus = __instance.status;
-            __instance.SetStatus(2);
-            int j;
-            int i;
-            for (i = 0; i < 35; i = j + 1)
-            {
-                yield return 0f;
-                j = i;
-            }
-            __instance.RpcPlayMusic();
-            for (i = 0; i < 100; i = j + 1)
-            {
-                yield return 0f;
-                j = i;
-            }
-            __instance.MovePlayers(target);
-            i = 0;
-            while ((float)i < (__instance.movingSpeed - 2f) * 50f)
-            {
-                yield return 0f;
-                j = i;
-                i = j + 1;
-            }
-            __instance.SetStatus((byte)((previousStatus == global::Lift.Status.Down) ? 0 : 1));
-            for (i = 0; i < 100; i = j + 1)
-            {
-                yield return 0f;
-                j = i;
-            }
-            __instance.operative = true;
-            yield break;
-        }
-    }
-
     [HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.UserCode_CmdInteract))]
     internal static class Scp079BulkPatch
     {
@@ -402,12 +348,11 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                         {
                             float manaFromLabel = __instance.GetManaFromLabel("Elevator Use", __instance.abilities);
                             string elevatorName = string.Empty;
-                            if (array.Length > 1)
+                            if (array.Length > 0)
                             {
-                                elevatorName = array[1];
+                                elevatorName = array[0];
                             }
-                            ////Synapse.Api.Logger.Get.Debug(string.Join(", ", array)); //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-                            ////Synapse.Api.Logger.Get.Debug(string.Join(", ", Synapse.Server.Get.Map.Elevators.Select(_ => _.Name))); //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                           
                             Elevator synElevator = Map.Get.Elevators.Find(_ => _.Name == elevatorName);
                             Scp079EventMisc.InteractionResult intendedResult;
                             if (manaFromLabel <= __instance.Mana)
@@ -422,7 +367,6 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                             {
                                 intendedResult = Scp079EventMisc.InteractionResult.Allow;
                             }
-                            //Synapse.Api.Logger.Get.Debug("1"); //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
                             intendedResult = manaFromLabel <= __instance.Mana ? Scp079EventMisc.InteractionResult.Allow : Scp079EventMisc.InteractionResult.NoEnergy;
 
@@ -434,24 +378,19 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                 out var actualResult
                                 );
 
-                            //Synapse.Api.Logger.Get.Debug(actualResult); //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-                            //Synapse.Api.Logger.Get.Debug("2"); //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                             switch (actualResult)
                             {
                                 case Scp079EventMisc.InteractionResult.Allow:
                                     {
                                         if (synElevator.Use())
                                         {
-                                            Synapse.Api.Logger.Get.Debug("3"); //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                                             __instance.Mana -= manaFromLabel;
                                             bool flag3 = false;
                                             foreach (Lift.Elevator elevator in synElevator.Lift.elevators)
                                             {
-                                                //Synapse.Api.Logger.Get.Debug("A"); //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                                                 __instance.AddInteractionToHistory(elevator.door.GetComponentInParent<Scp079Interactable>().gameObject, !flag3);
                                                 flag3 = true;
                                             }
-                                            Synapse.Api.Logger.Get.Debug("4"); //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                                         }
 
                                         return false;
