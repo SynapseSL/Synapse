@@ -5,7 +5,7 @@ using Synapse.Api.Items;
 
 namespace Synapse.Patches.SynapsePatches.Item
 {
-    [HarmonyPatch(typeof(ItemPickupBase), nameof(ItemPickupBase.DestroySelf))]
+    //[HarmonyPatch(typeof(ItemPickupBase), nameof(ItemPickupBase.DestroySelf))]
     internal static class PickupPatches
     {
         [HarmonyPrefix]
