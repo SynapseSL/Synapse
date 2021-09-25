@@ -2,6 +2,7 @@
 using HarmonyLib;
 using Synapse.Api.Plugin;
 using Synapse.Command;
+using System.Linq;
 
 public class SynapseController
 {
@@ -23,6 +24,12 @@ public class SynapseController
 
     internal SynapseController()
     {
+        if(StartupArgs.Args.Any(x => x.ToLower() == "-nosynapse"))
+        {
+            Server.Logger.Warn("Server started with -nosynapse argument! Synapse will not be loaded");
+            return;
+        }
+
         SynapseVersion.Init();
 
         PatchMethods();
