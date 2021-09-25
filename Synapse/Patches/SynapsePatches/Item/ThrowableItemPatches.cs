@@ -1,5 +1,6 @@
 ﻿using System;
 using HarmonyLib;
+using InventorySystem;
 using InventorySystem.Items.Pickups;
 using InventorySystem.Items.ThrowableProjectiles;
 using Mirror;
@@ -48,6 +49,54 @@ namespace Synapse.Patches.SynapsePatches.Item
                 Logger.Get.Error($"Synapse-Item: ThrowableItem.ServerThrow Patch failed:\n{e}");
                 return true;
             }
+        }
+    }
+
+    [HarmonyPatch(typeof(TimedGrenadePickup),nameof(TimedGrenadePickup.Update))]
+    internal static class UpdateTimedGrenadePatch
+    {
+        [HarmonyPrefix]
+        private static bool Update(TimedGrenadePickup __instance)
+        {
+            try
+            {
+                if (!__instance._replaceNextFrame)
+                    return false;
+
+                if (!InventoryItemLoader.AvailableItems.TryGetValue(__instance.Info.ItemId, out var itemBase))
+                    return false;
+
+                if (!(itemBase is ThrowableItem throwableItem))
+                {
+                    return false;
+                }
+                var thrownProjectile = UnityEngine.Object.Instantiate(throwableItem.Projectile);
+                if (thrownProjectile.TryGetComponent<Rigidbody>(out var rigidbody))
+                {
+                    rigidbody.position = __instance.Rb.position;
+                    rigidbody.rotation = __instance.Rb.rotation;
+                    rigidbody.velocity = __instance.Rb.velocity;
+                    rigidbody.angularVelocity = rigidbody.angularVelocity;
+                }
+                __instance.Info.Locked = true;
+                thrownProjectile.NetworkInfo = __instance.Info;
+                thrownProjectile.PreviousOwner = __instance._attacker;
+                NetworkServer.Spawn(thrownProjectile.gameObject);
+                thrownProjectile.InfoReceived(default, __instance.Info);
+
+                var item = __instance.GetSynapseItem();
+                item.Throwable.ThrowableItem = thrownProjectile;
+
+                thrownProjectile.ServerActivate();
+                item.DespawnPickup();
+                __instance._replaceNextFrame = false;
+            }
+            catch(Exception e)
+            {
+                Logger.Get.Error($"Synapse-Item: TimedGrenade Update Patch failed:\n{e}");
+            }
+
+            return false;
         }
     }
 }

@@ -201,6 +201,8 @@ namespace Synapse.Api
             }
 
             Scp914.Scp914Controller = UnityEngine.Object.FindObjectOfType<Scp914Controller>();
+
+            SynapseController.Server.Map.Elevators.RemoveAll(x => x.GameObject == null);
         }
 
         internal void ClearObjects()
