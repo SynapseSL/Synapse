@@ -4,6 +4,7 @@ using HarmonyLib;
 using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Firearms.BasicMessages;
 using Mirror;
+using Synapse.Api;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
@@ -22,10 +23,15 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     return false;
                 var item = itembase.GetSynapseItem();
 
-                var target = Server.Get.Players.FirstOrDefault(x => x.NetworkIdentity.netId == msg.TargetNetId);
-                if (target == null)
-                    target = Server.Get.Map.Dummies.FirstOrDefault(x => x.Player.NetworkIdentity?.netId == msg.TargetNetId)?.Player;
-
+                Player target;
+                if (msg.TargetNetId != 0)
+                {
+                    target = Server.Get.Players.FirstOrDefault(x => x.NetworkIdentity.netId == msg.TargetNetId);
+                    if (target == null)
+                        target = Server.Get.Map.Dummies.FirstOrDefault(x => x.Player.NetworkIdentity?.netId == msg.TargetNetId)?.Player;
+                }
+                else target = null;
+                
                 Server.Get.Events.Player.InvokePlayerShootEvent(player, target, msg.TargetPosition, item, out var allow);
                 Server.Get.Events.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allow);
 
