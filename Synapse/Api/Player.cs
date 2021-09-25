@@ -74,7 +74,11 @@ namespace Synapse.Api
             RoleChangeClassIdPatch.ForceLite = false;
         }
 
-        public void Kill(DamageTypes.DamageType damageType = default) => PlayerStats.HurtPlayer(new PlayerStats.HitInfo(-1f, "WORLD", damageType, 0, true), gameObject);
+        public void Kill(DamageTypes.DamageType damageType = default)
+        {
+            Health = 1;
+            Hurt(100);
+        }
 
         public void GiveTextHint(string message, float duration = 5f)
         {
@@ -121,8 +125,10 @@ namespace Synapse.Api
 
         public void Hurt(int amount, DamageTypes.DamageType damagetype = default, Player attacker = null)
         {
+            if (damagetype == default)
+                damagetype = DamageTypes.None;
             if (attacker == null) attacker = this;
-            attacker.PlayerStats.HurtPlayer(new PlayerStats.HitInfo(amount, attacker.NickName, damagetype, attacker.PlayerId, false), gameObject);
+            attacker.PlayerStats.HurtPlayer(new PlayerStats.HitInfo(amount, attacker.NickName, damagetype, attacker.PlayerId, true), gameObject);
         }
 
         public void OpenReportWindow(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
