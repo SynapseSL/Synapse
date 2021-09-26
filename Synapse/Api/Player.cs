@@ -513,8 +513,8 @@ namespace Synapse.Api
 
         public PlayerMovementState MovementState
         {
-            get => (PlayerMovementState)AnimationController.Network_curMoveState;
-            set => AnimationController.Network_curMoveState = (byte)value;
+            get => AnimationController.MoveState;
+            set => AnimationController.UserCode_CmdChangeSpeedState((byte)value);
         }
 
         public Vector3 Scale
@@ -702,8 +702,8 @@ namespace Synapse.Api
 
         public bool IsMuted
         {
-            get => ClassManager.NetworkMuted;
-            set => ClassManager.NetworkMuted = value;
+            get => DissonanceUserSetup.Muted;
+            set => DissonanceUserSetup.NetworkmuteStatus = value ? Assets._Scripts.Dissonance.VoicechatMuteStatus.AdministrativelyMuted : 0;
         }
 
         public bool IsIntercomMuted

@@ -3,10 +3,10 @@ using Assets._Scripts.Dissonance;
 using HarmonyLib;
 using Synapse.Api.Events.SynapseEventArguments;
 
-// ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(DissonanceUserSetup), nameof(DissonanceUserSetup.UserCode_CmdAltIsActive))]
+    //TODO:
+    //[HarmonyPatch(typeof(DissonanceUserSetup), nameof(DissonanceUserSetup.UserCode_CmdAltIsActive))]
     internal static class PlayerSpeakPatch
     {
         [HarmonyPrefix]
