@@ -28,18 +28,20 @@ namespace Synapse.Api.Events
                         else Logger.Get.Warn($"{item.Key} - {item.Value.ItemType}");
                     }
                     break;
-
                 case KeyCode.Alpha2:
                     Logger.Get.Warn(ev.Player.ItemInHand.Serial);
                     ev.Player.ItemInHand.Scale = Vector3.one * 3;
                     break;
-
                 case KeyCode.Alpha3:
                     foreach (var item in ev.Player.VanillaInventory.UserInventory.Items)
                     {
                         Logger.Get.Warn($"Null: {item.Value == null}");
                         Logger.Get.Warn($"Serial: {item.Key}");
                     }
+                    break;
+                case KeyCode.Alpha4:
+                    Synapse.Api.Logger.Get.Debug(ev.Player.Hub.fpc.NetworkforceStopInputs);
+                    ev.Player.Hub.fpc.NetworkforceStopInputs = !ev.Player.Hub.fpc.NetworkforceStopInputs;
                     break;
             }
         }

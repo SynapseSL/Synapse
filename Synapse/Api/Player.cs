@@ -42,8 +42,8 @@ namespace Synapse.Api
         }
 
         #region Methods
-        
-        [Obsolete("Use GetPreference()",true)]
+
+        [Obsolete("Use GetPreference()", true)]
         public int GetSightPreference(ItemType item) => GetPreference(item, 0);
 
         [Obsolete("Use GetPreference()", true)]
@@ -70,7 +70,7 @@ namespace Synapse.Api
         public void ChangeRoleAtPosition(RoleType role)
         {
             RoleChangeClassIdPatch.ForceLite = true;
-            Hub.characterClassManager.SetClassIDAdv(role, true,CharacterClassManager.SpawnReason.None);
+            Hub.characterClassManager.SetClassIDAdv(role, true, CharacterClassManager.SpawnReason.None);
             RoleChangeClassIdPatch.ForceLite = false;
         }
 
@@ -209,6 +209,8 @@ namespace Synapse.Api
             Connection.Send(msg);
             NetworkWriterPool.Recycle(writer);
         }
+
+        public bool StopInput { get => Hub.fpc.NetworkforceStopInputs; set => Hub.fpc.NetworkforceStopInputs = value; }
 
         private float delay = Time.time;
         private int pos = 0;
@@ -623,7 +625,7 @@ namespace Synapse.Api
             }
         }
 
-        [Obsolete("Please use player.AmmoBox[AmmoType.Ammo556x45]",false)]
+        [Obsolete("Please use player.AmmoBox[AmmoType.Ammo556x45]", false)]
         public uint Ammo5
         {
             get => AmmoBox[AmmoType.Ammo556x45];
@@ -770,7 +772,7 @@ namespace Synapse.Api
             }
             set
             {
-                if(value == null || value == SynapseItem.None || !Inventory.Items.Contains(value))
+                if (value == null || value == SynapseItem.None || !Inventory.Items.Contains(value))
                 {
                     VanillaInventory.NetworkCurItem = ItemIdentifier.None;
                     VanillaInventory.CurInstance = null;
@@ -867,10 +869,10 @@ namespace Synapse.Api
                 var changeTeam = false;
 
 
-                foreach(var entry in DisarmedPlayers.Entries)
-                    if(entry.DisarmedPlayer == NetworkIdentity.netId)
+                foreach (var entry in DisarmedPlayers.Entries)
+                    if (entry.DisarmedPlayer == NetworkIdentity.netId)
                     {
-                        if(entry.Disarmer == 0)
+                        if (entry.Disarmer == 0)
                         {
                             changeTeam = CharacterClassManager.ForceCuffedChangeTeam;
                             break;
@@ -884,7 +886,7 @@ namespace Synapse.Api
                             changeTeam = true;
                     }
 
-                
+
 
                 switch (RoleType)
                 {
