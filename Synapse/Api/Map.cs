@@ -125,14 +125,41 @@ namespace Synapse.Api
             Server.Get.GetObjectOf<NineTailedFoxAnnouncer>().ServerOnlyAddGlitchyPhrase(words, UnityEngine.Random.Range(0.1f, 0.14f) * num2, UnityEngine.Random.Range(0.07f, 0.08f) * num2);
         }
 
-        public void SpawnGrenade(Vector3 position, Vector3 velocity, float fusetime = 3f, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null)
+        public SynapseItem SpawnGrenade(Vector3 position, Vector3 velocity, float fusetime = 3f, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null)
         {
-            //TODO: Reimplement this
+            var itemtype = ItemType.GrenadeHE;
+            switch (grenadeType)
+            {
+                case GrenadeType.Grenade: itemtype = ItemType.GrenadeHE; break;
+                case GrenadeType.Flashbang: itemtype = ItemType.GrenadeFlash; break;
+                case GrenadeType.Scp018: itemtype = ItemType.SCP018; break;
+            }
+            var grenadeitem = new SynapseItem(itemtype, position);
+            grenadeitem.Throwable.Fuse();
+            grenadeitem.Throwable.FuseTime = fusetime;
+            if (player != null)
+                grenadeitem.Throwable.ThrowableItem.PreviousOwner = new Footprinting.Footprint(player.Hub);
+
+            if(grenadeitem.Throwable.ThrowableItem.TryGetComponent<Rigidbody>(out var rgb))
+                rgb.velocity = velocity;
+
+            return grenadeitem;
         }
 
         public void Explode(Vector3 position, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null)
         {
-            //TODO: Reimplement this
+            var itemtype = ItemType.GrenadeHE;
+            switch (grenadeType)
+            {
+                case GrenadeType.Grenade: itemtype = ItemType.GrenadeHE; break;
+                case GrenadeType.Flashbang: itemtype = ItemType.GrenadeFlash; break;
+                case GrenadeType.Scp018: itemtype = ItemType.SCP018; break;
+            }
+            var grenadeitem = new SynapseItem(itemtype, position);
+            grenadeitem.Throwable.Fuse();
+            if (player != null)
+                grenadeitem.Throwable.ThrowableItem.PreviousOwner = new Footprinting.Footprint(player.Hub);
+            MEC.Timing.CallDelayed(0.1f, () => grenadeitem.Destroy());
         }
 
         public void PlaceBlood(Vector3 pos, int type = 0, float size = 2)
