@@ -34,6 +34,7 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<PlayerEscapeEventArgs> PlayerEscapesEvent;
 
+        [Obsolete("Use Server.Update Event instead and go through all players")]
         public event EventHandler.OnSynapseEvent<PlayerSyncDataEventArgs> PlayerSyncDataEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerReloadEventArgs> PlayerReloadEvent;

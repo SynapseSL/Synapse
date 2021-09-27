@@ -1,5 +1,4 @@
-﻿using Synapse.Api.Items;
-using Synapse.Config;
+﻿using Synapse.Config;
 using UnityEngine;
 
 namespace Synapse.Api.Events
@@ -9,10 +8,10 @@ namespace Synapse.Api.Events
         internal EventHandler()
         {
             Player.PlayerJoinEvent += PlayerJoin;
-            Player.PlayerSyncDataEvent += PlayerSyncData;
             Round.RoundRestartEvent += RounRestart;
             Round.WaitingForPlayersEvent += Waiting;
             Player.LoadComponentsEvent += LoadPlayer;
+            Server.UpdateEvent += OnUpdate;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
 #endif
@@ -110,11 +109,16 @@ namespace Synapse.Api.Events
                 ev.Player.OpenReportWindow(Conf.JoinWindow.Replace("\\n","\n"));
         }
 
-        private void PlayerSyncData(SynapseEventArguments.PlayerSyncDataEventArgs ev)
+        private void OnUpdate()
         {
-            if (Vector3.Distance(ev.Player.Position, ev.Player.Escape.worldPosition) < Escape.radius)
-                ev.Player.TriggerEscape();
+            foreach (var player in SynapseController.Server.Players)
+            {
+                if (Vector3.Distance(player.Position, player.Escape.worldPosition) < Escape.radius)
+                    player.TriggerEscape();
+
+                Player.InvokePlayerSyncDataEvent(player, out _);
+            }
         }
-#endregion
+        #endregion
     }
 }

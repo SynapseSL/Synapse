@@ -159,7 +159,6 @@
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerGeneratorInteract.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerEnterFemurPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerReloadPatch.cs" />
-    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSyncDataPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerBanPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerBasicItemUsePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDamagePatch.cs" />
