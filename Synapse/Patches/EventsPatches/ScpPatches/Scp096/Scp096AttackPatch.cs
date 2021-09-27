@@ -111,7 +111,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                 {
                     __instance._targets.Remove(player);
 
-                    scp.Connection.Send(new PlayableScps.Messages.ScpHitmarkerMessage(1.35f), 0);
+                    Hitmarker.SendHitmarker(__instance.Hub, 1.35f);
                     if (!__instance._chargeKilled)
                     {
                         __instance._chargeCooldownPenaltyAmount++;

@@ -13,7 +13,7 @@ public static class SynapseVersion
 
     public const string SubVersion = "1.5";
 
-    public const string BasedGameVersion = "11.0.0-parabellum-public-2.5-9dee09b1";
+    public const string BasedGameVersion = "11.0.0-parabellum-rc-1-603f54bd";
 
     public static bool Debug { get; private set; } = false;
 

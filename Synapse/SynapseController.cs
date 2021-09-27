@@ -2,6 +2,7 @@
 using HarmonyLib;
 using Synapse.Api.Plugin;
 using Synapse.Command;
+using System.Linq;
 
 public class SynapseController
 {
@@ -24,6 +25,14 @@ public class SynapseController
     internal SynapseController()
     {
         SynapseVersion.Init();
+
+        if (StartupArgs.Args.Any(x => x.Equals("-nosynapse", StringComparison.OrdinalIgnoreCase)))
+        {
+            Server.Logger.Warn("Server started with -nosynapse argument! Synapse will not be loaded");
+            //So even if Synapse is not active the server code is still modified
+            CustomNetworkManager.Modded = true;
+            return;
+        }
 
         PatchMethods();
         try

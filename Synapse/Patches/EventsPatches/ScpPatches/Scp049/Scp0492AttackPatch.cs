@@ -29,7 +29,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp049
                 if (!allow) return false;
 
                 player.Hurt((int)__instance.damage, DamageTypes.Scp0492, scp);
-                __instance.TargetHitMarker(scp.Connection);
+                Hitmarker.SendHitmarker(scp.Connection, 1f);
                 scp.ClassManager.RpcPlaceBlood(player.Position, 0, player.RoleType == RoleType.Spectator ? 1.3f : 0.5f);
                 return false;
             }

@@ -10,42 +10,34 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp939
     internal static class Scp939AttackPatch
     {
         [HarmonyPrefix]
-        private static bool Scp939Attack(PlayableScps.Scp939 __instance, PlayableScps.Messages.Scp939AttackMessage msg)
+        private static bool Scp939Attack(PlayableScps.Scp939 __instance, GameObject target, out bool __result)
         {
+            __result = false;
             try
             {
-                var scp = Server.Get.GetPlayer(msg.PlayerID);
+                var scp = __instance.GetPlayer();
 
-                if (scp == null || msg.Victim == null || __instance._currentBiteCooldown > 0f || Vector3.Distance(scp.Position, msg.Victim.transform.position) >= 2.87)
-                    return false;
-
-                if(msg.Victim.TryGetComponent<BreakableWindow>(out var window))
+                if(target.TryGetComponent<BreakableWindow>(out var window))
                 {
                     window.Damage(50f, null, new Footprinting.Footprint(scp.Hub), Vector3.zero);
-                    __instance._currentBiteCooldown = 1f;
-
-                    scp.Connection.Send(new PlayableScps.Messages.ScpHitmarkerMessage(1.5f));
-                    NetworkServer.SendToAll(new PlayableScps.Messages.Scp939OnHitMessage(scp.PlayerId));
+                    __result = true;
                 }
                 else
                 {
-                    __instance._currentBiteCooldown = 1f;
+                    var targetplayer = target.GetPlayer();
 
-                    scp.Connection.Send(new PlayableScps.Messages.ScpHitmarkerMessage(1.5f));
-                    NetworkServer.SendToAll(new PlayableScps.Messages.Scp939OnHitMessage(scp.PlayerId));
-                    var target = msg.Victim.GetPlayer();
+                    if (!SynapseExtensions.GetHarmPermission(scp, targetplayer)) return false;
 
-                    if (!SynapseExtensions.GetHarmPermission(scp, target)) return false;
-
-                    ev.Get.Scp.InvokeScpAttack(scp, target, Api.Enum.ScpAttackType.Scp939_Bite, out var allow);
+                    ev.Get.Scp.InvokeScpAttack(scp, targetplayer, Api.Enum.ScpAttackType.Scp939_Bite, out var allow);
 
                     if (!allow) return false;
 
                     scp.PlayerStats.HurtPlayer(new PlayerStats.HitInfo(50f, scp.Hub.LoggedNameFromRefHub(),
-                      DamageTypes.Scp939, scp.PlayerId, false), msg.Victim, false, true);
-                    scp.ClassManager.RpcPlaceBlood(target.Position, 0, 2f);
+                      DamageTypes.Scp939, scp.PlayerId, false), target, false, true);
+                    scp.ClassManager.RpcPlaceBlood(targetplayer.Position, 0, 2f);
 
-                    target.PlayerEffectsController.EnableEffect<CustomPlayerEffects.Amnesia>(3f, true);
+                    targetplayer.PlayerEffectsController.EnableEffect<CustomPlayerEffects.Amnesia>(3f, true);
+                    __result = true;
                 }
 
                 return false;

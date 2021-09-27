@@ -116,6 +116,9 @@ namespace Synapse
         public List<Player> Players =>
             PlayerManager.players.Select(x => x.GetComponent<Player>()).Where(x => !x.IsDummy).ToList();
 
+        private List<Player> PlayerObjects =>
+            PlayerManager.players.Select(x => x.GetComponent<Player>()).ToList();
+
         //Vanilla Objects
         public ServerConsole ServerConsole => ServerConsole.singleton;
 
@@ -265,10 +268,10 @@ namespace Synapse
 
         public Player GetPlayer(int playerid)
         {
-            return Players.FirstOrDefault(x => x.PlayerId == playerid);
+            return PlayerObjects.FirstOrDefault(x => x.PlayerId == playerid);
         }
 
-        public Player GetPlayer(uint netID) => Players.FirstOrDefault(x => x.NetworkIdentity.netId == netID);
+        public Player GetPlayer(uint netID) => PlayerObjects.FirstOrDefault(x => x.NetworkIdentity.netId == netID);
 
         public Player GetPlayerByUID(string uid)
         {

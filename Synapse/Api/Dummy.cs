@@ -99,8 +99,8 @@ namespace Synapse.Api
 
         public PlayerMovementState Movement
         {
-            get => (PlayerMovementState)Player.AnimationController.Network_curMoveState;
-            set => Player.AnimationController.Network_curMoveState = (byte)value;
+            get => Player.AnimationController.MoveState;
+            set => Player.AnimationController.UserCode_CmdChangeSpeedState((byte)value);
         }
 
         public MovementDirection Direction { get; set; }
@@ -120,7 +120,7 @@ namespace Synapse.Api
                 if (GameObject == null) yield break;
                 if (Direction == MovementDirection.Stop)
                 {
-                    Player.AnimationController.Networkspeed = new Vector2(0f, 0f);
+                    //Player.AnimationController.Speed = new Vector2(0f, 0f);
                     continue;
                 }
 
@@ -145,7 +145,7 @@ namespace Synapse.Api
                 switch (Direction)
                 {
                     case MovementDirection.Forward:
-                        Player.AnimationController.Networkspeed = new Vector2(speed, 0f);
+                        //Player.AnimationController.Networkspeed = new Vector2(speed, 0f);
                         var pos = Position + Player.CameraReference.forward / 10 * speed;
 
                         if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
@@ -154,7 +154,7 @@ namespace Synapse.Api
                         break;
 
                     case MovementDirection.BackWards:
-                        Player.AnimationController.Networkspeed = new Vector2(-speed, 0f);
+                        //Player.AnimationController.Networkspeed = new Vector2(-speed, 0f);
                         pos = Position - Player.CameraReference.forward / 10 * speed;
 
                         if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
@@ -163,7 +163,7 @@ namespace Synapse.Api
                         break;
 
                     case MovementDirection.Right:
-                        Player.AnimationController.Networkspeed = new Vector2(0f, speed);
+                        //Player.AnimationController.Networkspeed = new Vector2(0f, speed);
                         pos = Position + Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed;
 
                         if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
@@ -172,7 +172,7 @@ namespace Synapse.Api
                         break;
 
                     case MovementDirection.Left:
-                        Player.AnimationController.Networkspeed = new Vector2(0f, -speed);
+                        //Player.AnimationController.Networkspeed = new Vector2(0f, -speed);
                         pos = Position - Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed;
 
                         if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
@@ -184,7 +184,7 @@ namespace Synapse.Api
                 if (wall)
                 {
                     Direction = MovementDirection.Stop;
-                    Player.AnimationController.Networkspeed = new Vector2(0f, 0f);
+                    //Player.AnimationController.Networkspeed = new Vector2(0f, 0f);
                 }
             }
         }

@@ -4,7 +4,8 @@ using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(AnimationController), nameof(AnimationController.UserCode_CmdSyncData))]
+    //TODO:
+    //[HarmonyPatch(typeof(AnimationController), nameof(AnimationController.Syncda))]
     internal static class SyncDataPatch
     {
         [HarmonyPrefix]
