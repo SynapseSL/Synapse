@@ -28,7 +28,7 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<PlayerItemInteractEventArgs> PlayerItemUseEvent;
 
-        //public event EventHandler.OnSynapseEvent<PlayerThrowGrenadeEventArgs> PlayerThrowGrenadeEvent;
+        public event EventHandler.OnSynapseEvent<PlayerThrowGrenadeEventArgs> PlayerThrowGrenadeEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerHealEventArgs> PlayerHealEvent;
 
@@ -423,6 +423,20 @@ namespace Synapse.Api.Events
             };
 
             PlayerChangeItemEvent?.Invoke(ev);
+
+            allow = ev.Allow;
+        }
+
+        internal void InvokeThrowGrenade(Player player, SynapseItem grenade, out bool allow)
+        {
+            var ev = new PlayerThrowGrenadeEventArgs
+            {
+                Allow = true,
+                Item = grenade,
+                Player = player
+            };
+
+            PlayerThrowGrenadeEvent?.Invoke(ev);
 
             allow = ev.Allow;
         }

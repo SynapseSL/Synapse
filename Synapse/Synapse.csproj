@@ -149,6 +149,7 @@
     <Compile Include="Patches\EventsPatches\MapPatches\WarheadDetonationPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerChangeItemPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerReportPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerThrowGrenadePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerWalkOnSinkholePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerUseMicroPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDisarmPatch.cs" />

@@ -113,8 +113,10 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public Items.SynapseItem Item { get; internal set; }
 
+        [Obsolete("Removed Since 11.0.0")]
         public float ForceMultiplier { get; set; }
         
+        [Obsolete("Removed since 11.0.0")]
         public float Delay { get; set; }
         
         public bool Allow { get; set; }
