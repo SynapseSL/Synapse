@@ -40,28 +40,7 @@ namespace Synapse.Api.Events
                     }
                     break;
                 case KeyCode.Alpha4:
-                    Synapse.Api.Logger.Get.Debug(ev.Player.Hub.fpc.NetworkforceStopInputs);
-                    ev.Player.Hub.fpc.NetworkforceStopInputs = !ev.Player.Hub.fpc.NetworkforceStopInputs;
-                    break;
-
-                case KeyCode.Alpha5:
-                    Synapse.Api.Map.Get.Explode(ev.Player.Position, Enum.GrenadeType.Grenade, ev.Player);
-                    break;
-
-                case KeyCode.Alpha6:
-                    Synapse.Api.Map.Get.Explode(ev.Player.Position, Enum.GrenadeType.Flashbang, ev.Player);
-                    break;
-
-                case KeyCode.Alpha7:
-                    Synapse.Api.Map.Get.SpawnGrenade(ev.Player.Position, Vector3.forward*10, 30, Enum.GrenadeType.Grenade, ev.Player);
-                    break;
-
-                case KeyCode.Alpha8:
-                    Synapse.Api.Map.Get.SpawnGrenade(ev.Player.Position, Vector3.back, 3, Enum.GrenadeType.Flashbang, ev.Player);
-                    break;
-
-                case KeyCode.Alpha9:
-                    Synapse.Api.Map.Get.SpawnGrenade(ev.Player.Position, Vector3.zero, 10, Enum.GrenadeType.Scp018, ev.Player);
+                    new WorkStation(ev.Player.Position, ev.Player.transform.rotation.eulerAngles, Vector3.one);
                     break;
             }
         }

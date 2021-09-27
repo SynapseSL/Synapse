@@ -30,6 +30,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                             //A Newitem with a new Serial is needed or else the client will try to throw it locally
                             var newitem = new Synapse.Api.Items.SynapseItem(item.ID);
                             newitem.Durabillity = item.Durabillity;
+                            newitem.ItemData = item.ItemData;
                             item.Destroy();
                             newitem.PickUp(player);
                             return false;

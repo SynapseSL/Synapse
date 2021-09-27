@@ -13,7 +13,6 @@ namespace Synapse.Api
 
         public WorkStation(Vector3 position, Vector3 rotation, Vector3 scale)
         {
-            //TODO: Check if this still functions
             var bench = UnityEngine.Object.Instantiate(NetworkManager.singleton.spawnPrefabs.Find(p => p.gameObject.name == "Work Station"));
             bench.gameObject.transform.localScale = scale;
             bench.gameObject.transform.position = position;
