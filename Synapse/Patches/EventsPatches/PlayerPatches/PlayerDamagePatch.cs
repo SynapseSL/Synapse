@@ -8,7 +8,6 @@ using Respawning;
 using Synapse.Api;
 using UnityEngine;
 
-// ReSharper disable All
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
     [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.HurtPlayer))]
@@ -117,9 +116,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
             void PlayerDeathEvent(Player victim, Player killer, bool friendlyFire, DamageTypes.DamageType damageType, ref bool died)
             {
-                //TODO:
-                //foreach (Scp079PlayerScript scp079PlayerScript in Scp079PlayerScript.instances)
-                //    scp079PlayerScript.ServerProcessKillAssist(victim.Hub, ExpGainType.KillAssist);
+                foreach (Scp079PlayerScript scp079PlayerScript in Scp079PlayerScript.instances)
+                    scp079PlayerScript.ServerProcessKillAssist(victim.Hub, ExpGainType.KillAssist);
 
                 HandleRoundStatsAndArchievements(victim, killer, friendlyFire, ref died);
 

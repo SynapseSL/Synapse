@@ -127,13 +127,7 @@ namespace Synapse.Api
 
         public SynapseItem SpawnGrenade(Vector3 position, Vector3 velocity, float fusetime = 3f, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null)
         {
-            var itemtype = ItemType.GrenadeHE;
-            switch (grenadeType)
-            {
-                case GrenadeType.Grenade: itemtype = ItemType.GrenadeHE; break;
-                case GrenadeType.Flashbang: itemtype = ItemType.GrenadeFlash; break;
-                case GrenadeType.Scp018: itemtype = ItemType.SCP018; break;
-            }
+            var itemtype = (ItemType)grenadeType;
             var grenadeitem = new SynapseItem(itemtype, position);
             grenadeitem.Throwable.Fuse();
             grenadeitem.Throwable.FuseTime = fusetime;
@@ -148,13 +142,7 @@ namespace Synapse.Api
 
         public void Explode(Vector3 position, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null)
         {
-            var itemtype = ItemType.GrenadeHE;
-            switch (grenadeType)
-            {
-                case GrenadeType.Grenade: itemtype = ItemType.GrenadeHE; break;
-                case GrenadeType.Flashbang: itemtype = ItemType.GrenadeFlash; break;
-                case GrenadeType.Scp018: itemtype = ItemType.SCP018; break;
-            }
+            var itemtype = (ItemType)grenadeType;
             var grenadeitem = new SynapseItem(itemtype, position);
             grenadeitem.Throwable.Fuse();
             if (player != null)

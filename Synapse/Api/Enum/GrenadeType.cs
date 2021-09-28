@@ -2,8 +2,8 @@
 {
     public enum GrenadeType
     {
-        Grenade,
+        Grenade = 25,
         Flashbang,
-        Scp018
+        Scp018 = 31
     }
 }

@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp173
 {
-    //TODO: Rework this
     [HarmonyPatch(typeof(PlayableScps.Scp173), nameof(PlayableScps.Scp173.ServerHandleBlinkMessage))]
     internal static class Scp173BlinkingPatch
     {
@@ -12,6 +11,10 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp173
         {
             try
             {
+                if (!__instance.BlinkReady) return false;
+                if ((__instance.Hub.PlayerCameraReference.transform.position - blinkPos).magnitude > __instance.EffectiveBlinkDistance() * 1.05)
+                    return false;
+
                 Server.Get.Events.Scp.Scp173.InvokeScp173BlinkEvent(__instance.GetPlayer(), ref blinkPos, out var allow);
                 return allow;
             }

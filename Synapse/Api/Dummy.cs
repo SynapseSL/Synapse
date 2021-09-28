@@ -1,10 +1,9 @@
-﻿using Mirror;
-using RemoteAdmin;
-using System.Linq;
-using UnityEngine;
-using System.Collections.Generic;
-using Synapse.Api.Enum;
+﻿using System.Collections.Generic;
 using InventorySystem;
+using Mirror;
+using RemoteAdmin;
+using Synapse.Api.Enum;
+using UnityEngine;
 
 namespace Synapse.Api
 {
@@ -120,7 +119,6 @@ namespace Synapse.Api
                 if (GameObject == null) yield break;
                 if (Direction == MovementDirection.Stop)
                 {
-                    //Player.AnimationController.Speed = new Vector2(0f, 0f);
                     continue;
                 }
 
@@ -145,7 +143,6 @@ namespace Synapse.Api
                 switch (Direction)
                 {
                     case MovementDirection.Forward:
-                        //Player.AnimationController.Networkspeed = new Vector2(speed, 0f);
                         var pos = Position + Player.CameraReference.forward / 10 * speed;
 
                         if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
@@ -154,7 +151,6 @@ namespace Synapse.Api
                         break;
 
                     case MovementDirection.BackWards:
-                        //Player.AnimationController.Networkspeed = new Vector2(-speed, 0f);
                         pos = Position - Player.CameraReference.forward / 10 * speed;
 
                         if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
@@ -163,7 +159,6 @@ namespace Synapse.Api
                         break;
 
                     case MovementDirection.Right:
-                        //Player.AnimationController.Networkspeed = new Vector2(0f, speed);
                         pos = Position + Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed;
 
                         if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
@@ -172,7 +167,6 @@ namespace Synapse.Api
                         break;
 
                     case MovementDirection.Left:
-                        //Player.AnimationController.Networkspeed = new Vector2(0f, -speed);
                         pos = Position - Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed;
 
                         if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
@@ -184,7 +178,6 @@ namespace Synapse.Api
                 if (wall)
                 {
                     Direction = MovementDirection.Stop;
-                    //Player.AnimationController.Networkspeed = new Vector2(0f, 0f);
                 }
             }
         }

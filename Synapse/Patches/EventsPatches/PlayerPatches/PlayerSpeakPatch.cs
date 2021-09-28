@@ -66,27 +66,27 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                var intercom = __instance.IntercomAsHuman;
-                var radio = __instance.RadioAsHuman;
+                var intercom = __instance._dissonanceSetup.IntercomAsHuman;
+                var radio = __instance._dissonanceSetup.RadioAsHuman;
                 var scp939 = Server.Get.Configs.synapseConfiguration.SpeakingScps.Contains(__instance.GetPlayer().RoleID);
-                var scpChat = __instance.SCPChat;
-                var specChat = __instance.SpectatorChat;
+                var scpChat = __instance._dissonanceSetup.SCPChat;
+                var specChat = __instance._dissonanceSetup.SpectatorChat;
                 var allow = true;
 
                 SynapseController.Server.Events.Player.InvokePlayerSpeakEvent(__instance, ref intercom, ref radio, ref scp939, ref scpChat, ref specChat, ref allow);
 
-                __instance.SCPChat = scpChat;
-                __instance.SpectatorChat = specChat;
-                __instance.IntercomAsHuman = intercom;
+                __instance._dissonanceSetup.SCPChat = scpChat;
+                __instance._dissonanceSetup.SpectatorChat = specChat;
+                __instance._dissonanceSetup.IntercomAsHuman = intercom;
 
-                if (scp939) __instance.MimicAs939 = value;
-                else __instance.MimicAs939 = false;
+                if (scp939) __instance._dissonanceSetup.MimicAs939 = b;
+                else __instance._dissonanceSetup.MimicAs939 = false;
 
-                if (radio) __instance.RadioAsHuman = value;
+                if (radio) __instance._dissonanceSetup.RadioAsHuman = b;
 
                 try
                 {
-                    if (__instance.RadioAsHuman)
+                    if (__instance._dissonanceSetup.RadioAsHuman)
                     {
                         var player = __instance.GetPlayer();
                         var index = __instance.GetComponent<Radio>().myRadio;
