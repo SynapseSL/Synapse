@@ -16,7 +16,7 @@ namespace Synapse.Api.Events
             Player.PlayerKeyPressEvent += KeyPress;
 #endif
         }
-
+        public static bool BlockSpectatorVoice;
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
         {
             switch (ev.KeyCode)
@@ -41,6 +41,10 @@ namespace Synapse.Api.Events
                     break;
                 case KeyCode.Alpha4:
                     new WorkStation(ev.Player.Position, ev.Player.transform.rotation.eulerAngles, Vector3.one);
+                    break;
+                case KeyCode.Alpha5:
+                    BlockSpectatorVoice = !BlockSpectatorVoice;
+                    Synapse.Api.Logger.Get.Debug(BlockSpectatorVoice);
                     break;
             }
         }
