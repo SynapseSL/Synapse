@@ -29,8 +29,6 @@ public class SynapseController
         if (StartupArgs.Args.Any(x => x.Equals("-nosynapse", StringComparison.OrdinalIgnoreCase)))
         {
             Server.Logger.Warn("Server started with -nosynapse argument! Synapse will not be loaded");
-            //So even if Synapse is not active the server code is still modified
-            CustomNetworkManager.Modded = true;
             return;
         }
 
