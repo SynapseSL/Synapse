@@ -1,9 +1,9 @@
 using System;
-using Synapse.Config;
 using System.Collections.Generic;
-using Synapse.Api;
 using System.Linq;
- 
+using Synapse.Api;
+using Synapse.Config;
+
 namespace Synapse.Permission
 {
     public class PermissionHandler
@@ -111,7 +111,7 @@ namespace Synapse.Permission
         public SynapseGroup GetServerGroup(string groupname)
         {
             if (!Groups.Keys.Any(x => x.ToLower() == groupname.ToLower())) return null;
-            return groups.FirstOrDefault(x => x.Key.ToLower() == groupname.ToLower()).Value;
+            return groups.FirstOrDefault(x => x.Key.ToLower() == groupname.ToLower()).Value.Copy();
         }
 
         public SynapseGroup GetPlayerGroup(Player player)
@@ -119,7 +119,7 @@ namespace Synapse.Permission
             var group = groups.Values.FirstOrDefault(x => x.Members != null && x.Members.Contains(player.UserId));
 
             if (group != null)
-                return group;
+                return group.Copy();
 
             var nwgroup = GetNorthwoodGroup();
 
@@ -134,7 +134,7 @@ namespace Synapse.Permission
             var group = groups.Values.FirstOrDefault(x => x.Members != null && x.Members.Contains(UserID));
 
             if (group != null)
-                return group;
+                return group.Copy();
 
             var nwgroup = GetNorthwoodGroup();
 
@@ -149,7 +149,7 @@ namespace Synapse.Permission
             var group = groups.Values.FirstOrDefault(x => x.Default);
 
             if (group != null)
-                return group;
+                return group.Copy();
 
             return new SynapseGroup
             {
@@ -160,7 +160,7 @@ namespace Synapse.Permission
             };
         }
 
-        public SynapseGroup GetNorthwoodGroup() => groups.Values.FirstOrDefault(x => x.Northwood);
+        public SynapseGroup GetNorthwoodGroup() => groups.Values.FirstOrDefault(x => x.Northwood).Copy();
 
         public bool AddPlayerToGroup(string groupname, string userid)
         {

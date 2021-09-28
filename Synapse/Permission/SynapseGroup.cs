@@ -106,6 +106,22 @@ namespace Synapse.Permission
             return value;
         }
 
+        public SynapseGroup Copy() => new SynapseGroup
+        {
+            Badge = Badge,
+            Color = Color,
+            Cover = Cover,
+            Default = Default,
+            Hidden = Hidden,
+            Inheritance = Inheritance,
+            KickPower = KickPower,
+            Members = Members,
+            Northwood = Northwood,
+            Permissions = Permissions,
+            RemoteAdmin = RemoteAdmin,
+            RequiredKickPower = RequiredKickPower
+        };
+
         private const string VanillaPrefix = "vanilla";
     }
 }
