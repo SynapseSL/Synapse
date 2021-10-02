@@ -212,6 +212,12 @@ namespace Synapse.Permission
             return true;
         }
         
+        /// <summary>
+        /// Replaces a group with a new one
+        /// </summary>
+        /// <param name="groupName">The group name which you want to replace</param>
+        /// <param name="newGroup">The new group which will replace the old one</param>
+        /// <returns>Returns true if it was successful and false if the group from groupName was not found</returns>
         public bool UpdateGroup(string groupName, SynapseGroup newGroup)
         {
             if (GetServerGroup(groupName) == null)
