@@ -211,5 +211,21 @@ namespace Synapse.Permission
 
             return true;
         }
+        
+        public bool UpdateGroup(string groupName, SynapseGroup newGroup)
+        {
+            if (GetServerGroup(groupName) == null)
+            {
+                Logger.Get.Warn($"Group {groupName} does not exist!");
+                return false;
+            }
+            
+            _permissionSYML.Sections.FirstOrDefault(x => x.Key.ToLower() == groupName.ToLower()).Value.Import(newGroup);
+            _permissionSYML.Store();
+            
+            Reload();
+
+            return true;
+        }
     }
 }
