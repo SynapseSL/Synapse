@@ -1,57 +1,17 @@
 ﻿using System;
-using Synapse.Api;
-using System.Linq;
 using HarmonyLib;
 
 namespace Synapse.Patches.SynapsePatches
 {
-    [HarmonyPatch(typeof(WeaponManager), nameof(WeaponManager.GetShootPermission), new Type[] { typeof(CharacterClassManager), typeof(bool) })]
+    [HarmonyPatch(typeof(HitboxIdentity), nameof(HitboxIdentity.CheckFriendlyFire),new[] { typeof(ReferenceHub), typeof(ReferenceHub) , typeof(bool) })]
     internal static class ShootPermissionPatch
     {
-        private static bool Prefix(WeaponManager __instance,out bool __result, CharacterClassManager c, bool forceFriendlyFire = false)
+        [HarmonyPrefix]
+        private static bool CheckFF(out bool __result,ReferenceHub attacker, ReferenceHub victim, bool ignoreConfig = false)
         {
             try
             {
-                var shooter = __instance.GetPlayer();
-                var target = c.GetPlayer();
-
-                __result = true;
-
-                if (Map.Get.Round.RoundEnded && Server.Get.Configs.synapseConfiguration.AutoFF)
-                    return false;
-
-                if (shooter.CustomRole == null && target.CustomRole == null)
-                {
-                    if (shooter.Team == Team.SCP && target.Team == Team.SCP) __result = false;
-
-                    var ff = Server.Get.FF;
-                    if (forceFriendlyFire)
-                        ff = true;
-
-                    else if (!ff) __result = Misc.GetFraction(shooter.Team) != Misc.GetFraction(target.Team);
-                }
-                else
-                {
-                    if (shooter.CustomRole != null)
-                    {
-                        if (shooter.CustomRole.GetFriendsID().Any(x => x == target.TeamID))
-                        {
-                            __result = false;
-                            shooter.GiveTextHint(Server.Get.Configs.synapseTranslation.ActiveTranslation.sameTeam);
-                        }
-                    }
-                    if (target.CustomRole != null)
-                    {
-                        if (target.CustomRole.GetFriendsID().Any(x => x == shooter.TeamID))
-                        {
-                            __result = false;
-                            shooter.GiveTextHint(Server.Get.Configs.synapseTranslation.ActiveTranslation.sameTeam);
-                        }
-                    }
-                }
-
-                Server.Get.Events.Player.InvokePlayerDamagePermissions(target, shooter, ref __result);
-
+                __result = SynapseExtensions.GetHarmPermission(attacker.GetPlayer(), victim.GetPlayer(), ignoreConfig);
                 return false;
             }
             catch(Exception e)

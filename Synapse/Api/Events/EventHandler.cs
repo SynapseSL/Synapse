@@ -8,7 +8,10 @@ namespace Synapse.Api.Events
         internal EventHandler()
         {
             Player.PlayerJoinEvent += PlayerJoin;
-            Player.PlayerSyncDataEvent += PlayerSyncData;
+            Round.RoundRestartEvent += RounRestart;
+            Round.WaitingForPlayersEvent += Waiting;
+            Player.LoadComponentsEvent += LoadPlayer;
+            Server.UpdateEvent += OnUpdate;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
 #endif
@@ -19,23 +22,25 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    var dummy = new Dummy(ev.Player.Position, ev.Player.Rotation, ev.Player.RoleType, "")
+                    foreach(var item in Synapse.Api.Items.SynapseItem.AllItems)
                     {
-                        Scale = new Vector3(0.3f, 1.3f, 0.3f)
-                    };
-                    dummy.Direction = Enum.MovementDirection.Forward;
+                        if (item.Value == null) Logger.Get.Warn(item.Key + " - null");
+                        else Logger.Get.Warn($"{item.Key} - {item.Value.ItemType}");
+                    }
                     break;
-
                 case KeyCode.Alpha2:
-                    SynapseController.Server.Map.Round.SpawnVehicle();
+                    Logger.Get.Warn(ev.Player.ItemInHand.Serial);
+                    ev.Player.ItemInHand.Scale = Vector3.one * 3;
                     break;
-
                 case KeyCode.Alpha3:
-                    SynapseController.Server.Map.Round.SpawnVehicle(true);
+                    foreach (var item in ev.Player.VanillaInventory.UserInventory.Items)
+                    {
+                        Logger.Get.Warn($"Null: {item.Value == null}");
+                        Logger.Get.Warn($"Serial: {item.Key}");
+                    }
                     break;
-
                 case KeyCode.Alpha4:
-                    SynapseController.Server.Map.Round.PlayChaosSpawnSound();
+                    new WorkStation(ev.Player.Position, ev.Player.transform.rotation.eulerAngles, Vector3.one);
                     break;
             }
         }
@@ -61,6 +66,20 @@ namespace Synapse.Api.Events
 #region HookedEvents
         private SynapseConfiguration Conf => SynapseController.Server.Configs.synapseConfiguration;
 
+        private void LoadPlayer(SynapseEventArguments.LoadComponentEventArgs ev)
+        {
+            if (ev.Player.GetComponent<Player>() == null)
+                ev.Player.gameObject.AddComponent<Player>();
+        }
+
+        private void Waiting()
+        {
+            SynapseController.Server.Map.AddObjects();
+            SynapseController.Server.Map.Round.CurrentRound++;
+        }
+
+        private void RounRestart() => Synapse.Api.Map.Get.ClearObjects();
+
         private void PlayerJoin(SynapseEventArguments.PlayerJoinEventArgs ev)
         {
             ev.Player.Broadcast(Conf.JoinMessagesDuration, Conf.JoinBroadcast);
@@ -69,11 +88,16 @@ namespace Synapse.Api.Events
                 ev.Player.OpenReportWindow(Conf.JoinWindow.Replace("\\n","\n"));
         }
 
-        private void PlayerSyncData(SynapseEventArguments.PlayerSyncDataEventArgs ev)
+        private void OnUpdate()
         {
-            if (Vector3.Distance(ev.Player.Position, ev.Player.Escape.worldPosition) < Escape.radius)
-                ev.Player.TriggerEscape();
+            foreach (var player in SynapseController.Server.Players)
+            {
+                if (Vector3.Distance(player.Position, player.Escape.worldPosition) < Escape.radius)
+                    player.TriggerEscape();
+
+                Player.InvokePlayerSyncDataEvent(player, out _);
+            }
         }
-#endregion
+        #endregion
     }
 }

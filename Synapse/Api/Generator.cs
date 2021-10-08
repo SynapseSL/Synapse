@@ -1,117 +1,97 @@
-﻿using System.Linq;
+﻿using System;
+using MapGeneration.Distributors;
+using Synapse.Api.Items;
 using UnityEngine;
 
 namespace Synapse.Api
 {
     public class Generator
     {
-        internal Generator(Generator079 gen,bool main)
+        internal Generator(Scp079Generator gen)
         {
             generator = gen;
-            MainGenerator = main;
+            positionsync = generator.GetComponent<StructurePositionSync>();
         }
 
-        private Generator079 generator;
+        public readonly Scp079Generator generator;
+
+        public readonly StructurePositionSync positionsync;
 
         public GameObject GameObject => generator.gameObject;
 
-        public readonly bool MainGenerator;
-
         public string Name => GameObject.name;
 
-        public Vector3 Position => GameObject.transform.position;
+        public Vector3 Position
+        {
+            get => generator.transform.position;
+            set => positionsync.Network_position = value;
+        }
+
+        public sbyte Rotation
+        {
+            get => (sbyte)Mathf.RoundToInt(generator.transform.rotation.eulerAngles.y / 5.625f);
+            set => positionsync.Network_rotationY = value;
+        }
 
         public bool Open
         {
-            get => generator.NetworkisDoorOpen;
+            get => generator.HasFlag(generator._flags,Scp079Generator.GeneratorFlags.Open);
             set
             {
-                generator._doorAnimationCooldown = 1.5f;
-                generator.NetworkisDoorOpen = value;
-                generator.RpcDoSound(!value);
+                generator.ServerSetFlag(Scp079Generator.GeneratorFlags.Open, value);
+                generator._targetCooldown = generator._doorToggleCooldownTime;
             }
         }
 
         public bool Locked
         {
-            get => !generator.NetworkisDoorUnlocked;
+            get => !generator.HasFlag(generator._flags,Scp079Generator.GeneratorFlags.Unlocked);
             set
             {
-                if (value == Locked) return;
-                generator.NetworkisDoorUnlocked = !value;
-                generator._doorAnimationCooldown = 0.5f;
+                generator.ServerSetFlag(Scp079Generator.GeneratorFlags.Unlocked, !value);
+                generator._targetCooldown = generator._unlockCooldownTime;
             }
         }
 
-        public bool IsTabletConnected
+        public bool Active
         {
-            get => generator.isTabletConnected;
+            get => generator.Activating;
             set
             {
+                generator.Activating = value;
                 if (value)
-                {
-                    if (!IsTabletConnected)
-                        generator.NetworkisTabletConnected = true;
-                }
-                else
-                {
-                    if(IsTabletConnected)
-                        generator.EjectTablet();
-                }
+                    generator._leverStopwatch.Restart();
+
+                generator._targetCooldown = generator._doorToggleCooldownTime;
             }
         }
 
-        private Items.SynapseItem tablet;
-        public Items.SynapseItem ConnectedTablet
-        {
-            get => tablet;
-            set
-            {
-                tablet = value;
+        public bool Engaged { get => generator.Engaged; set => generator.Engaged = value; }
 
-                if (value != null)
-                {
-                    IsTabletConnected = true;
-                    value.Despawn();
-                }
-                else
-                    IsTabletConnected = false;
-            }
-        }
+        public short Time { get => generator._syncTime; set => generator.Network_syncTime = value; }
 
-        public float RemainingPowerUp
-        {
-            get => generator.remainingPowerup;
-            set => generator.SetTime(value);
-        }
+        [Obsolete()]
+        public Room Room => null;
 
-        public Room Room => Map.Get.Rooms.FirstOrDefault(x => x.RoomName.ToLower() == generator.CurRoom.ToLower());
+        [Obsolete("Use Engaged")]
+        public bool IsOvercharged => Engaged;
 
-        public Vector3 TabletEjectionPoint => generator.tabletEjectionPoint.position;
+        [Obsolete("Just set Engaged to true")]
+        public void Overcharge() => Engaged = true;
 
-        public bool IsOvercharged => Map.Get.HeavyController.ForcedOvercharge || generator._localTime <= 0f;
+        [Obsolete("Use Time instead")]
+        public float RemainingPowerUp { get; set; }
 
-        public void Overcharge()
-        {
-            if (IsOvercharged) return;
-            Locked = false;
-            Map.Get.HeavyController.ActiveGenerators++;
-            generator.NetworkremainingPowerup = 0f;
-            generator._localTime = 0f;
-            generator.EjectTablet();
-            generator.RpcNotify(Map.Get.HeavyController.ActiveGenerators);
-            if (Map.Get.HeavyController.ActiveGenerators < 5)
-                Respawning.RespawnEffectsController.PlayCassieAnnouncement(string.Concat(new object[]
-                {
-                        "JAM_",
-                        UnityEngine.Random.Range(0, 100).ToString("000"),
-                        "_",
-                        UnityEngine.Random.Range(2, 5),
-                        " SCP079RECON",
-                        Map.Get.HeavyController.ActiveGenerators
-                }), false, true);
-            else
-                Recontainer079.BeginContainment(false);
-        }
+        [Obsolete("Use Active instead")]
+        public bool IsTabletConnected { get => Active; set => Active = value; }
+
+        [Obsolete("Since 11.0.0 removed")]
+        public SynapseItem ConnectedTablet { get; set; }
+
+        [Obsolete("Since 11.0.0 removed")]
+        public readonly bool MainGenerator;
+
+        [Obsolete("Since 11.0.0 removed")]
+        public Vector3 TabletEjectionPoint => Vector3.zero;
     }
 }

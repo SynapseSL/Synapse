@@ -1,44 +1,65 @@
 ﻿using System;
+using System.Linq;
 using HarmonyLib;
+using InventorySystem.Items.Firearms;
+using InventorySystem.Items.Firearms.BasicMessages;
+using Mirror;
 using Synapse.Api;
-using UnityEngine;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(WeaponManager),nameof(WeaponManager.CallCmdShoot))]
+    [HarmonyPatch(typeof(FirearmBasicMessagesHandler), nameof(FirearmBasicMessagesHandler.ServerShotReceived))]
     internal static class PlayerShootPatch
     {
-        private static bool Prefix(WeaponManager __instance, GameObject target, Vector3 targetPos)
+        [HarmonyPrefix]
+        private static bool ServerProcessShotPatch(NetworkConnection conn, ShotMessage msg)
         {
             try
             {
-                if (!__instance._iawRateLimit.CanExecute(true))
+                var player = conn.GetPlayer();
+
+                if (!player.VanillaInventory.UserInventory.Items.TryGetValue(msg.ShooterWeaponSerial, out var itembase))
                     return false;
-                int itemIndex = __instance._hub.inventory.GetItemIndex();
-                if (itemIndex < 0 || itemIndex >= __instance._hub.inventory.items.Count || __instance.curWeapon < 0 ||
-                    ((__instance._reloadCooldown > 0.0 || __instance._fireCooldown > 0.0) &&
-                     !__instance.isLocalPlayer) ||
-                    (__instance._hub.inventory.curItem != __instance.weapons[__instance.curWeapon].inventoryID ||
-                     __instance._hub.inventory.items[itemIndex].durability <= 0.0))
-                    return false;
+                var item = itembase.GetSynapseItem();
 
-                Player targetplayer = null;
-                if (target != null)
-                    targetplayer = target.GetPlayer();
+                Player target;
+                if (msg.TargetNetId != 0)
+                {
+                    target = Server.Get.Players.FirstOrDefault(x => x.NetworkIdentity.netId == msg.TargetNetId);
+                    if (target == null)
+                        target = Server.Get.Map.Dummies.FirstOrDefault(x => x.Player.NetworkIdentity?.netId == msg.TargetNetId)?.Player;
+                }
+                else target = null;
+                
+                Server.Get.Events.Player.InvokePlayerShootEvent(player, target, msg.TargetPosition, item, out var allow);
+                Server.Get.Events.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allow);
 
-                var player = __instance.GetPlayer();
-                var item = player.ItemInHand;
+                if (allow)
+                {
+                    if (!ReferenceHub.TryGetHub(conn.identity.gameObject, out ReferenceHub referenceHub))
+                    {
+                        return false;
+                    }
+                    if (msg.ShooterWeaponSerial != referenceHub.inventory.CurItem.SerialNumber)
+                    {
+                        return false;
+                    }
+                    if (referenceHub.inventory.CurInstance is Firearm firearm && firearm.ActionModule.ServerAuthorizeShot())
+                    {
+                        firearm.HitregModule.ServerProcessShot(msg);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
 
-                Server.Get.Events.Player.InvokePlayerShootEvent(player, targetplayer, targetPos, item, out var allow);
-                if (item != null)
-                    Server.Get.Events.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allow);
-
-                return allow;
+                return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: PlayerShoot failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Logger.Get.Error($"Synapse-Event: PlayerShoot failed!!\n{e}");
                 return true;
             }
         }

@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
+using InventorySystem.Items.MicroHID;
+using LightContainmentZoneDecontamination;
+using MapGeneration;
 using Mirror;
 using UnityEngine;
 using EventHandler = Synapse.Api.Events.EventHandler;
@@ -8,31 +12,34 @@ using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
 {
-    [HarmonyPatch(typeof(Scp106PlayerScript), nameof(Scp106PlayerScript.CallCmdMovePlayer))]
+    [HarmonyPatch(typeof(Scp106PlayerScript), nameof(Scp106PlayerScript.UserCode_CmdMovePlayer))]
     internal class PocketDimensionEnterPatch
     {
-        private static bool Prefix(Scp106PlayerScript __instance, GameObject ply, int t)
+        [HarmonyPrefix]
+        private static bool MovePlayer(Scp106PlayerScript __instance, GameObject ply, int t)
         {
             try
             {
-                if (!__instance._iawRateLimit.CanExecute(true) || ply == null) return false;
+                if (!__instance._iawRateLimit.CanExecute(true) || ply == null || !__instance.iAm106) return false;
+
                 var scp = __instance.GetPlayer();
                 var player = ply.GetPlayer();
-                if (player == null || player.GodMode || !ServerTime.CheckSynchronization(t) || !__instance.iAm106) 
+
+                if (player == null || player.GodMode || !ServerTime.CheckSynchronization(t) || !player.ClassManager.IsHuman()) 
                     return false;
 
-                if (!scp.WeaponManager.GetShootPermission(player.ClassManager))
+                if (!SynapseExtensions.GetHarmPermission(scp, player))
                     return false;
 
                 var pos = player.Position;
                 var num = Vector3.Distance(scp.Position, pos);
                 var num2 = Math.Abs(scp.Position.y - pos.y);
-                if ((num >= 1.818f && num2 < 1.02f) || (num >= 2.1f && num2 < 1.95f) || (num >= 2.65f && num2 < 2.2f) || (num >= 3.2f && num2 < 3f) || num >= 3.64f)
+                if ((num >= 1.818f && num2 < 1.02f) || (num >= 3.4f && num2 < 1.95f) || (num >= 3.7f && num2 < 2.2f) || (num >= 3.9f && num2 < 3f) || num >= 4.2f)
                 {
                     __instance._hub.characterClassManager.TargetConsolePrint(scp.Connection, string.Format("106 MovePlayer command rejected - too big distance (code: T1). Distance: {0}, Y Diff: {1}.", num, num2), "gray");
                     return false;
                 }
-                if (Physics.Linecast(scp.Position, ply.transform.position, scp.WeaponManager.raycastServerMask))
+                if (Physics.Linecast(scp.Position, player.Position, MicroHIDItem.WallMask))
                 {
                     __instance._hub.characterClassManager.TargetConsolePrint(scp.Connection, string.Format("106 MovePlayer command rejected - collider found between you and the target (code: T2). Distance: {0}, Y Diff: {1}.", num, num2), "gray");
                     return false;
@@ -53,108 +60,124 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                 {
                     player.Hurt(40, DamageTypes.Scp106, scp);
                     player.Position = Vector3.down * 1998.5f;
-                    foreach(var scp079 in Scp079PlayerScript.instances)
+                    foreach (Scp079PlayerScript scp079PlayerScript in Scp079PlayerScript.instances)
                     {
-                        var room = player.ClassManager.Scp079.GetOtherRoom();
-                        var filter = new Scp079Interactable.InteractableType[]
+                        Scp079Interactable.InteractableType[] filter = new Scp079Interactable.InteractableType[]
                         {
-                            Scp079Interactable.InteractableType.Door,
-                            Scp079Interactable.InteractableType.Light,
-                            Scp079Interactable.InteractableType.Lockdown,
-                            Scp079Interactable.InteractableType.Tesla,
-                            Scp079Interactable.InteractableType.ElevatorUse,
+                    Scp079Interactable.InteractableType.Door,
+                    Scp079Interactable.InteractableType.Light,
+                    Scp079Interactable.InteractableType.Lockdown,
+                    Scp079Interactable.InteractableType.Tesla,
+                    Scp079Interactable.InteractableType.ElevatorUse
                         };
-
-                        var flag = true;
-                        foreach (var interaction in scp079.ReturnRecentHistory(12f, filter))
-                            foreach (var zoneRoom in interaction.interactable.currentZonesAndRooms)
-                                if (zoneRoom.currentZone == room.currentZone && zoneRoom.currentRoom == room.currentRoom)
+                        bool flag = false;
+                        using (IEnumerator<Scp079Interaction> enumerator2 = scp079PlayerScript.ReturnRecentHistory(12f, filter).GetEnumerator())
+                        {
+                            while (enumerator2.MoveNext())
+                            {
+                                if (RoomIdUtils.IsTheSameRoom(enumerator2.Current.interactable.transform.position, ply.transform.position))
+                                {
                                     flag = true;
+                                }
+                            }
+                        }
                         if (flag)
-                            scp079.RpcGainExp(ExpGainType.PocketAssist, player.RoleType);
+                        {
+                            scp079PlayerScript.RpcGainExp(ExpGainType.PocketAssist, player.RoleType);
+                        }
                     }
-
-                    if (player.RoleType == RoleType.Spectator) return false;
 
                     EventHandler.Get.Scp.Scp106.InvokePocketDimensionEnterEvent(player, scp, ref allow);
                     if (!allow) return false;
                     scp.Scp106Controller.PocketPlayers.Add(player);
-                    player.PlayerEffectsController.GetEffect<CustomPlayerEffects.Corroding>().IsInPd = true;
-                    player.GiveEffect(Api.Enum.Effect.Corroding);
+
+                    player.PlayerEffectsController.EnableEffect<CustomPlayerEffects.Corroding>(0f, false);
                 }
 
                 return false;
             }
             catch (Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: PocketDimEnter/ScpAttackEvent(106) failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Logger.Get.Error($"Synapse-Event: PocketDimEnter/ScpAttackEvent(106) failed!!\n{e}");
                 return true;
             }
         }
     }
 
-    [HarmonyPatch(typeof(PocketDimensionTeleport), nameof(PocketDimensionTeleport.OnTriggerEnter))]
+    //[HarmonyPatch(typeof(PocketDimensionTeleport), nameof(PocketDimensionTeleport.OnTriggerEnter))]
     internal class PocketDimensionLeavePatch
     {
-        private static bool Prefix(PocketDimensionTeleport __instance, Collider other)
+        [HarmonyPrefix]
+        private static bool TriggerEnter(PocketDimensionTeleport __instance, Collider other)
         {
             try
             {
-                if (!NetworkServer.active) return false;
-
                 var component = other.GetComponent<NetworkIdentity>();
                 if (component == null) return false;
 
-                var type = __instance.type;
+                var type = __instance._type;
                 var player = component.GetPlayer();
-
+                var pos = Vector3.zero;
                 if (player == null) return false;
 
-                __instance.tpPositions.Clear();
-                var stringList = GameCore.ConfigFile.ServerConfig.GetStringList(Synapse.Api.Map.Get.Decontamination.IsDecontaminationInProgress ? "pd_random_exit_rids_after_decontamination" : "pd_random_exit_rids");
-                foreach (GameObject gameObject in Server.Get.Map.Rooms.Select(x => x.GameObject))
+                var forceEscape = !SynapseExtensions.CanHarmScp(player, false);
+
+                if (player.Hub.scp106PlayerScript.GrabbedPosition == Vector3.zero)
+                    player.Hub.scp106PlayerScript.GrabbedPosition = new Vector3(0f, -1997f, 0f);
+
+                var identifier = MapGeneration.RoomIdUtils.RoomAtPosition(player.Hub.scp106PlayerScript.GrabbedPosition);
+
+                if(identifier.Zone == FacilityZone.Surface)
                 {
-                    var component2 = gameObject.GetComponent<Rid>();
-                    if (component2 != null && stringList.Contains(component2.id, StringComparison.Ordinal))
-                        __instance.tpPositions.Add(gameObject.transform.position);
+                    foreach(var player2 in Server.Get.Players)
+                        if(player2.RoleType == RoleType.Scp106)
+                        {
+                            var num = Vector3.Distance(player2.Position, __instance._gateBPDPosition);
+                            var num2 = Vector3.Distance(player2.Position,__instance._gateBPDPosition);
+                            pos = num2 < num ? __instance._gateBPDPosition : __instance._gateAPDPosition;
+                            break;
+                        }
                 }
+                else
+                {
+                    var hashSet = MapGeneration.RoomIdUtils.FindRooms(MapGeneration.RoomName.Unnamed, identifier.Zone, MapGeneration.RoomShape.Undefined);
+                    hashSet.RemoveWhere((MapGeneration.RoomIdentifier room) => 
+                    room.Name == MapGeneration.RoomName.Hcz106 || room.Name == MapGeneration.RoomName.EzGateA || 
+                    room.Name == MapGeneration.RoomName.EzGateB || (room.Zone == MapGeneration.FacilityZone.LightContainment 
+                    && room.Shape == MapGeneration.RoomShape.Curve) || __instance.ProblemChildren.Contains(room.Name));
 
-                if (stringList.Contains("PORTAL"))
-                    foreach (Scp106PlayerScript scp106PlayerScript in UnityEngine.Object.FindObjectsOfType<Scp106PlayerScript>())
-                        if (scp106PlayerScript.portalPosition != Vector3.zero)
-                            __instance.tpPositions.Add(scp106PlayerScript.portalPosition);
-
-                if(__instance.tpPositions == null || __instance.tpPositions.Count == 0)
-                    foreach (GameObject gameObject2 in GameObject.FindGameObjectsWithTag("PD_EXIT"))
-                        __instance.tpPositions.Add(gameObject2.transform.position);
-
-                var pos = __instance.tpPositions[UnityEngine.Random.Range(0, __instance.tpPositions.Count)];
-                pos.y += 2f;
-
-                if (!SynapseExtensions.CanHarmScp(player, false) || player.Team == Team.SCP)
-                    type = PocketDimensionTeleport.PDTeleportType.Exit;
+                    while (hashSet.Count > 0)
+                    {
+                        MapGeneration.RoomIdentifier roomIdentifier2 = hashSet.ElementAt(UnityEngine.Random.Range(0, hashSet.Count));
+                        if (PlayerMovementSync.FindSafePosition(roomIdentifier2.transform.position, out pos, false, true))
+                            break;
+                        hashSet.Remove(roomIdentifier2);
+                    }
+                }
 
                 EventHandler.Get.Scp.Scp106.InvokePocketDimensionLeaveEvent(player, ref pos, ref type, out var allow);
 
                 if (!allow) return false;
 
-                if (type == PocketDimensionTeleport.PDTeleportType.Killer || BlastDoor.OneDoor.isClosed)
+                if(!forceEscape && (type == PocketDimensionTeleport.PDTeleportType.Killer || Synapse.Api.Nuke.Get.Detonated))
                 {
-                    player.Hurt(9999, DamageTypes.Pocket, player);
+                    player.Hurt(999999, DamageTypes.Pocket);
                     return false;
                 }
+                else
+                {
+                    player.Position = pos;
+                    player.PlayerEffectsController.EnableEffect<CustomPlayerEffects.Disabled>(10f, true);
+                    player.PlayerEffectsController.GetEffect<CustomPlayerEffects.Corroding>().Intensity = 0;
+                    player.PlayerStats.TargetAchieve(component.connectionToClient, "larryisyourfriend");
+                }
+                MapGeneration.ImageGenerator.pocketDimensionGenerator.GenerateRandom();
 
-                player.PlayerMovementSync.AddSafeTime(2f, false);
-                player.Position = pos;
-                __instance.RemoveCorrosionEffect(player.gameObject);
-                PlayerManager.localPlayer.GetComponent<PlayerStats>().TargetAchieve(component.connectionToClient, "larryisyourfriend");
-                if (PocketDimensionTeleport.RefreshExit)
-                    MapGeneration.ImageGenerator.pocketDimensionGenerator.GenerateRandom();
                 return false;
             } 
             catch (Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: PocketDimLeave failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Logger.Get.Error($"Synapse-Event: PocketDimLeave failed!!\n{e}");
                 return true;
             }
         }

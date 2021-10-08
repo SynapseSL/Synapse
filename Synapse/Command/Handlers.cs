@@ -1,13 +1,15 @@
-﻿using Synapse.Command.Commands;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Synapse.Command.Commands;
 
 namespace Synapse.Command
 {
     public class Handlers
     {
-        internal Handlers() { }
-
         private static readonly List<ISynapseCommand> AwaitingFinalization = new List<ISynapseCommand>();
+
+        internal Handlers()
+        {
+        }
 
         public CommandHandler RemoteAdminHandler { get; } = new CommandHandler();
 
@@ -27,6 +29,10 @@ namespace Synapse.Command
             RegisterCommand(new SynapseSetClassCommand(), false);
             RegisterCommand(new SynapseMapPointCommand(), false);
             RegisterCommand(new SynapseRespawnCommand(), false);
+#if DEBUG
+            RegisterCommand(new SynapseGccCommand(), false);
+            RegisterCommand(new SynapseDebugCommand(), false);
+#endif
         }
 
         internal static void RegisterCommand(ISynapseCommand iSynapseCommand, bool awaitPluginInitialisation)
@@ -36,13 +42,25 @@ namespace Synapse.Command
                 AwaitingFinalization.Add(iSynapseCommand);
                 return;
             }
-            
-            var command = GeneratedCommand.FromSynapseCommand(iSynapseCommand);
+
+            RegisterGeneratedCommand(GeneratedCommand.FromSynapseCommand(iSynapseCommand));
+        }
+
+        internal static void FinalizePluginsCommands()
+        {
+            foreach (var iSynapseCommand in AwaitingFinalization)
+                RegisterGeneratedCommand(GeneratedCommand.FromSynapseCommand(iSynapseCommand));
+
+            AwaitingFinalization.Clear();
+        }
+
+        internal static void RegisterGeneratedCommand(GeneratedCommand command)
+        {
             foreach (var platform in command.Platforms)
-            {
                 switch (platform)
                 {
                     case Platform.ClientConsole:
+
                         SynapseController.CommandHandlers.ClientCommandHandler.RegisterCommand(command);
                         break;
                     case Platform.RemoteAdmin:
@@ -52,31 +70,6 @@ namespace Synapse.Command
                         SynapseController.CommandHandlers.ServerConsoleHandler.RegisterCommand(command);
                         break;
                 }
-            }
-        }
-        
-        internal static void FinalizePluginsCommands()
-        {
-            foreach (var iSynapseCommand in AwaitingFinalization)
-            {
-                var command = GeneratedCommand.FromSynapseCommand(iSynapseCommand);
-                foreach (var platform in command.Platforms)
-                {
-                    switch (platform)
-                    {
-                        case Platform.ClientConsole:
-                            SynapseController.CommandHandlers.ClientCommandHandler.RegisterCommand(command);
-                            break;
-                        case Platform.RemoteAdmin:
-                            SynapseController.CommandHandlers.RemoteAdminHandler.RegisterCommand(command);
-                            break;
-                        case Platform.ServerConsole:
-                            SynapseController.CommandHandlers.ServerConsoleHandler.RegisterCommand(command);
-                            break;
-                    }
-                }
-            }
-            AwaitingFinalization.Clear();
         }
     }
 }

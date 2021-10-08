@@ -1,24 +1,20 @@
-﻿using HarmonyLib;
+﻿using System.Linq;
+using HarmonyLib;
+using MapGeneration.Distributors;
 using Synapse.Api;
-using System.Linq;
 
 namespace Synapse.Patches.SynapsePatches
 {
-    [HarmonyPatch(typeof(Generator079), nameof(Generator079.Awake))]
+    [HarmonyPatch(typeof(Scp079Generator), nameof(Scp079Generator.Start))]
     internal static class GeneratorStartPatch
     {
-        private static void Postfix(Generator079 __instance)
+        [HarmonyPostfix]
+        private static void Start(Scp079Generator __instance)
         {
             while (Map.Get.Generators.Select(x => x.GameObject).Contains(null))
                 Map.Get.Doors.Remove(Map.Get.Doors.FirstOrDefault(x => x.GameObject == null));
 
-            if (!__instance.name.Contains("("))
-            {
-                Map.Get.Generators.Add(new Api.Generator(__instance,true));
-                return;
-            }
-
-            Map.Get.Generators.Add(new Api.Generator(__instance,false));
+            Map.Get.Generators.Add(new Api.Generator(__instance));
         }
     }
 }

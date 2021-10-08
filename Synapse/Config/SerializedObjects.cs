@@ -1,8 +1,9 @@
-﻿using Synapse.Api;
-using UnityEngine;
-using System;
-using Synapse.Api.Items;
+﻿using System;
 using System.Collections.Generic;
+using Synapse.Api;
+using Synapse.Api.Enum;
+using Synapse.Api.Items;
+using UnityEngine;
 
 namespace Synapse.Config
 {
@@ -37,49 +38,55 @@ namespace Synapse.Config
         public MapPoint Parse() => MapPoint.Parse(ToString());
 
         public override string ToString() => $"{Room}:{X}:{Y}:{Z}";
+
+        public static explicit operator MapPoint(SerializedMapPoint point) => point.Parse();
+        public static implicit operator SerializedMapPoint(MapPoint point) => new SerializedMapPoint(point);
     }
 
     [Serializable]
     public class SerializedItem
     {
-        public SerializedItem(Synapse.Api.Items.SynapseItem item)
-        {
-            ID = item.ID;
-            Durabillity = item.Durabillity;
-            Barrel = item.Barrel;
-            Sight = item.Sight;
-            Other = item.Other;
-            XSize = item.Scale.x;
-            YSize = item.Scale.y;
-            ZSize = item.Scale.z;
-        }
+        public SerializedItem() { }
 
-        public SerializedItem(int id, float durabillity, int barrel, int sight, int other,Vector3 scale)
+        public SerializedItem(SynapseItem item)
+            : this(item.ID, item.Durabillity, item.WeaponAttachments, item.Scale) { }
+
+        public SerializedItem(int id, float durabillity, uint weaponattachement, Vector3 scale)
         {
             ID = id;
             Durabillity = durabillity;
-            Barrel = barrel;
-            Sight = sight;
-            Other = other;
+            WeaponAttachments = weaponattachement;
             XSize = scale.x;
             YSize = scale.y;
             ZSize = scale.z;
         }
 
-        public SerializedItem()
-        {
-        }
-
         public int ID { get; set; }
         public float Durabillity { get; set; }
-        public int Sight { get; set; }
-        public int Barrel { get; set; }
-        public int Other { get; set; }
+        public uint WeaponAttachments { get; set; }
         public float XSize { get; set; }
         public float YSize { get; set; }
         public float ZSize { get; set; }
 
-        public Synapse.Api.Items.SynapseItem Parse() => new SynapseItem(ID, Durabillity, Sight, Barrel, Other) { Scale = new Vector3(XSize,YSize,ZSize)};
+        public SynapseItem Parse() => new SynapseItem(ID) 
+        { 
+            Scale = new Vector3(XSize,YSize,ZSize),
+            Durabillity = Durabillity,
+            WeaponAttachments = WeaponAttachments
+        };
+
+        public static explicit operator SynapseItem(SerializedItem item) => item.Parse();
+        public static implicit operator SerializedItem(SynapseItem item) => new SerializedItem(item);
+
+        [Obsolete("Please use the Attachments code now")]
+        public SerializedItem(int id, float durabillity, int barrel, int sight, int other, Vector3 scale)
+        {
+            ID = id;
+            Durabillity = durabillity;
+            XSize = scale.x;
+            YSize = scale.y;
+            ZSize = scale.z;
+        }
     }
 
     [Serializable]
@@ -87,18 +94,12 @@ namespace Synapse.Config
     {
         public SerializedPlayerItem() { }
 
-        public SerializedPlayerItem(Synapse.Api.Items.SynapseItem item, short chance, bool preference) : this(item.ID, item.Durabillity, item.Barrel, item.Sight, item.Other, item.Scale, chance, preference) { }
+        public SerializedPlayerItem(SynapseItem item, short chance, bool preference) 
+            : this(item.ID, item.Durabillity, item.WeaponAttachments, item.Scale, chance, preference) { }
 
-        public SerializedPlayerItem(int id, float durabillity, int barrel, int sight, int other, Vector3 scale, short chance, bool preference)
+        public SerializedPlayerItem(int id, float durabillity, uint weaponattachement, Vector3 scale, short chance, bool preference) 
+            : base(id, durabillity, weaponattachement, scale)
         {
-            ID = id;
-            Durabillity = durabillity;
-            Barrel = barrel;
-            Sight = sight;
-            Other = other;
-            XSize = scale.x;
-            YSize = scale.y;
-            ZSize = scale.z;
             Chance = chance;
             UsePreferences = preference;
         }
@@ -108,22 +109,26 @@ namespace Synapse.Config
 
         public SynapseItem Apply(Player player)
         {
-            var item = new Api.Items.SynapseItem(ID, Durabillity, Sight, Barrel, Other) 
-            { 
-                Scale = new Vector3(XSize, YSize, ZSize) 
-            };
+            var item = Parse();
 
-            if (UsePreferences)
-            {
-                item.Sight = player.GetSightPreference(item.ItemType);
-                item.Barrel = player.GetBarrelPreference(item.ItemType);
-                item.Other = player.GetOtherPreference(item.ItemType);
-            }
+            if (UsePreferences) item.WeaponAttachments = player.GetPreference(ItemManager.Get.GetBaseType(ID));
 
             if(UnityEngine.Random.Range(1f,100f) <= Chance)
                 item.PickUp(player);
 
             return item;
+        }
+
+        [Obsolete("Use the Attachements Code now")]
+        public SerializedPlayerItem(int id, float durabillity, int barrel, int sight, int other, Vector3 scale, short chance, bool preference)
+        {
+            ID = id;
+            Durabillity = durabillity;
+            XSize = scale.x;
+            YSize = scale.y;
+            ZSize = scale.z;
+            Chance = chance;
+            UsePreferences = preference;
         }
     }
 
@@ -132,22 +137,38 @@ namespace Synapse.Config
     {
         public SerializedAmmo() { }
 
+        [Obsolete("Ammo is stored in ushort since 11.0")]
         public SerializedAmmo(uint ammo5, uint ammo7, uint ammo9)
+        {
+            Ammo5 = (ushort)ammo5;
+            Ammo7 = (ushort)ammo7;
+            Ammo9 = (ushort)ammo9;
+            Ammo12 = 0;
+            Ammo44 = 0;
+        }
+
+        public SerializedAmmo(ushort ammo5, ushort ammo7, ushort ammo9, ushort ammo12, ushort ammo44)
         {
             Ammo5 = ammo5;
             Ammo7 = ammo7;
             Ammo9 = ammo9;
+            Ammo12 = ammo12;
+            Ammo44 = ammo44;
         }
 
-        public uint Ammo5 { get; set; }
-        public uint Ammo7 { get; set; }
-        public uint Ammo9 { get; set; }
+        public ushort Ammo5 { get; set; }
+        public ushort Ammo7 { get; set; }
+        public ushort Ammo9 { get; set; }
+        public ushort Ammo12 { get; set; }
+        public ushort Ammo44 { get; set; }
 
         public void Apply(Player player)
         {
-            player.Ammo5 = Ammo5;
-            player.Ammo7 = Ammo7;
-            player.Ammo9 = Ammo9;
+            player.AmmoBox[AmmoType.Ammo556x45] = Ammo5;
+            player.AmmoBox[AmmoType.Ammo762x39] = Ammo7;
+            player.AmmoBox[AmmoType.Ammo9x19] = Ammo9;
+            player.AmmoBox[AmmoType.Ammo12gauge] = Ammo12;
+            player.AmmoBox[AmmoType.Ammo44cal] = Ammo44;
         }
     }
 
@@ -193,5 +214,8 @@ namespace Synapse.Config
         public float X { get; set; }
         public float Y { get; set; }
         public float Z { get; set; }
+
+        public static implicit operator Vector3(SerializedVector3 vector) => vector.Parse();
+        public static implicit operator SerializedVector3(Vector3 vector) => new SerializedVector3(vector);
     }
 }

@@ -5,7 +5,7 @@ namespace KeyPressInjector
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SCP Secret Laboratory");
             var file = Path.Combine(path, "cmdbinding.txt");

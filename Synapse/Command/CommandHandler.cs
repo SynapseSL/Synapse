@@ -25,6 +25,12 @@ namespace Synapse.Command
             if (string.IsNullOrWhiteSpace(command.Name))
                 return false;
 
+            if (commands.Any(x => x.Key == command.Name.ToLower()))
+            {
+                Synapse.Api.Logger.Get.Warn($"Command {command.Name} was registered twice");
+                return false;
+            } 
+
             commands.Add(command.Name.ToLower(), command);
 
             if (command.Aliases != null)

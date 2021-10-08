@@ -8,7 +8,7 @@ namespace Synapse.Api
     {
         internal Jail(Player player) => Player = player;
 
-        private Player Player;
+        private readonly Player Player;
         private bool isjailed = false;
 
         public bool IsJailed

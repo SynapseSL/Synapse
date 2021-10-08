@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Synapse.Api.Exceptions;
 
@@ -9,7 +8,7 @@ namespace Synapse.Api.Items
     {
         public static ItemManager Get => Server.Get.ItemManager;
 
-        public const int HighestItem = (int)ItemType.Coin;
+        public const int HighestItem = (int)ItemType.GunShotgun;
 
         private readonly List<CustomItemInformation> customItems = new List<CustomItemInformation>();
 

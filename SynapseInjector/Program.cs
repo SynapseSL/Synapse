@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
@@ -29,7 +28,7 @@ namespace SynapseInjector
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                Thread.Sleep(100000);
+                Thread.Sleep(10000);
             }
 
             Thread.Sleep(2000);
@@ -58,7 +57,18 @@ namespace SynapseInjector
             var nested = new List<TypeDef>();
             foreach (var type in types)
             {
-                type.Attributes = type.IsNested ? TypeAttributes.NestedPublic : TypeAttributes.Public;
+                if (!type.IsPublic)
+                {
+                    bool isInter = type.IsInterface;
+                    bool isAbstr = type.IsAbstract;
+
+                    type.Attributes = type.IsNested ? TypeAttributes.NestedPublic : TypeAttributes.Public;
+
+                    if (isInter)
+                        type.IsInterface = true;
+                    if (isAbstr)
+                        type.IsAbstract = true;
+                }
                 if (type.CustomAttributes.Find("System.Runtime.CompilerServices.CompilerGeneratedAttribute") != null) continue;
                 nested.AddRange(type.NestedTypes.ToList());
             }

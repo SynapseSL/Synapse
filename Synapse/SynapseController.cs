@@ -1,8 +1,8 @@
 ﻿using System;
-using CommandSystem.Commands;
 using HarmonyLib;
 using Synapse.Api.Plugin;
 using Synapse.Command;
+using System.Linq;
 
 public class SynapseController
 {
@@ -16,17 +16,22 @@ public class SynapseController
 
     public static void Init()
     {
-        ServerConsole.AddLog("Welcome to Synapse! :)", ConsoleColor.Cyan);
         if (IsLoaded) return;
+        ServerConsole.AddLog("Welcome to Synapse! :)", ConsoleColor.Cyan);
         IsLoaded = true;
         new SynapseController();
     }
 
     internal SynapseController()
     {
-        CustomNetworkManager.Modded = true;
-        BuildInfoCommand.ModDescription = $"Plugin Framework: Synapse\nSynapse Version: {SynapseVersion}\nDescription: Synapse is a heavily modded server software using extensive runtime patching to make development faster and the usage more accessible to end-users";
-        
+        SynapseVersion.Init();
+
+        if (StartupArgs.Args.Any(x => x.Equals("-nosynapse", StringComparison.OrdinalIgnoreCase)))
+        {
+            Server.Logger.Warn("Server started with -nosynapse argument! Synapse will not be loaded");
+            return;
+        }
+
         PatchMethods();
         try
         {
@@ -37,15 +42,15 @@ public class SynapseController
 
             PluginLoader.ActivatePlugins();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Server.Logger.Error($"Error while Initialising Synapse! Please fix the Issue and restart your Server:\n{e}");
             return;
         }
 
         Server.Logger.Info("Synapse is now ready!");
-    } 
-    
+    }
+
     private void PatchMethods()
     {
         try
@@ -54,14 +59,14 @@ public class SynapseController
             instance.PatchAll();
             Server.Logger.Info("Harmony Patching was sucessfully!");
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Server.Logger.Error($"Harmony Patching threw an error:\n\n {e}");
         }
     }
 
-    public const int SynapseMajor = 2;
-    public const int SynapseMinor = 6;
-    public const int SynapsePatch = 1;
-    public const string SynapseVersion = "2.6.1";
+    public const int SynapseMajor = SynapseVersion.Major;
+    public const int SynapseMinor = SynapseVersion.Minor;
+    public const int SynapsePatch = SynapseVersion.Patch;
+    public const string BasedGameVersion = SynapseVersion.BasedGameVersion;
 }

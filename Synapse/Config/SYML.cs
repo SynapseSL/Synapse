@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Reflection;
+using System.Text;
 using JetBrains.Annotations;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
@@ -20,19 +20,16 @@ namespace Synapse.Config
         private readonly string _path;
 
         public Dictionary<string, ConfigSection> Sections = new Dictionary<string, ConfigSection>();
-        
+
         public SYML(string path)
         {
-            this._path = path;
-            if (!File.Exists(path))
-            {
-                File.Create(path).Close();
-            }
+            _path = path;
+            if (!File.Exists(path)) File.Create(path).Close();
         }
 
         public void Load()
         {
-            var text = File.ReadAllText(_path);
+            var text = File.ReadAllText(_path, Encoding.UTF8);
             Sections = ParseString(text);
         }
 
@@ -42,85 +39,76 @@ namespace Synapse.Config
             {
                 return Sections[section].LoadAs<T>();
             }
-            else
-            {
-                ConfigSection cfgs = new ConfigSection(section, "");
-                cfgs.Import(defValue);
-                Sections[section] = cfgs;
-                Store();
-                return defValue;
-            }
+
+            var cfgs = new ConfigSection(section, "");
+            cfgs.Import(defValue);
+            Sections[section] = cfgs;
+            Store();
+            return defValue;
         }
 
-        public object GetOrSetDefaultUnsafe(string section, object obj) 
+        public object GetOrSetDefaultUnsafe(string section, object obj)
         {
             if (Sections.ContainsKey(section))
             {
                 return Sections[section].LoadAsType(obj.GetType());
             }
-            else
-            {
-                ConfigSection cfgs = new ConfigSection(section, "");
-                cfgs.ImportUnsafe(obj);
-                Sections[section] = cfgs;
-                Store();
-                return obj;
-            }
+
+            var cfgs = new ConfigSection(section, "");
+            cfgs.ImportUnsafe(obj);
+            Sections[section] = cfgs;
+            Store();
+            return obj;
         }
 
-        
+
         public void Store()
         {
             var text = WriteSections(Sections);
-            File.WriteAllText(_path, text);
+            File.WriteAllText(_path, text, Encoding.UTF8);
         }
-        
-        private static Dictionary<string,ConfigSection> ParseString(string str)
+
+        private static Dictionary<string, ConfigSection> ParseString(string str)
         {
             var sections = new Dictionary<string, ConfigSection>();
-            var split =  str.Split(new string[] {"[","]"}, StringSplitOptions.None);
+            var split = str.Split(new[] {"[", "]"}, StringSplitOptions.None);
 
-            for (var i = 1; i < split.Length; i+=2)
+            for (var i = 1; i < split.Length; i += 2)
             {
                 var identifier = split[i];
                 var content = split[i + 1];
-                
-                int lastBracket = content.Length - 1;
-                int firstBracket = 0;
+
+                var lastBracket = content.Length - 1;
+                var firstBracket = 0;
                 for (var i1 = 0; i1 < content.Length; i1++)
-                {
                     if (content[i1] == '{')
                     {
                         firstBracket = i1;
                         break;
-                    } 
-                }
+                    }
+
                 for (var i1 = 0; i1 < content.Length; i1++)
-                {
                     if (content[i1] == '}')
-                    {
                         lastBracket = i1;
-                    } 
-                }
                 content = content.Substring(firstBracket + 1, lastBracket - firstBracket - 1);
 
                 content = content
-	                .Replace("::lcb::", "[")
-	                .Replace("::rcb::", "]")
-	                .Replace("::lsb::", "{")
-	                .Replace("::rsb::", "}")
-	                ;
-                
-                sections.Add(identifier, new ConfigSection(identifier,content));
+                        .Replace("::lcb::", "[")
+                        .Replace("::rcb::", "]")
+                        .Replace("::lsb::", "{")
+                        .Replace("::rsb::", "}")
+                    ;
+
+                sections.Add(identifier, new ConfigSection(identifier, content));
             }
-            
+
             return sections;
         }
 
         [CanBeNull]
         private static string WriteSections(Dictionary<string, ConfigSection> sections)
         {
-            string s = "";
+            var s = "";
             foreach (var value in sections.Values)
             {
                 s += value.Serialize();
@@ -131,24 +119,26 @@ namespace Synapse.Config
         }
     }
 
-    public interface IConfigSection { }
+    public interface IConfigSection
+    {
+    }
 
     public abstract class AbstractConfigSection : IConfigSection
     {
-
 	    /// <summary>
-	    /// Does not function if section has a non-autogenerated Name
+	    ///     Does not function if section has a non-autogenerated Name
 	    /// </summary>
 	    public void Update()
-	    {
-		    SynapseController.Server.Configs.UpdateSection(GetType().FullName?.Replace(".", " "), this);
-	    }
-
+        {
+            SynapseController.Server.Configs.UpdateSection(GetType().FullName?.Replace(".", " "), this);
+        }
     }
 
     public class ConfigSection
     {
-        public ConfigSection() { }
+        public ConfigSection()
+        {
+        }
 
         public ConfigSection(string section, string content)
         {
@@ -158,18 +148,15 @@ namespace Synapse.Config
 
         public string Section { get; set; }
         public string Content { get; set; }
-        
-        public T LoadAs<T>() where T: IConfigSection
+
+        public T LoadAs<T>() where T : IConfigSection
         {
             try
             {
-#if DEBUG
-                SynapseController.Server.Logger.Send($"==SymlDez==> '{Section}' ~> {typeof(T).FullName}", ConsoleColor.Magenta);
-#endif
                 var ret = new DeserializerBuilder()
-	                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-	                .IgnoreUnmatchedProperties()
-	                .Build().Deserialize<T>(Content);
+                    .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                    .IgnoreUnmatchedProperties()
+                    .Build().Deserialize<T>(Content);
                 return ret;
             }
             catch (Exception e)
@@ -187,9 +174,9 @@ namespace Synapse.Config
                 SynapseController.Server.Logger.Info($"==SymlDez==> '{Section}' ~> {type.FullName}");
 #endif
                 var ret = new DeserializerBuilder()
-	                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-	                .IgnoreUnmatchedProperties()
-	                .Build().Deserialize(Content, type);
+                    .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                    .IgnoreUnmatchedProperties()
+                    .Build().Deserialize(Content, type);
                 return ret;
             }
             catch (Exception e)
@@ -198,14 +185,14 @@ namespace Synapse.Config
                 throw;
             }
         }
-        
-        public string Import<T>(T t) where T: IConfigSection
+
+        public string Import<T>(T t) where T : IConfigSection
         {
             Content = new SerializerBuilder()
-	            .WithNamingConvention(CamelCaseNamingConvention.Instance)
-	            .WithTypeInspector(inner => new CommentGatheringTypeInspector(inner))
-	            .WithEmissionPhaseObjectGraphVisitor(args => new CommentsObjectGraphVisitor(args.InnerVisitor))
-                .Build().Serialize((object)t);
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .WithTypeInspector(inner => new CommentGatheringTypeInspector(inner))
+                .WithEmissionPhaseObjectGraphVisitor(args => new CommentsObjectGraphVisitor(args.InnerVisitor))
+                .Build().Serialize(t);
 
             return Content;
         }
@@ -213,138 +200,127 @@ namespace Synapse.Config
         public string ImportUnsafe(object obj)
         {
             Content = new SerializerBuilder()
-	            .WithNamingConvention(CamelCaseNamingConvention.Instance)
-	            .WithTypeInspector(inner => new CommentGatheringTypeInspector(inner))
-	            .WithEmissionPhaseObjectGraphVisitor(args => new CommentsObjectGraphVisitor(args.InnerVisitor))
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .WithTypeInspector(inner => new CommentGatheringTypeInspector(inner))
+                .WithEmissionPhaseObjectGraphVisitor(args => new CommentsObjectGraphVisitor(args.InnerVisitor))
                 .Build().Serialize(obj);
             return Content;
         }
 
-        
+
         public string Serialize()
         {
             return "[" + Section + "]" + "\n" + "{\n" + Content
-	            .Replace("[", "::lcb::")
-	            .Replace("]", "::rcb::")
-	            .Replace("{", "::lsb::")
-	            .Replace("}", "::rsb::")
-	            .Trim() + "\n}\n";
+                .Replace("[", "::lcb::")
+                .Replace("]", "::rcb::")
+                .Replace("{", "::lsb::")
+                .Replace("}", "::rsb::")
+                .Trim() + "\n}\n";
         }
     }
-    
+
     /**
      * The code bellow is from https://dotnetfiddle.net/8M6iIE
      * Great thanks to Antoine Aubry for providing this awesome
      * code sample, showing how to emit comments in YamlDotNet
      */
-	public class CommentGatheringTypeInspector : TypeInspectorSkeleton
-	{
-		private readonly ITypeInspector _innerTypeDescriptor;
-		
-		public CommentGatheringTypeInspector(ITypeInspector innerTypeDescriptor)
-		{
-			if (innerTypeDescriptor == null)
-			{
-				throw new ArgumentNullException("innerTypeDescriptor");
-			}
-			
-			this._innerTypeDescriptor = innerTypeDescriptor;
-		}
-		
-		public override IEnumerable<IPropertyDescriptor> GetProperties(Type type, object container)
-		{
-			return _innerTypeDescriptor
-				.GetProperties(type, container)
-				.Select(d => new CommentsPropertyDescriptor(d));
-		}
-		
-		private sealed class CommentsPropertyDescriptor : IPropertyDescriptor
-		{
-			private readonly IPropertyDescriptor _baseDescriptor;
-			
-			public CommentsPropertyDescriptor(IPropertyDescriptor baseDescriptor)
-			{
-				this._baseDescriptor = baseDescriptor;
-				Name = baseDescriptor.Name;
-			}
-			
-			public string Name { get; set; }
-			
-			public Type Type { get { return _baseDescriptor.Type; } }
-			
-			public Type TypeOverride
-			{
-				get { return _baseDescriptor.TypeOverride; }
-				set { _baseDescriptor.TypeOverride = value; }
-			}
-			
-			public int Order { get; set; }
-			
-			public ScalarStyle ScalarStyle
-			{
-				get { return _baseDescriptor.ScalarStyle; }
-				set { _baseDescriptor.ScalarStyle = value; }
-			}
-			
-			public bool CanWrite { get { return _baseDescriptor.CanWrite; } }
-			
-			public void Write(object target, object value)
-			{
-				_baseDescriptor.Write(target, value);
-			}
-			
-			public T GetCustomAttribute<T>() where T : Attribute
-			{
-				return _baseDescriptor.GetCustomAttribute<T>();
-			}
-			
-			[SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
-			public IObjectDescriptor Read(object target)
-			{
-				var description = _baseDescriptor.GetCustomAttribute<DescriptionAttribute>();
-				return description != null
-					? new CommentsObjectDescriptor(_baseDescriptor.Read(target), description.Description)
-					: _baseDescriptor.Read(target);
-			}
-		}
-	}
+    public class CommentGatheringTypeInspector : TypeInspectorSkeleton
+    {
+        private readonly ITypeInspector _innerTypeDescriptor;
 
-	public sealed class CommentsObjectDescriptor : IObjectDescriptor
-	{
-		private readonly IObjectDescriptor _innerDescriptor;
-		
-		public CommentsObjectDescriptor(IObjectDescriptor innerDescriptor, string comment)
-		{
-			this._innerDescriptor = innerDescriptor;
-			this.Comment = comment;
-		}
-		
-		public string Comment { get; private set; }
-		
-		public object Value { get { return _innerDescriptor.Value; } }
-		public Type Type { get { return _innerDescriptor.Type; } }
-		public Type StaticType { get { return _innerDescriptor.StaticType; } }
-		public ScalarStyle ScalarStyle { get { return _innerDescriptor.ScalarStyle; } }
-	}
+        public CommentGatheringTypeInspector(ITypeInspector innerTypeDescriptor)
+        {
+            _innerTypeDescriptor = innerTypeDescriptor ?? throw new ArgumentNullException("innerTypeDescriptor");
+        }
 
-	public class CommentsObjectGraphVisitor : ChainedObjectGraphVisitor
-	{
-		public CommentsObjectGraphVisitor(IObjectGraphVisitor<IEmitter> nextVisitor)
-			: base(nextVisitor)
-		{
-		}	
-		
-		public override bool EnterMapping(IPropertyDescriptor key, IObjectDescriptor value, IEmitter context)
-		{
-			var commentsDescriptor = value as CommentsObjectDescriptor;
-			if (commentsDescriptor != null && commentsDescriptor.Comment != null)
-			{
-				context.Emit(new Comment(commentsDescriptor.Comment, false));
-			}
-			
-			return base.EnterMapping(key, value, context);
-		}
-	}
-	    
-    
+        public override IEnumerable<IPropertyDescriptor> GetProperties(Type type, object container)
+        {
+            return _innerTypeDescriptor
+                .GetProperties(type, container)
+                .Select(d => new CommentsPropertyDescriptor(d));
+        }
+
+        private sealed class CommentsPropertyDescriptor : IPropertyDescriptor
+        {
+            private readonly IPropertyDescriptor _baseDescriptor;
+
+            public CommentsPropertyDescriptor(IPropertyDescriptor baseDescriptor)
+            {
+                _baseDescriptor = baseDescriptor;
+                Name = baseDescriptor.Name;
+            }
+
+            public string Name { get; }
+
+            public Type Type => _baseDescriptor.Type;
+
+            public Type TypeOverride
+            {
+                get => _baseDescriptor.TypeOverride;
+                set => _baseDescriptor.TypeOverride = value;
+            }
+
+            public int Order { get; set; }
+
+            public ScalarStyle ScalarStyle
+            {
+                get => _baseDescriptor.ScalarStyle;
+                set => _baseDescriptor.ScalarStyle = value;
+            }
+
+            public bool CanWrite => _baseDescriptor.CanWrite;
+
+            public void Write(object target, object value)
+            {
+                _baseDescriptor.Write(target, value);
+            }
+
+            public T GetCustomAttribute<T>() where T : Attribute
+            {
+                return _baseDescriptor.GetCustomAttribute<T>();
+            }
+
+            public IObjectDescriptor Read(object target)
+            {
+                var description = _baseDescriptor.GetCustomAttribute<DescriptionAttribute>();
+                return description != null
+                    ? new CommentsObjectDescriptor(_baseDescriptor.Read(target), description.Description)
+                    : _baseDescriptor.Read(target);
+            }
+        }
+    }
+
+    public sealed class CommentsObjectDescriptor : IObjectDescriptor
+    {
+        private readonly IObjectDescriptor _innerDescriptor;
+
+        public CommentsObjectDescriptor(IObjectDescriptor innerDescriptor, string comment)
+        {
+            _innerDescriptor = innerDescriptor;
+            Comment = comment;
+        }
+
+        public string Comment { get; }
+
+        public object Value => _innerDescriptor.Value;
+        public Type Type => _innerDescriptor.Type;
+        public Type StaticType => _innerDescriptor.StaticType;
+        public ScalarStyle ScalarStyle => _innerDescriptor.ScalarStyle;
+    }
+
+    public class CommentsObjectGraphVisitor : ChainedObjectGraphVisitor
+    {
+        public CommentsObjectGraphVisitor(IObjectGraphVisitor<IEmitter> nextVisitor)
+            : base(nextVisitor)
+        {
+        }
+
+        public override bool EnterMapping(IPropertyDescriptor key, IObjectDescriptor value, IEmitter context)
+        {
+            if (value is CommentsObjectDescriptor commentsDescriptor && commentsDescriptor.Comment != null)
+                context.Emit(new Comment(commentsDescriptor.Comment, false));
+
+            return base.EnterMapping(key, value, context);
+        }
+    }
 }

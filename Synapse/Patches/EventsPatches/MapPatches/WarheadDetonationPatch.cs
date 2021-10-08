@@ -6,7 +6,8 @@ namespace Synapse.Patches.EventsPatches.MapPatches
     [HarmonyPatch(typeof(AlphaWarheadController), nameof(AlphaWarheadController.Detonate))]
     internal static class WarheadDetonationPatch
     {
-        private static void Prefix()
+        [HarmonyPrefix]
+        private static void Detonate()
         {
             try
             {
@@ -14,7 +15,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
             }
             catch (Exception e)
             {
-                SynapseController.Server.Logger.Error($"Synapse-Event: WarheadDetonation failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                SynapseController.Server.Logger.Error($"Synapse-Event: WarheadDetonation failed!!\n{e}");
             }
         }
     }

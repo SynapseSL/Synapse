@@ -1,9 +1,9 @@
-﻿using Mirror;
+﻿using System.Collections.Generic;
+using InventorySystem;
+using Mirror;
 using RemoteAdmin;
-using System.Linq;
-using UnityEngine;
-using System.Collections.Generic;
 using Synapse.Api.Enum;
+using UnityEngine;
 
 namespace Synapse.Api
 {
@@ -49,7 +49,11 @@ namespace Synapse.Api
         public Vector2 Rotation
         {
             get => Player.Rotation;
-            set => Player.Rotation = value;
+            set
+            {
+                Player.Rotation = value;
+                Player.CameraReference.rotation = Quaternion.Euler(new Vector3(value.x, value.y, 90f));
+            }
         }
 
         /// <summary>
@@ -69,7 +73,7 @@ namespace Synapse.Api
             get => helditem;
             set
             {
-                GameObject.GetComponent<Inventory>().SetCurItem(value);
+                GameObject.GetComponent<Inventory>().NetworkCurItem = new InventorySystem.Items.ItemIdentifier(value, 0);
                 helditem = value;
             }
         }
@@ -94,8 +98,8 @@ namespace Synapse.Api
 
         public PlayerMovementState Movement
         {
-            get => (PlayerMovementState)Player.AnimationController.Network_curMoveState;
-            set => Player.AnimationController.Network_curMoveState = (byte)value;
+            get => Player.AnimationController.MoveState;
+            set => Player.AnimationController.UserCode_CmdChangeSpeedState((byte)value);
         }
 
         public MovementDirection Direction { get; set; }
@@ -115,7 +119,6 @@ namespace Synapse.Api
                 if (GameObject == null) yield break;
                 if (Direction == MovementDirection.Stop)
                 {
-                    Player.AnimationController.Networkspeed = new Vector2(0f, 0f);
                     continue;
                 }
 
@@ -129,18 +132,17 @@ namespace Synapse.Api
                         break;
 
                     case PlayerMovementState.Sprinting:
-                        speed = RunSpeed;
+                        speed = RunSpeed * Map.Get.SprintSpeed;
                         break;
 
                     case PlayerMovementState.Walking:
-                        speed = WalkSpeed;
+                        speed = WalkSpeed * Map.Get.WalkSpeed;
                         break;
                 }
 
                 switch (Direction)
                 {
                     case MovementDirection.Forward:
-                        Player.AnimationController.Networkspeed = new Vector2(speed, 0f);
                         var pos = Position + Player.CameraReference.forward / 10 * speed;
 
                         if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
@@ -149,7 +151,6 @@ namespace Synapse.Api
                         break;
 
                     case MovementDirection.BackWards:
-                        Player.AnimationController.Networkspeed = new Vector2(-speed, 0f);
                         pos = Position - Player.CameraReference.forward / 10 * speed;
 
                         if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
@@ -158,7 +159,6 @@ namespace Synapse.Api
                         break;
 
                     case MovementDirection.Right:
-                        Player.AnimationController.Networkspeed = new Vector2(0f, speed);
                         pos = Position + Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed;
 
                         if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
@@ -167,7 +167,6 @@ namespace Synapse.Api
                         break;
 
                     case MovementDirection.Left:
-                        Player.AnimationController.Networkspeed = new Vector2(0f, -speed);
                         pos = Position - Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed;
 
                         if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
@@ -179,7 +178,6 @@ namespace Synapse.Api
                 if (wall)
                 {
                     Direction = MovementDirection.Stop;
-                    Player.AnimationController.Networkspeed = new Vector2(0f, 0f);
                 }
             }
         }
@@ -199,7 +197,7 @@ namespace Synapse.Api
         {
             GameObject obj =
                 Object.Instantiate(
-                    NetworkManager.singleton.spawnPrefabs.FirstOrDefault(p => p.gameObject.name == "Player"));
+                    NetworkManager.singleton.playerPrefab);
 
             GameObject = obj;
             Player = GameObject.GetPlayer();

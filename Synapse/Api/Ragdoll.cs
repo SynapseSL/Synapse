@@ -1,5 +1,6 @@
 ﻿using Mirror;
 using UnityEngine;
+using System.Linq;
 
 namespace Synapse.Api
 {
@@ -24,6 +25,11 @@ namespace Synapse.Api
         public GameObject GameObject => ragdoll.gameObject;
 
         public string Name => ragdoll.name;
+
+        public RoleType RoleType
+        {
+            get => Server.Get.Host.ClassManager.Classes.FirstOrDefault(role => role.fullName == ragdoll.owner.FullName).roleId;
+        }
 
         public Vector3 Position
         {

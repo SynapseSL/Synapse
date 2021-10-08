@@ -1,67 +1,28 @@
 ﻿using HarmonyLib;
-using MEC;
-using Mirror;
-using Synapse.Api;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp173
 {
-    [HarmonyPatch(typeof(Scp173PlayerScript), nameof(Scp173PlayerScript.FixedUpdate))]
+    [HarmonyPatch(typeof(PlayableScps.Scp173), nameof(PlayableScps.Scp173.ServerHandleBlinkMessage))]
     internal static class Scp173BlinkingPatch
     {
-        private static bool Prefix(Scp173PlayerScript __instance)
+        [HarmonyPrefix]
+        private static bool Blink(PlayableScps.Scp173 __instance, ref Vector3 blinkPos)
         {
             try
             {
-                if ((Scp173PlayerScript._remainingTime - Time.fixedDeltaTime) >= 0f)
-                    return true;
-                if (!SynapseController.Server.Map.Round.RoundIsActive)
-                    return true;
-
-                __instance.DoBlinkingSequence();
-                if (!__instance.iAm173 || (!__instance.isLocalPlayer && !NetworkServer.active))
-                {
+                if (!__instance.BlinkReady) return false;
+                if ((__instance.Hub.PlayerCameraReference.transform.position - blinkPos).magnitude > __instance.EffectiveBlinkDistance() * 1.05)
                     return false;
-                }
 
-                HashSet<Player> players = new HashSet<Player>();
-
-                //Get all players looking at Scp173
-                foreach (GameObject gameObject in PlayerManager.players)
-                {
-                    Scp173PlayerScript component = gameObject.GetComponent<Scp173PlayerScript>();
-                    if (!component.SameClass && component.LookFor173(__instance.gameObject, true) && __instance.LookFor173(component.gameObject, false))
-                    {
-                        players.Add(gameObject.GetPlayer());
-                    }
-                }
-
-                var scriptHolder = __instance.gameObject.GetPlayer();
-                scriptHolder.Scp173Controller.ConfrontingPlayers = players;
-
-                //If someone is confronting Scp173 when blinking
-                if (scriptHolder.Scp173Controller.ConfrontingPlayers.Count != 0)
-                    Server.Get.Events.Scp.Scp173.InvokeScp173BlinkEvent(scriptHolder);
-
-                __instance.AllowMove = true;
-
-                //Original
-                foreach (GameObject gameObject in PlayerManager.players)
-                {
-                    Scp173PlayerScript component = gameObject.GetComponent<Scp173PlayerScript>();
-                    if (!component.SameClass && component.LookFor173(__instance.gameObject, true) && __instance.LookFor173(component.gameObject, false))
-                    {
-                        __instance.AllowMove = false;
-                        break;
-                    }
-                }
+                Server.Get.Events.Scp.Scp173.InvokeScp173BlinkEvent(__instance.GetPlayer(), ref blinkPos, out var allow);
+                return allow;
             }
             catch (System.Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp173BlinkEvent(Scp173) failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp173BlinkEvent(Scp173) failed!!\n{e}");
+                return true;
             }
-            return false;
         }
     }
 }

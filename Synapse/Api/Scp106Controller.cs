@@ -9,25 +9,25 @@ namespace Synapse.Api
 
         private readonly Player player;
 
-        private Scp106PlayerScript script => player.ClassManager.Scp106;
+        private Scp106PlayerScript Script => player.ClassManager.Scp106;
 
         public bool Is106 => player.RoleType == RoleType.Scp106;
 
-        public Vector3 PortalPosition { get => script.NetworkportalPosition; set => script.SetPortalPosition(value); }
+        public Vector3 PortalPosition { get => Script.NetworkportalPosition; set => Script.SetPortalPosition(Vector3.zero, value); }
 
-        public bool IsUsingPortal => script.goingViaThePortal;
+        public bool IsUsingPortal => Script.goingViaThePortal;
 
         public HashSet<Player> PocketPlayers { get; } = new HashSet<Player>();
 
 
-        public void UsePortal() => script.UseTeleport();
+        public void UsePortal() => Script.UserCode_CmdUsePortal();
 
-        public void DeletePortal() => script.DeletePortal();
+        public void DeletePortal() => Script.DeletePortal();
 
-        public void CreatePortal() => script.CreatePortalInCurrentPosition();
+        public void CreatePortal() => Script.CreatePortalInCurrentPosition();
 
-        public void Contain() => script.Contain(player.Hub);
+        public void Contain() => Script.Contain(player.Hub);
 
-        public void CapturePlayer(Player player) => script.CallCmdMovePlayer(player.gameObject, ServerTime.time);
+        public void CapturePlayer(Player player) => Script.UserCode_CmdMovePlayer(player.gameObject, ServerTime.time);
     }
 }

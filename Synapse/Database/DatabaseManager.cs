@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using LiteDB;
 
@@ -16,7 +15,7 @@ namespace Synapse.Database
             if (!SynapseController.Server.Configs.synapseConfiguration.DatabaseEnabled) throw new DataException("The Database has been disabled in the config. " +
                                                                            "Please check SynapseController.EnableDatabase before accessing connected APIs");
         }
-        
+
         public static PlayerRepository PlayerRepository = new PlayerRepository();
 
     }
@@ -34,20 +33,18 @@ namespace Synapse.Database
         }
     }
 
-    [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class PlayerDbo : IDatabaseEntity
     {
-        public int Id { get; set; } 
-        
+        public int Id { get; set; }
+
         public string GameIdentifier { get; set; }
-        
+
         public string Name { get; set; }
-        
+
         public bool DoNotTrack { get; set; }
-        
-        public Dictionary<string,string> Data { get; set; } 
-        
+
+        public Dictionary<string, string> Data { get; set; }
+
         public int GetId()
         {
             return Id;

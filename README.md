@@ -1,16 +1,21 @@
 ![discord badge](https://img.shields.io/discord/716698782317805629?color=7289DA&label=discord)
 # **Synapse**
 ### **What is Synapse?**
-Synapse is a project created by two german official community Server-Hosters. We used Harmony to create a framework which makes us easier to implement new functions, game updates and overall a new experience a player.
+Synapse is a project created by two german official community Server-Hosters. We used Harmony to create a framework which makes it easier for us to implement new functions, game updates and overall a new experience for players.
 
 ## **Features & Configs**
 Synapse itself has a ton of features some of these include:
-* Permission System which replaces the Permission System of Scp:Sl
-* Api to create own Roles 
-* Api to create own Items
-* Api to interact with the Features of Scp:SL
+* Permission system which replaces the Permission system of SCP:SL
+* MapPoint API
+* Custom Role API
+* Custom Item API
+* Custom Team API
+* Custom Command API
+* Dummy API that are able to walk
+* API to interact with the Features of SCP:SL
 * Database support
-* Command System
+* Translation system
+* Wrappers for various vanilla-classes
 
 ## **Installation**
 The installation of Synapse is very easy.
@@ -30,4 +35,4 @@ First of all we need to thank [SCP: Secret Laboratory](https://scpslgame.com) an
 
 We also need to thank the [Harmony](https://github.com/pardeike/Harmony) guys for developing a Runtime .NET Patcher.
 
-#### **Created by Dimenzio and SirRoob**
+#### **Created by Dimenzio and Helight**

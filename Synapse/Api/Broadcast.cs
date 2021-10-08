@@ -14,7 +14,7 @@ namespace Synapse.Api
             _player = player;
         }
 
-        private Player _player;
+        private readonly Player _player;
 
         public float DisplayTime { get; internal set; } = float.MinValue;
 
@@ -80,7 +80,7 @@ namespace Synapse.Api
     {
         public BroadcastList(Player player) => _player = player;
 
-        private Player _player;
+        private readonly Player _player;
 
         private List<Broadcast> bcs = new List<Broadcast>();
 
@@ -93,8 +93,10 @@ namespace Synapse.Api
             {
                 var currentbc = bcs.FirstOrDefault();
 
-                var list = new List<Broadcast>();
-                list.Add(bc);
+                var list = new List<Broadcast>
+                {
+                    bc
+                };
                 list.AddRange(bcs);
                 bcs = list;
 

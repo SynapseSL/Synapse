@@ -2,7 +2,6 @@
 
 namespace Synapse.Api.Enum
 {
-    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public enum Effect
     {
         /// <summary>

@@ -1,37 +1,50 @@
 ﻿using System;
 using HarmonyLib;
+using Mirror;
 using UnityEngine;
 using ev = Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp939
 {
-    [HarmonyPatch(typeof(Scp939PlayerScript),nameof(Scp939PlayerScript.CallCmdShoot))]
+    [HarmonyPatch(typeof(PlayableScps.Scp939),nameof(PlayableScps.Scp939.ServerAttack))]
     internal static class Scp939AttackPatch
     {
-        private static bool Prefix(Scp939PlayerScript __instance, GameObject target)
+        [HarmonyPrefix]
+        private static bool Scp939Attack(PlayableScps.Scp939 __instance, GameObject target, out bool __result)
         {
+            __result = false;
             try
             {
-                if (target == null || !__instance.iAm939 || __instance.cooldown > 0f ) return false;
                 var scp = __instance.GetPlayer();
-                var player = target.GetPlayer();
-                if (Vector3.Distance(player.Position, scp.Position) >= __instance.attackDistance * 1.2f) return false;
 
-                if (!scp.WeaponManager.GetShootPermission(player.ClassManager)) return false;
+                if(target.TryGetComponent<BreakableWindow>(out var window))
+                {
+                    window.Damage(50f, null, new Footprinting.Footprint(scp.Hub), Vector3.zero);
+                    __result = true;
+                }
+                else
+                {
+                    var targetplayer = target.GetPlayer();
 
-                ev.Get.Scp.InvokeScpAttack(scp, player, Api.Enum.ScpAttackType.Scp939_Bite, out var allow);
+                    if (!SynapseExtensions.GetHarmPermission(scp, targetplayer)) return false;
 
-                if (!allow) return false;
+                    ev.Get.Scp.InvokeScpAttack(scp, targetplayer, Api.Enum.ScpAttackType.Scp939_Bite, out var allow);
 
-                __instance.cooldown = 1f;
-                player.Hurt(65, DamageTypes.Scp939, scp);
-                player.GiveEffect(Api.Enum.Effect.Amnesia, 1, 3f);
-                __instance.RpcShoot();
+                    if (!allow) return false;
+
+                    scp.PlayerStats.HurtPlayer(new PlayerStats.HitInfo(50f, scp.Hub.LoggedNameFromRefHub(),
+                      DamageTypes.Scp939, scp.PlayerId, false), target, false, true);
+                    scp.ClassManager.RpcPlaceBlood(targetplayer.Position, 0, 2f);
+
+                    targetplayer.PlayerEffectsController.EnableEffect<CustomPlayerEffects.Amnesia>(3f, true);
+                    __result = true;
+                }
+
                 return false;
             }
             catch(Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp939) failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Synapse.Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp939) failed!!\n{e}");
                 return true;
             }
         }

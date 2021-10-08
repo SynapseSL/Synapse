@@ -8,7 +8,8 @@ namespace Synapse.Patches.EventsPatches.MapPatches
     [HarmonyPatch(typeof(DecontaminationController),nameof(DecontaminationController.FinishDecontamination))]
     internal static class LCZDecontaminationPatch
     {
-        private static bool Prefix()
+        [HarmonyPrefix]
+        private static bool OnDecontamination()
         {
             try
             {
@@ -17,7 +18,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: LCZDecontamination failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Logger.Get.Error($"Synapse-Event: LCZDecontamination failed!!\n{e}");
                 return true;
             }
         }

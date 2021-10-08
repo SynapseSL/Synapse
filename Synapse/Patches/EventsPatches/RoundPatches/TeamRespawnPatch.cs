@@ -1,17 +1,18 @@
-﻿using HarmonyLib;
-using Respawning;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using HarmonyLib;
 using NorthwoodLib.Pools;
+using Respawning;
+using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.RoundPatches
 {
     [HarmonyPatch(typeof(RespawnManager),nameof(RespawnManager.Spawn))]
     internal static class TeamRespawnPatch
     {
-        private static bool Prefix(RespawnManager __instance)
+		[HarmonyPrefix]
+		private static bool Spawn(RespawnManager __instance)
         {
             try
             {
@@ -34,6 +35,9 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 					list.ShuffleList<ReferenceHub>();
 
 				var num = RespawnTickets.Singleton.GetAvailableTickets(__instance.NextKnownTeam);
+
+				if (RespawnTickets.Singleton.IsFirstWave)
+					RespawnTickets.Singleton.IsFirstWave = false;
 
 				if (num == 0)
 				{
@@ -65,12 +69,15 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 				list = players.Select(x => x.Hub).ToList();
 				__instance.NextKnownTeam = team;
 
+				var que = new Queue<RoleType>();
+				spawnableTeam.GenerateQueue(que, list.Count);
+
 				foreach (ReferenceHub referenceHub in list)
 				{
 					try
 					{
-						RoleType classid = spawnableTeam.ClassQueue[Mathf.Min(list2.Count, spawnableTeam.ClassQueue.Length - 1)];
-						referenceHub.characterClassManager.SetPlayersClass(classid, referenceHub.gameObject, false, false);
+						RoleType classid = que.Dequeue();
+						referenceHub.characterClassManager.SetPlayersClass(classid, referenceHub.gameObject, CharacterClassManager.SpawnReason.Respawn, false);
 						list2.Add(referenceHub);
 						ServerLogs.AddLog(ServerLogs.Modules.ClassChange, string.Concat(new string[]
 						{
@@ -104,19 +111,17 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 			          "!"
 					}), ServerLogs.ServerLogType.GameEvent, false);
 					RespawnTickets.Singleton.GrantTickets(__instance.NextKnownTeam, -list2.Count * spawnableTeam.TicketRespawnCost, false);
-					Respawning.NamingRules.UnitNamingRule unitNamingRule;
-					if (Respawning.NamingRules.UnitNamingRules.TryGetNamingRule(__instance.NextKnownTeam, out unitNamingRule))
-					{
-						string text;
-						unitNamingRule.GenerateNew(__instance.NextKnownTeam, out text);
-						foreach (ReferenceHub referenceHub2 in list2)
-						{
-							referenceHub2.characterClassManager.NetworkCurSpawnableTeamType = (byte)__instance.NextKnownTeam;
-							referenceHub2.characterClassManager.NetworkCurUnitName = text;
-						}
-						unitNamingRule.PlayEntranceAnnouncement(text);
-					}
-					RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.UponRespawn, __instance.NextKnownTeam);
+                    if (Respawning.NamingRules.UnitNamingRules.TryGetNamingRule(__instance.NextKnownTeam, out var unitNamingRule))
+                    {
+                        unitNamingRule.GenerateNew(__instance.NextKnownTeam, out string text);
+                        foreach (ReferenceHub referenceHub2 in list2)
+                        {
+                            referenceHub2.characterClassManager.NetworkCurSpawnableTeamType = (byte)__instance.NextKnownTeam;
+                            referenceHub2.characterClassManager.NetworkCurUnitName = text;
+                        }
+                        unitNamingRule.PlayEntranceAnnouncement(text);
+                    }
+                    RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.UponRespawn, __instance.NextKnownTeam);
 				}
 				ListPool<ReferenceHub>.Shared.Return(list2);
 				__instance.NextKnownTeam = SpawnableTeamType.None;
@@ -125,7 +130,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 			}
             catch(Exception e)
             {
-                SynapseController.Server.Logger.Error($"Synapse-Event: TeamRespawn failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                SynapseController.Server.Logger.Error($"Synapse-Event: TeamRespawn failed!!\n{e}");
                 return true;
             }
         }

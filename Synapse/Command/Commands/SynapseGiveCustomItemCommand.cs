@@ -39,9 +39,7 @@ namespace Synapse.Command.Commands
             }
 
             float durabillity = 0;
-            int sight = 0;
-            int barrel = 0;
-            int other = 0;
+            uint sight = 0;
             float xsize = 1;
             float ysize = 1;
             float zsize = 1;
@@ -55,47 +53,31 @@ namespace Synapse.Command.Commands
                 }
 
             if (context.Arguments.Count > 3)
-                if (!int.TryParse(context.Arguments.ElementAt(3), out sight))
+                if (!uint.TryParse(context.Arguments.ElementAt(3), out sight))
                 {
-                    result.Message = "Invalid Parameter for Sight";
+                    result.Message = "Invalid Parameter for Attachements";
                     result.State = CommandResultState.Error;
                     return result;
                 }
 
             if (context.Arguments.Count > 4)
-                if (!int.TryParse(context.Arguments.ElementAt(4), out barrel))
-                {
-                    result.Message = "Invalid Parameter for Barrel";
-                    result.State = CommandResultState.Error;
-                    return result;
-                }
-
-            if (context.Arguments.Count > 5)
-                if (!int.TryParse(context.Arguments.ElementAt(5), out other))
-                {
-                    result.Message = "Invalid Parameter for Other";
-                    result.State = CommandResultState.Error;
-                    return result;
-                }
-
-            if (context.Arguments.Count > 6)
-                if (!float.TryParse(context.Arguments.ElementAt(6), out xsize))
+                if (!float.TryParse(context.Arguments.ElementAt(4), out xsize))
                 {
                     result.Message = "Invalid Parameter for XSize";
                     result.State = CommandResultState.Error;
                     return result;
                 }
 
-            if (context.Arguments.Count > 7)
-                if (!float.TryParse(context.Arguments.ElementAt(7), out ysize))
+            if (context.Arguments.Count > 5)
+                if (!float.TryParse(context.Arguments.ElementAt(5), out ysize))
                 {
                     result.Message = "Invalid Parameter for YSize";
                     result.State = CommandResultState.Error;
                     return result;
                 }
 
-            if (context.Arguments.Count > 8)
-                if (!float.TryParse(context.Arguments.ElementAt(8), out zsize))
+            if (context.Arguments.Count > 6)
+                if (!float.TryParse(context.Arguments.ElementAt(6), out zsize))
                 {
                     result.Message = "Invalid Parameter for ZSize";
                     result.State = CommandResultState.Error;
@@ -109,9 +91,13 @@ namespace Synapse.Command.Commands
                 return result;
             }
 
-            var item = new Api.Items.SynapseItem(id, durabillity, sight, barrel, other);
-            item.Scale = new UnityEngine.Vector3(xsize, ysize, zsize);
+            var item = new Api.Items.SynapseItem(id)
+            {
+                Scale = new UnityEngine.Vector3(xsize, ysize, zsize),
+            };
             player.Inventory.AddItem(item);
+            item.Durabillity = durabillity;
+            item.WeaponAttachments = sight;
 
 
             result.Message = "Added Item to Players Inventory!";

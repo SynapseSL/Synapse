@@ -1,12 +1,14 @@
-﻿using Interactables.Interobjects;
-using Interactables.Interobjects.DoorUtils;
-using MapGeneration;
-using Mirror;
-using Synapse.Api.Enum;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Management.Instrumentation;
+using Interactables.Interobjects.DoorUtils;
+using InventorySystem.Items;
+using InventorySystem.Items.Firearms.Attachments;
+using MapGeneration;
+using Mirror;
+using Scp914;
+using Synapse.Api.Enum;
+using Synapse.Api.Items;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -41,9 +43,11 @@ namespace Synapse.Api
 
         public List<Ragdoll> Ragdolls { get; } = new List<Ragdoll>();
 
-        public List<Items.SynapseItem> Items { get; } = new List<Items.SynapseItem>();
+        public List<SynapseItem> Items => SynapseItem.AllItems.Values.Where(x => x != null).ToList();
 
         public List<Dummy> Dummies { get; } = new List<Dummy>();
+
+        public List<Camera> Cameras { get; } = new List<Camera>();
 
         public string IntercomText
         {
@@ -81,13 +85,13 @@ namespace Synapse.Api
 
         public int Seed => MapGeneration.SeedSynchronizer.Seed;
 
-        public Room GetRoom(RoomInformation.RoomType roomType) 
+        public Room GetRoom(RoomName roomType)
             => Rooms.FirstOrDefault(x => x.RoomType == roomType);
 
-        public Door GetDoor(Enum.DoorType doorType) 
+        public Door GetDoor(Enum.DoorType doorType)
             => Doors.FirstOrDefault(x => x.DoorType == doorType);
 
-        public Elevator GetElevator(Enum.ElevatorType elevatorType) 
+        public Elevator GetElevator(Enum.ElevatorType elevatorType)
             => Elevators.FirstOrDefault(x => x.ElevatorType == elevatorType);
 
         public void SendBroadcast(ushort time, string message, bool instant = false)
@@ -96,13 +100,23 @@ namespace Synapse.Api
                 ply.SendBroadcast(time, message, instant);
         }
 
-        public void AnnounceScpDeath(string scp)
-        {
-            var text = $"SCP {scp} SUCCESSFULLY TERMINATED . TERMINATION CAUSE UNSPECIFIED";
-            GlitchedCassie(text);
-        }
+        public void AnnounceScpDeath(string scp) => AnnounceScpDeath(scp, ScpRecontainmentType.Unknown);
 
-        public void Cassie(string words, bool makehold = true, bool makenoise = true) 
+        public void AnnounceScpDeath(string scp, ScpRecontainmentType deathType, string Unit = "UNKNOWN") =>
+        GlitchedCassie(deathType switch
+        {
+            ScpRecontainmentType.Tesla => $". SCP {scp} SUCCESSFULLY TERMINATED BY AUTOMATIC SECURITY SYSTEM",
+            ScpRecontainmentType.Nuke => $". SCP {scp} SUCCESSFULLY TERMINATED BY ALPHA WARHEAD",
+            ScpRecontainmentType.Decontamination => $". SCP {scp} LOST IN DECONTAMINATION SEQUENCE",
+            ScpRecontainmentType.Mtf => $". SCP {scp} SUCCESSFULLY TERMINATED . CONTAINEDSUCCESSFULLY CONTAINMENTUNIT {Unit}",
+            ScpRecontainmentType.Chaos => $". SCP {scp} SUCCESSFULLY TERMINATED . BY CHAOSINSURGENCY",
+            ScpRecontainmentType.Scientist => $". SCP {scp} SUCCESSFULLY TERMINATED . BY SCIENCE PERSONNEL",
+            ScpRecontainmentType.ClassD => $". SCP {scp} SUCCESSFULLY TERMINATED . BY CLASSD PERSONNEL",
+            ScpRecontainmentType.Unknown => $". SCP {scp} SUCCESSFULLY TERMINATED . CONTAINMENTUNIT UNKNOWN",
+            _ => $". SCP {scp} SUCCESSFULLY TERMINATED . TERMINATION CAUSE UNSPECIFIED",
+        });
+
+        public void Cassie(string words, bool makehold = true, bool makenoise = true)
             => Respawning.RespawnEffectsController.PlayCassieAnnouncement(words, makehold, makenoise);
 
         public void GlitchedCassie(string words)
@@ -111,30 +125,29 @@ namespace Synapse.Api
             Server.Get.GetObjectOf<NineTailedFoxAnnouncer>().ServerOnlyAddGlitchyPhrase(words, UnityEngine.Random.Range(0.1f, 0.14f) * num2, UnityEngine.Random.Range(0.07f, 0.08f) * num2);
         }
 
-        public Grenades.Grenade SpawnGrenade(Vector3 position, Vector3 velocity, float fusetime = 3f, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null)
+        public SynapseItem SpawnGrenade(Vector3 position, Vector3 velocity, float fusetime = 3f, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null)
         {
-            if (player == null)
-                player = Server.Get.Host;
+            var itemtype = (ItemType)grenadeType;
+            var grenadeitem = new SynapseItem(itemtype, position);
+            grenadeitem.Throwable.Fuse();
+            grenadeitem.Throwable.FuseTime = fusetime;
+            if (player != null)
+                grenadeitem.Throwable.ThrowableItem.PreviousOwner = new Footprinting.Footprint(player.Hub);
 
-            var component = player.GrenadeManager;
-            var component2 = UnityEngine.Object.Instantiate(component.availableGrenades[(int)grenadeType].grenadeInstance).GetComponent<Grenades.Grenade>();
-            component2.FullInitData(component, position, Quaternion.Euler(component2.throwStartAngle), velocity, component2.throwAngularVelocity, player == Server.Get.Host ? Team.RIP : player.Team);
-            component2.NetworkfuseTime = NetworkTime.time + (double)fusetime;
-            NetworkServer.Spawn(component2.gameObject);
+            if(grenadeitem.Throwable.ThrowableItem.TryGetComponent<Rigidbody>(out var rgb))
+                rgb.velocity = velocity;
 
-            return component2;
+            return grenadeitem;
         }
 
         public void Explode(Vector3 position, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null)
         {
-            if (player == null)
-                player = Server.Get.Host;
-
-            var component = player.GrenadeManager;
-            var component2 = UnityEngine.Object.Instantiate(component.availableGrenades[(int)grenadeType].grenadeInstance).GetComponent<Grenades.Grenade>();
-            component2.FullInitData(component, position, Quaternion.identity, Vector3.zero, Vector3.zero, Team.RIP);
-            component2.NetworkfuseTime = 0.10000000149011612;
-            NetworkServer.Spawn(component2.gameObject);
+            var itemtype = (ItemType)grenadeType;
+            var grenadeitem = new SynapseItem(itemtype, position);
+            grenadeitem.Throwable.Fuse();
+            if (player != null)
+                grenadeitem.Throwable.ThrowableItem.PreviousOwner = new Footprinting.Footprint(player.Hub);
+            MEC.Timing.CallDelayed(0.1f, () => grenadeitem.Destroy());
         }
 
         public void PlaceBlood(Vector3 pos, int type = 0, float size = 2)
@@ -145,11 +158,11 @@ namespace Synapse.Api
             => new Dummy(pos, rot, role, name, badgetext, badgecolor);
 
         [Obsolete("Moved to Workstation.CreateWorkStation()", true)]
-        public WorkStation CreateWorkStation(Vector3 position, Vector3 rotation, Vector3 scale) 
+        public WorkStation CreateWorkStation(Vector3 position, Vector3 rotation, Vector3 scale)
             => new WorkStation(position, rotation, scale);
 
         [Obsolete("Moved to Ragdoll.CreateRagdoll()", true)]
-        public Ragdoll CreateRagdoll(RoleType roletype, Vector3 pos, Quaternion rot, Vector3 velocity, PlayerStats.HitInfo info, bool allowRecall, Player owner) 
+        public Ragdoll CreateRagdoll(RoleType roletype, Vector3 pos, Quaternion rot, Vector3 velocity, PlayerStats.HitInfo info, bool allowRecall, Player owner)
             => new Ragdoll(roletype, pos, rot, velocity, info, allowRecall, owner);
 
         [Obsolete("Moved to Door.SpawnDoorVariant()", true)]
@@ -169,26 +182,30 @@ namespace Synapse.Api
 
         internal void AddObjects()
         {
+            foreach (var room in RoomIdentifier.AllRoomIdentifiers)
+            {
+                var synRoom = new Room(room);
+                Rooms.Add(synRoom);
+                Cameras.AddRange(synRoom.Cameras);
+            }
+
             foreach (var tesla in SynapseController.Server.GetObjectsOf<TeslaGate>())
                 Teslas.Add(new Tesla(tesla));
 
-            foreach (var room in SynapseController.Server.GetObjectsOf<Transform>().Where(x => x.CompareTag("Room") || x.name == "Root_*&*Outside Cams" || x.name == "PocketWorld"))
-                Rooms.Add(new Room(room.gameObject));
-
-            foreach (var station in Server.Get.GetObjectsOf<global::WorkStation>())
+            foreach (var station in WorkstationController.AllWorkstations)
                 WorkStations.Add(new WorkStation(station));
 
             foreach (var door in SynapseController.Server.GetObjectsOf<DoorVariant>())
                 Doors.Add(new Door(door));
 
-            foreach (var interactable in Interface079.singleton.allInteractables)
+            foreach (var pair in Scp079Interactable.InteractablesByRoomId)
             {
-                foreach (var zoneroom in interactable.currentZonesAndRooms)
+                foreach (var interactable in pair.Value)
                 {
                     try
                     {
-                        var room = Rooms.FirstOrDefault(x => x.RoomName == zoneroom.currentRoom);
-                        var door = interactable.GetComponentInParent<Interactables.Interobjects.DoorUtils.DoorVariant>();
+                        var room = Rooms.FirstOrDefault(x => x.ID == pair.Key);
+                        var door = interactable.GetComponentInParent<DoorVariant>();
                         if (room == null || door == null) continue;
                         var sdoor = door.GetDoor();
                         sdoor.Rooms.Add(room);
@@ -197,6 +214,10 @@ namespace Synapse.Api
                     catch { }
                 }
             }
+
+            Scp914.Scp914Controller = UnityEngine.Object.FindObjectOfType<Scp914Controller>();
+
+            SynapseController.Server.Map.Elevators.RemoveAll(x => x.GameObject == null);
         }
 
         internal void ClearObjects()
@@ -208,8 +229,8 @@ namespace Synapse.Api
             Generators.Clear();
             WorkStations.Clear();
             Ragdolls.Clear();
-            Items.Clear();
-            HeavyController.Is079Recontained = false;
+            SynapseItem.AllItems.Clear();
+            ItemSerialGenerator.Reset();
         }
     }
 }

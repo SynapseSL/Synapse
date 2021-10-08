@@ -12,7 +12,7 @@ namespace Synapse.Translation
             translationSYML.Load();
         }
 
-        private SYML translationSYML;
+        private readonly SYML translationSYML;
 
         public TPluginTranslation ActiveTranslation
         {
