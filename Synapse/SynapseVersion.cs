@@ -9,9 +9,9 @@ public static class SynapseVersion
 
     public const int Patch = 0;
 
-    public const VersionType Type = VersionType.Pre;
+    public const VersionType Type = VersionType.None;
 
-    public const string SubVersion = "1.5";
+    public const string SubVersion = "";
 
     public const string BasedGameVersion = "11.0.0";
 
