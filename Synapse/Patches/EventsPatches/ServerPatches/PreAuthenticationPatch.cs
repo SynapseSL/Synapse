@@ -35,9 +35,11 @@ namespace Synapse.Patches.EventsPatches.ServerPatches
                 data.Put(reason);
                 request.RejectForce(data);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Synapse.Api.Logger.Get.Error($"Synapse-Event: PreAuthenticationFailed failed!!\n{e}");
+                //Just casually accept if Synapse messes up here.
+                request.Accept();
             }
         }
 
@@ -45,7 +47,7 @@ namespace Synapse.Patches.EventsPatches.ServerPatches
         {
             var codes = new List<CodeInstruction>(instructions);
 
-            foreach (var code in codes.Select((x, i) => new {Value = x, Index = i}))
+            foreach (var code in codes.Select((x, i) => new { Value = x, Index = i }))
             {
                 if (code.Value.opcode != OpCodes.Callvirt) continue;
                 if (codes[code.Index + 2].opcode != OpCodes.Ldstr) continue;
