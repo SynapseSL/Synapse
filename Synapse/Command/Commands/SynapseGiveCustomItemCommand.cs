@@ -93,11 +93,11 @@ namespace Synapse.Command.Commands
 
             var item = new Api.Items.SynapseItem(id)
             {
-                Durabillity = durabillity,
                 Scale = new UnityEngine.Vector3(xsize, ysize, zsize),
-                WeaponAttachments = sight
             };
             player.Inventory.AddItem(item);
+            item.Durabillity = durabillity;
+            item.WeaponAttachments = sight;
 
 
             result.Message = "Added Item to Players Inventory!";

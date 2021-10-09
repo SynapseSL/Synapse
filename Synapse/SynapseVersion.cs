@@ -9,11 +9,11 @@ public static class SynapseVersion
 
     public const int Patch = 0;
 
-    public const VersionType Type = VersionType.Pre;
+    public const VersionType Type = VersionType.None;
 
-    public const string SubVersion = "1.5";
+    public const string SubVersion = "";
 
-    public const string BasedGameVersion = "11.0.0-parabellum-rc-2.1-af5dff49";
+    public const string BasedGameVersion = "11.0.0";
 
     public static bool Debug { get; private set; } = false;
 
@@ -22,10 +22,10 @@ public static class SynapseVersion
         var version = $"{Major}.{Minor}.{Patch}";
 
         if (Type != VersionType.None)
-            version += $"-{Type}-{SubVersion}";
+            version += $" {Type} {SubVersion}";
 
         if (Debug)
-            version += "-DEBUG";
+            version += " DEBUG";
 
         return version;
     }
