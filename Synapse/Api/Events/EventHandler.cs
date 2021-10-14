@@ -46,6 +46,10 @@ namespace Synapse.Api.Events
                     BlockSpectatorVoice = !BlockSpectatorVoice;
                     Synapse.Api.Logger.Get.Debug(BlockSpectatorVoice);
                     break;
+
+                case KeyCode.Alpha6:
+                    Ragdoll.CreateRagdoll(RoleType.ClassD, ev.Player.Position, Quaternion.identity, Vector3.zero, new PlayerStats.HitInfo(), false, ev.Player);
+                    break;
             }
         }
 
