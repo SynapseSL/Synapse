@@ -127,6 +127,7 @@ namespace Synapse.Api
         {
             if (damagetype == default)
                 damagetype = DamageTypes.None;
+
             if (attacker == null) attacker = this;
             attacker.PlayerStats.HurtPlayer(new PlayerStats.HitInfo(amount, attacker.NickName, damagetype, attacker.PlayerId, true), gameObject);
         }

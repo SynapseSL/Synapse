@@ -217,7 +217,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 {
                     __instance.TargetAchieve(victim.Connection, "iwanttobearocket");
                 }
-                else if (info.Tool.Weapon != ItemType.None)
+                else if (info.Tool?.Weapon != ItemType.None)
                 {
                     if (victim.RoleType == RoleType.Scientist && victim.ItemInHand.ID != -1 &&
                         victim.ItemInHand.ItemCategory == ItemCategory.Keycard &&
@@ -260,7 +260,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 
 
-                if (info.Tool.Scp != RoleType.None || info.Tool == DamageTypes.Pocket)
+                if (info.Tool?.Scp != RoleType.None || info.Tool == DamageTypes.Pocket)
                     RoundSummary.kills_by_scp++;
 
                 else if (info.Tool == DamageTypes.Grenade)
@@ -270,12 +270,11 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             void ConsoleLogging(Player victim, Player killer, bool friendlyFire)
             {
                 bool suicide = victim == killer;
-
                 if (suicide)
                 {
                     ServerLogs.AddLog(
                         ServerLogs.Modules.ClassChange,
-                        $"{victim.Hub.LoggedNameFromRefHub()} playing as {victim.ClassManager.CurRole.fullName} committed a suicide using {info.Tool.Name}.",
+                        $"{victim.Hub.LoggedNameFromRefHub()} playing as {victim.ClassManager.CurRole.fullName} committed a suicide using {info.Tool?.Name}.",
                         ServerLogs.ServerLogType.Suicide,
                         false
                         );

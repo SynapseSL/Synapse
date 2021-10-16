@@ -48,7 +48,11 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha6:
-                    Ragdoll.CreateRagdoll(RoleType.ClassD, ev.Player.Position, Quaternion.identity, Vector3.zero, new PlayerStats.HitInfo(), false, ev.Player);
+                    ev.Player.Hurt(150);
+                    break;
+
+                case KeyCode.Alpha7:
+                    ev.Player.Kill();
                     break;
             }
         }
