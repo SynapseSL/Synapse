@@ -268,10 +268,12 @@ namespace Synapse.Api
             get => _role;
             set
             {
-                if (_role != null)
-                    _role.DeSpawn();
+                var oldRole = _role;
 
                 _role = value;
+
+                if (oldRole != null)
+                    oldRole.DeSpawn();
 
                 if (_role == null) return;
 
