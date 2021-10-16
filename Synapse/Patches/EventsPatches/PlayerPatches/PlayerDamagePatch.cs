@@ -26,6 +26,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 if (victim != null && victim.Hub.characterClassManager.CurClass == RoleType.Spectator)
                     return false;
 
+                var isCustomRoleInvolved = victim.CustomRole != null || killer.CustomRole != null;
+
                 bool died = false;
                 float artificialHealth = default;
                 float health = default;
@@ -69,7 +71,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     return false;
 
                 //This just blocks any TeamKillReport that is connected with CustomRoles
-                if (victim.CustomRole != null || killer.CustomRole != null)
+                if (isCustomRoleInvolved)
                     return false;
 
                 if (friendlyFire)
@@ -152,12 +154,13 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 victim.PlayerStats.SetHPAmount(100);
                 victim.ClassManager.SetClassID(RoleType.Spectator, CharacterClassManager.SpawnReason.Died);
 
-                victim.CustomRole = null;
                 foreach (var larry in Server.Get.Players.Where(x => x.Scp106Controller.PocketPlayers.Contains(victim)))
                     larry.Scp106Controller.PocketPlayers.Remove(victim);
 
                 if (victim.IsDummy)
                     Map.Get.Dummies.FirstOrDefault(x => x.Player == victim)?.Destroy();
+
+                victim.CustomRole = null;
             }
             void AnnounceScpDeath(Player victim, DamageTypes.DamageType damageType)
             {
