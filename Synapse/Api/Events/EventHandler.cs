@@ -21,27 +21,7 @@ namespace Synapse.Api.Events
         {
             switch (ev.KeyCode)
             {
-                case KeyCode.Alpha1:
-                    foreach(var item in Synapse.Api.Items.SynapseItem.AllItems)
-                    {
-                        if (item.Value == null) Logger.Get.Warn(item.Key + " - null");
-                        else Logger.Get.Warn($"{item.Key} - {item.Value.ItemType}");
-                    }
-                    break;
-                case KeyCode.Alpha2:
-                    Logger.Get.Warn(ev.Player.ItemInHand.Serial);
-                    ev.Player.ItemInHand.Scale = Vector3.one * 3;
-                    break;
-                case KeyCode.Alpha3:
-                    foreach (var item in ev.Player.VanillaInventory.UserInventory.Items)
-                    {
-                        Logger.Get.Warn($"Null: {item.Value == null}");
-                        Logger.Get.Warn($"Serial: {item.Key}");
-                    }
-                    break;
-                case KeyCode.Alpha4:
-                    new WorkStation(ev.Player.Position, ev.Player.transform.rotation.eulerAngles, Vector3.one);
-                    break;
+
             }
         }
 
@@ -72,10 +52,18 @@ namespace Synapse.Api.Events
                 ev.Player.gameObject.AddComponent<Player>();
         }
 
+        private bool firstLoaded = false;
+
         private void Waiting()
         {
             SynapseController.Server.Map.AddObjects();
             SynapseController.Server.Map.Round.CurrentRound++;
+
+            if (!firstLoaded)
+            {
+                firstLoaded = true;
+                SynapseController.CommandHandlers.GenerateCommandCompletion();
+            }
         }
 
         private void RounRestart() => Synapse.Api.Map.Get.ClearObjects();

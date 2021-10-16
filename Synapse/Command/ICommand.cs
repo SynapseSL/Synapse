@@ -30,6 +30,12 @@ namespace Synapse.Command
             get;
             set;
         }
+
+        string[] Arguments
+        {
+            get;
+            set;
+        }
         
         string Description
         {

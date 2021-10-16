@@ -8,13 +8,13 @@ namespace Synapse.Api
     {
         internal Ragdoll(global::Ragdoll rag) => ragdoll = rag;
 
-        public Ragdoll(RoleType roletype, Vector3 pos, Quaternion rot, Vector3 velocity, PlayerStats.HitInfo info, bool allowRecall, Player owner)
+        public Ragdoll(RoleType roletype, Vector3 pos, Quaternion rot, Vector3 velocity, PlayerStats.HitInfo info, bool allowRecall, string owner)
         {
             var role = Server.Get.Host.ClassManager.Classes.SafeGet((int)roletype);
             var gameobject = UnityEngine.Object.Instantiate(role.model_ragdoll, pos + role.ragdoll_offset.position, Quaternion.Euler(rot.eulerAngles + role.ragdoll_offset.rotation));
             NetworkServer.Spawn(gameobject);
             ragdoll = gameobject.GetComponent<global::Ragdoll>();
-            ragdoll.Networkowner = new global::Ragdoll.Info(owner.GetComponent<Dissonance.Integrations.MirrorIgnorance.MirrorIgnorancePlayer>().PlayerId, owner.NickName, info,role, owner.PlayerId);
+            ragdoll.Networkowner = new global::Ragdoll.Info("", owner, info, role, 0);
             ragdoll.NetworkallowRecall = allowRecall;
             ragdoll.NetworkPlayerVelo = velocity;
             Map.Get.Ragdolls.Add(this);
@@ -77,6 +77,6 @@ namespace Synapse.Api
         }
         
         public static Ragdoll CreateRagdoll(RoleType roletype, Vector3 pos, Quaternion rot, Vector3 velocity, PlayerStats.HitInfo info, bool allowRecall, Player owner) 
-            => new Ragdoll(roletype, pos, rot, velocity, info, allowRecall, owner);
+            => new Ragdoll(roletype, pos, rot, velocity, info, allowRecall, owner.NickName);
     }
 }

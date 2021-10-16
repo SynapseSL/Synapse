@@ -126,10 +126,17 @@ namespace Synapse
 
 
         public void Reload()
-        {      
-            Configs.Reload();
-            PermissionHandler.Reload();
-            SynapseController.PluginLoader.ReloadConfigs();
+        {
+            try
+            {
+                Configs.Reload();
+                PermissionHandler.Reload();
+                SynapseController.PluginLoader.ReloadConfigs();
+            }
+            catch(Exception e)
+            {
+                Logger.Error($"Error ocurred while reloading Synapse:\n{e}");
+            }
         }
 
         /// <summary>

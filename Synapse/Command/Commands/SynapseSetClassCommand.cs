@@ -8,7 +8,8 @@ namespace Synapse.Command.Commands
         Description = "A command to set the class of a Player",
         Permission = "synapse.command.setclass",
         Platforms = new[] {Platform.RemoteAdmin,Platform.ServerConsole},
-        Usage = "setclass player RoleID"
+        Usage = "setclass player RoleID",
+        Arguments = new[] { "Player", "RoleID" }
         )]
     public class SynapseSetClassCommand : ISynapseCommand
     {

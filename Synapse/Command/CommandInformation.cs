@@ -12,6 +12,8 @@ namespace Synapse.Command
 
         public string Usage;
 
+        public string[] Arguments;
+
         public string Description;
 
         public Platform[] Platforms;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
 using InventorySystem.Items.MicroHID;
-using LightContainmentZoneDecontamination;
 using MapGeneration;
 using Mirror;
 using UnityEngine;
@@ -104,7 +103,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
         }
     }
 
-    //[HarmonyPatch(typeof(PocketDimensionTeleport), nameof(PocketDimensionTeleport.OnTriggerEnter))]
+    [HarmonyPatch(typeof(PocketDimensionTeleport), nameof(PocketDimensionTeleport.OnTriggerEnter))]
     internal class PocketDimensionLeavePatch
     {
         [HarmonyPrefix]

@@ -8,7 +8,8 @@ namespace Synapse.Command.Commands
         Description = "A command to manage the Permission System",
         Usage = "Execute the command without parameters for help",
         Permission = "",
-        Platforms = new[] { Platform.RemoteAdmin,Platform.ServerConsole }
+        Platforms = new[] { Platform.RemoteAdmin,Platform.ServerConsole },
+        Arguments = new[] { "ME/GROUPS/SETGROUP/DELETE" }
     )]
     public class SynapsePermissionCommand : ISynapseCommand
     {

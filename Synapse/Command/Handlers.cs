@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Synapse.Command.Commands;
+using System.Linq;
 
 namespace Synapse.Command
 {
@@ -7,9 +8,7 @@ namespace Synapse.Command
     {
         private static readonly List<ISynapseCommand> AwaitingFinalization = new List<ISynapseCommand>();
 
-        internal Handlers()
-        {
-        }
+        internal Handlers() { }
 
         public CommandHandler RemoteAdminHandler { get; } = new CommandHandler();
 
@@ -29,10 +28,6 @@ namespace Synapse.Command
             RegisterCommand(new SynapseSetClassCommand(), false);
             RegisterCommand(new SynapseMapPointCommand(), false);
             RegisterCommand(new SynapseRespawnCommand(), false);
-#if DEBUG
-            RegisterCommand(new SynapseGccCommand(), false);
-            RegisterCommand(new SynapseDebugCommand(), false);
-#endif
         }
 
         internal static void RegisterCommand(ISynapseCommand iSynapseCommand, bool awaitPluginInitialisation)
@@ -70,6 +65,34 @@ namespace Synapse.Command
                         SynapseController.CommandHandlers.ServerConsoleHandler.RegisterCommand(command);
                         break;
                 }
+        }
+
+        internal void GenerateCommandCompletion()
+        {
+            var list = RemoteAdmin.QueryProcessor._commands.ToList();
+            foreach(var command in RemoteAdminHandler.Commands)
+            {
+                list.Add(new RemoteAdmin.QueryProcessor.CommandData
+                {
+                    Command = command.Name,
+                    AliasOf = null,
+                    Description = command.Description,
+                    Hidden = false,
+                    Usage = command.Arguments
+                });
+
+                foreach (var ali in command.Aliases)
+                    list.Add(new RemoteAdmin.QueryProcessor.CommandData
+                    {
+                        Command = ali,
+                        AliasOf = command.Name,
+                        Description = command.Description,
+                        Hidden = false,
+                        Usage = command.Arguments
+                    });
+            }
+
+            RemoteAdmin.QueryProcessor._commands = list.ToArray();
         }
     }
 }

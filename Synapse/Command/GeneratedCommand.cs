@@ -16,6 +16,7 @@ namespace Synapse.Command
         public string[] Aliases { get; set; }
         public string Permission { get; set; }
         public string Usage { get; set; }
+        public string[] Arguments { get; set; }
         public string Description { get; set; }
         
         public Platform[] Platforms { get; set; }
@@ -31,6 +32,7 @@ namespace Synapse.Command
                 Aliases = cmdInf.Aliases,
                 Permission = cmdInf.Permission??"",
                 Usage = cmdInf.Usage,
+                Arguments = cmdInf.Arguments,
                 Description = cmdInf.Description??"",
                 Platforms = cmdInf.Platforms??new []{Platform.RemoteAdmin, Platform.ServerConsole}
             };

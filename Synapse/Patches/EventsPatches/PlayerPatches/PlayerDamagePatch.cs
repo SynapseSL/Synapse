@@ -26,6 +26,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 if (victim != null && victim.Hub.characterClassManager.CurClass == RoleType.Spectator)
                     return false;
 
+                var isCustomRoleInvolved = victim.CustomRole != null || killer.CustomRole != null;
+
                 bool died = false;
                 float artificialHealth = default;
                 float health = default;
@@ -69,7 +71,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     return false;
 
                 //This just blocks any TeamKillReport that is connected with CustomRoles
-                if (victim.CustomRole != null || killer.CustomRole != null)
+                if (isCustomRoleInvolved)
                     return false;
 
                 if (friendlyFire)
@@ -152,12 +154,13 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 victim.PlayerStats.SetHPAmount(100);
                 victim.ClassManager.SetClassID(RoleType.Spectator, CharacterClassManager.SpawnReason.Died);
 
-                victim.CustomRole = null;
                 foreach (var larry in Server.Get.Players.Where(x => x.Scp106Controller.PocketPlayers.Contains(victim)))
                     larry.Scp106Controller.PocketPlayers.Remove(victim);
 
                 if (victim.IsDummy)
                     Map.Get.Dummies.FirstOrDefault(x => x.Player == victim)?.Destroy();
+
+                victim.CustomRole = null;
             }
             void AnnounceScpDeath(Player victim, DamageTypes.DamageType damageType)
             {
@@ -217,7 +220,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 {
                     __instance.TargetAchieve(victim.Connection, "iwanttobearocket");
                 }
-                else if (info.Tool.Weapon != ItemType.None)
+                else if (info.Tool?.Weapon != ItemType.None)
                 {
                     if (victim.RoleType == RoleType.Scientist && victim.ItemInHand.ID != -1 &&
                         victim.ItemInHand.ItemCategory == ItemCategory.Keycard &&
@@ -260,7 +263,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 
 
-                if (info.Tool.Scp != RoleType.None || info.Tool == DamageTypes.Pocket)
+                if (info.Tool?.Scp != RoleType.None || info.Tool == DamageTypes.Pocket)
                     RoundSummary.kills_by_scp++;
 
                 else if (info.Tool == DamageTypes.Grenade)
@@ -270,12 +273,11 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             void ConsoleLogging(Player victim, Player killer, bool friendlyFire)
             {
                 bool suicide = victim == killer;
-
                 if (suicide)
                 {
                     ServerLogs.AddLog(
                         ServerLogs.Modules.ClassChange,
-                        $"{victim.Hub.LoggedNameFromRefHub()} playing as {victim.ClassManager.CurRole.fullName} committed a suicide using {info.Tool.Name}.",
+                        $"{victim.Hub.LoggedNameFromRefHub()} playing as {victim.ClassManager.CurRole.fullName} committed a suicide using {info.Tool?.Name}.",
                         ServerLogs.ServerLogType.Suicide,
                         false
                         );

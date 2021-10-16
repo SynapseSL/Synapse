@@ -112,6 +112,8 @@ namespace Synapse.Api
             if (!ServerRoles.AdminChatPerms)
                 ServerRoles.AdminChatPerms = SynapseGroup.HasVanillaPermission(PlayerPermissions.AdminChat);
             ServerRoles.TargetOpenRemoteAdmin(false);
+
+            QueryProcessor.SyncCommandsToClient();
         }
 
         public void RaLogout()
@@ -127,6 +129,7 @@ namespace Synapse.Api
         {
             if (damagetype == default)
                 damagetype = DamageTypes.None;
+
             if (attacker == null) attacker = this;
             attacker.PlayerStats.HurtPlayer(new PlayerStats.HitInfo(amount, attacker.NickName, damagetype, attacker.PlayerId, true), gameObject);
         }
@@ -267,10 +270,12 @@ namespace Synapse.Api
             get => _role;
             set
             {
-                if (_role != null)
-                    _role.DeSpawn();
+                var oldRole = _role;
 
                 _role = value;
+
+                if (oldRole != null)
+                    oldRole.DeSpawn();
 
                 if (_role == null) return;
 
