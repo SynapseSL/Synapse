@@ -8,7 +8,8 @@ namespace Synapse.Command.Commands
         Description = "spawns a specific team,",
         Usage = "respawn teamid size",
         Permission = "synapse.command.respawn",
-        Platforms = new[] { Platform.ClientConsole, Platform.RemoteAdmin, Platform.ServerConsole }
+        Platforms = new[] { Platform.ClientConsole, Platform.RemoteAdmin, Platform.ServerConsole },
+        Arguments = new[] { "TeamID" }
     )]
     public class SynapseRespawnCommand : ISynapseCommand
     {

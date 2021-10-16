@@ -112,6 +112,8 @@ namespace Synapse.Api
             if (!ServerRoles.AdminChatPerms)
                 ServerRoles.AdminChatPerms = SynapseGroup.HasVanillaPermission(PlayerPermissions.AdminChat);
             ServerRoles.TargetOpenRemoteAdmin(false);
+
+            QueryProcessor.SyncCommandsToClient();
         }
 
         public void RaLogout()

@@ -78,7 +78,7 @@ namespace Synapse.Command
                     AliasOf = null,
                     Description = command.Description,
                     Hidden = false,
-                    Usage = new[] { command.Usage }
+                    Usage = command.Arguments
                 });
 
                 foreach (var ali in command.Aliases)
@@ -87,8 +87,8 @@ namespace Synapse.Command
                         Command = ali,
                         AliasOf = command.Name,
                         Description = command.Description,
-                        Hidden = true,
-                        Usage = new[] { command.Usage }
+                        Hidden = false,
+                        Usage = command.Arguments
                     });
             }
 

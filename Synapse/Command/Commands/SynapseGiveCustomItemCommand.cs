@@ -8,7 +8,8 @@ namespace Synapse.Command.Commands
         Description = "A Command to give a Player an Item",
         Permission = "synapse.command.give",
         Platforms = new[] {Platform.RemoteAdmin,Platform.ServerConsole},
-        Usage = "give player id or give player id durabillity sight barrel other xsize ysize zsize"
+        Usage = "give player id or give player id durabillity sight barrel other xsize ysize zsize",
+        Arguments = new[] { "Player", "ItemID", "(Durabillity)", "(Attachments)", "(X Size)", "(Y Size)", "(Z Size)" }
         )]
     public class SynapseGiveCustomItemCommand : ISynapseCommand
     {

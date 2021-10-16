@@ -8,7 +8,8 @@ namespace Synapse.Command.Commands
         Description = "A command which provides information about the currently installed Plugins",
         Usage = "\"plugin\" for a list of all plugins or \"plugin {pluginname}\" for information about a specific plugin",
         Permission = "synapse.command.plugins",
-        Platforms = new[] { Platform.ClientConsole,Platform.RemoteAdmin,Platform.ServerConsole }
+        Platforms = new[] { Platform.ClientConsole,Platform.RemoteAdmin,Platform.ServerConsole },
+        Arguments = new[] { "(PluginName)" }
     )]
     public class SynapsePluginCommand : ISynapseCommand
     {
