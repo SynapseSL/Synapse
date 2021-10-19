@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using MapGeneration;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -59,6 +60,34 @@ namespace Synapse.Api
             if (!float.TryParse(args[3], out var z)) throw new Exception("Parsing of string to MapPoint failed because of the Relative z Position!");
 
             Room = room ?? throw new Exception("Parsing of string to MapPoint failed because of the roomname");
+            RelativePosition = new Vector3(x, y, z);
+        }
+
+        /// <summary>
+        /// Creates a MapPoint
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        public MapPoint(RoomName type, float x, float y, float z)
+        {
+            var synapseroom = SynapseController.Server.Map.GetRoom(type);
+            Room = synapseroom ?? throw new Exception("Parsing of string to MapPoint failed because of the roomname");
+            RelativePosition = new Vector3(x, y, z);
+        }
+
+        /// <summary>
+        /// Creates a MapPoint
+        /// </summary>
+        /// <param name="room"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        public MapPoint(string room, float x, float y, float z)
+        {
+            var synapseroom = SynapseController.Server.Map.Rooms.FirstOrDefault(r => r.RoomName.ToLower() == room.ToLower());
+            Room = synapseroom ?? throw new Exception("Parsing of string to MapPoint failed because of the roomname");
             RelativePosition = new Vector3(x, y, z);
         }
 
