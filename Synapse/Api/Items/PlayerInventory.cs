@@ -17,7 +17,7 @@ namespace Synapse.Api.Items
             get => Items[index];
         }
 
-        public List<Items.SynapseItem> Items => player.VanillaInventory.UserInventory.Items.Select(x => x.Value.GetSynapseItem()).ToList();
+        public List<Items.SynapseItem> Items => player.VanillaInventory.UserInventory.Items.Select(x => x.Value.GetSynapseItem()).Where(x => x != null).ToList();
 
         public void AddItem(SynapseItem item) => item.PickUp(player);
 
@@ -36,7 +36,7 @@ namespace Synapse.Api.Items
             try
             {
                 foreach (var item in Items)
-                    item.Drop();
+                    item?.Drop();
 
                 foreach (var ammo in player.VanillaInventory.UserInventory.ReserveAmmo.ToList())
                     player.VanillaInventory.ServerDropAmmo(ammo.Key, ammo.Value);

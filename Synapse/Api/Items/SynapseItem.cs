@@ -297,6 +297,7 @@ namespace Synapse.Api.Items
             }
         }
 
+        private float durabillity = 0;
         public float Durabillity
         {
             get
@@ -331,10 +332,16 @@ namespace Synapse.Api.Items
                         break;
                 }
 
-                return 0;
+                return durabillity;
             }
             set
             {
+                if(State == ItemState.Despawned)
+                {
+                    durabillity = value;
+                    return;
+                }
+
                 switch (ItemCategory)
                 {
                     case ItemCategory.Radio:
@@ -372,6 +379,7 @@ namespace Synapse.Api.Items
             }
         }
 
+        private uint attachments = 0;
         public uint WeaponAttachments
         {
             get
@@ -384,10 +392,16 @@ namespace Synapse.Api.Items
                 {
                     return armpickup.Status.Attachments;
                 }
-                return 0;
+                return attachments;
             }
             set
             {
+                if (State == ItemState.Despawned)
+                {
+                    attachments = value;
+                    return;
+                }
+
                 if (ItemBase is Firearm arm)
                 {
                     arm.ApplyAttachmentsCode(value,true);
@@ -412,6 +426,8 @@ namespace Synapse.Api.Items
 
                 case ItemState.Despawned:
                     player.VanillaInventory.ServerAddItem(ItemType, Serial);
+                    Durabillity = durabillity;
+                    WeaponAttachments = attachments;
                     break;
 
                 case ItemState.Inventory:
@@ -449,6 +465,9 @@ namespace Synapse.Api.Items
                         PickupBase.transform.localScale = Scale;
                         NetworkServer.Spawn(PickupBase.gameObject);
                         PickupBase.InfoReceived(default, info);
+
+                        Durabillity = durabillity;
+                        WeaponAttachments = attachments;
                     }
                     break;
             }
@@ -465,6 +484,9 @@ namespace Synapse.Api.Items
 
         public void Despawn()
         {
+            durabillity = Durabillity;
+            attachments = WeaponAttachments;
+
             DespawnItemBase();
             DespawnPickup();
             Throwable.DestroyProjectile();
