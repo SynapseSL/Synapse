@@ -21,7 +21,11 @@ namespace Synapse.Api.Events
         {
             switch (ev.KeyCode)
             {
-
+                case KeyCode.Alpha1:
+                    var dummy = new Dummy(ev.Player.Position, ev.Player.transform.rotation, ev.Player.RoleType, ev.Player.NickName);
+                    dummy.HeldItem = ItemType.MicroHID;
+                    dummy.Direction = Enum.MovementDirection.Forward;
+                    break;
             }
         }
 

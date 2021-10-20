@@ -7,7 +7,7 @@ public static class SynapseVersion
 
     public const int Minor = 7;
 
-    public const int Patch = 1;
+    public const int Patch = 2;
 
     public const VersionType Type = VersionType.None;
 
