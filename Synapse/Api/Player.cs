@@ -667,7 +667,11 @@ namespace Synapse.Api
 
                     return 0;
                 }
-                set => player.VanillaInventory.UserInventory.ReserveAmmo[(ItemType)ammo] = value;
+                set
+                {
+                    player.VanillaInventory.UserInventory.ReserveAmmo[(ItemType)ammo] = value;
+                    player.VanillaInventory.SendAmmoNextFrame = true;
+                }
             }
         }
 

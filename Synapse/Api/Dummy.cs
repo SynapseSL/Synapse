@@ -186,8 +186,6 @@ namespace Synapse.Api
                     {
                         Direction = MovementDirection.Stop;
                     }
-
-                    Player.PlayerMovementSync.NetworkGrounded = true;
                 }
                 catch(Exception e)
                 {
@@ -231,6 +229,7 @@ namespace Synapse.Api
             Player.RankName = badgetext;
             Player.RankColor = badgecolor;
             Player.GodMode = true;
+            Player.PlayerMovementSync.NetworkGrounded = true;
             RunSpeed = CharacterClassManager._staticClasses[(int)role].runSpeed;
             WalkSpeed = CharacterClassManager._staticClasses[(int)role].walkSpeed;
             MEC.Timing.RunCoroutine(Update());
