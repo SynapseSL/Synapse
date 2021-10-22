@@ -589,7 +589,7 @@ namespace Synapse.Api
 
         public Room Room
         {
-            get => RoomIdUtils.RoomAtPosition(Position).GetSynapseRoom();
+            get => RoomIdUtils.RoomAtPosition(Position).GetSynapseRoom() ?? Map.Get.Rooms.OrderBy(x => Vector3.Distance(x.Position, Position)).FirstOrDefault();
             set => Position = value.Position;
         }
 
