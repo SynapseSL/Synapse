@@ -258,9 +258,7 @@ namespace Synapse
 
             if (argument.Contains("@"))
             {
-                char[] separators = new char[] { ' ', '(', ')' };
-                string[] subs = argument.Split(separators, StringSplitOptions.RemoveEmptyEntries);
-                string arguid = subs[subs.Length - 1];
+                var arguid = argument.Substring(argument.LastIndexOf('(') + 1, argument.Length - 2 - argument.LastIndexOf('('));
 
                 var player = GetPlayerByUID(arguid);
                 if (player != null)
