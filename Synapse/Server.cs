@@ -258,9 +258,7 @@ namespace Synapse
 
             if (argument.Contains("@"))
             {
-                var arguid = argument.Substring(argument.LastIndexOf('(') + 1, argument.Length - 2 - argument.LastIndexOf('('));
-
-                var player = GetPlayerByUID(arguid);
+                var player = GetPlayerByUID(argument);
                 if (player != null)
                     return player;
             }
