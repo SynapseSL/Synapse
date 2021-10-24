@@ -258,7 +258,11 @@ namespace Synapse
 
             if (argument.Contains("@"))
             {
-                var player = GetPlayerByUID(argument);
+                char[] separators = new char[] { ' ', '(', ')' };
+                string[] subs = argument.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+                string arguid = subs[subs.Length - 1];
+
+                var player = GetPlayerByUID(arguid);
                 if (player != null)
                     return player;
             }
