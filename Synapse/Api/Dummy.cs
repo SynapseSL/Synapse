@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using InventorySystem;
 using Mirror;
 using RemoteAdmin;
@@ -99,7 +100,11 @@ namespace Synapse.Api
         public PlayerMovementState Movement
         {
             get => Player.AnimationController.MoveState;
-            set => Player.AnimationController.UserCode_CmdChangeSpeedState((byte)value);
+            set
+            {
+                Player.AnimationController.MoveState = Movement;
+                Player.AnimationController.RpcReceiveState((byte)Movement);
+            }
         }
 
         public MovementDirection Direction { get; set; }
@@ -116,68 +121,75 @@ namespace Synapse.Api
             for(; ; )
             {
                 yield return MEC.Timing.WaitForSeconds(0.1f);
-                if (GameObject == null) yield break;
-                if (Direction == MovementDirection.Stop)
+                try
                 {
-                    continue;
+                    if (GameObject == null) yield break;
+                    if (Direction == MovementDirection.Stop)
+                    {
+                        continue;
+                    }
+
+                    var wall = false;
+                    var speed = 0f;
+
+                    switch (Movement)
+                    {
+                        case PlayerMovementState.Sneaking:
+                            speed = SneakSpeed;
+                            break;
+
+                        case PlayerMovementState.Sprinting:
+                            speed = RunSpeed * Map.Get.SprintSpeed;
+                            break;
+
+                        case PlayerMovementState.Walking:
+                            speed = WalkSpeed * Map.Get.WalkSpeed;
+                            break;
+                    }
+
+                    switch (Direction)
+                    {
+                        case MovementDirection.Forward:
+                            var pos = Position + Player.CameraReference.forward / 10 * speed;
+
+                            if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
+                                Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
+                            else wall = true;
+                            break;
+
+                        case MovementDirection.BackWards:
+                            pos = Position - Player.CameraReference.forward / 10 * speed;
+
+                            if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
+                                Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
+                            else wall = true;
+                            break;
+
+                        case MovementDirection.Right:
+                            pos = Position + Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed;
+
+                            if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
+                                Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
+                            else wall = true;
+                            break;
+
+                        case MovementDirection.Left:
+                            pos = Position - Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed;
+
+                            if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
+                                Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
+                            else wall = true;
+                            break;
+                    }
+
+                    if (wall)
+                    {
+                        Direction = MovementDirection.Stop;
+                    }
                 }
-
-                var wall = false;
-                var speed = 0f;
-
-                switch (Movement)
+                catch(Exception e)
                 {
-                    case PlayerMovementState.Sneaking:
-                        speed = SneakSpeed;
-                        break;
-
-                    case PlayerMovementState.Sprinting:
-                        speed = RunSpeed * Map.Get.SprintSpeed;
-                        break;
-
-                    case PlayerMovementState.Walking:
-                        speed = WalkSpeed * Map.Get.WalkSpeed;
-                        break;
-                }
-
-                switch (Direction)
-                {
-                    case MovementDirection.Forward:
-                        var pos = Position + Player.CameraReference.forward / 10 * speed;
-
-                        if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
-                            Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
-                        else wall = true;
-                        break;
-
-                    case MovementDirection.BackWards:
-                        pos = Position - Player.CameraReference.forward / 10 * speed;
-
-                        if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
-                            Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
-                        else wall = true;
-                        break;
-
-                    case MovementDirection.Right:
-                        pos = Position + Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed;
-
-                        if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
-                            Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
-                        else wall = true;
-                        break;
-
-                    case MovementDirection.Left:
-                        pos = Position - Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed;
-
-                        if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
-                            Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
-                        else wall = true;
-                        break;
-                }
-
-                if (wall)
-                {
-                    Direction = MovementDirection.Stop;
+                    Logger.Get.Error($"Synapse-Dummy: Dummy Update Failed:\n{e}");
                 }
             }
         }
@@ -196,7 +208,7 @@ namespace Synapse.Api
         public Dummy(Vector3 pos, Vector2 rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "")
         {
             GameObject obj =
-                Object.Instantiate(
+                UnityEngine.Object.Instantiate(
                     NetworkManager.singleton.playerPrefab);
 
             GameObject = obj;
@@ -217,6 +229,7 @@ namespace Synapse.Api
             Player.RankName = badgetext;
             Player.RankColor = badgecolor;
             Player.GodMode = true;
+            Player.PlayerMovementSync.NetworkGrounded = true;
             RunSpeed = CharacterClassManager._staticClasses[(int)role].runSpeed;
             WalkSpeed = CharacterClassManager._staticClasses[(int)role].walkSpeed;
             MEC.Timing.RunCoroutine(Update());
@@ -254,7 +267,7 @@ namespace Synapse.Api
         /// </summary>
         public void Destroy()
         {
-            Object.Destroy(GameObject);
+            UnityEngine.Object.Destroy(GameObject);
             Map.Get.Dummies.Remove(this);
         }
 

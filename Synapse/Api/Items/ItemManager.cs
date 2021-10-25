@@ -8,7 +8,7 @@ namespace Synapse.Api.Items
     {
         public static ItemManager Get => Server.Get.ItemManager;
 
-        public const int HighestItem = (int)ItemType.GunShotgun;
+        public const int HighestItem = (int)ItemType.SCP2176;
 
         private readonly List<CustomItemInformation> customItems = new List<CustomItemInformation>();
 
