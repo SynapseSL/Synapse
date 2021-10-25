@@ -589,7 +589,7 @@ namespace Synapse.Api
 
         public Room Room
         {
-            get => RoomIdUtils.RoomAtPosition(Position).GetSynapseRoom();
+            get => RoomIdUtils.RoomAtPosition(Position).GetSynapseRoom() ?? Map.Get.Rooms.OrderBy(x => Vector3.Distance(x.Position, Position)).FirstOrDefault();
             set => Position = value.Position;
         }
 
@@ -667,7 +667,11 @@ namespace Synapse.Api
 
                     return 0;
                 }
-                set => player.VanillaInventory.UserInventory.ReserveAmmo[(ItemType)ammo] = value;
+                set
+                {
+                    player.VanillaInventory.UserInventory.ReserveAmmo[(ItemType)ammo] = value;
+                    player.VanillaInventory.SendAmmoNextFrame = true;
+                }
             }
         }
 
@@ -771,9 +775,9 @@ namespace Synapse.Api
         {
             get
             {
-                if (VanillaInventory.CurItem == ItemIdentifier.None) return SynapseItem.None;
+                if (VanillaInventory.CurItem == ItemIdentifier.None || VanillaInventory.CurInstance == null) return SynapseItem.None;
 
-                return VanillaInventory.CurInstance.GetSynapseItem();
+                return SynapseItem.AllItems[VanillaInventory.CurItem.SerialNumber];
             }
             set
             {

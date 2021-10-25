@@ -7,13 +7,13 @@ public static class SynapseVersion
 
     public const int Minor = 7;
 
-    public const int Patch = 1;
+    public const int Patch = 2;
 
     public const VersionType Type = VersionType.None;
 
     public const string SubVersion = "";
 
-    public const string BasedGameVersion = "11.0.0";
+    public const string BasedGameVersion = "11.0.1-2021-halloween-ff7ed68c";
 
     public static bool Debug { get; private set; } = false;
 
