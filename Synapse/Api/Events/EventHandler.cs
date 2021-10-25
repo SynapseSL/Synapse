@@ -22,13 +22,8 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    var dummy = new Dummy(ev.Player.Position, ev.Player.transform.rotation, ev.Player.RoleType, ev.Player.NickName);
-                    dummy.HeldItem = ItemType.MicroHID;
-                    MEC.Timing.CallDelayed(1f, () => dummy.RotateToPosition(ev.Player.Position));
-                    break;
-
-                case KeyCode.Alpha2:
-                    ev.Player.AmmoBox[Enum.AmmoType.Ammo12gauge] = 999;
+                    Logger.Get.Debug(ev.Player.ItemInHand.ID);
+                    
                     break;
             }
         }

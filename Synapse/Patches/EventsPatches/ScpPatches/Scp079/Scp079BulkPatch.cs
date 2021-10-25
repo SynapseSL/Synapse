@@ -495,12 +495,6 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                     }
                                 }
 
-                                if (roomInteractablesHashSet.Count == 0 || lockdownInteractable == null || __instance._scheduledUnlocks.Count > 0)
-                                {
-                                    string str2 = string.Format("(code: {0}x{1}x{2})", roomInteractablesHashSet.Count, __instance._scheduledUnlocks.Count, (lockdownInteractable == null) ? 0 : 1);
-                                    GameCore.Console.AddDebugLog("SCP079", "This room can't be locked down " + str2, MessageImportance.LessImportant, false);
-                                    return false;
-                                }
                                 if (__instance.CurrentLDCooldown > 0f)
                                 {
                                     GameCore.Console.AddDebugLog("SCP079", "Lockdown still on cooldown.", MessageImportance.LessImportant, false);
@@ -546,15 +540,6 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                 {
                                     case Scp079EventMisc.InteractionResult.Allow:
                                         {
-                                            if (doorHashSet.Count > 0)
-                                            {
-                                                __instance._scheduledUnlocks.Add(Time.realtimeSinceStartup + __instance.LockdownDuration, doorHashSet);
-                                                GameCore.Console.AddDebugLog("SCP079", "Locking " + doorHashSet.Count + " doors", MessageImportance.LeastImportant, false);
-                                            }
-                                            else
-                                            {
-                                                GameCore.Console.AddDebugLog("SCP079", "No doors to lock found, code " + roomInteractablesHashSet.Count(x => x.type == Scp079Interactable.InteractableType.Door), MessageImportance.LessImportant, false);
-                                            }
                                             foreach (FlickerableLightController flickerableLightController in __instance.CurrentRoom.GetComponentsInChildren<FlickerableLightController>())
                                             {
                                                 if (flickerableLightController != null)

@@ -34,7 +34,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 bool friendlyFire = default;
                 DamageTypes.DamageType damageType = default;
 
-                if (!TryPlayerDamageEvent(killer, victim, out (float artificialHealth, float health, bool friendlyFire, DamageTypes.DamageType damageType) temp))
+                if (!TryPlayerDamageEvent(ref killer, victim, out (float artificialHealth, float health, bool friendlyFire, DamageTypes.DamageType damageType) temp))
                     return false;
 
                 (artificialHealth, health, friendlyFire, damageType) = (temp.artificialHealth, temp.health, temp.friendlyFire, temp.damageType);
@@ -367,7 +367,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 victim.PlayerStats.lastHitInfo = info;
 
             }
-            bool TryPlayerDamageEvent(Player killer, Player victim, out (float ArtificialHealth, float Health, bool FriendlyFire, DamageTypes.DamageType DamageType) paramInfo)
+            bool TryPlayerDamageEvent(ref Player killer, Player victim, out (float ArtificialHealth, float Health, bool FriendlyFire, DamageTypes.DamageType DamageType) paramInfo)
             {
                 paramInfo.ArtificialHealth = 0;
                 paramInfo.Health = 0;

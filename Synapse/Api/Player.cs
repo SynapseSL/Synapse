@@ -775,9 +775,9 @@ namespace Synapse.Api
         {
             get
             {
-                if (VanillaInventory.CurItem == ItemIdentifier.None) return SynapseItem.None;
+                if (VanillaInventory.CurItem == ItemIdentifier.None || VanillaInventory.CurInstance == null) return SynapseItem.None;
 
-                return VanillaInventory.CurInstance.GetSynapseItem();
+                return SynapseItem.AllItems[VanillaInventory.CurItem.SerialNumber];
             }
             set
             {
