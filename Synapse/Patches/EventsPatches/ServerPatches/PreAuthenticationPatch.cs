@@ -21,7 +21,11 @@ namespace Synapse.Patches.EventsPatches.ServerPatches
 
                 if (!request.Data.EndOfData) return;
 
-                var userId = CustomLiteNetLib4MirrorTransport.UserIds[request.RemoteEndPoint].UserId;
+                var userId = "";
+
+                if(CustomLiteNetLib4MirrorTransport.UserIds.ContainsKey(request.RemoteEndPoint))
+                    userId = CustomLiteNetLib4MirrorTransport.UserIds[request.RemoteEndPoint].UserId;
+
                 SynapseController.Server.Events.Server.InvokePreAuthenticationEvent(userId, ref allow, ref reason, request);
 
                 if (allow)
