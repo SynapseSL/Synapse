@@ -111,7 +111,7 @@ namespace Synapse.Config
         {
             var item = Parse();
 
-            if (UsePreferences) item.WeaponAttachments = player.GetPreference(ItemManager.Get.GetBaseType(ID));
+            if (UsePreferences && item.ItemCategory == ItemCategory.Firearm) item.WeaponAttachments = player.GetPreference(ItemManager.Get.GetBaseType(ID));
 
             if(UnityEngine.Random.Range(1f,100f) <= Chance)
                 item.PickUp(player);
