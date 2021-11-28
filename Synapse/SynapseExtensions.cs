@@ -49,6 +49,8 @@ public static class SynapseExtensions
         sender.RaReply($"{Assembly.GetCallingAssembly().GetName().Name}#" + message, success, true, category);
     }
 
+    public static Team GetTeam(this RoleType role) => Server.Get.Host.ClassManager.Classes.SafeGet(role).team;
+
     public static Room GetSynapseRoom(this RoomIdentifier identifier) => Map.Get.Rooms.FirstOrDefault(x => x.Identifier == identifier);
 
     public static Generator GetGenerator(this Scp079Generator generator079) => Map.Get.Generators.FirstOrDefault(x => x.GameObject == generator079.gameObject);
@@ -78,6 +80,59 @@ public static class SynapseExtensions
         }
 
         return item;
+    }
+
+    public static List<Vector3> GetSpawnPoints(this RoleType role)
+    {
+        List<Vector3> spawnPointsPose = new List<Vector3>();
+        GameObject[] spawnPoints = null;
+        switch (role.GetTeam())
+        {
+            case Team.SCP:
+                switch (role)
+                {
+                    case RoleType.Scp106:
+                        spawnPoints = GameObject.FindGameObjectsWithTag("SP_106");
+                        break;
+                    case RoleType.Scp049:
+                        spawnPoints = GameObject.FindGameObjectsWithTag("SP_049");
+                        break;
+                    case RoleType.Scp079:
+                        spawnPoints = GameObject.FindGameObjectsWithTag("SP_079");
+                        break;
+                    case RoleType.Scp096:
+                        spawnPoints = GameObject.FindGameObjectsWithTag("SCP_096"); // Idk why his switch from SP to SCP 
+                        break;
+                    case RoleType.Scp93953:
+                    case RoleType.Scp93989:
+                        spawnPoints = GameObject.FindGameObjectsWithTag("SCP_939"); 
+                        break;
+                    case RoleType.Scp173:
+                        spawnPoints = GameObject.FindGameObjectsWithTag("SP_173");
+                        break;
+                    default: return null;
+                }
+                break;
+            case Team.MTF:
+                spawnPoints = GameObject.FindGameObjectsWithTag(role == RoleType.FacilityGuard ? "SP_GUARD" : "SP_MTF");
+                break;
+            case Team.CHI:
+                spawnPoints = GameObject.FindGameObjectsWithTag("SP_CI");
+                break;
+            case Team.RSC:
+                spawnPoints = GameObject.FindGameObjectsWithTag("SP_RSC");
+                break;
+            case Team.CDP:
+                spawnPoints = GameObject.FindGameObjectsWithTag("SP_CDP");
+                break;
+            case Team.TUT:
+                spawnPoints = GameObject.FindGameObjectsWithTag("TUT Spawn");
+                break;
+            default: return null;
+        }
+
+        spawnPoints.ToList().ForEach(spawnPoint => spawnPointsPose.Add(spawnPoint.transform.position));
+        return spawnPointsPose;
     }
 
     public static SynapseItem GetSynapseItem(this ItemPickupBase pickupbase)
