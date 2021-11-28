@@ -65,23 +65,6 @@ public static class SynapseExtensions
 
     public static Synapse.Api.Camera GetSynapseCamera(this Camera079 camera) => Map.Get.Cameras.FirstOrDefault(x => x.GameObject == camera.gameObject);
 
-    public static SynapseItem GetSynapseItem(this ItemBase itembase)
-    {
-        //If the List doesn't even contain the Serial then it is destroyed or a item with this ID was never spawned
-        if (!SynapseItem.AllItems.ContainsKey(itembase.ItemSerial)) return null;
-
-        var item = SynapseItem.AllItems[itembase.ItemSerial];
-
-        //This is a simple fallback if the item is not registered
-        if (item == null)
-        {
-            Synapse.Api.Logger.Get.Warn($"Found unregistered ItemBase with Serial: {itembase.ItemSerial} - Create a new SynapseItem Instance");
-            return new SynapseItem(itembase);
-        }
-
-        return item;
-    }
-
     public static List<Vector3> GetSpawnPoints(this RoleType role)
     {
         List<Vector3> spawnPointsPose = new List<Vector3>();
@@ -133,6 +116,23 @@ public static class SynapseExtensions
 
         spawnPoints.ToList().ForEach(spawnPoint => spawnPointsPose.Add(spawnPoint.transform.position));
         return spawnPointsPose;
+    }
+
+    public static SynapseItem GetSynapseItem(this ItemBase itembase)
+    {
+        //If the List doesn't even contain the Serial then it is destroyed or a item with this ID was never spawned
+        if (!SynapseItem.AllItems.ContainsKey(itembase.ItemSerial)) return null;
+
+        var item = SynapseItem.AllItems[itembase.ItemSerial];
+
+        //This is a simple fallback if the item is not registered
+        if (item == null)
+        {
+            Synapse.Api.Logger.Get.Warn($"Found unregistered ItemBase with Serial: {itembase.ItemSerial} - Create a new SynapseItem Instance");
+            return new SynapseItem(itembase);
+        }
+
+        return item;
     }
 
     public static SynapseItem GetSynapseItem(this ItemPickupBase pickupbase)
