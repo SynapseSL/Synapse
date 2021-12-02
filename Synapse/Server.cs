@@ -14,8 +14,6 @@ using EventHandler = Synapse.Api.Events.EventHandler;
 using Logger = Synapse.Api.Logger;
 using Object = UnityEngine.Object;
 
-//Mika was here
-
 namespace Synapse
 {
     public class Server
