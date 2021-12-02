@@ -1,5 +1,6 @@
 ﻿using System;
 using HarmonyLib;
+using PlayerStatsSystem;
 using UnityEngine;
 using ev = Synapse.Api.Events.EventHandler;
 
@@ -31,7 +32,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp049
                 ev.Get.Scp.InvokeScpAttack(scp, player, Api.Enum.ScpAttackType.Scp049_Touch, out var allow);
                 if (!allow) return false;
 
-                player.Hurt(4949, DamageTypes.Scp049, scp);
+                player.PlayerStats.DealDamage(new ScpDamageHandler(scp.Hub, 4949f, DeathTranslations.Scp049));
                 GameCore.Console.AddDebugLog("SCPCTRL", "SCP-049 | Sent 'death time' RPC", MessageImportance.LessImportant, false);
                 scp.Hub.scpsController.RpcTransmit_Byte(0);
                 __instance.RemainingServerKillCooldown = PlayableScps.Scp049.KillCooldown;

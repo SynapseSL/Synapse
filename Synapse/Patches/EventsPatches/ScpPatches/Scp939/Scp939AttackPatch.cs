@@ -1,6 +1,6 @@
 ﻿using System;
 using HarmonyLib;
-using Mirror;
+using PlayerStatsSystem;
 using UnityEngine;
 using ev = Synapse.Api.Events.EventHandler;
 
@@ -19,7 +19,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp939
 
                 if(target.TryGetComponent<BreakableWindow>(out var window))
                 {
-                    window.Damage(50f, null, new Footprinting.Footprint(scp.Hub), Vector3.zero);
+                    window.Damage(50f, new ScpDamageHandler(scp.Hub, 50f, DeathTranslations.Scp939), Vector3.zero);
                     __result = true;
                 }
                 else
@@ -31,9 +31,8 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp939
                     ev.Get.Scp.InvokeScpAttack(scp, targetplayer, Api.Enum.ScpAttackType.Scp939_Bite, out var allow);
 
                     if (!allow) return false;
-
-                    scp.PlayerStats.HurtPlayer(new PlayerStats.HitInfo(50f, scp.Hub.LoggedNameFromRefHub(),
-                      DamageTypes.Scp939, scp.PlayerId, false), target, false, true);
+                    
+                    targetplayer.PlayerStats.DealDamage(new ScpDamageHandler(scp.Hub, 50f, DeathTranslations.Scp939));
                     scp.ClassManager.RpcPlaceBlood(targetplayer.Position, 0, 2f);
 
                     targetplayer.PlayerEffectsController.EnableEffect<CustomPlayerEffects.Amnesia>(3f, true);
