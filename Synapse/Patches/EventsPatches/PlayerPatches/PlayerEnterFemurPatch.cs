@@ -1,5 +1,6 @@
 ﻿using System;
 using HarmonyLib;
+using PlayerStatsSystem;
 using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
@@ -29,7 +30,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     SynapseController.Server.Events.Player.InvokePlayerEnterFemurEvent(player, ref allow, ref closeFemur);
 
                     if (!allow) continue;
-                    player.Hurt(10000, DamageTypes.Lure);
+                    player.PlayerStats.DealDamage(new UniversalDamageHandler(10000, DeathTranslations.UsedAs106Bait));
                     FemurBrokePeople++;
                     if (closeFemur) __instance._lureSpj.SetState(__instance._lureSpj.allowContain, true);
                 }
