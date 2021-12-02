@@ -5,6 +5,7 @@ using HarmonyLib;
 using InventorySystem.Items.MicroHID;
 using MapGeneration;
 using Mirror;
+using PlayerStatsSystem;
 using UnityEngine;
 using EventHandler = Synapse.Api.Events.EventHandler;
 using Logger = Synapse.Api.Logger;
@@ -53,11 +54,13 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                 if (Scp106PlayerScript._blastDoor.isClosed)
                 {
                     __instance._hub.characterClassManager.RpcPlaceBlood(player.Position, 1, 2f);
-                    player.Hurt(500, DamageTypes.Scp106, scp);
+                    // player.Hurt(500, DamageTypes.Scp106, scp);
+                    player.PlayerStats.DealDamage(500, DeathTranslations.PocketDecay);
                 }
                 else
                 {
-                    player.Hurt(40, DamageTypes.Scp106, scp);
+                    // player.Hurt(40, DamageTypes.Scp106, scp);
+                    player.PlayerStats.DealDamage(40, DeathTranslations.PocketDecay);
                     player.Position = Vector3.down * 1998.5f;
                     foreach (Scp079PlayerScript scp079PlayerScript in Scp079PlayerScript.instances)
                     {
@@ -160,7 +163,9 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
 
                 if(!forceEscape && (type == PocketDimensionTeleport.PDTeleportType.Killer || Synapse.Api.Nuke.Get.Detonated))
                 {
-                    player.Hurt(999999, DamageTypes.Pocket);
+                    // player.Hurt(999999, DamageTypes.Pocket);
+                    // Es sollte so richtig sein ~ Dimenzio
+                    player.PlayerStats.DealDamage(999999, DeathTranslations.PocketDecay);
                     return false;
                 }
                 else
