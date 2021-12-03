@@ -1,6 +1,7 @@
 ﻿using GameCore;
 using Respawning;
 using System;
+using RoundRestarting;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -36,20 +37,20 @@ namespace Synapse.Api
 
         public int EscapedDPersonnel
         {
-            get => RoundSummary.escaped_ds;
-            set => RoundSummary.escaped_ds = value;
+            get => RoundSummary.EscapedClassD;
+            set => RoundSummary.EscapedClassD = value;
         }
 
         public int EscapedScientists
         {
-            get => RoundSummary.escaped_scientists;
-            set => RoundSummary.escaped_scientists = value;
+            get => RoundSummary.EscapedScientists;
+            set => RoundSummary.EscapedScientists = value;
         }
 
         public int ScpKills
         {
-            get => RoundSummary.kills_by_scp;
-            set => RoundSummary.kills_by_scp = value;
+            get => RoundSummary.KilledBySCPs;
+            set => RoundSummary.KilledBySCPs = value;
         }
 
         public int MtfTickets
@@ -76,7 +77,7 @@ namespace Synapse.Api
 
         public void EndRound() => Forceend = true;
 
-        public void RestartRound() => Server.Get.Host.PlayerStats.Roundrestart();
+        public void RestartRound() => RoundRestart.InitiateRoundRestart();
 
         public void SpawnVehicle(bool IsCI = false) => RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.Selection, IsCI ? SpawnableTeamType.ChaosInsurgency : SpawnableTeamType.NineTailedFox);
 

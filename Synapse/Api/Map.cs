@@ -6,6 +6,7 @@ using InventorySystem.Items;
 using InventorySystem.Items.Firearms.Attachments;
 using MapGeneration;
 using Mirror;
+using PlayerStatsSystem;
 using Scp914;
 using Synapse.Api.Enum;
 using Synapse.Api.Items;
@@ -161,9 +162,9 @@ namespace Synapse.Api
         public WorkStation CreateWorkStation(Vector3 position, Vector3 rotation, Vector3 scale)
             => new WorkStation(position, rotation, scale);
 
-        [Obsolete("Moved to Ragdoll.CreateRagdoll()", true)]
-        public Ragdoll CreateRagdoll(RoleType roletype, Vector3 pos, Quaternion rot, Vector3 velocity, PlayerStats.HitInfo info, bool allowRecall, Player owner)
-            => new Ragdoll(roletype, pos, rot, velocity, info, allowRecall, owner.NickName);
+        //[Obsolete("Moved to Ragdoll.CreateRagdoll()", true)]
+        //public Ragdoll CreateRagdoll(RoleType roletype, Vector3 pos, Quaternion rot, DamageHandlerBase handler, Player owner) 
+        //    => new Ragdoll(roletype, pos, rot, handler, owner);
 
         [Obsolete("Moved to Door.SpawnDoorVariant()", true)]
         public Door SpawnDoorVariant(Vector3 position, Quaternion? rotation = null, DoorPermissions permissions = null)

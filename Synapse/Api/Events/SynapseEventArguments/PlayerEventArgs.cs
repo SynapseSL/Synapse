@@ -5,6 +5,8 @@ using UnityEngine;
 using InventorySystem.Items.MicroHID;
 using Synapse.Api.Enum;
 using System;
+using PlayerStatsSystem;
+using Synapse.Api;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Synapse.Api.Events.SynapseEventArguments
@@ -66,7 +68,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         
         public Player Killer { get; internal set; }
         
-        public PlayerStats.HitInfo HitInfo { get; internal set; }
+        public DamageHandlerBase DamageHandler { get; internal set; }
     }
 
     public class PlayerDamageEventArgs : EventHandler.ISynapseEventArgs
@@ -74,19 +76,8 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Player Killer { get; internal set; }
         
         public Player Victim { get; internal set; }
-       
-        public float DamageAmount
-        {
-            get => HitInfo.Amount;
-            set
-            {
-                var info = HitInfo;
-                info.Amount = value;
-                HitInfo = info;
-            }
-        }
 
-        public PlayerStats.HitInfo HitInfo { get; set; }
+        public DamageHandlerBase DamageHandler { get; set; }
 
         public bool Allow { get; set; } = true;
     }

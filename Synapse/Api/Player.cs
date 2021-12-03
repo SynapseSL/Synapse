@@ -5,11 +5,13 @@ using Hints;
 using InventorySystem;
 using InventorySystem.Disarming;
 using InventorySystem.Items;
+using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Firearms.Attachments;
 using InventorySystem.Searching;
 using MapGeneration;
 using Mirror;
 using Mirror.LiteNetLib4Mirror;
+using PlayerStatsSystem;
 using RemoteAdmin;
 using Synapse.Api.Enum;
 using Synapse.Api.Events.SynapseEventArguments;
@@ -74,10 +76,10 @@ namespace Synapse.Api
             RoleChangeClassIdPatch.ForceLite = false;
         }
 
-        public void Kill(DamageTypes.DamageType damageType = default)
+        public void Kill(DamageHandlerBase damageType = default)
         {
-            Health = 1;
-            Hurt(100);
+            damageType ??= new UniversalDamageHandler(10000, DeathTranslations.Unknown);
+            PlayerStats.KillPlayer(damageType);
         }
 
         public void GiveTextHint(string message, float duration = 5f)
@@ -123,15 +125,12 @@ namespace Synapse.Api
             Hub.serverRoles.TargetCloseRemoteAdmin();
         }
 
-        public void Heal(float hp) => PlayerStats.HealHPAmount(hp);
+        public void Heal(float hp) => Health += hp;
 
-        public void Hurt(int amount, DamageTypes.DamageType damagetype = default, Player attacker = null)
+        public void Hurt(int amount, DamageHandlerBase damageType = default)
         {
-            if (damagetype == default)
-                damagetype = DamageTypes.None;
-
-            if (attacker == null) attacker = this;
-            attacker.PlayerStats.HurtPlayer(new PlayerStats.HitInfo(amount, attacker.NickName, damagetype, attacker.PlayerId, true), gameObject);
+            damageType ??= new UniversalDamageHandler(amount, DeathTranslations.Unknown);
+            PlayerStats.DealDamage(damageType);
         }
 
         public void OpenReportWindow(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
@@ -547,26 +546,28 @@ namespace Synapse.Api
 
         public float Health
         {
-            get => PlayerStats.Health;
-            set => PlayerStats.Health = value;
+            get => PlayerStats.StatModules[0].CurValue;
+            set => PlayerStats.StatModules[0].CurValue = value;
         }
 
         public int MaxHealth
         {
-            get => PlayerStats.maxHP;
-            set => PlayerStats.maxHP = value;
+            get => (int) PlayerStats.StatModules[0].MaxValue;
+            //TODO: Has no setter anymore
+            //set => PlayerStats.StatModules[0].MaxValue = value;
         }
 
         public float ArtificialHealth
         {
-            get => PlayerStats.GetAhpValue();
-            set => PlayerStats.SafeSetAhpValue(value);
+            get => PlayerStats.StatModules[1].CurValue;
+            set => PlayerStats.StatModules[1].CurValue = value;
         }
 
         public int MaxArtificialHealth
         {
-            get => PlayerStats.MaxArtificialHealth;
-            set => PlayerStats.MaxArtificialHealth = value;
+            get => (int) PlayerStats.StatModules[1].MaxValue;
+            //TODO: Has no setter anymore
+            //set => PlayerStats.MaxArtificialHealth = value;
         }
 
         public float Stamina
@@ -932,25 +933,25 @@ namespace Synapse.Api
                 switch (RealTeam)
                 {
                     case Team.MTF when changeTeam:
-                        RoundSummary.escaped_scientists++;
+                        RoundSummary.EscapedScientists++;
                         tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
                             GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_mtf_classd_cuffed_count", 1), false);
                         break;
 
                     case Team.MTF when !changeTeam:
-                        RoundSummary.escaped_scientists++;
+                        RoundSummary.EscapedScientists++;
                         tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
                             GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_mtf_scientist_count", 1), false);
                         break;
 
                     case Team.CHI when changeTeam:
-                        RoundSummary.escaped_ds++;
+                        RoundSummary.EscapedClassD++;
                         tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
                             GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_ci_scientist_cuffed_count", 1), false);
                         break;
 
                     case Team.CHI when !changeTeam:
-                        RoundSummary.escaped_ds++;
+                        RoundSummary.EscapedClassD++;
                         tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
                             GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_ci_classd_count", 1), false);
                         break;
@@ -959,7 +960,6 @@ namespace Synapse.Api
             else
             {
                 CustomRole.Escape();
-                return;
             }
         }
     }
