@@ -44,7 +44,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 //Find the Position and Rotation if the player becomes a living Role
                 if(classid != RoleType.Spectator && classid != RoleType.None)
                 {
-                    var randomPosition = CharacterClassManager._spawnpointManager.GetRandomPosition(classid);
+                    var randomPosition = SpawnpointManager.GetRandomPosition(classid);
                     if (Map.Get.RespawnPoint != Vector3.zero)
                     {
                         eventargs.Position = Map.Get.RespawnPoint;
@@ -218,7 +218,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     }
                     if (!__instance.isLocalPlayer)
                     {
-                        __instance._hub.playerStats.maxHP = curRole.maxHP;
+                        __instance._hub.GetPlayer().MaxHealth = curRole.maxHP;
                     }
                 }
 
