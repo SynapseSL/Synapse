@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using Interactables.Interobjects.DoorUtils;
 using Mirror;
+using PlayerStatsSystem;
 using UnityEngine;
 using ev = Synapse.Api.Events.EventHandler;
 
@@ -19,7 +21,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
 
                 if (target.TryGetComponent<BreakableWindow>(out var window))
                 {
-                    __result = window.Damage(500f, null, new Footprinting.Footprint(__instance.Hub), target.transform.position);
+                    __result = window.Damage(500f, new Scp096DamageHandler(__instance, 500f, Scp096DamageHandler.AttackType.Slap), target.transform.position);
                     return false;
                 }
 
@@ -51,9 +53,8 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                 {
                     Synapse.Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp096-Charge) failed!!\n{e}");
                 }
-
-                if(__instance.Hub.playerStats.HurtPlayer(new PlayerStats.HitInfo(9696f, __instance.Hub.LoggedNameFromRefHub(),
-                    DamageTypes.Scp096, __instance.Hub.queryProcessor.PlayerId, false), hub.gameObject, false, true))
+                
+                if (hub.playerStats.DealDamage(new Scp096DamageHandler(__instance, 9696f, Scp096DamageHandler.AttackType.Slap)))
                 {
                     __instance._targets.Remove(hub);
                     NetworkServer.SendToAll(default(PlayableScps.Messages.Scp096OnKillMessage), 0, false);
@@ -104,7 +105,8 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                 }
 
                 var flag = __instance._targets.Contains(player);
-                var flag2 = __instance.Hub.playerStats.HurtPlayer(new PlayerStats.HitInfo(flag ? 9696f : 40f, null, DamageTypes.Scp096, __instance.Hub.playerId, false), player.gameObject, false, true);
+                var damage = flag ? 9696f : 40f;
+                var flag2 = player.playerStats.DealDamage(new Scp096DamageHandler(__instance, damage, Scp096DamageHandler.AttackType.Charge));
                 __instance._chargeHitTargets.Add(player);
 
                 if (flag2)
@@ -166,7 +168,8 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                         Synapse.Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp096-Charge) failed!!\n{e}");
                     }
 
-                    if (__instance.Hub.playerStats.HurtPlayer(new PlayerStats.HitInfo(9696f, null, DamageTypes.Scp096, __instance.Hub.playerId, false), componentInParent.gameObject, false, true))
+                    // if (__instance.Hub.playerStats.HurtPlayer(new PlayerStats.HitInfo(9696f, null, DamageTypes.Scp096, __instance.Hub.playerId, false), componentInParent.gameObject, false, true))
+                    if (componentInParent.playerStats.DealDamage(new Scp096DamageHandler(__instance, 9696f, Scp096DamageHandler.AttackType.GateKill)))
                     {
                         if (__instance._targets.Contains(componentInParent))
                             __instance._targets.Remove(componentInParent);
