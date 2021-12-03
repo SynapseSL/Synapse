@@ -223,7 +223,6 @@ namespace Synapse.Api
             Player.QueryProcessor.NetworkPlayerId = QueryProcessor._idIterator;
             Player.QueryProcessor._ipAddress = Server.Get.Host.IpAddress;
             Player.ClassManager.CurClass = role;
-            Player.MaxHealth = Player.ClassManager.Classes.SafeGet((int)Player.RoleType).maxHP;
             Player.Health = Player.MaxHealth;
             Player.NicknameSync.Network_myNickSync = name;
             Player.RankName = badgetext;
