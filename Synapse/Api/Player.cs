@@ -945,7 +945,7 @@ namespace Synapse.Api
                         break;
 
                     case Team.CHI when changeTeam:
-                        RoundSummary.EscapedScientists++;
+                        RoundSummary.EscapedClassD++;
                         tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
                             GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_ci_scientist_cuffed_count", 1), false);
                         break;
