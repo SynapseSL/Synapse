@@ -1,6 +1,7 @@
 ﻿using System;
 using HarmonyLib;
 using PlayableScps;
+using PlayerStatsSystem;
 using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
@@ -59,13 +60,14 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
     internal static class Scp096ShootPatch
     {
         [HarmonyPrefix]
-        private static bool Damage(PlayableScps.Scp096 __instance, PlayerStats.HitInfo info)
+        private static bool Damage(PlayableScps.Scp096 __instance, PlayerStatsSystem.DamageHandlerBase handler)
         {
             try
             {
-                if (info == null || info.RHub == null || info.Tool.Weapon == ItemType.None) return false;
+                AttackerDamageHandler attackerDamageHandler = handler as AttackerDamageHandler;
+                if (attackerDamageHandler == null || attackerDamageHandler.Attacker.Hub == null || !__instance.CanEnrage) return false;
 
-                var player = info.RHub.GetPlayer();
+                var player = attackerDamageHandler.Attacker.Hub.GetPlayer();
 
                 if (player.Invisible || Server.Get.Configs.synapseConfiguration.CantRage096.Contains(player.RoleID))
                     return false;
@@ -74,6 +76,12 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                     return false;
 
                 Server.Get.Events.Scp.Scp096.InvokeScpTargetEvent(player, __instance.GetPlayer(), __instance.PlayerState, out var allow);
+
+                if (allow)
+                {
+                    __instance.AddTarget(attackerDamageHandler.Attacker.Hub.gameObject);
+                    __instance.Windup(false);
+                }
                 return allow;
             }
             catch (Exception e)
