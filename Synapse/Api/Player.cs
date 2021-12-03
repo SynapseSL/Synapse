@@ -127,7 +127,7 @@ namespace Synapse.Api
 
         public void Heal(float hp) => Health += hp;
 
-        public void Hurt(int amount, DamageHandlerBase damageType = default, Player attacker = null)
+        public void Hurt(int amount, DamageHandlerBase damageType = default)
         {
             damageType ??= new UniversalDamageHandler(amount, DeathTranslations.Unknown);
             PlayerStats.DealDamage(damageType);
