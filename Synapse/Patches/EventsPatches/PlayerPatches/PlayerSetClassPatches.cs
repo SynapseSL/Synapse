@@ -216,10 +216,10 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                         if (args.CanBeDeleted) player.setClassEventArgs = null;
                     }
-                    if (!__instance.isLocalPlayer)
+                    /*if (!__instance.isLocalPlayer)
                     {
                         __instance._hub.GetPlayer().MaxHealth = curRole.maxHP;
-                    }
+                    }*/
                 }
 
                 __instance.Scp0492.iAm049_2 = (__instance.CurClass == RoleType.Scp0492);
