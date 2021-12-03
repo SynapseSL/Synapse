@@ -1,23 +1,29 @@
 ﻿using System;
 using System.Linq;
-using CustomPlayerEffects;
 using Dissonance.Integrations.MirrorIgnorance;
 using HarmonyLib;
 using InventorySystem.Items.MicroHID;
+using PlayerStatsSystem;
 using Respawning;
 using Synapse.Api;
 using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.HurtPlayer))]
+    [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.DealDamage))]
     internal static class PlayerDamagePatch
     {
         [HarmonyPrefix]
-        private static bool HurtPlayer(PlayerStats __instance, out bool __result, PlayerStats.HitInfo info, GameObject go, bool noTeamDamage = false, bool IsValidDamage = true)
+        private static bool DealDamagePatch(PlayerStats __instance, out bool __result, DamageHandlerBase handler)
         {
-            try
+            UniversalDamageHandler newHandler = handler as UniversalDamageHandler;
+            SynapseController.Server.Logger.Debug(newHandler.Damage);
+            
+            __result = true;
+            return false;
+            /*try
             {
+                handler.GetType()
                 __result = false;
                 var victim = go?.GetPlayer();
                 var killer = __instance.GetPlayer();
@@ -367,6 +373,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 victim.PlayerStats.lastHitInfo = info;
 
             }
+            
             bool TryPlayerDamageEvent(ref Player killer, Player victim, out (float ArtificialHealth, float Health, bool FriendlyFire, DamageTypes.DamageType DamageType) paramInfo)
             {
                 paramInfo.ArtificialHealth = 0;
@@ -433,7 +440,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 }
                 
                 return true;
-            }
+            }*/
         }
     }
 }
