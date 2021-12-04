@@ -92,7 +92,6 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             /*try
             {
-                handler.GetType()
                 __result = false;
                 var victim = go?.GetPlayer();
                 var killer = __instance.GetPlayer();
@@ -101,7 +100,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 if (victim != null && victim.Hub.characterClassManager.CurClass == RoleType.Spectator)
                     return false;
 
-                var isCustomRoleInvolved = victim.CustomRole != null || killer.CustomRole != null;
+                var isCustomRoleInvolved = victim.CustomRole != null || killer.CustomRole != null; // Friendlyfire Detector
 
                 bool died = false;
                 float artificialHealth = default;

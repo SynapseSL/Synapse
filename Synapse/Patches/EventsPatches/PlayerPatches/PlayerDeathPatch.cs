@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using HarmonyLib;
 using PlayerStatsSystem;
 using Synapse.Api;
@@ -69,8 +70,14 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                         break;
                 }
 
-                SynapseController.Server.Events.Player.InvokePlayerDeathEvent(Victim, Attacker, Weapon, out allowed);
-
+                SynapseController.Server.Events.Player.InvokePlayerDeathEvent(Victim, Attacker, Weapon);
+                
+                foreach (var larry in Server.Get.Players.Where(x => x.Scp106Controller.PocketPlayers.Contains(Victim)))
+                    larry.Scp106Controller.PocketPlayers.Remove(Victim);
+                
+                if (Victim.IsDummy)
+                    Map.Get.Dummies.FirstOrDefault(x => x.Player == Victim)?.Destroy();
+                
                 return allowed;
             }
             catch (Exception e)
