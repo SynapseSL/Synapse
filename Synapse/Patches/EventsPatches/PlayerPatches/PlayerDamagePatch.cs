@@ -22,7 +22,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             Player Attacker = null;
             float Damage = -1;
             ItemType Weapon = ItemType.None;
-            bool allowed;
+            bool allowed = true;
 
             switch (handlerType)
             {
@@ -84,7 +84,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             
             SynapseController.Server.Events.Player.InvokePlayerDamageEvent(Victim, Attacker, ref Damage, Weapon, out allowed);
 
-            return true;
+            return allowed;
             /*try
             {
                 handler.GetType()

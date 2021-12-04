@@ -71,6 +71,8 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public float Damage { get; set; }
         
         public ItemType Weapon { get; internal set; }
+        
+        public bool Allow { get; set; }
     }
 
     public class PlayerDamageEventArgs : EventHandler.ISynapseEventArgs
