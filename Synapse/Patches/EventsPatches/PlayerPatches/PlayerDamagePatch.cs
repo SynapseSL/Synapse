@@ -27,8 +27,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             switch (handlerType)
             {
                 case "PlayerStatsSystem.UniversalDamageHandler":
-                    Damage = ((ScpDamageHandler) handler).Damage;
-                    return true;
+                    Damage = ((UniversalDamageHandler) handler).Damage;
+                    break;
 
                 case "PlayerStatsSystem.ScpDamageHandler":
                     ScpDamageHandler scpDamageHandler = (ScpDamageHandler) handler;
