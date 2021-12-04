@@ -546,29 +546,19 @@ namespace Synapse.Api
 
         public float Health
         {
-            get => PlayerStats.StatModules[0].CurValue;
-            set => PlayerStats.StatModules[0].CurValue = value;
+            get => Hub.playerStats.GetModule<HealthStat>().CurValue;
+            set => Hub.playerStats.GetModule<HealthStat>().CurValue = value;
         }
 
-        public int MaxHealth
-        {
-            get => (int) PlayerStats.StatModules[0].MaxValue;
-            //TODO: Has no setter anymore
-            //set => PlayerStats.StatModules[0].MaxValue = value;
-        }
+        public float MaxHealth => Hub.playerStats.GetModule<HealthStat>().MaxValue;
 
         public float ArtificialHealth
         {
-            get => PlayerStats.StatModules[1].CurValue;
-            set => PlayerStats.StatModules[1].CurValue = value;
+            get => Hub.playerStats.GetModule<AhpStat>().CurValue;
+            set => Hub.playerStats.GetModule<AhpStat>().CurValue = value;
         }
 
-        public int MaxArtificialHealth
-        {
-            get => (int) PlayerStats.StatModules[1].MaxValue;
-            //TODO: Has no setter anymore
-            //set => PlayerStats.MaxArtificialHealth = value;
-        }
+        public int MaxArtificialHealth => (int) Hub.playerStats.GetModule<AhpStat>().MaxValue;
 
         public float Stamina
         {
@@ -610,7 +600,7 @@ namespace Synapse.Api
         {
             get
             {
-                if (!DisarmedPlayers.Entries.Any(x => x.DisarmedPlayer == NetworkIdentity.netId)) return null;
+                if (DisarmedPlayers.Entries.All(x => x.DisarmedPlayer != NetworkIdentity.netId)) return null;
 
                 var id = DisarmedPlayers.Entries.FirstOrDefault(x => x.DisarmedPlayer == NetworkIdentity.netId).Disarmer;
                 if (id == 0)

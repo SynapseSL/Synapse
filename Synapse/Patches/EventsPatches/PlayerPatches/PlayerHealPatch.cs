@@ -4,7 +4,7 @@ using PlayerStatsSystem;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(StatBase), "set_CurValue")]
+    [HarmonyPatch(typeof(SyncedStatBase), nameof(SyncedStatBase.CurValue), MethodType.Setter)]
     internal static class PlayerHealPatch
     {
         [HarmonyPrefix]

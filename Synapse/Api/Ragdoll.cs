@@ -21,14 +21,18 @@ namespace Synapse.Api
             Map.Get.Ragdolls.Add(this);
         }*/
 
-        public Ragdoll(RoleType roletype, Vector3 pos, Quaternion rot, DamageHandlerBase handler, Player owner)
+        public Ragdoll(RoleType roleType, Vector3 pos, Quaternion rot, DamageHandlerBase handler, Player owner)
         {
-            Role role = Server.Get.Host.ClassManager.Classes.SafeGet((int) roletype);
-            GameObject gameObject = Object.Instantiate(role.model_ragdoll, pos + role.model_offset.position,
-                Quaternion.Euler(rot.eulerAngles + role.model_offset.rotation));
-            NetworkServer.Spawn(gameObject);
+            GameObject gameObject = Server.Get.Host.ClassManager.Classes.SafeGet((int) roleType).model_ragdoll;
+            //GameObject gameObject = Object.Instantiate(role.model_ragdoll, pos + role.model_offset.position,
+            //    Quaternion.Euler(rot.eulerAngles + role.model_offset.rotation));
+            if (gameObject == null || !Object.Instantiate(gameObject).TryGetComponent(out ragdoll))
+            {
+                return;
+            }
             ragdoll = gameObject.GetComponent<global::Ragdoll>();
             ragdoll.NetworkInfo = new RagdollInfo(owner.Hub, handler, pos, rot);
+            NetworkServer.Spawn(gameObject);
         }
 
         private readonly global::Ragdoll ragdoll;

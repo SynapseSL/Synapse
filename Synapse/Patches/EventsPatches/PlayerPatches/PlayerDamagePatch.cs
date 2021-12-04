@@ -1,23 +1,93 @@
 ﻿using System;
 using System.Linq;
-using CustomPlayerEffects;
 using Dissonance.Integrations.MirrorIgnorance;
 using HarmonyLib;
 using InventorySystem.Items.MicroHID;
+using PlayerStatsSystem;
 using Respawning;
 using Synapse.Api;
 using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.HurtPlayer))]
+    [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.DealDamage))]
     internal static class PlayerDamagePatch
     {
         [HarmonyPrefix]
-        private static bool HurtPlayer(PlayerStats __instance, out bool __result, PlayerStats.HitInfo info, GameObject go, bool noTeamDamage = false, bool IsValidDamage = true)
+        private static bool DealDamagePatch(PlayerStats __instance, DamageHandlerBase handler)
         {
-            try
+            String handlerType = handler.GetType().ToString();
+
+            Player Victim = __instance.GetPlayer();
+            Player Attacker = null;
+            float Damage = -1;
+            ItemType Weapon = ItemType.None;
+            bool allowed = true;
+
+            switch (handlerType)
             {
+                case "PlayerStatsSystem.UniversalDamageHandler":
+                    Damage = ((UniversalDamageHandler) handler).Damage;
+                    break;
+
+                case "PlayerStatsSystem.ScpDamageHandler":
+                    ScpDamageHandler scpDamageHandler = (ScpDamageHandler) handler;
+                    
+                    Attacker = scpDamageHandler.Attacker.Hub.GetPlayer();
+                    Damage = scpDamageHandler.Damage;
+                    break;
+
+                case "PlayerStatsSystem.FirearmDamageHandler":
+                    FirearmDamageHandler firearmHandler = (FirearmDamageHandler) handler;
+                    
+                    Attacker = firearmHandler.Attacker.Hub.GetPlayer();
+                    Damage = firearmHandler.Damage;
+                    Weapon = firearmHandler.WeaponType;
+                    break;
+
+                case "PlayerStatsSystem.ExplosionDamageHandler":
+                    ExplosionDamageHandler explosionDamageHandler = (ExplosionDamageHandler) handler;
+
+                    Attacker = explosionDamageHandler.Attacker.Hub.GetPlayer();
+                    Damage = explosionDamageHandler.Damage;
+                    break;
+
+                case "PlayerStatsSystem.CustomReasonDamageHandler":
+                    CustomReasonDamageHandler customReasonDamageHandler = (CustomReasonDamageHandler) handler;
+
+                    Damage = customReasonDamageHandler.Damage;
+                    break;
+
+                case "PlayerStatsSystem.MicroHidDamageHandler":
+                    MicroHidDamageHandler microHidDamageHandler = (MicroHidDamageHandler) handler;
+
+                    Attacker = microHidDamageHandler.Attacker.Hub.GetPlayer();
+                    Damage = microHidDamageHandler.Damage;
+                    Weapon = ItemType.MicroHID;
+                    break;
+
+                case "PlayerStatsSystem.Scp018DamageHandler":
+                    Scp018DamageHandler scp018DamageHandler = (Scp018DamageHandler) handler;
+
+                    Attacker = scp018DamageHandler.Attacker.Hub.GetPlayer();
+                    Damage = scp018DamageHandler.Damage;
+                    Weapon = ItemType.SCP018;
+                    break;
+
+                case "PlayerStatsSystem.Scp096DamageHandler":
+                    Scp096DamageHandler scp096DamageHandler = (Scp096DamageHandler) handler;
+
+                    Attacker = scp096DamageHandler.Attacker.Hub.GetPlayer();
+                    Damage = scp096DamageHandler.Damage;
+                    break;
+            }
+            
+            SynapseController.Server.Events.Player.InvokePlayerDamageEvent(Victim, Attacker, ref Damage, Weapon, out allowed);
+
+            return allowed;
+            /*try
+            {
+                handler.GetType()
                 __result = false;
                 var victim = go?.GetPlayer();
                 var killer = __instance.GetPlayer();
@@ -367,6 +437,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 victim.PlayerStats.lastHitInfo = info;
 
             }
+            
             bool TryPlayerDamageEvent(ref Player killer, Player victim, out (float ArtificialHealth, float Health, bool FriendlyFire, DamageTypes.DamageType DamageType) paramInfo)
             {
                 paramInfo.ArtificialHealth = 0;
@@ -433,7 +504,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 }
                 
                 return true;
-            }
+            }*/
         }
     }
 }
