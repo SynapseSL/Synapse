@@ -118,7 +118,7 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void InvokePlayerDeathEvent(Player victim, Player killer, ItemType Weapon, out bool Allow)
+        internal void InvokePlayerDeathEvent(Player victim, Player killer, ItemType Weapon)
         {
             var ev = new PlayerDeathEventArgs
             {
@@ -127,8 +127,6 @@ namespace Synapse.Api.Events
                 Weapon = Weapon
             };
             PlayerDeathEvent?.Invoke(ev);
-            
-            Allow = ev.Allow;
         }
 
         internal void InvokePlayerDamageEvent(Player victim, Player killer, ref float Damage, ItemType Weapon, out bool Allow)
