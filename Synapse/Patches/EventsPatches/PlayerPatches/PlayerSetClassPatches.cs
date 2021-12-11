@@ -67,7 +67,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                         eventargs.Ammo[(AmmoType)ammo.Key] = ammo.Value;
 
                     foreach (var itemtype in roleitems.Items)
+                    {
                         eventargs.Items.Add(new SynapseItem(itemtype));
+                    }
                 }
 
                 Server.Get.Events.Player.InvokeSetClassEvent(eventargs);
@@ -116,7 +118,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 foreach (var item in args.Items)
                 {
                     item.Drop();
-                    var arg = player.VanillaInventory.ServerAddItem(item.ItemType, item.Serial, item.PickupBase);
+                    var arg = player.VanillaInventory.ServerAddItem(item.ItemType);
 
                     InventoryItemProvider.OnItemProvided?.Invoke(player.Hub, arg);
                 }
