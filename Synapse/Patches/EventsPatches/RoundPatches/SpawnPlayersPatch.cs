@@ -69,8 +69,6 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                     ServerLogs.AddLog(ServerLogs.Modules.Logger, "Class Picker Result: " + builder, ServerLogs.ServerLogType.GameEvent, false);
                     StringBuilderPool.Shared.Return(builder);
                 }
-                if (NetworkServer.active)
-                    Timing.RunCoroutine(__instance.MakeSureToSetHPAndStamina(),Segment.FixedUpdate);
 
                 return false;
             }

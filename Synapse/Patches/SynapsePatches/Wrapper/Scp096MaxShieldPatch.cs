@@ -4,7 +4,7 @@ using Synapse.Api;
 
 namespace Synapse.Patches.SynapsePatches.Wrapper
 {
-    [HarmonyPatch(typeof(PlayableScps.Scp096), "get_MaxShield")]
+    [HarmonyPatch(typeof(PlayableScps.Scp096), "CurMaxShield", MethodType.Getter)]
     internal static class Scp096MaxShieldPatch
     {
         [HarmonyPostfix]

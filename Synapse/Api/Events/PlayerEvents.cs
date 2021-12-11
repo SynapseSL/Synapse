@@ -4,6 +4,7 @@ using Synapse.Api.Items;
 using UnityEngine;
 using InventorySystem.Items.MicroHID;
 using System;
+using PlayerStatsSystem;
 using Synapse.Api.Enum;
 
 namespace Synapse.Api.Events
@@ -117,25 +118,33 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void InvokePlayerDeathEvent(Player victim, Player killer, PlayerStats.HitInfo info)
+        internal void InvokePlayerDeathEvent(Player victim, Player killer, ItemType Weapon, out bool Allow)
         {
-            var ev = new PlayerDeathEventArgs {HitInfo = info, Killer = killer, Victim = victim};
+            var ev = new PlayerDeathEventArgs
+            {
+                Killer = killer,
+                Victim = victim,
+                Weapon = Weapon
+            };
             PlayerDeathEvent?.Invoke(ev);
+            
+            Allow = ev.Allow;
         }
 
-        internal void InvokePlayerDamageEvent(Player victim, Player killer, ref PlayerStats.HitInfo info, out bool allow)
+        internal void InvokePlayerDamageEvent(Player victim, Player killer, ref float Damage, ItemType Weapon, out bool Allow)
         {
             var ev = new PlayerDamageEventArgs
             {
-                HitInfo = info,
                 Killer = killer,
-                Victim = victim
+                Victim = victim,
+                Damage = Damage,
+                Weapon = Weapon
             };
-
+            
             PlayerDamageEvent?.Invoke(ev);
 
-            info = ev.HitInfo;
-            allow = ev.Allow;
+            Damage = ev.Damage;
+            Allow = ev.Allow;
         }
 
         internal void InvokeLoadComponentsEvent(GameObject gameObject)
