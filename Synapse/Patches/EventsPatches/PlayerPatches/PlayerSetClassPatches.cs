@@ -67,7 +67,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                         eventargs.Ammo[(AmmoType)ammo.Key] = ammo.Value;
 
                     foreach (var itemtype in roleitems.Items)
+                    {
                         eventargs.Items.Add(new SynapseItem(itemtype));
+                    }
                 }
 
                 Server.Get.Events.Player.InvokeSetClassEvent(eventargs);
@@ -106,7 +108,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 if(args.IsEscaping)
                 {
                     foreach (var item in player.Inventory.Items)
-                        item.Despawn();
+                        // This is just a temporary fix until somebody has time fo fix it finally
+                        // Because of this Ghostlights and balls are activating themselves
+                        item.Drop(args.Position);
                 }
                 else player.Inventory.Clear();
 
@@ -116,24 +120,24 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 foreach (var item in args.Items)
                 {
                     item.Drop();
-                    var arg = player.VanillaInventory.ServerAddItem(item.ItemType, item.Serial, item.PickupBase);
+                    var arg = player.VanillaInventory.ServerAddItem(item.ItemType);
 
                     InventoryItemProvider.OnItemProvided?.Invoke(player.Hub, arg);
                 }
 
-                if (args.IsEscaping)
-                {
-                    foreach(var item in args.EscapeItems)
-                    {
-                        if(inventory.UserInventory.Items.Count < 8 && item.ItemCategory != ItemCategory.Armor)
-                        {
-                            item.PickUp(player);
-                            InventorySystem.Items.Armor.BodyArmorUtils.RemoveEverythingExceedingLimits(inventory, 
-                                inventory.TryGetBodyArmor(out var bodyArmor) ? bodyArmor : null, true, true);
-                        }
-                        else item.Drop(args.Position);
-                    }
-                }
+                // if (args.IsEscaping)
+                // {
+                //     foreach(var item in args.EscapeItems)
+                //     {
+                //         if(inventory.UserInventory.Items.Count < 8 && item.ItemCategory != ItemCategory.Armor)
+                //         {
+                //             item.PickUp(player);
+                //             InventorySystem.Items.Armor.BodyArmorUtils.RemoveEverythingExceedingLimits(inventory, 
+                //                 inventory.TryGetBodyArmor(out var bodyArmor) ? bodyArmor : null, true, true);
+                //         }
+                //         else item.Drop(args.Position);
+                //     }
+                // }
 
                 args.CanBeDeleted = true;
 

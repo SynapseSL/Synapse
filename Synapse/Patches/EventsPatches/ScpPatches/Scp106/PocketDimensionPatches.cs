@@ -52,6 +52,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                 scp.ClassManager.RpcPlaceBlood(player.Position, 1, 2f);
                 __instance.TargetHitMarker(scp.Connection, __instance.captureCooldown);
                 __instance._currentServerCooldown = __instance.captureCooldown;
+                player.Hub.scp106PlayerScript.GrabbedPosition = player.Hub.playerMovementSync.RealModelPosition;
                 if (Scp106PlayerScript._blastDoor.isClosed)
                 {
                     __instance._hub.characterClassManager.RpcPlaceBlood(player.Position, 1, 2f);
