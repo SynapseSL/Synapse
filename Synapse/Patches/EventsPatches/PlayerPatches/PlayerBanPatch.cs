@@ -15,7 +15,14 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             try
             {
                 var player = user.GetPlayer();
-                var banIssuer = SynapseController.Server.GetPlayer(issuer);
+                Api.Player banIssuer;
+                if (issuer.Contains("(")) {
+                    banIssuer = SynapseController.Server.GetPlayer(issuer.Substring(issuer.LastIndexOf('(') + 1, issuer.Length - 2 - issuer.LastIndexOf('(')));
+                }
+                else 
+                {
+                    banIssuer = SynapseController.Server.GetPlayer(issuer);
+                }
                 var allow = true;
                 SynapseController.Server.Events.Player.InvokePlayerBanEvent(player, banIssuer, ref duration, ref reason, ref allow);
 
