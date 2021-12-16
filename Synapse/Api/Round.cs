@@ -1,6 +1,9 @@
 ﻿using GameCore;
 using Respawning;
+using Respawning.NamingRules;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using RoundRestarting;
 using UnityEngine;
 
@@ -21,6 +24,12 @@ namespace Synapse.Api
         {
             get => Rm._timeForNextSequence - (Rm._stopwatch.Elapsed.Hours * 3600 + Rm._stopwatch.Elapsed.Minutes * 60 + Rm._stopwatch.Elapsed.Seconds);
             set => Rm._timeForNextSequence = value + (Rm._stopwatch.Elapsed.Hours * 3600 + Rm._stopwatch.Elapsed.Minutes * 60 + Rm._stopwatch.Elapsed.Seconds);
+        }
+
+        public bool PrioritySpawn
+        {
+            get => Rm._prioritySpawn;
+            set => Rm._prioritySpawn = value;
         }
 
         public bool LobbyLock
@@ -92,7 +101,73 @@ namespace Synapse.Api
             Rs.RpcShowRoundSummary(Rs.classlistStart,remainingPlayers, team, EscapedDPersonnel, EscapedScientists, ScpKills, timeToRoundRestart);
         }
 
-        public void MtfRespawn(bool isCI = false) 
-            => RespawnManager.Singleton.ForceSpawnTeam(isCI ? SpawnableTeamType.ChaosInsurgency : SpawnableTeamType.NineTailedFox);
+        public void MtfRespawn(bool isCI = false) => MtfRespawn(isCI, RoleType.Spectator.GetPlayers(), true);
+
+        public void MtfRespawn(bool isCI, List<Player> players, bool useTicket = true)
+        {
+            if (!players.Any()) return;
+            SpawnableTeamType Team = isCI ? SpawnableTeamType.ChaosInsurgency : SpawnableTeamType.NineTailedFox;
+
+            players.RemoveAll(p => p.OverWatch);
+            if (!players.Any()) return;
+            Queue<RoleType> queueToFill = new Queue<RoleType>();
+            SpawnableTeamHandlerBase spawnableTeamHandlerBase = RespawnWaveGenerator.SpawnableTeams[Team];
+            spawnableTeamHandlerBase.GenerateQueue(queueToFill, players.Count);
+
+            if (useTicket)
+            {
+                if (PrioritySpawn)
+                    players = players.OrderBy(p => p.DeathTime).ToList();
+                else
+                    players.ShuffleList();
+
+                int tickets = RespawnTickets.Singleton.GetAvailableTickets(Team);
+                if (tickets == 0)
+                {
+                    tickets = 5;
+                    ChaosTickets = 5;
+                }
+                int num = Mathf.Min(tickets, spawnableTeamHandlerBase.MaxWaveSize);
+
+                players.RemoveRange(players.Count - num, num);
+            }
+            players.ShuffleList();
+
+            string unityName = "";
+            bool setUnite = UnitNamingRules.TryGetNamingRule(Team, out UnitNamingRule rule);
+
+            if (setUnite)
+            {
+                rule.GenerateNew(Team, out unityName);
+                rule.PlayEntranceAnnouncement(unityName);
+            }
+
+            foreach (var player in players)
+            {
+                try
+                {
+                    if (player == null)
+                    {
+                        Logger.Get.Error("Couldn't spawn a player - target's is null.");
+                        continue;
+                    }
+
+                    RoleType role = queueToFill.Dequeue();
+                    player.ClassManager.SetPlayersClass(role, player.gameObject, CharacterClassManager.SpawnReason.Respawn);
+
+                    if (setUnite)
+                    {
+                        player.ClassManager.NetworkCurSpawnableTeamType = (byte)Team;
+                        player.UnitName = unityName;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Get.Error($"Player {player.name} couldn't be spawned. Err msg: {e.Message}");
+                }
+            }
+            RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.UponRespawn, Team);
+            RespawnManager.Singleton.RestartSequence();
+        }
     }
 }
