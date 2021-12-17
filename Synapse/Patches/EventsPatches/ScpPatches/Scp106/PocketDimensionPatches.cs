@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Achievements;
 using HarmonyLib;
 using InventorySystem.Items.MicroHID;
 using MapGeneration;
 using Mirror;
+using PlayerStatsSystem;
 using UnityEngine;
 using EventHandler = Synapse.Api.Events.EventHandler;
 using Logger = Synapse.Api.Logger;
@@ -50,14 +52,17 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                 scp.ClassManager.RpcPlaceBlood(player.Position, 1, 2f);
                 __instance.TargetHitMarker(scp.Connection, __instance.captureCooldown);
                 __instance._currentServerCooldown = __instance.captureCooldown;
+                player.Hub.scp106PlayerScript.GrabbedPosition = player.Hub.playerMovementSync.RealModelPosition;
                 if (Scp106PlayerScript._blastDoor.isClosed)
                 {
                     __instance._hub.characterClassManager.RpcPlaceBlood(player.Position, 1, 2f);
-                    player.Hurt(500, DamageTypes.Scp106, scp);
+                    // player.Hurt(500, DamageTypes.Scp106, scp);
+                    player.PlayerStats.DealDamage(new ScpDamageHandler(__instance._hub, PlayerStatsSystem.DeathTranslations.PocketDecay));
                 }
                 else
                 {
-                    player.Hurt(40, DamageTypes.Scp106, scp);
+                    // player.Hurt(40, DamageTypes.Scp106, scp);
+                    player.PlayerStats.DealDamage(new ScpDamageHandler(__instance._hub, 40f, PlayerStatsSystem.DeathTranslations.PocketDecay));
                     player.Position = Vector3.down * 1998.5f;
                     foreach (Scp079PlayerScript scp079PlayerScript in Scp079PlayerScript.instances)
                     {
@@ -160,7 +165,9 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
 
                 if(!forceEscape && (type == PocketDimensionTeleport.PDTeleportType.Killer || Synapse.Api.Nuke.Get.Detonated))
                 {
-                    player.Hurt(999999, DamageTypes.Pocket);
+                    // player.Hurt(999999, DamageTypes.Pocket);
+                    // Es sollte so richtig sein ~ Dimenzio (It was wrong. This is hopefully better)
+                    player.PlayerStats.DealDamage(new UniversalDamageHandler(-1f, DeathTranslations.PocketDecay));
                     return false;
                 }
                 else
@@ -168,7 +175,8 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                     player.Position = pos;
                     player.PlayerEffectsController.EnableEffect<CustomPlayerEffects.Disabled>(10f, true);
                     player.PlayerEffectsController.GetEffect<CustomPlayerEffects.Corroding>().Intensity = 0;
-                    player.PlayerStats.TargetAchieve(component.connectionToClient, "larryisyourfriend");
+                    // player.PlayerStats.TargetAchieve(component.connectionToClient, "larryisyourfriend");
+                    Achievements.AchievementHandlerBase.ServerAchieve(component.connectionToClient, AchievementName.LarryFriend);
                 }
                 MapGeneration.ImageGenerator.pocketDimensionGenerator.GenerateRandom();
 

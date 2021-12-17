@@ -26,7 +26,7 @@ namespace Synapse.Api
 
         public void CreatePortal() => Script.CreatePortalInCurrentPosition();
 
-        public void Contain() => Script.Contain(player.Hub);
+        public void Contain() => Script.Contain(new Footprinting.Footprint(player.Hub));
 
         public void CapturePlayer(Player player) => Script.UserCode_CmdMovePlayer(player.gameObject, ServerTime.time);
     }

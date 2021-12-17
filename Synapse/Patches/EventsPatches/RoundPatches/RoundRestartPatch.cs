@@ -1,10 +1,11 @@
 ﻿using System;
 using HarmonyLib;
+using RoundRestarting;
 using Synapse.Api;
 
 namespace Synapse.Patches.EventsPatches.RoundPatches
 {
-    [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.Roundrestart))]
+    [HarmonyPatch(typeof(RoundRestart), nameof(RoundRestart.InitiateRoundRestart))]
     internal static class RoundRestartPatch
     {
         [HarmonyPrefix]

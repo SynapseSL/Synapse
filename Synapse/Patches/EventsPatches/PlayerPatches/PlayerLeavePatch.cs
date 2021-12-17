@@ -12,7 +12,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                var player = conn?.identity?.GetPlayer();
+                if (conn == null || conn.identity == null) return;
+
+                var player = conn.identity.GetPlayer();
                 if (player == null) return;
 
                 if (player.CustomRole != null)

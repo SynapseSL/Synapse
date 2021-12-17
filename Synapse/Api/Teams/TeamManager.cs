@@ -29,8 +29,15 @@ namespace Synapse.Api.Teams
 
         public bool IsDefaultID(int id) => id >= (int)Team.SCP && id <= (int)Team.TUT;
 
-        public void SpawnTeam(int id,List<Player> players)
+        public bool IsDefaultSpawnableID(int id) => id == (int)Team.MTF || id == (int)Team.CHI;
+
+        public void SpawnTeam(int id, List<Player> players)
         {
+            if (IsDefaultSpawnableID(id))
+            {
+                Round.Get.MtfRespawn(id == (int)Team.MTF, players);
+                return;
+            }
             var team = teams.FirstOrDefault(x => x.Info.ID == id);
             if (team == null) return;
             team.Spawn(players);

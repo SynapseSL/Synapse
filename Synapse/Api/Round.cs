@@ -1,6 +1,10 @@
 ﻿using GameCore;
 using Respawning;
+using Respawning.NamingRules;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using RoundRestarting;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -22,6 +26,12 @@ namespace Synapse.Api
             set => Rm._timeForNextSequence = value + (Rm._stopwatch.Elapsed.Hours * 3600 + Rm._stopwatch.Elapsed.Minutes * 60 + Rm._stopwatch.Elapsed.Seconds);
         }
 
+        public bool PrioritySpawn
+        {
+            get => Rm._prioritySpawn;
+            set => Rm._prioritySpawn = value;
+        }
+
         public bool LobbyLock
         {
             get => RoundStart.LobbyLock;
@@ -36,20 +46,20 @@ namespace Synapse.Api
 
         public int EscapedDPersonnel
         {
-            get => RoundSummary.escaped_ds;
-            set => RoundSummary.escaped_ds = value;
+            get => RoundSummary.EscapedClassD;
+            set => RoundSummary.EscapedClassD = value;
         }
 
         public int EscapedScientists
         {
-            get => RoundSummary.escaped_scientists;
-            set => RoundSummary.escaped_scientists = value;
+            get => RoundSummary.EscapedScientists;
+            set => RoundSummary.EscapedScientists = value;
         }
 
         public int ScpKills
         {
-            get => RoundSummary.kills_by_scp;
-            set => RoundSummary.kills_by_scp = value;
+            get => RoundSummary.KilledBySCPs;
+            set => RoundSummary.KilledBySCPs = value;
         }
 
         public int MtfTickets
@@ -76,7 +86,7 @@ namespace Synapse.Api
 
         public void EndRound() => Forceend = true;
 
-        public void RestartRound() => Server.Get.Host.PlayerStats.Roundrestart();
+        public void RestartRound() => RoundRestart.InitiateRoundRestart();
 
         public void SpawnVehicle(bool IsCI = false) => RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.Selection, IsCI ? SpawnableTeamType.ChaosInsurgency : SpawnableTeamType.NineTailedFox);
 
@@ -91,7 +101,73 @@ namespace Synapse.Api
             Rs.RpcShowRoundSummary(Rs.classlistStart,remainingPlayers, team, EscapedDPersonnel, EscapedScientists, ScpKills, timeToRoundRestart);
         }
 
-        public void MtfRespawn(bool isCI = false) 
-            => RespawnManager.Singleton.ForceSpawnTeam(isCI ? SpawnableTeamType.ChaosInsurgency : SpawnableTeamType.NineTailedFox);
+        public void MtfRespawn(bool isCI = false) => MtfRespawn(isCI, RoleType.Spectator.GetPlayers(), true);
+
+        public void MtfRespawn(bool isCI, List<Player> players, bool useTicket = true)
+        {
+            if (!players.Any()) return;
+            SpawnableTeamType Team = isCI ? SpawnableTeamType.ChaosInsurgency : SpawnableTeamType.NineTailedFox;
+
+            players.RemoveAll(p => p.OverWatch);
+            if (!players.Any()) return;
+            Queue<RoleType> queueToFill = new Queue<RoleType>();
+            SpawnableTeamHandlerBase spawnableTeamHandlerBase = RespawnWaveGenerator.SpawnableTeams[Team];
+            spawnableTeamHandlerBase.GenerateQueue(queueToFill, players.Count);
+
+            if (useTicket)
+            {
+                if (PrioritySpawn)
+                    players = players.OrderBy(p => p.DeathTime).ToList();
+                else
+                    players.ShuffleList();
+
+                int tickets = RespawnTickets.Singleton.GetAvailableTickets(Team);
+                if (tickets == 0)
+                {
+                    tickets = 5;
+                    ChaosTickets = 5;
+                }
+                int num = Mathf.Min(tickets, spawnableTeamHandlerBase.MaxWaveSize);
+
+                players.RemoveRange(players.Count - num, num);
+            }
+            players.ShuffleList();
+
+            string unityName = "";
+            bool setUnite = UnitNamingRules.TryGetNamingRule(Team, out UnitNamingRule rule);
+
+            if (setUnite)
+            {
+                rule.GenerateNew(Team, out unityName);
+                rule.PlayEntranceAnnouncement(unityName);
+            }
+
+            foreach (var player in players)
+            {
+                try
+                {
+                    if (player == null)
+                    {
+                        Logger.Get.Error("Couldn't spawn a player - target's is null.");
+                        continue;
+                    }
+
+                    RoleType role = queueToFill.Dequeue();
+                    player.ClassManager.SetPlayersClass(role, player.gameObject, CharacterClassManager.SpawnReason.Respawn);
+
+                    if (setUnite)
+                    {
+                        player.ClassManager.NetworkCurSpawnableTeamType = (byte)Team;
+                        player.UnitName = unityName;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Get.Error($"Player {player.name} couldn't be spawned. Err msg: {e.Message}");
+                }
+            }
+            RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.UponRespawn, Team);
+            RespawnManager.Singleton.RestartSequence();
+        }
     }
 }

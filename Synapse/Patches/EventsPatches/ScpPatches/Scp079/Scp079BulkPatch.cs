@@ -519,6 +519,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                                 doorVariant3.NetworkTargetState = false;
                                             }
                                             doorVariant3.ServerChangeLock(DoorLockReason.Lockdown079, true);
+                                            doorVariant3.UnlockLater(__instance.LockdownDuration, DoorLockReason.Lockdown079);
                                             doorHashSet.Add(doorVariant3);
                                         }
                                     }

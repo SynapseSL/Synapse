@@ -135,7 +135,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                     if (role.GetEnemiesID().Any(x => teamids.Contains(x)))
                         endround = false;
 
-                if (RoundSummary.escaped_ds + teams.Count(x => x == Team.CDP) > 0)
+                if (RoundSummary.EscapedClassD + teams.Count(x => x == Team.CDP) > 0)
                 {
                     if(teams.Contains(Team.SCP) || teams.Contains(Team.CHI) || teams.Contains(Team.CHI))
                         leadingTeam = RoundSummary.LeadingTeam.ChaosInsurgency;
@@ -144,7 +144,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                 {
                     if (teams.Contains(Team.MTF) || teams.Contains(Team.RSC))
                     {
-                        if (RoundSummary.escaped_scientists + teams.Count(x => x == Team.RSC) > 0)
+                        if (RoundSummary.EscapedScientists + teams.Count(x => x == Team.RSC) > 0)
                             leadingTeam = RoundSummary.LeadingTeam.FacilityForces;
                     }
                     else
@@ -167,8 +167,8 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                     Map.Get.Round.Forceend = false;
                     FriendlyFireConfig.PauseDetector = true;
 
-                    var dpercentage = (float)instance.classlistStart.class_ds == 0 ? 0 : RoundSummary.escaped_ds + result.class_ds / instance.classlistStart.class_ds;
-                    var spercentage = (float)instance.classlistStart.scientists == 0 ? 0 : RoundSummary.escaped_scientists + result.scientists / instance.classlistStart.scientists;
+                    var dpercentage = (float)instance.classlistStart.class_ds == 0 ? 0 : RoundSummary.EscapedClassD + result.class_ds / instance.classlistStart.class_ds;
+                    var spercentage = (float)instance.classlistStart.scientists == 0 ? 0 : RoundSummary.EscapedScientists + result.scientists / instance.classlistStart.scientists;
                     var text = $"Round finished! Anomalies: {teams.Where(x => x == Team.SCP).Count()} | Chaos: {teams.Where(x => x == Team.CHI || x == Team.CDP).Count()}" +
                         $" | Facility Forces: {teams.Where(x => x == Team.MTF || x == Team.RSC).Count()} | D escaped percentage: {dpercentage} | S escaped percentage : {spercentage}";
                     GameCore.Console.AddLog(text, Color.gray, false);

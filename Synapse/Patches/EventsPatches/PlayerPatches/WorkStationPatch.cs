@@ -14,11 +14,15 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                if (colliderId != __instance._activateCollder.ColliderId || __instance.Status != 0) return false;
+                if (colliderId != __instance._activateCollder?.ColliderId || __instance.Status != 0) return false;
+
+                if (ply == null) return false;
 
                 var player = ply.GetPlayer();
                 var station = __instance.GetWorkStation();
-                station.KnownUser = player;
+
+                if (station != null)
+                    station.KnownUser = player;
 
                 Event.Get.Player.InvokePlayerStartWorkstation(player, station, out var allow);
 
