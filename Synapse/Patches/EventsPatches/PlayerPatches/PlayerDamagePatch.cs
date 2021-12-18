@@ -2,6 +2,7 @@
 using HarmonyLib;
 using PlayerStatsSystem;
 using Synapse.Api;
+using Synapse.Api.Items;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
@@ -14,76 +15,21 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                String handlerType = handler.GetType().ToString();
-
                 Player Victim = __instance.GetPlayer();
-                Player Attacker = null;
-                float Damage = -1;
-                ItemType Weapon = ItemType.None;
-                bool allowed = true;
+                Player Attacker;
+                float Damage;
+                SynapseItem Weapon;
+                ItemType WeaponType;
+                bool allow = true;
 
-                switch (handlerType)
-                {
-                    case "PlayerStatsSystem.UniversalDamageHandler":
-                        Damage = ((UniversalDamageHandler) handler).Damage;
-                        break;
+                handler.Analyze(out Attacker, out Weapon, out WeaponType, out Damage); 
 
-                    case "PlayerStatsSystem.ScpDamageHandler":
-                        ScpDamageHandler scpDamageHandler = (ScpDamageHandler) handler;
+                SynapseController.Server.Events.Player.InvokePlayerDamageEvent(Victim, Attacker, ref Damage, WeaponType, Weapon, out allow);
 
-                        Attacker = scpDamageHandler.Attacker.Hub.GetPlayer();
-                        Damage = scpDamageHandler.Damage;
-                        break;
+                if (handler is StandardDamageHandler standarHandler) 
+                    standarHandler.Damage = Damage;
 
-                    case "PlayerStatsSystem.FirearmDamageHandler":
-                        FirearmDamageHandler firearmHandler = (FirearmDamageHandler) handler;
-
-                        Attacker = firearmHandler.Attacker.Hub.GetPlayer();
-                        Damage = firearmHandler.Damage;
-                        Weapon = firearmHandler.WeaponType;
-                        break;
-
-                    case "PlayerStatsSystem.ExplosionDamageHandler":
-                        ExplosionDamageHandler explosionDamageHandler = (ExplosionDamageHandler) handler;
-
-                        Attacker = explosionDamageHandler.Attacker.Hub.GetPlayer();
-                        Damage = explosionDamageHandler.Damage;
-                        break;
-
-                    case "PlayerStatsSystem.CustomReasonDamageHandler":
-                        CustomReasonDamageHandler customReasonDamageHandler = (CustomReasonDamageHandler) handler;
-
-                        Damage = customReasonDamageHandler.Damage;
-                        break;
-
-                    case "PlayerStatsSystem.MicroHidDamageHandler":
-                        MicroHidDamageHandler microHidDamageHandler = (MicroHidDamageHandler) handler;
-
-                        Attacker = microHidDamageHandler.Attacker.Hub.GetPlayer();
-                        Damage = microHidDamageHandler.Damage;
-                        Weapon = ItemType.MicroHID;
-                        break;
-
-                    case "PlayerStatsSystem.Scp018DamageHandler":
-                        Scp018DamageHandler scp018DamageHandler = (Scp018DamageHandler) handler;
-
-                        Attacker = scp018DamageHandler.Attacker.Hub.GetPlayer();
-                        Damage = scp018DamageHandler.Damage;
-                        Weapon = ItemType.SCP018;
-                        break;
-
-                    case "PlayerStatsSystem.Scp096DamageHandler":
-                        Scp096DamageHandler scp096DamageHandler = (Scp096DamageHandler) handler;
-
-                        Attacker = scp096DamageHandler.Attacker.Hub.GetPlayer();
-                        Damage = scp096DamageHandler.Damage;
-                        break;
-                }
-
-                SynapseController.Server.Events.Player.InvokePlayerDamageEvent(Victim, Attacker, ref Damage, Weapon,
-                    out allowed);
-
-                return allowed;
+                return allow;
             }
             catch (Exception e)
             {
