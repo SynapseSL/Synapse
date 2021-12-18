@@ -65,9 +65,9 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
             try
             {
                 AttackerDamageHandler attackerDamageHandler = handler as AttackerDamageHandler;
-                if (attackerDamageHandler == null || attackerDamageHandler.Attacker.Hub == null || !__instance.CanEnrage) return false;
+                if (attackerDamageHandler == null || attackerDamageHandler.Attacker.GetPlayer() == null || !__instance.CanEnrage) return false;
 
-                var player = attackerDamageHandler.Attacker.Hub.GetPlayer();
+                var player = attackerDamageHandler.Attacker.GetPlayer();
 
                 if (player.Invisible || Server.Get.Configs.synapseConfiguration.CantRage096.Contains(player.RoleID))
                     return false;

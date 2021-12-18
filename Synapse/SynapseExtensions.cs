@@ -13,12 +13,15 @@ using MapGeneration;
 using InventorySystem.Items.Firearms.Attachments;
 using Mirror;
 using MapGeneration.Distributors;
+using Footprinting;
 
 public static class SynapseExtensions
 {
     public static Player GetPlayer(this NetworkConnection connection) => connection.identity.GetPlayer();
 
     public static Player GetPlayer(this MonoBehaviour mono) => mono?.gameObject?.GetComponent<Player>();
+
+    public static Player GetPlayer(this Footprint footprint) => footprint.Hub?.GetPlayer();
 
     public static Player GetPlayer(this GameObject gameObject) => gameObject?.GetComponent<Player>();
 

@@ -219,7 +219,7 @@ namespace Synapse.Api.Items
             {
                 switch (State)
                 {
-                    case ItemState.Map: return PickupBase.PreviousOwner.Hub.GetPlayer();
+                    case ItemState.Map: return PickupBase.PreviousOwner.GetPlayer();
                     case ItemState.Inventory: return ItemBase.Owner.GetPlayer();
                     default: return null;
                 }
