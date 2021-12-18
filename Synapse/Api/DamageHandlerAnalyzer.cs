@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Synapse.Api
 {
-    public static class DamageHandlerAnalayzer
+    public static class DamageHandlerAnalyzer
     {
         public static void Analyze(this DamageHandlerBase handler, out Player Attacker, out SynapseItem Weapon, out ItemType WeaponType, out float Damage)
         {
