@@ -24,7 +24,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 ItemType WeaponType;
                 bool allow = true;
 
-                handler.Analyze(out Attacker, out Weapon, out WeaponType, out DamageType, out Damage); 
+                handler.Analyze(out Attacker, out Weapon, out WeaponType, out DamageType, out Damage);
 
                 SynapseController.Server.Events.Player.InvokePlayerDamageEvent(Victim, Attacker, ref Damage, DamageType, WeaponType, Weapon, out allow);
 
@@ -35,7 +35,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             catch (Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: PlayerGeneratorInteract event failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Event: PlayerDamageEvent event failed!!\n{e}");
                 return true;
             }
             /*try
