@@ -3,6 +3,7 @@ using System.Linq;
 using HarmonyLib;
 using PlayerStatsSystem;
 using Synapse.Api;
+using Synapse.Api.Enum;
 using Synapse.Api.Items;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
@@ -17,13 +18,14 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             {
                 Player Victim = __instance.GetPlayer();
                 Player Attacker;
-                float Damage;
                 SynapseItem Weapon;
                 ItemType WeaponType;
+                float Damage;
+                DamageType DamageType;
 
-                handler.Analyze(out Attacker, out Weapon, out WeaponType, out Damage);
+                handler.Analyze(out Attacker, out Weapon, out WeaponType, out DamageType, out Damage);
 
-                SynapseController.Server.Events.Player.InvokePlayerDeathEvent(Victim, Attacker, Damage, WeaponType, Weapon);
+                SynapseController.Server.Events.Player.InvokePlayerDeathEvent(Victim, Attacker, Damage, DamageType, WeaponType, Weapon);
                 
                 foreach (var larry in Server.Get.Players.Where(x => x.Scp106Controller.PocketPlayers.Contains(Victim)))
                     larry.Scp106Controller.PocketPlayers.Remove(Victim);

@@ -2,6 +2,7 @@
 using HarmonyLib;
 using PlayerStatsSystem;
 using Synapse.Api;
+using Synapse.Api.Enum;
 using Synapse.Api.Items;
 using Logger = Synapse.Api.Logger;
 
@@ -18,13 +19,14 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 Player Victim = __instance.GetPlayer();
                 Player Attacker;
                 float Damage;
+                DamageType DamageType;
                 SynapseItem Weapon;
                 ItemType WeaponType;
                 bool allow = true;
 
-                handler.Analyze(out Attacker, out Weapon, out WeaponType, out Damage); 
+                handler.Analyze(out Attacker, out Weapon, out WeaponType, out DamageType, out Damage); 
 
-                SynapseController.Server.Events.Player.InvokePlayerDamageEvent(Victim, Attacker, ref Damage, WeaponType, Weapon, out allow);
+                SynapseController.Server.Events.Player.InvokePlayerDamageEvent(Victim, Attacker, ref Damage, DamageType, WeaponType, Weapon, out allow);
 
                 if (handler is StandardDamageHandler standarHandler) 
                     standarHandler.Damage = Damage;
