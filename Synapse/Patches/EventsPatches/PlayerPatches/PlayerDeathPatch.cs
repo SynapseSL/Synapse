@@ -21,11 +21,12 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 SynapseItem Weapon;
                 ItemType WeaponType;
                 float Damage;
-                DamageType DamageType;
+                DamageHandlerType DamageHandlerType;
+                DamageTranslation DamageTranslation;
 
-                handler.Analyze(out Attacker, out Weapon, out WeaponType, out DamageType, out Damage);
+                handler.Analyze(out Attacker, out Weapon, out WeaponType, out DamageHandlerType, out DamageTranslation, out Damage);
 
-                SynapseController.Server.Events.Player.InvokePlayerDeathEvent(Victim, Attacker, Damage, DamageType, WeaponType, Weapon);
+                SynapseController.Server.Events.Player.InvokePlayerDeathEvent(Victim, Attacker, Damage, DamageHandlerType, DamageTranslation, WeaponType, Weapon);
                 
                 foreach (var larry in Server.Get.Players.Where(x => x.Scp106Controller.PocketPlayers.Contains(Victim)))
                     larry.Scp106Controller.PocketPlayers.Remove(Victim);

@@ -155,26 +155,28 @@ public static class SynapseExtensions
         return item;
     }
 
-    public static ScpRecontainmentType GetScpRecontainmentType(this DamageType damageType, Player player = null)
+    public static ScpRecontainmentType GetScpRecontainmentType(this DamageTranslation damageType, Player player = null)
     { 
         switch (damageType)
         {
-            case DamageType.MicroHid:
-            case DamageType.Firearm:
-            case DamageType.Scp018:
+            case DamageTranslation.MicroHID:
+            case DamageTranslation.BulletWounds:
+            case DamageTranslation.Explosion:
+            case DamageTranslation.Crushed:
                 if (player == null || (player.TeamID >= 5 && player.TeamID <= 0))
                     return ScpRecontainmentType.Unknown;
                 return (ScpRecontainmentType)player.TeamID;
-            case DamageType.Nuck:
+            case DamageTranslation.Nuck:
                 return ScpRecontainmentType.Nuke;
-            case DamageType.Decontamination:
+            case DamageTranslation.Decontamination:
                 return ScpRecontainmentType.Decontamination;
-            case DamageType.Tesla:
+            case DamageTranslation.Tesla:
                 return ScpRecontainmentType.Tesla;
             default: 
                 return ScpRecontainmentType.Unspecified;
         }
     }
+
     public static bool CanHarmScp(Player player,bool message = true)
     {
         if (player.Team == Team.SCP || player.CustomRole?.GetFriendsID().Any(x => x == (int)Team.SCP) == true)

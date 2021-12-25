@@ -19,14 +19,15 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 Player Victim = __instance.GetPlayer();
                 Player Attacker;
                 float Damage;
-                DamageType DamageType;
+                DamageHandlerType DamageHandlerType;
+                DamageTranslation DamageTranslation;
                 SynapseItem Weapon;
                 ItemType WeaponType;
                 bool allow = true;
 
-                handler.Analyze(out Attacker, out Weapon, out WeaponType, out DamageType, out Damage);
+                handler.Analyze(out Attacker, out Weapon, out WeaponType, out DamageHandlerType, out DamageTranslation, out Damage);
 
-                SynapseController.Server.Events.Player.InvokePlayerDamageEvent(Victim, Attacker, ref Damage, DamageType, WeaponType, Weapon, out allow);
+                SynapseController.Server.Events.Player.InvokePlayerDamageEvent(Victim, Attacker, ref Damage, DamageHandlerType, DamageTranslation, WeaponType, Weapon, out allow);
 
                 if (handler is StandardDamageHandler standarHandler) 
                     standarHandler.Damage = Damage;

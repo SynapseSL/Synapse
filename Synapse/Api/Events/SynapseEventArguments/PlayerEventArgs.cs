@@ -70,7 +70,9 @@ namespace Synapse.Api.Events.SynapseEventArguments
         
         public float Damage { get; set; }
 
-        public DamageType DamageType { get; internal set; }
+        public DamageHandlerType DamageHadnlerType { get; internal set; }
+
+        public DamageTranslation DamageTranslation { get; internal set; }
 
         public SynapseItem Weapon { get; internal set; }
 
@@ -85,7 +87,9 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public float Damage { get; set; }
         
-        public DamageType DamageType { get; internal set; }
+        public DamageHandlerType DamageHadnlerType { get; internal set; }
+
+        public DamageTranslation DamageTranslation { get; internal set; }
 
         public SynapseItem Weapon { get; internal set; }
 

@@ -133,6 +133,11 @@ namespace Synapse.Api
             PlayerStats.DealDamage(damageType);
         }
 
+        public void Hurt(DamageHandlerBase damageType) =>  PlayerStats.DealDamage(damageType);
+        
+        public void Hurt(int amount) => Hurt(new UniversalDamageHandler(amount, DeathTranslations.Unknown));
+        
+
         public void OpenReportWindow(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
 
         public void RemoveDisplayInfo(PlayerInfoArea playerInfo) => NicknameSync.Network_playerInfoToShow &= ~playerInfo;

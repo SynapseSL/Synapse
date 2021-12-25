@@ -41,7 +41,8 @@
   <ItemGroup>
     <Compile Include="Api\Broadcast.cs" />
     <Compile Include="Api\DamageHandlerAnalyzer.cs" />
-    <Compile Include="Api\Enum\DamageType.cs" />
+    <Compile Include="Api\Enum\DamageHandlerType.cs" />
+    <Compile Include="Api\Enum\DamageTranslation.cs" />
     <Compile Include="Api\Enum\MovementDirection.cs" />
     <Compile Include="Api\Enum\ElevatorType.cs" />
     <Compile Include="Api\Enum\ScpRecontainmentType.cs" />
