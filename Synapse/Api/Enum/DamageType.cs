@@ -1,0 +1,39 @@
+﻿namespace Synapse.Api.Enum
+{
+    public enum DamageType
+    {
+        Recontained,
+        Warhead,
+        Scp049,
+        Unknown,
+        Asphyxiated,
+        Bleeding,
+        Falldown,
+        PocketDecay,
+        Decontamination,
+        Poisoned,
+        Scp207,
+        SeveredHands,
+        MicroHID,
+        Tesla,
+        Explosion,
+        Scp096,
+        Scp173,
+        Scp939,
+        Zombie,
+        BulletWounds,
+        Crushed,
+        UsedAs106Bait,
+        FriendlyFireDetector,
+        Hypothermia,
+
+        Universal,
+        CustomReason,
+        Disruptor,
+        Firearm,
+        MicroHid,
+        Recontainment,
+        Scp018,
+        Scp,
+    }
+}

@@ -25,6 +25,12 @@ namespace Synapse.Api.Events
                     ev.Player.MaxHealth = 500;
                     ev.Player.MaxArtificialHealth = 500;
                     break;
+
+                case KeyCode.Alpha2:
+                    Logger.Get.Debug(new PlayerStatsSystem.ExplosionDamageHandler(new Footprinting.Footprint(ev.Player.Hub), Vector3.zero, 0, 0).GetDamageType());
+                    Logger.Get.Debug(new PlayerStatsSystem.UniversalDamageHandler(0f, PlayerStatsSystem.DeathTranslations.Asphyxiated).GetDamageType());
+                    Logger.Get.Debug(new PlayerStatsSystem.UniversalDamageHandler(0f, new PlayerStatsSystem.DeathTranslation(100, 0, 0, "")).GetDamageType());
+                    break;
             }
         }
 

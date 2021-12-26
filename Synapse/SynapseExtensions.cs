@@ -1,19 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using InventorySystem.Items;
+﻿using InventorySystem.Items;
+using InventorySystem.Items.Firearms.Attachments;
 using InventorySystem.Items.Pickups;
+using MapGeneration;
+using MapGeneration.Distributors;
+using Mirror;
+using PlayerStatsSystem;
 using Synapse;
 using Synapse.Api;
 using Synapse.Api.Enum;
 using Synapse.Api.Items;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
-using MapGeneration;
-using InventorySystem.Items.Firearms.Attachments;
-using Mirror;
-using MapGeneration.Distributors;
-using PlayerStatsSystem;
 
 public static class SynapseExtensions
 {
@@ -217,6 +217,25 @@ public static class SynapseExtensions
             Synapse.Api.Logger.Get.Error($"Synapse-API: GetShootPermission  failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             return true;
         }
+    }
+
+    public static DamageType GetDamageType(this DamageHandlerBase handler)
+    {
+        if(Enum.TryParse<DamageType>(handler.GetType().Name.Replace("DamageHandler",""),out var type))
+        {
+            if(type == DamageType.Universal)
+            {
+                var id = (handler as UniversalDamageHandler).TranslationId;
+
+                if (id < 0 || id > 23) return DamageType.Universal;
+
+                return (DamageType)id;
+            }
+
+            return type;
+        }
+
+        return DamageType.Universal;
     }
 
     [Obsolete("Use SynapseExtensions.CanHarmScp() and check if it is false")]

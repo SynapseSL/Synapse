@@ -1,11 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using Hints;
+﻿using Hints;
 using InventorySystem;
 using InventorySystem.Disarming;
 using InventorySystem.Items;
-using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Firearms.Attachments;
 using InventorySystem.Searching;
 using MapGeneration;
@@ -20,6 +16,9 @@ using Synapse.Api.Roles;
 using Synapse.Database;
 using Synapse.Patches.EventsPatches.PlayerPatches;
 using Synapse.Permission;
+using System;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace Synapse.Api
