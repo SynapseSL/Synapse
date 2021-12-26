@@ -75,12 +75,6 @@ namespace Synapse.Api
             RoleChangeClassIdPatch.ForceLite = false;
         }
 
-        public void Kill(DamageHandlerBase damageType = default)
-        {
-            damageType ??= new UniversalDamageHandler(10000, DeathTranslations.Unknown);
-            PlayerStats.KillPlayer(damageType);
-        }
-
         public void GiveTextHint(string message, float duration = 5f)
         {
             Hub.hints.Show(new TextHint(message, new HintParameter[]
@@ -126,11 +120,16 @@ namespace Synapse.Api
 
         public void Heal(float hp) => Health += hp;
 
-        public void Hurt(int amount, DamageHandlerBase damageType = default)
+        public bool Hurt(float damage, DamageType type = DamageType.Unknown)
         {
-            damageType ??= new UniversalDamageHandler(amount, DeathTranslations.Unknown);
-            PlayerStats.DealDamage(damageType);
+            var handler = type.GetUniversalDamageHandler();
+            handler.Damage = damage;
+            return PlayerStats.DealDamage(handler);
         }
+
+        public bool Hurt(DamageHandlerBase handlerbase) => PlayerStats.DealDamage(handlerbase);
+
+        public bool Kill(string reason, string cassie = "") => PlayerStats.DealDamage(new CustomReasonDamageHandler(reason, 9999999999f, cassie));
 
         public void OpenReportWindow(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
 

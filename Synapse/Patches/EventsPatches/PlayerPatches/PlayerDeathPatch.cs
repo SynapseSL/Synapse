@@ -1,8 +1,8 @@
-﻿using System;
-using System.Linq;
-using HarmonyLib;
+﻿using HarmonyLib;
 using PlayerStatsSystem;
 using Synapse.Api;
+using System;
+using System.Linq;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
@@ -14,7 +14,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                String handlerType = handler.GetType().ToString();
+                string handlerType = handler.GetType().ToString();
 
                 Player Victim = __instance.GetPlayer();
                 Player Attacker = null;
@@ -70,7 +70,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                         break;
                 }
 
-                SynapseController.Server.Events.Player.InvokePlayerDeathEvent(Victim, Attacker, Weapon);
+                SynapseController.Server.Events.Player.InvokePlayerDeathEvent(Victim, Attacker, handler);
                 
                 foreach (var larry in Server.Get.Players.Where(x => x.Scp106Controller.PocketPlayers.Contains(Victim)))
                     larry.Scp106Controller.PocketPlayers.Remove(Victim);

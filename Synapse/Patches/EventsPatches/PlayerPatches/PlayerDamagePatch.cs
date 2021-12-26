@@ -1,7 +1,7 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using PlayerStatsSystem;
 using Synapse.Api;
+using System;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
@@ -80,8 +80,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                         break;
                 }
 
-                SynapseController.Server.Events.Player.InvokePlayerDamageEvent(Victim, Attacker, ref Damage, Weapon,
-                    out allowed);
+                SynapseController.Server.Events.Player.InvokePlayerDamageEvent(Victim, Attacker, ref Damage, handler ,out allowed);
 
                 return allowed;
             }

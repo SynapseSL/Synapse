@@ -68,9 +68,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         
         public Player Killer { get; internal set; }
         
-        public float Damage { get; set; }
-        
-        public ItemType Weapon { get; internal set; }
+        public DamageType DamageType { get; internal set; }
     }
 
     public class PlayerDamageEventArgs : EventHandler.ISynapseEventArgs
@@ -80,8 +78,8 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Player Victim { get; internal set; }
 
         public float Damage { get; set; }
-        
-        public ItemType Weapon { get; internal set; }
+
+        public DamageType DamageType { get; internal set; }
 
         public bool Allow { get; set; } = true;
     }

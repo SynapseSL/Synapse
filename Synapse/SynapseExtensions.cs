@@ -221,6 +221,8 @@ public static class SynapseExtensions
 
     public static DamageType GetDamageType(this DamageHandlerBase handler)
     {
+        if (handler == null) return DamageType.Unknown;
+                
         if(Enum.TryParse<DamageType>(handler.GetType().Name.Replace("DamageHandler",""),out var type))
         {
             if(type == DamageType.Universal)
@@ -235,7 +237,14 @@ public static class SynapseExtensions
             return type;
         }
 
-        return DamageType.Universal;
+        return DamageType.Unknown;
+    }
+
+    public static UniversalDamageHandler GetUniversalDamageHandler(this DamageType type)
+    {
+        if((int)type < 0 || (int)type > 23) return new UniversalDamageHandler(0f,DeathTranslations.Unknown);
+
+        return new UniversalDamageHandler(0f, DeathTranslations.TranslationsById[(byte)type]);
     }
 
     [Obsolete("Use SynapseExtensions.CanHarmScp() and check if it is false")]

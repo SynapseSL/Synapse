@@ -31,6 +31,14 @@ namespace Synapse.Api.Events
                     Logger.Get.Debug(new PlayerStatsSystem.UniversalDamageHandler(0f, PlayerStatsSystem.DeathTranslations.Asphyxiated).GetDamageType());
                     Logger.Get.Debug(new PlayerStatsSystem.UniversalDamageHandler(0f, new PlayerStatsSystem.DeathTranslation(100, 0, 0, "")).GetDamageType());
                     break;
+
+                case KeyCode.Alpha3:
+                    ev.Player.Kill("U r ded now", "A A A A");
+                    break;
+
+                case KeyCode.Alpha4:
+                    ev.Player.Hurt(1000f,Enum.DamageType.Falldown);
+                    break;
             }
         }
 
