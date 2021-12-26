@@ -13,6 +13,7 @@ using MapGeneration;
 using InventorySystem.Items.Firearms.Attachments;
 using Mirror;
 using MapGeneration.Distributors;
+using PlayerStatsSystem;
 
 public static class SynapseExtensions
 {
@@ -25,6 +26,8 @@ public static class SynapseExtensions
     public static Player GetPlayer(this PlayableScps.PlayableScp scp) => scp?.Hub?.GetPlayer();
 
     public static Player GetPlayer(this CommandSender sender) => Server.Get.Players.FirstOrDefault(x => x.CommandSender == sender);
+
+    public static Player GetPlayer(this StatBase stat) => stat.Hub.GetPlayer();
 
     public static List<Player> GetPlayers(this RoleType role) => SynapseController.Server.Players.Where(x => x.RoleType == role).ToList();
 

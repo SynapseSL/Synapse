@@ -14,13 +14,7 @@ namespace Synapse.Api.Events
             Server.UpdateEvent += OnUpdate;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
-            Player.PlayerShootEvent += Shoot;
 #endif
-        }
-
-        private void Shoot(SynapseEventArguments.PlayerShootEventArgs ev)
-        {
-            Logger.Get.Warn(ev.TargetPosition);
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
@@ -28,8 +22,8 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    foreach (var station in Api.Map.Get.WorkStations)
-                        Logger.Get.Warn(station.GameObject.name);
+                    ev.Player.MaxHealth = 500;
+                    ev.Player.MaxArtificialHealth = 500;
                     break;
             }
         }

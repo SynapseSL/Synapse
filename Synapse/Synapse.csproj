@@ -190,6 +190,7 @@
     <Compile Include="Patches\SynapsePatches\Dummy\MirrorPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Dummy\OverridePositionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Dummy\ShootPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\HealthPatches.cs" />
     <Compile Include="Patches\SynapsePatches\Item\ItemDistributorPatches.cs" />
     <Compile Include="Patches\SynapsePatches\Item\PickupPatches.cs" />
     <Compile Include="Patches\SynapsePatches\Item\InventoryExtensionPatches.cs" />

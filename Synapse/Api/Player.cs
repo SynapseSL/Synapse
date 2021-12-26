@@ -550,7 +550,7 @@ namespace Synapse.Api
             set => Hub.playerStats.GetModule<HealthStat>().CurValue = value;
         }
 
-        public float MaxHealth => Hub.playerStats.GetModule<HealthStat>().MaxValue;
+        public float MaxHealth { get; set; } = 100f;
 
         public float ArtificialHealth
         {
@@ -558,7 +558,18 @@ namespace Synapse.Api
             set => Hub.playerStats.GetModule<AhpStat>().CurValue = value;
         }
 
-        public int MaxArtificialHealth => (int) Hub.playerStats.GetModule<AhpStat>().MaxValue;
+        private int maxahp = 75;
+
+        public int MaxArtificialHealth
+        {
+            get => maxahp;
+            set
+            {
+                maxahp = value;
+                foreach (var process in PlayerStats.GetModule<AhpStat>()._activeProcesses)
+                    process.Limit = value;
+            }
+        }
 
         public float Stamina
         {
