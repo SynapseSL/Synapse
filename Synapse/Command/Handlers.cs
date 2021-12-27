@@ -81,6 +81,8 @@ namespace Synapse.Command
                     Usage = command.Arguments
                 });
 
+                if (command.Aliases == null) continue;
+                
                 foreach (var ali in command.Aliases)
                     list.Add(new RemoteAdmin.QueryProcessor.CommandData
                     {
