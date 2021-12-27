@@ -1,7 +1,7 @@
 ﻿using Mirror;
-using UnityEngine;
-using System.Linq;
 using PlayerStatsSystem;
+using Synapse.Api.Enum;
+using UnityEngine;
 
 namespace Synapse.Api
 {
@@ -9,52 +9,29 @@ namespace Synapse.Api
     {
         internal Ragdoll(global::Ragdoll rag) => ragdoll = rag;
 
-        /*public Ragdoll(RoleType roletype, Vector3 pos, Quaternion rot, Vector3 velocity, PlayerStats.HitInfo info, bool allowRecall, string owner)
-        {
-            var role = Server.Get.Host.ClassManager.Classes.SafeGet((int)roletype);
-            var gameobject = UnityEngine.Object.Instantiate(role.model_ragdoll, pos + role.ragdoll_offset.position, Quaternion.Euler(rot.eulerAngles + role.ragdoll_offset.rotation));
-            NetworkServer.Spawn(gameobject);
-            ragdoll = gameobject.GetComponent<global::Ragdoll>();
-            ragdoll.Networkowner = new global::Ragdoll.Info("", owner, info, role, 0);
-            ragdoll.NetworkallowRecall = allowRecall;
-            ragdoll.NetworkPlayerVelo = velocity;
-            Map.Get.Ragdolls.Add(this);
-        }*/
+        public Ragdoll(RoleType roleType, string name, Vector3 pos, Quaternion rot, DamageType type)
+            : this(roleType, name, pos, rot, type.GetUniversalDamageHandler()) { }
 
-        public Ragdoll(RoleType roleType, Vector3 pos, Quaternion rot, DamageHandlerBase handler, Player owner)
+        public Ragdoll(RoleType roleType, string name, Vector3 pos, Quaternion rot, DamageHandlerBase handler)
         {
-            GameObject gameObject = Server.Get.Host.ClassManager.Classes.SafeGet((int) roleType).model_ragdoll;
-            //GameObject gameObject = Object.Instantiate(role.model_ragdoll, pos + role.model_offset.position,
-            //    Quaternion.Euler(rot.eulerAngles + role.model_offset.rotation));
+            var gameObject = Server.Get.Host.ClassManager.Classes.SafeGet((int) roleType).model_ragdoll;
+
             if (gameObject == null || !Object.Instantiate(gameObject).TryGetComponent(out ragdoll))
-            {
                 return;
-            }
-            ragdoll = gameObject.GetComponent<global::Ragdoll>();
-            ragdoll.NetworkInfo = new RagdollInfo(owner.Hub, handler, pos, rot);
-            NetworkServer.Spawn(gameObject);
+
+            ragdoll.NetworkInfo = new RagdollInfo(Server.Get.Host.Hub, handler, roleType, pos, rot, name, NetworkTime.time);
+            NetworkServer.Spawn(GameObject);
+
+            Map.Get.Ragdolls.Add(this);
         }
 
-        private readonly global::Ragdoll ragdoll;
+        public readonly global::Ragdoll ragdoll;
 
         public GameObject GameObject => ragdoll.gameObject;
-
-        public string Name => ragdoll.name;
 
         public RoleType RoleType
         {
             get => ragdoll.Info.RoleType;
-        }
-
-        public Vector3 Position
-        {
-            get => ragdoll.transform.position;
-            set
-            {
-                NetworkServer.UnSpawn(GameObject);
-                ragdoll.transform.position = value;
-                NetworkServer.Spawn(GameObject);
-            }
         }
 
         public Vector3 Scale
@@ -79,7 +56,7 @@ namespace Synapse.Api
             Map.Get.Ragdolls.Remove(this);
         }
         
-        public static Ragdoll CreateRagdoll(RoleType roletype, Vector3 pos, Quaternion rot, DamageHandlerBase handler, Player owner) 
-            => new Ragdoll(roletype, pos, rot, handler, owner);
+        public static Ragdoll CreateRagdoll(RoleType roletype,string name, Vector3 pos, Quaternion rot, DamageType type) 
+            => new Ragdoll(roletype,name, pos, rot, type);
     }
 }
