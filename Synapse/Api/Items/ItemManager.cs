@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Synapse.Api.Exceptions;
+using System.Collections.Generic;
 using System.Linq;
-using Synapse.Api.Exceptions;
 
 namespace Synapse.Api.Items
 {
@@ -8,7 +8,7 @@ namespace Synapse.Api.Items
     {
         public static ItemManager Get => Server.Get.ItemManager;
 
-        public const int HighestItem = (int)ItemType.SCP2176;
+        public const int HighestItem = (int)ItemType.MolecularDisruptor;
 
         private readonly List<CustomItemInformation> customItems = new List<CustomItemInformation>();
 

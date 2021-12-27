@@ -8,7 +8,6 @@ using System;
 using PlayerStatsSystem;
 using Synapse.Api;
 
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Synapse.Api.Events.SynapseEventArguments
 {
     public class PlayerJoinEventArgs: EventHandler.ISynapseEventArgs
@@ -69,6 +68,8 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Player Killer { get; internal set; }
         
         public DamageType DamageType { get; internal set; }
+
+        public bool Allow { get; set; } = true;
     }
 
     public class PlayerDamageEventArgs : EventHandler.ISynapseEventArgs

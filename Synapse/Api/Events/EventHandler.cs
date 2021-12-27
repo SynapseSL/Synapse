@@ -14,7 +14,24 @@ namespace Synapse.Api.Events
             Server.UpdateEvent += OnUpdate;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
+            Player.PlayerDamageEvent += OnDebugDamage;
+            Player.PlayerDeathEvent += OnDebugDeath;
 #endif
+        }
+
+        private void OnDebugDeath(SynapseEventArguments.PlayerDeathEventArgs ev)
+        {
+            Logger.Get.Debug($"Victim: {ev.Victim} Attacker: {ev.Killer} Type: {ev.DamageType}");
+            if (ev.DamageType == Enum.DamageType.Explosion)
+                ev.Allow = false;
+        }
+
+        private void OnDebugDamage(SynapseEventArguments.PlayerDamageEventArgs ev)
+        {
+            Logger.Get.Debug($"Victim: {ev.Victim} Attacker: {ev.Killer} Type: {ev.DamageType}");
+            if (ev.DamageType == Enum.DamageType.Crushed) ev.Allow = false;
+
+            ev.Damage = 10;
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
@@ -33,11 +50,11 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha3:
-                    ev.Player.Kill("U r ded now", "A A A A");
+                    ev.Player.Hurt(1000f, Enum.DamageType.Decontamination);
                     break;
 
                 case KeyCode.Alpha4:
-                    ev.Player.Hurt(1000f,Enum.DamageType.Falldown);
+                    ev.Player.Hurt(1000f,Enum.DamageType.Crushed);
                     break;
             }
         }

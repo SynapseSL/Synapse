@@ -118,25 +118,27 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void InvokePlayerDeathEvent(Player victim, Player killer, DamageHandlerBase handlerBase)
+        internal void InvokePlayerDeathEvent(Player victim, Player killer, DamageType type, out bool allow)
         {
             var ev = new PlayerDeathEventArgs
             {
                 Killer = killer,
                 Victim = victim,
-                DamageType = handlerBase.GetDamageType(),
+                DamageType = type,
             };
             PlayerDeathEvent?.Invoke(ev);
+
+            allow = ev.Allow;
         }
 
-        internal void InvokePlayerDamageEvent(Player victim, Player killer, ref float damage, DamageHandlerBase handlerBase, out bool allow)
+        internal void InvokePlayerDamageEvent(Player victim, Player killer, ref float damage, DamageType type, out bool allow)
         {
             var ev = new PlayerDamageEventArgs
             {
                 Killer = killer,
                 Victim = victim,
                 Damage = damage,
-                DamageType = handlerBase.GetDamageType(),
+                DamageType = type,
             };
             
             PlayerDamageEvent?.Invoke(ev);

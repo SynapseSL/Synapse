@@ -29,6 +29,8 @@ public static class SynapseExtensions
 
     public static Player GetPlayer(this StatBase stat) => stat.Hub.GetPlayer();
 
+    public static Player GetPlayer(this Footprinting.Footprint footprint) => footprint.Hub?.GetPlayer();
+
     public static List<Player> GetPlayers(this RoleType role) => SynapseController.Server.Players.Where(x => x.RoleType == role).ToList();
 
     public static List<Player> GetPlayers(this Team team) => SynapseController.Server.Players.Where(x => x.Team == team).ToList();
