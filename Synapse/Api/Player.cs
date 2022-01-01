@@ -1,11 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using Hints;
+﻿using Hints;
 using InventorySystem;
 using InventorySystem.Disarming;
 using InventorySystem.Items;
-using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Firearms.Attachments;
 using InventorySystem.Searching;
 using MapGeneration;
@@ -20,6 +16,9 @@ using Synapse.Api.Roles;
 using Synapse.Database;
 using Synapse.Patches.EventsPatches.PlayerPatches;
 using Synapse.Permission;
+using System;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -76,12 +75,6 @@ namespace Synapse.Api
             RoleChangeClassIdPatch.ForceLite = false;
         }
 
-        public void Kill(DamageHandlerBase damageType = default)
-        {
-            damageType ??= new UniversalDamageHandler(10000, DeathTranslations.Unknown);
-            PlayerStats.KillPlayer(damageType);
-        }
-
         public void GiveTextHint(string message, float duration = 5f)
         {
             Hub.hints.Show(new TextHint(message, new HintParameter[]
@@ -127,11 +120,18 @@ namespace Synapse.Api
 
         public void Heal(float hp) => Health += hp;
 
-        public void Hurt(int amount, DamageHandlerBase damageType = default)
+        public bool Hurt(float damage, DamageType type = DamageType.Unknown)
         {
-            damageType ??= new UniversalDamageHandler(amount, DeathTranslations.Unknown);
-            PlayerStats.DealDamage(damageType);
+            var handler = type.GetUniversalDamageHandler();
+            handler.Damage = damage;
+            return PlayerStats.DealDamage(handler);
         }
+
+        public bool Hurt(DamageHandlerBase handlerbase) => PlayerStats.DealDamage(handlerbase);
+
+        public void Kill() => Kill("Unknown Reason");
+
+        public bool Kill(string reason, string cassie = "") => PlayerStats.DealDamage(new CustomReasonDamageHandler(reason, 9999999999f, cassie));
 
         public void OpenReportWindow(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
 
@@ -550,7 +550,7 @@ namespace Synapse.Api
             set => Hub.playerStats.GetModule<HealthStat>().CurValue = value;
         }
 
-        public float MaxHealth => Hub.playerStats.GetModule<HealthStat>().MaxValue;
+        public float MaxHealth { get; set; } = 100f;
 
         public float ArtificialHealth
         {
@@ -558,7 +558,18 @@ namespace Synapse.Api
             set => Hub.playerStats.GetModule<AhpStat>().CurValue = value;
         }
 
-        public int MaxArtificialHealth => (int) Hub.playerStats.GetModule<AhpStat>().MaxValue;
+        private int maxahp = 75;
+
+        public int MaxArtificialHealth
+        {
+            get => maxahp;
+            set
+            {
+                maxahp = value;
+                foreach (var process in PlayerStats.GetModule<AhpStat>()._activeProcesses)
+                    process.Limit = value;
+            }
+        }
 
         public float Stamina
         {

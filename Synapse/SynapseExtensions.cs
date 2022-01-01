@@ -1,18 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using InventorySystem.Items;
+﻿using InventorySystem.Items;
+using InventorySystem.Items.Firearms.Attachments;
 using InventorySystem.Items.Pickups;
+using MapGeneration;
+using MapGeneration.Distributors;
+using Mirror;
+using PlayerStatsSystem;
 using Synapse;
 using Synapse.Api;
 using Synapse.Api.Enum;
 using Synapse.Api.Items;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
-using MapGeneration;
-using InventorySystem.Items.Firearms.Attachments;
-using Mirror;
-using MapGeneration.Distributors;
 
 public static class SynapseExtensions
 {
@@ -25,6 +26,10 @@ public static class SynapseExtensions
     public static Player GetPlayer(this PlayableScps.PlayableScp scp) => scp?.Hub?.GetPlayer();
 
     public static Player GetPlayer(this CommandSender sender) => Server.Get.Players.FirstOrDefault(x => x.CommandSender == sender);
+
+    public static Player GetPlayer(this StatBase stat) => stat.Hub.GetPlayer();
+
+    public static Player GetPlayer(this Footprinting.Footprint footprint) => footprint.Hub?.GetPlayer();
 
     public static List<Player> GetPlayers(this RoleType role) => SynapseController.Server.Players.Where(x => x.RoleType == role).ToList();
 
@@ -214,6 +219,34 @@ public static class SynapseExtensions
             Synapse.Api.Logger.Get.Error($"Synapse-API: GetShootPermission  failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             return true;
         }
+    }
+
+    public static DamageType GetDamageType(this DamageHandlerBase handler)
+    {
+        if (handler == null) return DamageType.Unknown;
+                
+        if(Enum.TryParse<DamageType>(handler.GetType().Name.Replace("DamageHandler",""),out var type))
+        {
+            if(type == DamageType.Universal)
+            {
+                var id = (handler as UniversalDamageHandler).TranslationId;
+
+                if (id < 0 || id > 23) return DamageType.Universal;
+
+                return (DamageType)id;
+            }
+
+            return type;
+        }
+
+        return DamageType.Unknown;
+    }
+
+    public static UniversalDamageHandler GetUniversalDamageHandler(this DamageType type)
+    {
+        if((int)type < 0 || (int)type > 23) return new UniversalDamageHandler(0f,DeathTranslations.Unknown);
+
+        return new UniversalDamageHandler(0f, DeathTranslations.TranslationsById[(byte)type]);
     }
 
     [Obsolete("Use SynapseExtensions.CanHarmScp() and check if it is false")]

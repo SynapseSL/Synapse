@@ -9,7 +9,7 @@ using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.SynapsePatches.Item
 {
-    [HarmonyPatch(typeof(ThrowableItem),nameof(ThrowableItem.ServerThrow),new[] { typeof(float), typeof(float), typeof(Vector3) })]
+    [HarmonyPatch(typeof(ThrowableItem),nameof(ThrowableItem.ServerThrow),new[] { typeof(float), typeof(float), typeof(Vector3)})]
     internal static class ServerThrowPatch
     {
         [HarmonyPrefix]

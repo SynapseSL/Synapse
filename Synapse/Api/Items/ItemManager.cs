@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Synapse.Api.Exceptions;
+using System.Collections.Generic;
 using System.Linq;
-using Synapse.Api.Exceptions;
 
 namespace Synapse.Api.Items
 {
