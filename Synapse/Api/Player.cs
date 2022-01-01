@@ -129,6 +129,8 @@ namespace Synapse.Api
 
         public bool Hurt(DamageHandlerBase handlerbase) => PlayerStats.DealDamage(handlerbase);
 
+        public void Kill() => Kill("Unknown Reason");
+
         public bool Kill(string reason, string cassie = "") => PlayerStats.DealDamage(new CustomReasonDamageHandler(reason, 9999999999f, cassie));
 
         public void OpenReportWindow(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
