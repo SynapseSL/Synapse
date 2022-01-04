@@ -2,7 +2,7 @@
 # **Synapse**
 ### **What is Synapse?**
 Synapse is a project created by two german official community Server-Hosters. We used Harmony to create a framework which makes it easier for us to implement new functions, game updates and overall a new experience for players.
-
+e
 ## **Features & Configs**
 Synapse itself has a ton of features some of these include:
 * Permission system which replaces the Permission system of SCP:SL
