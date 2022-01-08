@@ -14,13 +14,13 @@ namespace Synapse.Patches.SynapsePatches
         }
     }
 
-    [HarmonyPatch(typeof(AhpStat),nameof(AhpStat.ServerAddProcess),new[] { typeof(float) })]
+    [HarmonyPatch(typeof(AhpStat), nameof(AhpStat.ServerAddProcess),new[] { typeof(float) })]
     internal static class AhpPatch
     {
         [HarmonyPrefix]
-        private static bool ServerAddProcess(AhpStat __instance, float amount)
+        private static bool ServerAddProcess(AhpStat __instance, float amount, out AhpStat.AhpProcess __result)
         {
-            __instance.ServerAddProcess(amount, __instance.GetPlayer().MaxArtificialHealth, 1.2f, 0.7f, 0f, false);
+            __result = __instance.ServerAddProcess(amount, 75, 1.2f, 0.7f, 0f, false);
             return false;
         }
     }
