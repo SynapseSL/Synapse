@@ -26,7 +26,7 @@ namespace Synapse.Patches.SynapsePatches.Item
                 if (itemBase == null) return false;
 
                 SynapseItem item;
-                if(itemSerial == 0)
+                if (itemSerial == 0)
                 {
                     itemSerial = ItemSerialGenerator.GenerateNext();
                     itemBase.ItemSerial = itemSerial;

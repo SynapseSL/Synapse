@@ -22,7 +22,7 @@ namespace Synapse.Patches.SynapsePatches.Wrapper
 		    NetworkServer.Spawn(ragdoll.gameObject);
 		    
 		    Map.Get.Ragdolls.Add(new Synapse.Api.Ragdoll(ragdoll));
-		    return true;
+		    return false;
 	    }
     }
 }
