@@ -203,8 +203,10 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                         var args = player.setClassEventArgs;
 
                         //It is null when SCP-049 "cures" a human to SCP-049-2
-                        if (args == null)
+                        if (args == null) {
                             __instance._pms.OnPlayerClassChange(__instance.DeathPosition, 0f);
+                            __instance._pms.GetPlayer().Health = 500;
+                        }
                         else
                         {
                             __instance._pms.OnPlayerClassChange(args.Position, args.Rotation);
