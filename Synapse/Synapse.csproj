@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Api\Broadcast.cs" />
     <Compile Include="Api\Enum\DamageType.cs" />
+    <Compile Include="Api\Enum\LockerType.cs" />
     <Compile Include="Api\Enum\MovementDirection.cs" />
     <Compile Include="Api\Enum\ElevatorType.cs" />
     <Compile Include="Api\Enum\ScpRecontainmentType.cs" />
@@ -51,6 +52,8 @@
     <Compile Include="Api\Exceptions\SynapseRoleNotFoundException.cs" />
     <Compile Include="Api\Exceptions\SynapseException.cs" />
     <Compile Include="Api\Items\ThrowableAPI.cs" />
+    <Compile Include="Api\Locker.cs" />
+    <Compile Include="Api\LockerChamber.cs" />
     <Compile Include="Api\Plugin\Processors\TranslationInjector.cs" />
     <Compile Include="Api\Prefabs.cs" />
     <Compile Include="Api\Roles\RoleInformation.cs" />
@@ -141,6 +144,7 @@
     <Compile Include="Database\Repository.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\914ActivatePatch.cs" />
+    <Compile Include="Patches\EventsPatches\MapPatches\LockerInteractPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\LCZDecontaminationPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\DoorInteractPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\TriggerTeslaPatch.cs" />
@@ -188,6 +192,7 @@
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp173\Scp173BlinkingPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp939\Scp939AttackPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\CheckFriendlyFirePatch.cs" />
     <Compile Include="Patches\SynapsePatches\Dummy\MirrorPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Dummy\OverridePositionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Dummy\ShootPatch.cs" />
@@ -204,6 +209,7 @@
     <Compile Include="Patches\EventsPatches\PlayerPatches\WorkStationPatch.cs" />
     <Compile Include="Patches\SynapsePatches\PermissionSystem\RefreshPermissionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\PermissionSystem\SetGroupPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\Wrapper\LockerStartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\Scp096MaxShieldPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\RagdollPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\GeneratorStartPatch.cs" />

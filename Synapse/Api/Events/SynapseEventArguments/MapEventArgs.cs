@@ -22,6 +22,13 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; }
     }
 
+    public class LockerInteractEventArgs : Synapse.Api.Events.EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+        public LockerChamber LockerChamber { get; internal set; }
+        public bool Allow { get; set; }
+    }
+
     public class LCZDecontaminationEventArgs : EventHandler.ISynapseEventArgs
     {
         public bool Allow { get; set; }
