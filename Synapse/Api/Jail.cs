@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Synapse.Api.Enum;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -31,6 +32,8 @@ namespace Synapse.Api
 
         public List<Items.SynapseItem> Items { get; set; } = new List<Items.SynapseItem>();
 
+        public Dictionary<AmmoType, ushort> Ammos { get; set; } = new Dictionary<AmmoType, ushort>();
+
         public float Health { get; set; }
 
         public void JailPlayer(Player admin)
@@ -40,6 +43,13 @@ namespace Synapse.Api
             Admin = admin;
             Role = Player.RoleType;
             Position = Player.Position;
+
+            Ammos.Clear();
+            foreach (var ammoType in (AmmoType[])System.Enum.GetValues(typeof(AmmoType)))
+            {
+                Ammos.Add(ammoType, Player.AmmoBox[ammoType]);
+                Player.AmmoBox[ammoType] = 0;
+            }
 
             Items.Clear();
             foreach (var item in Player.Inventory.Items)
@@ -62,10 +72,15 @@ namespace Synapse.Api
             Player.ChangeRoleAtPosition(Role);
             Player.Position = Position;
             Player.Health = Health;
+
             Player.Inventory.Clear();
+            
 
             foreach (var item in Items)
                 Player.Inventory.AddItem(item);
+                                        
+            foreach (var ammoType in (AmmoType[])System.Enum.GetValues(typeof(AmmoType)))
+                Player.AmmoBox[ammoType] = Ammos[ammoType];
 
             isjailed = false;
         }

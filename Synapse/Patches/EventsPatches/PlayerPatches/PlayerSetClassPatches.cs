@@ -225,6 +225,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     if (!__instance.isLocalPlayer)
                     {
                         __instance.GetPlayer().MaxHealth = curRole.maxHP;
+                        __instance.GetPlayer().Health = curRole.maxHP;
                         __instance.GetPlayer().MaxArtificialHealth = 75;
                     }
                 }

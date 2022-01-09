@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Interactables.Interobjects.DoorUtils;
+﻿using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items;
 using InventorySystem.Items.Firearms.Attachments;
 using MapGeneration;
 using Mirror;
-using PlayerStatsSystem;
 using Scp914;
 using Synapse.Api.Enum;
 using Synapse.Api.Items;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -49,6 +48,8 @@ namespace Synapse.Api
         public List<Dummy> Dummies { get; } = new List<Dummy>();
 
         public List<Camera> Cameras { get; } = new List<Camera>();
+
+        public List<Locker> Lockers { get; } = new List<Locker>();
 
         public string IntercomText
         {
@@ -228,6 +229,7 @@ namespace Synapse.Api
             Elevators.Clear();
             Rooms.Clear();
             Generators.Clear();
+            Lockers.Clear();
             WorkStations.Clear();
             Ragdolls.Clear();
             SynapseItem.AllItems.Clear();

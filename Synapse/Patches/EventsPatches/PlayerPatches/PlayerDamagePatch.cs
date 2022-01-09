@@ -3,6 +3,7 @@ using PlayerStatsSystem;
 using Synapse.Api.Enum;
 using System;
 using System.Linq;
+using System.Reflection;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
@@ -24,6 +25,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var victim = __instance.GetPlayer();
                 var attacker = handler is AttackerDamageHandler ahandler ? ahandler.Attacker.GetPlayer() : null;
                 var damage = standardhandler.Damage;
+                var allow = attacker != null ? SynapseExtensions.GetHarmPermission(attacker, victim) : true;
 
                 if (type == DamageType.PocketDecay)
                 {
@@ -31,9 +33,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     if (attacker != null && !SynapseExtensions.GetHarmPermission(attacker, victim)) return false;
                 }
 
-                SynapseController.Server.Events.Player.InvokePlayerDamageEvent(victim, attacker, ref damage, type, out var allow);
+                SynapseController.Server.Events.Player.InvokePlayerDamageEvent(victim, attacker, ref damage, type, ref allow);
                 standardhandler.Damage = damage;
-
+                
                 return allow;
             }
             catch (Exception e)
@@ -42,5 +44,51 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 return true;
             }
         }
+
+        private static void CallEvent(this PlayerStats source, string eventName, object[] parameters)
+        {
+            var eventsField = typeof(PlayerStats).GetField(eventName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (eventsField != null)
+            {
+                object eventHandlerList = eventsField.GetValue(source);
+                if (eventHandlerList != null)
+                {
+                    var my_event_invoke = eventHandlerList.GetType().GetMethod("Invoke");
+                    if (my_event_invoke != null)
+                    {
+                        my_event_invoke.Invoke(eventHandlerList, parameters);
+                    }
+                }
+                else Server.Get.Logger.Error("Synapse-Event: PlayerDamage failed!! \n eventHandlerList null");
+            }
+            else
+            {
+                Server.Get.Logger.Error("Synapse-Event: PlayerDamage failed!! \n eventsField null");
+            }
+        }
+
+
+        private static void CallStaticEvent(string eventName, object[] parameters)
+        {
+            var eventsField = typeof(PlayerStats).GetField(eventName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+            if (eventsField != null)
+            {
+                object eventHandlerList = eventsField.GetValue(null);
+                if (eventHandlerList != null)
+                {
+                    var my_event_invoke = eventHandlerList.GetType().GetMethod("Invoke");
+                    if (my_event_invoke != null)
+                    {
+                        my_event_invoke.Invoke(eventHandlerList, parameters);
+                    }
+                }
+                else Server.Get.Logger.Error("Synapse-Event: PlayerDamage failed!! \n eventHandlerList null");
+            }
+            else
+            {
+                Server.Get.Logger.Error("Synapse-Event: PlayerDamage failed!! \n eventsField null");
+            }
+        }
+
     }
 }
