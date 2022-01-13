@@ -44,51 +44,5 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 return true;
             }
         }
-
-        private static void CallEvent(this PlayerStats source, string eventName, object[] parameters)
-        {
-            var eventsField = typeof(PlayerStats).GetField(eventName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (eventsField != null)
-            {
-                object eventHandlerList = eventsField.GetValue(source);
-                if (eventHandlerList != null)
-                {
-                    var my_event_invoke = eventHandlerList.GetType().GetMethod("Invoke");
-                    if (my_event_invoke != null)
-                    {
-                        my_event_invoke.Invoke(eventHandlerList, parameters);
-                    }
-                }
-                else Server.Get.Logger.Error("Synapse-Event: PlayerDamage failed!! \n eventHandlerList null");
-            }
-            else
-            {
-                Server.Get.Logger.Error("Synapse-Event: PlayerDamage failed!! \n eventsField null");
-            }
-        }
-
-
-        private static void CallStaticEvent(string eventName, object[] parameters)
-        {
-            var eventsField = typeof(PlayerStats).GetField(eventName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-            if (eventsField != null)
-            {
-                object eventHandlerList = eventsField.GetValue(null);
-                if (eventHandlerList != null)
-                {
-                    var my_event_invoke = eventHandlerList.GetType().GetMethod("Invoke");
-                    if (my_event_invoke != null)
-                    {
-                        my_event_invoke.Invoke(eventHandlerList, parameters);
-                    }
-                }
-                else Server.Get.Logger.Error("Synapse-Event: PlayerDamage failed!! \n eventHandlerList null");
-            }
-            else
-            {
-                Server.Get.Logger.Error("Synapse-Event: PlayerDamage failed!! \n eventsField null");
-            }
-        }
-
     }
 }
