@@ -78,9 +78,9 @@ namespace Synapse.Api
 
             foreach (var item in Items)
                 Player.Inventory.AddItem(item);
-                                        
-            foreach (var ammoType in (AmmoType[])System.Enum.GetValues(typeof(AmmoType)))
-                Player.AmmoBox[ammoType] = Ammos[ammoType];
+
+            foreach (var ammo in Ammos)
+                Player.AmmoBox[ammo.Key] = ammo.Value;
 
             isjailed = false;
         }
