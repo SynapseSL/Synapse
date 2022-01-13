@@ -43,11 +43,8 @@ namespace Synapse.Command.Commands
 
             commandlist = commandlist.Where(x => context.Player.HasPermission(x.Permission) || string.IsNullOrWhiteSpace(x.Permission) || x.Permission.ToUpper() == "NONE").ToList();
 
-            if (context.Arguments.Count > 0)
+            if (context.Arguments.Count > 0 && !string.IsNullOrWhiteSpace(context.Arguments.First()))
             {
-                if (string.IsNullOrWhiteSpace(context.Arguments.First()))
-                    goto A_001;
-
                 var command = commandlist.FirstOrDefault(x => x.Name.ToLower() == context.Arguments.First());
 
                 if (command == null)
@@ -77,7 +74,6 @@ namespace Synapse.Command.Commands
                 return result;
             }
 
-        A_001:
             var msg = $"All Commands which you can execute for {context.Platform}:";
 
             foreach (var command in commandlist)
