@@ -42,7 +42,6 @@ namespace Synapse.Api
             AmmoBox = new PlayerAmmoBox(this);
         }
 
-
         #region Methods
 
         [Obsolete("Use GetPreference()", true)]

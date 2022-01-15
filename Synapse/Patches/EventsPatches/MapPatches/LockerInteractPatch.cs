@@ -64,7 +64,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
                         {
                             var allowcard = true;
                             EventHandler.Get.Player.InvokePlayerItemUseEvent(ply, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allowcard);
-                            return allowcard;
+                            if (allowcard) return allowcard;
                         }
                     }
                 }
