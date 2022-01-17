@@ -19,8 +19,8 @@ namespace Synapse.Patches.SynapsePatches.Item
             {
                 __instance._destroyTime = Time.timeSinceLevelLoad + __instance._postThrownAnimationTime;
                 __instance._alreadyFired = true;
-                var newpickup = UnityEngine.Object.Instantiate(__instance.Projectile
-                    , __instance.Owner.PlayerCameraReference.position, __instance.Owner.PlayerCameraReference.rotation);
+                var newpickup = UnityEngine.Object.Instantiate(__instance.Projectile,
+                    __instance.Owner.PlayerCameraReference.position, __instance.Owner.PlayerCameraReference.rotation);
 
                 var info = new PickupSyncInfo
                 {
