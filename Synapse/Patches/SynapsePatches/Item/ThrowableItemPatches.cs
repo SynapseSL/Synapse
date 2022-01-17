@@ -9,18 +9,18 @@ using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.SynapsePatches.Item
 {
-    [HarmonyPatch(typeof(ThrowableItem),nameof(ThrowableItem.ServerThrow),new[] { typeof(float), typeof(float), typeof(Vector3)})]
+    [HarmonyPatch(typeof(ThrowableItem),nameof(ThrowableItem.ServerThrow),new[] { typeof(float), typeof(float), typeof(Vector3), typeof(Vector3)})]
     internal static class ServerThrowPatch
     {
         [HarmonyPrefix]
-        private static bool ServerThrow(ThrowableItem __instance, float forceAmount, float upwardFactor, Vector3 torque)
+        private static bool ServerThrow(ThrowableItem __instance, float forceAmount, float upwardFactor, Vector3 torque, Vector3 startVel)
         {
             try
             {
                 __instance._destroyTime = Time.timeSinceLevelLoad + __instance._postThrownAnimationTime;
                 __instance._alreadyFired = true;
-                var newpickup = UnityEngine.Object.Instantiate(__instance.Projectile
-                    , __instance.Owner.PlayerCameraReference.position, __instance.Owner.PlayerCameraReference.rotation);
+                var newpickup = UnityEngine.Object.Instantiate(__instance.Projectile,
+                    __instance.Owner.PlayerCameraReference.position, __instance.Owner.PlayerCameraReference.rotation);
 
                 var info = new PickupSyncInfo
                 {
@@ -37,7 +37,7 @@ namespace Synapse.Patches.SynapsePatches.Item
                 NetworkServer.Spawn(newpickup.gameObject);
                 newpickup.InfoReceived(default, info);
                 if (newpickup.TryGetComponent<Rigidbody>(out var rb))
-                    __instance.PropelBody(rb, torque, forceAmount, upwardFactor);
+                    __instance.PropelBody(rb, torque, Vector3.zero, forceAmount, upwardFactor);
 
                 __instance.GetSynapseItem().Throwable.ThrowableItem = newpickup;
                 newpickup.ServerActivate();
