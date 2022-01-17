@@ -10,6 +10,7 @@ using PlayerStatsSystem;
 using UnityEngine;
 using EventHandler = Synapse.Api.Events.EventHandler;
 using Logger = Synapse.Api.Logger;
+using Random = UnityEngine.Random;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
 {
@@ -136,9 +137,18 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                     foreach(var player2 in Server.Get.Players)
                         if(player2.RoleType == RoleType.Scp106)
                         {
-                            var num = Vector3.Distance(player2.Position, __instance._gateBPDPosition);
-                            var num2 = Vector3.Distance(player2.Position,__instance._gateBPDPosition);
-                            pos = num2 < num ? __instance._gateBPDPosition : __instance._gateAPDPosition;
+                            Vector3 objPos = (player2 == null)
+                                ? Vector3.zero
+                                : player2.PlayerMovementSync.RealModelPosition;
+                            SafeTeleportPosition componentInChildren = identifier.GetComponentInChildren<SafeTeleportPosition>();
+                            float num = Vector3.Distance(objPos, componentInChildren.SafePositions[0].position);
+                            float num2 = Vector3.Distance(objPos, componentInChildren.SafePositions[1].position);
+                            player.PlayerMovementSync.OverridePosition((num2 < num) ? componentInChildren.SafePositions[0].position : componentInChildren.SafePositions[1].position, Random.value * 360f, false);
+                            
+                            
+                            // var num = Vector3.Distance(player2.Position, __instance._gateBPDPosition);
+                            // var num2 = Vector3.Distance(player2.Position,__instance._gateBPDPosition);
+                            // pos = num2 < num ? __instance._gateBPDPosition : __instance._gateAPDPosition;
                             break;
                         }
                 }
@@ -148,7 +158,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                     hashSet.RemoveWhere((MapGeneration.RoomIdentifier room) => 
                     room.Name == MapGeneration.RoomName.Hcz106 || room.Name == MapGeneration.RoomName.EzGateA || 
                     room.Name == MapGeneration.RoomName.EzGateB || (room.Zone == MapGeneration.FacilityZone.LightContainment 
-                    && room.Shape == MapGeneration.RoomShape.Curve) || __instance.ProblemChildren.Contains(room.Name));
+                    && room.Shape == MapGeneration.RoomShape.Curve));
 
                     while (hashSet.Count > 0)
                     {
