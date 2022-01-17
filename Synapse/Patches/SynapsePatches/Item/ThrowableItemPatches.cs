@@ -9,11 +9,11 @@ using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.SynapsePatches.Item
 {
-    [HarmonyPatch(typeof(ThrowableItem),nameof(ThrowableItem.ServerThrow),new[] { typeof(float), typeof(float), typeof(Vector3)})]
+    [HarmonyPatch(typeof(ThrowableItem),nameof(ThrowableItem.ServerThrow),new[] { typeof(float), typeof(float), typeof(Vector3), typeof(Vector3)})]
     internal static class ServerThrowPatch
     {
         [HarmonyPrefix]
-        private static bool ServerThrow(ThrowableItem __instance, float forceAmount, float upwardFactor, Vector3 torque)
+        private static bool ServerThrow(ThrowableItem __instance, float forceAmount, float upwardFactor, Vector3 torque, Vector3 startVel)
         {
             try
             {
