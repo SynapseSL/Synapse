@@ -25,12 +25,7 @@ namespace Synapse.Patches.SynapsePatches.Dummy
             }
             foreach (ReferenceHub referenceHub2 in referenceHub.spectatorManager.ServerCurrentSpectatingPlayers)
             {
-                referenceHub2.networkIdentity.connectionToClient.Send(new GunHitMessage
-                {
-                    Weapon = ItemType.None,
-                    Damage = (byte)Mathf.Round(damage * 2.5f),
-                    DamagePosition = origin
-                }, 0);
+                referenceHub2.networkIdentity.connectionToClient.Send(new GunHitMessage(false, damage, origin));
             }
             return false;
         }
