@@ -13,6 +13,8 @@ namespace Synapse.Api.Events
 
         public event Action WarheadDetonationEvent;
 
+        public event EventHandler.OnSynapseEvent<WarheadDetonationCanceledEventArgs> WarheadDetonationCanceledEvent; 
+
         public event EventHandler.OnSynapseEvent<DoorInteractEventArgs> DoorInteractEvent;
 
         public event EventHandler.OnSynapseEvent<LCZDecontaminationEventArgs> LCZDecontaminationEvent;
@@ -52,6 +54,20 @@ namespace Synapse.Api.Events
         }
 
         internal void InvokeWarheadDetonationEvent() => WarheadDetonationEvent?.Invoke();
+
+        internal void InvokeWarheadDetonationCanceledEvent(out bool allow, ref GameObject disabler)
+        {
+            var ev = new WarheadDetonationCanceledEventArgs
+            {
+                Disabler = disabler,
+                Allow = true,
+            };
+            
+            WarheadDetonationCanceledEvent?.Invoke(ev);
+
+            disabler = ev.Disabler;
+            allow = ev.Allow;
+        }
 
         internal void InvokeLCZDeconEvent(out bool allow)
         {

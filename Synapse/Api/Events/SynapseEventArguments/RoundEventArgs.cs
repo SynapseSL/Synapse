@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Synapse.Api.Events.SynapseEventArguments
 {
@@ -16,7 +17,14 @@ namespace Synapse.Api.Events.SynapseEventArguments
         /// </summary>
         public Dictionary<Player,int> SpawnPlayers { get; set; }
 
-        public bool Allow { get; set; }
+        public bool Allow { get; set; } = true;
+    }
+
+    public class WarheadDetonationCanceledEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public GameObject Disabler { get; set; }
+
+        public bool Allow { get; set; } = true;
     }
 
     public class TeamRespawnEventArgs : EventHandler.ISynapseEventArgs
