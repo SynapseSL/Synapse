@@ -3,6 +3,7 @@ using PlayerStatsSystem;
 using Synapse.Api.Enum;
 using System;
 using System.Linq;
+using System.Reflection;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
@@ -24,6 +25,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var victim = __instance.GetPlayer();
                 var attacker = handler is AttackerDamageHandler ahandler ? ahandler.Attacker.GetPlayer() : null;
                 var damage = standardhandler.Damage;
+                var allow = attacker != null ? SynapseExtensions.GetHarmPermission(attacker, victim) : true;
 
                 if (type == DamageType.PocketDecay)
                 {
@@ -31,9 +33,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     if (attacker != null && !SynapseExtensions.GetHarmPermission(attacker, victim)) return false;
                 }
 
-                SynapseController.Server.Events.Player.InvokePlayerDamageEvent(victim, attacker, ref damage, type, out var allow);
+                SynapseController.Server.Events.Player.InvokePlayerDamageEvent(victim, attacker, ref damage, type, ref allow);
                 standardhandler.Damage = damage;
-
+                
                 return allow;
             }
             catch (Exception e)

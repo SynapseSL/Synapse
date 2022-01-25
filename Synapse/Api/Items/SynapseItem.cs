@@ -403,13 +403,10 @@ namespace Synapse.Api.Items
                 }
 
                 if (ItemBase is Firearm arm)
-                {
-                    arm.ApplyAttachmentsCode(value,true);
-                }
+                    arm.ApplyAttachmentsCode(value, true);
                 else if (PickupBase is FirearmPickup armpickup)
-                {
                     armpickup.NetworkStatus = new FirearmStatus(armpickup.Status.Ammo, armpickup.Status.Flags, value);
-                }
+                
             }
         }
         #endregion

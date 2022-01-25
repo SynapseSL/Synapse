@@ -22,7 +22,10 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-
+                    Logger.Get.Debug(ev.Player.ItemInHand.WeaponAttachments);
+                    break;
+                case KeyCode.Alpha2:
+                    ev.Player.Jail.IsJailed = !ev.Player.Jail.IsJailed;
                     break;
             }
         }
