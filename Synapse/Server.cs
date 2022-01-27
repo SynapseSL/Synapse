@@ -84,7 +84,10 @@ namespace Synapse
         public bool FF
         {
             get => ServerConsole.FriendlyFire;
-            set => ServerConsole.FriendlyFire = value;
+            set {
+                ServerConsole.FriendlyFire = value;
+                ServerConfigSynchronizer.RefreshAllConfigs();
+            }
         }
 
         public string[] Colors { get; } =
