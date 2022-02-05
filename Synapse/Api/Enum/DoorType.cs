@@ -17,6 +17,8 @@
         LCZ_173_Connector,
         LCZ_173_Gate,
         LCZ_173_Bottom,
+        LCZ_330,
+        LCZ_330_Chamber,
         LCZ_914,
         Checkpoint_EZ_HCZ,
         Checkpoint_LCZ_A,
