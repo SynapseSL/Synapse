@@ -7,6 +7,7 @@ using InventorySystem.Items.MicroHID;
 using MapGeneration;
 using Mirror;
 using PlayerStatsSystem;
+using Synapse.Api;
 using UnityEngine;
 using EventHandler = Synapse.Api.Events.EventHandler;
 using Logger = Synapse.Api.Logger;
@@ -157,8 +158,10 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                     var hashSet = MapGeneration.RoomIdUtils.FindRooms(MapGeneration.RoomName.Unnamed, identifier.Zone, MapGeneration.RoomShape.Undefined);
                     hashSet.RemoveWhere((MapGeneration.RoomIdentifier room) => 
                     room.Name == MapGeneration.RoomName.Hcz106 || room.Name == MapGeneration.RoomName.EzGateA || 
-                    room.Name == MapGeneration.RoomName.EzGateB || (room.Zone == MapGeneration.FacilityZone.LightContainment 
-                    && room.Shape == MapGeneration.RoomShape.Curve));
+                    room.Name == MapGeneration.RoomName.EzGateB || room.Name == MapGeneration.RoomName.EzEvacShelter ||
+                    (room.Zone == MapGeneration.FacilityZone.LightContainment && room.Shape == MapGeneration.RoomShape.Curve) ||
+                    room.Zone == MapGeneration.FacilityZone.None || room.Name == MapGeneration.RoomName.Pocket || 
+                    room.Name == MapGeneration.RoomName.HczTesla);
 
                     while (hashSet.Count > 0)
                     {
