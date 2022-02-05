@@ -130,8 +130,15 @@ namespace Synapse.Api
         public bool Hurt(DamageHandlerBase handlerbase) => PlayerStats.DealDamage(handlerbase);
 
         public void Kill() => Kill("Unknown Reason");
-
-        public bool Kill(string reason, string cassie = "") => PlayerStats.DealDamage(new CustomReasonDamageHandler(reason, 9999999999f, cassie));
+        
+        public bool Kill(string reason) => PlayerStats.DealDamage(new CustomReasonDamageHandler(reason));
+        
+        public bool Kill(string reason, string cassie)
+        {
+            bool result = Kill(reason);
+            if (result) Server.Get.Map.Cassie(cassie);
+            return result;
+        }
 
         public void OpenReportWindow(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
 
