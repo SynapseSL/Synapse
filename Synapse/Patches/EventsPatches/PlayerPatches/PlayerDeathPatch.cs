@@ -26,6 +26,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 SynapseController.Server.Events.Player.InvokePlayerDeathEvent(victim, attacker, type, out var allow);
 
                 if (!allow) victim.Health = 1;
+                if (allow) victim.DeathPosition = victim.Position;
                 __state = allow;
                 return allow;
             }
