@@ -104,15 +104,17 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 if (args == null) return false;
 
                 var inventory = ply.inventory;
-
-                if(args.IsEscaping)
+                
+                // I think I fucking fixed it.
+                // At least I hope so...
+                if (args.IsEscaping)
                 {
-                    foreach (var item in player.Inventory.Items)
-                        // This is just a temporary fix until somebody has time fo fix it finally
-                        // Because of this Ghostlights and balls are activating themselves
-                        item.Drop(args.Position);
+                    player.Inventory.DropAll();
                 }
-                else player.Inventory.Clear();
+                else
+                {
+                    player.Inventory.Clear();
+                }
 
                 foreach (var ammo in args.Ammo)
                     inventory.ServerAddAmmo((ItemType)ammo.Key, ammo.Value);
@@ -121,23 +123,25 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 {
                     item.Drop();
                     var arg = player.VanillaInventory.ServerAddItem(item.ItemType);
-
+                    
                     InventoryItemProvider.OnItemProvided?.Invoke(player.Hub, arg);
                 }
 
-                // if (args.IsEscaping)
-                // {
-                //     foreach(var item in args.EscapeItems)
-                //     {
-                //         if(inventory.UserInventory.Items.Count < 8 && item.ItemCategory != ItemCategory.Armor)
-                //         {
-                //             item.PickUp(player);
-                //             InventorySystem.Items.Armor.BodyArmorUtils.RemoveEverythingExceedingLimits(inventory, 
-                //                 inventory.TryGetBodyArmor(out var bodyArmor) ? bodyArmor : null, true, true);
-                //         }
-                //         else item.Drop(args.Position);
-                //     }
-                // }
+                if (args.IsEscaping)
+                {
+                    foreach(var item in args.EscapeItems)
+                    {
+                        if(inventory.UserInventory.Items.Count < 8 && item.ItemCategory != ItemCategory.Armor)
+                        {
+                            inventory.ServerAddItem(item.PickupBase.Info.ItemId, item.PickupBase.Info.Serial,
+                                item.PickupBase);
+                            InventorySystem.Items.Armor.BodyArmorUtils.RemoveEverythingExceedingLimits(inventory, 
+                                inventory.TryGetBodyArmor(out var bodyArmor) ? bodyArmor : null, true, true);
+                            item.PickupBase.DestroySelf();
+                        }
+                        else item.Drop(args.Position);
+                    }
+                }
 
                 args.CanBeDeleted = true;
 
