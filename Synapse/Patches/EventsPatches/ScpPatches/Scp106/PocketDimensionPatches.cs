@@ -7,7 +7,6 @@ using InventorySystem.Items.MicroHID;
 using MapGeneration;
 using Mirror;
 using PlayerStatsSystem;
-using Synapse.Api;
 using UnityEngine;
 using EventHandler = Synapse.Api.Events.EventHandler;
 using Logger = Synapse.Api.Logger;

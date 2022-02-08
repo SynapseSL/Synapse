@@ -107,14 +107,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 
                 // I think I fucking fixed it.
                 // At least I hope so...
-                if (args.IsEscaping)
-                {
-                    player.Inventory.DropAll();
-                }
-                else
-                {
-                    player.Inventory.Clear();
-                }
+                if (args.IsEscaping) player.Inventory.DropAll();
+                else player.Inventory.Clear();
 
                 foreach (var ammo in args.Ammo)
                     inventory.ServerAddAmmo((ItemType)ammo.Key, ammo.Value);
