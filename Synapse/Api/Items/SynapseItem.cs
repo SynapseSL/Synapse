@@ -414,6 +414,12 @@ namespace Synapse.Api.Items
         #region Methods
         public void PickUp(Player player)
         {
+            if (player.Inventory.Items.Count >= 8)
+            {
+                Drop(player.Position);
+                return;
+            }
+
             switch (State)
             {
                 case ItemState.Map:
@@ -458,7 +464,7 @@ namespace Synapse.Api.Items
                             Serial = Serial,
                             Weight = Weight,
                         };
-                        PickupBase.NetworkInfo = info;
+                        PickupBase.Info = info;
                         PickupBase.transform.localScale = Scale;
                         NetworkServer.Spawn(PickupBase.gameObject);
                         PickupBase.InfoReceived(default, info);
@@ -505,12 +511,14 @@ namespace Synapse.Api.Items
                 }
 
                 UnityEngine.Object.Destroy(ItemBase.gameObject);
+                ItemBase = null;
             }
         }
 
         public void DespawnPickup()
         {
             if (PickupBase != null) NetworkServer.Destroy(PickupBase.gameObject);
+            PickupBase = null;
         }
 
         public void Destroy()
