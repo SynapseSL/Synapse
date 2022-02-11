@@ -14,7 +14,13 @@ namespace Synapse.Api.Events
             Server.UpdateEvent += OnUpdate;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
+            Player.PlayerReloadEvent += Player_PlayerReloadEvent;
 #endif
+        }
+
+        private void Player_PlayerReloadEvent(SynapseEventArguments.PlayerReloadEventArgs ev)
+        {
+            ev.Allow = false;
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
@@ -22,10 +28,7 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    Logger.Get.Debug(ev.Player.ItemInHand.WeaponAttachments);
-                    break;
-                case KeyCode.Alpha2:
-                    ev.Player.Jail.IsJailed = !ev.Player.Jail.IsJailed;
+                    ev.Player.SendToServer(7777);
                     break;
             }
         }

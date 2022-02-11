@@ -9,6 +9,7 @@ using Mirror;
 using Mirror.LiteNetLib4Mirror;
 using PlayerStatsSystem;
 using RemoteAdmin;
+using RoundRestarting;
 using Synapse.Api.Enum;
 using Synapse.Api.Events.SynapseEventArguments;
 using Synapse.Api.Items;
@@ -153,22 +154,7 @@ namespace Synapse.Api
         }
 
         public void SendToServer(ushort port)
-        {
-            var component = SynapseController.Server.Host.PlayerStats;
-            var writer = NetworkWriterPool.GetWriter();
-            writer.WriteSingle(1f);
-            writer.WriteUInt16(port);
-            var msg = new RpcMessage
-            {
-                netId = component.netId,
-                componentIndex = component.ComponentIndex,
-                functionHash = typeof(PlayerStats).FullName.GetStableHashCode() * 503 + "RpcRoundrestartRedirect".GetStableHashCode(),
-                payload = writer.ToArraySegment()
-            };
-            Connection.Send(msg);
-            NetworkWriterPool.Recycle(writer);
-
-        }
+            => Connection.Send(new RoundRestartMessage(RoundRestartType.FullRestart, 1f, port, true));
 
         public void DimScreen()
         {

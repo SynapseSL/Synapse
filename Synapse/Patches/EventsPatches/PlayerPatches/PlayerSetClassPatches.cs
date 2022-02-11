@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using HarmonyLib;
+﻿using HarmonyLib;
 using InventorySystem;
-using InventorySystem.Items.Armor;
 using MEC;
+using PlayerStatsSystem;
 using Synapse.Api;
 using Synapse.Api.Enum;
 using Synapse.Api.Events.SynapseEventArguments;
 using Synapse.Api.Items;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Logger = Synapse.Api.Logger;
 
@@ -91,17 +91,19 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     }
 
     [HarmonyPatch(typeof(PlayerMovementSync),nameof(PlayerMovementSync.OnPlayerClassChange))]
-    internal static class PlayerMovementSyncPatch
+    internal static class HandlePositionPatch
     {
         [HarmonyPrefix]
         private static bool OnPlayerMovementSync(PlayerMovementSync __instance)
         {
             try
             {
-                var args = __instance.GetPlayer()?.setClassEventArgs;
+                var player = __instance.GetPlayer();
+                var args = player.setClassEventArgs;
                 //It is null when someone is revived by 049 since the first patch is never called in this situation
                 if (args == null) return true;
                 Timing.RunCoroutine(__instance.SafelySpawnPlayer(args.Position, args.Rotation), Segment.FixedUpdate);
+                player.setClassEventArgs = null;
                 return false;
             }
             catch(Exception e)
@@ -148,6 +150,24 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             {
                 Logger.Get.Error($"Synapse-Event: PlayerSetClass(Items) failed!!\n{e}");
                 return true;
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(HealthStat),nameof(HealthStat.ClassChanged))]
+    internal static class HandleHealthPatch
+    {
+        [HarmonyPrefix]
+        private static void OnClassChanged(HealthStat __instance)
+        {
+            try
+            {
+                var player = __instance.GetPlayer();
+                player.MaxHealth = player.ClassManager.CurRole.maxHP;
+            }
+            catch(Exception e)
+            {
+
             }
         }
     }
