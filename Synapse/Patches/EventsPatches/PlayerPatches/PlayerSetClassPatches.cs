@@ -88,6 +88,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 return true;
             }
         }
+
+        [HarmonyPostfix]
+        private static void RemoveArgs(CharacterClassManager __instance) => __instance.GetPlayer().setClassEventArgs = null;
     }
 
     [HarmonyPatch(typeof(PlayerMovementSync),nameof(PlayerMovementSync.OnPlayerClassChange))]
@@ -103,7 +106,6 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 //It is null when someone is revived by 049 since the first patch is never called in this situation
                 if (args == null) return true;
                 Timing.RunCoroutine(__instance.SafelySpawnPlayer(args.Position, args.Rotation), Segment.FixedUpdate);
-                player.setClassEventArgs = null;
                 return false;
             }
             catch(Exception e)
@@ -167,7 +169,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             catch(Exception e)
             {
-
+                Logger.Get.Error($"Synapse-Event: PlayerSetClass(Health) failed!!\n{e}");
             }
         }
     }

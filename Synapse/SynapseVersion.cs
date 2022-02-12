@@ -7,11 +7,11 @@ public static class SynapseVersion
 
     public const int Minor = 8;
 
-    public const int Patch = 2;
+    public const int Patch = 3;
 
-    public const VersionType Type = VersionType.None;
+    public const VersionType Type = VersionType.Dev;
 
-    public const string SubVersion = "";
+    public const string SubVersion = "1.0";
 
     public const string BasedGameVersion = "11.1.2";
 

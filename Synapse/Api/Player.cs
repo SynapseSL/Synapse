@@ -119,7 +119,15 @@ namespace Synapse.Api
             Hub.serverRoles.TargetCloseRemoteAdmin();
         }
 
-        public void Heal(float hp) => Health += hp;
+        public void Heal(float hp)
+        {
+            var health = Health;
+            health += hp;
+            if (health > MaxHealth)
+                health = MaxHealth;
+
+            Health = health;
+        }
 
         public bool Hurt(float damage, DamageType type = DamageType.Unknown)
         {

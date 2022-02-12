@@ -1,4 +1,7 @@
-﻿using Synapse.Config;
+﻿using Mirror;
+using Synapse.Api.CustomObjects;
+using Synapse.Config;
+using System.Linq;
 using UnityEngine;
 
 namespace Synapse.Api.Events
@@ -14,13 +17,7 @@ namespace Synapse.Api.Events
             Server.UpdateEvent += OnUpdate;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
-            Player.PlayerReloadEvent += Player_PlayerReloadEvent;
 #endif
-        }
-
-        private void Player_PlayerReloadEvent(SynapseEventArguments.PlayerReloadEventArgs ev)
-        {
-            ev.Allow = false;
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
@@ -28,7 +25,15 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    ev.Player.SendToServer(7777);
+                    var obj = new SynapseObject(PrimitiveType.Sphere, Color.black, ev.Player.Position, ev.Player.transform.rotation, Vector3.one * 2f, false);
+
+                    foreach (var com in obj.ObjectToy.GetComponents<Component>())
+                        Logger.Get.Warn(com.GetType().Name);
+
+                    MEC.Timing.CallDelayed(2f, () => obj.ObjectToy.transform.parent = ev.Player.transform);
+                    break;
+
+                    case KeyCode.Alpha2:
                     break;
             }
         }
