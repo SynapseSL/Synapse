@@ -25,15 +25,15 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    var obj = new SynapseObject(PrimitiveType.Sphere, Color.black, ev.Player.Position, ev.Player.transform.rotation, Vector3.one * 2f, false);
-
-                    foreach (var com in obj.ObjectToy.GetComponents<Component>())
-                        Logger.Get.Warn(com.GetType().Name);
-
-                    MEC.Timing.CallDelayed(2f, () => obj.ObjectToy.transform.parent = ev.Player.transform);
+                    var pos = ev.Player.Position;
+                    pos.y += 1f;
+                    var obj = new SynapseObject(PrimitiveType.Sphere, Color.blue, pos, ev.Player.transform.rotation, Vector3.one, false);
+                    obj.ObjectToy.transform.parent = ev.Player.transform;
                     break;
 
                     case KeyCode.Alpha2:
+                    foreach (var comp in ev.Player.GetComponents<Component>())
+                        Logger.Get.Debug(comp.GetType());
                     break;
             }
         }
@@ -51,6 +51,8 @@ namespace Synapse.Api.Events
         public MapEvents Map { get; } = new MapEvents();
 
         public ScpEvents Scp { get; } = new ScpEvents();
+
+        public SynapseObjectEvent SynapseObject { get; } = new SynapseObjectEvent();
 
         public interface ISynapseEventArgs
         {

@@ -40,6 +40,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Api\Broadcast.cs" />
+    <Compile Include="Api\CustomObjects\SynapseSchematic.cs" />
     <Compile Include="Api\CustomObjects\SynapseScript.cs" />
     <Compile Include="Api\Enum\DamageType.cs" />
     <Compile Include="Api\Enum\LockerType.cs" />
@@ -47,6 +48,8 @@
     <Compile Include="Api\Enum\ElevatorType.cs" />
     <Compile Include="Api\Enum\ScpRecontainmentType.cs" />
     <Compile Include="Api\Enum\WorkstationState.cs" />
+    <Compile Include="Api\Events\SynapseEventArguments\SynapseObjectEventArgs.cs" />
+    <Compile Include="Api\Events\SynapseObjectEvent.cs" />
     <Compile Include="Api\Exceptions\SynapseItemAlreadyRegisteredException.cs" />
     <Compile Include="Api\Exceptions\SynapseItemNotFoundException.cs" />
     <Compile Include="Api\Exceptions\SynapseRoleAlreadyRegisteredException.cs" />

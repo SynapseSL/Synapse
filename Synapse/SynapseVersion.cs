@@ -11,7 +11,7 @@ public static class SynapseVersion
 
     public const VersionType Type = VersionType.Dev;
 
-    public const string SubVersion = "1.0";
+    public const string SubVersion = "1.1";
 
     public const string BasedGameVersion = "11.1.2";
 

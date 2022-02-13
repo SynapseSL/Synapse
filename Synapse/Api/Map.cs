@@ -4,6 +4,7 @@ using InventorySystem.Items.Firearms.Attachments;
 using MapGeneration;
 using Mirror;
 using Scp914;
+using Synapse.Api.CustomObjects;
 using Synapse.Api.Enum;
 using Synapse.Api.Items;
 using System;
@@ -50,6 +51,8 @@ namespace Synapse.Api
         public List<Camera> Cameras { get; } = new List<Camera>();
 
         public List<Locker> Lockers { get; } = new List<Locker>();
+
+        public List<SynapseObject> SynapseObjects { get; } = new List<SynapseObject>();
 
         public string IntercomText
         {

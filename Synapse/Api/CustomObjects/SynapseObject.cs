@@ -1,5 +1,7 @@
 ﻿using AdminToys;
 using Mirror;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Synapse.Api.CustomObjects
@@ -18,9 +20,11 @@ namespace Synapse.Api.CustomObjects
                 }
         }
 
+        public SynapseObject(PrimitiveType primitiveType, Vector3 position) : this(primitiveType, Color.white, position, Quaternion.identity, Vector3.one, false) { }
+
         public SynapseObject(PrimitiveType primitiveType,Color color, Vector3 position, Quaternion rotation, Vector3 scale, bool applyPhyics)
         {
-            ObjectToy = Object.Instantiate(Prefab, position, rotation);
+            ObjectToy = UnityEngine.Object.Instantiate(Prefab, position, rotation);
             NetworkServer.Spawn(ObjectToy.gameObject);
             ObjectToy.NetworkPrimitiveType = primitiveType;
             ObjectToy.NetworkMaterialColor = color;
@@ -28,25 +32,15 @@ namespace Synapse.Api.CustomObjects
             ObjectToy.transform.rotation = rotation;
             ObjectToy.transform.localScale = scale;
             ObjectToy.NetworkScale = scale;
-            ObjectToy.gameObject.AddComponent<SynapseScript>();
-
+            Script = ObjectToy.gameObject.AddComponent<SynapseScript>();
+            Script.SynapseObject = this;
             if (applyPhyics)
-                Rigidbody = ObjectToy.gameObject.AddComponent<Rigidbody>();
+                ApplyPhysics();
+            Map.Get.SynapseObjects.Add(this);
+            Server.Get.Events.SynapseObject.InvokeLoadComponent(new Events.SynapseEventArguments.SOEventArgs(this));
         }
 
-        public PrimitiveObjectToy ObjectToy { get; set; }
-
-        public Rigidbody Rigidbody { get; private set; }
-
-        public Color Color
-        {
-            get => ObjectToy.MaterialColor;
-        }
-
-        public PrimitiveType PrimitiveType
-        {
-            get => ObjectToy.PrimitiveType;
-        }
+        public Dictionary<string, object> ObjectData { get; } = new Dictionary<string, object>();
 
         public Vector3 Position
         {
@@ -68,6 +62,34 @@ namespace Synapse.Api.CustomObjects
                 ObjectToy.transform.localScale = value;
                 ObjectToy.NetworkScale = value;
             }
+        }
+
+        public void ApplyPhysics() => Rigidbody = ObjectToy.gameObject.AddComponent<Rigidbody>();
+
+        public void Destroy()
+        {
+            Map.Get.SynapseObjects.Remove(this);
+            NetworkServer.Destroy(ObjectToy.gameObject);
+        }
+
+        public PrimitiveObjectToy ObjectToy { get; private set; }
+
+        public Rigidbody Rigidbody { get; private set; }
+
+        public SynapseScript Script { get; private set; }
+
+        public Guid Guid { get; } = Guid.NewGuid();
+
+        public bool UsePhysics => Rigidbody != null;
+
+        public Color Color
+        {
+            get => ObjectToy.MaterialColor;
+        }
+
+        public PrimitiveType PrimitiveType
+        {
+            get => ObjectToy.PrimitiveType;
         }
     }
 }
