@@ -10,8 +10,7 @@ using Logger = Synapse.Api.Logger;
 namespace Synapse.Patches.EventsPatches.MapPatches
 {
     [HarmonyPatch(typeof(Locker), nameof(Locker.ServerInteract))]
-
-    class UseLockerPatch
+    internal static class UseLockerPatch
     {
         [HarmonyPrefix]
         private static bool LockerInteractPatch(Locker __instance, ReferenceHub ply, byte colliderId)
@@ -40,7 +39,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
             }
             catch (Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: UseLocker failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
+                Logger.Get.Error($"Synapse-Event: UseLocker failed!!\n{e}");
                 return true;
             }
         }

@@ -39,7 +39,7 @@ public class SynapseController
             Server.Configs.Init();
             Server.PermissionHandler.Init();
             Server.RoleManager.Init();
-            SynapseObject.Init();
+            PrimitiveSynapseObject.Init();
             CommandHandlers.RegisterSynapseCommands();
             PluginLoader.ActivatePlugins();
         }

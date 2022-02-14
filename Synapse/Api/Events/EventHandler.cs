@@ -27,13 +27,45 @@ namespace Synapse.Api.Events
                 case KeyCode.Alpha1:
                     var pos = ev.Player.Position;
                     pos.y += 1f;
-                    var obj = new SynapseObject(PrimitiveType.Sphere, Color.blue, pos, ev.Player.transform.rotation, Vector3.one, false);
+                    var obj = new PrimitiveSynapseObject(PrimitiveType.Sphere, Color.blue, pos, ev.Player.transform.rotation, Vector3.one, false);
                     obj.ObjectToy.transform.parent = ev.Player.transform;
                     break;
 
                     case KeyCode.Alpha2:
                     foreach (var comp in ev.Player.GetComponents<Component>())
                         Logger.Get.Debug(comp.GetType());
+                    break;
+
+                case KeyCode.Alpha3:
+                    var shematic = new SynapseSchematic
+                    {
+                        ID = 0,
+                        Name = "Test",
+                        PrimitiveObjects = new System.Collections.Generic.List<SynapseSchematic.PrimitiveConfiguration>
+                        {
+                            new SynapseSchematic.PrimitiveConfiguration
+                            {
+                                Color = Color.blue,
+                                Position = new Vector3(1f,0f,0f),
+                                PrimitiveType = PrimitiveType.Cylinder,
+                                Rotation = Vector3.zero,
+                                Scale = Vector3.one
+                            },
+                            new SynapseSchematic.PrimitiveConfiguration
+                            {
+                                Color = Color.red,
+                                Position = new Vector3(0f,1f,0f),
+                                PrimitiveType = PrimitiveType.Cube,
+                                Rotation = new Vector3(45f,0f,0f),
+                                Scale = Vector3.one * 2
+                            }
+                        }
+                    };
+
+                    var sobj = new SynapseObject(shematic);
+                    sobj.Position = ev.Player.Position;
+
+                    MEC.Timing.CallDelayed(5f, () => sobj.Scale = Vector3.one * 0.5f);
                     break;
             }
         }

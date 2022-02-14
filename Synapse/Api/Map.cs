@@ -52,7 +52,7 @@ namespace Synapse.Api
 
         public List<Locker> Lockers { get; } = new List<Locker>();
 
-        public List<SynapseObject> SynapseObjects { get; } = new List<SynapseObject>();
+        public List<PrimitiveSynapseObject> SynapseObjects { get; } = new List<PrimitiveSynapseObject>();
 
         public string IntercomText
         {

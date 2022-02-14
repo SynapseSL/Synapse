@@ -40,6 +40,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Api\Broadcast.cs" />
+    <Compile Include="Api\CustomObjects\SchematicHandler.cs" />
+    <Compile Include="Api\CustomObjects\SynapseObject.cs" />
     <Compile Include="Api\CustomObjects\SynapseSchematic.cs" />
     <Compile Include="Api\CustomObjects\SynapseScript.cs" />
     <Compile Include="Api\Enum\DamageType.cs" />
@@ -73,7 +75,7 @@
     <Compile Include="Api\Ragdoll.cs" />
     <Compile Include="Api\Scp914.cs" />
     <Compile Include="Api\Camera.cs" />
-    <Compile Include="Api\CustomObjects\SynapseObject.cs" />
+    <Compile Include="Api\CustomObjects\PrimitiveSynapseObject.cs" />
     <Compile Include="Api\Teams\SynapseTeamInformation.cs" />
     <Compile Include="Api\Teams\SynapseTeam.cs" />
     <Compile Include="Api\Teams\ISynapseTeam.cs" />

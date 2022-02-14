@@ -82,7 +82,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public DamageType DamageType { get; internal set; }
 
-        public bool Allow { get; set; }
+        public bool Allow { get; set; } = true;
     }
 
     public class LoadComponentEventArgs : EventHandler.ISynapseEventArgs

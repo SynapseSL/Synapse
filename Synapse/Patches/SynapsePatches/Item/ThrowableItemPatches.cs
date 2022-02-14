@@ -1,9 +1,9 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using InventorySystem;
 using InventorySystem.Items.Pickups;
 using InventorySystem.Items.ThrowableProjectiles;
 using Mirror;
+using System;
 using UnityEngine;
 using Logger = Synapse.Api.Logger;
 
@@ -37,7 +37,7 @@ namespace Synapse.Patches.SynapsePatches.Item
                 NetworkServer.Spawn(newpickup.gameObject);
                 newpickup.InfoReceived(default, info);
                 if (newpickup.TryGetComponent<Rigidbody>(out var rb))
-                    __instance.PropelBody(rb, torque, Vector3.zero, forceAmount, upwardFactor);
+                    __instance.PropelBody(rb, torque, startVel, forceAmount, upwardFactor);
 
                 __instance.GetSynapseItem().Throwable.ThrowableItem = newpickup;
                 newpickup.ServerActivate();
