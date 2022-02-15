@@ -137,6 +137,7 @@ namespace Synapse
             {
                 Configs.Reload();
                 PermissionHandler.Reload();
+                Shematic.Load();
                 SynapseController.PluginLoader.ReloadConfigs();
             }
             catch(Exception e)

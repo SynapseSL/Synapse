@@ -139,6 +139,7 @@
     <Compile Include="Command\Commands\SynapseKeyPressCommand.cs" />
     <Compile Include="Command\Commands\SynapseReloadCommand.cs" />
     <Compile Include="Command\Commands\SynapseHelpCommand.cs" />
+    <Compile Include="Command\Commands\SynapseSpawnShematic.cs" />
     <Compile Include="Command\GeneratedCommand.cs" />
     <Compile Include="Command\Handlers.cs" />
     <Compile Include="Command\ICommand.cs" />

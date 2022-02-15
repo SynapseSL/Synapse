@@ -12,6 +12,8 @@ namespace Synapse.Api.CustomObjects
     {
         internal ShematicHandler() { }
 
+        public static ShematicHandler Get => Server.Get.Shematic;
+
         internal void Init()
         {
             PrimitiveSynapseObject.Init();
@@ -30,6 +32,8 @@ namespace Synapse.Api.CustomObjects
 
         public SynapseObject SpawnShematic(SynapseShematic shematic, Vector3 position)
         {
+            if (shematic == null) return null;
+
             var so = new SynapseObject(shematic);
             so.Position = position;
             return so;

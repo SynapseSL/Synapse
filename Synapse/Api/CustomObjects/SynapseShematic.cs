@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using Synapse.Config;
 using System;
-using Synapse.Config;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Synapse.Api.CustomObjects
 {
@@ -15,7 +15,7 @@ namespace Synapse.Api.CustomObjects
 
         public List<PrimitiveConfiguration> PrimitiveObjects { get; set; } = new List<PrimitiveConfiguration>();
 
-        public class PrimitiveConfiguration
+        public abstract class PrimitiveConfiguration
         {
             public PrimitiveType PrimitiveType { get; set; }
 
