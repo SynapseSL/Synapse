@@ -37,13 +37,13 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha3:
-                    var shematic = new SynapseSchematic
+                    var shematic = new SynapseShematic
                     {
                         ID = 0,
                         Name = "Test",
-                        PrimitiveObjects = new System.Collections.Generic.List<SynapseSchematic.PrimitiveConfiguration>
+                        PrimitiveObjects = new System.Collections.Generic.List<SynapseShematic.PrimitiveConfiguration>
                         {
-                            new SynapseSchematic.PrimitiveConfiguration
+                            new SynapseShematic.PrimitiveConfiguration
                             {
                                 Color = Color.blue,
                                 Position = new Vector3(1f,0f,0f),
@@ -51,7 +51,7 @@ namespace Synapse.Api.Events
                                 Rotation = Vector3.zero,
                                 Scale = Vector3.one
                             },
-                            new SynapseSchematic.PrimitiveConfiguration
+                            new SynapseShematic.PrimitiveConfiguration
                             {
                                 Color = Color.red,
                                 Position = new Vector3(0f,1f,0f),

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Synapse.Api;
+using Synapse.Api.CustomObjects;
 using Synapse.Api.Items;
 using Synapse.Api.Plugin;
 using Synapse.Api.Roles;
@@ -44,6 +45,8 @@ namespace Synapse
         public ConfigHandler Configs { get; } = new ConfigHandler();
 
         public PermissionHandler PermissionHandler { get; } = new PermissionHandler();
+
+        public ShematicHandler Shematic { get; } = new ShematicHandler();
 
         public Player Host
         {
@@ -300,23 +303,22 @@ namespace Synapse
 
             //config
             private string _mainConfigDirectory;
+            private string _sharedConfigDirectory;
+            private string _permissionFile;
 
             //plugin
             private string _mainPluginDirectory;
-            private string _permissionFile;
             private string _pluginDirectory;
-            private string _sharedConfigDirectory;
-
             private string _sharedPluginDirectory;
+
+            //Shematic
+            private string _shematicDirectory;
 
             //synapse
             private string _synapseDirectory;
 
 
-            internal FileLocations()
-            {
-                Refresh();
-            }
+            internal FileLocations() => Refresh();
 
             //Synapse
             public string SynapseDirectory
@@ -418,8 +420,19 @@ namespace Synapse
                 }
                 private set => _sharedConfigDirectory = value;
             }
-            //Currently should it not be auto generated
-            public string ModuleDirectory { get; set; }
+
+            public string ShematicDirectory
+            {
+                get
+                {
+                    if(!Directory.Exists(_shematicDirectory))
+                        Directory.CreateDirectory(_shematicDirectory);
+
+                    return _shematicDirectory;
+                }
+                private set => _shematicDirectory = value;
+            }
+
             public string PermissionFile
             {
                 get
@@ -460,7 +473,7 @@ namespace Synapse
                 ConfigDirectory = Path.Combine(MainConfigDirectory, $"server-{ServerStatic.ServerPort}");
                 SharedConfigDirectory = Path.Combine(MainConfigDirectory, "server-shared");
 
-                ModuleDirectory = Path.Combine(SynapseDirectory, "modules");
+
 
                 var configpath = Path.Combine(ConfigDirectory, "config.syml");
                 ConfigFile = File.Exists(configpath) ? configpath : Path.Combine(SharedConfigDirectory, "config.syml");

@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace Synapse.Api.CustomObjects
 {
-    public class SynapseObject
+    public class SynapseObject : ISynapseObject
     {
-        public SynapseObject(SynapseSchematic schematic)
+        public SynapseObject(SynapseShematic schematic)
         {
             Name = schematic.Name;
             ID = schematic.ID;
@@ -21,6 +21,10 @@ namespace Synapse.Api.CustomObjects
             }
 
             PrimitiveChildrens = list;
+            Script = GameObject.AddComponent<SynapseScript>();
+            Script.SynapseObject = this;
+            Map.Get.SynapseObjects.Add(this);
+            Server.Get.Events.SynapseObject.InvokeLoadComponent(new Events.SynapseEventArguments.SOEventArgs(this));
         }
 
         public Vector3 Position
@@ -45,7 +49,13 @@ namespace Synapse.Api.CustomObjects
             }
         }
 
+        public bool IsPrimitive => false;
+
+        public SynapseScript Script { get; }
+
         public GameObject GameObject { get; internal set; }
+
+        public Rigidbody Rigidbody { get; internal set; }
 
         public IReadOnlyList<PrimitiveSynapseObject> PrimitiveChildrens { get; internal set; }
 
@@ -55,10 +65,13 @@ namespace Synapse.Api.CustomObjects
 
         public int ID { get; }
 
+        public void ApplyPhysics()
+            => Rigidbody = GameObject.AddComponent<Rigidbody>();
+
         private void UpdateScale()
         {
             foreach (var prim in PrimitiveChildrens)
-                prim.ObjectToy.NetworkScale = new Vector3(prim.OriginalScale.x * Scale.x, prim.OriginalScale.y * Scale.y, prim.OriginalScale.z * Scale.z);
+                prim.Scale = new Vector3(prim.OriginalScale.x * Scale.x, prim.OriginalScale.y * Scale.y, prim.OriginalScale.z * Scale.z);
 
             foreach (var child in Childrens)
                 child.UpdateScale();

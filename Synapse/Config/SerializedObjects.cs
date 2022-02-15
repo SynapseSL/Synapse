@@ -218,4 +218,34 @@ namespace Synapse.Config
         public static implicit operator Vector3(SerializedVector3 vector) => vector.Parse();
         public static implicit operator SerializedVector3(Vector3 vector) => new SerializedVector3(vector);
     }
+
+    [Serializable]
+    public class SerializedColor
+    {
+        public SerializedColor() { }
+        public SerializedColor(Color color)
+        {
+            R = color.r;
+            G = color.g;
+            B = color.b;
+            A = color.a;
+        }
+        public SerializedColor(float r, float g, float b, float a)
+        {
+            R = r;
+            G = g;
+            B = b;
+            A = a;
+        }
+
+        public float R { get; set; }
+        public float G { get; set; }
+        public float B { get; set; }
+        public float A { get; set; }
+
+        public Color Parse() => new Color(R, G, B, A);
+
+        public static implicit operator Color(SerializedColor color) => color.Parse();
+        public static implicit operator SerializedColor(Color color) => new SerializedColor(color);
+    }
 }

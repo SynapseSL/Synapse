@@ -40,9 +40,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Api\Broadcast.cs" />
-    <Compile Include="Api\CustomObjects\SchematicHandler.cs" />
+    <Compile Include="Api\CustomObjects\ISynapseObject.cs" />
+    <Compile Include="Api\CustomObjects\ShematicHandler.cs" />
     <Compile Include="Api\CustomObjects\SynapseObject.cs" />
-    <Compile Include="Api\CustomObjects\SynapseSchematic.cs" />
+    <Compile Include="Api\CustomObjects\SynapseShematic.cs" />
     <Compile Include="Api\CustomObjects\SynapseScript.cs" />
     <Compile Include="Api\Enum\DamageType.cs" />
     <Compile Include="Api\Enum\LockerType.cs" />

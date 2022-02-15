@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Synapse.Api.CustomObjects
 {
-    public class PrimitiveSynapseObject
+    public class PrimitiveSynapseObject : ISynapseObject
     {
         private static PrimitiveObjectToy Prefab { get; set; }
 
@@ -79,6 +79,8 @@ namespace Synapse.Api.CustomObjects
             }
         }
 
+        public bool IsPrimitive => true;
+
         internal Vector3 OriginalScale { get; set; }
 
         public void ApplyPhysics() => Rigidbody = ObjectToy.gameObject.AddComponent<Rigidbody>();
@@ -90,6 +92,8 @@ namespace Synapse.Api.CustomObjects
         }
 
         public PrimitiveObjectToy ObjectToy { get; private set; }
+
+        public GameObject GameObject => ObjectToy.gameObject;
 
         public Rigidbody Rigidbody { get; private set; }
 

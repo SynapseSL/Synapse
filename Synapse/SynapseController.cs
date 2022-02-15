@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using Synapse.Api.CustomObjects;
 using Synapse.Api.Plugin;
 using Synapse.Command;
 using System;
@@ -39,7 +38,7 @@ public class SynapseController
             Server.Configs.Init();
             Server.PermissionHandler.Init();
             Server.RoleManager.Init();
-            PrimitiveSynapseObject.Init();
+            Server.Shematic.Init();
             CommandHandlers.RegisterSynapseCommands();
             PluginLoader.ActivatePlugins();
         }

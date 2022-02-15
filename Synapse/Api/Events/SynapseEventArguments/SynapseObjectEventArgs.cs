@@ -5,8 +5,8 @@ namespace Synapse.Api.Events.SynapseEventArguments
 {
     public class SOEventArgs : ISynapseEventArgs
     {
-        public PrimitiveSynapseObject Object { get; }
+        public ISynapseObject Object { get; }
 
-        internal SOEventArgs(PrimitiveSynapseObject so) => Object = so;
+        internal SOEventArgs(ISynapseObject so) => Object = so;
     }
 }

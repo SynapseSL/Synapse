@@ -4,9 +4,9 @@ namespace Synapse.Api.CustomObjects
 {
     public class SynapseScript : MonoBehaviour
     {
-        public PrimitiveSynapseObject SynapseObject { get; set; }
+        internal ISynapseObject SynapseObject { get; set; }
 
-        public void Update()
+        private void Update()
             => Server.Get.Events.SynapseObject.InvokeUpdate(new Events.SynapseEventArguments.SOEventArgs(SynapseObject));
     }
 }
