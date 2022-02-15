@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Synapse.Api.CustomObjects
 {
-    public class SynapseShematic : IConfigSection
+    public class SynapseSchematic : IConfigSection
     {
         [NonSerialized]
         internal bool reload = true;
@@ -15,7 +15,7 @@ namespace Synapse.Api.CustomObjects
 
         public List<PrimitiveConfiguration> PrimitiveObjects { get; set; } = new List<PrimitiveConfiguration>();
 
-        public abstract class PrimitiveConfiguration
+        public class PrimitiveConfiguration
         {
             public PrimitiveType PrimitiveType { get; set; }
 

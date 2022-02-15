@@ -112,12 +112,11 @@ namespace Synapse.Patches.SynapsePatches
 					}
 					__instance.IsSuicide = true;
 				}
-				else if (!HitboxIdentity.CheckFriendlyFire(__instance.Attacker.Hub, ply, true))
+				else if (!HitboxIdentity.CheckFriendlyFire(__instance.Attacker.Hub, ply))
 				{
 					__instance.Damage *= AttackerDamageHandler._ffMultiplier;
 					__instance.IsFriendlyFire = true;
 				}
-				__instance.ProcessDamage(ply);
 
 				return false;
 			}

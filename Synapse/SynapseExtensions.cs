@@ -186,6 +186,8 @@ public static class SynapseExtensions
             {
                 if (attacker.Team == Team.SCP && victim.Team == Team.SCP) result = false;
 
+                Server.Get.Logger.Debug("FF: " + Server.Get.FF);
+                Server.Get.Logger.Debug("ignore: " + ignoreConfig);
                 var ff = Server.Get.FF;
                 if (ignoreConfig)
                     ff = true;

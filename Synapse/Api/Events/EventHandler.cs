@@ -17,28 +17,20 @@ namespace Synapse.Api.Events
             Server.UpdateEvent += OnUpdate;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
+            Player.PlayerDamageEvent += Player_PlayerDamageEvent;
 #endif
+        }
+
+        private void Player_PlayerDamageEvent(SynapseEventArguments.PlayerDamageEventArgs ev)
+        {
+            Logger.Get.Debug("Allow: " + ev.Allow);
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
         {
             switch (ev.KeyCode)
             {
-                case KeyCode.Alpha1:
-                    var pos = ev.Player.Position;
-                    pos.y += 1f;
-                    var obj = new PrimitiveSynapseObject(PrimitiveType.Sphere, Color.blue, pos, ev.Player.transform.rotation, Vector3.one, false);
-                    obj.ObjectToy.transform.parent = ev.Player.transform;
-                    break;
-
-                    case KeyCode.Alpha2:
-                    foreach (var comp in ev.Player.GetComponents<Component>())
-                        Logger.Get.Debug(comp.GetType());
-                    break;
-
-                case KeyCode.Alpha3:
-                    SynapseController.Server.Shematic.SpawnShematic(1, ev.Player.Position);
-                    break;
+                
             }
         }
 

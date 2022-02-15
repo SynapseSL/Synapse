@@ -46,7 +46,7 @@ namespace Synapse
 
         public PermissionHandler PermissionHandler { get; } = new PermissionHandler();
 
-        public ShematicHandler Shematic { get; } = new ShematicHandler();
+        public SchematicHandler Schematic { get; } = new SchematicHandler();
 
         public Player Host
         {
@@ -137,7 +137,7 @@ namespace Synapse
             {
                 Configs.Reload();
                 PermissionHandler.Reload();
-                Shematic.Load();
+                Schematic.Load();
                 SynapseController.PluginLoader.ReloadConfigs();
             }
             catch(Exception e)
@@ -312,8 +312,8 @@ namespace Synapse
             private string _pluginDirectory;
             private string _sharedPluginDirectory;
 
-            //Shematic
-            private string _shematicDirectory;
+            //Schematic
+            private string _schematicDirectory;
 
             //synapse
             private string _synapseDirectory;
@@ -422,16 +422,16 @@ namespace Synapse
                 private set => _sharedConfigDirectory = value;
             }
 
-            public string ShematicDirectory
+            public string SchematicDirectory
             {
                 get
                 {
-                    if(!Directory.Exists(_shematicDirectory))
-                        Directory.CreateDirectory(_shematicDirectory);
+                    if(!Directory.Exists(_schematicDirectory))
+                        Directory.CreateDirectory(_schematicDirectory);
 
-                    return _shematicDirectory;
+                    return _schematicDirectory;
                 }
-                private set => _shematicDirectory = value;
+                private set => _schematicDirectory = value;
             }
 
             public string PermissionFile
@@ -474,7 +474,7 @@ namespace Synapse
                 ConfigDirectory = Path.Combine(MainConfigDirectory, $"server-{ServerStatic.ServerPort}");
                 SharedConfigDirectory = Path.Combine(MainConfigDirectory, "server-shared");
 
-                ShematicDirectory = Path.Combine(SynapseDirectory, "shematics");
+                SchematicDirectory = Path.Combine(SynapseDirectory, "schematics");
 
                 var configpath = Path.Combine(ConfigDirectory, "config.syml");
                 ConfigFile = File.Exists(configpath) ? configpath : Path.Combine(SharedConfigDirectory, "config.syml");

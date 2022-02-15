@@ -38,7 +38,7 @@ public class SynapseController
             Server.Configs.Init();
             Server.PermissionHandler.Init();
             Server.RoleManager.Init();
-            Server.Shematic.Init();
+            Server.Schematic.Init();
             CommandHandlers.RegisterSynapseCommands();
             PluginLoader.ActivatePlugins();
         }

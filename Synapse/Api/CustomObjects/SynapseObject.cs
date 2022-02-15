@@ -5,7 +5,7 @@ namespace Synapse.Api.CustomObjects
 {
     public class SynapseObject : ISynapseObject
     {
-        public SynapseObject(SynapseShematic schematic)
+        public SynapseObject(SynapseSchematic schematic)
         {
             Name = schematic.Name;
             ID = schematic.ID;

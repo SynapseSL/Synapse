@@ -5,13 +5,13 @@ public static class SynapseVersion
 {
     public const int Major = 2;
 
-    public const int Minor = 8;
+    public const int Minor = 9;
 
-    public const int Patch = 3;
+    public const int Patch = 0;
 
     public const VersionType Type = VersionType.Dev;
 
-    public const string SubVersion = "1.1";
+    public const string SubVersion = "1.0";
 
     public const string BasedGameVersion = "11.1.2";
 
