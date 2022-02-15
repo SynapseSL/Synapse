@@ -37,35 +37,7 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha3:
-                    var shematic = new SynapseShematic
-                    {
-                        ID = 0,
-                        Name = "Test",
-                        PrimitiveObjects = new System.Collections.Generic.List<SynapseShematic.PrimitiveConfiguration>
-                        {
-                            new SynapseShematic.PrimitiveConfiguration
-                            {
-                                Color = Color.blue,
-                                Position = new Vector3(1f,0f,0f),
-                                PrimitiveType = PrimitiveType.Cylinder,
-                                Rotation = Vector3.zero,
-                                Scale = Vector3.one
-                            },
-                            new SynapseShematic.PrimitiveConfiguration
-                            {
-                                Color = Color.red,
-                                Position = new Vector3(0f,1f,0f),
-                                PrimitiveType = PrimitiveType.Cube,
-                                Rotation = new Vector3(45f,0f,0f),
-                                Scale = Vector3.one * 2
-                            }
-                        }
-                    };
-
-                    var sobj = new SynapseObject(shematic);
-                    sobj.Position = ev.Player.Position;
-
-                    MEC.Timing.CallDelayed(5f, () => sobj.Scale = Vector3.one * 0.5f);
+                    SynapseController.Server.Shematic.SpawnShematic(1, ev.Player.Position);
                     break;
             }
         }

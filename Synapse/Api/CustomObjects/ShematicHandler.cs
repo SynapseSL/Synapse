@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using UnityEngine;
 
 namespace Synapse.Api.CustomObjects
 {
@@ -23,20 +24,38 @@ namespace Synapse.Api.CustomObjects
 
         public SynapseShematic GetShematic(string name) => Shematics.FirstOrDefault(x => x.Name == name);
 
-        public SynapseObject SpawnShematic(string name) => SpawnShematic(GetShematic(name));
+        public SynapseObject SpawnShematic(string name, Vector3 position) => SpawnShematic(GetShematic(name), position);
 
-        public SynapseObject SpawnShematic(int id) => SpawnShematic(GetShematic(id));
+        public SynapseObject SpawnShematic(int id, Vector3 position) => SpawnShematic(GetShematic(id), position);
 
-        public SynapseObject SpawnShematic(SynapseShematic shematic) => new SynapseObject(shematic);
+        public SynapseObject SpawnShematic(SynapseShematic shematic, Vector3 position)
+        {
+            var so = new SynapseObject(shematic);
+            so.Position = position;
+            return so;
+        }
 
         public bool IsIDRegistered(int id) => Shematics.Any(x => x.ID == id);
 
         public void AddShematic(SynapseShematic shematic, bool removeOnReload = true)
         {
+            if (IsIDRegistered(shematic.ID)) return;
             shematic.reload = removeOnReload;
             var list = Shematics.ToList();
             list.Add(shematic);
             Shematics = list.AsReadOnly();
+        }
+
+        public void SaveShematic(SynapseShematic shematic, string fileName)
+        {
+            if (IsIDRegistered(shematic.ID)) return;
+            AddShematic(shematic);
+
+            var syml = new SYML(Path.Combine(Server.Get.Files.ShematicDirectory, fileName + ".syml"));
+            var section = new ConfigSection { Section = shematic.Name };
+            section.Import(shematic);
+            syml.Sections.Add(shematic.Name, section);
+            syml.Store();
         }
 
         internal void Load()
