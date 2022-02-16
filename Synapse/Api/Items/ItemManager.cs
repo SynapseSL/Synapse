@@ -14,7 +14,7 @@ namespace Synapse.Api.Items
 
         public ItemType GetBaseType(int id)
         {
-            if (id >= 0 && id <= 35)
+            if (id >= 0 && id <= HighestItem)
                 return (ItemType)id;
 
             if (!IsIDRegistered(id)) throw new SynapseItemNotFoundException("The BaseType was requested from an not registered Item ID", id);
