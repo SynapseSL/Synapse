@@ -1,7 +1,4 @@
-﻿using Mirror;
-using Synapse.Api.CustomObjects;
-using Synapse.Config;
-using System.Linq;
+﻿using Synapse.Config;
 using UnityEngine;
 
 namespace Synapse.Api.Events
@@ -17,20 +14,16 @@ namespace Synapse.Api.Events
             Server.UpdateEvent += OnUpdate;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
-            Player.PlayerDamageEvent += Player_PlayerDamageEvent;
 #endif
-        }
-
-        private void Player_PlayerDamageEvent(SynapseEventArguments.PlayerDamageEventArgs ev)
-        {
-            Logger.Get.Debug("Allow: " + ev.Allow);
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
         {
             switch (ev.KeyCode)
             {
-                
+                case KeyCode.Alpha1:
+
+                    break;
             }
         }
 
