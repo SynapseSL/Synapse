@@ -16,7 +16,7 @@ namespace Synapse.Api.CustomObjects
 
         internal void Init()
         {
-            PrimitiveSynapseObject.Init();
+            SynapsePrimitiveObject.Init();
             Load();
         }
 

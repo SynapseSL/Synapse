@@ -22,7 +22,8 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-
+                    foreach (var pref in CustomNetworkManager.singleton.spawnPrefabs)
+                        Logger.Get.Debug(pref.name);
                     break;
             }
         }
