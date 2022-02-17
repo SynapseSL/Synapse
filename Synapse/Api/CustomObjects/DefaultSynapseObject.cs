@@ -1,4 +1,5 @@
 ﻿using Mirror;
+using Synapse.Api.Enum;
 using System.Collections.Generic;
 using UnityEngine;
 

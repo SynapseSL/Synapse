@@ -76,6 +76,18 @@ namespace Synapse.Api.Events
 
                     MEC.Timing.CallDelayed(5f, () => obj.LightShadows = false);
                     break;
+
+                case KeyCode.Alpha4:
+                    new SynapseTargetObject(Enum.TargetType.DBoy, ev.Player.Position, ev.Player.transform.rotation, Vector3.one * 3);
+                    break;
+
+                case KeyCode.Alpha5:
+                    new SynapseTargetObject(Enum.TargetType.Binary, ev.Player.Position, ev.Player.transform.rotation, Vector3.one * 3);
+                    break;
+
+                case KeyCode.Alpha6:
+                    new SynapseTargetObject(Enum.TargetType.Sport, ev.Player.Position, ev.Player.transform.rotation, Vector3.one * 3);
+                    break;
             }
         }
 

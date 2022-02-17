@@ -1,5 +1,6 @@
 ﻿using AdminToys;
 using Mirror;
+using Synapse.Api.Enum;
 using UnityEngine;
 
 namespace Synapse.Api.CustomObjects
@@ -22,7 +23,6 @@ namespace Synapse.Api.CustomObjects
             OriginalScale = configuration.Scale;
         }
 
-        public override GameObject GameObject => ToyBase.gameObject;
         public override ObjectType Type => ObjectType.LightSource;
         public override LightSourceToy ToyBase { get; }
 

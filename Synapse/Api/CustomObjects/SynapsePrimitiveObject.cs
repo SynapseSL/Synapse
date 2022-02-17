@@ -1,5 +1,6 @@
 ﻿using AdminToys;
 using Mirror;
+using Synapse.Api.Enum;
 using UnityEngine;
 
 namespace Synapse.Api.CustomObjects
@@ -39,8 +40,6 @@ namespace Synapse.Api.CustomObjects
 
             return ot;
         }
-
-        public override GameObject GameObject { get => ToyBase.gameObject; }
 
         public override ObjectType Type => ObjectType.Primitive;
 

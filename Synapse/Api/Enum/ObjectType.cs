@@ -1,4 +1,4 @@
-﻿namespace Synapse.Api.CustomObjects
+﻿namespace Synapse.Api.Enum
 {
     public enum ObjectType
     {

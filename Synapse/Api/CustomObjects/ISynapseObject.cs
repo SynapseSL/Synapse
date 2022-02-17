@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Synapse.Api.Enum;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Synapse.Api.CustomObjects

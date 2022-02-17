@@ -1,5 +1,6 @@
 ﻿using AdminToys;
 using Mirror;
+using Synapse.Api.Enum;
 using Synapse.Config;
 using System;
 using System.Collections.Generic;
@@ -20,15 +21,27 @@ namespace Synapse.Api.CustomObjects
         {
             foreach (var prefab in NetworkManager.singleton.spawnPrefabs)
             {
-                if (prefab.TryGetComponent<PrimitiveObjectToy>(out var pref))
+                switch (prefab.name)
                 {
-                    SynapsePrimitiveObject.Prefab = pref;
-                    continue;
-                }
-                if (prefab.TryGetComponent<LightSourceToy>(out var lightpref))
-                {
-                    SynapseLightObject.Prefab = lightpref;
-                    continue;
+                    case "PrimitiveObjectToy" when prefab.TryGetComponent<PrimitiveObjectToy>(out var pref):
+                        SynapsePrimitiveObject.Prefab = pref;
+                        break;
+
+                    case "LightSourceToy" when prefab.TryGetComponent<LightSourceToy>(out var lightpref):
+                        SynapseLightObject.Prefab = lightpref;
+                        break;
+
+                    case "sportTargetPrefab" when prefab.TryGetComponent<ShootingTarget>(out var target):
+                        SynapseTargetObject.Prefabs[TargetType.Sport] = target;
+                        break;
+
+                    case "dboyTargetPrefab" when prefab.TryGetComponent<ShootingTarget>(out var target):
+                        SynapseTargetObject.Prefabs[TargetType.DBoy] = target;
+                        break;
+
+                    case "binaryTargetPrefab" when prefab.TryGetComponent<ShootingTarget>(out var target):
+                        SynapseTargetObject.Prefabs[TargetType.Binary] = target;
+                        break;
                 }
             }
 
