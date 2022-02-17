@@ -26,6 +26,13 @@ namespace Synapse.Api.CustomObjects
                 obj.GameObject.transform.parent = GameObject.transform;
             }
 
+            foreach(var target in schematic.TargetObjects)
+            {
+                var obj = new SynapseTargetObject(target);
+                TargetObjects.Add(obj);
+                obj.GameObject.transform.parent = GameObject.transform;
+            }
+
             Map.Get.SynapseObjects.Add(this);
             Server.Get.Events.SynapseObject.InvokeLoadComponent(new Events.SynapseEventArguments.SOEventArgs(this));
         }
@@ -44,9 +51,11 @@ namespace Synapse.Api.CustomObjects
 
         public override ObjectType Type => ObjectType.Shematic;
 
-        public List<SynapsePrimitiveObject> PrimitivesChildrens { get; internal set; } = new List<SynapsePrimitiveObject>();
+        public List<SynapsePrimitiveObject> PrimitivesChildrens { get; } = new List<SynapsePrimitiveObject>();
 
-        public List<SynapseLightObject> LightChildrens { get; internal set; } = new List<SynapseLightObject>();
+        public List<SynapseLightObject> LightChildrens { get; } = new List<SynapseLightObject>();
+
+        public List<SynapseTargetObject> TargetObjects { get; } = new List<SynapseTargetObject>();
 
         public string Name { get; }
 

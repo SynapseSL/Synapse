@@ -1,4 +1,5 @@
-﻿using Synapse.Config;
+﻿using Synapse.Api.Enum;
+using Synapse.Config;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,7 +16,9 @@ namespace Synapse.Api.CustomObjects
 
         public List<PrimitiveConfiguration> PrimitiveObjects { get; set; } = new List<PrimitiveConfiguration>();
 
-        public List<LightSource> LightObjects { get; set; } = new List<LightSource>();
+        public List<LightSourceConfiguration> LightObjects { get; set; } = new List<LightSourceConfiguration>();
+
+        public List<TargetConfiguration> TargetObjects { get; set; } = new List<TargetConfiguration>();
 
         public class PrimitiveConfiguration
         {
@@ -30,7 +33,7 @@ namespace Synapse.Api.CustomObjects
             public SerializedColor Color { get; set; }
         }
 
-        public class LightSource
+        public class LightSourceConfiguration
         {
             public SerializedVector3 Position { get; set; }
 
@@ -45,6 +48,17 @@ namespace Synapse.Api.CustomObjects
             public float LightRange { get; set; }
 
             public bool LightShadows { get; set; }
+        }
+
+        public class TargetConfiguration
+        {
+            public TargetType TargetType { get; set; }
+
+            public SerializedVector3 Position { get; set; }
+
+            public SerializedVector3 Rotation { get; set; }
+
+            public SerializedVector3 Scale { get; set; }
         }
     }
 }

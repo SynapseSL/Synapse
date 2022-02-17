@@ -52,9 +52,9 @@ namespace Synapse.Api.Events
                                 Scale = Vector3.one
                             },
                         },
-                        LightObjects = new System.Collections.Generic.List<SynapseSchematic.LightSource>
+                        LightObjects = new System.Collections.Generic.List<SynapseSchematic.LightSourceConfiguration>
                         {
-                            new SynapseSchematic.LightSource
+                            new SynapseSchematic.LightSourceConfiguration
                             {
                                 Color = Color.green,
                                 LightIntensity = 1,

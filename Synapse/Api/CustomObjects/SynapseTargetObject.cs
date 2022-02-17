@@ -14,14 +14,24 @@ namespace Synapse.Api.CustomObjects
         public SynapseTargetObject(TargetType type, Vector3 position, Quaternion rotation, Vector3 scale)
         {
             ToyBase = CreateTarget(type, position, rotation, scale);
+            TargetType = type;
 
             Map.Get.SynapseObjects.Add(this);
             Server.Get.Events.SynapseObject.InvokeLoadComponent(new Events.SynapseEventArguments.SOEventArgs(this));
         }
 
+        internal SynapseTargetObject(SynapseSchematic.TargetConfiguration configuration)
+        {
+            ToyBase = CreateTarget(configuration.TargetType, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale);
+            OriginalScale = configuration.Scale;
+            TargetType = configuration.TargetType;
+        }
+
         public override GameObject GameObject => throw new NotImplementedException();
         public override ObjectType Type => ObjectType.Target;
         public override ShootingTarget ToyBase { get; }
+
+        public TargetType TargetType { get; }
 
         private ShootingTarget CreateTarget(TargetType type, Vector3 position, Quaternion rotation, Vector3 scale)
         {

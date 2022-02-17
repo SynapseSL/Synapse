@@ -17,7 +17,7 @@ namespace Synapse.Api.CustomObjects
             Server.Get.Events.SynapseObject.InvokeLoadComponent(new Events.SynapseEventArguments.SOEventArgs(this));
         }
 
-        internal SynapseLightObject(SynapseSchematic.LightSource configuration)
+        internal SynapseLightObject(SynapseSchematic.LightSourceConfiguration configuration)
         {
             ToyBase = CreateLightSource(configuration.Color, configuration.LightIntensity, configuration.LightRange, configuration.LightShadows, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale);
             OriginalScale = configuration.Scale;
