@@ -1,10 +1,9 @@
-﻿using System;
-using InventorySystem.Items.Firearms.Attachments;
-using Mirror;
+﻿using InventorySystem.Items.Firearms.Attachments;
+using Synapse.Api.CustomObjects;
 using Synapse.Api.Enum;
 using Synapse.Api.Items;
+using System;
 using UnityEngine;
-using Synapse.Api.CustomObjects;
 
 namespace Synapse.Api
 {
@@ -26,16 +25,33 @@ namespace Synapse.Api
 
         public string Name => GameObject.name;
 
-        public Vector3 Position => GameObject.transform.position;
+        public Vector3 Position
+        {
+            get => GameObject.transform.position;
+            set
+            {
+                GameObject.transform.position = value;
+                workStation.netIdentity.UpdatePositionRotationScale();
+            }
+        }
+
+        public Quaternion Rotation
+        {
+            get => GameObject.transform.rotation;
+            set
+            {
+                GameObject.transform.rotation = value;
+                workStation.netIdentity.UpdatePositionRotationScale();
+            }
+        }
 
         public Vector3 Scale
         {
             get => GameObject.transform.localScale;
             set
             {
-                NetworkServer.UnSpawn(GameObject);
                 GameObject.transform.localScale = value;
-                NetworkServer.Spawn(GameObject);
+                workStation.netIdentity.UpdatePositionRotationScale();
             }
         }
 

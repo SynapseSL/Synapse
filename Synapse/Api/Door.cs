@@ -36,9 +36,8 @@ namespace Synapse.Api
             get => GameObject.transform.position;
             set
             {
-                NetworkServer.UnSpawn(GameObject);
                 GameObject.transform.position = value;
-                NetworkServer.Spawn(GameObject);
+                VDoor.netIdentity.UpdatePositionRotationScale();
             }
         }
 
@@ -47,9 +46,18 @@ namespace Synapse.Api
             get => GameObject.transform.rotation;
             set
             {
-                NetworkServer.UnSpawn(GameObject);
                 GameObject.transform.rotation = value;
-                NetworkServer.Spawn(GameObject);
+                VDoor.netIdentity.UpdatePositionRotationScale();
+            }
+        }
+
+        public Vector3 Scale
+        {
+            get => GameObject.transform.localScale;
+            set
+            {
+                GameObject.transform.localScale = value;
+                VDoor.netIdentity.UpdatePositionRotationScale();
             }
         }
 

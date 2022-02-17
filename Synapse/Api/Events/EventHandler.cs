@@ -102,20 +102,8 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha3:
-                    var obj = new SynapseLightObject(Color.green, 1f, 10f, true, ev.Player.Position, ev.Player.transform.rotation, Vector3.one);
-
-                    MEC.Timing.CallDelayed(5f, () => obj.LightShadows = false);
-                    break;
-
-                case KeyCode.Alpha4:
-                    var st = new SynapseWorkStationObject(ev.Player.Position, ev.Player.transform.rotation, Vector3.one);
-                    MEC.Timing.CallDelayed(5f, () => st.Position = ev.Player.Position);
-                    MEC.Timing.CallDelayed(10f, () => st.Rotation = ev.Player.transform.rotation);
-                    MEC.Timing.CallDelayed(15f, () => st.Scale = Vector3.one * 3);
-                    break;
-
-                case KeyCode.Alpha5:
-                    ev.Player.AttachSynapseObject(new SynapsePrimitiveObject(PrimitiveType.Sphere, Vector3.zero), new Vector3(0f, 1.5f, 0f));
+                    foreach (var door in SynapseController.Server.Map.Doors)
+                        door.Scale = Vector3.one * 2;
                     break;
             }
         }
