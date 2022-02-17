@@ -6,7 +6,6 @@
         Primitive,
         LightSource,
         Target,
-        Window,
         Door,
         Workstation,
         Item

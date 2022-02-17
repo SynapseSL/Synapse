@@ -64,11 +64,32 @@ namespace Synapse.Api.Events
                                 Rotation = Vector3.zero,
                                 Scale = Vector3.one
                             }
+                        },
+                        TargetObjects = new System.Collections.Generic.List<SynapseSchematic.TargetConfiguration>
+                        {
+                            new SynapseSchematic.TargetConfiguration
+                            {
+                                Position = new Vector3(3f,0f,0f),
+                                Rotation = Vector3.zero,
+                                Scale = Vector3.one
+                            }
+                        },
+                        ItemObjects = new System.Collections.Generic.List<SynapseSchematic.ItemConfiguration>
+                        {
+                            new SynapseSchematic.ItemConfiguration
+                            {
+                                ItemType = ItemType.MicroHID,
+                                Position = new Vector3(0f,5f,0f),
+                                Rotation = Vector3.zero,
+                                Scale = Vector3.one * 4
+                            }
                         }
                     };
                     var sobj = SchematicHandler.Get.SpawnSchematic(schematic, ev.Player.Position);
+                    MEC.Timing.CallDelayed(5f, () => sobj.Position = ev.Player.Position);
+                    MEC.Timing.CallDelayed(10f, () => sobj.Scale = Vector3.one * 0.5f);
 
-                    SchematicHandler.Get.SaveSchematic(schematic, "Key3");
+                    SchematicHandler.Get.SaveSchematic(schematic, "Key2");
                     break;
 
                 case KeyCode.Alpha3:
@@ -78,15 +99,7 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha4:
-                    new SynapseTargetObject(Enum.TargetType.DBoy, ev.Player.Position, ev.Player.transform.rotation, Vector3.one * 3);
-                    break;
-
-                case KeyCode.Alpha5:
-                    new SynapseTargetObject(Enum.TargetType.Binary, ev.Player.Position, ev.Player.transform.rotation, Vector3.one * 3);
-                    break;
-
-                case KeyCode.Alpha6:
-                    new SynapseTargetObject(Enum.TargetType.Sport, ev.Player.Position, ev.Player.transform.rotation, Vector3.one * 3);
+                    new SynapseItemObject(ItemType.Flashlight, ev.Player.Position, ev.Player.transform.rotation, Vector3.one * 5);
                     break;
             }
         }

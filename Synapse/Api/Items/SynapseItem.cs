@@ -230,6 +230,8 @@ namespace Synapse.Api.Items
         #region ChangableAPIValues
         public Dictionary<string, object> ItemData { get; set; } = new Dictionary<string, object>();
 
+        public bool CanBePickedUp { get; set; } = true;
+
         private Vector3 position = Vector3.zero;
         public Vector3 Position
         {

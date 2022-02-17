@@ -20,6 +20,8 @@ namespace Synapse.Api.CustomObjects
 
         public List<TargetConfiguration> TargetObjects { get; set; } = new List<TargetConfiguration>();
 
+        public List<ItemConfiguration> ItemObjects { get; set; } = new List<ItemConfiguration>();
+
         public class PrimitiveConfiguration
         {
             public PrimitiveType PrimitiveType { get; set; }
@@ -53,6 +55,17 @@ namespace Synapse.Api.CustomObjects
         public class TargetConfiguration
         {
             public TargetType TargetType { get; set; }
+
+            public SerializedVector3 Position { get; set; }
+
+            public SerializedVector3 Rotation { get; set; }
+
+            public SerializedVector3 Scale { get; set; }
+        }
+
+        public class ItemConfiguration
+        {
+            public ItemType ItemType { get; set; }
 
             public SerializedVector3 Position { get; set; }
 

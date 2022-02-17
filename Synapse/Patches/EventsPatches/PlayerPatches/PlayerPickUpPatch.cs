@@ -18,7 +18,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 if (item == null) return true;
 
-                if (__instance.Completor.ValidateUpdate())
+                if (item.CanBePickedUp && __instance.Completor.ValidateUpdate())
                 {
                     if (NetworkTime.time < __instance.SessionPipe.Session.FinishTime) return false;
 

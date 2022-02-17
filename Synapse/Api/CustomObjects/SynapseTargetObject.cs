@@ -27,7 +27,6 @@ namespace Synapse.Api.CustomObjects
             TargetType = configuration.TargetType;
         }
 
-        public override GameObject GameObject => throw new NotImplementedException();
         public override ObjectType Type => ObjectType.Target;
         public override ShootingTarget ToyBase { get; }
 

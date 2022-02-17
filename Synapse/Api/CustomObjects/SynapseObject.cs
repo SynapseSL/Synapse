@@ -29,7 +29,14 @@ namespace Synapse.Api.CustomObjects
             foreach(var target in schematic.TargetObjects)
             {
                 var obj = new SynapseTargetObject(target);
-                TargetObjects.Add(obj);
+                TargetChildrens.Add(obj);
+                obj.GameObject.transform.parent = GameObject.transform;
+            }
+
+            foreach(var item in schematic.ItemObjects)
+            {
+                var obj = new SynapseItemObject(item);
+                ItemChildrens.Add(obj);
                 obj.GameObject.transform.parent = GameObject.transform;
             }
 
@@ -55,7 +62,9 @@ namespace Synapse.Api.CustomObjects
 
         public List<SynapseLightObject> LightChildrens { get; } = new List<SynapseLightObject>();
 
-        public List<SynapseTargetObject> TargetObjects { get; } = new List<SynapseTargetObject>();
+        public List<SynapseTargetObject> TargetChildrens { get; } = new List<SynapseTargetObject>();
+
+        public List<SynapseItemObject> ItemChildrens { get; } = new List<SynapseItemObject>();
 
         public string Name { get; }
 
@@ -71,6 +80,15 @@ namespace Synapse.Api.CustomObjects
         {
             foreach (var prim in PrimitivesChildrens)
                 prim.Scale = new Vector3(prim.OriginalScale.x * Scale.x, prim.OriginalScale.y * Scale.y, prim.OriginalScale.z * Scale.z);
+
+            foreach(var light in LightChildrens)
+                light.Scale = new Vector3(light.OriginalScale.x * Scale.x, light.OriginalScale.y * Scale.y, light.OriginalScale.z * Scale.z);
+
+            foreach (var target in TargetChildrens)
+                target.Scale = new Vector3(target.OriginalScale.x * Scale.x, target.OriginalScale.y * Scale.y, target.OriginalScale.z * Scale.z);
+
+            foreach(var item in ItemChildrens)
+                item.Scale = new Vector3(item.OriginalScale.x * Scale.x, item.OriginalScale.y * Scale.y, item.OriginalScale.z * Scale.z);
         }
     }
 }

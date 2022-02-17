@@ -42,6 +42,7 @@
     <Compile Include="Api\Broadcast.cs" />
     <Compile Include="Api\CustomObjects\DefaultSynapseObject.cs" />
     <Compile Include="Api\CustomObjects\ISynapseObject.cs" />
+    <Compile Include="Api\CustomObjects\SynapseItemObject.cs" />
     <Compile Include="Api\Enum\ObjectType.cs" />
     <Compile Include="Api\CustomObjects\SchematicHandler.cs" />
     <Compile Include="Api\CustomObjects\SynapseLightObject.cs" />
