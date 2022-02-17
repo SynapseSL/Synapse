@@ -10,6 +10,7 @@ using Mirror.LiteNetLib4Mirror;
 using PlayerStatsSystem;
 using RemoteAdmin;
 using RoundRestarting;
+using Synapse.Api.CustomObjects;
 using Synapse.Api.Enum;
 using Synapse.Api.Events.SynapseEventArguments;
 using Synapse.Api.Items;
@@ -44,6 +45,12 @@ namespace Synapse.Api
         }
 
         #region Methods
+        public void AttachSynapseObject(ISynapseObject so, Vector3 offset)
+        {
+            so.Rotation = transform.rotation;
+            so.Position = transform.TransformPoint(offset);
+            so.GameObject.transform.parent = transform;
+        }
 
         [Obsolete("Use GetPreference()", true)]
         public int GetSightPreference(ItemType item) => GetPreference(item, 0);

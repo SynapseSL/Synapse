@@ -15,12 +15,10 @@ namespace Synapse.Api.CustomObjects
         public string Name { get; internal set; }
 
         public List<PrimitiveConfiguration> PrimitiveObjects { get; set; } = new List<PrimitiveConfiguration>();
-
         public List<LightSourceConfiguration> LightObjects { get; set; } = new List<LightSourceConfiguration>();
-
         public List<TargetConfiguration> TargetObjects { get; set; } = new List<TargetConfiguration>();
-
         public List<ItemConfiguration> ItemObjects { get; set; } = new List<ItemConfiguration>();
+        public List<WorkStationConfiguration> WorkStationObjects { get; set; } = new List<WorkStationConfiguration>();
 
         public class PrimitiveConfiguration
         {
@@ -67,6 +65,15 @@ namespace Synapse.Api.CustomObjects
         {
             public ItemType ItemType { get; set; }
 
+            public SerializedVector3 Position { get; set; }
+
+            public SerializedVector3 Rotation { get; set; }
+
+            public SerializedVector3 Scale { get; set; }
+        }
+
+        public class WorkStationConfiguration
+        {
             public SerializedVector3 Position { get; set; }
 
             public SerializedVector3 Rotation { get; set; }

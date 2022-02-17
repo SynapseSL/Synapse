@@ -7,7 +7,7 @@ namespace Synapse.Api.CustomObjects
 {
     public class SynapsePrimitiveObject : SynapseToyObject<PrimitiveObjectToy>
     {
-        internal static PrimitiveObjectToy Prefab { get; set; }
+        public static PrimitiveObjectToy Prefab { get; set; }
 
         public SynapsePrimitiveObject(PrimitiveType primitiveType, Vector3 position) : this(primitiveType, Color.white, position, Quaternion.identity, Vector3.one, false) { }
 

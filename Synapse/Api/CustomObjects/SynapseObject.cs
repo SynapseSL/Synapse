@@ -40,8 +40,38 @@ namespace Synapse.Api.CustomObjects
                 obj.GameObject.transform.parent = GameObject.transform;
             }
 
+            foreach(var station in schematic.WorkStationObjects)
+            {
+                var obj = new SynapseWorkStationObject(station);
+                WorkStationChildrens.Add(obj);
+                obj.GameObject.transform.parent = GameObject.transform;
+            }
+
             Map.Get.SynapseObjects.Add(this);
             Server.Get.Events.SynapseObject.InvokeLoadComponent(new Events.SynapseEventArguments.SOEventArgs(this));
+        }
+
+        public override Vector3 Position
+        {
+            get
+            {
+                return base.Position;
+            }
+            set
+            {
+                base.Position = value;
+                UpdatePositionAndRotation();
+            }
+        }
+
+        public override Quaternion Rotation
+        {
+            get => base.Rotation;
+            set
+            {
+                base.Rotation = value;
+                UpdatePositionAndRotation();
+            }
         }
 
         public override Vector3 Scale
@@ -59,12 +89,10 @@ namespace Synapse.Api.CustomObjects
         public override ObjectType Type => ObjectType.Shematic;
 
         public List<SynapsePrimitiveObject> PrimitivesChildrens { get; } = new List<SynapsePrimitiveObject>();
-
         public List<SynapseLightObject> LightChildrens { get; } = new List<SynapseLightObject>();
-
         public List<SynapseTargetObject> TargetChildrens { get; } = new List<SynapseTargetObject>();
-
         public List<SynapseItemObject> ItemChildrens { get; } = new List<SynapseItemObject>();
+        public List<SynapseWorkStationObject> WorkStationChildrens { get; } = new List<SynapseWorkStationObject>();
 
         public string Name { get; }
 
@@ -74,6 +102,12 @@ namespace Synapse.Api.CustomObjects
         {
             foreach (var child in PrimitivesChildrens)
                 child.Destroy();
+        }
+
+        private void UpdatePositionAndRotation()
+        {
+            foreach (var station in WorkStationChildrens)
+                station.Refresh();
         }
 
         private void UpdateScale()
@@ -89,6 +123,9 @@ namespace Synapse.Api.CustomObjects
 
             foreach(var item in ItemChildrens)
                 item.Scale = new Vector3(item.OriginalScale.x * Scale.x, item.OriginalScale.y * Scale.y, item.OriginalScale.z * Scale.z);
+
+            foreach(var station in WorkStationChildrens)
+                station.Scale = new Vector3(station.OriginalScale.x * Scale.x, station.OriginalScale.y * Scale.y, station.OriginalScale.z * Scale.z);
         }
     }
 }

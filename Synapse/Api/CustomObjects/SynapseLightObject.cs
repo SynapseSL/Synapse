@@ -7,7 +7,7 @@ namespace Synapse.Api.CustomObjects
 {
     public class SynapseLightObject : SynapseToyObject<LightSourceToy>
     {
-        internal static LightSourceToy Prefab { get; set; }
+        public static LightSourceToy Prefab { get; set; }
 
         public SynapseLightObject(Color color, float lightIntensity, float range, bool shadows, Vector3 position, Quaternion rotation, Vector3 scale)
         {

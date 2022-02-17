@@ -83,6 +83,15 @@ namespace Synapse.Api.Events
                                 Rotation = Vector3.zero,
                                 Scale = Vector3.one * 4
                             }
+                        },
+                        WorkStationObjects = new System.Collections.Generic.List<SynapseSchematic.WorkStationConfiguration>
+                        {
+                            new SynapseSchematic.WorkStationConfiguration
+                            {
+                                Position = new Vector3(-2f,0f,0f),
+                                Rotation = Vector3.zero,
+                                Scale = Vector3.one
+                            }
                         }
                     };
                     var sobj = SchematicHandler.Get.SpawnSchematic(schematic, ev.Player.Position);
@@ -99,7 +108,14 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha4:
-                    new SynapseItemObject(ItemType.Flashlight, ev.Player.Position, ev.Player.transform.rotation, Vector3.one * 5);
+                    var st = new SynapseWorkStationObject(ev.Player.Position, ev.Player.transform.rotation, Vector3.one);
+                    MEC.Timing.CallDelayed(5f, () => st.Position = ev.Player.Position);
+                    MEC.Timing.CallDelayed(10f, () => st.Rotation = ev.Player.transform.rotation);
+                    MEC.Timing.CallDelayed(15f, () => st.Scale = Vector3.one * 3);
+                    break;
+
+                case KeyCode.Alpha5:
+                    ev.Player.AttachSynapseObject(new SynapsePrimitiveObject(PrimitiveType.Sphere, Vector3.zero), new Vector3(0f, 1.5f, 0f));
                     break;
             }
         }

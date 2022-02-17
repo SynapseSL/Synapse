@@ -1,4 +1,5 @@
 ﻿using AdminToys;
+using InventorySystem.Items.Firearms.Attachments;
 using Mirror;
 using Synapse.Api.Enum;
 using Synapse.Config;
@@ -42,6 +43,10 @@ namespace Synapse.Api.CustomObjects
                     case "binaryTargetPrefab" when prefab.TryGetComponent<ShootingTarget>(out var target):
                         SynapseTargetObject.Prefabs[TargetType.Binary] = target;
                         break;
+
+                    case "Work Station" when prefab.TryGetComponent<WorkstationController>(out var station):
+                        SynapseWorkStationObject.Prefab = station;
+                    break;
                 }
             }
 

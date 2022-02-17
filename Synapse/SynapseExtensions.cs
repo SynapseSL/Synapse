@@ -253,6 +253,26 @@ public static class SynapseExtensions
         return new UniversalDamageHandler(0f, DeathTranslations.TranslationsById[(byte)type]);
     }
 
+    public static void UpdatePositionRotationScale(this NetworkIdentity identity)
+    {
+        var writer = NetworkWriterPool.GetWriter();
+        var writer2 = NetworkWriterPool.GetWriter();
+        var payload = NetworkServer.CreateSpawnMessagePayload(false, identity, writer, writer2);
+        var msg = new SpawnMessage
+        {
+            netId = identity.netId,
+            isLocalPlayer = false,
+            isOwner = false,
+            sceneId = identity.sceneId,
+            assetId = identity.assetId,
+            position = identity.gameObject.transform.position,
+            rotation = identity.gameObject.transform.rotation,
+            scale = identity.gameObject.transform.localScale,
+            payload = payload
+        };
+        NetworkServer.SendToAll(msg);
+    }
+
     [Obsolete("Use SynapseExtensions.CanHarmScp() and check if it is false")]
     public static bool CanNotHurtByScp(Player player) => !CanHarmScp(player, false);
 }
