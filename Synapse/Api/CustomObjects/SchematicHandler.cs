@@ -1,4 +1,6 @@
-﻿using Synapse.Config;
+﻿using AdminToys;
+using Mirror;
+using Synapse.Config;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,7 +18,20 @@ namespace Synapse.Api.CustomObjects
 
         internal void Init()
         {
-            SynapsePrimitiveObject.Init();
+            foreach (var prefab in NetworkManager.singleton.spawnPrefabs)
+            {
+                if (prefab.TryGetComponent<PrimitiveObjectToy>(out var pref))
+                {
+                    SynapsePrimitiveObject.Prefab = pref;
+                    continue;
+                }
+                if (prefab.TryGetComponent<LightSourceToy>(out var lightpref))
+                {
+                    SynapseLightObject.Prefab = lightpref;
+                    continue;
+                }
+            }
+
             Load();
         }
 

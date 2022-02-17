@@ -4,40 +4,29 @@ using UnityEngine;
 
 namespace Synapse.Api.CustomObjects
 {
-    public class SynapsePrimitiveObject : SynapseToyObject
+    public class SynapsePrimitiveObject : SynapseToyObject<PrimitiveObjectToy>
     {
-        private static PrimitiveObjectToy Prefab { get; set; }
-
-        internal static void Init()
-        {
-            foreach(var prefab in NetworkManager.singleton.spawnPrefabs)
-                if(prefab.TryGetComponent<PrimitiveObjectToy>(out var pref))
-                {
-                    Prefab = pref;
-                    return;
-                }
-        }
+        internal static PrimitiveObjectToy Prefab { get; set; }
 
         public SynapsePrimitiveObject(PrimitiveType primitiveType, Vector3 position) : this(primitiveType, Color.white, position, Quaternion.identity, Vector3.one, false) { }
 
         public SynapsePrimitiveObject(PrimitiveType primitiveType,Color color, Vector3 position, Quaternion rotation, Vector3 scale, bool applyPhyics)
         {
-            ObjectToy = CreatePrimitive(primitiveType, color, position, rotation, scale, applyPhyics);
-            ToyBase = ObjectToy;
+            ToyBase = CreatePrimitive(primitiveType, color, position, rotation, scale);
+            if (applyPhyics) ApplyPhysics();
 
             Map.Get.SynapseObjects.Add(this);
             Server.Get.Events.SynapseObject.InvokeLoadComponent(new Events.SynapseEventArguments.SOEventArgs(this));
         }
 
         //This constructor is only used for creating Childrens of a Synapse Object
-        internal SynapsePrimitiveObject(PrimitiveType primitiveType, Color color, Vector3 position, Quaternion rotation, Vector3 scale)
+        internal SynapsePrimitiveObject(SynapseSchematic.PrimitiveConfiguration configuration)
         {
-            ObjectToy = CreatePrimitive(primitiveType, color, position, rotation, scale, false);
-            ToyBase = ObjectToy;
-            OriginalScale = scale;
+            ToyBase = CreatePrimitive(configuration.PrimitiveType, configuration.Color, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale);
+            OriginalScale = configuration.Scale;
         }
 
-        private PrimitiveObjectToy CreatePrimitive(PrimitiveType primitiveType, Color color, Vector3 position, Quaternion rotation, Vector3 scale, bool applyPhyics)
+        private PrimitiveObjectToy CreatePrimitive(PrimitiveType primitiveType, Color color, Vector3 position, Quaternion rotation, Vector3 scale)
         {
             var ot = UnityEngine.Object.Instantiate(Prefab, position, rotation);
             NetworkServer.Spawn(ot.gameObject);
@@ -47,22 +36,20 @@ namespace Synapse.Api.CustomObjects
             ot.transform.rotation = rotation;
             ot.transform.localScale = scale;
             ot.NetworkScale = scale;
-            if (applyPhyics)
-                ApplyPhysics();
 
             return ot;
         }
 
-        public override GameObject GameObject { get => ObjectToy.gameObject; }
+        public override GameObject GameObject { get => ToyBase.gameObject; }
 
         public override ObjectType Type => ObjectType.Primitive;
 
-        public PrimitiveObjectToy ObjectToy { get; private set; }
+        public override PrimitiveObjectToy ToyBase { get; }
 
         public Color Color
-            => ObjectToy.MaterialColor;
+            => ToyBase.MaterialColor;
 
         public PrimitiveType PrimitiveType
-            => ObjectToy.PrimitiveType;
+            => ToyBase.PrimitiveType;
     }
 }

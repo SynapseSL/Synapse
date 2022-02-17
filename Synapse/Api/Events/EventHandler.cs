@@ -1,4 +1,6 @@
-﻿using Synapse.Config;
+﻿using Mirror;
+using Synapse.Api.CustomObjects;
+using Synapse.Config;
 using UnityEngine;
 
 namespace Synapse.Api.Events
@@ -22,8 +24,57 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    foreach (var pref in CustomNetworkManager.singleton.spawnPrefabs)
+                    foreach (var pref in NetworkManager.singleton.spawnPrefabs)
                         Logger.Get.Debug(pref.name);
+                    break;
+
+                    case KeyCode.Alpha2:
+                    var schematic = new SynapseSchematic
+                    {
+                        ID = 3,
+                        Name = "test",
+                        PrimitiveObjects = new System.Collections.Generic.List<SynapseSchematic.PrimitiveConfiguration>
+                        {
+                            new SynapseSchematic.PrimitiveConfiguration
+                            {
+                                Color = Color.red,
+                                Position = new Vector3(0f,-1f,0f),
+                                PrimitiveType = PrimitiveType.Capsule,
+                                Rotation = Vector3.zero,
+                                Scale = Vector3.one * 2
+                            },
+                            new SynapseSchematic.PrimitiveConfiguration
+                            {
+                                Color = Color.gray,
+                                Position = new Vector3(0f,2f,0f),
+                                PrimitiveType = PrimitiveType.Cube,
+                                Rotation = new Vector3(45f,45f,45f),
+                                Scale = Vector3.one
+                            },
+                        },
+                        LightObjects = new System.Collections.Generic.List<SynapseSchematic.LightSource>
+                        {
+                            new SynapseSchematic.LightSource
+                            {
+                                Color = Color.green,
+                                LightIntensity = 1,
+                                LightRange = 100,
+                                LightShadows = true,
+                                Position = new Vector3(1f,0f,0f),
+                                Rotation = Vector3.zero,
+                                Scale = Vector3.one
+                            }
+                        }
+                    };
+                    var sobj = SchematicHandler.Get.SpawnSchematic(schematic, ev.Player.Position);
+
+                    SchematicHandler.Get.SaveSchematic(schematic, "Key3");
+                    break;
+
+                case KeyCode.Alpha3:
+                    var obj = new SynapseLightObject(Color.green, 1f, 10f, true, ev.Player.Position, ev.Player.transform.rotation, Vector3.one);
+
+                    MEC.Timing.CallDelayed(5f, () => obj.LightShadows = false);
                     break;
             }
         }

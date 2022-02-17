@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace Synapse.Api.CustomObjects
 {
-    public abstract class SynapseToyObject : DefaultSynapseObject
+    public abstract class SynapseToyObject<TToy> : DefaultSynapseObject where TToy : AdminToyBase
     {
-        internal AdminToyBase ToyBase { get; set; }
+        public abstract TToy ToyBase { get; }
 
         public override Vector3 Scale
         {
