@@ -113,14 +113,14 @@ namespace Synapse.Api.Events
                         }
                     };
                     var sobj = SchematicHandler.Get.SpawnSchematic(schematic, ev.Player.Position);
-                    MEC.Timing.CallDelayed(5f, () => sobj.Position = ev.Player.Position);
-                    MEC.Timing.CallDelayed(10f, () => sobj.Scale = Vector3.one * 0.5f);
-
+                    MEC.Timing.CallDelayed(5f, () => sobj.Scale = Vector3.one * 0.5f);
+                    MEC.Timing.CallDelayed(10f, () => sobj.Destroy());
                     SchematicHandler.Get.SaveSchematic(schematic, "Key2");
                     break;
 
                 case KeyCode.Alpha3:
-                    var door = new SynapseDoorObject(Enum.SpawnableDoorType.EZ, ev.Player.Position, ev.Player.transform.rotation, Vector3.one);
+                    foreach (var ob in SynapseController.Server.Map.SynapseObjects)
+                        Logger.Get.Debug(ob.GameObject.name);
                     break;
             }
         }

@@ -21,6 +21,7 @@ namespace Synapse.Api.CustomObjects
         {
             Item = CreateItem(configuration.ItemType, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale);
             OriginalScale = configuration.Scale;
+            CustomAttributes = configuration.CustomAttributes;
             ItemType = configuration.ItemType;
 
             var script = GameObject.AddComponent<SynapseObjectScript>();

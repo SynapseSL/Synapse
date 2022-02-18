@@ -24,6 +24,7 @@ namespace Synapse.Api.CustomObjects
         {
             WorkStation = CreateStation(configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale);
             OriginalScale = configuration.Scale;
+            CustomAttributes = configuration.CustomAttributes;
 
             var script = GameObject.AddComponent<SynapseObjectScript>();
             script.Object = this;

@@ -16,5 +16,12 @@ namespace Synapse.Api.CustomObjects
 
         public void Update()
             => Server.Get.Events.SynapseObject.InvokeUpdate(new Events.SynapseEventArguments.SOEventArgs(Object));
+
+        public void OnDestroy()
+        {
+            Server.Get.Events.SynapseObject.InvokeUpdate(new Events.SynapseEventArguments.SOEventArgs(Object));
+            if (Map.Get.SynapseObjects.Contains(Object))
+                Map.Get.SynapseObjects.Remove(Object);
+        }
     }
 }

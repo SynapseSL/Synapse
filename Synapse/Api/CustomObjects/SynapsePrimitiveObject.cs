@@ -27,6 +27,7 @@ namespace Synapse.Api.CustomObjects
         {
             ToyBase = CreatePrimitive(configuration.PrimitiveType, configuration.Color, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale);
             OriginalScale = configuration.Scale;
+            CustomAttributes = configuration.CustomAttributes;
 
             var script = GameObject.AddComponent<SynapseObjectScript>();
             script.Object = this;

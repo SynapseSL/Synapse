@@ -14,6 +14,7 @@ namespace Synapse.Api.CustomObjects
         {
             Door = CreateDoor(configuration.DoorType, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale, configuration.Open, configuration.Locked);
             OriginalScale = configuration.Scale;
+            CustomAttributes = configuration.CustomAttributes;
 
             var script = GameObject.AddComponent<SynapseObjectScript>();
             script.Object = this;

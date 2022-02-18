@@ -11,6 +11,7 @@ namespace Synapse.Api.CustomObjects
         public abstract ObjectType Type { get; }
 
         public Dictionary<string, object> ObjectData => new Dictionary<string, object>();
+        public Dictionary<string, string> CustomAttributes { get; set; }
         public Vector3 OriginalScale { get; internal set; }
 
         public virtual Vector3 Position
@@ -40,11 +41,6 @@ namespace Synapse.Api.CustomObjects
         }
 
         public virtual void Destroy()
-        {
-            if(Map.Get.SynapseObjects.Contains(this))
-                Map.Get.SynapseObjects.Remove(this);
-
-            NetworkServer.Destroy(GameObject);
-        }
+            => NetworkServer.Destroy(GameObject);
     }
 }

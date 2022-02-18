@@ -13,6 +13,7 @@ namespace Synapse.Api.CustomObjects
 
         public int ID { get; internal set; }
         public string Name { get; internal set; }
+        public Dictionary<string, string> CustomAttributes { get; set; }
 
         public List<PrimitiveConfiguration> PrimitiveObjects { get; set; } = new List<PrimitiveConfiguration>();
         public List<LightSourceConfiguration> LightObjects { get; set; } = new List<LightSourceConfiguration>();
@@ -32,6 +33,8 @@ namespace Synapse.Api.CustomObjects
             public SerializedVector3 Scale { get; set; }
 
             public SerializedColor Color { get; set; }
+
+            public Dictionary<string, string> CustomAttributes { get; set; }
         }
 
         public class LightSourceConfiguration
@@ -49,6 +52,8 @@ namespace Synapse.Api.CustomObjects
             public float LightRange { get; set; }
 
             public bool LightShadows { get; set; }
+
+            public Dictionary<string, string> CustomAttributes { get; set; }
         }
 
         public class TargetConfiguration
@@ -60,6 +65,8 @@ namespace Synapse.Api.CustomObjects
             public SerializedVector3 Rotation { get; set; }
 
             public SerializedVector3 Scale { get; set; }
+
+            public Dictionary<string, string> CustomAttributes { get; set; }
         }
 
         public class ItemConfiguration
@@ -71,6 +78,8 @@ namespace Synapse.Api.CustomObjects
             public SerializedVector3 Rotation { get; set; }
 
             public SerializedVector3 Scale { get; set; }
+
+            public Dictionary<string, string> CustomAttributes { get; set; }
         }
 
         public class WorkStationConfiguration
@@ -80,6 +89,8 @@ namespace Synapse.Api.CustomObjects
             public SerializedVector3 Rotation { get; set; }
 
             public SerializedVector3 Scale { get; set; }
+
+            public Dictionary<string, string> CustomAttributes { get; set; }
         }
 
         public class DoorConfiguration
@@ -95,6 +106,8 @@ namespace Synapse.Api.CustomObjects
             public bool Open { get; set; }
 
             public bool Locked { get; set; }
+
+            public Dictionary<string, string> CustomAttributes { get; set; }
         }
     }
 }

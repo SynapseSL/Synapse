@@ -23,6 +23,7 @@ namespace Synapse.Api.CustomObjects
         {
             ToyBase = CreateLightSource(configuration.Color, configuration.LightIntensity, configuration.LightRange, configuration.LightShadows, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale);
             OriginalScale = configuration.Scale;
+            CustomAttributes = configuration.CustomAttributes;
 
             var script = GameObject.AddComponent<SynapseObjectScript>();
             script.Object = this;

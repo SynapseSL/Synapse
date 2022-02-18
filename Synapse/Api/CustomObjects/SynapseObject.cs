@@ -10,12 +10,14 @@ namespace Synapse.Api.CustomObjects
         {
             Name = schematic.Name;
             ID = schematic.ID;
+            CustomAttributes = schematic.CustomAttributes;
             GameObject = new GameObject(Name);
 
             foreach (var primitive in schematic.PrimitiveObjects)
             {
                 var obj = new SynapsePrimitiveObject(primitive);
                 PrimitivesChildrens.Add(obj);
+                Childrens.Add(obj);
                 obj.GameObject.transform.parent = GameObject.transform;
             }
 
@@ -23,6 +25,7 @@ namespace Synapse.Api.CustomObjects
             {
                 var obj = new SynapseLightObject(light);
                 LightChildrens.Add(obj);
+                Childrens.Add(obj);
                 obj.GameObject.transform.parent = GameObject.transform;
             }
 
@@ -30,6 +33,7 @@ namespace Synapse.Api.CustomObjects
             {
                 var obj = new SynapseTargetObject(target);
                 TargetChildrens.Add(obj);
+                Childrens.Add(obj);
                 obj.GameObject.transform.parent = GameObject.transform;
             }
 
@@ -37,6 +41,7 @@ namespace Synapse.Api.CustomObjects
             {
                 var obj = new SynapseItemObject(item);
                 ItemChildrens.Add(obj);
+                Childrens.Add(obj);
                 obj.GameObject.transform.parent = GameObject.transform;
             }
 
@@ -44,6 +49,7 @@ namespace Synapse.Api.CustomObjects
             {
                 var obj = new SynapseWorkStationObject(station);
                 WorkStationChildrens.Add(obj);
+                Childrens.Add(obj);
                 obj.GameObject.transform.parent = GameObject.transform;
             }
 
@@ -51,6 +57,7 @@ namespace Synapse.Api.CustomObjects
             {
                 var obj = new SynapseDoorObject(door);
                 DoorChildrens.Add(obj);
+                Childrens.Add(obj);
                 obj.GameObject.transform.parent = GameObject.transform;
             }
 
@@ -97,6 +104,7 @@ namespace Synapse.Api.CustomObjects
 
         public override ObjectType Type => ObjectType.Shematic;
 
+        public List<ISynapseObject> Childrens { get; } = new List<ISynapseObject>();
         public List<SynapsePrimitiveObject> PrimitivesChildrens { get; } = new List<SynapsePrimitiveObject>();
         public List<SynapseLightObject> LightChildrens { get; } = new List<SynapseLightObject>();
         public List<SynapseTargetObject> TargetChildrens { get; } = new List<SynapseTargetObject>();
@@ -108,11 +116,12 @@ namespace Synapse.Api.CustomObjects
 
         public int ID { get; }
 
-        //TODO:
         public override void Destroy()
         {
-            foreach (var child in PrimitivesChildrens)
+            foreach(var child in Childrens)
                 child.Destroy();
+
+            Object.Destroy(GameObject);
         }
 
         private void UpdatePositionAndRotation()
@@ -126,23 +135,8 @@ namespace Synapse.Api.CustomObjects
 
         private void UpdateScale()
         {
-            foreach (var prim in PrimitivesChildrens)
-                prim.Scale = new Vector3(prim.OriginalScale.x * Scale.x, prim.OriginalScale.y * Scale.y, prim.OriginalScale.z * Scale.z);
-
-            foreach(var light in LightChildrens)
-                light.Scale = new Vector3(light.OriginalScale.x * Scale.x, light.OriginalScale.y * Scale.y, light.OriginalScale.z * Scale.z);
-
-            foreach (var target in TargetChildrens)
-                target.Scale = new Vector3(target.OriginalScale.x * Scale.x, target.OriginalScale.y * Scale.y, target.OriginalScale.z * Scale.z);
-
-            foreach(var item in ItemChildrens)
-                item.Scale = new Vector3(item.OriginalScale.x * Scale.x, item.OriginalScale.y * Scale.y, item.OriginalScale.z * Scale.z);
-
-            foreach(var station in WorkStationChildrens)
-                station.Scale = new Vector3(station.OriginalScale.x * Scale.x, station.OriginalScale.y * Scale.y, station.OriginalScale.z * Scale.z);
-
-            foreach (var door in DoorChildrens)
-                door.Scale = new Vector3(door.OriginalScale.x * Scale.x, door.OriginalScale.y * Scale.y, door.OriginalScale.z * Scale.z);
+            foreach(var child in Childrens)
+                child.Scale = new Vector3(child.OriginalScale.x * Scale.x, child.OriginalScale.y * Scale.y, child.OriginalScale.z * Scale.z);
         }
     }
 }

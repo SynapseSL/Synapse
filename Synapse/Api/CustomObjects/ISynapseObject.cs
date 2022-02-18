@@ -8,6 +8,8 @@ namespace Synapse.Api.CustomObjects
     {
         public Dictionary<string, object> ObjectData { get; }
 
+        public Dictionary<string, string> CustomAttributes { get; }
+
         public Vector3 Position { get; set; }
 
         public Quaternion Rotation { get; set; }
