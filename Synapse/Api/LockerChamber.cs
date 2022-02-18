@@ -8,13 +8,13 @@ namespace Synapse.Api
         internal LockerChamber(MapGeneration.Distributors.LockerChamber vanilalockerChamber, Locker locker, ushort id)
         {
             lockerChamber = vanilalockerChamber;
-            this.locker = locker.locker;
-            this.Locker = locker; 
+            vanillalocker = locker.locker;
+            Locker = locker; 
             colliderId = id;
             byteId = (ushort)(1 << id);
         }
 
-        private readonly MapGeneration.Distributors.Locker locker;
+        private readonly MapGeneration.Distributors.Locker vanillalocker;
 
         public readonly ushort byteId;
 
@@ -40,16 +40,15 @@ namespace Synapse.Api
 
         public bool Open 
         {
-            get => (locker.OpenedChambers & byteId) == byteId;
+            get => (vanillalocker.OpenedChambers & byteId) == byteId;
             set
             {
-
                 lockerChamber.IsOpen = value;
-                locker.RefreshOpenedSyncvar();
+                vanillalocker.RefreshOpenedSyncvar();
                 if (value)
-                    locker.OpenedChambers = (ushort)(locker.OpenedChambers | byteId);
+                    vanillalocker.OpenedChambers = (ushort)(vanillalocker.OpenedChambers | byteId);
                 else
-                    locker.OpenedChambers = (ushort)(locker.OpenedChambers & (~byteId));
+                    vanillalocker.OpenedChambers = (ushort)(vanillalocker.OpenedChambers & (~byteId));
                 lockerChamber._targetCooldown = 1f;
                 lockerChamber._stopwatch.Restart();
             }

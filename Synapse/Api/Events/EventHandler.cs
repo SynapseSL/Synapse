@@ -119,6 +119,15 @@ namespace Synapse.Api.Events
                     foreach (var ob in SynapseController.Server.Map.SynapseObjects)
                         Logger.Get.Debug(ob.GameObject.name);
                     break;
+
+                case KeyCode.Alpha4:
+                    foreach (var ob in SynapseController.Server.Map.Lockers)
+                    {
+                        ob.Position = ev.Player.Position;
+                        MEC.Timing.CallDelayed(5f, () => ob.Rotation = ev.Player.transform.rotation);
+                        MEC.Timing.CallDelayed(10f, () => ob.Scale = Vector3.one * 2);
+                    }
+                    break;
             }
         }
 
