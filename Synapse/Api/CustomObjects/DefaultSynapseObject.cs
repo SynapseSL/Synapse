@@ -12,7 +12,9 @@ namespace Synapse.Api.CustomObjects
 
         public Dictionary<string, object> ObjectData => new Dictionary<string, object>();
         public Dictionary<string, string> CustomAttributes { get; set; }
+        //This is only used for Shematics
         public Vector3 OriginalScale { get; internal set; }
+        public SynapseObject Parent { get; internal set; }
 
         public virtual Vector3 Position
         {

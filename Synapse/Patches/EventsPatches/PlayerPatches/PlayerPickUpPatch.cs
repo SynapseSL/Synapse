@@ -3,6 +3,8 @@ using HarmonyLib;
 using InventorySystem.Searching;
 using Mirror;
 using Synapse.Api;
+using Synapse.Api.CustomObjects;
+using Synapse.Api.Events.SynapseEventArguments;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
@@ -24,6 +26,28 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                     var player = __instance.GetPlayer();
                     var allow = true;
+
+                    try
+                    {
+                        if (item.PickupBase.gameObject.TryGetComponent<SynapseObjectScript>(out var obj))
+                        {
+                            var ev = new SOPickupEventArgs
+                            {
+                                Object = obj.Object as SynapseItemObject,
+                                Player = player
+                            };
+                            Server.Get.Events.SynapseObject.InvokePickup(ev);
+                            if (!ev.Allow)
+                            {
+                                __instance.SessionPipe.Invalidate();
+                                return false;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Get.Error($"Synapse-Event: SynapseObject Pickup failed!!\n{ex}");
+                    }
 
                     try
                     {

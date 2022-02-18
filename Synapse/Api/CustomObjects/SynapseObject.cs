@@ -19,6 +19,7 @@ namespace Synapse.Api.CustomObjects
                 PrimitivesChildrens.Add(obj);
                 Childrens.Add(obj);
                 obj.GameObject.transform.parent = GameObject.transform;
+                obj.Parent = this;
             }
 
             foreach(var light in schematic.LightObjects)
@@ -27,6 +28,7 @@ namespace Synapse.Api.CustomObjects
                 LightChildrens.Add(obj);
                 Childrens.Add(obj);
                 obj.GameObject.transform.parent = GameObject.transform;
+                obj.Parent = this;
             }
 
             foreach(var target in schematic.TargetObjects)
@@ -35,6 +37,7 @@ namespace Synapse.Api.CustomObjects
                 TargetChildrens.Add(obj);
                 Childrens.Add(obj);
                 obj.GameObject.transform.parent = GameObject.transform;
+                obj.Parent = this;
             }
 
             foreach(var item in schematic.ItemObjects)
@@ -43,6 +46,7 @@ namespace Synapse.Api.CustomObjects
                 ItemChildrens.Add(obj);
                 Childrens.Add(obj);
                 obj.GameObject.transform.parent = GameObject.transform;
+                obj.Parent = this;
             }
 
             foreach(var station in schematic.WorkStationObjects)
@@ -51,6 +55,7 @@ namespace Synapse.Api.CustomObjects
                 WorkStationChildrens.Add(obj);
                 Childrens.Add(obj);
                 obj.GameObject.transform.parent = GameObject.transform;
+                obj.Parent = this;
             }
 
             foreach(var door in schematic.DoorObjects)
@@ -59,6 +64,7 @@ namespace Synapse.Api.CustomObjects
                 DoorChildrens.Add(obj);
                 Childrens.Add(obj);
                 obj.GameObject.transform.parent = GameObject.transform;
+                obj.Parent = this;
             }
 
             Map.Get.SynapseObjects.Add(this);
@@ -135,8 +141,11 @@ namespace Synapse.Api.CustomObjects
 
         private void UpdateScale()
         {
-            foreach(var child in Childrens)
+            foreach(var ichild in Childrens)
+            {
+                var child = ichild as DefaultSynapseObject;
                 child.Scale = new Vector3(child.OriginalScale.x * Scale.x, child.OriginalScale.y * Scale.y, child.OriginalScale.z * Scale.z);
+            }
         }
     }
 }

@@ -25,6 +25,7 @@ namespace Synapse.Api.CustomObjects
             WorkStation = CreateStation(configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale);
             OriginalScale = configuration.Scale;
             CustomAttributes = configuration.CustomAttributes;
+            UpdateEveryFrame = configuration.UpdateEveryFrame;
 
             var script = GameObject.AddComponent<SynapseObjectScript>();
             script.Object = this;
@@ -72,6 +73,7 @@ namespace Synapse.Api.CustomObjects
 
 
         public WorkStation WorkStation { get; }
+        public bool UpdateEveryFrame { get; set; } = false;
 
 
         public void Refresh()

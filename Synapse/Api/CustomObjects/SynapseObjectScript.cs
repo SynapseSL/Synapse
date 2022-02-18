@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Synapse.Api.CustomObjects
 {
@@ -11,11 +6,27 @@ namespace Synapse.Api.CustomObjects
     {
         public ISynapseObject Object { get; internal set; }
 
+        public SynapseObject Parent { get; private set; }
+
+        public bool IsChild { get; private set; }
+
         public void Start()
-            => Server.Get.Events.SynapseObject.InvokeLoadComponent(new Events.SynapseEventArguments.SOEventArgs(Object));
+        {
+            Server.Get.Events.SynapseObject.InvokeLoadComponent(new Events.SynapseEventArguments.SOEventArgs(Object));
+            Parent = (Object as DefaultSynapseObject).Parent;
+            IsChild = Parent != null;
+        }
 
         public void Update()
-            => Server.Get.Events.SynapseObject.InvokeUpdate(new Events.SynapseEventArguments.SOEventArgs(Object));
+        {
+            Server.Get.Events.SynapseObject.InvokeUpdate(new Events.SynapseEventArguments.SOEventArgs(Object));
+
+            if (Object.Type == Enum.ObjectType.Workstation && Object is SynapseWorkStationObject work && work.UpdateEveryFrame)
+                work.Refresh();
+
+            if (Object.Type == Enum.ObjectType.Door && Object is SynapseDoorObject door && door.UpdateEveryFrame)
+                door.Refresh();
+        }
 
         public void OnDestroy()
         {

@@ -73,6 +73,8 @@ namespace Synapse.Api.CustomObjects
         {
             public ItemType ItemType { get; set; }
 
+            public bool CanBePickedUp { get; set; }
+
             public SerializedVector3 Position { get; set; }
 
             public SerializedVector3 Rotation { get; set; }
@@ -90,6 +92,8 @@ namespace Synapse.Api.CustomObjects
 
             public SerializedVector3 Scale { get; set; }
 
+            public bool UpdateEveryFrame { get; set; } = false;
+
             public Dictionary<string, string> CustomAttributes { get; set; }
         }
 
@@ -106,6 +110,8 @@ namespace Synapse.Api.CustomObjects
             public bool Open { get; set; }
 
             public bool Locked { get; set; }
+
+            public bool UpdateEveryFrame { get; set; } = false;
 
             public Dictionary<string, string> CustomAttributes { get; set; }
         }

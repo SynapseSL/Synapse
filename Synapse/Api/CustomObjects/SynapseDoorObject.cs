@@ -15,6 +15,7 @@ namespace Synapse.Api.CustomObjects
             Door = CreateDoor(configuration.DoorType, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale, configuration.Open, configuration.Locked);
             OriginalScale = configuration.Scale;
             CustomAttributes = configuration.CustomAttributes;
+            UpdateEveryFrame = configuration.UpdateEveryFrame;
 
             var script = GameObject.AddComponent<SynapseObjectScript>();
             script.Object = this;
@@ -71,6 +72,7 @@ namespace Synapse.Api.CustomObjects
             get => Door.Locked;
             set => Door.Locked = value;
         }
+        public bool UpdateEveryFrame { get; set; } = false;
 
 
         public void Refresh()

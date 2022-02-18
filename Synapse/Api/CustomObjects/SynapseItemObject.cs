@@ -6,9 +6,9 @@ namespace Synapse.Api.CustomObjects
 {
     public class SynapseItemObject : DefaultSynapseObject
     {
-        public SynapseItemObject(ItemType type, Vector3 position, Quaternion rotation, Vector3 scale)
+        public SynapseItemObject(ItemType type, Vector3 position, Quaternion rotation, Vector3 scale, bool pickup = false)
         {
-            Item = CreateItem(type, position, rotation, scale);
+            Item = CreateItem(type, position, rotation, scale, pickup);
             ItemType = type;
 
             Map.Get.SynapseObjects.Add(this);
@@ -19,7 +19,7 @@ namespace Synapse.Api.CustomObjects
 
         internal SynapseItemObject(SynapseSchematic.ItemConfiguration configuration)
         {
-            Item = CreateItem(configuration.ItemType, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale);
+            Item = CreateItem(configuration.ItemType, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale, configuration.CanBePickedUp);
             OriginalScale = configuration.Scale;
             CustomAttributes = configuration.CustomAttributes;
             ItemType = configuration.ItemType;
@@ -36,11 +36,17 @@ namespace Synapse.Api.CustomObjects
         public override Vector3 Scale { get => Item.Scale; set => Item.Scale = value; }
         public override void Destroy() => Item.Destroy();
         public override Rigidbody Rigidbody { get => Item.PickupBase?.Rb; set { } }
+        public override void ApplyPhysics()
+        {
+            Item.PickupBase.Rb.isKinematic = false;
+            Item.PickupBase.Rb.useGravity = true;
+        }
 
         public SynapseItem Item { get; }
+        public bool CanBePickedUp { get => Item.CanBePickedUp; set => Item.CanBePickedUp = value; }
         public ItemType ItemType { get; }
 
-        private SynapseItem CreateItem(ItemType type, Vector3 position, Quaternion rotation, Vector3 scale)
+        private SynapseItem CreateItem(ItemType type, Vector3 position, Quaternion rotation, Vector3 scale, bool pickup = false)
         {
             var item = new SynapseItem(type);
             item.Rotation = rotation;
@@ -49,7 +55,7 @@ namespace Synapse.Api.CustomObjects
             item.Drop(position);
             item.PickupBase.Rb.isKinematic = true;
             item.PickupBase.Rb.useGravity = false;
-            item.CanBePickedUp = false;
+            item.CanBePickedUp = pickup;
             return item;
         }
     }

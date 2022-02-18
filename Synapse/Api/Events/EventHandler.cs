@@ -16,13 +16,7 @@ namespace Synapse.Api.Events
             Server.UpdateEvent += OnUpdate;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
-            SynapseObject.LoadComponentEvent += SynapseObject_LoadComponentEvent;
 #endif
-        }
-
-        private void SynapseObject_LoadComponentEvent(SynapseEventArguments.SOEventArgs ev)
-        {
-            Logger.Get.Debug("Load Object Event: "+ ev.Object.GameObject.name);
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
@@ -87,7 +81,8 @@ namespace Synapse.Api.Events
                                 ItemType = ItemType.MicroHID,
                                 Position = new Vector3(0f, 5f, 0f),
                                 Rotation = Vector3.zero,
-                                Scale = Vector3.one * 4
+                                Scale = Vector3.one * 4,
+                                CanBePickedUp = true,
                             }
                         },
                         WorkStationObjects = new System.Collections.Generic.List<SynapseSchematic.WorkStationConfiguration>
@@ -96,7 +91,8 @@ namespace Synapse.Api.Events
                             {
                                 Position = new Vector3(-2f, 0f, 0f),
                                 Rotation = Vector3.zero,
-                                Scale = Vector3.one
+                                Scale = Vector3.one,
+                                UpdateEveryFrame = true
                             }
                         },
                         DoorObjects = new System.Collections.Generic.List<SynapseSchematic.DoorConfiguration>
@@ -109,12 +105,13 @@ namespace Synapse.Api.Events
                                 DoorType = Enum.SpawnableDoorType.LCZ,
                                 Locked = true,
                                 Open = true,
+                                UpdateEveryFrame = true
                             }
                         }
                     };
                     var sobj = SchematicHandler.Get.SpawnSchematic(schematic, ev.Player.Position);
                     MEC.Timing.CallDelayed(5f, () => sobj.Scale = Vector3.one * 0.5f);
-                    MEC.Timing.CallDelayed(10f, () => sobj.Destroy());
+                    MEC.Timing.CallDelayed(10f, () => sobj.ApplyPhysics());
                     SchematicHandler.Get.SaveSchematic(schematic, "Key2");
                     break;
 

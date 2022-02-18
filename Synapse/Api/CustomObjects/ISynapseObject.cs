@@ -16,9 +16,6 @@ namespace Synapse.Api.CustomObjects
 
         public Vector3 Scale { get; set; }
 
-        //This is only used for Shematics
-        public Vector3 OriginalScale { get; }
-
         public GameObject GameObject { get; }
 
         public Rigidbody Rigidbody { get; }
