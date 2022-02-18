@@ -5,12 +5,10 @@ using MapGeneration;
 using Mirror;
 using PlayerStatsSystem;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using EventHandler = Synapse.Api.Events.EventHandler;
 using Logger = Synapse.Api.Logger;
-using Random = UnityEngine.Random;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
 {
@@ -91,7 +89,6 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
         {
             try
             {
-                Logger.Get.Debug("1");
                 var component = other.GetComponent<NetworkIdentity>();
                 if (component == null) return false;
 
@@ -101,32 +98,27 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                 if (player == null) return false;
 
                 var forceEscape = !SynapseExtensions.CanHarmScp(player, false);
-                Logger.Get.Debug("2");
                 if (player.Hub.scp106PlayerScript.GrabbedPosition == Vector3.zero)
                     player.Hub.scp106PlayerScript.GrabbedPosition = new Vector3(0f, -1997f, 0f);
 
                 var identifier = MapGeneration.RoomIdUtils.RoomAtPosition(player.Hub.scp106PlayerScript.GrabbedPosition);
-                Logger.Get.Debug("3");
                 if (identifier.Zone == FacilityZone.Surface)
                 {
                     foreach(var player2 in Server.Get.Players)
                         if(player2.RoleType == RoleType.Scp106)
                         {
-                            Logger.Get.Debug("4");
                             Vector3 objPos = (player2 == null)
                                 ? Vector3.zero
                                 : player2.PlayerMovementSync.RealModelPosition;
                             SafeTeleportPosition componentInChildren = identifier.GetComponentInChildren<SafeTeleportPosition>();
                             float num = Vector3.Distance(objPos, componentInChildren.SafePositions[0].position);
                             float num2 = Vector3.Distance(objPos, componentInChildren.SafePositions[1].position);
-                            player.PlayerMovementSync.OverridePosition((num2 < num) ? componentInChildren.SafePositions[0].position : componentInChildren.SafePositions[1].position, Random.value * 360f, false);
-                            Logger.Get.Debug("5");
+                            pos = (num2 < num) ? componentInChildren.SafePositions[0].position : componentInChildren.SafePositions[1].position;
                             break;
                         }
                 }
                 else
                 {
-                    Logger.Get.Debug("6");
                     var hashSet = MapGeneration.RoomIdUtils.FindRooms(MapGeneration.RoomName.Unnamed, identifier.Zone, MapGeneration.RoomShape.Undefined);
                     /*hashSet.RemoveWhere((MapGeneration.RoomIdentifier room) => 
                     room.Name == MapGeneration.RoomName.Hcz106 || room.Name == MapGeneration.RoomName.EzGateA || 
@@ -135,44 +127,45 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                     room.Zone == MapGeneration.FacilityZone.None || room.Name == MapGeneration.RoomName.Pocket || 
                     room.Name == MapGeneration.RoomName.HczTesla);*/
 
-                    while (hashSet.Count > 0)
+                    try
                     {
-                        Logger.Get.Debug("7");
-                        MapGeneration.RoomIdentifier roomIdentifier2 = hashSet.ElementAt(UnityEngine.Random.Range(0, hashSet.Count));
-                        var safepos = roomIdentifier2.transform.position;
-                        var safeTeleport = roomIdentifier2.GetComponentInChildren<SafeTeleportPosition>();
-                        if (safeTeleport != null && safeTeleport.SafePositions.Length != 0)
-                            safepos = safeTeleport.SafePositions[UnityEngine.Random.Range(0, safeTeleport.SafePositions.Length)].position;
+                        while (hashSet.Count > 0)
+                        {
+                            MapGeneration.RoomIdentifier roomIdentifier2 = hashSet.ElementAt(UnityEngine.Random.Range(0, hashSet.Count));
+                            var safepos = roomIdentifier2.transform.position;
+                            var safeTeleport = roomIdentifier2.GetComponentInChildren<SafeTeleportPosition>();
+                            if (safeTeleport != null && safeTeleport.SafePositions?.Length != 0)
+                                safepos = safeTeleport.SafePositions[UnityEngine.Random.Range(0, safeTeleport.SafePositions.Length)].position;
 
-                        if (PlayerMovementSync.FindSafePosition(safepos, out pos, false, true))
-                            break;
-                        hashSet.Remove(roomIdentifier2);
+                            if (PlayerMovementSync.FindSafePosition(safepos, out pos, false, true))
+                                break;
+                            hashSet.Remove(roomIdentifier2);
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        //I don't know how but for some Reason this fails sometimes and the method is called a second time
+                        //Logger.Get.Debug(ex);
+                        return false;
                     }
                 }
-
-                Logger.Get.Debug("8");
                 EventHandler.Get.Scp.Scp106.InvokePocketDimensionLeaveEvent(player, ref pos, ref type, out var allow);
-
+                
                 if (!allow) return false;
 
-                Logger.Get.Debug("9");
                 if (!forceEscape && (type == PocketDimensionTeleport.PDTeleportType.Killer || Synapse.Api.Nuke.Get.Detonated))
                 {
-                    Logger.Get.Debug("10");
                     player.PlayerStats.DealDamage(new UniversalDamageHandler(-1f, DeathTranslations.PocketDecay));
                     return false;
                 }
                 else
                 {
-                    Logger.Get.Debug("11");
                     player.Position = pos;
                     player.PlayerEffectsController.EnableEffect<CustomPlayerEffects.Disabled>(10f, true);
                     player.PlayerEffectsController.GetEffect<CustomPlayerEffects.Corroding>().Intensity = 0;
                     Achievements.AchievementHandlerBase.ServerAchieve(component.connectionToClient, AchievementName.LarryFriend);
-                    Logger.Get.Debug("12");
                 }
                 MapGeneration.ImageGenerator.pocketDimensionGenerator.GenerateRandom();
-                Logger.Get.Debug("13");
 
                 return false;
             } 

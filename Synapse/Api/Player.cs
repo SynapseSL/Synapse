@@ -754,13 +754,6 @@ namespace Synapse.Api
 
         public bool IsDead => Team == Team.RIP;
 
-        /*
-        //TODO: ReImplement this
-        public bool IsZooming => false;
-
-        public bool IsReloading => false;
-        */
-
         public bool IsCuffed => DisarmedPlayers.IsDisarmed(VanillaInventory);
 
         public float AliveTime => ClassManager.AliveTime;
