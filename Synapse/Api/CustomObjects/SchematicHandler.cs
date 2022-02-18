@@ -81,7 +81,27 @@ namespace Synapse.Api.CustomObjects
 
         public SynapseObject SpawnSchematic(string name, Vector3 position) => SpawnSchematic(GetSchematic(name), position);
 
+        public SynapseObject SpawnSchematic(string name, Vector3 position, Vector3 rotation) => SpawnSchematic(GetSchematic(name), position, Quaternion.Euler(rotation));
+        
+        public SynapseObject SpawnSchematic(string name, Vector3 position, Quaternion rotation) => SpawnSchematic(GetSchematic(name), position, rotation);
+
         public SynapseObject SpawnSchematic(int id, Vector3 position) => SpawnSchematic(GetSchematic(id), position);
+        
+        public SynapseObject SpawnSchematic(int id, Vector3 position, Vector3 rotation) => SpawnSchematic(GetSchematic(id), position, Quaternion.Euler(rotation));
+
+        public SynapseObject SpawnSchematic(int id, Vector3 position, Quaternion rotation) => SpawnSchematic(GetSchematic(id), position, rotation);
+
+        public SynapseObject SpawnSchematic(SynapseSchematic schematic, Vector3 position, Vector3 rotation) => SpawnSchematic(schematic, position, Quaternion.Euler(rotation));
+        
+        public SynapseObject SpawnSchematic(SynapseSchematic schematic, Vector3 position, Quaternion rotation)
+        {
+            if (schematic == null) return null;
+
+            var so = new SynapseObject(schematic);
+            so.Position = position;
+            so.Rotation = rotation;
+            return so;
+        }
 
         public SynapseObject SpawnSchematic(SynapseSchematic schematic, Vector3 position)
         {

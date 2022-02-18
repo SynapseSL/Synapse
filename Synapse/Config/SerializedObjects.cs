@@ -223,6 +223,14 @@ namespace Synapse.Config
     public class SerializedColor
     {
         public SerializedColor() { }
+
+        public SerializedColor(Color32 color)
+        {
+            R = color.r / 255f;
+            G = color.g / 255f;
+            B = color.b / 255f;
+            A = color.a / 255f;
+        }
         public SerializedColor(Color color)
         {
             R = color.r;
@@ -247,5 +255,8 @@ namespace Synapse.Config
 
         public static implicit operator Color(SerializedColor color) => color.Parse();
         public static implicit operator SerializedColor(Color color) => new SerializedColor(color);
+        public static implicit operator Color32(SerializedColor color) => (Color32)color.Parse();
+        public static implicit operator SerializedColor(Color32 color) => new SerializedColor(color);
+
     }
 }
