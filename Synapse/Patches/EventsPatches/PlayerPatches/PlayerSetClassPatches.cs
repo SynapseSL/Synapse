@@ -9,6 +9,7 @@ using Synapse.Api.Items;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using InventorySystem.Items.Firearms.Attachments;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
@@ -140,8 +141,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 foreach (var item in args.Items)
                 {
-                    item.PickUp(player);
-                    InventoryItemProvider.OnItemProvided?.Invoke(player.Hub, item.ItemBase);
+                    var itembase = player.VanillaInventory.ServerAddItem(item.ItemType, item.Serial);
+                    InventoryItemProvider.OnItemProvided?.Invoke(player.Hub, itembase);
                 }
 
                 if(args.IsEscaping) foreach(var item in args.EscapeItems) item.PickUp(player);
