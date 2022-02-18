@@ -1,9 +1,12 @@
-﻿using UnityEngine;
+﻿using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
-using vDoor = Interactables.Interobjects.DoorUtils.DoorVariant;
-using Interactables.Interobjects;
 using Mirror;
+using Synapse.Api.CustomObjects;
+using Synapse.Api.Enum;
+using System;
 using System.Collections.Generic;
+using UnityEngine;
+using vDoor = Interactables.Interobjects.DoorUtils.DoorVariant;
 
 namespace Synapse.Api
 {
@@ -130,18 +133,13 @@ namespace Synapse.Api
 
         public List<Room> Rooms { get; } = new List<Room>();
 
+        [Obsolete("Please create a Synapse.Api.CustomObjects.SynapseDoorObject")]
         public static Door SpawnDoorVariant(Vector3 position, Quaternion? rotation = null, DoorPermissions permissions = null)
         {
-            DoorVariant doorVariant = Object.Instantiate(Server.Get.Prefabs.DoorVariantPrefab);
-
-            doorVariant.transform.position = position;
-            doorVariant.transform.rotation = rotation ?? new Quaternion(0, 0, 0, 0);
-            doorVariant.RequiredPermissions = permissions ?? new DoorPermissions();
-            var door = new Door(doorVariant);
-            Map.Get.Doors.Add(door);
-            NetworkServer.Spawn(doorVariant.gameObject);
-
-            return door;
+            if(rotation == null) rotation = Quaternion.identity;
+            var obj = new SynapseDoorObject(SpawnableDoorType.HCZ, position, rotation.Value, Vector3.one);
+            obj.Door.DoorPermissions = permissions;
+            return obj.Door;
         }
 
         public override string ToString() => Name;

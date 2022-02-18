@@ -19,6 +19,7 @@ namespace Synapse.Api.CustomObjects
         public List<TargetConfiguration> TargetObjects { get; set; } = new List<TargetConfiguration>();
         public List<ItemConfiguration> ItemObjects { get; set; } = new List<ItemConfiguration>();
         public List<WorkStationConfiguration> WorkStationObjects { get; set; } = new List<WorkStationConfiguration>();
+        public List<DoorConfiguration> DoorObjects { get; set; } = new List<DoorConfiguration>();
 
         public class PrimitiveConfiguration
         {
@@ -79,6 +80,21 @@ namespace Synapse.Api.CustomObjects
             public SerializedVector3 Rotation { get; set; }
 
             public SerializedVector3 Scale { get; set; }
+        }
+
+        public class DoorConfiguration
+        {
+            public SpawnableDoorType DoorType { get; set; }
+
+            public SerializedVector3 Position { get; set; }
+
+            public SerializedVector3 Rotation { get; set; }
+
+            public SerializedVector3 Scale { get; set; }
+
+            public bool Open { get; set; }
+
+            public bool Locked { get; set; }
         }
     }
 }

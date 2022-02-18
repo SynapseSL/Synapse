@@ -7,20 +7,25 @@ namespace Synapse.Api.CustomObjects
 {
     public class SynapseLightObject : SynapseToyObject<LightSourceToy>
     {
-        public static LightSourceToy Prefab { get; set; }
+        public static LightSourceToy Prefab { get; internal set; }
 
         public SynapseLightObject(Color color, float lightIntensity, float range, bool shadows, Vector3 position, Quaternion rotation, Vector3 scale)
         {
             ToyBase = CreateLightSource(color, lightIntensity, range, shadows, position, rotation, scale);
 
             Map.Get.SynapseObjects.Add(this);
-            Server.Get.Events.SynapseObject.InvokeLoadComponent(new Events.SynapseEventArguments.SOEventArgs(this));
+
+            var script = GameObject.AddComponent<SynapseObjectScript>();
+            script.Object = this;
         }
 
         internal SynapseLightObject(SynapseSchematic.LightSourceConfiguration configuration)
         {
             ToyBase = CreateLightSource(configuration.Color, configuration.LightIntensity, configuration.LightRange, configuration.LightShadows, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale);
             OriginalScale = configuration.Scale;
+
+            var script = GameObject.AddComponent<SynapseObjectScript>();
+            script.Object = this;
         }
 
         public override ObjectType Type => ObjectType.LightSource;

@@ -1,4 +1,5 @@
 ﻿using AdminToys;
+using Interactables.Interobjects;
 using InventorySystem.Items.Firearms.Attachments;
 using Mirror;
 using Synapse.Api.Enum;
@@ -20,37 +21,56 @@ namespace Synapse.Api.CustomObjects
 
         internal void Init()
         {
-            foreach (var prefab in NetworkManager.singleton.spawnPrefabs)
+            try
             {
-                switch (prefab.name)
+                foreach (var prefab in NetworkManager.singleton.spawnPrefabs)
                 {
-                    case "PrimitiveObjectToy" when prefab.TryGetComponent<PrimitiveObjectToy>(out var pref):
-                        SynapsePrimitiveObject.Prefab = pref;
-                        break;
+                    switch (prefab.name)
+                    {
+                        case "PrimitiveObjectToy" when prefab.TryGetComponent<PrimitiveObjectToy>(out var pref):
+                            SynapsePrimitiveObject.Prefab = pref;
+                            break;
 
-                    case "LightSourceToy" when prefab.TryGetComponent<LightSourceToy>(out var lightpref):
-                        SynapseLightObject.Prefab = lightpref;
-                        break;
+                        case "LightSourceToy" when prefab.TryGetComponent<LightSourceToy>(out var lightpref):
+                            SynapseLightObject.Prefab = lightpref;
+                            break;
 
-                    case "sportTargetPrefab" when prefab.TryGetComponent<ShootingTarget>(out var target):
-                        SynapseTargetObject.Prefabs[TargetType.Sport] = target;
-                        break;
+                        case "sportTargetPrefab" when prefab.TryGetComponent<ShootingTarget>(out var target):
+                            SynapseTargetObject.Prefabs[TargetType.Sport] = target;
+                            break;
 
-                    case "dboyTargetPrefab" when prefab.TryGetComponent<ShootingTarget>(out var target):
-                        SynapseTargetObject.Prefabs[TargetType.DBoy] = target;
-                        break;
+                        case "dboyTargetPrefab" when prefab.TryGetComponent<ShootingTarget>(out var target):
+                            SynapseTargetObject.Prefabs[TargetType.DBoy] = target;
+                            break;
 
-                    case "binaryTargetPrefab" when prefab.TryGetComponent<ShootingTarget>(out var target):
-                        SynapseTargetObject.Prefabs[TargetType.Binary] = target;
-                        break;
+                        case "binaryTargetPrefab" when prefab.TryGetComponent<ShootingTarget>(out var target):
+                            SynapseTargetObject.Prefabs[TargetType.Binary] = target;
+                            break;
 
-                    case "Work Station" when prefab.TryGetComponent<WorkstationController>(out var station):
-                        SynapseWorkStationObject.Prefab = station;
-                    break;
+                        case "Work Station" when prefab.TryGetComponent<WorkstationController>(out var station):
+                            SynapseWorkStationObject.Prefab = station;
+                            break;
+
+                        case "EZ BreakableDoor" when prefab.TryGetComponent<BreakableDoor>(out var door):
+                            SynapseDoorObject.Prefab[SpawnableDoorType.EZ] = door;
+                            break;
+
+                        case "HCZ BreakableDoor" when prefab.TryGetComponent<BreakableDoor>(out var door):
+                            SynapseDoorObject.Prefab[SpawnableDoorType.HCZ] = door;
+                            break;
+
+                        case "LCZ BreakableDoor" when prefab.TryGetComponent<BreakableDoor>(out var door):
+                            SynapseDoorObject.Prefab[SpawnableDoorType.LCZ] = door;
+                            break;
+                    }
                 }
-            }
 
-            Load();
+                Load();
+            }
+            catch(Exception ex)
+            {
+                Logger.Get.Error("Synapse-Object: Error while Initialising Synapse Objects and Schematics:\n" + ex);
+            }
         }
 
         public ReadOnlyCollection<SynapseSchematic> Schematics { get; private set; } = new List<SynapseSchematic>().AsReadOnly();

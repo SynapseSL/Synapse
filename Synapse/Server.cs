@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Synapse.Api;
+﻿using Synapse.Api;
 using Synapse.Api.CustomObjects;
 using Synapse.Api.Items;
 using Synapse.Api.Plugin;
@@ -10,6 +6,10 @@ using Synapse.Api.Roles;
 using Synapse.Api.Teams;
 using Synapse.Config;
 using Synapse.Permission;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Console = GameCore.Console;
 using EventHandler = Synapse.Api.Events.EventHandler;
 using Logger = Synapse.Api.Logger;
@@ -29,8 +29,6 @@ namespace Synapse
         public Logger Logger { get; } = new Logger();
 
         public Map Map { get; } = new Map();
-
-        public Prefabs Prefabs { get; } = new Prefabs();
 
         public FileLocations Files { get; } = new FileLocations();
 

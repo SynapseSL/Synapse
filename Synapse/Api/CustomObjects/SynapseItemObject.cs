@@ -12,7 +12,9 @@ namespace Synapse.Api.CustomObjects
             ItemType = type;
 
             Map.Get.SynapseObjects.Add(this);
-            Server.Get.Events.SynapseObject.InvokeLoadComponent(new Events.SynapseEventArguments.SOEventArgs(this));
+
+            var script = GameObject.AddComponent<SynapseObjectScript>();
+            script.Object = this;
         }
 
         internal SynapseItemObject(SynapseSchematic.ItemConfiguration configuration)
@@ -20,6 +22,9 @@ namespace Synapse.Api.CustomObjects
             Item = CreateItem(configuration.ItemType, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale);
             OriginalScale = configuration.Scale;
             ItemType = configuration.ItemType;
+
+            var script = GameObject.AddComponent<SynapseObjectScript>();
+            script.Object = this;
         }
 
         public override GameObject GameObject => Item.PickupBase?.gameObject;

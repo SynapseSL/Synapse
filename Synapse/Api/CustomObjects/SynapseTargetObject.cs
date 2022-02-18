@@ -9,7 +9,7 @@ namespace Synapse.Api.CustomObjects
 {
     public class SynapseTargetObject : SynapseToyObject<ShootingTarget>
     {
-        public static Dictionary<TargetType, ShootingTarget> Prefabs { get; set; } = new Dictionary<TargetType, ShootingTarget>();
+        public static Dictionary<TargetType, ShootingTarget> Prefabs { get; } = new Dictionary<TargetType, ShootingTarget>();
 
         public SynapseTargetObject(TargetType type, Vector3 position, Quaternion rotation, Vector3 scale)
         {
@@ -17,7 +17,9 @@ namespace Synapse.Api.CustomObjects
             TargetType = type;
 
             Map.Get.SynapseObjects.Add(this);
-            Server.Get.Events.SynapseObject.InvokeLoadComponent(new Events.SynapseEventArguments.SOEventArgs(this));
+
+            var script = GameObject.AddComponent<SynapseObjectScript>();
+            script.Object = this;
         }
 
         internal SynapseTargetObject(SynapseSchematic.TargetConfiguration configuration)
@@ -25,6 +27,9 @@ namespace Synapse.Api.CustomObjects
             ToyBase = CreateTarget(configuration.TargetType, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale);
             OriginalScale = configuration.Scale;
             TargetType = configuration.TargetType;
+
+            var script = GameObject.AddComponent<SynapseObjectScript>();
+            script.Object = this;
         }
 
         public override ObjectType Type => ObjectType.Target;

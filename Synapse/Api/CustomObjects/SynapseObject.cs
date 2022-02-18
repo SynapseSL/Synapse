@@ -47,8 +47,17 @@ namespace Synapse.Api.CustomObjects
                 obj.GameObject.transform.parent = GameObject.transform;
             }
 
+            foreach(var door in schematic.DoorObjects)
+            {
+                var obj = new SynapseDoorObject(door);
+                DoorChildrens.Add(obj);
+                obj.GameObject.transform.parent = GameObject.transform;
+            }
+
             Map.Get.SynapseObjects.Add(this);
-            Server.Get.Events.SynapseObject.InvokeLoadComponent(new Events.SynapseEventArguments.SOEventArgs(this));
+
+            var script = GameObject.AddComponent<SynapseObjectScript>();
+            script.Object = this;
         }
 
         public override Vector3 Position
@@ -93,11 +102,13 @@ namespace Synapse.Api.CustomObjects
         public List<SynapseTargetObject> TargetChildrens { get; } = new List<SynapseTargetObject>();
         public List<SynapseItemObject> ItemChildrens { get; } = new List<SynapseItemObject>();
         public List<SynapseWorkStationObject> WorkStationChildrens { get; } = new List<SynapseWorkStationObject>();
+        public List<SynapseDoorObject> DoorChildrens { get; } = new List<SynapseDoorObject>();
 
         public string Name { get; }
 
         public int ID { get; }
 
+        //TODO:
         public override void Destroy()
         {
             foreach (var child in PrimitivesChildrens)
@@ -108,6 +119,9 @@ namespace Synapse.Api.CustomObjects
         {
             foreach (var station in WorkStationChildrens)
                 station.Refresh();
+
+            foreach(var door in DoorChildrens)
+                door.Refresh();
         }
 
         private void UpdateScale()
@@ -126,6 +140,9 @@ namespace Synapse.Api.CustomObjects
 
             foreach(var station in WorkStationChildrens)
                 station.Scale = new Vector3(station.OriginalScale.x * Scale.x, station.OriginalScale.y * Scale.y, station.OriginalScale.z * Scale.z);
+
+            foreach (var door in DoorChildrens)
+                door.Scale = new Vector3(door.OriginalScale.x * Scale.x, door.OriginalScale.y * Scale.y, door.OriginalScale.z * Scale.z);
         }
     }
 }

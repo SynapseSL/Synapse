@@ -172,18 +172,7 @@ namespace Synapse.Api
 
         [Obsolete("Moved to Door.SpawnDoorVariant()", true)]
         public Door SpawnDoorVariant(Vector3 position, Quaternion? rotation = null, DoorPermissions permissions = null)
-        {
-            DoorVariant doorVariant = UnityEngine.Object.Instantiate(Server.Get.Prefabs.DoorVariantPrefab);
-
-            doorVariant.transform.position = position;
-            doorVariant.transform.rotation = rotation ?? new Quaternion(0, 0, 0, 0);
-            doorVariant.RequiredPermissions = permissions ?? new DoorPermissions();
-            var door = new Door(doorVariant);
-            Get.Doors.Add(door);
-            NetworkServer.Spawn(doorVariant.gameObject);
-
-            return door;
-        }
+            => Door.SpawnDoorVariant(position, rotation, permissions);
 
         internal void AddObjects()
         {
@@ -235,6 +224,7 @@ namespace Synapse.Api
             Lockers.Clear();
             WorkStations.Clear();
             Ragdolls.Clear();
+            SynapseObjects.Clear();
             SynapseItem.AllItems.Clear();
             ItemSerialGenerator.Reset();
         }

@@ -16,7 +16,13 @@ namespace Synapse.Api.Events
             Server.UpdateEvent += OnUpdate;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
+            SynapseObject.LoadComponentEvent += SynapseObject_LoadComponentEvent;
 #endif
+        }
+
+        private void SynapseObject_LoadComponentEvent(SynapseEventArguments.SOEventArgs ev)
+        {
+            Logger.Get.Debug("Load Object Event: "+ ev.Object.GameObject.name);
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
@@ -38,7 +44,7 @@ namespace Synapse.Api.Events
                             new SynapseSchematic.PrimitiveConfiguration
                             {
                                 Color = Color.red,
-                                Position = new Vector3(0f,-1f,0f),
+                                Position = new Vector3(0f, -1f, 0f),
                                 PrimitiveType = PrimitiveType.Capsule,
                                 Rotation = Vector3.zero,
                                 Scale = Vector3.one * 2
@@ -46,9 +52,9 @@ namespace Synapse.Api.Events
                             new SynapseSchematic.PrimitiveConfiguration
                             {
                                 Color = Color.gray,
-                                Position = new Vector3(0f,2f,0f),
+                                Position = new Vector3(0f, 2f, 0f),
                                 PrimitiveType = PrimitiveType.Cube,
-                                Rotation = new Vector3(45f,45f,45f),
+                                Rotation = new Vector3(45f, 45f, 45f),
                                 Scale = Vector3.one
                             },
                         },
@@ -60,7 +66,7 @@ namespace Synapse.Api.Events
                                 LightIntensity = 1,
                                 LightRange = 100,
                                 LightShadows = true,
-                                Position = new Vector3(1f,0f,0f),
+                                Position = new Vector3(1f, 0f, 0f),
                                 Rotation = Vector3.zero,
                                 Scale = Vector3.one
                             }
@@ -69,7 +75,7 @@ namespace Synapse.Api.Events
                         {
                             new SynapseSchematic.TargetConfiguration
                             {
-                                Position = new Vector3(3f,0f,0f),
+                                Position = new Vector3(3f, 0f, 0f),
                                 Rotation = Vector3.zero,
                                 Scale = Vector3.one
                             }
@@ -79,7 +85,7 @@ namespace Synapse.Api.Events
                             new SynapseSchematic.ItemConfiguration
                             {
                                 ItemType = ItemType.MicroHID,
-                                Position = new Vector3(0f,5f,0f),
+                                Position = new Vector3(0f, 5f, 0f),
                                 Rotation = Vector3.zero,
                                 Scale = Vector3.one * 4
                             }
@@ -88,9 +94,21 @@ namespace Synapse.Api.Events
                         {
                             new SynapseSchematic.WorkStationConfiguration
                             {
-                                Position = new Vector3(-2f,0f,0f),
+                                Position = new Vector3(-2f, 0f, 0f),
                                 Rotation = Vector3.zero,
                                 Scale = Vector3.one
+                            }
+                        },
+                        DoorObjects = new System.Collections.Generic.List<SynapseSchematic.DoorConfiguration>
+                        {
+                            new SynapseSchematic.DoorConfiguration
+                            {
+                                Position = new Vector3(0f,0f,-3f),
+                                Rotation = Vector3.zero,
+                                Scale = Vector3.one * 2,
+                                DoorType = Enum.SpawnableDoorType.LCZ,
+                                Locked = true,
+                                Open = true,
                             }
                         }
                     };
@@ -102,8 +120,7 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha3:
-                    foreach (var door in SynapseController.Server.Map.Doors)
-                        door.Scale = Vector3.one * 2;
+                    var door = new SynapseDoorObject(Enum.SpawnableDoorType.EZ, ev.Player.Position, ev.Player.transform.rotation, Vector3.one);
                     break;
             }
         }

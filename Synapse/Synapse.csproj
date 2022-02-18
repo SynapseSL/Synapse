@@ -42,7 +42,9 @@
     <Compile Include="Api\Broadcast.cs" />
     <Compile Include="Api\CustomObjects\DefaultSynapseObject.cs" />
     <Compile Include="Api\CustomObjects\ISynapseObject.cs" />
+    <Compile Include="Api\CustomObjects\SynapseDoorObject.cs" />
     <Compile Include="Api\CustomObjects\SynapseItemObject.cs" />
+    <Compile Include="Api\CustomObjects\SynapseObjectScript.cs" />
     <Compile Include="Api\CustomObjects\SynapseWorkStationObject.cs" />
     <Compile Include="Api\Enum\ObjectType.cs" />
     <Compile Include="Api\CustomObjects\SchematicHandler.cs" />
@@ -56,6 +58,7 @@
     <Compile Include="Api\Enum\MovementDirection.cs" />
     <Compile Include="Api\Enum\ElevatorType.cs" />
     <Compile Include="Api\Enum\ScpRecontainmentType.cs" />
+    <Compile Include="Api\Enum\SpawnableDoorType.cs" />
     <Compile Include="Api\Enum\TargetType.cs" />
     <Compile Include="Api\Enum\WorkstationState.cs" />
     <Compile Include="Api\Events\SynapseEventArguments\SynapseObjectEventArgs.cs" />
@@ -69,7 +72,6 @@
     <Compile Include="Api\Locker.cs" />
     <Compile Include="Api\LockerChamber.cs" />
     <Compile Include="Api\Plugin\Processors\TranslationInjector.cs" />
-    <Compile Include="Api\Prefabs.cs" />
     <Compile Include="Api\Roles\RoleInformation.cs" />
     <Compile Include="Api\Scp173Controller.cs" />
     <Compile Include="Api\Scp096Controller.cs" />
@@ -219,7 +221,6 @@
     <Compile Include="Patches\SynapsePatches\Item\InventoryExtensionPatches.cs" />
     <Compile Include="Patches\SynapsePatches\Item\SerialPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Item\ThrowableItemPatches.cs" />
-    <Compile Include="Patches\SynapsePatches\Wrapper\DoorSpawnpointPatch.cs" />
     <Compile Include="Patches\SynapsePatches\ShootPermissionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\InvisiblePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSetClassPatches.cs" />

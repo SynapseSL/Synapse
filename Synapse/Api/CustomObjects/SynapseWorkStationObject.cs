@@ -1,14 +1,13 @@
 ﻿using InventorySystem.Items.Firearms.Attachments;
 using Mirror;
 using Synapse.Api.Enum;
-using System;
 using UnityEngine;
 
 namespace Synapse.Api.CustomObjects
 {
     public class SynapseWorkStationObject : DefaultSynapseObject
     {
-        public static WorkstationController Prefab { get; set; }
+        public static WorkstationController Prefab { get; internal set; }
 
         //This is just for compatibillity with older Versions
         internal SynapseWorkStationObject(WorkStation station, Vector3 position, Quaternion rotation, Vector3 scale)
@@ -17,19 +16,26 @@ namespace Synapse.Api.CustomObjects
             station.workStation = CreateController(position, rotation, scale);
 
             Map.Get.SynapseObjects.Add(this);
-            Server.Get.Events.SynapseObject.InvokeLoadComponent(new Events.SynapseEventArguments.SOEventArgs(this));
+
+            var script = GameObject.AddComponent<SynapseObjectScript>();
+            script.Object = this;
         }
         internal SynapseWorkStationObject(SynapseSchematic.WorkStationConfiguration configuration)
         {
             WorkStation = CreateStation(configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale);
             OriginalScale = configuration.Scale;
+
+            var script = GameObject.AddComponent<SynapseObjectScript>();
+            script.Object = this;
         }
         public SynapseWorkStationObject(Vector3 position, Quaternion rotation, Vector3 scale)
         {
             WorkStation = CreateStation(position, rotation, scale);
 
             Map.Get.SynapseObjects.Add(this);
-            Server.Get.Events.SynapseObject.InvokeLoadComponent(new Events.SynapseEventArguments.SOEventArgs(this));
+
+            var script = GameObject.AddComponent<SynapseObjectScript>();
+            script.Object = this;
         }
 
 
