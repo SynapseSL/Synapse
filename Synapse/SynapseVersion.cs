@@ -9,7 +9,7 @@ public static class SynapseVersion
 
     public const int Patch = 0;
 
-    public const VersionType Type = VersionType.None;
+    public const VersionType Type = VersionType.Pre;
 
     public const string SubVersion = "1.0";
 

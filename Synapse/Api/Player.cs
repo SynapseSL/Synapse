@@ -169,7 +169,7 @@ namespace Synapse.Api
         }
 
         public void SendToServer(ushort port)
-            => Connection.Send(new RoundRestartMessage(RoundRestartType.RedirectRestart, 1f, port, true));
+            => Connection.Send(new RoundRestartMessage(RoundRestartType.RedirectRestart, 1f, port, true, false));
 
         public void DimScreen()
         {

@@ -91,31 +91,9 @@ namespace Synapse
             }
         }
 
-        public string[] Colors { get; } =
-        {
-            "silver",
-            "pink",
-            "deep_pink",
-            "magenta",
-            "tomato",
-            "crimson",
-            "carmine",
-            "red",
-            "brown",
-            "army_green",
-            "green",
-            "light_green",
-            "emerald",
-            "orange",
-            "yellow",
-            "lime",
-            "pumpkin",
-            "blue_green",
-            "aqua",
-            "cyan",
-            "mint",
-            "nickel"
-        };
+        public string[] Colors => AllowedColors.Values.ToArray();
+
+        public Dictionary<Misc.PlayerInfoColorTypes, string> AllowedColors => Misc.AllowedColors;
 
         public List<Player> Players =>
             PlayerManager.players.Select(x => x.GetComponent<Player>()).Where(x => !x.IsDummy).ToList();

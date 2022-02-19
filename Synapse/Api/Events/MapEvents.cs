@@ -23,6 +23,8 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<LockerInteractEventArgs> LockerInteractEvent;
 
+        public event EventHandler.OnSynapseEvent<LiftMoveObjectsEventArgs> LiftMoveObjectsEvent;
+
         #region Invoke
         internal void InvokeTriggerTeslaEv(Player player, Tesla tesla, ref bool trigger)
         {
@@ -113,6 +115,8 @@ namespace Synapse.Api.Events
             items = ev.Items;
             moveVector = ev.MoveVector;
         }
+        
+        internal void InvokeLiftMoveObjects(LiftMoveObjectsEventArgs ev) => LiftMoveObjectsEvent?.Invoke(ev);
         #endregion
     }
 }

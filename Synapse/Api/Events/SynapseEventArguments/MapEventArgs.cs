@@ -47,4 +47,25 @@ namespace Synapse.Api.Events.SynapseEventArguments
         [Obsolete("Use MoveVector instead and set it to Vector3.zero")]
         public bool Move { get; set; } = true;
     }
+
+    public class LiftMoveObjectsEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Elevator Elevator { get; internal set; }
+
+        internal Transform Transform { get; set; }
+        internal bool DeleteTransform { get; set; } = false;
+        public Vector3 Position
+        {
+            get => Transform.position;
+            set
+            {
+                DeleteTransform = true;
+                var obj = new GameObject("LiftPosition");
+                obj.transform.position = value;
+                Transform = obj.transform;
+            }
+        }
+
+        public bool Allow { get; set; } = true;
+    }
 }
