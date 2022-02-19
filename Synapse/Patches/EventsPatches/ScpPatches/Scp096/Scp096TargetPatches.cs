@@ -14,8 +14,6 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
         {
             try
             {
-                if (__instance._flash.IsEnabled) return false;
-
                 var vector = __instance.Hub.transform.TransformPoint(PlayableScps.Scp096._headOffset);
                 foreach (var player in Server.Get.Players)
                 {

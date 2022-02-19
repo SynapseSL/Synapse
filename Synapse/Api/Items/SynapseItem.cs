@@ -219,7 +219,7 @@ namespace Synapse.Api.Items
             {
                 switch (State)
                 {
-                    case ItemState.Map: return PickupBase.PreviousOwner.Hub.GetPlayer();
+                    //case ItemState.Map: return PickupBase.PreviousOwner.Hub.GetPlayer();
                     case ItemState.Inventory: return ItemBase.Owner.GetPlayer();
                     default: return null;
                 }
@@ -229,6 +229,8 @@ namespace Synapse.Api.Items
 
         #region ChangableAPIValues
         public Dictionary<string, object> ItemData { get; set; } = new Dictionary<string, object>();
+
+        public bool CanBePickedUp { get; set; } = true;
 
         private Vector3 position = Vector3.zero;
         public Vector3 Position
@@ -403,13 +405,10 @@ namespace Synapse.Api.Items
                 }
 
                 if (ItemBase is Firearm arm)
-                {
-                    arm.ApplyAttachmentsCode(value,true);
-                }
+                    arm.ApplyAttachmentsCode(value, true);
                 else if (PickupBase is FirearmPickup armpickup)
-                {
                     armpickup.NetworkStatus = new FirearmStatus(armpickup.Status.Ammo, armpickup.Status.Flags, value);
-                }
+                
             }
         }
         #endregion
@@ -417,6 +416,12 @@ namespace Synapse.Api.Items
         #region Methods
         public void PickUp(Player player)
         {
+            if (player.Inventory.Items.Count >= 8)
+            {
+                Drop(player.Position);
+                return;
+            }
+
             switch (State)
             {
                 case ItemState.Map:
@@ -461,7 +466,7 @@ namespace Synapse.Api.Items
                             Serial = Serial,
                             Weight = Weight,
                         };
-                        PickupBase.NetworkInfo = info;
+                        PickupBase.Info = info;
                         PickupBase.transform.localScale = Scale;
                         NetworkServer.Spawn(PickupBase.gameObject);
                         PickupBase.InfoReceived(default, info);
@@ -508,12 +513,14 @@ namespace Synapse.Api.Items
                 }
 
                 UnityEngine.Object.Destroy(ItemBase.gameObject);
+                ItemBase = null;
             }
         }
 
         public void DespawnPickup()
         {
             if (PickupBase != null) NetworkServer.Destroy(PickupBase.gameObject);
+            PickupBase = null;
         }
 
         public void Destroy()

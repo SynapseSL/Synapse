@@ -1,4 +1,6 @@
-﻿using Synapse.Config;
+﻿using Mirror;
+using Synapse.Api.CustomObjects;
+using Synapse.Config;
 using UnityEngine;
 
 namespace Synapse.Api.Events
@@ -22,7 +24,109 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
+                    foreach (var pref in NetworkManager.singleton.spawnPrefabs)
+                        Logger.Get.Debug(pref.name);
+                    break;
 
+                    case KeyCode.Alpha2:
+                    var schematic = new SynapseSchematic
+                    {
+                        ID = 3,
+                        Name = "test",
+                        PrimitiveObjects = new System.Collections.Generic.List<SynapseSchematic.PrimitiveConfiguration>
+                        {
+                            new SynapseSchematic.PrimitiveConfiguration
+                            {
+                                Color = Color.red,
+                                Position = new Vector3(0f, -1f, 0f),
+                                PrimitiveType = PrimitiveType.Capsule,
+                                Rotation = Vector3.zero,
+                                Scale = Vector3.one * 2
+                            },
+                            new SynapseSchematic.PrimitiveConfiguration
+                            {
+                                Color = Color.gray,
+                                Position = new Vector3(0f, 2f, 0f),
+                                PrimitiveType = PrimitiveType.Cube,
+                                Rotation = new Vector3(45f, 45f, 45f),
+                                Scale = Vector3.one
+                            },
+                        },
+                        LightObjects = new System.Collections.Generic.List<SynapseSchematic.LightSourceConfiguration>
+                        {
+                            new SynapseSchematic.LightSourceConfiguration
+                            {
+                                Color = Color.green,
+                                LightIntensity = 1,
+                                LightRange = 100,
+                                LightShadows = true,
+                                Position = new Vector3(1f, 0f, 0f),
+                                Rotation = Vector3.zero,
+                                Scale = Vector3.one
+                            }
+                        },
+                        TargetObjects = new System.Collections.Generic.List<SynapseSchematic.TargetConfiguration>
+                        {
+                            new SynapseSchematic.TargetConfiguration
+                            {
+                                Position = new Vector3(3f, 0f, 0f),
+                                Rotation = Vector3.zero,
+                                Scale = Vector3.one
+                            }
+                        },
+                        ItemObjects = new System.Collections.Generic.List<SynapseSchematic.ItemConfiguration>
+                        {
+                            new SynapseSchematic.ItemConfiguration
+                            {
+                                ItemType = ItemType.MicroHID,
+                                Position = new Vector3(0f, 5f, 0f),
+                                Rotation = Vector3.zero,
+                                Scale = Vector3.one * 4,
+                                CanBePickedUp = true,
+                            }
+                        },
+                        WorkStationObjects = new System.Collections.Generic.List<SynapseSchematic.WorkStationConfiguration>
+                        {
+                            new SynapseSchematic.WorkStationConfiguration
+                            {
+                                Position = new Vector3(-2f, 0f, 0f),
+                                Rotation = Vector3.zero,
+                                Scale = Vector3.one,
+                                UpdateEveryFrame = true
+                            }
+                        },
+                        DoorObjects = new System.Collections.Generic.List<SynapseSchematic.DoorConfiguration>
+                        {
+                            new SynapseSchematic.DoorConfiguration
+                            {
+                                Position = new Vector3(0f,0f,-3f),
+                                Rotation = Vector3.zero,
+                                Scale = Vector3.one * 2,
+                                DoorType = Enum.SpawnableDoorType.LCZ,
+                                Locked = true,
+                                Open = true,
+                                UpdateEveryFrame = true
+                            }
+                        }
+                    };
+                    var sobj = SchematicHandler.Get.SpawnSchematic(schematic, ev.Player.Position);
+                    MEC.Timing.CallDelayed(5f, () => sobj.Scale = Vector3.one * 0.5f);
+                    MEC.Timing.CallDelayed(10f, () => sobj.ApplyPhysics());
+                    SchematicHandler.Get.SaveSchematic(schematic, "Key2");
+                    break;
+
+                case KeyCode.Alpha3:
+                    foreach (var ob in SynapseController.Server.Map.SynapseObjects)
+                        Logger.Get.Debug(ob.GameObject.name);
+                    break;
+
+                case KeyCode.Alpha4:
+                    foreach (var ob in SynapseController.Server.Map.Lockers)
+                    {
+                        ob.Position = ev.Player.Position;
+                        MEC.Timing.CallDelayed(5f, () => ob.Rotation = ev.Player.transform.rotation);
+                        MEC.Timing.CallDelayed(10f, () => ob.Scale = Vector3.one * 2);
+                    }
                     break;
             }
         }
@@ -40,6 +144,8 @@ namespace Synapse.Api.Events
         public MapEvents Map { get; } = new MapEvents();
 
         public ScpEvents Scp { get; } = new ScpEvents();
+
+        public SynapseObjectEvent SynapseObject { get; } = new SynapseObjectEvent();
 
         public interface ISynapseEventArgs
         {

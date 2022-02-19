@@ -1,9 +1,11 @@
 ﻿using System;
+using Achievements;
 using HarmonyLib;
 using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Firearms.Attachments;
 using InventorySystem.Items.Firearms.BasicMessages;
 using InventorySystem.Items.Firearms.Modules;
+using Mirror;
 using UnityEngine;
 
 namespace Synapse.Patches.SynapsePatches.Dummy
@@ -73,5 +75,12 @@ namespace Synapse.Patches.SynapsePatches.Dummy
             serverSoundPlayed.Invoke(firearm, clipId, num);
             return false;
         }
+    }
+
+    [HarmonyPatch(typeof(AchievementHandlerBase),nameof(AchievementHandlerBase.ServerAchieve))]
+    internal static class AchievePatch
+    {
+        [HarmonyPrefix]
+        private static bool OnAchieve(NetworkConnection conn) => conn != null;
     }
 }

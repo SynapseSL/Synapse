@@ -35,7 +35,7 @@ namespace Synapse.Api.Teams
         {
             if (IsDefaultSpawnableID(id))
             {
-                Round.Get.MtfRespawn(id == (int)Team.MTF, players);
+                Round.Get.MtfRespawn(id == (int)Team.MTF);
                 return;
             }
             var team = teams.FirstOrDefault(x => x.Info.ID == id);

@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Synapse.Api.Events.SynapseEventArguments;
+using System;
 using System.Collections.Generic;
-using Synapse.Api.Events.SynapseEventArguments;
 using UnityEngine;
 
 namespace Synapse.Api.Events
@@ -20,6 +20,10 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<LCZDecontaminationEventArgs> LCZDecontaminationEvent;
 
         public event EventHandler.OnSynapseEvent<Scp914ActivateEventArgs> Scp914ActivateEvent;
+
+        public event EventHandler.OnSynapseEvent<LockerInteractEventArgs> LockerInteractEvent;
+
+        public event EventHandler.OnSynapseEvent<LiftMoveObjectsEventArgs> LiftMoveObjectsEvent;
 
         #region Invoke
         internal void InvokeTriggerTeslaEv(Player player, Tesla tesla, ref bool trigger)
@@ -49,6 +53,20 @@ namespace Synapse.Api.Events
             };
 
             DoorInteractEvent.Invoke(ev);
+
+            allow = ev.Allow;
+        }
+
+        internal void InvokeLockerInteractEvent(Player player, LockerChamber locker, ref bool allow)
+        {
+            var ev = new LockerInteractEventArgs
+            {
+                Player = player,
+                Allow = allow,
+                LockerChamber = locker
+            };
+
+            LockerInteractEvent?.Invoke(ev);
 
             allow = ev.Allow;
         }
@@ -97,6 +115,8 @@ namespace Synapse.Api.Events
             items = ev.Items;
             moveVector = ev.MoveVector;
         }
+        
+        internal void InvokeLiftMoveObjects(LiftMoveObjectsEventArgs ev) => LiftMoveObjectsEvent?.Invoke(ev);
         #endregion
     }
 }

@@ -246,11 +246,6 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public float Rotation { get; set; }
 
         public bool Allow { get; set; }
-
-        /// <summary>
-        /// This is only for Synapse to know if the object can be deleted by one of the patches
-        /// </summary>
-        internal bool CanBeDeleted { get; set; } = false;
     }
 
     public class PlayerStartWorkstationEventArgs : EventHandler.ISynapseEventArgs

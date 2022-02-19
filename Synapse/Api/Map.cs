@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Interactables.Interobjects.DoorUtils;
+﻿using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items;
 using InventorySystem.Items.Firearms.Attachments;
 using MapGeneration;
 using Mirror;
-using PlayerStatsSystem;
 using Scp914;
+using Synapse.Api.CustomObjects;
 using Synapse.Api.Enum;
 using Synapse.Api.Items;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -49,6 +49,10 @@ namespace Synapse.Api
         public List<Dummy> Dummies { get; } = new List<Dummy>();
 
         public List<Camera> Cameras { get; } = new List<Camera>();
+
+        public List<Locker> Lockers { get; } = new List<Locker>();
+
+        public List<ISynapseObject> SynapseObjects { get; } = new List<ISynapseObject>();
 
         public string IntercomText
         {
@@ -168,18 +172,7 @@ namespace Synapse.Api
 
         [Obsolete("Moved to Door.SpawnDoorVariant()", true)]
         public Door SpawnDoorVariant(Vector3 position, Quaternion? rotation = null, DoorPermissions permissions = null)
-        {
-            DoorVariant doorVariant = UnityEngine.Object.Instantiate(Server.Get.Prefabs.DoorVariantPrefab);
-
-            doorVariant.transform.position = position;
-            doorVariant.transform.rotation = rotation ?? new Quaternion(0, 0, 0, 0);
-            doorVariant.RequiredPermissions = permissions ?? new DoorPermissions();
-            var door = new Door(doorVariant);
-            Get.Doors.Add(door);
-            NetworkServer.Spawn(doorVariant.gameObject);
-
-            return door;
-        }
+            => Door.SpawnDoorVariant(position, rotation, permissions);
 
         internal void AddObjects()
         {
@@ -228,8 +221,10 @@ namespace Synapse.Api
             Elevators.Clear();
             Rooms.Clear();
             Generators.Clear();
+            Lockers.Clear();
             WorkStations.Clear();
             Ragdolls.Clear();
+            SynapseObjects.Clear();
             SynapseItem.AllItems.Clear();
             ItemSerialGenerator.Reset();
         }

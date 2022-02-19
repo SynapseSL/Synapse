@@ -9,6 +9,8 @@ using Mirror;
 using Mirror.LiteNetLib4Mirror;
 using PlayerStatsSystem;
 using RemoteAdmin;
+using RoundRestarting;
+using Synapse.Api.CustomObjects;
 using Synapse.Api.Enum;
 using Synapse.Api.Events.SynapseEventArguments;
 using Synapse.Api.Items;
@@ -43,6 +45,12 @@ namespace Synapse.Api
         }
 
         #region Methods
+        public void AttachSynapseObject(ISynapseObject so, Vector3 offset)
+        {
+            so.Rotation = transform.rotation;
+            so.Position = transform.TransformPoint(offset);
+            so.GameObject.transform.parent = transform;
+        }
 
         [Obsolete("Use GetPreference()", true)]
         public int GetSightPreference(ItemType item) => GetPreference(item, 0);
@@ -118,7 +126,15 @@ namespace Synapse.Api
             Hub.serverRoles.TargetCloseRemoteAdmin();
         }
 
-        public void Heal(float hp) => Health += hp;
+        public void Heal(float hp)
+        {
+            var health = Health;
+            health += hp;
+            if (health > MaxHealth)
+                health = MaxHealth;
+
+            Health = health;
+        }
 
         public bool Hurt(float damage, DamageType type = DamageType.Unknown)
         {
@@ -130,8 +146,15 @@ namespace Synapse.Api
         public bool Hurt(DamageHandlerBase handlerbase) => PlayerStats.DealDamage(handlerbase);
 
         public void Kill() => Kill("Unknown Reason");
-
-        public bool Kill(string reason, string cassie = "") => PlayerStats.DealDamage(new CustomReasonDamageHandler(reason, 9999999999f, cassie));
+        
+        public bool Kill(string reason) => PlayerStats.DealDamage(new CustomReasonDamageHandler(reason));
+        
+        public bool Kill(string reason, string cassie)
+        {
+            bool result = Kill(reason);
+            if (result) Server.Get.Map.Cassie(cassie);
+            return result;
+        }
 
         public void OpenReportWindow(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
 
@@ -146,22 +169,7 @@ namespace Synapse.Api
         }
 
         public void SendToServer(ushort port)
-        {
-            var component = SynapseController.Server.Host.PlayerStats;
-            var writer = NetworkWriterPool.GetWriter();
-            writer.WriteSingle(1f);
-            writer.WriteUInt16(port);
-            var msg = new RpcMessage
-            {
-                netId = component.netId,
-                componentIndex = component.ComponentIndex,
-                functionHash = typeof(PlayerStats).FullName.GetStableHashCode() * 503 + "RpcRoundrestartRedirect".GetStableHashCode(),
-                payload = writer.ToArraySegment()
-            };
-            Connection.Send(msg);
-            NetworkWriterPool.Recycle(writer);
-
-        }
+            => Connection.Send(new RoundRestartMessage(RoundRestartType.RedirectRestart, 1f, port, true, false));
 
         public void DimScreen()
         {
@@ -745,13 +753,6 @@ namespace Synapse.Api
         public bool DoNotTrack => ServerRoles.DoNotTrack;
 
         public bool IsDead => Team == Team.RIP;
-
-        /*
-        //TODO: ReImplement this
-        public bool IsZooming => false;
-
-        public bool IsReloading => false;
-        */
 
         public bool IsCuffed => DisarmedPlayers.IsDisarmed(VanillaInventory);
 

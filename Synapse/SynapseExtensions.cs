@@ -70,6 +70,8 @@ public static class SynapseExtensions
 
     public static Synapse.Api.Camera GetSynapseCamera(this Camera079 camera) => Map.Get.Cameras.FirstOrDefault(x => x.GameObject == camera.gameObject);
 
+    public static Synapse.Api.Locker GetLocker(this MapGeneration.Distributors.Locker locker) => Map.Get.Lockers.FirstOrDefault(x => x.GameObject == locker.gameObject);
+
     public static List<Vector3> GetSpawnPoints(this RoleType role)
     {
         List<Vector3> spawnPointsPose = new List<Vector3>();
@@ -247,6 +249,26 @@ public static class SynapseExtensions
         if((int)type < 0 || (int)type > 23) return new UniversalDamageHandler(0f,DeathTranslations.Unknown);
 
         return new UniversalDamageHandler(0f, DeathTranslations.TranslationsById[(byte)type]);
+    }
+
+    public static void UpdatePositionRotationScale(this NetworkIdentity identity)
+    {
+        var writer = NetworkWriterPool.GetWriter();
+        var writer2 = NetworkWriterPool.GetWriter();
+        var payload = NetworkServer.CreateSpawnMessagePayload(false, identity, writer, writer2);
+        var msg = new SpawnMessage
+        {
+            netId = identity.netId,
+            isLocalPlayer = false,
+            isOwner = false,
+            sceneId = identity.sceneId,
+            assetId = identity.assetId,
+            position = identity.gameObject.transform.position,
+            rotation = identity.gameObject.transform.rotation,
+            scale = identity.gameObject.transform.localScale,
+            payload = payload
+        };
+        NetworkServer.SendToAll(msg);
     }
 
     [Obsolete("Use SynapseExtensions.CanHarmScp() and check if it is false")]

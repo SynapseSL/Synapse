@@ -1,8 +1,8 @@
-﻿using System;
-using InventorySystem.Items.Firearms.Attachments;
-using Mirror;
+﻿using InventorySystem.Items.Firearms.Attachments;
+using Synapse.Api.CustomObjects;
 using Synapse.Api.Enum;
 using Synapse.Api.Items;
+using System;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -11,38 +11,47 @@ namespace Synapse.Api
     {
         internal WorkStation(WorkstationController station) => workStation = station;
 
+        [Obsolete("Please create a Synapse.Api.CustomObjects.SynapseWorkStationObject")]
         public WorkStation(Vector3 position, Vector3 rotation, Vector3 scale)
-        {
-            var bench = UnityEngine.Object.Instantiate(NetworkManager.singleton.spawnPrefabs.Find(p => p.gameObject.name == "Work Station"));
-            bench.gameObject.transform.localScale = scale;
-            bench.gameObject.transform.position = position;
-            bench.gameObject.transform.rotation = Quaternion.Euler(rotation);
+            => new SynapseWorkStationObject(position, Quaternion.Euler(rotation), scale);
 
-            NetworkServer.Spawn(bench);
-            workStation = bench.GetComponent<WorkstationController>();
-
-            Map.Get.WorkStations.Add(this);
-        }
-
+        [Obsolete("Please create a Synapse.Api.CustomObjects.SynapseWorkStationObject")]
         public static WorkStation CreateWorkStation(Vector3 position, Vector3 rotation, Vector3 scale)
             => new WorkStation(position, rotation, scale);
 
-        private readonly WorkstationController workStation;
+        internal WorkstationController workStation;
 
         public GameObject GameObject => workStation.gameObject;
 
         public string Name => GameObject.name;
 
-        public Vector3 Position => GameObject.transform.position;
+        public Vector3 Position
+        {
+            get => GameObject.transform.position;
+            set
+            {
+                GameObject.transform.position = value;
+                workStation.netIdentity.UpdatePositionRotationScale();
+            }
+        }
+
+        public Quaternion Rotation
+        {
+            get => GameObject.transform.rotation;
+            set
+            {
+                GameObject.transform.rotation = value;
+                workStation.netIdentity.UpdatePositionRotationScale();
+            }
+        }
 
         public Vector3 Scale
         {
             get => GameObject.transform.localScale;
             set
             {
-                NetworkServer.UnSpawn(GameObject);
                 GameObject.transform.localScale = value;
-                NetworkServer.Spawn(GameObject);
+                workStation.netIdentity.UpdatePositionRotationScale();
             }
         }
 

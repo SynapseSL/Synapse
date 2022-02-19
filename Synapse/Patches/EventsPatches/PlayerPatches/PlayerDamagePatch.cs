@@ -33,7 +33,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 SynapseController.Server.Events.Player.InvokePlayerDamageEvent(victim, attacker, ref damage, type, out var allow);
                 standardhandler.Damage = damage;
-
+                
                 return allow;
             }
             catch (Exception e)

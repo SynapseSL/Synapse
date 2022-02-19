@@ -1,11 +1,12 @@
-﻿namespace Synapse.Api.Enum
+﻿using System;
+
+namespace Synapse.Api.Enum
 {
     public enum DoorType
     {
-        LCZ_012,
-        LCZ_012_Bottom,
-        LCZ_012_Locker,
-        HCZ_049_Armory,
+        LCZ_330,
+        LCZ_330_Chamber,
+        HCZ_049_Armory = 3,
         HCZ_049_Gate,
         HCZ_079_First,
         HCZ_079_Second,
@@ -17,7 +18,7 @@
         LCZ_173_Connector,
         LCZ_173_Gate,
         LCZ_173_Bottom,
-        LCZ_914,
+        LCZ_914 = 15,
         Checkpoint_EZ_HCZ,
         Checkpoint_LCZ_A,
         Checkpoint_LCZ_B,
@@ -43,6 +44,13 @@
         EZ_Door,
         PrisonDoor,
         Airlock,
-        Other
+        Other,
+
+        [Obsolete("012 is no longer in the game", true)]
+        LCZ_012 = 0,
+        [Obsolete("012 is no longer in the game", true)]
+        LCZ_012_Bottom = 1,
+        [Obsolete("012 is no longer in the game", true)]
+        LCZ_012_Locker = 2,
     }
 }

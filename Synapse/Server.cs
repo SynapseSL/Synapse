@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Synapse.Api;
+﻿using Synapse.Api;
+using Synapse.Api.CustomObjects;
 using Synapse.Api.Items;
 using Synapse.Api.Plugin;
 using Synapse.Api.Roles;
 using Synapse.Api.Teams;
 using Synapse.Config;
 using Synapse.Permission;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Console = GameCore.Console;
 using EventHandler = Synapse.Api.Events.EventHandler;
 using Logger = Synapse.Api.Logger;
@@ -29,8 +30,6 @@ namespace Synapse
 
         public Map Map { get; } = new Map();
 
-        public Prefabs Prefabs { get; } = new Prefabs();
-
         public FileLocations Files { get; } = new FileLocations();
 
         public EventHandler Events { get; } = new EventHandler();
@@ -44,6 +43,8 @@ namespace Synapse
         public ConfigHandler Configs { get; } = new ConfigHandler();
 
         public PermissionHandler PermissionHandler { get; } = new PermissionHandler();
+
+        public SchematicHandler Schematic { get; } = new SchematicHandler();
 
         public Player Host
         {
@@ -84,34 +85,15 @@ namespace Synapse
         public bool FF
         {
             get => ServerConsole.FriendlyFire;
-            set => ServerConsole.FriendlyFire = value;
+            set {
+                ServerConsole.FriendlyFire = value;
+                ServerConfigSynchronizer.RefreshAllConfigs();
+            }
         }
 
-        public string[] Colors { get; } =
-        {
-            "silver",
-            "pink",
-            "deep_pink",
-            "magenta",
-            "tomato",
-            "crimson",
-            "carmine",
-            "red",
-            "brown",
-            "army_green",
-            "green",
-            "light_green",
-            "emerald",
-            "orange",
-            "yellow",
-            "lime",
-            "pumpkin",
-            "blue_green",
-            "aqua",
-            "cyan",
-            "mint",
-            "nickel"
-        };
+        public string[] Colors => AllowedColors.Values.ToArray();
+
+        public Dictionary<Misc.PlayerInfoColorTypes, string> AllowedColors => Misc.AllowedColors;
 
         public List<Player> Players =>
             PlayerManager.players.Select(x => x.GetComponent<Player>()).Where(x => !x.IsDummy).ToList();
@@ -131,6 +113,7 @@ namespace Synapse
             {
                 Configs.Reload();
                 PermissionHandler.Reload();
+                Schematic.Load();
                 SynapseController.PluginLoader.ReloadConfigs();
             }
             catch(Exception e)
@@ -297,23 +280,22 @@ namespace Synapse
 
             //config
             private string _mainConfigDirectory;
+            private string _sharedConfigDirectory;
+            private string _permissionFile;
 
             //plugin
             private string _mainPluginDirectory;
-            private string _permissionFile;
             private string _pluginDirectory;
-            private string _sharedConfigDirectory;
-
             private string _sharedPluginDirectory;
+
+            //Schematic
+            private string _schematicDirectory;
 
             //synapse
             private string _synapseDirectory;
 
 
-            internal FileLocations()
-            {
-                Refresh();
-            }
+            internal FileLocations() => Refresh();
 
             //Synapse
             public string SynapseDirectory
@@ -415,8 +397,19 @@ namespace Synapse
                 }
                 private set => _sharedConfigDirectory = value;
             }
-            //Currently should it not be auto generated
-            public string ModuleDirectory { get; set; }
+
+            public string SchematicDirectory
+            {
+                get
+                {
+                    if(!Directory.Exists(_schematicDirectory))
+                        Directory.CreateDirectory(_schematicDirectory);
+
+                    return _schematicDirectory;
+                }
+                private set => _schematicDirectory = value;
+            }
+
             public string PermissionFile
             {
                 get
@@ -457,7 +450,7 @@ namespace Synapse
                 ConfigDirectory = Path.Combine(MainConfigDirectory, $"server-{ServerStatic.ServerPort}");
                 SharedConfigDirectory = Path.Combine(MainConfigDirectory, "server-shared");
 
-                ModuleDirectory = Path.Combine(SynapseDirectory, "modules");
+                SchematicDirectory = Path.Combine(SynapseDirectory, "schematics");
 
                 var configpath = Path.Combine(ConfigDirectory, "config.syml");
                 ConfigFile = File.Exists(configpath) ? configpath : Path.Combine(SharedConfigDirectory, "config.syml");

@@ -62,7 +62,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                         bounds.Encapsulate(pos + player.PlayerMovementSync.PlayerVelocity * 0.2f);
                         player.CameraReference.position = bounds.ClosestPoint(msg.CameraPosition);
                         player.CameraReference.rotation = msg.CameraRotation;
-                        throwable.ServerThrow(msg.Request == ThrowableNetworkHandler.RequestType.ConfirmThrowFullForce, UnityEngine.Vector3.forward);
+                        throwable.ServerThrow(msg.Request == ThrowableNetworkHandler.RequestType.ConfirmThrowFullForce, ThrowableNetworkHandler.GetLimitedVelocity(msg.PlayerVelocity));
                         player.CameraReference.position = pos;
                         player.CameraReference.rotation = rot;
                         break;

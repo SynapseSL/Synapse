@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using HarmonyLib;
+﻿using HarmonyLib;
 using InventorySystem;
-using InventorySystem.Items.Armor;
+using MEC;
+using PlayerStatsSystem;
 using Synapse.Api;
 using Synapse.Api.Enum;
 using Synapse.Api.Events.SynapseEventArguments;
 using Synapse.Api.Items;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
+using InventorySystem.Items.Firearms.Attachments;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
@@ -16,7 +18,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     internal static class SetPlayersClassPatch
     {
         [HarmonyPrefix]
-        private static bool OnSetClass(ref RoleType classid, GameObject ply, CharacterClassManager.SpawnReason spawnReason, bool lite = false)
+        private static bool OnSetClass(ref RoleType classid, GameObject ply, CharacterClassManager.SpawnReason spawnReason)
         {
             try
             {
@@ -87,13 +89,39 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 return true;
             }
         }
+
+        [HarmonyPostfix]
+        private static void RemoveArgs(CharacterClassManager __instance) => __instance.GetPlayer().setClassEventArgs = null;
     }
 
-    [HarmonyPatch(typeof(InventoryItemProvider),nameof(InventoryItemProvider.RoleChanged))]
+    [HarmonyPatch(typeof(PlayerMovementSync),nameof(PlayerMovementSync.OnPlayerClassChange))]
+    internal static class HandlePositionPatch
+    {
+        [HarmonyPrefix]
+        private static bool OnPlayerMovementSync(PlayerMovementSync __instance)
+        {
+            try
+            {
+                var player = __instance.GetPlayer();
+                var args = player.setClassEventArgs;
+                //It is null when someone is revived by 049 since the first patch is never called in this situation
+                if (args == null) return true;
+                Timing.RunCoroutine(__instance.SafelySpawnPlayer(args.Position, args.Rotation), Segment.FixedUpdate);
+                return false;
+            }
+            catch(Exception e)
+            {
+                Logger.Get.Error($"Synapse-Event: PlayerSetClass(Position) failed!!\n{e}");
+                return true;
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(InventoryItemProvider), nameof(InventoryItemProvider.RoleChanged))]
     internal static class HandleItemPatch
     {
         [HarmonyPrefix]
-        private static bool OnRoleChanged(ReferenceHub ply, RoleType prevRole, RoleType newRole, bool lite, CharacterClassManager.SpawnReason spawnReason)
+        private static bool OnRoleChanged(ReferenceHub ply)
         {
             try
             {
@@ -105,45 +133,23 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 var inventory = ply.inventory;
 
-                if(args.IsEscaping)
-                {
-                    foreach (var item in player.Inventory.Items)
-                        // This is just a temporary fix until somebody has time fo fix it finally
-                        // Because of this Ghostlights and balls are activating themselves
-                        item.Drop(args.Position);
-                }
+                if (args.IsEscaping) foreach (var item in player.Inventory.Items) item.Despawn();
                 else player.Inventory.Clear();
 
                 foreach (var ammo in args.Ammo)
-                    inventory.ServerAddAmmo((ItemType)ammo.Key, ammo.Value);
+                    player.AmmoBox[ammo.Key] = ammo.Value;
 
                 foreach (var item in args.Items)
                 {
-                    item.Drop();
-                    var arg = player.VanillaInventory.ServerAddItem(item.ItemType);
-
-                    InventoryItemProvider.OnItemProvided?.Invoke(player.Hub, arg);
+                    var itembase = player.VanillaInventory.ServerAddItem(item.ItemType, item.Serial);
+                    InventoryItemProvider.OnItemProvided?.Invoke(player.Hub, itembase);
                 }
 
-                // if (args.IsEscaping)
-                // {
-                //     foreach(var item in args.EscapeItems)
-                //     {
-                //         if(inventory.UserInventory.Items.Count < 8 && item.ItemCategory != ItemCategory.Armor)
-                //         {
-                //             item.PickUp(player);
-                //             InventorySystem.Items.Armor.BodyArmorUtils.RemoveEverythingExceedingLimits(inventory, 
-                //                 inventory.TryGetBodyArmor(out var bodyArmor) ? bodyArmor : null, true, true);
-                //         }
-                //         else item.Drop(args.Position);
-                //     }
-                // }
-
-                args.CanBeDeleted = true;
+                if(args.IsEscaping) foreach(var item in args.EscapeItems) item.PickUp(player);
 
                 return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: PlayerSetClass(Items) failed!!\n{e}");
                 return true;
@@ -151,94 +157,20 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         }
     }
 
-    [HarmonyPatch(typeof(CharacterClassManager),nameof(CharacterClassManager.ApplyProperties))]
-    internal static class ApplyPropertiesPatch
+    [HarmonyPatch(typeof(HealthStat),nameof(HealthStat.ClassChanged))]
+    internal static class HandleHealthPatch
     {
         [HarmonyPrefix]
-        private static bool OnApplyProperties(CharacterClassManager __instance,bool lite)
+        private static void OnClassChanged(HealthStat __instance)
         {
             try
             {
-                if (lite) return true;
-
                 var player = __instance.GetPlayer();
-
-                var curRole = __instance.CurRole;
-                if (!__instance._wasAnytimeAlive && __instance.CurClass != RoleType.Spectator && __instance.CurClass != RoleType.None)
-                    __instance._wasAnytimeAlive = true;
-
-                __instance.InitSCPs();
-                __instance.AliveTime = 0f;
-
-                var team = curRole.team;
-                if (team - Team.RSC <= 1)
-                    __instance.EscapeStartTime = (int)Time.realtimeSinceStartup;
-
-                try
-                {
-                    __instance._hub.footstepSync.SetLoudness(curRole.team, curRole.roleId.Is939());
-                }
-                catch
-                {
-                }
-
-                if (curRole.roleId != RoleType.Spectator 
-                    && Respawning.RespawnManager.CurrentSequence() != Respawning.RespawnManager.RespawnSequencePhase.SpawningSelectedTeam 
-                    && Respawning.NamingRules.UnitNamingManager.RolesWithEnforcedDefaultName.TryGetValue(curRole.roleId, out var spawnableTeamType) 
-                    && Respawning.RespawnManager.Singleton.NamingManager.TryGetAllNamesFromGroup((byte)spawnableTeamType, out var array) 
-                    && array.Length != 0)
-                {
-                    __instance.NetworkCurSpawnableTeamType = (byte)spawnableTeamType;
-                    __instance.NetworkCurUnitName = array[0];
-                }
-                else if (__instance.CurSpawnableTeamType != 0)
-                {
-                    __instance.NetworkCurSpawnableTeamType = 0;
-                    __instance.NetworkCurUnitName = string.Empty;
-                }
-                if (curRole.team != Team.RIP)
-                {
-                    if (!lite)
-                    {
-                        var args = player.setClassEventArgs;
-
-                        //It is null when SCP-049 "cures" a human to SCP-049-2
-                        if (args == null) {
-                            __instance._pms.OnPlayerClassChange(__instance.DeathPosition, 0f);
-                            __instance._pms.GetPlayer().Health = 500;
-                        }
-                        else
-                        {
-                            __instance._pms.OnPlayerClassChange(args.Position, args.Rotation);
-                            __instance._pms.IsAFK = true;
-                        }
-
-                        if (!__instance.SpawnProtected && CharacterClassManager.EnableSP && CharacterClassManager.SProtectedTeam.Contains((int)curRole.team))
-                        {
-                            __instance.GodMode = true;
-                            __instance.SpawnProtected = true;
-                            __instance.ProtectedTime = Time.time;
-                        }
-
-                        if (args.CanBeDeleted) player.setClassEventArgs = null;
-                    }
-                    if (!__instance.isLocalPlayer)
-                    {
-                        __instance.GetPlayer().MaxHealth = curRole.maxHP;
-                        __instance.GetPlayer().MaxArtificialHealth = 75;
-                    }
-                }
-
-                __instance.Scp0492.iAm049_2 = (__instance.CurClass == RoleType.Scp0492);
-                __instance.Scp106.iAm106 = (__instance.CurClass == RoleType.Scp106);
-                __instance.RefreshPlyModel(RoleType.None);
-
-                return false;
+                player.MaxHealth = player.ClassManager.CurRole.maxHP;
             }
             catch(Exception e)
             {
-                Logger.Get.Error($"Synapse-Event: PlayerSetClass(ApplyProperties) failed!!\n{e}");
-                return true;
+                Logger.Get.Error($"Synapse-Event: PlayerSetClass(Health) failed!!\n{e}");
             }
         }
     }
