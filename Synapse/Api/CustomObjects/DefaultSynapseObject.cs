@@ -42,6 +42,13 @@ namespace Synapse.Api.CustomObjects
                 Rigidbody = GameObject.AddComponent<Rigidbody>();
         }
 
+        public virtual void RemoveParent()
+        {
+            GameObject.transform.parent = null;
+            if (!Map.Get.SynapseObjects.Contains(this))
+                Map.Get.SynapseObjects.Add(this);
+        }
+
         public virtual void Destroy()
             => NetworkServer.Destroy(GameObject);
     }

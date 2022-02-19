@@ -11,8 +11,8 @@ namespace Synapse.Api.CustomObjects
         [NonSerialized]
         internal bool reload = true;
 
-        public int ID { get; internal set; }
-        public string Name { get; internal set; }
+        public int ID { get; set; }
+        public string Name { get; set; }
         public Dictionary<string, string> CustomAttributes { get; set; }
 
         public List<PrimitiveConfiguration> PrimitiveObjects { get; set; } = new List<PrimitiveConfiguration>();

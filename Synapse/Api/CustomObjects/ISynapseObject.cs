@@ -22,6 +22,8 @@ namespace Synapse.Api.CustomObjects
 
         public ObjectType Type { get; }
 
+        public void RemoveParent();
+
         public void ApplyPhysics();
 
         public void Destroy();
