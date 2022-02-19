@@ -102,7 +102,7 @@ namespace Synapse.Api.Events
                                 Position = new Vector3(0f,0f,-3f),
                                 Rotation = Vector3.zero,
                                 Scale = Vector3.one * 2,
-                                DoorType = Enum.SpawnableDoorType.LCZ,
+                                DoorType = Enum.SpawnableDoorType.EZ,
                                 Locked = true,
                                 Open = true,
                                 UpdateEveryFrame = true

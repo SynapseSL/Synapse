@@ -59,7 +59,8 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                 else
                 {
                     EventHandler.Get.Scp.Scp106.InvokePocketDimensionEnterEvent(player, scp, ref allow);
-                    if (!allow) return false;
+                    if (!allow) return false;   
+                    scp.Scp106Controller.PocketPlayers.Add(player);
 
                     foreach (var script in Scp079PlayerScript.instances)
                         script.ServerProcessKillAssist(player.Hub, ExpGainType.PocketAssist);
