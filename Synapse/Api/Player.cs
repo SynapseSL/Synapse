@@ -563,7 +563,7 @@ namespace Synapse.Api
         public float ArtificialHealth
         {
             get => Hub.playerStats.GetModule<AhpStat>().CurValue;
-            set => Hub.playerStats.GetModule<AhpStat>().CurValue = value;
+            set => Hub.playerStats.GetModule<AhpStat>().ServerAddProcess(value,value, 1.2f, 0f, 0f, false);
         }
 
         private int maxahp = 75;
