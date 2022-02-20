@@ -159,7 +159,7 @@ public static class SynapseExtensions
         return item;
     }
 
-    public static bool CanHarmScp(Player player,bool message = true)
+    public static bool CanHarmScp(this Player player,bool message = true)
     {
         if (player.Team == Team.SCP || player.CustomRole?.GetFriendsID().Any(x => x == (int)Team.SCP) == true)
         {
@@ -170,7 +170,7 @@ public static class SynapseExtensions
         return true;
     }
 
-    public static bool GetHarmPermission(Player attacker, Player victim, bool ignoreConfig = false)
+    public static bool GetHarmPermission(this Player attacker, Player victim, bool ignoreConfig = false)
     {
         try
         {
