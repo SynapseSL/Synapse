@@ -42,7 +42,7 @@ public static class SynapseVersion
             Logger.Get.Warn("A Debug Build of Synapse was loaded! This version should only be used for testing and not playing as it loads for longer and is less stable.");
 
         if (BasedGameVersion != GameCore.Version.VersionString)
-            Logger.Get.Warn("Synapse-Version: Different game version than expected. Bugs may occurr!");
+            Logger.Get.Warn("Synapse-Version: Different game version than expected. Bugs may occur!");
     }
 
     public enum VersionType
