@@ -1,4 +1,4 @@
-﻿using CommandSystem.Commands.Shared;
+using CommandSystem.Commands.Shared;
 using Synapse.Api;
 
 public static class SynapseVersion
@@ -13,7 +13,7 @@ public static class SynapseVersion
 
     public const string SubVersion = "1.0";
 
-    public const string BasedGameVersion = "11.1.2";
+    public const string BasedGameVersion = "11.1.3";
 
     public static bool Debug { get; private set; } = false;
 
@@ -39,10 +39,10 @@ public static class SynapseVersion
         BuildInfoCommand.ModDescription = $"Plugin Framework: Synapse\nSynapse Version: {GetVersionName()}\nDescription: Synapse is a heavily modded server software using extensive runtime patching to make development faster and the usage more accessible to end-users";
 
         if (Debug)
-            Logger.Get.Warn("Debug Version of Synapse loaded! This Version should only be used for testing and not playing");
+            Logger.Get.Warn("A Debug Build of Synapse was loaded! This version should only be used for testing and not playing as it loads for longer and is less stable.");
 
         if (BasedGameVersion != GameCore.Version.VersionString)
-            Logger.Get.Warn("Synapse-Version: Different Game Version than expected. Bugs may occurre");
+            Logger.Get.Warn("Synapse-Version: Different game version than expected. Bugs may occurr!");
     }
 
     public enum VersionType
