@@ -2,6 +2,7 @@
 using Synapse.Api.CustomObjects;
 using Synapse.Config;
 using UnityEngine;
+using System.Linq;
 
 namespace Synapse.Api.Events
 {
@@ -121,7 +122,19 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha4:
-                    ev.Player.ArtificialHealth = 100;
+                    var door = SynapseController.Server.Map.Doors.FirstOrDefault(x => x.DoorType == Enum.DoorType.LCZ_Door);
+                    ev.Player.Position = door.Position;
+                    var child = door.GameObject.transform.GetChild(2).GetChild(1).GetChild(0); // 0 = Left 1 = Right
+                    var count = child.transform.childCount;
+                    for (var i = 0; i < count; i++)
+                    {
+                        var childchild = child.transform.GetChild(i);
+                        Logger.Get.Debug(childchild.name);
+                    }
+
+                    Logger.Get.Debug(child.transform.position);
+                    door.Open = true;
+                    MEC.Timing.CallDelayed(1f,() => Logger.Get.Debug(child.transform.position));
                     break;
             }
         }
