@@ -3,6 +3,9 @@ using Synapse.Api.CustomObjects;
 using Synapse.Config;
 using UnityEngine;
 using System.Linq;
+using System.Collections.Generic;
+using Synapse.Api.Items;
+using MEC;
 
 namespace Synapse.Api.Events
 {
@@ -117,8 +120,41 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha3:
-                    foreach (var ob in SynapseController.Server.Map.SynapseObjects)
-                        Logger.Get.Debug(ob.GameObject.name);
+                    foreach(var item in (ItemType[])System.Enum.GetValues(typeof(ItemType)))
+                    {
+                        ItemManager.Get.SetSchematicForVanillaItem(item, new SynapseSchematic
+                        {
+                            ID = 99,
+                            Name = "CustomItem",
+                            PrimitiveObjects = new System.Collections.Generic.List<SynapseSchematic.PrimitiveConfiguration>
+                            {
+                                new SynapseSchematic.PrimitiveConfiguration
+                                {
+                                    Color = Color.red,
+                                    Position = Vector3.up,
+                                    PrimitiveType = PrimitiveType.Sphere,
+                                    Rotation = Vector3.zero,
+                                    Scale = Vector3.one * 0.1f
+                                }
+                            },
+                            ItemObjects = new System.Collections.Generic.List<SynapseSchematic.ItemConfiguration>
+                            {
+                                new SynapseSchematic.ItemConfiguration
+                                {
+                                    CanBePickedUp = false,
+                                    ItemType = ItemType.Medkit,
+                                    Scale = Vector3.one * 0.1f,
+                                    Position = Vector3.zero,
+                                    Rotation = Vector3.zero,
+                                }
+                            }
+                        });
+                    }
+                    break;
+
+                case KeyCode.Alpha5:
+                    foreach (var item in SynapseController.Server.Map.Items)
+                        item.Scale = Vector3.one * 3;
                     break;
 
                 case KeyCode.Alpha4:
@@ -136,6 +172,43 @@ namespace Synapse.Api.Events
                     door.Open = true;
                     MEC.Timing.CallDelayed(1f,() => Logger.Get.Debug(child.transform.position));
                     break;
+
+                case KeyCode.Alpha6:
+                    Timing.RunCoroutine(Test(ev.Player));
+                    break;
+
+                case KeyCode.Alpha7:
+                    foreach (var obj in SynapseController.Server.Map.Rooms)
+                    {
+                        var comp = obj.GameObject.GetComponentInParent<NetworkIdentity>();
+                        comp?.DespawnForOnePlayer(ev.Player);
+                    }
+                        break;
+
+                case KeyCode.Alpha8:
+                    foreach (var room in SynapseController.Server.Map.Rooms)
+                        room.Scale = Vector3.one * 2;
+                    break;
+
+                case KeyCode.Alpha9:
+                    foreach (var obj in GameObject.FindObjectsOfType<NetworkIdentity>())
+                        if (obj.name.Contains("All"))
+                        {
+                            if (Vector3.Distance(obj.transform.position, ev.Player.Position) < 10f)
+                                Logger.Get.Debug($"Name: {obj.name} Asset{obj.assetId} Net{obj.netId}");
+                        }
+                    break;
+            }
+        }
+
+        private IEnumerator<float> Test(Player player)
+        {
+            foreach(var obj in GameObject.FindObjectsOfType<NetworkIdentity>())
+            {
+                if (!obj.name.Contains("All")) continue;
+                Logger.Get.Debug(obj.assetId);
+                obj.GetComponent<NetworkIdentity>()?.DespawnForOnePlayer(player);
+                yield return Timing.WaitForSeconds(2f);
             }
         }
 

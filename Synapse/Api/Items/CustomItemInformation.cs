@@ -7,5 +7,7 @@
         public ItemType BasedItemType;
 
         public string Name;
+
+        public int SchematicID = -1;
     }
 }

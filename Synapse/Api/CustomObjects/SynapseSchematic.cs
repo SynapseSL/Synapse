@@ -26,6 +26,8 @@ namespace Synapse.Api.CustomObjects
         {
             public PrimitiveType PrimitiveType { get; set; }
 
+            public bool Physics { get; set; }
+
             public SerializedVector3 Position { get; set; }
 
             public SerializedVector3 Rotation { get; set; }
@@ -75,6 +77,8 @@ namespace Synapse.Api.CustomObjects
 
             public bool CanBePickedUp { get; set; }
 
+            public bool Physics { get; set; }
+
             public SerializedVector3 Position { get; set; }
 
             public SerializedVector3 Rotation { get; set; }
@@ -112,6 +116,19 @@ namespace Synapse.Api.CustomObjects
             public bool Locked { get; set; }
 
             public bool UpdateEveryFrame { get; set; } = false;
+
+            public Dictionary<string, string> CustomAttributes { get; set; }
+        }
+
+        public class CustomObjectConfiguration
+        {
+            public int ID { get; set; }
+
+            public SerializedVector3 Position { get; set; }
+
+            public SerializedVector3 Rotation { get; set; }
+
+            public SerializedVector3 Scale { get; set; }
 
             public Dictionary<string, string> CustomAttributes { get; set; }
         }

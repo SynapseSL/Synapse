@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using InventorySystem;
+﻿using InventorySystem;
 using InventorySystem.Items;
 using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Firearms.Ammo;
@@ -9,7 +7,10 @@ using InventorySystem.Items.MicroHID;
 using InventorySystem.Items.Pickups;
 using InventorySystem.Items.Radio;
 using Mirror;
+using Synapse.Api.CustomObjects;
 using Synapse.Api.Enum;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Synapse.Api.Items
@@ -37,6 +38,7 @@ namespace Synapse.Api.Items
             Serial = ItemSerialGenerator.GenerateNext();
             AllItems[Serial] = this;
             ID = (int)type;
+            Schematic = ItemManager.Get.GetSchematic(ID);
             Name = type.ToString();
             IsCustomItem = false;
             ItemType = type;
@@ -69,7 +71,7 @@ namespace Synapse.Api.Items
         /// <param name="type"></param>
         public SynapseItem(int id) : this()
         {
-            if(id == -1 && None == null)
+            if (id == -1 && None == null)
             {
                 ID = -1;
                 ItemType = ItemType.None;
@@ -80,6 +82,7 @@ namespace Synapse.Api.Items
             Serial = ItemSerialGenerator.GenerateNext();
             AllItems[Serial] = this;
             ID = id;
+            Schematic = ItemManager.Get.GetSchematic(ID);
 
             if (id >= 0 && id <= ItemManager.HighestItem)
             {
@@ -126,6 +129,7 @@ namespace Synapse.Api.Items
             Serial = itemBase.ItemSerial;
             AllItems[Serial] = this;
             ID = (int)itemBase.ItemTypeId;
+            Schematic = ItemManager.Get.GetSchematic(ID);
             Name = itemBase.ItemTypeId.ToString();
             IsCustomItem = false;
             ItemType = itemBase.ItemTypeId;
@@ -144,6 +148,7 @@ namespace Synapse.Api.Items
             PickupBase = pickupBase;
             AllItems[Serial] = this;
             ID = (int)pickupBase.Info.ItemId;
+            Schematic = ItemManager.Get.GetSchematic(ID);
             Name = pickupBase.Info.ItemId.ToString();
             IsCustomItem = false;
             ItemType = pickupBase.Info.ItemId;
@@ -231,6 +236,8 @@ namespace Synapse.Api.Items
         public Dictionary<string, object> ItemData { get; set; } = new Dictionary<string, object>();
 
         public bool CanBePickedUp { get; set; } = true;
+        public SynapseSchematic Schematic { get; set; }
+        public SynapseObject SynapseObject { get; set; }
 
         private Vector3 position = Vector3.zero;
         public Vector3 Position
@@ -291,8 +298,11 @@ namespace Synapse.Api.Items
                 if (PickupBase != null)
                 {
                     PickupBase.transform.localScale = value;
-                    NetworkServer.UnSpawn(PickupBase.gameObject);
-                    NetworkServer.Spawn(PickupBase.gameObject);
+
+                    if (SynapseObject == null)
+                        PickupBase.netIdentity.UpdatePositionRotationScale();
+                    else
+                        SynapseObject.Scale = SynapseObject.GameObject.transform.lossyScale;
                 }
 
                 scale = value;
@@ -473,6 +483,8 @@ namespace Synapse.Api.Items
 
                         Durabillity = durabillity;
                         WeaponAttachments = attachments;
+
+                        CheckForSchematic();
                     }
                     break;
             }
@@ -528,6 +540,38 @@ namespace Synapse.Api.Items
             Despawn();
             AllItems.Remove(Serial);
             deactivated = true;
+        }
+
+        internal void CheckForSchematic()
+        {
+            if (Schematic == null) return;
+            Transform parent;
+            if (PickupBase != null) parent = PickupBase.transform;
+            else if (Throwable.ThrowableItem != null) parent = Throwable.ThrowableItem.transform;
+            else return;
+
+            SynapseObject = new SynapseObject(Schematic);
+            SynapseObject.Position = Position;
+            SynapseObject.ItemParent = this;
+
+            var scale = Scale;
+            Scale = Vector3.one;
+            SynapseObject.GameObject.transform.parent = parent;
+            Scale = scale;
+            SynapseObject.Scale = SynapseObject.GameObject.transform.lossyScale;
+
+            PickupBase?.netIdentity.DespawnForAllPlayers();
+            Throwable.ThrowableItem?.netIdentity.DespawnForAllPlayers();
+
+            foreach (var comp in SynapseObject.GameObject.GetComponentsInChildren<Rigidbody>())
+                if(comp != null)
+                comp.isKinematic = true;
+
+            Logger.Get.Debug(SynapseObject?.Childrens == null);
+
+            foreach (var child in SynapseObject.Childrens)
+                if (child != null && child.Rigidbody != null)
+                    child.Rigidbody.isKinematic = true;
         }
         #endregion
 

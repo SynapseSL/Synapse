@@ -19,8 +19,10 @@ namespace Synapse.Api.Items
             set
             {
                 if (ThrowableItem == null) return;
+                var comp = ThrowableItem.GetComponent<TimeGrenade>();
 
-                ThrowableItem.GetComponent<TimeGrenade>().RpcSetTime(value);
+                comp.RpcSetTime(value);
+                comp.UserCode_RpcSetTime(value);
             }
         }
 

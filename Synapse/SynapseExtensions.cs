@@ -271,6 +271,18 @@ public static class SynapseExtensions
         NetworkServer.SendToAll(msg);
     }
 
+    public static void DespawnForOnePlayer(this NetworkIdentity identity, Player player)
+    {
+        var msg = new ObjectDestroyMessage { netId = identity.netId };
+        player.Connection.Send(msg);
+    }
+
+    public static void DespawnForAllPlayers(this NetworkIdentity identity)
+    {
+        var msg = new ObjectDestroyMessage { netId = identity.netId };
+        NetworkServer.SendToAll(msg);
+    }
+
     [Obsolete("Use SynapseExtensions.CanHarmScp() and check if it is false")]
     public static bool CanNotHurtByScp(Player player) => !CanHarmScp(player, false);
 }

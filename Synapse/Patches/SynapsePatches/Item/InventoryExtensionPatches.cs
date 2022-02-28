@@ -96,6 +96,8 @@ namespace Synapse.Patches.SynapsePatches.Item
                 if (spawn)
                     NetworkServer.Spawn(pickup.gameObject);
 
+                sitem.CheckForSchematic();
+
                 pickup.InfoReceived(default, psi);
 
                 __result = pickup;
