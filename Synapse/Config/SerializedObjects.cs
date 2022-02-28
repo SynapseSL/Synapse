@@ -217,6 +217,8 @@ namespace Synapse.Config
 
         public static implicit operator Vector3(SerializedVector3 vector) => vector.Parse();
         public static implicit operator SerializedVector3(Vector3 vector) => new SerializedVector3(vector);
+        public static implicit operator SerializedVector3(Quaternion rotation) => new SerializedVector3(rotation.eulerAngles);
+        public static implicit operator Quaternion(SerializedVector3 vector) => Quaternion.Euler(vector);
     }
 
     [Serializable]

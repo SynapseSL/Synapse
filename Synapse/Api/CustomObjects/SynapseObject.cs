@@ -76,6 +76,15 @@ namespace Synapse.Api.CustomObjects
                 obj.Parent = this;
             }
 
+            foreach (var dummy in schematic.DummyObjects)
+            {
+                var obj = new SynapseDummyObject(dummy);
+                DummyChildrens.Add(obj);
+                Childrens.Add(obj);
+                obj.GameObject.transform.parent = GameObject.transform;
+                obj.Parent = this;
+            }
+
             Map.Get.SynapseObjects.Add(this);
 
             var script = GameObject.AddComponent<SynapseObjectScript>();
@@ -127,6 +136,7 @@ namespace Synapse.Api.CustomObjects
         public List<SynapseWorkStationObject> WorkStationChildrens { get; } = new List<SynapseWorkStationObject>();
         public List<SynapseDoorObject> DoorChildrens { get; } = new List<SynapseDoorObject>();
         public List<SynapseRagdollObject> RagdollChildrens { get; } = new List<SynapseRagdollObject>();
+        public List<SynapseDummyObject> DummyChildrens { get; } = new List<SynapseDummyObject>();
 
         public string Name { get; }
 
@@ -150,6 +160,9 @@ namespace Synapse.Api.CustomObjects
 
             foreach (var rag in RagdollChildrens)
                 rag.Refresh();
+
+            foreach(var dummy in DummyChildrens)
+                dummy.Refresh();
         }
 
         private void UpdateScale()

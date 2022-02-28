@@ -22,6 +22,8 @@ namespace Synapse.Api.CustomObjects
         public List<WorkStationConfiguration> WorkStationObjects { get; set; } = new List<WorkStationConfiguration>();
         public List<DoorConfiguration> DoorObjects { get; set; } = new List<DoorConfiguration>();
         public List<RagdollConfiguration> RagdollObjects { get; set; } = new List<RagdollConfiguration>();
+        public List<DummyConfiguration> DummyObjects { get; set; } = new List<DummyConfiguration>();
+
 
         public class PrimitiveConfiguration
         {
@@ -141,6 +143,27 @@ namespace Synapse.Api.CustomObjects
             public RoleType RoleType { get; set; }
 
             public DamageType DamageType { get; set; }
+
+            public SerializedVector3 Position { get; set; }
+
+            public SerializedVector3 Rotation { get; set; }
+
+            public SerializedVector3 Scale { get; set; }
+
+            public Dictionary<string, string> CustomAttributes { get; set; }
+        }
+
+        public class DummyConfiguration
+        {
+            public RoleType Role { get; set; }
+
+            public ItemType HeldItem { get; set; }
+
+            public string Name { get; set; }
+
+            public string Badge { get; set; }
+
+            public string BadgeColor { get; set; }
 
             public SerializedVector3 Position { get; set; }
 

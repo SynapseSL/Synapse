@@ -32,21 +32,36 @@ namespace Synapse.Api.Events
                 case KeyCode.Alpha2:
                     SchematicHandler.Get.SpawnSchematic(new SynapseSchematic
                     {
-                        ID = 1,
-                        Name = "",
-                        RagdollObjects = new System.Collections.Generic.List<SynapseSchematic.RagdollConfiguration>
+                        ID = 3672,
+                        Name = "weqeqwe",
+                        PrimitiveObjects = new System.Collections.Generic.List<SynapseSchematic.PrimitiveConfiguration>
                         {
-                            new SynapseSchematic.RagdollConfiguration
+                            new SynapseSchematic.PrimitiveConfiguration
                             {
-                                DamageType = Enum.DamageType.Bleeding,
-                                Nick = "gadshi",
+                                Color = Color.red,
                                 Position = Vector3.zero,
-                                RoleType = RoleType.ChaosConscript,
+                                PrimitiveType = PrimitiveType.Cube,
                                 Rotation = Vector3.zero,
-                                Scale = Vector3.one * 2
+                                Scale = Vector3.one
+                            }
+                        },
+                        DummyObjects = new System.Collections.Generic.List<SynapseSchematic.DummyConfiguration>
+                        {
+                            new SynapseSchematic.DummyConfiguration
+                            {
+                                HeldItem = ItemType.None,
+                                Scale = Vector3.one,
+                                Name = "Dummy",
+                                Position = Vector3.zero,
+                                Rotation = Quaternion.identity,
+                                Role = RoleType.ClassD
                             }
                         }
                     }, ev.Player.Position);
+                    break;
+
+                case KeyCode.Alpha3:
+                    var dum = new SynapseDummyObject(ev.Player.Position, ev.Player.transform.rotation, Vector3.one, ev.Player.RoleType, ItemType.Coin, "asd", "asdsds", "cyan");
                     break;
 
 
