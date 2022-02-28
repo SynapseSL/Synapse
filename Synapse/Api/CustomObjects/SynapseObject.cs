@@ -67,6 +67,15 @@ namespace Synapse.Api.CustomObjects
                 obj.Parent = this;
             }
 
+            foreach (var rag in schematic.RagdollObjects)
+            {
+                var obj = new SynapseRagdollObject(rag);
+                RagdollChildrens.Add(obj);
+                Childrens.Add(obj);
+                obj.GameObject.transform.parent = GameObject.transform;
+                obj.Parent = this;
+            }
+
             Map.Get.SynapseObjects.Add(this);
 
             var script = GameObject.AddComponent<SynapseObjectScript>();
@@ -138,6 +147,9 @@ namespace Synapse.Api.CustomObjects
 
             foreach(var door in DoorChildrens)
                 door.Refresh();
+
+            foreach (var rag in RagdollChildrens)
+                rag.Refresh();
         }
 
         private void UpdateScale()

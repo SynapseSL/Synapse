@@ -8,11 +8,20 @@ namespace Synapse.Api.CustomObjects
 {
     public class SynapseRagdollObject : NetworkSynapseObject
     {
-        public SynapseRagdollObject(RoleType role, DamageType damage, Vector3 pos, Quaternion rot, string nick)
+        public SynapseRagdollObject(RoleType role, DamageType damage, Vector3 pos, Quaternion rot, Vector3 scale, string nick)
         {
-            Ragdoll = CreateRagDoll(role, damage, pos, rot, nick);
+            Ragdoll = CreateRagDoll(role, damage, pos, rot, scale, nick);
 
             Map.Get.SynapseObjects.Add(this);
+
+            var script = GameObject.AddComponent<SynapseObjectScript>();
+            script.Object = this;
+        }
+        internal SynapseRagdollObject(SynapseSchematic.RagdollConfiguration configuration)
+        {
+            Ragdoll = CreateRagDoll(configuration.RoleType, configuration.DamageType, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale, configuration.Nick);
+            OriginalScale = configuration.Scale;
+            CustomAttributes = configuration.CustomAttributes;
 
             var script = GameObject.AddComponent<SynapseObjectScript>();
             script.Object = this;
@@ -39,11 +48,12 @@ namespace Synapse.Api.CustomObjects
         public string Nick => Ragdoll.ragdoll.Info.Nickname;
         public Ragdoll Ragdoll { get; }
 
-        public Ragdoll CreateRagDoll(RoleType role, DamageType damage,Vector3 pos, Quaternion rot,string nick)
+        public Ragdoll CreateRagDoll(RoleType role, DamageType damage, Vector3 pos, Quaternion rot, Vector3 scale, string nick)
         {
             var obj = UnityEngine.Object.Instantiate(Prefabs[role]);
             var rag = obj.GetComponent<Rag>();
             rag.NetworkInfo = new RagdollInfo(Server.Get.Host, damage.GetUniversalDamageHandler(), role, pos, rot, nick, NetworkTime.time);
+            rag.transform.localScale = scale;
             NetworkServer.Spawn(rag.gameObject);
 
             var srag = new Ragdoll(rag);

@@ -30,7 +30,23 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha2:
-                    var rag = new SynapseRagdollObject(ev.Player.RoleType, Enum.DamageType.Bleeding, ev.Player.Position, ev.Player.transform.rotation, ev.Player.NickName);
+                    SchematicHandler.Get.SpawnSchematic(new SynapseSchematic
+                    {
+                        ID = 1,
+                        Name = "",
+                        RagdollObjects = new System.Collections.Generic.List<SynapseSchematic.RagdollConfiguration>
+                        {
+                            new SynapseSchematic.RagdollConfiguration
+                            {
+                                DamageType = Enum.DamageType.Bleeding,
+                                Nick = "gadshi",
+                                Position = Vector3.zero,
+                                RoleType = RoleType.ChaosConscript,
+                                Rotation = Vector3.zero,
+                                Scale = Vector3.one * 2
+                            }
+                        }
+                    }, ev.Player.Position);
                     break;
 
 
