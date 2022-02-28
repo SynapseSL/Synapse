@@ -216,6 +216,7 @@ namespace Synapse.Api
 
         internal void ClearObjects()
         {
+            Room.networkIdentities = null;
             Teslas.Clear();
             Doors.Clear();
             Elevators.Clear();

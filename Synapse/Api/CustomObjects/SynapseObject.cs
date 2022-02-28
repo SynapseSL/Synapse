@@ -117,6 +117,7 @@ namespace Synapse.Api.CustomObjects
         public List<SynapseItemObject> ItemChildrens { get; } = new List<SynapseItemObject>();
         public List<SynapseWorkStationObject> WorkStationChildrens { get; } = new List<SynapseWorkStationObject>();
         public List<SynapseDoorObject> DoorChildrens { get; } = new List<SynapseDoorObject>();
+        public List<SynapseRagdollObject> RagdollChildrens { get; } = new List<SynapseRagdollObject>();
 
         public string Name { get; }
 

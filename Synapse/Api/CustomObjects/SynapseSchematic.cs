@@ -132,5 +132,22 @@ namespace Synapse.Api.CustomObjects
 
             public Dictionary<string, string> CustomAttributes { get; set; }
         }
+
+        public class RagdollConfiguration
+        {
+            public string Nick { get; set; }
+
+            public RoleType RoleType { get; set; }
+
+            public DamageType DamageType { get; set; }
+
+            public SerializedVector3 Position { get; set; }
+
+            public SerializedVector3 Rotation { get; set; }
+
+            public SerializedVector3 Scale { get; set; }
+
+            public Dictionary<string, string> CustomAttributes { get; set; }
+        }
     }
 }

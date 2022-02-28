@@ -114,7 +114,7 @@ namespace Synapse.Api
 
         public Color WarheadColor { get => LightController.Network_warheadLightColor; set => LightController.Network_warheadLightColor = value; }
 
-        private static List<NetworkIdentity> networkIdentities;
+        internal static List<NetworkIdentity> networkIdentities;
 
         private static NetworkIdentity GetNetworkIdentity(RoomName room)
         {

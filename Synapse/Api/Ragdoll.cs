@@ -39,9 +39,8 @@ namespace Synapse.Api
             get => ragdoll.transform.localScale;
             set
             {
-                NetworkServer.UnSpawn(GameObject);
                 ragdoll.transform.localScale = value;
-                NetworkServer.Spawn(GameObject);
+                ragdoll.netIdentity.UpdatePositionRotationScale();
             }
         }
 

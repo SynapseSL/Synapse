@@ -31,6 +31,8 @@ namespace Synapse.Api.CustomObjects
         public void OnDestroy()
         {
             Server.Get.Events.SynapseObject.InvokeDestroy(new Events.SynapseEventArguments.SOEventArgs(Object));
+            if (Parent != null)
+                Parent.Childrens.Remove(Object);
             if (Map.Get.SynapseObjects.Contains(Object))
                 Map.Get.SynapseObjects.Remove(Object);
         }

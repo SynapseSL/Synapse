@@ -244,6 +244,9 @@ namespace Synapse.Api.Items
         {
             get
             {
+                if (Throwable.ThrowableItem != null)
+                    return Throwable.ThrowableItem.transform.position;
+
                 if (ItemBase != null)
                     return ItemHolder.Position;
 
@@ -545,10 +548,7 @@ namespace Synapse.Api.Items
         internal void CheckForSchematic()
         {
             if (Schematic == null) return;
-            Transform parent;
-            if (PickupBase != null) parent = PickupBase.transform;
-            else if (Throwable.ThrowableItem != null) parent = Throwable.ThrowableItem.transform;
-            else return;
+            if (State != ItemState.Map) return;
 
             SynapseObject = new SynapseObject(Schematic);
             SynapseObject.Position = Position;
@@ -556,22 +556,11 @@ namespace Synapse.Api.Items
 
             var scale = Scale;
             Scale = Vector3.one;
-            SynapseObject.GameObject.transform.parent = parent;
+            SynapseObject.GameObject.transform.parent = PickupBase.transform;
             Scale = scale;
             SynapseObject.Scale = SynapseObject.GameObject.transform.lossyScale;
 
             PickupBase?.netIdentity.DespawnForAllPlayers();
-            Throwable.ThrowableItem?.netIdentity.DespawnForAllPlayers();
-
-            foreach (var comp in SynapseObject.GameObject.GetComponentsInChildren<Rigidbody>())
-                if(comp != null)
-                comp.isKinematic = true;
-
-            Logger.Get.Debug(SynapseObject?.Childrens == null);
-
-            foreach (var child in SynapseObject.Childrens)
-                if (child != null && child.Rigidbody != null)
-                    child.Rigidbody.isKinematic = true;
         }
         #endregion
 

@@ -964,5 +964,10 @@ namespace Synapse.Api
                 CustomRole.Escape();
             }
         }
+
+        public static implicit operator Player(Footprinting.Footprint footprint) => footprint.Hub.GetPlayer();
+        public static implicit operator Player(ReferenceHub hub) => hub.GetPlayer();
+        public static implicit operator Footprinting.Footprint(Player player) => new Footprinting.Footprint(player.Hub);
+        public static implicit operator ReferenceHub(Player player) => player.Hub;
     }
 }
