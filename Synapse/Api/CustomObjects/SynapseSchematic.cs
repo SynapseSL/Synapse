@@ -21,6 +21,7 @@ namespace Synapse.Api.CustomObjects
         public List<ItemConfiguration> ItemObjects { get; set; } = new List<ItemConfiguration>();
         public List<WorkStationConfiguration> WorkStationObjects { get; set; } = new List<WorkStationConfiguration>();
         public List<DoorConfiguration> DoorObjects { get; set; } = new List<DoorConfiguration>();
+        public List<CustomObjectConfiguration> CustomObjects { get; set; } = new List<CustomObjectConfiguration>();
         public List<RagdollConfiguration> RagdollObjects { get; set; } = new List<RagdollConfiguration>();
         public List<DummyConfiguration> DummyObjects { get; set; } = new List<DummyConfiguration>();
 

@@ -67,6 +67,15 @@ namespace Synapse.Api.CustomObjects
                 obj.Parent = this;
             }
 
+            foreach(var custom in schematic.CustomObjects)
+            {
+                var obj = new SynapseCustomObject(custom);
+                CustomChildrens.Add(obj);
+                Childrens.Add(obj);
+                obj.GameObject.transform.parent = GameObject.transform;
+                obj.Parent = this;
+            }
+
             foreach (var rag in schematic.RagdollObjects)
             {
                 var obj = new SynapseRagdollObject(rag);
@@ -135,6 +144,7 @@ namespace Synapse.Api.CustomObjects
         public List<SynapseItemObject> ItemChildrens { get; } = new List<SynapseItemObject>();
         public List<SynapseWorkStationObject> WorkStationChildrens { get; } = new List<SynapseWorkStationObject>();
         public List<SynapseDoorObject> DoorChildrens { get; } = new List<SynapseDoorObject>();
+        public List<SynapseCustomObject> CustomChildrens { get; } = new List<SynapseCustomObject>();
         public List<SynapseRagdollObject> RagdollChildrens { get; } = new List<SynapseRagdollObject>();
         public List<SynapseDummyObject> DummyChildrens { get; } = new List<SynapseDummyObject>();
 

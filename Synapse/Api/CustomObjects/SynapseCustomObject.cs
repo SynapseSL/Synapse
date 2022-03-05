@@ -23,6 +23,10 @@ namespace Synapse.Api.CustomObjects
 
         internal SynapseCustomObject(SynapseSchematic.CustomObjectConfiguration configuration)
         {
+            GameObject = new GameObject("SynapseCustomObject-" + configuration.ID);
+            GameObject.transform.position = configuration.Position;
+            GameObject.transform.rotation = configuration.Rotation;
+            GameObject.transform.localScale = configuration.Scale;
             OriginalScale = configuration.Scale;
             CustomAttributes = configuration.CustomAttributes;
             ID = configuration.ID;
