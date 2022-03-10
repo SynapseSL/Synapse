@@ -20,6 +20,8 @@ namespace Synapse.Api.CustomObjects
         internal SynapseItemObject(SynapseSchematic.ItemConfiguration configuration)
         {
             Item = CreateItem(configuration.ItemType, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale, configuration.CanBePickedUp);
+            Item.Durabillity = configuration.Durabillity;
+            Item.WeaponAttachments = configuration.Attachments;
             OriginalScale = configuration.Scale;
             CustomAttributes = configuration.CustomAttributes;
             ItemType = configuration.ItemType;

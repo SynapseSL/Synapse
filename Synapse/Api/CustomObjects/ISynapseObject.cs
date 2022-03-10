@@ -6,9 +6,9 @@ namespace Synapse.Api.CustomObjects
 {
     public interface ISynapseObject
     {
-        public Dictionary<string, object> ObjectData { get; }
+        public Dictionary<string, object> ObjectData { get; set; }
 
-        public Dictionary<string, string> CustomAttributes { get; }
+        public List<string> CustomAttributes { get; set; }
 
         public Vector3 Position { get; set; }
 

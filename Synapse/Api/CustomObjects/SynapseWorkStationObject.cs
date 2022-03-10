@@ -13,7 +13,7 @@ namespace Synapse.Api.CustomObjects
         internal SynapseWorkStationObject(WorkStation station, Vector3 position, Quaternion rotation, Vector3 scale)
         {
             WorkStation = station;
-            station.workStation = CreateController(position, rotation, scale);
+            station.workStation = CreateNetworkObject(Prefab, position, rotation, scale);
 
             Map.Get.SynapseObjects.Add(this);
 
@@ -52,18 +52,9 @@ namespace Synapse.Api.CustomObjects
 
         private WorkStation CreateStation(Vector3 position, Quaternion rotation, Vector3 scale)
         {
-            var station = new WorkStation(CreateController(position, rotation, scale));
+            var station = new WorkStation(CreateNetworkObject(Prefab, position, rotation, scale));
             Map.Get.WorkStations.Add(station);
             return station;
-        }
-        private WorkstationController CreateController(Vector3 position, Quaternion rotation, Vector3 scale)
-        {
-            var ot = UnityEngine.Object.Instantiate(Prefab, position, rotation);
-            ot.transform.position = position;
-            ot.transform.rotation = rotation;
-            ot.transform.localScale = scale;
-            NetworkServer.Spawn(ot.gameObject);
-            return ot;
         }
     }
 }

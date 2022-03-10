@@ -30,6 +30,7 @@ namespace Synapse.Api.CustomObjects
         public override Vector3 Position { get => Dummy.Position; set => Dummy.Position = value; }
         public override Quaternion Rotation { get => Quaternion.Euler(new Vector3(Dummy.Rotation.x, Dummy.Rotation.y, 90f)); set => Dummy.Rotation = new Vector2(value.eulerAngles.x, value.eulerAngles.y); }
         public override Vector3 Scale { get => Dummy.Scale; set => Dummy.Scale = value; }
+
         public RoleType Role { get => Dummy.Role; set => Dummy.Role = value; }
         public ItemType HeldItem { get => Dummy.HeldItem; set => Dummy.HeldItem = value; }
         public string Name { get => Dummy.Name; set => Dummy.Name = value; }

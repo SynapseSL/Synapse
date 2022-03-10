@@ -11,6 +11,8 @@
         Item,
         Ragdoll,
         Dummy,
-        Custom
+        Custom,
+        Locker,
+        Generator
     }
 }

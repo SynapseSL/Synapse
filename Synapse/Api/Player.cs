@@ -126,15 +126,7 @@ namespace Synapse.Api
             Hub.serverRoles.TargetCloseRemoteAdmin();
         }
 
-        public void Heal(float hp)
-        {
-            var health = Health;
-            health += hp;
-            if (health > MaxHealth)
-                health = MaxHealth;
-
-            Health = health;
-        }
+        public void Heal(float hp) => GetStatBase<HealthStat>().ServerHeal(hp);
 
         public bool Hurt(float damage, DamageType type = DamageType.Unknown)
         {
@@ -433,6 +425,8 @@ namespace Synapse.Api
         #endregion
 
         #region Default Stuff
+        public TStat GetStatBase<TStat>() where TStat : StatBase => PlayerStats.GetModule<TStat>();
+
         public string DisplayName
         {
             get => NicknameSync.DisplayName;
@@ -554,16 +548,16 @@ namespace Synapse.Api
 
         public float Health
         {
-            get => Hub.playerStats.GetModule<HealthStat>().CurValue;
-            set => Hub.playerStats.GetModule<HealthStat>().CurValue = value;
+            get => GetStatBase<HealthStat>().CurValue;
+            set => GetStatBase<HealthStat>().CurValue = value;
         }
 
         public float MaxHealth { get; set; } = 100f;
 
         public float ArtificialHealth
         {
-            get => Hub.playerStats.GetModule<AhpStat>().CurValue;
-            set => Hub.playerStats.GetModule<AhpStat>().ServerAddProcess(value,value, 1.2f, 0f, 0f, false);
+            get => GetStatBase<AhpStat>().CurValue;
+            set => GetStatBase<AhpStat>().ServerAddProcess(value,value, 1.2f, 0f, 0f, false);
         }
 
         private int maxahp = 75;
@@ -574,7 +568,7 @@ namespace Synapse.Api
             set
             {
                 maxahp = value;
-                foreach (var process in PlayerStats.GetModule<AhpStat>()._activeProcesses)
+                foreach (var process in GetStatBase<AhpStat>()._activeProcesses)
                     process.Limit = value;
             }
         }
@@ -780,7 +774,7 @@ namespace Synapse.Api
             {
                 if (VanillaInventory.CurItem == ItemIdentifier.None || VanillaInventory.CurInstance == null) return SynapseItem.None;
 
-                return SynapseItem.AllItems[VanillaInventory.CurItem.SerialNumber];
+                return SynapseItem.GetSynapseItem(VanillaInventory.CurItem.SerialNumber);
             }
             set
             {

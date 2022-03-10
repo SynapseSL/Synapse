@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Api\Broadcast.cs" />
     <Compile Include="Api\CustomObjects\NetworkSynapseObject.cs" />
+    <Compile Include="Api\CustomObjects\StructureSyncSynapseObject.cs" />
     <Compile Include="Api\CustomObjects\SynapseCustomObject.cs" />
     <Compile Include="Api\CustomObjects\CustomAttributes\Breakable.cs" />
     <Compile Include="Api\CustomObjects\CustomAttributes\CustomAttributeHandler.cs" />
@@ -49,7 +50,9 @@
     <Compile Include="Api\CustomObjects\SynapseDummyObject.cs" />
     <Compile Include="Api\CustomObjects\ISynapseObject.cs" />
     <Compile Include="Api\CustomObjects\SynapseDoorObject.cs" />
+    <Compile Include="Api\CustomObjects\SynapseGeneratorObject.cs" />
     <Compile Include="Api\CustomObjects\SynapseItemObject.cs" />
+    <Compile Include="Api\CustomObjects\SynapseLockerObject.cs" />
     <Compile Include="Api\CustomObjects\SynapseObjectScript.cs" />
     <Compile Include="Api\CustomObjects\SynapseRagdollObject.cs" />
     <Compile Include="Api\CustomObjects\SynapseWorkStationObject.cs" />

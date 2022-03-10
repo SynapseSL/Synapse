@@ -3,6 +3,8 @@ using Synapse.Config;
 using System.Linq;
 using UnityEngine;
 using Synapse.Api.CustomObjects;
+using MapGeneration.Distributors;
+using System;
 
 namespace Synapse.Api.Events
 {
@@ -17,7 +19,13 @@ namespace Synapse.Api.Events
             Server.UpdateEvent += OnUpdate;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
+            Player.PlayerHealEvent += OnHeal;
 #endif
+        }
+
+        private void OnHeal(SynapseEventArguments.PlayerHealEventArgs ev)
+        {
+            Logger.Get.Debug(ev.Amount);
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
@@ -61,7 +69,11 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha3:
-                    var dum = new SynapseDummyObject(ev.Player.Position, ev.Player.transform.rotation, Vector3.one, ev.Player.RoleType, ItemType.Coin, "asd", "asdsds", "cyan");
+                    var gen = new SynapseLockerObject(Enum.LockerType.StandardLocker, ev.Player.Position, ev.Player.transform.rotation, Vector3.one);
+                    MEC.Timing.CallDelayed(3f,() => gen.Position = ev.Player.Position);
+                    MEC.Timing.CallDelayed(6f, () => gen.Rotation = ev.Player.transform.rotation);
+                    MEC.Timing.CallDelayed(9f, () => gen.Scale = Vector3.one * 3);
+                    MEC.Timing.CallDelayed(12f, () => Logger.Get.Debug($"{gen.Position} {gen.Rotation.eulerAngles} {gen.Scale}"));
                     break;
 
 
@@ -85,8 +97,20 @@ namespace Synapse.Api.Events
                     foreach (var room in SynapseController.Server.Map.Rooms)
                         room.Rotation = Quaternion.Euler(180f, 0f, 0f);
                     break;
+
+                case KeyCode.Alpha5:
+                    var handler = GameObject.FindObjectOfType<SqueakSpawner>();
+                    handler.NetworksyncSpawn = (byte)((test)+(1));
+                    var mice = handler.mice[test];
+                    mice.SetActive(true);
+                    handler._spawnedMouse = mice.GetComponent<Interactables.Interobjects.SqueakInteraction>();
+                    ev.Player.Position = mice.transform.position;
+                    test++;
+                    break;
             }
         }
+
+        public byte test = 0;
 
         public static EventHandler Get => SynapseController.Server.Events;
 
@@ -129,9 +153,7 @@ namespace Synapse.Api.Events
                 firstLoaded = true;
                 SynapseController.CommandHandlers.GenerateCommandCompletion();
 
-                foreach (var role in CharacterClassManager._staticClasses)
-                    if (role != null)
-                        SynapseRagdollObject.Prefabs[role.roleId] = role.model_ragdoll;
+                SchematicHandler.Get.InitLate();
             }
         }
 

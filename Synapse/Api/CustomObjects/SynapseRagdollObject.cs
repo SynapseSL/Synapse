@@ -27,7 +27,7 @@ namespace Synapse.Api.CustomObjects
             script.Object = this;
         }
 
-        public static Dictionary<RoleType, GameObject> Prefabs = new Dictionary<RoleType, GameObject>();
+        public static Dictionary<RoleType, Rag> Prefabs = new Dictionary<RoleType, Rag>();
 
         public override GameObject GameObject => Ragdoll.GameObject;
         public override NetworkIdentity NetworkIdentity => Ragdoll.ragdoll.netIdentity;
@@ -50,11 +50,8 @@ namespace Synapse.Api.CustomObjects
 
         public Ragdoll CreateRagDoll(RoleType role, DamageType damage, Vector3 pos, Quaternion rot, Vector3 scale, string nick)
         {
-            var obj = UnityEngine.Object.Instantiate(Prefabs[role]);
-            var rag = obj.GetComponent<Rag>();
+            var rag = CreateNetworkObject(Prefabs[role], pos, rot, scale);
             rag.NetworkInfo = new RagdollInfo(Server.Get.Host, damage.GetUniversalDamageHandler(), role, pos, rot, nick, NetworkTime.time);
-            rag.transform.localScale = scale;
-            NetworkServer.Spawn(rag.gameObject);
 
             var srag = new Ragdoll(rag);
             Map.Get.Ragdolls.Add(srag);

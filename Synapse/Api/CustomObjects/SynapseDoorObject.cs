@@ -49,11 +49,7 @@ namespace Synapse.Api.CustomObjects
 
         private Door CreateDoor(SpawnableDoorType type, Vector3 position, Quaternion rotation, Vector3 scale, bool open, bool locked)
         {
-            var ot = UnityEngine.Object.Instantiate(Prefab[type], position, rotation);
-            ot.transform.position = position;
-            ot.transform.rotation = rotation;
-            ot.transform.localScale = scale;
-            NetworkServer.Spawn(ot.gameObject);
+            var ot = CreateNetworkObject(Prefab[type], position, rotation, scale);
             var door = new Door(ot);
             door.Open = open;
             door.Locked = locked;

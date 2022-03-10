@@ -130,7 +130,7 @@ public static class SynapseExtensions
         //If the List doesn't even contain the Serial then it is destroyed or a item with this ID was never spawned
         if (!SynapseItem.AllItems.ContainsKey(itembase.ItemSerial)) return null;
 
-        var item = SynapseItem.AllItems[itembase.ItemSerial];
+        var item = SynapseItem.GetSynapseItem(itembase.ItemSerial);
 
         //This is a simple fallback if the item is not registered
         if (item == null)
@@ -147,7 +147,7 @@ public static class SynapseExtensions
         //If the List doesn't even contain the Serial then it is destroyed or a item with this ID was never spawned
         if (!SynapseItem.AllItems.ContainsKey(pickupbase.Info.Serial)) return null;
 
-        var item = SynapseItem.AllItems[pickupbase.Info.Serial];
+        var item = SynapseItem.GetSynapseItem(pickupbase.Info.Serial);
 
         //This is a simple fallback if the item is not registered
         if (item == null)
@@ -252,11 +252,14 @@ public static class SynapseExtensions
     }
 
     public static void UpdatePositionRotationScale(this NetworkIdentity identity)
+        => NetworkServer.SendToAll(GetSpawnMessage(identity));
+
+    public static SpawnMessage GetSpawnMessage(this NetworkIdentity identity)
     {
         var writer = NetworkWriterPool.GetWriter();
         var writer2 = NetworkWriterPool.GetWriter();
         var payload = NetworkServer.CreateSpawnMessagePayload(false, identity, writer, writer2);
-        var msg = new SpawnMessage
+        return new SpawnMessage
         {
             netId = identity.netId,
             isLocalPlayer = false,
@@ -268,7 +271,6 @@ public static class SynapseExtensions
             scale = identity.gameObject.transform.localScale,
             payload = payload
         };
-        NetworkServer.SendToAll(msg);
     }
 
     public static void DespawnForOnePlayer(this NetworkIdentity identity, Player player)

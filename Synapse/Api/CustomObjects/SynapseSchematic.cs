@@ -13,7 +13,7 @@ namespace Synapse.Api.CustomObjects
 
         public int ID { get; set; }
         public string Name { get; set; }
-        public Dictionary<string, string> CustomAttributes { get; set; }
+        public List<string> CustomAttributes { get; set; }
 
         public List<PrimitiveConfiguration> PrimitiveObjects { get; set; } = new List<PrimitiveConfiguration>();
         public List<LightSourceConfiguration> LightObjects { get; set; } = new List<LightSourceConfiguration>();
@@ -40,7 +40,7 @@ namespace Synapse.Api.CustomObjects
 
             public SerializedColor Color { get; set; }
 
-            public Dictionary<string, string> CustomAttributes { get; set; }
+            public List<string> CustomAttributes { get; set; }
         }
 
         public class LightSourceConfiguration
@@ -59,7 +59,7 @@ namespace Synapse.Api.CustomObjects
 
             public bool LightShadows { get; set; }
 
-            public Dictionary<string, string> CustomAttributes { get; set; }
+            public List<string> CustomAttributes { get; set; }
         }
 
         public class TargetConfiguration
@@ -72,7 +72,7 @@ namespace Synapse.Api.CustomObjects
 
             public SerializedVector3 Scale { get; set; }
 
-            public Dictionary<string, string> CustomAttributes { get; set; }
+            public List<string> CustomAttributes { get; set; }
         }
 
         public class ItemConfiguration
@@ -83,13 +83,17 @@ namespace Synapse.Api.CustomObjects
 
             public bool Physics { get; set; }
 
+            public float Durabillity { get; set; }
+
+            public uint Attachments { get; set; }
+
             public SerializedVector3 Position { get; set; }
 
             public SerializedVector3 Rotation { get; set; }
 
             public SerializedVector3 Scale { get; set; }
 
-            public Dictionary<string, string> CustomAttributes { get; set; }
+            public List<string> CustomAttributes { get; set; }
         }
 
         public class WorkStationConfiguration
@@ -102,7 +106,7 @@ namespace Synapse.Api.CustomObjects
 
             public bool UpdateEveryFrame { get; set; } = false;
 
-            public Dictionary<string, string> CustomAttributes { get; set; }
+            public List<string> CustomAttributes { get; set; }
         }
 
         public class DoorConfiguration
@@ -121,7 +125,7 @@ namespace Synapse.Api.CustomObjects
 
             public bool UpdateEveryFrame { get; set; } = false;
 
-            public Dictionary<string, string> CustomAttributes { get; set; }
+            public List<string> CustomAttributes { get; set; }
         }
 
         public class CustomObjectConfiguration
@@ -134,7 +138,7 @@ namespace Synapse.Api.CustomObjects
 
             public SerializedVector3 Scale { get; set; }
 
-            public Dictionary<string, string> CustomAttributes { get; set; }
+            public List<string> CustomAttributes { get; set; }
         }
 
         public class RagdollConfiguration
@@ -151,7 +155,7 @@ namespace Synapse.Api.CustomObjects
 
             public SerializedVector3 Scale { get; set; }
 
-            public Dictionary<string, string> CustomAttributes { get; set; }
+            public List<string> CustomAttributes { get; set; }
         }
 
         public class DummyConfiguration
@@ -172,7 +176,7 @@ namespace Synapse.Api.CustomObjects
 
             public SerializedVector3 Scale { get; set; }
 
-            public Dictionary<string, string> CustomAttributes { get; set; }
+            public List<string> CustomAttributes { get; set; }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AdminToys;
 using Interactables.Interobjects;
 using InventorySystem.Items.Firearms.Attachments;
+using MapGeneration.Distributors;
 using Mirror;
 using Synapse.Api.Enum;
 using Synapse.Config;
@@ -71,6 +72,47 @@ namespace Synapse.Api.CustomObjects
             {
                 Logger.Get.Error("Synapse-Object: Error while Initialising Synapse Objects and Schematics:\n" + ex);
             }
+        }
+
+        internal void InitLate()
+        {
+            foreach (var prefab in NetworkClient.prefabs)
+            {
+                switch (prefab.Key.ToString())
+                {
+                    case "daf3ccde-4392-c0e4-882d-b7002185c6b8" when prefab.Value.TryGetComponent<Scp079Generator>(out var gen):
+                        SynapseGeneratorObject.GeneratorPrefab = gen;
+                        break;
+
+                    case "68f13209-e652-6024-2b89-0f75fb88a998" when prefab.Value.TryGetComponent<MapGeneration.Distributors.Locker>(out var locker):
+                        SynapseLockerObject.Prefabs[LockerType.ScpPedestal] = locker;
+                        break;
+
+                    case "5ad5dc6d-7bc5-3154-8b1a-3598b96e0d5b" when prefab.Value.TryGetComponent<MapGeneration.Distributors.Locker>(out var locker):
+                        SynapseLockerObject.Prefabs[LockerType.LargeGunLocker] = locker;
+                        break;
+
+                    case "850f84ad-e273-1824-8885-11ae5e01e2f4" when prefab.Value.TryGetComponent<MapGeneration.Distributors.Locker>(out var locker):
+                        SynapseLockerObject.Prefabs[LockerType.RifleRackLocker] = locker;
+                        break;
+
+                    case "d54bead1-286f-3004-facd-74482a872ad8" when prefab.Value.TryGetComponent<MapGeneration.Distributors.Locker>(out var locker):
+                        SynapseLockerObject.Prefabs[LockerType.StandardLocker] = locker;
+                        break;
+
+                    case "5b227bd2-1ed2-8fc4-2aa1-4856d7cb7472" when prefab.Value.TryGetComponent<MapGeneration.Distributors.Locker>(out var locker):
+                        SynapseLockerObject.Prefabs[LockerType.MedkitWallCabinet] = locker;
+                        break;
+
+                    case "db602577-8d4f-97b4-890b-8c893bfcd553" when prefab.Value.TryGetComponent<MapGeneration.Distributors.Locker>(out var locker):
+                        SynapseLockerObject.Prefabs[LockerType.AdrenalineWallCabinet] = locker;
+                        break;
+                }
+            }
+
+            foreach (var role in CharacterClassManager._staticClasses)
+                if (role != null)
+                    SynapseRagdollObject.Prefabs[role.roleId] = role.model_ragdoll?.GetComponent<global::Ragdoll>();
         }
 
         public ReadOnlyCollection<SynapseSchematic> Schematics { get; private set; } = new List<SynapseSchematic>().AsReadOnly();

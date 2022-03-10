@@ -9,7 +9,6 @@ using Synapse.Api.Items;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using InventorySystem.Items.Firearms.Attachments;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
@@ -18,11 +17,13 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     internal static class SetPlayersClassPatch
     {
         [HarmonyPrefix]
-        private static bool OnSetClass(ref RoleType classid, GameObject ply, CharacterClassManager.SpawnReason spawnReason)
+        private static bool OnSetClass(ref RoleType classid, GameObject ply, CharacterClassManager.SpawnReason spawnReason, out Player __state)
         {
+            __state = null;
             try
             {
                 var player = ply.GetPlayer();
+                __state = player;
 
                 if (player.Hub.isDedicatedServer || !player.Hub.Ready) return false;
 
@@ -91,7 +92,11 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         }
 
         [HarmonyPostfix]
-        private static void RemoveArgs(CharacterClassManager __instance) => __instance.GetPlayer().setClassEventArgs = null;
+        private static void RemoveArgs(Player __state)
+        {
+            if (__state != null)
+                __state.setClassEventArgs = null;
+        }
     }
 
     [HarmonyPatch(typeof(PlayerMovementSync),nameof(PlayerMovementSync.OnPlayerClassChange))]
@@ -129,7 +134,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var args = player.setClassEventArgs;
 
                 //If args is null he is SCP0492 and should not get any Items
-                if (args == null) return false;
+                if (args == null) return true;
 
                 var inventory = ply.inventory;
 

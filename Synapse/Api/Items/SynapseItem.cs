@@ -21,6 +21,16 @@ namespace Synapse.Api.Items
 
         public static Dictionary<ushort, SynapseItem> AllItems { get; } = new Dictionary<ushort, SynapseItem>();
 
+        public static SynapseItem GetSynapseItem(ushort serial)
+        {
+            if (!AllItems.ContainsKey(serial))
+            {
+                Logger.Get.Warn("If this message appears exists a Item that is not registered. Please report this bug in our Discord as detailed as possible");
+                return None;
+            }
+            return AllItems[serial];
+        }
+
         private bool deactivated = false;
 
         #region Constructors
