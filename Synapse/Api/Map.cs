@@ -145,6 +145,14 @@ namespace Synapse.Api
             return grenadeitem;
         }
 
+        public NetworkIdentity SpawnOldGrenade(Vector3 position, Quaternion rotation, bool flash = false)
+        {
+            var prefab = flash ? NetworkClient.prefabs[Guid.Parse("c69da0e5-a829-6a04-c8d9-f404a1073cfe")] : NetworkClient.prefabs[Guid.Parse("8063e113-c1f1-1514-7bc5-840ea8ee5f01")];
+            var gameObject = UnityEngine.Object.Instantiate(prefab, position, rotation);
+            NetworkServer.Spawn(gameObject.gameObject);
+            return gameObject.GetComponent<NetworkIdentity>();
+        }
+
         public void Explode(Vector3 position, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null)
         {
             var itemtype = (ItemType)grenadeType;

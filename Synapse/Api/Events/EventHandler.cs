@@ -19,63 +19,91 @@ namespace Synapse.Api.Events
             Server.UpdateEvent += OnUpdate;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
-            Player.PlayerHealEvent += OnHeal;
 #endif
-        }
-
-        private void OnHeal(SynapseEventArguments.PlayerHealEventArgs ev)
-        {
-            Logger.Get.Debug(ev.Amount);
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
         {
             switch (ev.KeyCode)
             {
-                case KeyCode.Alpha1:
-                    foreach (var pref in NetworkManager.singleton.spawnPrefabs)
-                        Logger.Get.Debug(pref.name);
-                    break;
-
-                case KeyCode.Alpha2:
-                    SchematicHandler.Get.SpawnSchematic(new SynapseSchematic
+                case KeyCode.Alpha0:
+                    var obj = SchematicHandler.Get.SpawnSchematic(new SynapseSchematic
                     {
-                        ID = 3672,
-                        Name = "weqeqwe",
-                        PrimitiveObjects = new System.Collections.Generic.List<SynapseSchematic.PrimitiveConfiguration>
+                        GeneratorObjects = new System.Collections.Generic.List<SynapseSchematic.GeneratorConfiguration>
                         {
-                            new SynapseSchematic.PrimitiveConfiguration
+                            new SynapseSchematic.GeneratorConfiguration()
                             {
-                                Color = Color.red,
-                                Position = Vector3.zero,
-                                PrimitiveType = PrimitiveType.Cube,
-                                Rotation = Vector3.zero,
+                                Position = Vector3.up * -10,
+                                Rotation = Quaternion.identity,
                                 Scale = Vector3.one
                             }
                         },
-                        DummyObjects = new System.Collections.Generic.List<SynapseSchematic.DummyConfiguration>
+                        LockerObjects = new System.Collections.Generic.List<SynapseSchematic.LockerConfiguration>
                         {
-                            new SynapseSchematic.DummyConfiguration
+                            new SynapseSchematic.LockerConfiguration
                             {
-                                HeldItem = ItemType.None,
+                                LockerType = Enum.LockerType.ScpPedestal,
+                                Position = Vector3.up * 5,
+                                Chambers = new System.Collections.Generic.List<SynapseSchematic.LockerConfiguration.LockerChamber>
+                                {
+                                    new SynapseSchematic.LockerConfiguration.LockerChamber
+                                    {
+                                        Items = new System.Collections.Generic.List<ItemType>{ItemType.Adrenaline}
+                                    }
+                                },
+                                Rotation = Quaternion.identity,
                                 Scale = Vector3.one,
-                                Name = "Dummy",
+                            },
+                            new SynapseSchematic.LockerConfiguration
+                            {
+                                LockerType = Enum.LockerType.StandardLocker,
+                                Position = Vector3.forward * 5,
+                                Rotation = Quaternion.identity,
+                                Scale = Vector3.one,
+                            },
+                            new SynapseSchematic.LockerConfiguration
+                            {
+                                LockerType = Enum.LockerType.RifleRackLocker,
+                                Position = Vector3.forward * -5,
+                                Rotation = Quaternion.identity,
+                                Scale = Vector3.one,
+                            },
+                            new SynapseSchematic.LockerConfiguration
+                            {
+                                LockerType = Enum.LockerType.LargeGunLocker,
+                                Position = Vector3.left * 5,
+                                Rotation = Quaternion.identity,
+                                Scale = Vector3.one,
+                            },
+                            new SynapseSchematic.LockerConfiguration
+                            {
+                                LockerType = Enum.LockerType.MedkitWallCabinet,
+                                Position = Vector3.left * -5,
+                                Rotation = Quaternion.identity,
+                                Scale = Vector3.one,
+                                DeleteDefaultItems = false
+                            },
+                            new SynapseSchematic.LockerConfiguration
+                            {
+                                LockerType = Enum.LockerType.AdrenalineWallCabinet,
                                 Position = Vector3.zero,
                                 Rotation = Quaternion.identity,
-                                Role = RoleType.ClassD
+                                Scale = Vector3.one,
                             }
-                        }
+                        },
                     }, ev.Player.Position);
-                    break;
 
-                case KeyCode.Alpha3:
-                    var gen = new SynapseLockerObject(Enum.LockerType.StandardLocker, ev.Player.Position, ev.Player.transform.rotation, Vector3.one);
-                    MEC.Timing.CallDelayed(3f,() => gen.Position = ev.Player.Position);
-                    MEC.Timing.CallDelayed(6f, () => gen.Rotation = ev.Player.transform.rotation);
-                    MEC.Timing.CallDelayed(9f, () => gen.Scale = Vector3.one * 3);
-                    MEC.Timing.CallDelayed(12f, () => Logger.Get.Debug($"{gen.Position} {gen.Rotation.eulerAngles} {gen.Scale}"));
-                    break;
+                    MEC.Timing.CallDelayed(5f, () => obj.Position = ev.Player.Position);
 
+                    foreach (Rigidbody rigidbody in SpawnablesDistributorBase.BodiesToUnfreeze)
+                    {
+                        if (rigidbody != null)
+                        {
+                            rigidbody.isKinematic = false;
+                            rigidbody.useGravity = true;
+                        }
+                    }
+                    break;
 
                 case KeyCode.Alpha4:
                     var door = SynapseController.Server.Map.Doors.FirstOrDefault(x => x.DoorType == Enum.DoorType.LCZ_Door);
@@ -91,21 +119,6 @@ namespace Synapse.Api.Events
                     Logger.Get.Debug(child.transform.position);
                     door.Open = true;
                     MEC.Timing.CallDelayed(1f,() => Logger.Get.Debug(child.transform.position));
-                    break;
-
-                case KeyCode.Alpha8:
-                    foreach (var room in SynapseController.Server.Map.Rooms)
-                        room.Rotation = Quaternion.Euler(180f, 0f, 0f);
-                    break;
-
-                case KeyCode.Alpha5:
-                    var handler = GameObject.FindObjectOfType<SqueakSpawner>();
-                    handler.NetworksyncSpawn = (byte)((test)+(1));
-                    var mice = handler.mice[test];
-                    mice.SetActive(true);
-                    handler._spawnedMouse = mice.GetComponent<Interactables.Interobjects.SqueakInteraction>();
-                    ev.Player.Position = mice.transform.position;
-                    test++;
                     break;
             }
         }

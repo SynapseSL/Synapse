@@ -21,11 +21,8 @@ namespace Synapse.Api.CustomObjects
         {
             Server.Get.Events.SynapseObject.InvokeUpdate(new Events.SynapseEventArguments.SOEventArgs(Object));
 
-            if (Object.Type == Enum.ObjectType.Workstation && Object is SynapseWorkStationObject work && work.UpdateEveryFrame)
-                work.Refresh();
-
-            if (Object.Type == Enum.ObjectType.Door && Object is SynapseDoorObject door && door.UpdateEveryFrame)
-                door.Refresh();
+            if(Object is NetworkSynapseObject network && network.UpdateEveryFrame)
+                network.Refresh();
         }
 
         public void OnDestroy()

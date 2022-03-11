@@ -24,6 +24,8 @@ namespace Synapse.Api.CustomObjects
         public List<CustomObjectConfiguration> CustomObjects { get; set; } = new List<CustomObjectConfiguration>();
         public List<RagdollConfiguration> RagdollObjects { get; set; } = new List<RagdollConfiguration>();
         public List<DummyConfiguration> DummyObjects { get; set; } = new List<DummyConfiguration>();
+        public List<GeneratorConfiguration> GeneratorObjects { get; set; } = new List<GeneratorConfiguration>();
+        public List<LockerConfiguration> LockerObjects { get; set; } = new List<LockerConfiguration>();
 
 
         public class PrimitiveConfiguration
@@ -177,6 +179,43 @@ namespace Synapse.Api.CustomObjects
             public SerializedVector3 Scale { get; set; }
 
             public List<string> CustomAttributes { get; set; }
+        }
+
+        public class GeneratorConfiguration
+        {
+            public SerializedVector3 Position { get; set; }
+
+            public SerializedVector3 Rotation { get; set; }
+
+            public SerializedVector3 Scale { get; set; }
+
+            public bool UpdateEveryFrame { get; set; } = false;
+
+            public List<string> CustomAttributes { get; set; }
+        }
+
+        public class LockerConfiguration
+        {
+            public LockerType LockerType { get; set; }
+
+            public List<LockerChamber> Chambers { get; set; } = new List<LockerChamber>();
+
+            public bool DeleteDefaultItems { get; set; }
+
+            public SerializedVector3 Position { get; set; }
+
+            public SerializedVector3 Rotation { get; set; }
+
+            public SerializedVector3 Scale { get; set; }
+
+            public bool UpdateEveryFrame { get; set; } = false;
+
+            public List<string> CustomAttributes { get; set; }
+
+            public class LockerChamber
+            {
+                public List<ItemType> Items { get; set; } = new List<ItemType>();
+            }
         }
     }
 }

@@ -85,6 +85,7 @@ namespace Synapse.Api.CustomObjects
                         break;
 
                     case "68f13209-e652-6024-2b89-0f75fb88a998" when prefab.Value.TryGetComponent<MapGeneration.Distributors.Locker>(out var locker):
+
                         SynapseLockerObject.Prefabs[LockerType.ScpPedestal] = locker;
                         break;
 

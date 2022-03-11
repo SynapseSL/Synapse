@@ -7,6 +7,8 @@ namespace Synapse.Api.CustomObjects
     {
         public abstract NetworkIdentity NetworkIdentity { get; }
 
+        public bool UpdateEveryFrame { get; set; } = false;
+
         public virtual void Refresh() => NetworkIdentity.UpdatePositionRotationScale();
 
         public override Vector3 Position

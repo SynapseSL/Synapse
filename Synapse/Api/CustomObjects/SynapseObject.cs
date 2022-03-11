@@ -1,4 +1,5 @@
-﻿using Synapse.Api.Enum;
+﻿using Mirror;
+using Synapse.Api.Enum;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -94,6 +95,24 @@ namespace Synapse.Api.CustomObjects
                 obj.Parent = this;
             }
 
+            foreach (var generator in schematic.GeneratorObjects)
+            {
+                var obj = new SynapseGeneratorObject(generator);
+                GeneratorChildrens.Add(obj);
+                Childrens.Add(obj);
+                obj.GameObject.transform.parent = GameObject.transform;
+                obj.Parent = this;
+            }
+
+            foreach (var locker in schematic.LockerObjects)
+            {
+                var obj = new SynapseLockerObject(locker);
+                LockerChildrens.Add(obj);
+                Childrens.Add(obj);
+                obj.GameObject.transform.parent = GameObject.transform;
+                obj.Parent = this;
+            }
+
             Map.Get.SynapseObjects.Add(this);
 
             var script = GameObject.AddComponent<SynapseObjectScript>();
@@ -147,10 +166,19 @@ namespace Synapse.Api.CustomObjects
         public List<SynapseCustomObject> CustomChildrens { get; } = new List<SynapseCustomObject>();
         public List<SynapseRagdollObject> RagdollChildrens { get; } = new List<SynapseRagdollObject>();
         public List<SynapseDummyObject> DummyChildrens { get; } = new List<SynapseDummyObject>();
+        public List<SynapseGeneratorObject> GeneratorChildrens { get; } = new List<SynapseGeneratorObject>();
+        public List<SynapseLockerObject> LockerChildrens { get; } = new List<SynapseLockerObject>();
 
         public string Name { get; }
 
         public int ID { get; }
+
+        public void DespawnForOnePlayer(Player player)
+        {
+            foreach(var child in Childrens)
+                if (child.GameObject.TryGetComponent<NetworkIdentity>(out var net))
+                    net.DespawnForOnePlayer(player);
+        }
 
         public override void Destroy()
         {
@@ -162,17 +190,9 @@ namespace Synapse.Api.CustomObjects
 
         private void UpdatePositionAndRotation()
         {
-            foreach (var station in WorkStationChildrens)
-                station.Refresh();
-
-            foreach(var door in DoorChildrens)
-                door.Refresh();
-
-            foreach (var rag in RagdollChildrens)
-                rag.Refresh();
-
-            foreach(var dummy in DummyChildrens)
-                dummy.Refresh();
+            foreach (var child in Childrens)
+                if (child is NetworkSynapseObject network)
+                    network.Refresh();
         }
 
         private void UpdateScale()
