@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Synapse.Api.Events.SynapseEventArguments
 {
@@ -137,5 +136,13 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Spawning { get; internal set; }
         public bool MapSwitch { get; internal set; }
         public bool Allow { get; set; }
+    }
+    public class Scp049ReviveEvent : EventHandler.ISynapseEventArgs
+    {
+        public Player Scp049 { get; internal set; }
+        public Player Target { get; internal set; }
+        public Ragdoll Ragdoll { get; internal set; }
+        public bool Finish { get; internal set; }
+        public bool Allow { get; set; } = true;
     }
 }

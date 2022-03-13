@@ -153,6 +153,18 @@ namespace Synapse.Api
             return gameObject.GetComponent<NetworkIdentity>();
         }
 
+        public GameObject SpawnTantrum(Vector3 position, float destroy = -1)
+        {
+            var prefab = NetworkClient.prefabs[Guid.Parse("a0e7ee93-b802-e5a4-38bd-95e27cc133ea")];
+            var gameObject = UnityEngine.Object.Instantiate(prefab, position, Quaternion.identity);
+            NetworkServer.Spawn(gameObject.gameObject);
+
+            if (destroy >= 0)
+                MEC.Timing.CallDelayed(destroy,() => NetworkServer.Destroy(gameObject));
+
+            return gameObject;
+        }
+
         public void Explode(Vector3 position, Enum.GrenadeType grenadeType = Enum.GrenadeType.Grenade, Player player = null)
         {
             var itemtype = (ItemType)grenadeType;

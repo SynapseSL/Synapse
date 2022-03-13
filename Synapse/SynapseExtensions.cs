@@ -72,6 +72,8 @@ public static class SynapseExtensions
 
     public static Synapse.Api.Locker GetLocker(this MapGeneration.Distributors.Locker locker) => Map.Get.Lockers.FirstOrDefault(x => x.GameObject == locker.gameObject);
 
+    public static Synapse.Api.Ragdoll GetRagdoll(this Ragdoll rag) => Map.Get.Ragdolls.FirstOrDefault(x => x.ragdoll == rag);
+
     public static List<Vector3> GetSpawnPoints(this RoleType role)
     {
         List<Vector3> spawnPointsPose = new List<Vector3>();

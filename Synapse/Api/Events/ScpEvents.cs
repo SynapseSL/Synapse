@@ -1,7 +1,5 @@
-﻿using Synapse.Api.Events.SynapseEventArguments;
-using Synapse.Api.Enum;
-using System.Collections.Generic;
-using Interactables.Interobjects.DoorUtils;
+﻿using Synapse.Api.Enum;
+using Synapse.Api.Events.SynapseEventArguments;
 using UnityEngine;
 
 namespace Synapse.Api.Events
@@ -17,6 +15,8 @@ namespace Synapse.Api.Events
         public Scp079Events Scp079 { get; } = new Scp079Events();
 
         public Scp173Events Scp173 { get; } = new Scp173Events();
+
+        public Scp049Events Scp049 { get; } = new Scp049Events();
 
         public event EventHandler.OnSynapseEvent<ScpAttackEventArgs> ScpAttackEvent;
 
@@ -289,6 +289,28 @@ namespace Synapse.Api.Events
 
                 allow = ev.Allow;
                 pos = ev.Position;
+            }
+        }
+
+        public class Scp049Events
+        {
+            internal Scp049Events() { }
+
+            public event EventHandler.OnSynapseEvent<Scp049ReviveEvent> Scp049ReviveEvent;
+
+            internal void InvokeRevive(Player scp, Player target, Ragdoll rag,bool finish,out bool allow)
+            {
+                var ev = new Scp049ReviveEvent
+                {
+                    Ragdoll = rag,
+                    Scp049 = scp,
+                    Target = target,
+                    Finish = finish,
+                };
+
+                Scp049ReviveEvent?.Invoke(ev);
+
+                allow = ev.Allow;
             }
         }
 

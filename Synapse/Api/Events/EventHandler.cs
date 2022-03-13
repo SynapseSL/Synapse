@@ -19,7 +19,17 @@ namespace Synapse.Api.Events
             Server.UpdateEvent += OnUpdate;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
+            Scp.Scp049.Scp049ReviveEvent += Scp049_Scp049ReviveEvent;
 #endif
+        }
+
+        private void Scp049_Scp049ReviveEvent(SynapseEventArguments.Scp049ReviveEvent ev)
+        {
+            Logger.Get.Debug(ev.Ragdoll.RoleType);
+            Logger.Get.Debug(ev.Scp049.NickName);
+            Logger.Get.Debug(ev.Target.NickName);
+            Logger.Get.Debug(ev.Finish);
+            if (ev.Finish) ev.Allow = false;
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
@@ -27,82 +37,13 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha0:
-                    var obj = SchematicHandler.Get.SpawnSchematic(new SynapseSchematic
-                    {
-                        GeneratorObjects = new System.Collections.Generic.List<SynapseSchematic.GeneratorConfiguration>
-                        {
-                            new SynapseSchematic.GeneratorConfiguration()
-                            {
-                                Position = Vector3.up * -10,
-                                Rotation = Quaternion.identity,
-                                Scale = Vector3.one
-                            }
-                        },
-                        LockerObjects = new System.Collections.Generic.List<SynapseSchematic.LockerConfiguration>
-                        {
-                            new SynapseSchematic.LockerConfiguration
-                            {
-                                LockerType = Enum.LockerType.ScpPedestal,
-                                Position = Vector3.up * 5,
-                                Chambers = new System.Collections.Generic.List<SynapseSchematic.LockerConfiguration.LockerChamber>
-                                {
-                                    new SynapseSchematic.LockerConfiguration.LockerChamber
-                                    {
-                                        Items = new System.Collections.Generic.List<ItemType>{ItemType.Adrenaline}
-                                    }
-                                },
-                                Rotation = Quaternion.identity,
-                                Scale = Vector3.one,
-                            },
-                            new SynapseSchematic.LockerConfiguration
-                            {
-                                LockerType = Enum.LockerType.StandardLocker,
-                                Position = Vector3.forward * 5,
-                                Rotation = Quaternion.identity,
-                                Scale = Vector3.one,
-                            },
-                            new SynapseSchematic.LockerConfiguration
-                            {
-                                LockerType = Enum.LockerType.RifleRackLocker,
-                                Position = Vector3.forward * -5,
-                                Rotation = Quaternion.identity,
-                                Scale = Vector3.one,
-                            },
-                            new SynapseSchematic.LockerConfiguration
-                            {
-                                LockerType = Enum.LockerType.LargeGunLocker,
-                                Position = Vector3.left * 5,
-                                Rotation = Quaternion.identity,
-                                Scale = Vector3.one,
-                            },
-                            new SynapseSchematic.LockerConfiguration
-                            {
-                                LockerType = Enum.LockerType.MedkitWallCabinet,
-                                Position = Vector3.left * -5,
-                                Rotation = Quaternion.identity,
-                                Scale = Vector3.one,
-                                DeleteDefaultItems = false
-                            },
-                            new SynapseSchematic.LockerConfiguration
-                            {
-                                LockerType = Enum.LockerType.AdrenalineWallCabinet,
-                                Position = Vector3.zero,
-                                Rotation = Quaternion.identity,
-                                Scale = Vector3.one,
-                            }
-                        },
-                    }, ev.Player.Position);
+                    var locker = new SynapseLockerObject(Enum.LockerType.ScpPedestal, ev.Player.Position, Quaternion.identity, Vector3.one);
 
-                    MEC.Timing.CallDelayed(5f, () => obj.Position = ev.Player.Position);
+                    MEC.Timing.CallDelayed(5f,() => locker.Position = ev.Player.Position);
+                    break;
 
-                    foreach (Rigidbody rigidbody in SpawnablesDistributorBase.BodiesToUnfreeze)
-                    {
-                        if (rigidbody != null)
-                        {
-                            rigidbody.isKinematic = false;
-                            rigidbody.useGravity = true;
-                        }
-                    }
+                case KeyCode.Alpha1:
+                    SynapseController.Server.Map.SpawnTantrum(ev.Player.Position, 10f);
                     break;
 
                 case KeyCode.Alpha4:
@@ -122,8 +63,6 @@ namespace Synapse.Api.Events
                     break;
             }
         }
-
-        public byte test = 0;
 
         public static EventHandler Get => SynapseController.Server.Events;
 
