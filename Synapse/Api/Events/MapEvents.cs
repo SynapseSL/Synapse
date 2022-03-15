@@ -25,7 +25,22 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<LiftMoveObjectsEventArgs> LiftMoveObjectsEvent;
 
+        public event EventHandler.OnSynapseEvent<WarheadInsidePanelInteractEvent> WarheadInsidePanelInteractEvent;
+
         #region Invoke
+        internal void InvokeWarheadPanel(Player player, bool cancel, out bool allow)
+        {
+            var ev = new WarheadInsidePanelInteractEvent
+            {
+                Player = player,
+                CancelDetonation = cancel,
+            };
+
+            WarheadInsidePanelInteractEvent?.Invoke(ev);
+
+            allow = ev.Allow;
+        }
+
         internal void InvokeTriggerTeslaEv(Player player, Tesla tesla, ref bool trigger)
         {
             trigger = true;

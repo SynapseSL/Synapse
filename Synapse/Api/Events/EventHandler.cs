@@ -1,10 +1,7 @@
-﻿using Mirror;
+﻿using Synapse.Api.CustomObjects;
 using Synapse.Config;
 using System.Linq;
 using UnityEngine;
-using Synapse.Api.CustomObjects;
-using MapGeneration.Distributors;
-using System;
 
 namespace Synapse.Api.Events
 {
@@ -19,17 +16,17 @@ namespace Synapse.Api.Events
             Server.UpdateEvent += OnUpdate;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
-            Scp.Scp049.Scp049ReviveEvent += Scp049_Scp049ReviveEvent;
+            Map.WarheadInsidePanelInteractEvent += Map_WarheadPanelInteractEvent;
 #endif
         }
 
-        private void Scp049_Scp049ReviveEvent(SynapseEventArguments.Scp049ReviveEvent ev)
+        private void Map_WarheadPanelInteractEvent(SynapseEventArguments.WarheadInsidePanelInteractEvent ev)
         {
-            Logger.Get.Debug(ev.Ragdoll.RoleType);
-            Logger.Get.Debug(ev.Scp049.NickName);
-            Logger.Get.Debug(ev.Target.NickName);
-            Logger.Get.Debug(ev.Finish);
-            if (ev.Finish) ev.Allow = false;
+            Logger.Get.Debug(ev.Player.NickName);
+            Logger.Get.Debug(ev.CancelDetonation);
+            Logger.Get.Debug(ev.Panel.Enabled);
+            if (ev.CancelDetonation)
+                ev.Allow = false;
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)

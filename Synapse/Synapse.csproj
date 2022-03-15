@@ -179,6 +179,7 @@
     <Compile Include="Patches\EventsPatches\MapPatches\TriggerTeslaPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\WarheadDetonationCanceledPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\WarheadDetonationPatch.cs" />
+    <Compile Include="Patches\EventsPatches\MapPatches\WarheadPanelInteract.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerChangeItemPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDeathPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerReportPatch.cs" />
@@ -243,7 +244,6 @@
     <Compile Include="Patches\SynapsePatches\Wrapper\Scp096MaxShieldPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\RagdollPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\GeneratorStartPatch.cs" />
-    <Compile Include="Patches\SynapsePatches\Wrapper\NukeLockPatch.cs" />
     <Compile Include="Patches\SynapsePatches\CommandPatches.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\ComponentPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\ElevatorStartPatch.cs" />

@@ -52,16 +52,12 @@ namespace Synapse.Api
                 set => Panel.Networkenabled = value;
             }
 
-            public float LeverStatus
-            {
-                get => Panel._leverStatus;
-                set => Panel._leverStatus = value;
-            }
-
             //Is used by a Harmony Patch
             public bool Locked { get; set; }
 
             public Transform Lever => Panel.lever;
+
+            public Vector3 Position => Panel.transform.position;
         }
 
         public class NukeOutsidePanel
