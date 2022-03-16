@@ -16,23 +16,15 @@ namespace Synapse.Api.Events
             Server.UpdateEvent += OnUpdate;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
-            Map.WarheadInsidePanelInteractEvent += Map_WarheadPanelInteractEvent;
-            Map.WarheadStartDetonationEvent += Map_WarheadStartDetonationEvent;
+            Player.PlayerRadioInteractEvent += Player_PlayerRadioInteractEvent;
 #endif
         }
 
-        private void Map_WarheadStartDetonationEvent(SynapseEventArguments.WarheadStartDetonationEvent ev)
+        private void Player_PlayerRadioInteractEvent(SynapseEventArguments.PlayerRadioInteractEventArgs ev)
         {
-            Logger.Get.Debug(ev.Player.NickName);
-        }
-
-        private void Map_WarheadPanelInteractEvent(SynapseEventArguments.WarheadInsidePanelInteractEvent ev)
-        {
-            Logger.Get.Debug(ev.Player.NickName);
-            Logger.Get.Debug(ev.CancelDetonation);
-            Logger.Get.Debug(ev.Panel.Enabled);
-            if (ev.CancelDetonation)
-                ev.Allow = false;
+            Logger.Get.Debug(ev.Interaction);
+            Logger.Get.Debug(ev.CurrentRange);
+            ev.NextRange = InventorySystem.Items.Radio.RadioMessages.RadioRangeLevel.UltraRange;
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)

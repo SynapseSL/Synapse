@@ -1,12 +1,11 @@
 ﻿using Assets._Scripts.Dissonance;
+using InventorySystem.Items.MicroHID;
+using InventorySystem.Items.Radio;
+using Synapse.Api.Enum;
 using Synapse.Api.Items;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using InventorySystem.Items.MicroHID;
-using Synapse.Api.Enum;
-using System;
-using PlayerStatsSystem;
-using Synapse.Api;
 
 namespace Synapse.Api.Events.SynapseEventArguments
 {
@@ -371,5 +370,20 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public SynapseItem OldItem { get; internal set; }
 
         public SynapseItem NewItem { get; internal set; }
+    }
+
+    public class PlayerRadioInteractEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public SynapseItem Radio { get; internal set; }
+
+        public RadioMessages.RadioCommand Interaction { get; set; }
+
+        public RadioMessages.RadioRangeLevel CurrentRange { get; internal set; }
+
+        public RadioMessages.RadioRangeLevel NextRange { get; set; }
+
+        public bool Allow { get; set; } = true;
     }
 }

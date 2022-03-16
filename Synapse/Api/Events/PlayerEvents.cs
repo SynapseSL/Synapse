@@ -6,6 +6,7 @@ using InventorySystem.Items.MicroHID;
 using System;
 using PlayerStatsSystem;
 using Synapse.Api.Enum;
+using InventorySystem.Items.Radio;
 
 namespace Synapse.Api.Events
 {
@@ -75,7 +76,27 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<PlayerChangeItemEventArgs> PlayerChangeItemEvent;
         
+        public event EventHandler.OnSynapseEvent<PlayerRadioInteractEventArgs> PlayerRadioInteractEvent;
+
         #region PlayerEventsInvoke
+        internal void InvokeRadio(Player player, SynapseItem item, ref RadioMessages.RadioCommand interaction, RadioMessages.RadioRangeLevel current, ref RadioMessages.RadioRangeLevel next, out bool allow)
+        {
+            var ev = new PlayerRadioInteractEventArgs
+            {
+                CurrentRange = current,
+                Interaction = interaction,
+                NextRange = next,
+                Player = player,
+                Radio = item
+            };
+
+            PlayerRadioInteractEvent?.Invoke(ev);
+
+            allow = ev.Allow;
+            interaction = ev.Interaction;
+            next = ev.NextRange;
+        }
+
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
         {
             var ev = new PlayerJoinEventArgs {Player = player, Nickname = nickname};

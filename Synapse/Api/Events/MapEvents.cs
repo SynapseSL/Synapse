@@ -25,14 +25,14 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<LiftMoveObjectsEventArgs> LiftMoveObjectsEvent;
 
-        public event EventHandler.OnSynapseEvent<WarheadInsidePanelInteractEvent> WarheadInsidePanelInteractEvent;
+        public event EventHandler.OnSynapseEvent<WarheadInsidePanelInteractEventArgs> WarheadInsidePanelInteractEvent;
 
-        public event EventHandler.OnSynapseEvent<WarheadStartDetonationEvent> WarheadStartDetonationEvent;
+        public event EventHandler.OnSynapseEvent<WarheadStartDetonationEventArgs> WarheadStartDetonationEvent;
 
         #region Invoke
         internal void InvokeWarheadStart(Player player, out bool allow)
         {
-            var ev = new WarheadStartDetonationEvent
+            var ev = new WarheadStartDetonationEventArgs
             {
                 Player = player,
             };
@@ -44,7 +44,7 @@ namespace Synapse.Api.Events
 
         internal void InvokeWarheadPanel(Player player, bool cancel, out bool allow)
         {
-            var ev = new WarheadInsidePanelInteractEvent
+            var ev = new WarheadInsidePanelInteractEventArgs
             {
                 Player = player,
                 CancelDetonation = cancel,
