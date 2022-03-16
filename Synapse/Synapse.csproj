@@ -176,6 +176,7 @@
     <Compile Include="Patches\EventsPatches\MapPatches\LockerInteractPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\LCZDecontaminationPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\DoorInteractPatch.cs" />
+    <Compile Include="Patches\EventsPatches\MapPatches\StartWarheadPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\TriggerTeslaPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\WarheadDetonationCanceledPatch.cs" />
     <Compile Include="Patches\EventsPatches\MapPatches\WarheadDetonationPatch.cs" />

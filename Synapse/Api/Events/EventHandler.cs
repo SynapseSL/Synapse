@@ -17,7 +17,13 @@ namespace Synapse.Api.Events
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
             Map.WarheadInsidePanelInteractEvent += Map_WarheadPanelInteractEvent;
+            Map.WarheadStartDetonationEvent += Map_WarheadStartDetonationEvent;
 #endif
+        }
+
+        private void Map_WarheadStartDetonationEvent(SynapseEventArguments.WarheadStartDetonationEvent ev)
+        {
+            Logger.Get.Debug(ev.Player.NickName);
         }
 
         private void Map_WarheadPanelInteractEvent(SynapseEventArguments.WarheadInsidePanelInteractEvent ev)

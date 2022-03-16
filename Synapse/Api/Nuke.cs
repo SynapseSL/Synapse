@@ -66,7 +66,7 @@ namespace Synapse.Api
 
             internal NukeOutsidePanel() { }
 
-            private AlphaWarheadOutsitePanel Panel => Server.Get.Host.GetComponent<AlphaWarheadOutsitePanel>();
+            private AlphaWarheadOutsitePanel Panel => Server.Get.GetObjectOf<AlphaWarheadOutsitePanel>();
 
             public bool KeyCardEntered
             {

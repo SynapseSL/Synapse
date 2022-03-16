@@ -27,7 +27,21 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<WarheadInsidePanelInteractEvent> WarheadInsidePanelInteractEvent;
 
+        public event EventHandler.OnSynapseEvent<WarheadStartDetonationEvent> WarheadStartDetonationEvent;
+
         #region Invoke
+        internal void InvokeWarheadStart(Player player, out bool allow)
+        {
+            var ev = new WarheadStartDetonationEvent
+            {
+                Player = player,
+            };
+
+            WarheadStartDetonationEvent?.Invoke(ev);
+
+            allow = ev.Allow;
+        }
+
         internal void InvokeWarheadPanel(Player player, bool cancel, out bool allow)
         {
             var ev = new WarheadInsidePanelInteractEvent
