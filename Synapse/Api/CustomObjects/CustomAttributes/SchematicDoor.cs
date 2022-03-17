@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Api.CustomObjects.CustomAttributes
 {
-    public class SchematicDoor
+    public class SchematicDoor : AttributeHandler
     {
-        internal void Init()
-        {
-
-        }
+        public override string Name => "SchematicDoor";
     }
 }

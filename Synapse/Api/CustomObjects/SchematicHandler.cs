@@ -3,6 +3,7 @@ using Interactables.Interobjects;
 using InventorySystem.Items.Firearms.Attachments;
 using MapGeneration.Distributors;
 using Mirror;
+using Synapse.Api.CustomObjects.CustomAttributes;
 using Synapse.Api.Enum;
 using Synapse.Config;
 using System;
@@ -19,6 +20,8 @@ namespace Synapse.Api.CustomObjects
         internal SchematicHandler() { }
 
         public static SchematicHandler Get => Server.Get.Schematic;
+
+        public CustomAttributeHandler AttributeHandler { get; } = new CustomAttributeHandler();
 
         internal void Init()
         {
@@ -67,6 +70,7 @@ namespace Synapse.Api.CustomObjects
                 }
 
                 Load();
+                AttributeHandler.Init();
             }
             catch(Exception ex)
             {

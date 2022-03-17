@@ -1,7 +1,7 @@
+using Synapse.Command;
 using System;
 using System.Linq;
 using System.Reflection;
-using Synapse.Command;
 
 namespace Synapse.Api.Plugin.Processors
 {

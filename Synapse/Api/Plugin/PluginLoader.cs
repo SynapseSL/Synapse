@@ -1,16 +1,16 @@
-﻿using System;
+﻿using Synapse.Api.Plugin.Processors;
+using Synapse.Command;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Synapse.Api.Plugin.Processors;
-using Synapse.Command;
 
 namespace Synapse.Api.Plugin
 {
     public class PluginLoader
     {
-        private readonly List<IContextProcessor> _processors = new List<IContextProcessor> { new ConfigInjector(),new CommandProcessor(),new TranslationInjector()};
+        private readonly List<IContextProcessor> _processors = new List<IContextProcessor> { new ConfigInjector(), new CommandProcessor(), new TranslationInjector(), new SynapseObjectAttributeProcessor() };
 
         private readonly List<IPlugin> _plugins = new List<IPlugin>();
 
