@@ -40,6 +40,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Api\Broadcast.cs" />
+    <Compile Include="Api\CustomObjects\IRefreshable.cs" />
     <Compile Include="Api\CustomObjects\NetworkSynapseObject.cs" />
     <Compile Include="Api\CustomObjects\StructureSyncSynapseObject.cs" />
     <Compile Include="Api\CustomObjects\SynapseCustomObject.cs" />

@@ -16,15 +16,7 @@ namespace Synapse.Api.Events
             Server.UpdateEvent += OnUpdate;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
-            Player.PlayerRadioInteractEvent += Player_PlayerRadioInteractEvent;
 #endif
-        }
-
-        private void Player_PlayerRadioInteractEvent(SynapseEventArguments.PlayerRadioInteractEventArgs ev)
-        {
-            Logger.Get.Debug(ev.Interaction);
-            Logger.Get.Debug(ev.CurrentRange);
-            ev.NextRange = InventorySystem.Items.Radio.RadioMessages.RadioRangeLevel.UltraRange;
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
@@ -38,7 +30,31 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha1:
-                    SynapseController.Server.Map.SpawnTantrum(ev.Player.Position, 10f);
+                    var dummy = SchematicHandler.Get.SpawnSchematic(new SynapseSchematic
+                    {
+                        DummyObjects = new System.Collections.Generic.List<SynapseSchematic.DummyConfiguration>
+                        {
+                            new SynapseSchematic.DummyConfiguration
+                            {
+                                HeldItem = ItemType.None,
+                                Position = Vector3.zero,
+                                Name = "",
+                                Role = RoleType.ClassD,
+                                Rotation = Quaternion.identity,
+                                Scale = Vector3.one
+                            }
+                        }
+                    }, ev.Player.Position);
+                    break;
+
+                case KeyCode.Alpha2:
+                    var realdummy = new Dummy(ev.Player.Position, ev.Player.transform.rotation, RoleType.ClassD, "");
+                    realdummy.HeldItem = ItemType.None;
+                    realdummy.Scale = Vector3.one * 1.3f;
+                    break;
+
+                case KeyCode.Alpha3:
+                    realdummy = new Dummy(ev.Player.Position, ev.Player.transform.rotation, RoleType.ClassD, "Test");
                     break;
 
                 case KeyCode.Alpha4:

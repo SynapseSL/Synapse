@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Synapse.Api.CustomObjects
 {
-    public abstract class NetworkSynapseObject : DefaultSynapseObject
+    public abstract class NetworkSynapseObject : DefaultSynapseObject, IRefreshable
     {
         public abstract NetworkIdentity NetworkIdentity { get; }
 

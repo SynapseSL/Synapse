@@ -191,8 +191,8 @@ namespace Synapse.Api.CustomObjects
         private void UpdatePositionAndRotation()
         {
             foreach (var child in Childrens)
-                if (child is NetworkSynapseObject network)
-                    network.Refresh();
+                if (child is IRefreshable refresh)
+                    refresh.Refresh();
         }
 
         private void UpdateScale()

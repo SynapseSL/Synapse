@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Synapse.Api.CustomObjects
 {
-    public class SynapseDummyObject : DefaultSynapseObject
+    public class SynapseDummyObject : DefaultSynapseObject, IRefreshable
     {
         public SynapseDummyObject(Vector3 pos, Quaternion rot, Vector3 scale, RoleType role, ItemType held, string name, string badge, string badgecolor)
         {
@@ -37,6 +37,7 @@ namespace Synapse.Api.CustomObjects
         public string Badge { get => Dummy.BadgeName; set => Dummy.BadgeName = value; }
         public string BadgeColor { get => Dummy.BadgeColor; set => Dummy.BadgeColor = value; }
         public Dummy Dummy { get; }
+        public bool UpdateEveryFrame { get; set; } = false;
 
         public void Refresh()
         {

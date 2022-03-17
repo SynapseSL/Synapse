@@ -21,8 +21,8 @@ namespace Synapse.Api.CustomObjects
         {
             Server.Get.Events.SynapseObject.InvokeUpdate(new Events.SynapseEventArguments.SOEventArgs(Object));
 
-            if(Object is NetworkSynapseObject network && network.UpdateEveryFrame)
-                network.Refresh();
+            if(Object is IRefreshable refresh && refresh.UpdateEveryFrame)
+                refresh.Refresh();
         }
 
         public void OnDestroy()
