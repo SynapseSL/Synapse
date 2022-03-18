@@ -1,5 +1,4 @@
 ﻿using static Synapse.Api.Events.EventHandler;
-using System.Linq;
 
 namespace Synapse.Api.CustomObjects.CustomAttributes
 {
@@ -16,10 +15,20 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
         {
             foreach (var handler in Handlers)
             {
-                if (!ev.Object.CustomAttributes.Any(x => x.ToLower().Contains(handler.Name.ToLower()))) continue;
+                var name = handler.Name;
 
-                handler.SynapseObjects.Add(ev.Object);
-                handler.OnLoad(ev.Object);
+                foreach(var attribute in ev.Object.CustomAttributes)
+                {
+                    if (attribute == null) continue;
+
+                    var args = attribute.Split(':');
+                    if (args[0].ToLower() != handler.Name.ToLower()) continue;
+                    var newargs = args.Segment(1);
+
+                    handler.SynapseObjects.Add(ev.Object);
+                    handler.OnLoad(ev.Object, newargs);
+                    return;
+                }
             }
         }
 

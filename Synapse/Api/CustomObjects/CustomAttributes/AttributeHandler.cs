@@ -10,7 +10,7 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
 
         public virtual void Init() { }
 
-        public virtual void OnLoad(ISynapseObject synapseObject) { }
+        public virtual void OnLoad(ISynapseObject synapseObject, System.ArraySegment<string> args) { }
 
         public virtual void OnDestroy(ISynapseObject synapseObject) { }
 

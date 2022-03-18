@@ -16,6 +16,7 @@ namespace Synapse.Api.CustomObjects
             OriginalScale = configuration.Scale;
             CustomAttributes = configuration.CustomAttributes;
             UpdateEveryFrame = configuration.UpdateEveryFrame;
+            DoorType = configuration.DoorType;
 
             var script = GameObject.AddComponent<SynapseObjectScript>();
             script.Object = this;
@@ -24,6 +25,7 @@ namespace Synapse.Api.CustomObjects
         public SynapseDoorObject(SpawnableDoorType type, Vector3 position, Quaternion rotation, Vector3 scale, bool open = false, bool locked = false)
         {
             Door = CreateDoor(type, position, rotation, scale, open, locked);
+            DoorType = type;
 
             Map.Get.SynapseObjects.Add(this);
             var script = GameObject.AddComponent<SynapseObjectScript>();
@@ -35,6 +37,7 @@ namespace Synapse.Api.CustomObjects
         public override ObjectType Type => ObjectType.Door;
 
         public Door Door { get; }
+        public SpawnableDoorType DoorType { get; }
         public bool Open
         {
             get => Door.Open;
@@ -45,7 +48,6 @@ namespace Synapse.Api.CustomObjects
             get => Door.Locked;
             set => Door.Locked = value;
         }
-        public bool UpdateEveryFrame { get; set; } = false;
 
         private Door CreateDoor(SpawnableDoorType type, Vector3 position, Quaternion rotation, Vector3 scale, bool open, bool locked)
         {

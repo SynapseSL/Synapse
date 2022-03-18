@@ -1,23 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Synapse.Api.CustomObjects.CustomAttributes
+﻿namespace Synapse.Api.CustomObjects.CustomAttributes
 {
     public class Breakable : AttributeHandler
     {
         public override string Name => "Breakable";
 
-        public override void OnLoad(ISynapseObject synapseObject)
+        public override void OnLoad(ISynapseObject synapseObject, System.ArraySegment<string> args)
         {
-            Logger.Get.Debug("Loaded: " + synapseObject.GameObject.name);
-        }
+            var hp = 100;
 
-        public override void OnDestroy(ISynapseObject synapseObject)
-        {
-            Logger.Get.Debug("Destroy: " + synapseObject.GameObject.name);
+            if (args.Count > 0 && int.TryParse(args.At(0), out var setHp))
+                hp = setHp;
+
+            synapseObject.ObjectData["hp"] = hp;
+
+            Logger.Get.Debug("SetHealth to: " + hp);
         }
     }
 }
