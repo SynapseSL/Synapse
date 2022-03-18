@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using static Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Api.CustomObjects.CustomAttributes
 {
@@ -29,8 +23,6 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
                 var rightschematic = SchematicHandler.Get.SpawnSchematic(righttschematicID, rightDoor.transform.position);
                 rightschematic.GameObject.transform.parent = rightDoor.transform;
             }
-
-            Logger.Get.Debug("SPAWNED CUBES");
         }
     }
 }

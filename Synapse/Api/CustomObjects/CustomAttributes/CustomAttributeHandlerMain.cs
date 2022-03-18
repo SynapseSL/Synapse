@@ -10,7 +10,6 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
 
         public List<Type> DefaultAttriutes { get; } = new List<Type>
         {
-            typeof(Breakable),
             typeof(SchematicDoor),
         };
 

@@ -46,7 +46,6 @@
     <Compile Include="Api\CustomObjects\NetworkSynapseObject.cs" />
     <Compile Include="Api\CustomObjects\StructureSyncSynapseObject.cs" />
     <Compile Include="Api\CustomObjects\SynapseCustomObject.cs" />
-    <Compile Include="Api\CustomObjects\CustomAttributes\Breakable.cs" />
     <Compile Include="Api\CustomObjects\CustomAttributes\CustomAttributeHandlerMain.cs" />
     <Compile Include="Api\CustomObjects\CustomAttributes\SchematicDoor.cs" />
     <Compile Include="Api\CustomObjects\DefaultSynapseObject.cs" />
