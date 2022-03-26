@@ -58,6 +58,8 @@
     <Compile Include="Api\CustomObjects\SynapseObjectScript.cs" />
     <Compile Include="Api\CustomObjects\SynapseRagdollObject.cs" />
     <Compile Include="Api\CustomObjects\SynapseWorkStationObject.cs" />
+    <Compile Include="Api\Enum\MenuType.cs" />
+    <Compile Include="Api\Enum\MessageType.cs" />
     <Compile Include="Api\Enum\ObjectType.cs" />
     <Compile Include="Api\CustomObjects\SchematicHandler.cs" />
     <Compile Include="Api\CustomObjects\SynapseLightObject.cs" />

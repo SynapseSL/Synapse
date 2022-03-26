@@ -1,7 +1,9 @@
-﻿using Synapse.Api.CustomObjects;
+﻿using Mirror;
+using Synapse.Api.CustomObjects;
 using Synapse.Config;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Synapse.Api.Events
 {
@@ -48,13 +50,7 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha2:
-                    var realdummy = new Dummy(ev.Player.Position, ev.Player.transform.rotation, RoleType.ClassD, "");
-                    realdummy.HeldItem = ItemType.None;
-                    realdummy.Scale = Vector3.one * 1.3f;
-                    break;
-
-                case KeyCode.Alpha3:
-                    realdummy = new Dummy(ev.Player.Position, ev.Player.transform.rotation, RoleType.ClassD, "Test");
+                    Logger.Get.SaveMesaage("TestMessage", Enum.MessageType.Other);
                     break;
             }
         }

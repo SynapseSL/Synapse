@@ -212,6 +212,33 @@ namespace Synapse.Api
             NetworkWriterPool.Recycle(writer);
         }
 
+        public void OpenMenu(MenuType menu)
+        {
+            var menutype = "";
+
+            switch (menu)
+            {
+                case MenuType.Menu:
+                    menutype = "NewMainMenu";
+                    break;
+
+                case MenuType.OldFastMenu:
+                    menutype = "FastMenu";
+                    break;
+
+                case MenuType.OldMenu:
+                    menutype = "MainMenuRemastered";
+                    break;
+            }
+
+            Connection.Send(new SceneMessage
+            {
+                sceneName = menutype,
+                sceneOperation = SceneOperation.Normal,
+                customHandling = false
+            });
+        }
+
         public bool StopInput { get => Hub.fpc.NetworkforceStopInputs; set => Hub.fpc.NetworkforceStopInputs = value; }
 
         private float delay = Time.time;

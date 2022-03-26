@@ -94,7 +94,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     }
 
     [HarmonyPatch(typeof(UsableItem), nameof(UsableItem.OnUsingCancelled))]
-    internal static class UsableCannelPatch
+    internal static class UsableCancelPatch
     {
         [HarmonyPrefix]
         private static bool CancelPatch(UsableItem __instance)

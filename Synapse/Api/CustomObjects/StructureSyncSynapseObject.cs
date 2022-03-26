@@ -9,7 +9,7 @@ namespace Synapse.Api.CustomObjects
 
         public override void Refresh()
         {
-            //I Still have to finde a way to properly Refresh these objects after the first spawn
+            //I Still have to find a way to properly Refresh these objects after the first spawn
             //I don't know why but it works?
             Sync.Start();
             base.Refresh();
