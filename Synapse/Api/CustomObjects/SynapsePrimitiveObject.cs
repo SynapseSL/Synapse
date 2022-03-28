@@ -53,22 +53,6 @@ namespace Synapse.Api.CustomObjects
 
         public override PrimitiveObjectToy ToyBase { get; }
 
-        public bool IsSolid 
-        { 
-            get 
-            {
-                for (int xyz = 0; xyz < 3; xyz++)
-                    if (Scale[xyz] < 0)
-                        return false;
-                return true;
-            }
-            set
-            {
-                if (IsSolid != value)
-                    Scale = Scale * -1;
-            }
-        }
-
         public Color Color
             => ToyBase.MaterialColor;
 

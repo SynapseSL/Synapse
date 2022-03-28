@@ -37,6 +37,12 @@ public static class SynapseVersion
 #endif
         CustomNetworkManager.Modded = true;
         BuildInfoCommand.ModDescription = $"Plugin Framework: Synapse\nSynapse Version: {GetVersionName()}\nDescription: Synapse is a heavily modded server software using extensive runtime patching to make development faster and the usage more accessible to end-users";
+
+        if (Debug)
+            Logger.Get.Warn("A Debug Build of Synapse was loaded! This version should only be used for testing and not playing as it loads for longer and is less stable.");
+
+        if (BasedGameVersion != GameCore.Version.VersionString)
+            Logger.Get.Warn("Synapse-Version: Different game version than expected. Bugs may occur!");
     }
 
     public enum VersionType
