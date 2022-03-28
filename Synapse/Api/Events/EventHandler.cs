@@ -1,6 +1,9 @@
-﻿using Mirror;
+﻿using InventorySystem.Items.Firearms;
+using Mirror;
 using Synapse.Api.CustomObjects;
 using Synapse.Config;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -50,8 +53,21 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha2:
-                    Logger.Get.SaveMesaage("TestMessage", Enum.MessageType.Other);
+                    MEC.Timing.RunCoroutine(Turret(ev.Player));
                     break;
+            }
+        }
+
+        public IEnumerator<float> Turret(Player player)
+        {
+            var turret = new Turret(player.Position);
+
+            for(; ; )
+            {
+                var dir = player.Position - turret.Position;
+                turret.SingleShootDirection(dir);
+
+                yield return MEC.Timing.WaitForSeconds(0.5f);
             }
         }
 
