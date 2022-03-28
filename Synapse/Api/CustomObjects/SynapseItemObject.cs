@@ -6,9 +6,9 @@ namespace Synapse.Api.CustomObjects
 {
     public class SynapseItemObject : DefaultSynapseObject
     {
-        public SynapseItemObject(ItemType type, Vector3 position, Quaternion rotation, Vector3 scale, bool pickup = false)
+        public SynapseItemObject(ItemType type, Vector3 position, Quaternion rotation, Vector3 scale, bool pickup = false, uint attachements = 0)
         {
-            Item = CreateItem(type, position, rotation, scale, pickup);
+            Item = CreateItem(type, position, rotation, scale, pickup, attachements);
             ItemType = type;
 
             Map.Get.SynapseObjects.Add(this);
@@ -50,7 +50,7 @@ namespace Synapse.Api.CustomObjects
         public bool CanBePickedUp { get => Item.CanBePickedUp; set => Item.CanBePickedUp = value; }
         public ItemType ItemType { get; }
 
-        private SynapseItem CreateItem(ItemType type, Vector3 position, Quaternion rotation, Vector3 scale, bool pickup = false)
+        private SynapseItem CreateItem(ItemType type, Vector3 position, Quaternion rotation, Vector3 scale, bool pickup = false, uint attachments = 0)
         {
             var item = new SynapseItem(type);
             item.Schematic = null;
@@ -61,6 +61,7 @@ namespace Synapse.Api.CustomObjects
             item.PickupBase.Rb.isKinematic = true;
             item.PickupBase.Rb.useGravity = false;
             item.CanBePickedUp = pickup;
+            item.WeaponAttachments = attachments;
             return item;
         }
     }

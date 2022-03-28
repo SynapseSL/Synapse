@@ -48,6 +48,12 @@ public class SynapseController
             return;
         }
 
+        if (SynapseVersion.Debug)
+            Server.Logger.Warn("A Debug Build of Synapse was loaded! This version should only be used for testing and not playing as it loads for longer and is less stable.");
+
+        if (BasedGameVersion != GameCore.Version.VersionString)
+            Server.Logger.Warn("Synapse-Version: Different game version than expected. Bugs may occur!");
+
         Server.Logger.Info("Synapse is now ready!");
     }
 
