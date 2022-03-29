@@ -106,7 +106,7 @@ namespace Synapse.Api.Events
             var ev = new PlayerFlipCoinEventArgs()
             {
                 IsTails = isTails,
-                player = player
+                Player = player
             };
 
             PlayerFlipCoinEvent.Invoke(ev);

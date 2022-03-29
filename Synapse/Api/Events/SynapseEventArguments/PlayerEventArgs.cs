@@ -394,7 +394,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
     public class PlayerFlipCoinEventArgs : EventHandler.ISynapseEventArgs
     {
-        public Player player { get; internal set; }
+        public Player Player { get; internal set; }
 
         public bool Allow { get; set; } = true;
 

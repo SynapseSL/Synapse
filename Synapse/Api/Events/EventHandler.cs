@@ -2,6 +2,7 @@
 using Mirror;
 using Synapse.Api.CustomObjects;
 using Synapse.Api.Enum;
+using Synapse.Api.Events.SynapseEventArguments;
 using Synapse.Config;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,30 +56,6 @@ namespace Synapse.Api.Events
                 case KeyCode.Alpha2:
                     Logger.Get.SaveMesaage("TestMessage", Enum.MessageType.Other);
                     break;
-                case KeyCode.Alpha3:
-                    Timing.RunCoroutine(Test(ev.Player));
-                    break;
-            }
-
-            IEnumerator<float> Test(Player player)
-            {
-                player.MaxHealth = 200;
-
-                for (byte i = 0; i < 4; i++)
-                {
-                    foreach (var effect in (Effect[])System.Enum.GetValues(typeof(Effect)))
-                    {
-                        player.Broadcast(4, effect.ToString());
-
-                        if (!player.PlayerEffectsController.ChangeByString(effect.ToString().ToLower(), i, 4))
-                            Logger.Get.Error($"{effect} -- {i}");
-
-                        yield return Timing.WaitForSeconds(4f);
-                        player.Health = 100;
-                        
-
-                    }
-                }
             }
         }
 
