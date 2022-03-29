@@ -1,6 +1,7 @@
 using Mirror;
 using Synapse.Api.CustomObjects;
 using Synapse.Config;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Synapse.Api.Events
