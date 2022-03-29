@@ -70,7 +70,7 @@ namespace Synapse.Api.Events
                     {
                         player.Broadcast(4, effect.ToString());
 
-                        if (player.PlayerEffectsController.ChangeByString(effect.ToString().ToLower(), i, 4))
+                        if (!player.PlayerEffectsController.ChangeByString(effect.ToString().ToLower(), i, 4))
                             Logger.Get.Error($"{effect} -- {i}");
 
                         yield return Timing.WaitForSeconds(4f);
