@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using Synapse.Api;
 using Synapse.Api.Plugin;
 using Synapse.Command;
 using System;
@@ -41,6 +42,7 @@ public class SynapseController
             Server.Schematic.Init();
             CommandHandlers.RegisterSynapseCommands();
             PluginLoader.ActivatePlugins();
+            Server.Logger.Refresh();
         }
         catch (Exception e)
         {

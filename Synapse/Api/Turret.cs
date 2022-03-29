@@ -5,7 +5,6 @@ using Mirror;
 using PlayerStatsSystem;
 using Synapse.Api.Enum;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using Utils.Networking;
 using Random = UnityEngine.Random;
@@ -49,6 +48,7 @@ namespace Synapse.Api
             PlayAudio(Sound);
         }
 
+        //TODO: Implement ShootSounds
         public void PlayAudio(ShootSound sound)
         {
             foreach(var player in Server.Get.Players)

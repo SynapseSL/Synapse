@@ -2,11 +2,13 @@
 using System.IO;
 using System.Reflection;
 using Synapse.Api.Enum;
+using System.Collections.Generic;
 
 namespace Synapse.Api
 {
     public class Logger
     {
+        #region API
         public static Logger Get => SynapseController.Server.Logger;
         
         internal Logger() { }
@@ -15,42 +17,42 @@ namespace Synapse.Api
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
             Send($"{name}: {message}", ConsoleColor.Cyan);
-            SaveMesaage(message, MessageType.Info);
+            SaveMessage(message, MessageType.Info);
         }
 
         public void Info(object message)
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
             Send($"{name}: {message}", ConsoleColor.Cyan);
-            SaveMesaage(message, MessageType.Info);
+            SaveMessage(message, MessageType.Info);
         }
 
         public void Warn(string message)
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
             Send($"{name}: {message}", ConsoleColor.Green);
-            SaveMesaage(message, MessageType.Warn);
+            SaveMessage(message, MessageType.Warn);
         }
 
         public void Warn(object message)
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
             Send($"{name}: {message}", ConsoleColor.Green);
-            SaveMesaage(message, MessageType.Warn);
+            SaveMessage(message, MessageType.Warn);
         }
 
         public void Error(string message)
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
             Send($"{name}: {message}", ConsoleColor.Red);
-            SaveMesaage(message, MessageType.Error);
+            SaveMessage(message, MessageType.Error);
         }
 
         public void Error(object message)
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
             Send($"{name}: {message}", ConsoleColor.Red);
-            SaveMesaage(message, MessageType.Error);
+            SaveMessage(message, MessageType.Error);
         }
 
         internal void Debug(object message)
@@ -58,17 +60,44 @@ namespace Synapse.Api
             if (SynapseVersion.Debug)
             {
                 Send($"Synapse-Debug: {message}", ConsoleColor.DarkYellow);
-                SaveMesaage(message, MessageType.Debug);
+                SaveMessage(message, MessageType.Debug);
             }
         }
 
-        public void Send(string message, ConsoleColor color) => ServerConsole.AddLog(message, color);
+        public void Send(object message, ConsoleColor color)
+            => ServerConsole.AddLog(message.ToString(), color);
 
-        public void SaveMesaage(object message, MessageType type)
+        public void Send(string message, ConsoleColor color)
+            => ServerConsole.AddLog(message, color);
+
+        public void SaveMessage(object message, MessageType type)
+            => SaveMessage(message, type, Assembly.GetCallingAssembly().GetName().Name);
+
+        public void SaveMessage(object message, MessageType type, string name)
         {
-            var name = Assembly.GetCallingAssembly().GetName().Name;
-            var save = $"{DateTime.Now} | {name}.dll | {type} | {message} \n";
-            File.AppendAllText(Server.Get.Files.LogFile, save);
+            var save = $"{DateTime.Now} | {name}.dll | {type} | {message}";
+            if (logEnabled)
+                File.AppendAllText(Server.Get.Files.LogFile, save + "\n");
+            else if(Server.Get.Configs?.synapseConfiguration?.LogMessages != false)
+                messages.Add(save);
+        }
+
+        #endregion
+        private List<string> messages = new List<string>();
+        private bool logEnabled = false;
+
+        internal void Refresh()
+        {
+            if (Server.Get.Configs.synapseConfiguration.LogMessages)
+            {
+                logEnabled = true;
+                Server.Get.Files.InitLogDirectories();
+                File.AppendAllLines(Server.Get.Files.LogFile, messages);
+            }
+            else
+                logEnabled = false;
+
+            messages.Clear();
         }
     }
 }

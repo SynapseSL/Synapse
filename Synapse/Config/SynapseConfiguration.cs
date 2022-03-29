@@ -11,6 +11,9 @@ namespace Synapse.Config
 
         [Description("The default Language that is used for translations")]
         public string Language { get; set; } = "ENGLISH";
+
+        [Description("If enabled all messages of Synapse and Plugins will be stored")]
+        public bool LogMessages { get; set; } = false;
         #endregion
 
         #region GameplayOptions
