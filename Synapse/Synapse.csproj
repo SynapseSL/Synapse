@@ -72,6 +72,7 @@
     <Compile Include="Api\Enum\MovementDirection.cs" />
     <Compile Include="Api\Enum\ElevatorType.cs" />
     <Compile Include="Api\Enum\ScpRecontainmentType.cs" />
+    <Compile Include="Api\Enum\ShootSound.cs" />
     <Compile Include="Api\Enum\SpawnableDoorType.cs" />
     <Compile Include="Api\Enum\TargetType.cs" />
     <Compile Include="Api\Enum\WorkstationState.cs" />
@@ -105,6 +106,7 @@
     <Compile Include="Api\Teams\SynapseTeam.cs" />
     <Compile Include="Api\Teams\ISynapseTeam.cs" />
     <Compile Include="Api\Teams\TeamManager.cs" />
+    <Compile Include="Api\Turret.cs" />
     <Compile Include="Api\WorkStation.cs" />
     <Compile Include="Api\Generator.cs" />
     <Compile Include="Api\Enum\GeneratorInteraction.cs" />
@@ -251,6 +253,7 @@
     <Compile Include="Patches\EventsPatches\PlayerPatches\WorkStationPatch.cs" />
     <Compile Include="Patches\SynapsePatches\PermissionSystem\RefreshPermissionPatch.cs" />
     <Compile Include="Patches\SynapsePatches\PermissionSystem\SetGroupPatch.cs" />
+    <Compile Include="Patches\SynapsePatches\TurretDamageHandler.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\LockerStartPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\Scp096MaxShieldPatch.cs" />
     <Compile Include="Patches\SynapsePatches\Wrapper\RagdollPatch.cs" />

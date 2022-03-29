@@ -116,6 +116,7 @@ namespace Synapse
                 PermissionHandler.Reload();
                 Schematic.Load();
                 SynapseController.PluginLoader.ReloadConfigs();
+                Logger.Refresh();
             }
             catch(Exception e)
             {
@@ -495,9 +496,6 @@ namespace Synapse
 
                 SchematicDirectory = Path.Combine(SynapseDirectory, "schematics");
 
-                LogDirectory = Path.Combine(SynapseDirectory, "logs");
-                LogPortDirectory = Path.Combine(LogDirectory, "server-" + ServerStatic.ServerPort);
-
                 var configpath = Path.Combine(ConfigDirectory, "config.syml");
                 ConfigFile = File.Exists(configpath) ? configpath : Path.Combine(SharedConfigDirectory, "config.syml");
 
@@ -506,6 +504,12 @@ namespace Synapse
                 PermissionFile = File.Exists(permissionspath)
                     ? permissionspath
                     : Path.Combine(SharedConfigDirectory, "permission.syml");
+            }
+
+            public void InitLogDirectories()
+            {
+                LogDirectory = Path.Combine(SynapseDirectory, "logs");
+                LogPortDirectory = Path.Combine(LogDirectory, "server-" + ServerStatic.ServerPort);
             }
 
             public string GetOldTranslationFile(PluginInformation infos)

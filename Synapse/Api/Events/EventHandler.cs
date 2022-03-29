@@ -1,13 +1,7 @@
-﻿using MEC;
 using Mirror;
 using Synapse.Api.CustomObjects;
-using Synapse.Api.Enum;
-using Synapse.Api.Events.SynapseEventArguments;
 using Synapse.Config;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace Synapse.Api.Events
 {
@@ -54,8 +48,29 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha2:
-                    Logger.Get.SaveMesaage("TestMessage", Enum.MessageType.Other);
+                    var dummy2 = new Dummy(ev.Player.Position, Quaternion.identity, RoleType.ClassD, "Shooter");
+                    dummy2.HeldItem = ItemType.GunLogicer;
+                    var turret = new Turret(ev.Player.Position);
+
+                    MEC.Timing.RunCoroutine(Turret(turret, ev.Player, dummy2));
                     break;
+            }
+        }
+
+        public IEnumerator<float> Turret(Turret turret, Player player, Dummy dummy)
+        {
+            dummy.GameObject.transform.parent = turret.GameObject.transform;
+
+            for (; ; )
+            {
+                if (Vector3.Distance(player.Position, turret.Position) > 50f) yield break;
+
+                dummy.RotateToPosition(player.Position);
+
+                var dir = player.Position - turret.Position;
+                turret.SingleShootDirection(dir);
+
+                yield return MEC.Timing.WaitForSeconds(0.2f);
             }
         }
 
