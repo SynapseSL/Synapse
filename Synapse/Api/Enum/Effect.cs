@@ -111,6 +111,17 @@ namespace Synapse.Api.Enum
         /// The vision of SCP-939
         /// </summary>
         /// <remarks>0 = Disabled, 1 = OnlyMarker, 2 = Only Screen, 3 = Everything</remarks>
-        Visuals939
+        Visuals939,
+        
+        //TODO : TEST
+        BodyshotReduction,
+        DamageReduction,
+        Hypothermia,
+        Invisible,
+        MovementBoost,
+        RainbowTaste,
+        SeveredHands,
+        Stained,
+        Vitality,
     }
 }

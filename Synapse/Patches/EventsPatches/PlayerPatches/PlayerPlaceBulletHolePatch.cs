@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(StandardHitregBase), nameof(StandardHitregBase.PlaceBloodDecal)]
+    [HarmonyPatch(typeof(StandardHitregBase), nameof(StandardHitregBase.PlaceBloodDecal))]
     internal static class PlayerPlaceBulletHolePatch
     {
         [HarmonyPrefix]
