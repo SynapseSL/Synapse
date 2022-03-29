@@ -99,7 +99,10 @@ namespace Synapse.Api.Enum
         /// </summary>
         /// <remarks>0 = Disabled, 1 = 1xCola, 2 = 2xCola, 3 = 3xCola, 4 = 4xCola</remarks>
         Scp207,
-        [Obsolete("Scp268 is no longer in the game", true)]
+        /// <summary>
+        /// use <see cref="Invisible"/>
+        /// </summary>
+        [Obsolete("Scp268 effect is no longer in the game, use Invisible", true)]
         Scp268,
         /// <summary>
         /// Slows down player (No effect on SCPs)
