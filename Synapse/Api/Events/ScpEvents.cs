@@ -277,6 +277,20 @@ namespace Synapse.Api.Events
 
             public event EventHandler.OnSynapseEvent<Scp173BlinkEventArgs> Scp173BlinkEvent;
 
+            public event EventHandler.OnSynapseEvent<Scp173PlaceTantrumEventArgs> Scp173PlaceTantrum;
+
+            internal void InvokeScp173PlaceTantrumEvent(Player scp173, out bool allow)
+            {
+                var ev = new Scp173PlaceTantrumEventArgs()
+                {
+                    Scp173 = scp173
+                };
+
+                Scp173PlaceTantrum.Invoke(ev);
+                
+                allow = ev.Allow;
+            }
+
             internal void InvokeScp173BlinkEvent(Player scp173, ref Vector3 pos, out bool allow)
             {
                 var ev = new Scp173BlinkEventArgs
