@@ -47,7 +47,6 @@ namespace Synapse.Api.CustomObjects
 
 
         public WorkStation WorkStation { get; }
-        public bool UpdateEveryFrame { get; set; } = false;
 
 
         private WorkStation CreateStation(Vector3 position, Quaternion rotation, Vector3 scale)

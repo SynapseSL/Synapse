@@ -48,11 +48,19 @@ namespace Synapse.Api.Events
                     break;
 
                 case KeyCode.Alpha2:
-                    var dummy2 = new Dummy(ev.Player.Position, Quaternion.identity, RoleType.ClassD, "Shooter");
-                    dummy2.HeldItem = ItemType.GunLogicer;
-                    var turret = new Turret(ev.Player.Position);
-
-                    MEC.Timing.RunCoroutine(Turret(turret, ev.Player, dummy2));
+                    var station = SynapseController.Server.Schematic.SpawnSchematic(new SynapseSchematic
+                    {
+                        WorkStationObjects = new List<SynapseSchematic.WorkStationConfiguration>
+                        {
+                            new SynapseSchematic.WorkStationConfiguration
+                            {
+                                Position = Vector3.zero,
+                                Rotation = Quaternion.identity,
+                                Scale = Vector3.one,
+                                UpdateEveryFrame = false,
+                            }
+                        }
+                    }, ev.Player.Position);
                     break;
             }
         }

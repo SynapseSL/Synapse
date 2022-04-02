@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using Synapse.Api;
 using Synapse.Api.Plugin;
 using Synapse.Command;
 using System;

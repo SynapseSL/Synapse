@@ -17,42 +17,42 @@ namespace Synapse.Api
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
             Send($"{name}: {message}", ConsoleColor.Cyan);
-            SaveMessage(message, MessageType.Info);
+            SaveMessage(message, MessageType.Info, name);
         }
 
         public void Info(object message)
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
             Send($"{name}: {message}", ConsoleColor.Cyan);
-            SaveMessage(message, MessageType.Info);
+            SaveMessage(message, MessageType.Info, name);
         }
 
         public void Warn(string message)
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
             Send($"{name}: {message}", ConsoleColor.Green);
-            SaveMessage(message, MessageType.Warn);
+            SaveMessage(message, MessageType.Warn, name);
         }
 
         public void Warn(object message)
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
             Send($"{name}: {message}", ConsoleColor.Green);
-            SaveMessage(message, MessageType.Warn);
+            SaveMessage(message, MessageType.Warn, name);
         }
 
         public void Error(string message)
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
             Send($"{name}: {message}", ConsoleColor.Red);
-            SaveMessage(message, MessageType.Error);
+            SaveMessage(message, MessageType.Error, name);
         }
 
         public void Error(object message)
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
             Send($"{name}: {message}", ConsoleColor.Red);
-            SaveMessage(message, MessageType.Error);
+            SaveMessage(message, MessageType.Error, name);
         }
 
         internal void Debug(object message)
