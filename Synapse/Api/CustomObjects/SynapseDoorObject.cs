@@ -55,6 +55,8 @@ namespace Synapse.Api.CustomObjects
             var door = new Door(ot);
             door.Open = open;
             door.Locked = locked;
+
+            Map.Get.Doors.Add(door);
             return door;
         }
     }
