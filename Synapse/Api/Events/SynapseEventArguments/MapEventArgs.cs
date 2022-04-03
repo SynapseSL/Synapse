@@ -4,6 +4,13 @@ using UnityEngine;
 
 namespace Synapse.Api.Events.SynapseEventArguments
 {
+    public class GeneratorEngageEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Generator Generator { get; internal set; }
+
+        public bool Allow { get; set; }
+    }
+
     public class TriggerTeslaEventArgs : EventHandler.ISynapseEventArgs
     {
         public Tesla Tesla { get; internal set; }
@@ -22,7 +29,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; }
     }
 
-    public class LockerInteractEventArgs : Synapse.Api.Events.EventHandler.ISynapseEventArgs
+    public class LockerInteractEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Player { get; internal set; }
         public LockerChamber LockerChamber { get; internal set; }
