@@ -9,7 +9,10 @@ namespace Synapse.Api.Events
     {
         internal MapEvents() { }
 
+
         public event EventHandler.OnSynapseEvent<TriggerTeslaEventArgs> TriggerTeslaEvent;
+
+        public event EventHandler.OnSynapseEvent<GeneratorEngageEventArgs> GeneratorEngageEvent;
 
         public event Action WarheadDetonationEvent;
 
@@ -39,6 +42,18 @@ namespace Synapse.Api.Events
             TriggerTeslaEvent?.Invoke(ev);
 
             trigger = ev.Trigger;
+        }
+
+        internal void InvokeGeneratorEngage(MapGeneration.Distributors.Scp079Generator generator, ref bool allow)
+        {
+            var ev = new GeneratorEngageEventArgs()
+            {
+                Generator = generator.GetGenerator(),
+                Allow = allow
+            };
+
+            GeneratorEngageEvent?.Invoke(ev);
+            allow = ev.Allow;
         }
 
         internal void InvokeDoorInteractEvent(Player player,Door door,ref bool allow)
