@@ -11,8 +11,6 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public MapGeneration.Distributors.Scp079Generator.GeneratorFlags Flag { get; internal set; }
 
         public bool State { get; internal set; }
-
-        public bool Allow { get; set; }
     }
 
     public class TriggerTeslaEventArgs : EventHandler.ISynapseEventArgs
