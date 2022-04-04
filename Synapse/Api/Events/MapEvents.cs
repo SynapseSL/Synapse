@@ -12,7 +12,7 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<TriggerTeslaEventArgs> TriggerTeslaEvent;
 
-        public event EventHandler.OnSynapseEvent<GeneratorEngageEventArgs> GeneratorEngageEvent;
+        public event EventHandler.OnSynapseEvent<GeneratorServerSetFlagEventArgs> GeneratorServerSetFlagEvent;
 
         public event Action WarheadDetonationEvent;
 
@@ -44,16 +44,16 @@ namespace Synapse.Api.Events
             trigger = ev.Trigger;
         }
 
-        internal void InvokeGeneratorEngage(MapGeneration.Distributors.Scp079Generator generator, ref bool allow)
+        internal void InvokeGeneratorGeneratorServerSetFlag(MapGeneration.Distributors.Scp079Generator generator, MapGeneration.Distributors.Scp079Generator.GeneratorFlags flag, bool state)
         {
-            var ev = new GeneratorEngageEventArgs()
+            var ev = new GeneratorServerSetFlagEventArgs()
             {
                 Generator = generator.GetGenerator(),
-                Allow = allow
+                Flag = flag,
+                State = state,
             };
 
-            GeneratorEngageEvent?.Invoke(ev);
-            allow = ev.Allow;
+            GeneratorServerSetFlagEvent?.Invoke(ev);
         }
 
         internal void InvokeDoorInteractEvent(Player player,Door door,ref bool allow)
@@ -114,7 +114,7 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void Invoke914Activate(ref List<Player> players, ref List<Synapse.Api.Items.SynapseItem> items, ref Vector3 moveVector, out bool allow)
+        internal void Invoke914Activate(ref List<Player> players, ref List<Items.SynapseItem> items, ref Vector3 moveVector, out bool allow)
         {
             var ev = new Scp914ActivateEventArgs
             {
