@@ -3,55 +3,38 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 using FieldAttributes = dnlib.DotNet.FieldAttributes;
 using MethodAttributes = dnlib.DotNet.MethodAttributes;
 using TypeAttributes = dnlib.DotNet.TypeAttributes;
 
-namespace SynapseInjector
+namespace Synapse.Injector
 {
-    public class Program
+    public class SynapseInjector
     {
-        public static void Main(string[] args)
+        private bool _writeToDisk;
+
+        public SynapseInjector(bool writeToDisk = true)
         {
-            try
-            {
-                if (args.Length == 0)
-                {
-                    return;
-                }
-
-                var program = new Program(args[0]);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                Thread.Sleep(10000);
-            }
-
-            Thread.Sleep(2000);
+            _writeToDisk = writeToDisk;
         }
 
-        private Program(string path)
+        public void Start(ModuleDefMD loadModule)
         {
             var sourceModule = ModuleDefMD.Load(Assembly.GetExecutingAssembly().Location);
-                
+
             var loaderSource = sourceModule.Types.First(t => t.Name == "Loader");
             loaderSource.DeclaringType = null;
             var loader = loaderSource.Methods.First(t => t.Name == "LoadSystem");
 
-            var loadModule = LoadAssemblyCSharp(path);
-                
-            SwapTypes(sourceModule,loadModule, loaderSource);
-                
+            SwapTypes(sourceModule, loadModule, loaderSource);
+
             InjectLoader(loadModule, loader);
             StoreModule(loadModule);
             Publicise(loadModule);
         }
-
-        private static void Publicise(ModuleDef md)
+        private void Publicise(ModuleDef md)
         {
             var types = md.Assembly.ManifestModule.Types.ToList();
             var nested = new List<TypeDef>();
@@ -78,10 +61,10 @@ namespace SynapseInjector
                 def.Attributes = def.IsNested ? TypeAttributes.NestedPublic : TypeAttributes.Public;
             }
             types.AddRange(nested);
-			
-            foreach (var def in types.SelectMany(t => t.Methods).Where(m => !m?.IsPublic ?? false)) 
-				def.Access = MethodAttributes.Public; 
-				
+
+            foreach (var def in types.SelectMany(t => t.Methods).Where(m => !m?.IsPublic ?? false))
+                def.Access = MethodAttributes.Public;
+
             foreach (var type in types)
             {
                 var events = type.Events.Select(_ => _.Name).ToArray();
@@ -93,32 +76,32 @@ namespace SynapseInjector
                         field.Access = FieldAttributes.Public;
                 }
             }
-            md.Write("./Delivery/Assembly-CSharp-Publicized.dll");
-            Console.WriteLine("Wrote Assembly-CSharp-Publicized.dll to Delivery directory");
+            if (_writeToDisk)
+            {
+                md.Write("./Delivery/Assembly-CSharp-Publicized.dll");
+                Console.WriteLine("Wrote Assembly-CSharp-Publicized.dll to Delivery directory");
+            }
         }
+        private void StoreModule(ModuleDef def)
+        {
+            if (!_writeToDisk)
+                return;
 
-        private static ModuleDef LoadAssemblyCSharp(string path)
-        {
-            return ModuleDefMD.Load(path, new ModuleCreationOptions());
-        }
-        
-        private static void StoreModule(ModuleDef def)
-        {
             if (!Directory.Exists(Path.Combine(Environment.CurrentDirectory + "/Delivery")))
                 Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory + "/Delivery"));
+
             def.Write("./Delivery/Assembly-CSharp.dll");
             Console.WriteLine("Wrote Assembly-CSharp.dll to Delivery directory");
         }
-        
-        private static void SwapTypes(ModuleDef a, ModuleDef b, TypeDef type)
+        private void SwapTypes(ModuleDef a, ModuleDef b, TypeDef type)
         {
             a.Types.Remove(type);
             b.Types.Add(type);
         }
-        
-        private static void InjectLoader(ModuleDef moduleDef, MethodDef callable) {
+        private void InjectLoader(ModuleDef moduleDef, MethodDef callable)
+        {
             MethodDef startMethod = null;
-            
+
             foreach (var module in moduleDef.Assembly.Modules)
             {
                 foreach (var type in module.Types)
@@ -129,9 +112,8 @@ namespace SynapseInjector
                     }
                 }
             }
-                
+
             startMethod?.Body.Instructions.Insert(0, OpCodes.Call.ToInstruction(callable));
         }
-        
     }
 }
