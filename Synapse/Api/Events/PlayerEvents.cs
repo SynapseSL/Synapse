@@ -84,20 +84,17 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<PlaceBulletHoleEventArgs> PlaceBulletHoleEvent;
 
         #region PlayerEventsInvoke
-        internal void InvokePlaceBulletHoleEvent(Player player, ref Vector3 postion, ref Vector3 rotation, out bool allow)
+        internal void InvokePlaceBulletHoleEvent(Player player, Vector3 postion, out bool allow)
         {
             var ev = new PlaceBulletHoleEventArgs()
             {
                 Player = player,
                 Position = postion,
-                Rotation = rotation
             };
 
             PlaceBulletHoleEvent?.Invoke(ev);
 
             allow = ev.Allow;
-            rotation = ev.Rotation;
-            postion = ev.Position;
         }
 
         internal void InvokeFlipCoinEvent(Player player, ref bool isTails, out bool allow)
@@ -424,28 +421,28 @@ namespace Synapse.Api.Events
         {
             PlayerWalkOnTantrumEventArgs ev = new PlayerWalkOnTantrumEventArgs()
             {
-                Allow = allow,
+                SlowDown = allow,
                 Player = player,
-                Trantrum = trantrum
+                Tantrum = trantrum
             };
 
             PlayerWalkOnTantrumEvent?.Invoke(ev);
 
-            allow = ev.Allow;
+            allow = ev.SlowDown;
         }
 
         internal void InvokeSinkhole(Player player,SinkholeEnvironmentalHazard sinkhole,ref bool allow)
         {
             var ev = new PlayerWalkOnSinkholeEventArgs
             {
-                Allow = allow,
+                SlowDown = allow,
                 Player = player,
                 Sinkhole = sinkhole
             };
 
             PlayerWalkOnSinkholeEvent?.Invoke(ev);
 
-            allow = ev.Allow;
+            allow = ev.SlowDown;
         }
 
         internal void InvokePlayerReport(Player player, Player target, string reason, ref bool global, out bool allow)

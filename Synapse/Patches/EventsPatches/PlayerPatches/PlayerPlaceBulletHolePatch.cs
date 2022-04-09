@@ -18,13 +18,11 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var point = hit.point;
                 var normal = hit.normal;
                 
-                Server.Get.Events.Player.InvokePlaceBulletHoleEvent(player, ref point, ref normal, out var allow);
+                Server.Get.Events.Player.InvokePlaceBulletHoleEvent(player, point, out var allow);
                 
                 if (!allow)
                     return false;
 
-                hit.point = point;
-                hit.normal = normal;
                 return true;
             }
             catch (Exception ex)

@@ -324,16 +324,19 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public SinkholeEnvironmentalHazard Sinkhole { get; internal set; }
 
-        public bool Allow { get; set; }
+        [Obsolete("Use SlowDown instead")]
+        public bool Allow { get => SlowDown; set => SlowDown = value; }
+
+        public bool SlowDown { get; set; }
     }
 
     public class PlayerWalkOnTantrumEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
-        public TantrumEnvironmentalHazard Trantrum { get; internal set; }
+        public TantrumEnvironmentalHazard Tantrum { get; internal set; }
 
-        public bool Allow { get; set; }
+        public bool SlowDown { get; set; }
     }
 
     public class PlayerReportEventArgs : EventHandler.ISynapseEventArgs
@@ -387,9 +390,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public bool Allow { get; set; } = true;
 
-        public Vector3 Position { get; set; }
-
-        public Vector3 Rotation { get; set; }
+        public Vector3 Position { get; internal set; }
     }
 
     public class PlayerFlipCoinEventArgs : EventHandler.ISynapseEventArgs

@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using Synapse.Api.Enum;
 using System;
 using UnityEngine;
 
@@ -29,7 +28,10 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 Synapse.Api.Events.EventHandler.Get.Player.InvokeTantrum(synapseplayer, __instance, ref allow);
 
                 if (allow)
-                    synapseplayer.GiveEffect(Effect.Stained, 0, 2f);
+                {
+                    Synapse.Api.Logger.Get.Debug("ALLOW TANTRUM");
+                    synapseplayer.PlayerEffectsController.EnableEffect<CustomPlayerEffects.Stained>(2f, false);
+                }
                 
                 return false;
             }
