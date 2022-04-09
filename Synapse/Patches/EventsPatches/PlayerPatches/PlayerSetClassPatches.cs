@@ -73,7 +73,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                     foreach (var itemtype in roleitems.Items)
                     {
-                        eventargs.Items.Add(new SynapseItem(itemtype));
+                        var item = new SynapseItem(itemtype);
+                        item.ItemData["setup"] = true;
+                        eventargs.Items.Add(item);
                     }
                 }
 
@@ -147,8 +149,13 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 foreach (var item in args.Items)
                 {
+                    //TODO: Find a better solution
+                    item.ItemData["dur"] = item.Durabillity;
                     var itembase = player.VanillaInventory.ServerAddItem(item.ItemType, item.Serial);
                     InventoryItemProvider.OnItemProvided?.Invoke(player.Hub, itembase);
+
+                    if (!item.ItemData.ContainsKey("setup") && item.ItemData["dur"] is float dur)
+                        item.Durabillity = dur;
                 }
 
                 if(args.IsEscaping) foreach(var item in args.EscapeItems) item.PickUp(player);

@@ -23,45 +23,6 @@ namespace Synapse.Api.Events
         {
             switch (ev.KeyCode)
             {
-                case KeyCode.Alpha0:
-                    var locker = new SynapseLockerObject(Enum.LockerType.ScpPedestal, ev.Player.Position, Quaternion.identity, Vector3.one);
-
-                    MEC.Timing.CallDelayed(5f,() => locker.Position = ev.Player.Position);
-                    break;
-
-                case KeyCode.Alpha1:
-                    var dummy = SchematicHandler.Get.SpawnSchematic(new SynapseSchematic
-                    {
-                        DummyObjects = new System.Collections.Generic.List<SynapseSchematic.DummyConfiguration>
-                        {
-                            new SynapseSchematic.DummyConfiguration
-                            {
-                                HeldItem = ItemType.None,
-                                Position = Vector3.zero,
-                                Name = "",
-                                Role = RoleType.ClassD,
-                                Rotation = Quaternion.identity,
-                                Scale = Vector3.one
-                            }
-                        }
-                    }, ev.Player.Position);
-                    break;
-
-                case KeyCode.Alpha2:
-                    var station = SynapseController.Server.Schematic.SpawnSchematic(new SynapseSchematic
-                    {
-                        WorkStationObjects = new List<SynapseSchematic.WorkStationConfiguration>
-                        {
-                            new SynapseSchematic.WorkStationConfiguration
-                            {
-                                Position = Vector3.zero,
-                                Rotation = Quaternion.identity,
-                                Scale = Vector3.one,
-                                UpdateEveryFrame = false,
-                            }
-                        }
-                    }, ev.Player.Position);
-                    break;
             }
         }
 
