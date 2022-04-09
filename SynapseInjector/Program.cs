@@ -78,8 +78,21 @@ namespace SynapseInjector
                 def.Attributes = def.IsNested ? TypeAttributes.NestedPublic : TypeAttributes.Public;
             }
             types.AddRange(nested);
-            foreach (var def in types.SelectMany(t => t.Methods).Where(m => !m?.IsPublic ?? false)) def.Access = MethodAttributes.Public; 
-            foreach (var def in types.SelectMany(t => t.Fields).Where(f => !f?.IsPublic ?? false)) def.Access = FieldAttributes.Public;
+			
+            foreach (var def in types.SelectMany(t => t.Methods).Where(m => !m?.IsPublic ?? false)) 
+				def.Access = MethodAttributes.Public; 
+				
+            foreach (var type in types)
+            {
+                var events = type.Events.Select(_ => _.Name).ToArray();
+                foreach (var field in type.Fields)
+                {
+                    var isEventBackingField = events.Any(_ => String.Equals(_, field.Name, StringComparison.InvariantCultureIgnoreCase));
+                    //Wenn nicht public und auch kein Event backing-field
+                    if ((!field?.IsPublic ?? false) && !isEventBackingField)
+                        field.Access = FieldAttributes.Public;
+                }
+            }
             md.Write("./Delivery/Assembly-CSharp-Publicized.dll");
             Console.WriteLine("Wrote Assembly-CSharp-Publicized.dll to Delivery directory");
         }
