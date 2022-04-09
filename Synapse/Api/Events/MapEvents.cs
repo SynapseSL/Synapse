@@ -12,7 +12,7 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<TriggerTeslaEventArgs> TriggerTeslaEvent;
 
-        public event EventHandler.OnSynapseEvent<GeneratorServerSetFlagEventArgs> GeneratorServerSetFlagEvent;
+        public event EventHandler.OnSynapseEvent<GeneratorEngageEventArgs> GeneratorEngageEvent;
 
         public event Action WarheadDetonationEvent;
 
@@ -44,16 +44,16 @@ namespace Synapse.Api.Events
             trigger = ev.Trigger;
         }
 
-        internal void InvokeGeneratorGeneratorServerSetFlag(MapGeneration.Distributors.Scp079Generator generator, MapGeneration.Distributors.Scp079Generator.GeneratorFlags flag, bool state)
+        internal void InvokeGeneratorEngage(MapGeneration.Distributors.Scp079Generator generator, ref bool allow)
         {
-            var ev = new GeneratorServerSetFlagEventArgs()
+            GeneratorEngageEventArgs ev = new GeneratorEngageEventArgs()
             {
                 Generator = generator.GetGenerator(),
-                Flag = flag,
-                State = state,
+                Allow = allow,
             };
 
-            GeneratorServerSetFlagEvent?.Invoke(ev);
+            GeneratorEngageEvent?.Invoke(ev);
+            allow = ev.Allow;
         }
 
         internal void InvokeDoorInteractEvent(Player player,Door door,ref bool allow)
