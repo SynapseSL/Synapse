@@ -161,7 +161,7 @@ public static class SynapseExtensions
         return item;
     }
 
-    public static bool CanHarmScp(Player player,bool message = true)
+    public static bool CanHarmScp(Player player, bool message = true)
     {
         if (player.Team == Team.SCP || player.CustomRole?.GetFriendsID().Any(x => x == (int)Team.SCP) == true)
         {
@@ -176,6 +176,8 @@ public static class SynapseExtensions
     {
         try
         {
+            Synapse.Api.Logger.Get.Debug("PERMISSION");
+
             var result = true;
 
             if (Map.Get.Round.RoundEnded && Server.Get.Configs.synapseConfiguration.AutoFF)
@@ -215,6 +217,8 @@ public static class SynapseExtensions
             }
 
             Server.Get.Events.Player.InvokePlayerDamagePermissions(victim, attacker, ref result);
+
+            Synapse.Api.Logger.Get.Debug("PERMISSION " + result);
 
             return result;
         }

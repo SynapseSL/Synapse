@@ -79,7 +79,7 @@ namespace Synapse.Api
         public void ChangeRoleAtPosition(RoleType role)
         {
             RoleChangeClassIdPatch.ForceLite = true;
-            Hub.characterClassManager.SetClassIDAdv(role, true, CharacterClassManager.SpawnReason.None);
+            Hub.characterClassManager.SetClassIDAdv(role, true, CharacterClassManager.SpawnReason.ForceClass);
             RoleChangeClassIdPatch.ForceLite = false;
         }
 

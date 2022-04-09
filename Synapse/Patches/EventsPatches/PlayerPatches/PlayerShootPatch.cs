@@ -62,7 +62,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: PlayerShoot failed!!\n{e}");
-                return true;
+                return false;
             }
         }
     }
