@@ -286,7 +286,7 @@ namespace Synapse.Api.Events
                     Scp173 = scp173
                 };
 
-                Scp173PlaceTantrum.Invoke(ev);
+                Scp173PlaceTantrum?.Invoke(ev);
                 
                 allow = ev.Allow;
             }

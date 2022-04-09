@@ -1,12 +1,11 @@
 ﻿using Assets._Scripts.Dissonance;
+using InventorySystem.Items.MicroHID;
+using InventorySystem.Items.Radio;
+using Synapse.Api.Enum;
 using Synapse.Api.Events.SynapseEventArguments;
 using Synapse.Api.Items;
-using UnityEngine;
-using InventorySystem.Items.MicroHID;
 using System;
-using PlayerStatsSystem;
-using Synapse.Api.Enum;
-using InventorySystem.Items.Radio;
+using UnityEngine;
 
 namespace Synapse.Api.Events
 {
@@ -85,7 +84,7 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<PlaceBulletHoleEventArgs> PlaceBulletHoleEvent;
 
         #region PlayerEventsInvoke
-        internal void InvokePlaceBulletHoleEvent(Player player,ref Vector3 postion,ref Vector3 rotation,out bool allow)
+        internal void InvokePlaceBulletHoleEvent(Player player, ref Vector3 postion, ref Vector3 rotation, out bool allow)
         {
             var ev = new PlaceBulletHoleEventArgs()
             {
@@ -94,7 +93,7 @@ namespace Synapse.Api.Events
                 Rotation = rotation
             };
 
-            PlaceBulletHoleEvent.Invoke(ev);
+            PlaceBulletHoleEvent?.Invoke(ev);
 
             allow = ev.Allow;
             rotation = ev.Rotation;
@@ -109,7 +108,7 @@ namespace Synapse.Api.Events
                 Player = player
             };
 
-            PlayerFlipCoinEvent.Invoke(ev);
+            PlayerFlipCoinEvent?.Invoke(ev);
 
             isTails = ev.IsTails;
             allow = ev.Allow;
@@ -430,7 +429,7 @@ namespace Synapse.Api.Events
                 Trantrum = trantrum
             };
 
-            PlayerWalkOnTantrumEvent.Invoke(ev);
+            PlayerWalkOnTantrumEvent?.Invoke(ev);
 
             allow = ev.Allow;
         }

@@ -12,15 +12,15 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp173
         {
             try
             {
-                if ((double)__instance._tantrumCooldownRemaining > 0.0 || __instance._isObserved)
+                if (__instance._tantrumCooldownRemaining > 0.0f || __instance._isObserved)
                     return false;
-                bool allow;
-                Server.Get.Events.Scp.Scp173.InvokeScp173PlaceTantrumEvent(__instance.Hub.GetPlayer(), out allow);
+
+                Server.Get.Events.Scp.Scp173.InvokeScp173PlaceTantrumEvent(__instance.Hub.GetPlayer(), out var allow);
                 return allow;
             }
             catch (Exception ex)
             {
-                Logger.Get.Error(string.Format("Synapse-Event: Scp173PlaceTantrum(Scp173) failed!!\n{0}", (object)ex));
+                Logger.Get.Error("Synapse-Event: Scp173PlaceTantrum(Scp173) failed!!\n" + ex);
                 return true;
             }
         }

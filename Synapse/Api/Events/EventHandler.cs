@@ -1,4 +1,3 @@
-using Mirror;
 using Synapse.Api.CustomObjects;
 using Synapse.Config;
 using System.Collections.Generic;

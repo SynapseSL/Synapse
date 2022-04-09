@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using InventorySystem.Items.Firearms.Modules;
-using Synapse.Api;
 using System;
 using UnityEngine;
 
@@ -10,11 +9,12 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     internal static class PlayerPlaceBulletHolePatch
     {
         [HarmonyPrefix]
-        private static bool PlaceBulletHole(StandardHitregBase __instance, Ray ray, RaycastHit hit)
+        private static bool PlaceBulletHole(StandardHitregBase __instance, RaycastHit hit)
         {
             try
             {
-                var player = __instance.Hub.GetPlayer();
+                var player = __instance?.Hub?.GetPlayer();
+                if (player == null) return false;
                 var point = hit.point;
                 var normal = hit.normal;
                 
@@ -29,7 +29,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             }
             catch (Exception ex)
             {
-                Server.Get.Logger.Error(string.Format("Synapse-Event: PlaceBulletHoleEvent failed!!\n{0}", (object)ex));
+                Server.Get.Logger.Error("Synapse-Event: PlaceBulletHoleEvent failed!!\n" + ex);
                 return true;
             }
         }
