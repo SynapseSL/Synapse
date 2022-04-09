@@ -4,13 +4,11 @@ using UnityEngine;
 
 namespace Synapse.Api.Events.SynapseEventArguments
 {
-    public class GeneratorServerSetFlagEventArgs : EventHandler.ISynapseEventArgs
+    public class GeneratorEngageEventArgs : EventHandler.ISynapseEventArgs
     {
         public Generator Generator { get; internal set; }
 
-        public MapGeneration.Distributors.Scp079Generator.GeneratorFlags Flag { get; internal set; }
-
-        public bool State { get; internal set; }
+        public bool Allow { get; set; }
     }
 
     public class TriggerTeslaEventArgs : EventHandler.ISynapseEventArgs
