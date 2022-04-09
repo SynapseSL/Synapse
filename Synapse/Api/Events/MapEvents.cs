@@ -9,14 +9,13 @@ namespace Synapse.Api.Events
     {
         internal MapEvents() { }
 
-
         public event EventHandler.OnSynapseEvent<TriggerTeslaEventArgs> TriggerTeslaEvent;
 
         public event EventHandler.OnSynapseEvent<GeneratorEngageEventArgs> GeneratorEngageEvent;
 
         public event Action WarheadDetonationEvent;
 
-        public event EventHandler.OnSynapseEvent<WarheadDetonationCanceledEventArgs> WarheadDetonationCanceledEvent; 
+        public event EventHandler.OnSynapseEvent<WarheadDetonationCanceledEventArgs> WarheadDetonationCanceledEvent;
 
         public event EventHandler.OnSynapseEvent<DoorInteractEventArgs> DoorInteractEvent;
 
@@ -56,7 +55,7 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void InvokeDoorInteractEvent(Player player,Door door,ref bool allow)
+        internal void InvokeDoorInteractEvent(Player player, Door door, ref bool allow)
         {
             if (DoorInteractEvent == null) return;
 
@@ -95,7 +94,7 @@ namespace Synapse.Api.Events
                 Disabler = disabler,
                 Allow = true,
             };
-            
+
             WarheadDetonationCanceledEvent?.Invoke(ev);
 
             disabler = ev.Disabler;
@@ -114,7 +113,7 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void Invoke914Activate(ref List<Player> players, ref List<Items.SynapseItem> items, ref Vector3 moveVector, out bool allow)
+        internal void Invoke914Activate(ref List<Player> players, ref List<Synapse.Api.Items.SynapseItem> items, ref Vector3 moveVector, out bool allow)
         {
             var ev = new Scp914ActivateEventArgs
             {
@@ -130,7 +129,7 @@ namespace Synapse.Api.Events
             items = ev.Items;
             moveVector = ev.MoveVector;
         }
-        
+
         internal void InvokeLiftMoveObjects(LiftMoveObjectsEventArgs ev) => LiftMoveObjectsEvent?.Invoke(ev);
         #endregion
     }
