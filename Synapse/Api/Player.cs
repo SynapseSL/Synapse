@@ -76,16 +76,11 @@ namespace Synapse.Api
 
         public void Ban(int duration, string reason, string issuer = "Plugin") => SynapseController.Server.GetObjectOf<BanPlayer>().BanUser(gameObject, duration, reason, issuer);
 
-        public void ChangeRoleAtPosition(RoleType role, bool keepHealth = false)
+        public void ChangeRoleAtPosition(RoleType role)
         {
             RoleChangeClassIdPatch.ForceLite = true;
-            float health = Health;
-            float maxHealth = MaxHealth;
-            Hub.characterClassManager.SetClassIDAdv(role, true, CharacterClassManager.SpawnReason.ForceClass);
+            Hub.characterClassManager.SetClassIDAdv(role, true, CharacterClassManager.SpawnReason.None);
             RoleChangeClassIdPatch.ForceLite = false;
-            if (!keepHealth) return;
-            Health = health;
-            MaxHealth = maxHealth;
         }
 
         public void GiveTextHint(string message, float duration = 5f)
