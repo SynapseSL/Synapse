@@ -327,6 +327,15 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; }
     }
 
+    public class PlayerWalkOnTantrumEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public TantrumEnvironmentalHazard Trantrum { get; internal set; }
+
+        public bool Allow { get; set; }
+    }
+
     public class PlayerReportEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Reporter { get; internal set; }
@@ -370,6 +379,26 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public SynapseItem OldItem { get; internal set; }
 
         public SynapseItem NewItem { get; internal set; }
+    }
+
+    public class PlaceBulletHoleEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public bool Allow { get; set; } = true;
+
+        public Vector3 Position { get; set; }
+
+        public Vector3 Rotation { get; set; }
+    }
+
+    public class PlayerFlipCoinEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Player Player { get; internal set; }
+
+        public bool Allow { get; set; } = true;
+
+        public bool IsTails { get; set; }
     }
 
     public class PlayerRadioInteractEventArgs : EventHandler.ISynapseEventArgs

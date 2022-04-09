@@ -190,6 +190,8 @@
     <Compile Include="Patches\EventsPatches\MapPatches\WarheadPanelInteract.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerChangeItemPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerDeathPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerFlipCoinPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerPlaceBulletHolePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerRadioInteractPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerReportPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerThrowGrenadePatch.cs" />
@@ -211,6 +213,7 @@
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerJoinPatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerLeavePatch.cs" />
     <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerSpeakPatch.cs" />
+    <Compile Include="Patches\EventsPatches\PlayerPatches\PlayerWalkOnTantrumPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\TeamRespawnPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\SpawnPlayersPatch.cs" />
     <Compile Include="Patches\EventsPatches\RoundPatches\RoundRestartPatch.cs" />
@@ -230,6 +233,7 @@
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp106\Scp106ContainmentPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp173\Scp173AttackPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp173\Scp173BlinkingPatch.cs" />
+    <Compile Include="Patches\EventsPatches\ScpPatches\Scp173\Scp173PlaceTantrumPatch.cs" />
     <Compile Include="Patches\EventsPatches\ScpPatches\Scp939\Scp939AttackPatch.cs" />
     <Compile Include="Patches\EventsPatches\ServerPatches\PreAuthenticationPatch.cs" />
     <Compile Include="Patches\SynapsePatches\CheckFriendlyFirePatch.cs" />

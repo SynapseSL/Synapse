@@ -68,6 +68,8 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<PlayerWalkOnSinkholeEventArgs> PlayerWalkOnSinkholeEvent;
 
+        public event EventHandler.OnSynapseEvent<PlayerWalkOnTantrumEventArgs> PlayerWalkOnTantrumEvent;
+
         public event EventHandler.OnSynapseEvent<PlayerReportEventArgs> PlayerReportEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerDamagePermissionEventArgs> PlayerDamagePermissionEvent;
@@ -78,7 +80,41 @@ namespace Synapse.Api.Events
         
         public event EventHandler.OnSynapseEvent<PlayerRadioInteractEventArgs> PlayerRadioInteractEvent;
 
+        public event EventHandler.OnSynapseEvent<PlayerFlipCoinEventArgs> PlayerFlipCoinEvent;
+
+        public event EventHandler.OnSynapseEvent<PlaceBulletHoleEventArgs> PlaceBulletHoleEvent;
+
         #region PlayerEventsInvoke
+        internal void InvokePlaceBulletHoleEvent(Player player,ref Vector3 postion,ref Vector3 rotation,out bool allow)
+        {
+            var ev = new PlaceBulletHoleEventArgs()
+            {
+                Player = player,
+                Position = postion,
+                Rotation = rotation
+            };
+
+            PlaceBulletHoleEvent.Invoke(ev);
+
+            allow = ev.Allow;
+            rotation = ev.Rotation;
+            postion = ev.Position;
+        }
+
+        internal void InvokeFlipCoinEvent(Player player, ref bool isTails, out bool allow)
+        {
+            var ev = new PlayerFlipCoinEventArgs()
+            {
+                IsTails = isTails,
+                Player = player
+            };
+
+            PlayerFlipCoinEvent.Invoke(ev);
+
+            isTails = ev.IsTails;
+            allow = ev.Allow;
+        }
+
         internal void InvokeRadio(Player player, SynapseItem item, ref RadioMessages.RadioCommand interaction, RadioMessages.RadioRangeLevel current, ref RadioMessages.RadioRangeLevel next, out bool allow)
         {
             var ev = new PlayerRadioInteractEventArgs
@@ -383,6 +419,20 @@ namespace Synapse.Api.Events
             PlayerUseMicroEvent?.Invoke(ev);
 
             state = ev.State;
+        }
+
+        internal void InvokeTantrum(Player player, TantrumEnvironmentalHazard trantrum, ref bool allow)
+        {
+            PlayerWalkOnTantrumEventArgs ev = new PlayerWalkOnTantrumEventArgs()
+            {
+                Allow = allow,
+                Player = player,
+                Trantrum = trantrum
+            };
+
+            PlayerWalkOnTantrumEvent.Invoke(ev);
+
+            allow = ev.Allow;
         }
 
         internal void InvokeSinkhole(Player player,SinkholeEnvironmentalHazard sinkhole,ref bool allow)
