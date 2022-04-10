@@ -57,7 +57,6 @@ namespace Synapse.Tests
                 }
             }
         }
-
         [Test]
         public void Types_StayAbstract()
         {
@@ -74,9 +73,6 @@ namespace Synapse.Tests
                 Is.EquivalentTo(_cleanDataAssembly.Types.Where(_ => _.IsInterface).Select(_ => _.FullName))
                 );
         }
-
-
-
         [Test]
         public void HasInjected_MethodCall()
         {
