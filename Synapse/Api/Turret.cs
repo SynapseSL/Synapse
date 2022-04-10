@@ -48,7 +48,6 @@ namespace Synapse.Api
             PlayAudio(Sound);
         }
 
-        //TODO: Implement ShootSounds
         public void PlayAudio(ShootSound sound)
         {
             foreach(var player in Server.Get.Players)
@@ -67,7 +66,7 @@ namespace Synapse.Api
                     msg.ShooterRealDistance = (byte)Mathf.RoundToInt(Mathf.Min(to.magnitude, 255f));
                 }
 
-                msg.Weapon = ItemType.GunE11SR;
+                msg.Weapon = (ItemType)sound;
 
                 player.Connection.Send(msg);
             }
@@ -104,48 +103,48 @@ namespace Synapse.Api
             ray.direction = Quaternion.Euler(a * Inaccuracy) * ray.direction;
             return ray;
         }
-    }
 
-    public class SynapseTurretDamageHandler : StandardDamageHandler
-    {
-        public SynapseTurretDamageHandler(float damage, string reason, string cassie)
+        public class SynapseTurretDamageHandler : StandardDamageHandler
         {
-            Damage = damage;
-            DeathReason = reason;
-            Cassie = cassie;
-        }
-
-        public string Cassie { get; }
-
-        public string DeathReason { get; }
-
-        public override float Damage { get; set; }
-
-        public override string ServerLogsText => DeathReason;
-
-        public override CassieAnnouncement CassieDeathAnnouncement
-        {
-            get
+            public SynapseTurretDamageHandler(float damage, string reason, string cassie)
             {
-                var cassie = new CassieAnnouncement();
-                cassie.Announcement = Cassie;
-                //TODO: Fix Subtitle
-                cassie.SubtitleParts = new Subtitles.SubtitlePart[]
+                Damage = damage;
+                DeathReason = reason;
+                Cassie = cassie;
+            }
+
+            public string Cassie { get; }
+
+            public string DeathReason { get; }
+
+            public override float Damage { get; set; }
+
+            public override string ServerLogsText => DeathReason;
+
+            public override CassieAnnouncement CassieDeathAnnouncement
+            {
+                get
                 {
+                    var cassie = new CassieAnnouncement();
+                    cassie.Announcement = Cassie;
+                    //TODO: Fix Subtitle
+                    cassie.SubtitleParts = new Subtitles.SubtitlePart[]
+                    {
                     new Subtitles.SubtitlePart(Subtitles.SubtitleType.Custom, new string[]
                     {
                         Cassie
                     })
-                };
+                    };
 
-                return cassie;
+                    return cassie;
+                }
             }
-        }
 
-        public override void WriteAdditionalData(NetworkWriter writer)
-        {
-            base.WriteAdditionalData(writer);
-            writer.WriteString(DeathReason);
+            public override void WriteAdditionalData(NetworkWriter writer)
+            {
+                base.WriteAdditionalData(writer);
+                writer.WriteString(DeathReason);
+            }
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Synapse.Patches.SynapsePatches
         {
             try
             {
-                if (info?.GetType() == typeof(SynapseTurretDamageHandler))
+                if (info?.GetType() == typeof(Turret.SynapseTurretDamageHandler))
                 {
                     writer?.WriteByte(DamageHandlers.IdsByTypeHash[typeof(CustomReasonDamageHandler).FullName.GetStableHashCode()]);
                     info?.WriteAdditionalData(writer);

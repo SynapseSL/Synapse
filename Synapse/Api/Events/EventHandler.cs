@@ -23,23 +23,10 @@ namespace Synapse.Api.Events
         {
             switch (ev.KeyCode)
             {
-            }
-        }
-
-        public IEnumerator<float> Turret(Turret turret, Player player, Dummy dummy)
-        {
-            dummy.GameObject.transform.parent = turret.GameObject.transform;
-
-            for (; ; )
-            {
-                if (Vector3.Distance(player.Position, turret.Position) > 50f) yield break;
-
-                dummy.RotateToPosition(player.Position);
-
-                var dir = player.Position - turret.Position;
-                turret.SingleShootDirection(dir);
-
-                yield return MEC.Timing.WaitForSeconds(0.2f);
+                case KeyCode.Alpha1:
+                    var turret = new Turret(ev.Player.Position);
+                    turret.PlayAudio(Enum.ShootSound.Crossvec);
+                    break;
             }
         }
 
