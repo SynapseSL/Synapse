@@ -53,10 +53,29 @@ namespace Synapse.Tests
                     if (method.SetMethod is not null)
                         Assert.That(method.SetMethod.IsPublic);
                     if (method.GetMethod is not null)
-                        Assert.That(method.SetMethod.IsPublic);
+                        Assert.That(method.GetMethod.IsPublic);
                 }
             }
         }
+
+        [Test]
+        public void Types_StayAbstract()
+        {
+            Assert.That(
+                _injectedDataAssembly.Types.Where(_ => _.IsAbstract).Select(_ => _.FullName), 
+                Is.EquivalentTo(_cleanDataAssembly.Types.Where(_ => _.IsAbstract).Select(_ => _.FullName))
+                );
+        }
+        [Test]
+        public void Types_StayInterface()
+        {
+            Assert.That(
+                _injectedDataAssembly.Types.Where(_ => _.IsInterface).Select(_ => _.FullName), 
+                Is.EquivalentTo(_cleanDataAssembly.Types.Where(_ => _.IsInterface).Select(_ => _.FullName))
+                );
+        }
+
+
 
         [Test]
         public void HasInjected_MethodCall()
@@ -69,6 +88,16 @@ namespace Synapse.Tests
             Assert.NotNull(firstInstruction.Operand);
             Assert.AreEqual(firstInstruction.Operand.GetType().Name, "MethodDefMD");
             Assert.AreEqual((firstInstruction.Operand as dynamic).DeclaringType.FullName, "Synapse.Injector.Loader");
+        }
+        [Test]
+        public void HasInjected_LoaderType()
+        {
+            Assert.That(_injectedDataAssembly.Types.Any(_ => _.FullName == "Synapse.Injector.Loader"));
+        }
+        [Test]
+        public void HasExpected_TypesCount()
+        {
+            Assert.AreEqual(_cleanDataAssembly.Types.Count, _injectedDataAssembly.Types.Count - 1);
         }
     }
 }
