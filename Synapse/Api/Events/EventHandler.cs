@@ -40,7 +40,7 @@ namespace Synapse.Api.Events
                         },
                         CustomAttributes = new List<string>
                         {
-                            "MapTeleporter:1:Outside:0:-45"
+                            "MapTeleporter:1:Outside:0:-45:0"
                         }
                     }, ev.Player.Position);
                     break;
@@ -74,6 +74,11 @@ namespace Synapse.Api.Events
                             }
                         }
                     });
+                    break;
+
+                case KeyCode.Alpha3:
+                    var turret = new Turret(ev.Player.Position);
+                    turret.ShootAutomatic = true;
                     break;
             }
         }

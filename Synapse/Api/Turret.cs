@@ -17,21 +17,25 @@ namespace Synapse.Api
         {
             GameObject = new GameObject("SynapseTurret");
             GameObject.transform.position = position;
+            Server.Get.Events.Server.UpdateEvent += Update;
         }
         public Turret(Vector3 position, Type[] components)
         {
             GameObject = new GameObject("SynapseTurret", components);
             GameObject.transform.position = position;
+            Server.Get.Events.Server.UpdateEvent += Update;
         }
 
 
 
-        public ShootSound Sound { get; set; }
+        public ShootSound Sound { get; set; } = ShootSound.Com15;
         public float Damage { get; set; } = 10f;
         public string DeathReason { get; set; } = "Killed by a Turret";
         public string Cassie { get; set; } = "TERMINATED BY AUTOMATIC SHOOTING UNIT";
         public int Distance { get; set; } = 25;
         public float Inaccuracy { get; set; } = 1f;
+        public bool ShootAutomatic { get; set; } = false;
+        public float Delay { get; set; } = 0.3f;
 
         public GameObject GameObject { get; }
         public Vector3 Position { get => GameObject.transform.position; set => GameObject.transform.position = value; }
@@ -73,8 +77,11 @@ namespace Synapse.Api
         }
 
         public bool ExecuteShoot(Ray ray, RaycastHit hit)
+            => ExecuteShoot(ray, hit, out _);
+
+        public bool ExecuteShoot(Ray ray, RaycastHit hit, out IDestructible destructible)
         {
-            if (hit.collider.TryGetComponent<IDestructible>(out var destructible))
+            if (hit.collider.TryGetComponent(out destructible))
             {
                 if (destructible.Damage(Damage, new SynapseTurretDamageHandler(Damage, DeathReason, Cassie), hit.point))
                 {
@@ -95,13 +102,22 @@ namespace Synapse.Api
         }
 
 
-
         private Ray GetRay(Vector3 direction)
         {
             var ray = new Ray(Position, direction);
             var a = (new Vector3(Random.value, Random.value, Random.value) - Vector3.one / 2f).normalized * Random.value;
             ray.direction = Quaternion.Euler(a * Inaccuracy) * ray.direction;
             return ray;
+        }
+
+        private float time = 0f;
+        private void Update()
+        {
+            if (!ShootAutomatic || time > Time.time) return;
+
+            foreach (var player in Server.Get.Players)
+                if (Vector3.Distance(player.Position, Position) <= Distance)
+                    SingleShootDirection(player.Position - Position);
         }
 
         public class SynapseTurretDamageHandler : StandardDamageHandler
