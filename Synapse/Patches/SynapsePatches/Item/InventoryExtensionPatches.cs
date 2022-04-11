@@ -72,6 +72,7 @@ namespace Synapse.Patches.SynapsePatches.Item
                     ReferenceHub.GetHub(inv.gameObject).PlayerCameraReference.rotation * 
                     item.PickupDropModel.transform.rotation);
 
+                //The Value to the Serial can also be null but every Serial should be as key inside AllItems
                 if (!SynapseItem.AllItems.TryGetValue(psi.Serial, out var sitem)) 
                 {
                     Logger.Get.Warn($"Found unregistered ItemSerial in PickupSyncInfo (CreatePickupPatch): {psi.Serial}");

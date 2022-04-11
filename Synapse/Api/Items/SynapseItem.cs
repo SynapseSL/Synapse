@@ -557,20 +557,27 @@ namespace Synapse.Api.Items
 
         internal void CheckForSchematic()
         {
-            if (Schematic == null) return;
-            if (State != ItemState.Map) return;
+            try
+            {
+                if (Schematic == null) return;
+                if (PickupBase == null) return;
 
-            SynapseObject = new SynapseObject(Schematic);
-            SynapseObject.Position = Position;
-            SynapseObject.ItemParent = this;
+                SynapseObject = new SynapseObject(Schematic);
+                SynapseObject.Position = Position;
+                SynapseObject.ItemParent = this;
 
-            var scale = Scale;
-            Scale = Vector3.one;
-            SynapseObject.GameObject.transform.parent = PickupBase.transform;
-            Scale = scale;
-            SynapseObject.Scale = SynapseObject.GameObject.transform.lossyScale;
+                var scale = Scale;
+                Scale = Vector3.one;
+                SynapseObject.GameObject.transform.parent = PickupBase.transform;
+                Scale = scale;
+                SynapseObject.Scale = SynapseObject.GameObject.transform.lossyScale;
 
-            PickupBase?.netIdentity.DespawnForAllPlayers();
+                PickupBase?.netIdentity.DespawnForAllPlayers();
+            }
+            catch(Exception ex)
+            {
+                Logger.Get.Error($"Synapse-Item: Creating the Schematic {Schematic?.ID} for a Item failed\n" + ex);
+            }
         }
         #endregion
 

@@ -8,14 +8,16 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
     {
         public List<AttributeHandler> Handlers { get; } = new List<AttributeHandler>();
 
-        public List<Type> DefaultAttriutes { get; } = new List<Type>
+        public List<Type> DefaultAttributes { get; } = new List<Type>
         {
             typeof(SchematicDoor),
+            typeof(StaticTeleporter),
+            typeof(MapTeleporter),
         };
 
         internal void Init()
         {
-            foreach(var type in DefaultAttriutes)
+            foreach(var type in DefaultAttributes)
                 LoadHandlerFromType(type);
 
             RegisterEvents();
@@ -26,6 +28,7 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
             try
             {
                 if (!typeof(AttributeHandler).IsAssignableFrom(type)) return;
+                if (type.IsAbstract) return;
 
                 var handlerobject = Activator.CreateInstance(type);
 

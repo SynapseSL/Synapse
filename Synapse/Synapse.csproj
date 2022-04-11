@@ -42,6 +42,9 @@
     <Compile Include="Api\Broadcast.cs" />
     <Compile Include="Api\CustomObjects\CustomAttributes\AttributeHandler.cs" />
     <Compile Include="Api\CustomObjects\CustomAttributes\CustomAttributeHandlerEvents.cs" />
+    <Compile Include="Api\CustomObjects\CustomAttributes\BasicTeleporter.cs" />
+    <Compile Include="Api\CustomObjects\CustomAttributes\MapTeleporter.cs" />
+    <Compile Include="Api\CustomObjects\CustomAttributes\StaticTeleporter.cs" />
     <Compile Include="Api\CustomObjects\IRefreshable.cs" />
     <Compile Include="Api\CustomObjects\NetworkSynapseObject.cs" />
     <Compile Include="Api\CustomObjects\StructureSyncSynapseObject.cs" />
