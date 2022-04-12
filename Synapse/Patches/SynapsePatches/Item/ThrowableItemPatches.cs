@@ -39,7 +39,8 @@ namespace Synapse.Patches.SynapsePatches.Item
                 if (newpickup.TryGetComponent<Rigidbody>(out var rb))
                     __instance.PropelBody(rb, torque, startVel, forceAmount, upwardFactor);
 
-                __instance.GetSynapseItem().Throwable.ThrowableItem = newpickup;
+                var sitem = __instance.GetSynapseItem();
+                sitem.Throwable.ThrowableItem = newpickup;
                 newpickup.ServerActivate();
 
                 return false;

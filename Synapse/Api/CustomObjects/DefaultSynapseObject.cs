@@ -1,5 +1,6 @@
 ﻿using Mirror;
 using Synapse.Api.Enum;
+using Synapse.Api.Items;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,11 +11,12 @@ namespace Synapse.Api.CustomObjects
         public abstract GameObject GameObject { get; }
         public abstract ObjectType Type { get; }
 
-        public Dictionary<string, object> ObjectData => new Dictionary<string, object>();
-        public Dictionary<string, string> CustomAttributes { get; set; }
-        //This is only used for Shematics
+        public Dictionary<string, object> ObjectData { get; set; } = new Dictionary<string, object>();
+        public List<string> CustomAttributes { get; set; }
+
         public Vector3 OriginalScale { get; internal set; }
         public SynapseObject Parent { get; internal set; }
+        public SynapseItem ItemParent { get; internal set; }
 
         public virtual Vector3 Position
         {

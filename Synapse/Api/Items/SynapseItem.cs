@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using InventorySystem;
+﻿using InventorySystem;
 using InventorySystem.Items;
 using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Firearms.Ammo;
@@ -9,7 +7,10 @@ using InventorySystem.Items.MicroHID;
 using InventorySystem.Items.Pickups;
 using InventorySystem.Items.Radio;
 using Mirror;
+using Synapse.Api.CustomObjects;
 using Synapse.Api.Enum;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Synapse.Api.Items
@@ -19,6 +20,16 @@ namespace Synapse.Api.Items
         public static SynapseItem None { get; } = new SynapseItem(-1);
 
         public static Dictionary<ushort, SynapseItem> AllItems { get; } = new Dictionary<ushort, SynapseItem>();
+
+        public static SynapseItem GetSynapseItem(ushort serial)
+        {
+            if (!AllItems.ContainsKey(serial))
+            {
+                Logger.Get.Warn("If this message appears exists a Item that is not registered. Please report this bug in our Discord as detailed as possible");
+                return None;
+            }
+            return AllItems[serial];
+        }
 
         private bool deactivated = false;
 
@@ -37,6 +48,7 @@ namespace Synapse.Api.Items
             Serial = ItemSerialGenerator.GenerateNext();
             AllItems[Serial] = this;
             ID = (int)type;
+            Schematic = ItemManager.Get.GetSchematic(ID);
             Name = type.ToString();
             IsCustomItem = false;
             ItemType = type;
@@ -69,7 +81,7 @@ namespace Synapse.Api.Items
         /// <param name="type"></param>
         public SynapseItem(int id) : this()
         {
-            if(id == -1 && None == null)
+            if (id == -1 && None == null)
             {
                 ID = -1;
                 ItemType = ItemType.None;
@@ -80,6 +92,7 @@ namespace Synapse.Api.Items
             Serial = ItemSerialGenerator.GenerateNext();
             AllItems[Serial] = this;
             ID = id;
+            Schematic = ItemManager.Get.GetSchematic(ID);
 
             if (id >= 0 && id <= ItemManager.HighestItem)
             {
@@ -126,6 +139,7 @@ namespace Synapse.Api.Items
             Serial = itemBase.ItemSerial;
             AllItems[Serial] = this;
             ID = (int)itemBase.ItemTypeId;
+            Schematic = ItemManager.Get.GetSchematic(ID);
             Name = itemBase.ItemTypeId.ToString();
             IsCustomItem = false;
             ItemType = itemBase.ItemTypeId;
@@ -144,6 +158,7 @@ namespace Synapse.Api.Items
             PickupBase = pickupBase;
             AllItems[Serial] = this;
             ID = (int)pickupBase.Info.ItemId;
+            Schematic = ItemManager.Get.GetSchematic(ID);
             Name = pickupBase.Info.ItemId.ToString();
             IsCustomItem = false;
             ItemType = pickupBase.Info.ItemId;
@@ -231,12 +246,17 @@ namespace Synapse.Api.Items
         public Dictionary<string, object> ItemData { get; set; } = new Dictionary<string, object>();
 
         public bool CanBePickedUp { get; set; } = true;
+        public SynapseSchematic Schematic { get; set; }
+        public SynapseObject SynapseObject { get; set; }
 
         private Vector3 position = Vector3.zero;
         public Vector3 Position
         {
             get
             {
+                if (Throwable.ThrowableItem != null)
+                    return Throwable.ThrowableItem.transform.position;
+
                 if (ItemBase != null)
                     return ItemHolder.Position;
 
@@ -291,8 +311,11 @@ namespace Synapse.Api.Items
                 if (PickupBase != null)
                 {
                     PickupBase.transform.localScale = value;
-                    NetworkServer.UnSpawn(PickupBase.gameObject);
-                    NetworkServer.Spawn(PickupBase.gameObject);
+
+                    if (SynapseObject == null)
+                        PickupBase.netIdentity.UpdatePositionRotationScale();
+                    else
+                        SynapseObject.Scale = SynapseObject.GameObject.transform.lossyScale;
                 }
 
                 scale = value;
@@ -473,6 +496,8 @@ namespace Synapse.Api.Items
 
                         Durabillity = durabillity;
                         WeaponAttachments = attachments;
+
+                        CheckForSchematic();
                     }
                     break;
             }
@@ -528,6 +553,31 @@ namespace Synapse.Api.Items
             Despawn();
             AllItems.Remove(Serial);
             deactivated = true;
+        }
+
+        internal void CheckForSchematic()
+        {
+            try
+            {
+                if (Schematic == null) return;
+                if (PickupBase == null) return;
+
+                SynapseObject = new SynapseObject(Schematic);
+                SynapseObject.Position = Position;
+                SynapseObject.ItemParent = this;
+
+                var scale = Scale;
+                Scale = Vector3.one;
+                SynapseObject.GameObject.transform.parent = PickupBase.transform;
+                Scale = scale;
+                SynapseObject.Scale = SynapseObject.GameObject.transform.lossyScale;
+
+                PickupBase?.netIdentity.DespawnForAllPlayers();
+            }
+            catch(Exception ex)
+            {
+                Logger.Get.Error($"Synapse-Item: Creating the Schematic {Schematic?.ID} for a Item failed\n" + ex);
+            }
         }
         #endregion
 

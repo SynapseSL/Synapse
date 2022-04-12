@@ -1,20 +1,22 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using PlayerStatsSystem;
+using System;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(SyncedStatBase), nameof(SyncedStatBase.CurValue), MethodType.Setter)]
+    [HarmonyPatch(typeof(HealthStat), nameof(HealthStat.ServerHeal))]
     internal static class PlayerHealPatch
     {
         [HarmonyPrefix]
-        private static bool OnHeal(StatBase __instance, ref float value)
+        private static bool OnHeal(HealthStat __instance, ref float healAmount)
         {
             try
             {
-                var player = __instance.Hub.GetPlayer();
+                var player = __instance?.Hub?.GetPlayer();
+                if (player == null) return false;
+
                 var allow = true;
-                SynapseController.Server.Events.Player.InvokePlayerHealEvent(player, ref value, ref allow);
+                SynapseController.Server.Events.Player.InvokePlayerHealEvent(player, ref healAmount, ref allow);
                 return allow;
             }
             catch (Exception e)

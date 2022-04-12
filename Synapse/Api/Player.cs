@@ -79,7 +79,7 @@ namespace Synapse.Api
         public void ChangeRoleAtPosition(RoleType role)
         {
             RoleChangeClassIdPatch.ForceLite = true;
-            Hub.characterClassManager.SetClassIDAdv(role, true, CharacterClassManager.SpawnReason.None);
+            Hub.characterClassManager.SetClassIDAdv(role, true, CharacterClassManager.SpawnReason.ForceClass);
             RoleChangeClassIdPatch.ForceLite = false;
         }
 
@@ -126,15 +126,7 @@ namespace Synapse.Api
             Hub.serverRoles.TargetCloseRemoteAdmin();
         }
 
-        public void Heal(float hp)
-        {
-            var health = Health;
-            health += hp;
-            if (health > MaxHealth)
-                health = MaxHealth;
-
-            Health = health;
-        }
+        public void Heal(float hp) => GetStatBase<HealthStat>().ServerHeal(hp);
 
         public bool Hurt(float damage, DamageType type = DamageType.Unknown)
         {
@@ -187,20 +179,7 @@ namespace Synapse.Api
         }
 
         public void ShakeScreen(bool achieve = false)
-        {
-            var component = AlphaWarheadController.Host;
-            var writer = NetworkWriterPool.GetWriter();
-            writer.WriteBoolean(achieve);
-            var msg = new RpcMessage
-            {
-                netId = component.netId,
-                componentIndex = component.ComponentIndex,
-                functionHash = typeof(AlphaWarheadController).FullName.GetStableHashCode() * 503 + "RpcShake".GetStableHashCode(),
-                payload = writer.ToArraySegment()
-            };
-            Connection.Send(msg);
-            NetworkWriterPool.Recycle(writer);
-        }
+            => AlphaWarheadController.Host.TargetRpcShake(Connection, achieve, GodMode);
 
         public void PlaceBlood(Vector3 pos, int type = 1, float size = 2f)
         {
@@ -218,6 +197,33 @@ namespace Synapse.Api
             };
             Connection.Send(msg);
             NetworkWriterPool.Recycle(writer);
+        }
+
+        public void OpenMenu(MenuType menu)
+        {
+            var menutype = "";
+
+            switch (menu)
+            {
+                case MenuType.Menu:
+                    menutype = "NewMainMenu";
+                    break;
+
+                case MenuType.OldFastMenu:
+                    menutype = "FastMenu";
+                    break;
+
+                case MenuType.OldMenu:
+                    menutype = "MainMenuRemastered";
+                    break;
+            }
+
+            Connection.Send(new SceneMessage
+            {
+                sceneName = menutype,
+                sceneOperation = SceneOperation.Normal,
+                customHandling = false
+            });
         }
 
         public bool StopInput { get => Hub.fpc.NetworkforceStopInputs; set => Hub.fpc.NetworkforceStopInputs = value; }
@@ -433,6 +439,8 @@ namespace Synapse.Api
         #endregion
 
         #region Default Stuff
+        public TStat GetStatBase<TStat>() where TStat : StatBase => PlayerStats.GetModule<TStat>();
+
         public string DisplayName
         {
             get => NicknameSync.DisplayName;
@@ -504,13 +512,23 @@ namespace Synapse.Api
         public Vector3 Position
         {
             get => PlayerMovementSync.GetRealPosition();
-            set => PlayerMovementSync.OverridePosition(value, 0f);
+            set => PlayerMovementSync.OverridePosition(value, PlayerRotation);
         }
 
         public Vector2 Rotation
         {
             get => PlayerMovementSync.RotationSync;
             set => PlayerMovementSync.NetworkRotationSync = value;
+        }
+
+        public PlayerMovementSync.PlayerRotation PlayerRotation
+        {
+            get
+            {
+                var vec2 = Rotation;
+                return new PlayerMovementSync.PlayerRotation(vec2.x, vec2.y);
+            }
+            set => Rotation = new Vector2(value.x.Value, value.y.Value);
         }
 
         public Vector3 DeathPosition
@@ -554,16 +572,16 @@ namespace Synapse.Api
 
         public float Health
         {
-            get => Hub.playerStats.GetModule<HealthStat>().CurValue;
-            set => Hub.playerStats.GetModule<HealthStat>().CurValue = value;
+            get => GetStatBase<HealthStat>().CurValue;
+            set => GetStatBase<HealthStat>().CurValue = value;
         }
 
         public float MaxHealth { get; set; } = 100f;
 
         public float ArtificialHealth
         {
-            get => Hub.playerStats.GetModule<AhpStat>().CurValue;
-            set => Hub.playerStats.GetModule<AhpStat>().ServerAddProcess(value,value, 1.2f, 0f, 0f, false);
+            get => GetStatBase<AhpStat>().CurValue;
+            set => GetStatBase<AhpStat>().ServerAddProcess(value,value, 1.2f, 0f, 0f, false);
         }
 
         private int maxahp = 75;
@@ -574,7 +592,7 @@ namespace Synapse.Api
             set
             {
                 maxahp = value;
-                foreach (var process in PlayerStats.GetModule<AhpStat>()._activeProcesses)
+                foreach (var process in GetStatBase<AhpStat>()._activeProcesses)
                     process.Limit = value;
             }
         }
@@ -780,7 +798,7 @@ namespace Synapse.Api
             {
                 if (VanillaInventory.CurItem == ItemIdentifier.None || VanillaInventory.CurInstance == null) return SynapseItem.None;
 
-                return SynapseItem.AllItems[VanillaInventory.CurItem.SerialNumber];
+                return SynapseItem.GetSynapseItem(VanillaInventory.CurItem.SerialNumber);
             }
             set
             {
@@ -964,5 +982,10 @@ namespace Synapse.Api
                 CustomRole.Escape();
             }
         }
+
+        public static implicit operator Player(Footprinting.Footprint footprint) => footprint.Hub.GetPlayer();
+        public static implicit operator Player(ReferenceHub hub) => hub.GetPlayer();
+        public static implicit operator Footprinting.Footprint(Player player) => new Footprinting.Footprint(player.Hub);
+        public static implicit operator ReferenceHub(Player player) => player.Hub;
     }
 }

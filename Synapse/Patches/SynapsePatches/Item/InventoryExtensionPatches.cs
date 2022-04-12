@@ -26,21 +26,14 @@ namespace Synapse.Patches.SynapsePatches.Item
                 if (itemBase == null) return false;
 
                 SynapseItem item;
-                if (itemSerial == 0)
+                if (itemSerial == 0 || !SynapseItem.AllItems.TryGetValue(itemSerial, out item))
                 {
                     itemSerial = ItemSerialGenerator.GenerateNext();
                     itemBase.ItemSerial = itemSerial;
                     item = new SynapseItem(itemBase);
                 }
-                else if(SynapseItem.AllItems.TryGetValue(itemSerial,out item))
-                {
-                    item.ItemBase = itemBase;
-                }
                 else
-                {
-                    Logger.Get.Warn($"Found unregistered ItemSerial: {itemSerial}");
-                    return false;
-                }
+                    item.ItemBase = itemBase;
 
                 inv.UserInventory.Items[itemSerial] = itemBase;
                 itemBase.ItemSerial = itemSerial;
@@ -79,10 +72,11 @@ namespace Synapse.Patches.SynapsePatches.Item
                     ReferenceHub.GetHub(inv.gameObject).PlayerCameraReference.rotation * 
                     item.PickupDropModel.transform.rotation);
 
+                //The Value to the Serial can also be null but every Serial should be as key inside AllItems
                 if (!SynapseItem.AllItems.TryGetValue(psi.Serial, out var sitem)) 
                 {
-                    Logger.Get.Warn($"Found unregistered ItemSerial: {psi.Serial}");
-                    return false;
+                    Logger.Get.Warn($"Found unregistered ItemSerial in PickupSyncInfo (CreatePickupPatch): {psi.Serial}");
+                    psi.Serial = ItemSerialGenerator.GenerateNext();
                 }
 
                 pickup.NetworkInfo = psi;
@@ -95,6 +89,8 @@ namespace Synapse.Patches.SynapsePatches.Item
 
                 if (spawn)
                     NetworkServer.Spawn(pickup.gameObject);
+
+                sitem.CheckForSchematic();
 
                 pickup.InfoReceived(default, psi);
 
@@ -122,7 +118,7 @@ namespace Synapse.Patches.SynapsePatches.Item
 
                 if (!SynapseItem.AllItems.TryGetValue(itemSerial, out var item))
                 {
-                    Logger.Get.Warn($"Found unregistered ItemSerial: {itemSerial}");
+                    Logger.Get.Warn($"Found unregistered ItemSerial (RemoveItemPatch): {itemSerial}");
                     return false;
                 }
 

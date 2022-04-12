@@ -1,11 +1,11 @@
 ﻿using Assets._Scripts.Dissonance;
+using InventorySystem.Items.MicroHID;
+using InventorySystem.Items.Radio;
+using Synapse.Api.Enum;
 using Synapse.Api.Events.SynapseEventArguments;
 using Synapse.Api.Items;
-using UnityEngine;
-using InventorySystem.Items.MicroHID;
 using System;
-using PlayerStatsSystem;
-using Synapse.Api.Enum;
+using UnityEngine;
 
 namespace Synapse.Api.Events
 {
@@ -67,6 +67,8 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<PlayerWalkOnSinkholeEventArgs> PlayerWalkOnSinkholeEvent;
 
+        public event EventHandler.OnSynapseEvent<PlayerWalkOnTantrumEventArgs> PlayerWalkOnTantrumEvent;
+
         public event EventHandler.OnSynapseEvent<PlayerReportEventArgs> PlayerReportEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerDamagePermissionEventArgs> PlayerDamagePermissionEvent;
@@ -75,7 +77,58 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<PlayerChangeItemEventArgs> PlayerChangeItemEvent;
         
+        public event EventHandler.OnSynapseEvent<PlayerRadioInteractEventArgs> PlayerRadioInteractEvent;
+
+        public event EventHandler.OnSynapseEvent<PlayerFlipCoinEventArgs> PlayerFlipCoinEvent;
+
+        public event EventHandler.OnSynapseEvent<PlaceBulletHoleEventArgs> PlaceBulletHoleEvent;
+
         #region PlayerEventsInvoke
+        internal void InvokePlaceBulletHoleEvent(Player player, Vector3 postion, out bool allow)
+        {
+            var ev = new PlaceBulletHoleEventArgs()
+            {
+                Player = player,
+                Position = postion,
+            };
+
+            PlaceBulletHoleEvent?.Invoke(ev);
+
+            allow = ev.Allow;
+        }
+
+        internal void InvokeFlipCoinEvent(Player player, ref bool isTails, out bool allow)
+        {
+            var ev = new PlayerFlipCoinEventArgs()
+            {
+                IsTails = isTails,
+                Player = player
+            };
+
+            PlayerFlipCoinEvent?.Invoke(ev);
+
+            isTails = ev.IsTails;
+            allow = ev.Allow;
+        }
+
+        internal void InvokeRadio(Player player, SynapseItem item, ref RadioMessages.RadioCommand interaction, RadioMessages.RadioRangeLevel current, ref RadioMessages.RadioRangeLevel next, out bool allow)
+        {
+            var ev = new PlayerRadioInteractEventArgs
+            {
+                CurrentRange = current,
+                Interaction = interaction,
+                NextRange = next,
+                Player = player,
+                Radio = item
+            };
+
+            PlayerRadioInteractEvent?.Invoke(ev);
+
+            allow = ev.Allow;
+            interaction = ev.Interaction;
+            next = ev.NextRange;
+        }
+
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
         {
             var ev = new PlayerJoinEventArgs {Player = player, Nickname = nickname};
@@ -364,18 +417,32 @@ namespace Synapse.Api.Events
             state = ev.State;
         }
 
+        internal void InvokeTantrum(Player player, TantrumEnvironmentalHazard trantrum, ref bool allow)
+        {
+            PlayerWalkOnTantrumEventArgs ev = new PlayerWalkOnTantrumEventArgs()
+            {
+                SlowDown = allow,
+                Player = player,
+                Tantrum = trantrum
+            };
+
+            PlayerWalkOnTantrumEvent?.Invoke(ev);
+
+            allow = ev.SlowDown;
+        }
+
         internal void InvokeSinkhole(Player player,SinkholeEnvironmentalHazard sinkhole,ref bool allow)
         {
             var ev = new PlayerWalkOnSinkholeEventArgs
             {
-                Allow = allow,
+                SlowDown = allow,
                 Player = player,
                 Sinkhole = sinkhole
             };
 
             PlayerWalkOnSinkholeEvent?.Invoke(ev);
 
-            allow = ev.Allow;
+            allow = ev.SlowDown;
         }
 
         internal void InvokePlayerReport(Player player, Player target, string reason, ref bool global, out bool allow)

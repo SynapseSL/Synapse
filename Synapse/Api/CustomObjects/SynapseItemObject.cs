@@ -20,9 +20,13 @@ namespace Synapse.Api.CustomObjects
         internal SynapseItemObject(SynapseSchematic.ItemConfiguration configuration)
         {
             Item = CreateItem(configuration.ItemType, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale, configuration.CanBePickedUp);
+            Item.Durabillity = configuration.Durabillity;
+            Item.WeaponAttachments = configuration.Attachments;
             OriginalScale = configuration.Scale;
             CustomAttributes = configuration.CustomAttributes;
             ItemType = configuration.ItemType;
+            if (configuration.Physics)
+                ApplyPhysics();
 
             var script = GameObject.AddComponent<SynapseObjectScript>();
             script.Object = this;
@@ -49,6 +53,7 @@ namespace Synapse.Api.CustomObjects
         private SynapseItem CreateItem(ItemType type, Vector3 position, Quaternion rotation, Vector3 scale, bool pickup = false)
         {
             var item = new SynapseItem(type);
+            item.Schematic = null;
             item.Rotation = rotation;
             item.Scale = scale;
             item.Position = position;

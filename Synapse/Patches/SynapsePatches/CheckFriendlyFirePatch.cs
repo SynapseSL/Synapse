@@ -89,42 +89,28 @@ namespace Synapse.Patches.SynapsePatches
 		}
     }
 	
-	[HarmonyPatch(typeof(AttackerDamageHandler),nameof(AttackerDamageHandler.ProcessDamage))]
-	internal static class ProcessDamagePatch
+	[HarmonyPatch(typeof(HitboxIdentity),nameof(HitboxIdentity.Damage))]
+	internal static class HitboxIdentityPatch
     {
 		[HarmonyPrefix]
-		private static bool ProcessDamage(AttackerDamageHandler __instance, ReferenceHub ply)
+		private static bool OnDamage(HitboxIdentity __instance, DamageHandlerBase handler)
         {
             try
             {
-				var curClass = ply.characterClassManager.CurClass;
-				if (__instance.CheckSpawnProtection(__instance.Attacker.Hub, ply))
+				if (handler is AttackerDamageHandler ahandler)
 				{
-					__instance.Damage = 0f;
-					return false;
+					var ply = __instance.TargetHub.GetPlayer();
+					var attacker = ahandler.Attacker.GetPlayer();
+					Logger.Get.Debug($"{ply == null} - {attacker == null}");
+					return SynapseExtensions.GetHarmPermission(attacker, ply);
 				}
-				if (ply.networkIdentity.netId == __instance.Attacker.NetId || __instance.ForceFullFriendlyFire)
-				{
-					if (!__instance.AllowSelfDamage && !__instance.ForceFullFriendlyFire)
-					{
-						__instance.Damage = 0f;
-						return false;
-					}
-					__instance.IsSuicide = true;
-				}
-				else if (!HitboxIdentity.CheckFriendlyFire(__instance.Attacker.Hub, ply))
-				{
-					__instance.Damage *= AttackerDamageHandler._ffMultiplier;
-					__instance.IsFriendlyFire = true;
-				}
-
-				return false;
 			}
-			catch (Exception ex)
+            catch (Exception ex)
             {
-				Logger.Get.Error($"Synapse-FF: ProcessDamage failed!!\n{ex}");
-				return true;
-			}
+				Logger.Get.Error($"Synapse-FF: PlayerDamage failed!!\n{ex}");
+            }
+			
+			return true;
         }
     }
 }

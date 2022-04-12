@@ -31,9 +31,9 @@ namespace Synapse.Config
         }
 
         public string Room { get; set; }
-        public float X { get; set; }
-        public float Y { get; set; }
-        public float Z { get; set; }
+        public float X { get; set; } = 0f;
+        public float Y { get; set; } = 0f;
+        public float Z { get; set; } = 0f;
 
         public MapPoint Parse() => MapPoint.Parse(ToString());
 
@@ -62,11 +62,11 @@ namespace Synapse.Config
         }
 
         public int ID { get; set; }
-        public float Durabillity { get; set; }
-        public uint WeaponAttachments { get; set; }
-        public float XSize { get; set; }
-        public float YSize { get; set; }
-        public float ZSize { get; set; }
+        public float Durabillity { get; set; } = 0f;
+        public uint WeaponAttachments { get; set; } = 0;
+        public float XSize { get; set; } = 1f;
+        public float YSize { get; set; } = 1f;
+        public float ZSize { get; set; } = 1f;
 
         public SynapseItem Parse() => new SynapseItem(ID) 
         { 
@@ -104,7 +104,7 @@ namespace Synapse.Config
             UsePreferences = preference;
         }
 
-        public short Chance { get; set; }
+        public short Chance { get; set; } = 100;
         public bool UsePreferences { get; set; }
 
         public SynapseItem Apply(Player player)
@@ -156,11 +156,11 @@ namespace Synapse.Config
             Ammo44 = ammo44;
         }
 
-        public ushort Ammo5 { get; set; }
-        public ushort Ammo7 { get; set; }
-        public ushort Ammo9 { get; set; }
-        public ushort Ammo12 { get; set; }
-        public ushort Ammo44 { get; set; }
+        public ushort Ammo5 { get; set; } = 0;
+        public ushort Ammo7 { get; set; } = 0;
+        public ushort Ammo9 { get; set; } = 0;
+        public ushort Ammo12 { get; set; } = 0;
+        public ushort Ammo44 { get; set; } = 0;
 
         public void Apply(Player player)
         {
@@ -211,12 +211,14 @@ namespace Synapse.Config
 
         public Vector3 Parse() => new Vector3(X, Y, Z);
 
-        public float X { get; set; }
-        public float Y { get; set; }
-        public float Z { get; set; }
+        public float X { get; set; } = 0f;
+        public float Y { get; set; } = 0f;
+        public float Z { get; set; } = 0f;
 
-        public static implicit operator Vector3(SerializedVector3 vector) => vector.Parse();
+        public static implicit operator Vector3(SerializedVector3 vector) => vector == null ? Vector3.zero : vector.Parse();
         public static implicit operator SerializedVector3(Vector3 vector) => new SerializedVector3(vector);
+        public static implicit operator SerializedVector3(Quaternion rotation) => new SerializedVector3(rotation.eulerAngles);
+        public static implicit operator Quaternion(SerializedVector3 vector) => Quaternion.Euler(vector);
     }
 
     [Serializable]
@@ -246,16 +248,16 @@ namespace Synapse.Config
             A = a;
         }
 
-        public float R { get; set; }
-        public float G { get; set; }
-        public float B { get; set; }
-        public float A { get; set; }
+        public float R { get; set; } = 0f;
+        public float G { get; set; } = 0f;
+        public float B { get; set; } = 0f;
+        public float A { get; set; } = 1f;
 
         public Color Parse() => new Color(R, G, B, A);
 
         public static implicit operator Color(SerializedColor color) => color.Parse();
         public static implicit operator SerializedColor(Color color) => new SerializedColor(color);
-        public static implicit operator Color32(SerializedColor color) => (Color32)color.Parse();
+        public static implicit operator Color32(SerializedColor color) => color.Parse();
         public static implicit operator SerializedColor(Color32 color) => new SerializedColor(color);
 
     }

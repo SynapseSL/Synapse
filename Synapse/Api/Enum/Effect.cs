@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Synapse.Api.Enum
 {
@@ -9,6 +10,7 @@ namespace Synapse.Api.Enum
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Amnesia,
+        [Obsolete("ArtificialRegen is no longer in the game", true)]
         ArtificialRegen,
         /// <summary>
         /// Quickly drains stamina then health if there is none left
@@ -54,7 +56,9 @@ namespace Synapse.Api.Enum
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Disabled,
+        [Obsolete("Disarmed is no longer in the game", true)]
         Disarmed,
+        [Obsolete("Discharge is no longer in the game", true)]
         Discharge,
         /// <summary>
         /// Prevents all movement
@@ -66,6 +70,7 @@ namespace Synapse.Api.Enum
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Exhausted,
+        [Obsolete("Exsanguination is no longer in the game", true)]
         Exsanguination,
         /// <summary>
         /// Flash the Player
@@ -82,10 +87,7 @@ namespace Synapse.Api.Enum
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Invigorated,
-        /// <summary>
-        /// Slightly increases stamina consumption
-        /// </summary>
-        /// <remarks>0 = Disabled, 1 = Enabled</remarks>
+        [Obsolete("Panic is no longer in the game", true)]
         Panic,
         /// <summary>
         /// Ascending damage over time. Ticks every 5s.
@@ -98,9 +100,9 @@ namespace Synapse.Api.Enum
         /// <remarks>0 = Disabled, 1 = 1xCola, 2 = 2xCola, 3 = 3xCola, 4 = 4xCola</remarks>
         Scp207,
         /// <summary>
-        /// The Player can't be seen by other entities. They need to hold Scp268 in their inventory.
+        /// use <see cref="Invisible"/>
         /// </summary>
-        /// <remarks>0 = Disabled,1 = Enabled</remarks>
+        [Obsolete("Scp268 effect is no longer in the game, use Invisible", true)]
         Scp268,
         /// <summary>
         /// Slows down player (No effect on SCPs)
@@ -111,6 +113,50 @@ namespace Synapse.Api.Enum
         /// The vision of SCP-939
         /// </summary>
         /// <remarks>0 = Disabled, 1 = OnlyMarker, 2 = Only Screen, 3 = Everything</remarks>
-        Visuals939
+        Visuals939,
+        /// <summary>
+        /// Reduces damage taken from shots
+        /// </summary>
+        /// <remarks>0 = Disabled, 1 = Enabled</remarks>
+        BodyshotReduction,
+        /// <summary>
+        /// Reduces all forms of damage
+        /// </summary>
+        /// <remarks>0 = Disabled, 1 = Enabled</remarks>
+        DamageReduction,
+        /// <summary>
+        /// Reduces player vision and weapon accuracy. Prevents Hume Shield from regenerating. Humans take damage overtime.
+        /// </summary>
+        Hypothermia,
+        /// <summary>
+        /// The Player can't be seen by other entities.
+        /// </summary>
+        /// <remarks>0 = Disabled, 1 = Enabled</remarks>
+        Invisible,
+        /// <summary>
+        /// Increases movement speed
+        /// </summary>
+        /// <remarks>0 = Disabled, each intensity point adds 1% of movement speed (max 355)</remarks>
+        MovementBoost,
+        /// <summary>
+        /// Reduces severity of Amnesia, Bleeding, Burned, Concussed, Hemorrhage, Poisoned and SCP-207.
+        /// </summary>
+        /// <remarks>0 = Disabled, 1 = Enabled</remarks>
+        RainbowTaste,
+        /// <summary>
+        /// Removes the player's hands and ability to open inventory or interact; Slowly drains HP.
+        /// </summary>
+        /// <remarks>0 = Disabled, 1 = Enabled</remarks>
+        SeveredHands,
+        /// <summary>
+        /// Reduces player speed by 20%; SCPs are immune to this effect.	
+        /// </summary>
+        /// <remarks>0 = Disabled, 1 = Enabled</remarks>
+        Stained,
+        /// <summary>
+        /// Immunity to negative status effects except decontamination and pocket dimension.
+        /// </summary>
+        /// <remarks>0 = Disabled, 1 = Enabled</remarks>
+        Vitality,
     }
 }

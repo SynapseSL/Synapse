@@ -19,7 +19,7 @@ namespace Synapse.Api
         public static WorkStation CreateWorkStation(Vector3 position, Vector3 rotation, Vector3 scale)
             => new WorkStation(position, rotation, scale);
 
-        internal WorkstationController workStation;
+        public WorkstationController workStation;
 
         public GameObject GameObject => workStation.gameObject;
 

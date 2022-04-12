@@ -41,6 +41,7 @@ public class SynapseController
             Server.Schematic.Init();
             CommandHandlers.RegisterSynapseCommands();
             PluginLoader.ActivatePlugins();
+            Server.Logger.Refresh();
         }
         catch (Exception e)
         {

@@ -21,16 +21,15 @@ namespace Synapse.Api.CustomObjects
         {
             Server.Get.Events.SynapseObject.InvokeUpdate(new Events.SynapseEventArguments.SOEventArgs(Object));
 
-            if (Object.Type == Enum.ObjectType.Workstation && Object is SynapseWorkStationObject work && work.UpdateEveryFrame)
-                work.Refresh();
-
-            if (Object.Type == Enum.ObjectType.Door && Object is SynapseDoorObject door && door.UpdateEveryFrame)
-                door.Refresh();
+            if(Object is IRefreshable refresh && refresh.UpdateEveryFrame)
+                refresh.Refresh();
         }
 
         public void OnDestroy()
         {
-            Server.Get.Events.SynapseObject.InvokeUpdate(new Events.SynapseEventArguments.SOEventArgs(Object));
+            Server.Get.Events.SynapseObject.InvokeDestroy(new Events.SynapseEventArguments.SOEventArgs(Object));
+            if (Parent != null)
+                Parent.Childrens.Remove(Object);
             if (Map.Get.SynapseObjects.Contains(Object))
                 Map.Get.SynapseObjects.Remove(Object);
         }

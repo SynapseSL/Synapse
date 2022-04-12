@@ -1,4 +1,5 @@
-﻿using Synapse.Api.Enum;
+﻿using Mirror;
+using Synapse.Api.Enum;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -67,6 +68,51 @@ namespace Synapse.Api.CustomObjects
                 obj.Parent = this;
             }
 
+            foreach(var custom in schematic.CustomObjects)
+            {
+                var obj = new SynapseCustomObject(custom);
+                CustomChildrens.Add(obj);
+                Childrens.Add(obj);
+                obj.GameObject.transform.parent = GameObject.transform;
+                obj.Parent = this;
+            }
+
+            foreach (var rag in schematic.RagdollObjects)
+            {
+                var obj = new SynapseRagdollObject(rag);
+                RagdollChildrens.Add(obj);
+                Childrens.Add(obj);
+                obj.GameObject.transform.parent = GameObject.transform;
+                obj.Parent = this;
+            }
+
+            foreach (var dummy in schematic.DummyObjects)
+            {
+                var obj = new SynapseDummyObject(dummy);
+                DummyChildrens.Add(obj);
+                Childrens.Add(obj);
+                obj.GameObject.transform.parent = GameObject.transform;
+                obj.Parent = this;
+            }
+
+            foreach (var generator in schematic.GeneratorObjects)
+            {
+                var obj = new SynapseGeneratorObject(generator);
+                GeneratorChildrens.Add(obj);
+                Childrens.Add(obj);
+                obj.GameObject.transform.parent = GameObject.transform;
+                obj.Parent = this;
+            }
+
+            foreach (var locker in schematic.LockerObjects)
+            {
+                var obj = new SynapseLockerObject(locker);
+                LockerChildrens.Add(obj);
+                Childrens.Add(obj);
+                obj.GameObject.transform.parent = GameObject.transform;
+                obj.Parent = this;
+            }
+
             Map.Get.SynapseObjects.Add(this);
 
             var script = GameObject.AddComponent<SynapseObjectScript>();
@@ -117,10 +163,22 @@ namespace Synapse.Api.CustomObjects
         public List<SynapseItemObject> ItemChildrens { get; } = new List<SynapseItemObject>();
         public List<SynapseWorkStationObject> WorkStationChildrens { get; } = new List<SynapseWorkStationObject>();
         public List<SynapseDoorObject> DoorChildrens { get; } = new List<SynapseDoorObject>();
+        public List<SynapseCustomObject> CustomChildrens { get; } = new List<SynapseCustomObject>();
+        public List<SynapseRagdollObject> RagdollChildrens { get; } = new List<SynapseRagdollObject>();
+        public List<SynapseDummyObject> DummyChildrens { get; } = new List<SynapseDummyObject>();
+        public List<SynapseGeneratorObject> GeneratorChildrens { get; } = new List<SynapseGeneratorObject>();
+        public List<SynapseLockerObject> LockerChildrens { get; } = new List<SynapseLockerObject>();
 
         public string Name { get; }
 
         public int ID { get; }
+
+        public void DespawnForOnePlayer(Player player)
+        {
+            foreach(var child in Childrens)
+                if (child.GameObject.TryGetComponent<NetworkIdentity>(out var net))
+                    net.DespawnForOnePlayer(player);
+        }
 
         public override void Destroy()
         {
@@ -132,11 +190,9 @@ namespace Synapse.Api.CustomObjects
 
         private void UpdatePositionAndRotation()
         {
-            foreach (var station in WorkStationChildrens)
-                station.Refresh();
-
-            foreach(var door in DoorChildrens)
-                door.Refresh();
+            foreach (var child in Childrens)
+                if (child is IRefreshable refresh)
+                    refresh.Refresh();
         }
 
         private void UpdateScale()

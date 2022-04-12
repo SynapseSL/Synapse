@@ -8,6 +8,11 @@
         Target,
         Door,
         Workstation,
-        Item
+        Item,
+        Ragdoll,
+        Dummy,
+        Custom,
+        Locker,
+        Generator
     }
 }

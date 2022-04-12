@@ -1,5 +1,6 @@
 ﻿using Synapse.Api;
 using Synapse.Api.CustomObjects;
+using Synapse.Api.Enum;
 using Synapse.Api.Items;
 using Synapse.Api.Plugin;
 using Synapse.Api.Roles;
@@ -115,6 +116,7 @@ namespace Synapse
                 PermissionHandler.Reload();
                 Schematic.Load();
                 SynapseController.PluginLoader.ReloadConfigs();
+                Logger.Refresh();
             }
             catch(Exception e)
             {
@@ -291,6 +293,10 @@ namespace Synapse
             //Schematic
             private string _schematicDirectory;
 
+            //Logs
+            private string _logDirectory;
+            private string _logPortDirectory;
+
             //synapse
             private string _synapseDirectory;
 
@@ -410,6 +416,44 @@ namespace Synapse
                 private set => _schematicDirectory = value;
             }
 
+            public string LogDirectory
+            {
+                get
+                {
+                    if (!Directory.Exists(_logDirectory))
+                        Directory.CreateDirectory(_logDirectory);
+
+                    return _logDirectory;
+                }
+                private set => _logDirectory = value;
+            }
+
+            public string LogPortDirectory
+            {
+                get
+                {
+                    if (!Directory.Exists(_logPortDirectory))
+                        Directory.CreateDirectory(_logPortDirectory);
+
+                    return _logPortDirectory;
+                }
+                private set => _logPortDirectory = value;
+            }
+
+            public string LogFile
+            {
+                get
+                {
+                    var date = DateTime.Now;
+                    var file = Path.Combine(LogPortDirectory, $"Synapse {date.Year}-{date.Month}-{date.Day}.txt");
+
+                    if (!File.Exists(file))
+                        File.Create(file).Close();
+
+                    return file;
+                }
+            }
+
             public string PermissionFile
             {
                 get
@@ -460,6 +504,12 @@ namespace Synapse
                 PermissionFile = File.Exists(permissionspath)
                     ? permissionspath
                     : Path.Combine(SharedConfigDirectory, "permission.syml");
+            }
+
+            public void InitLogDirectories()
+            {
+                LogDirectory = Path.Combine(SynapseDirectory, "logs");
+                LogPortDirectory = Path.Combine(LogDirectory, "server-" + ServerStatic.ServerPort);
             }
 
             public string GetOldTranslationFile(PluginInformation infos)

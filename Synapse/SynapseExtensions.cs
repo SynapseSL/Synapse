@@ -72,6 +72,8 @@ public static class SynapseExtensions
 
     public static Synapse.Api.Locker GetLocker(this MapGeneration.Distributors.Locker locker) => Map.Get.Lockers.FirstOrDefault(x => x.GameObject == locker.gameObject);
 
+    public static Synapse.Api.Ragdoll GetRagdoll(this Ragdoll rag) => Map.Get.Ragdolls.FirstOrDefault(x => x.ragdoll == rag);
+
     public static List<Vector3> GetSpawnPoints(this RoleType role)
     {
         List<Vector3> spawnPointsPose = new List<Vector3>();
@@ -130,7 +132,7 @@ public static class SynapseExtensions
         //If the List doesn't even contain the Serial then it is destroyed or a item with this ID was never spawned
         if (!SynapseItem.AllItems.ContainsKey(itembase.ItemSerial)) return null;
 
-        var item = SynapseItem.AllItems[itembase.ItemSerial];
+        var item = SynapseItem.GetSynapseItem(itembase.ItemSerial);
 
         //This is a simple fallback if the item is not registered
         if (item == null)
@@ -147,7 +149,7 @@ public static class SynapseExtensions
         //If the List doesn't even contain the Serial then it is destroyed or a item with this ID was never spawned
         if (!SynapseItem.AllItems.ContainsKey(pickupbase.Info.Serial)) return null;
 
-        var item = SynapseItem.AllItems[pickupbase.Info.Serial];
+        var item = SynapseItem.GetSynapseItem(pickupbase.Info.Serial);
 
         //This is a simple fallback if the item is not registered
         if (item == null)
@@ -159,7 +161,7 @@ public static class SynapseExtensions
         return item;
     }
 
-    public static bool CanHarmScp(Player player,bool message = true)
+    public static bool CanHarmScp(Player player, bool message = true)
     {
         if (player.Team == Team.SCP || player.CustomRole?.GetFriendsID().Any(x => x == (int)Team.SCP) == true)
         {
@@ -174,6 +176,8 @@ public static class SynapseExtensions
     {
         try
         {
+            Synapse.Api.Logger.Get.Debug("PERMISSION");
+
             var result = true;
 
             if (Map.Get.Round.RoundEnded && Server.Get.Configs.synapseConfiguration.AutoFF)
@@ -214,6 +218,8 @@ public static class SynapseExtensions
 
             Server.Get.Events.Player.InvokePlayerDamagePermissions(victim, attacker, ref result);
 
+            Synapse.Api.Logger.Get.Debug("PERMISSION " + result);
+
             return result;
         }
         catch (Exception e)
@@ -252,11 +258,14 @@ public static class SynapseExtensions
     }
 
     public static void UpdatePositionRotationScale(this NetworkIdentity identity)
+        => NetworkServer.SendToAll(GetSpawnMessage(identity));
+
+    public static SpawnMessage GetSpawnMessage(this NetworkIdentity identity)
     {
         var writer = NetworkWriterPool.GetWriter();
         var writer2 = NetworkWriterPool.GetWriter();
         var payload = NetworkServer.CreateSpawnMessagePayload(false, identity, writer, writer2);
-        var msg = new SpawnMessage
+        return new SpawnMessage
         {
             netId = identity.netId,
             isLocalPlayer = false,
@@ -268,6 +277,17 @@ public static class SynapseExtensions
             scale = identity.gameObject.transform.localScale,
             payload = payload
         };
+    }
+
+    public static void DespawnForOnePlayer(this NetworkIdentity identity, Player player)
+    {
+        var msg = new ObjectDestroyMessage { netId = identity.netId };
+        player.Connection.Send(msg);
+    }
+
+    public static void DespawnForAllPlayers(this NetworkIdentity identity)
+    {
+        var msg = new ObjectDestroyMessage { netId = identity.netId };
         NetworkServer.SendToAll(msg);
     }
 

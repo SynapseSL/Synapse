@@ -153,7 +153,7 @@ namespace Synapse.Api
                             var pos = Position + Player.CameraReference.forward / 10 * speed;
 
                             if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
-                                Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
+                                Player.PlayerMovementSync.OverridePosition(pos, null, true);
                             else wall = true;
                             break;
 
@@ -161,7 +161,7 @@ namespace Synapse.Api
                             pos = Position - Player.CameraReference.forward / 10 * speed;
 
                             if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
-                                Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
+                                Player.PlayerMovementSync.OverridePosition(pos, null, true);
                             else wall = true;
                             break;
 
@@ -169,7 +169,7 @@ namespace Synapse.Api
                             pos = Position + Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed;
 
                             if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
-                                Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
+                                Player.PlayerMovementSync.OverridePosition(pos, null, true);
                             else wall = true;
                             break;
 
@@ -177,7 +177,7 @@ namespace Synapse.Api
                             pos = Position - Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed;
 
                             if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
-                                Player.PlayerMovementSync.OverridePosition(pos, 0f, true);
+                                Player.PlayerMovementSync.OverridePosition(pos, null, true);
                             else wall = true;
                             break;
                     }

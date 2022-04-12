@@ -2,6 +2,8 @@
 using MapGeneration;
 using Synapse.Api.Enum;
 using UnityEngine;
+using Mirror;
+using System.Linq;
 
 namespace Synapse.Api
 {
@@ -20,6 +22,8 @@ namespace Synapse.Api
 
             foreach (var cam in GameObject.GetComponentsInChildren<Camera079>())
                 Cameras.Add(new Camera(cam,this));
+
+            NetworkIdentity = GetNetworkIdentity(RoomType);
         }
 
         public void LightsOut(float duration)
@@ -32,9 +36,42 @@ namespace Synapse.Api
 
         public RoomIdentifier Identifier { get; }
 
-        public Vector3 Position => GameObject.transform.position;
+        public Vector3 Position
+        {
+            get => GameObject.transform.position;
+            set
+            {
+                if (NetworkIdentity == null) return;
+                NetworkIdentity.transform.position = value;
+                NetworkIdentity.UpdatePositionRotationScale();
+            }
+        }
+
+        public Quaternion Rotation
+        {
+            get => GameObject.transform.rotation;
+            set
+            {
+                if (NetworkIdentity == null) return;
+                NetworkIdentity.transform.rotation = value;
+                NetworkIdentity.UpdatePositionRotationScale();
+            }
+        }
+
+        public Vector3 Scale
+        {
+            get => GameObject.transform.localScale;
+            set
+            {
+                if (NetworkIdentity == null) return;
+                NetworkIdentity.transform.localScale = value;
+                NetworkIdentity.UpdatePositionRotationScale();
+            }
+        }
 
         public string RoomName => GameObject.name;
+
+        public NetworkIdentity NetworkIdentity { get; }
 
         public FlickerableLightController LightController { get; }
 
@@ -76,5 +113,25 @@ namespace Synapse.Api
         public RoomShape RoomShape { get; }
 
         public Color WarheadColor { get => LightController.Network_warheadLightColor; set => LightController.Network_warheadLightColor = value; }
+
+        internal static List<NetworkIdentity> networkIdentities;
+
+        private static NetworkIdentity GetNetworkIdentity(RoomName room)
+        {
+            if(networkIdentities == null) networkIdentities = GameObject.FindObjectsOfType<NetworkIdentity>().Where(x => x.name.Contains("All")).ToList();
+            switch (room)
+            {
+                case MapGeneration.RoomName.Lcz330:
+                    return networkIdentities.FirstOrDefault(x => x.assetId == new System.Guid("17f38aa5-1bc8-8bc4-0ad1-fffcbe4214ae"));
+
+                case MapGeneration.RoomName.Hcz939:
+                    return networkIdentities.FirstOrDefault(x => x.assetId == new System.Guid("d1566564-d477-24c4-c953-c619898e4751"));
+
+                case MapGeneration.RoomName.Hcz106:
+                    return networkIdentities.FirstOrDefault(x => x.assetId == new System.Guid("c1ae9ee4-cc8e-0794-3b2c-358aa6e57565"));
+
+                default: return null;
+            }
+        }
     }
 }

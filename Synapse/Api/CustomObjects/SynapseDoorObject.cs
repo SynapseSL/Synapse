@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Synapse.Api.CustomObjects
 {
-    public class SynapseDoorObject : DefaultSynapseObject
+    public class SynapseDoorObject : NetworkSynapseObject
     {
         public static Dictionary<SpawnableDoorType, BreakableDoor> Prefab { get; internal set; } = new Dictionary<SpawnableDoorType, BreakableDoor>();
 
@@ -16,6 +16,7 @@ namespace Synapse.Api.CustomObjects
             OriginalScale = configuration.Scale;
             CustomAttributes = configuration.CustomAttributes;
             UpdateEveryFrame = configuration.UpdateEveryFrame;
+            DoorType = configuration.DoorType;
 
             var script = GameObject.AddComponent<SynapseObjectScript>();
             script.Object = this;
@@ -24,44 +25,19 @@ namespace Synapse.Api.CustomObjects
         public SynapseDoorObject(SpawnableDoorType type, Vector3 position, Quaternion rotation, Vector3 scale, bool open = false, bool locked = false)
         {
             Door = CreateDoor(type, position, rotation, scale, open, locked);
+            DoorType = type;
 
             Map.Get.SynapseObjects.Add(this);
             var script = GameObject.AddComponent<SynapseObjectScript>();
             script.Object = this;
         }
 
-
         public override GameObject GameObject => Door.GameObject;
+        public override NetworkIdentity NetworkIdentity => Door.VDoor.netIdentity;
         public override ObjectType Type => ObjectType.Door;
-        public override Vector3 Position
-        {
-            get => base.Position;
-            set
-            {
-                base.Position = value;
-                Refresh();
-            }
-        }
-        public override Quaternion Rotation
-        {
-            get => base.Rotation;
-            set
-            {
-                base.Rotation = value;
-                Refresh();
-            }
-        }
-        public override Vector3 Scale
-        {
-            get => base.Scale;
-            set
-            {
-                base.Scale = value;
-                Refresh();
-            }
-        }
 
         public Door Door { get; }
+        public SpawnableDoorType DoorType { get; }
         public bool Open
         {
             get => Door.Open;
@@ -72,22 +48,15 @@ namespace Synapse.Api.CustomObjects
             get => Door.Locked;
             set => Door.Locked = value;
         }
-        public bool UpdateEveryFrame { get; set; } = false;
-
-
-        public void Refresh()
-            => Door.VDoor.netIdentity.UpdatePositionRotationScale();
 
         private Door CreateDoor(SpawnableDoorType type, Vector3 position, Quaternion rotation, Vector3 scale, bool open, bool locked)
         {
-            var ot = UnityEngine.Object.Instantiate(Prefab[type], position, rotation);
-            ot.transform.position = position;
-            ot.transform.rotation = rotation;
-            ot.transform.localScale = scale;
-            NetworkServer.Spawn(ot.gameObject);
+            var ot = CreateNetworkObject(Prefab[type], position, rotation, scale);
             var door = new Door(ot);
             door.Open = open;
             door.Locked = locked;
+
+            Map.Get.Doors.Add(door);
             return door;
         }
     }

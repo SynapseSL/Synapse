@@ -53,5 +53,8 @@ namespace Synapse.Api
                 lockerChamber._stopwatch.Restart();
             }
         }
+
+        public void SpawnItem(ItemType type, int amount = 1)
+            => lockerChamber.SpawnItem(type, amount);
     }
 }

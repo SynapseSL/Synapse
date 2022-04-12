@@ -40,6 +40,7 @@ namespace Synapse.Api
             set
             {
                 GameObject.transform.position = value;
+                VDoor.netIdentity.DespawnForAllPlayers();
                 VDoor.netIdentity.UpdatePositionRotationScale();
             }
         }

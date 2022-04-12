@@ -1,10 +1,10 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using InventorySystem.Searching;
 using Mirror;
 using Synapse.Api;
 using Synapse.Api.CustomObjects;
 using Synapse.Api.Events.SynapseEventArguments;
+using System;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
@@ -17,23 +17,35 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             try
             {
                 var item = __instance.Completor.TargetPickup?.GetSynapseItem();
+                var schematic = item.PickupBase?.GetComponent<SynapseObjectScript>();
+                var def = schematic?.Object as DefaultSynapseObject;
 
                 if (item == null) return true;
 
-                if (item.CanBePickedUp && __instance.Completor.ValidateUpdate())
+                if(!item.CanBePickedUp && (def == null || def.Parent.ItemParent == null))
+                {
+                    __instance.SessionPipe.Invalidate();
+                    return false;
+                }
+
+                if (__instance.Completor.ValidateUpdate())
                 {
                     if (NetworkTime.time < __instance.SessionPipe.Session.FinishTime) return false;
 
                     var player = __instance.GetPlayer();
                     var allow = true;
 
+                    var change = def?.Parent?.ItemParent != null;
+                    if (change)
+                        item = def.Parent.ItemParent;
+
                     try
                     {
-                        if (item.PickupBase.gameObject.TryGetComponent<SynapseObjectScript>(out var obj))
+                        if (schematic != null)
                         {
                             var ev = new SOPickupEventArgs
                             {
-                                Object = obj.Object as SynapseItemObject,
+                                Object = schematic.Object as SynapseItemObject,
                                 Player = player
                             };
                             Server.Get.Events.SynapseObject.InvokePickup(ev);
@@ -61,6 +73,13 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     if (!allow)
                     {
                         __instance.SessionPipe.Invalidate();
+                        return false;
+                    }
+
+                    if (change)
+                    {
+                        __instance.SessionPipe.Invalidate();
+                        player.Inventory.AddItem(def.Parent.ItemParent);
                         return false;
                     }
 

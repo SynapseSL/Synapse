@@ -170,9 +170,6 @@ namespace Synapse.Config
         {
             try
             {
-#if DEBUG
-                SynapseController.Server.Logger.Info($"==SymlDez==> '{Section}' ~> {type.FullName}");
-#endif
                 var ret = new DeserializerBuilder()
                     .WithNamingConvention(CamelCaseNamingConvention.Instance)
                     .IgnoreUnmatchedProperties()

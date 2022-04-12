@@ -1,6 +1,8 @@
 ﻿using HarmonyLib;
 using InventorySystem;
+using InventorySystem.Items.Usables;
 using MEC;
+using Mirror;
 using PlayerStatsSystem;
 using Synapse.Api;
 using Synapse.Api.Enum;
@@ -9,7 +11,6 @@ using Synapse.Api.Items;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using InventorySystem.Items.Firearms.Attachments;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
@@ -18,11 +19,13 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     internal static class SetPlayersClassPatch
     {
         [HarmonyPrefix]
-        private static bool OnSetClass(ref RoleType classid, GameObject ply, CharacterClassManager.SpawnReason spawnReason)
+        private static bool OnSetClass(ref RoleType classid, GameObject ply, CharacterClassManager.SpawnReason spawnReason, out Player __state)
         {
+            __state = null;
             try
             {
                 var player = ply.GetPlayer();
+                __state = player;
 
                 if (player.Hub.isDedicatedServer || !player.Hub.Ready) return false;
 
@@ -70,7 +73,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                     foreach (var itemtype in roleitems.Items)
                     {
-                        eventargs.Items.Add(new SynapseItem(itemtype));
+                        var item = new SynapseItem(itemtype);
+                        item.ItemData["setup"] = true;
+                        eventargs.Items.Add(item);
                     }
                 }
 
@@ -91,7 +96,11 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         }
 
         [HarmonyPostfix]
-        private static void RemoveArgs(CharacterClassManager __instance) => __instance.GetPlayer().setClassEventArgs = null;
+        private static void RemoveArgs(Player __state)
+        {
+            if (__state != null)
+                __state.setClassEventArgs = null;
+        }
     }
 
     [HarmonyPatch(typeof(PlayerMovementSync),nameof(PlayerMovementSync.OnPlayerClassChange))]
@@ -104,9 +113,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             {
                 var player = __instance.GetPlayer();
                 var args = player.setClassEventArgs;
-                //It is null when someone is revived by 049 since the first patch is never called in this situation
-                if (args == null) return true;
-                Timing.RunCoroutine(__instance.SafelySpawnPlayer(args.Position, args.Rotation), Segment.FixedUpdate);
+                if (args == null) return false;
+                var rot = new PlayerMovementSync.PlayerRotation?(new PlayerMovementSync.PlayerRotation(new float?(0f), new float?(args.Rotation)));
+                Timing.RunCoroutine(__instance.SafelySpawnPlayer(args.Position, rot), Segment.FixedUpdate);
                 return false;
             }
             catch(Exception e)
@@ -128,7 +137,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var player = ply.GetPlayer();
                 var args = player.setClassEventArgs;
 
-                //If args is null he is SCP0492 and should not get any Items
+                //If args is null he is SCP0492 and should not get any Items or Lite is active
                 if (args == null) return false;
 
                 var inventory = ply.inventory;
@@ -141,8 +150,13 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 foreach (var item in args.Items)
                 {
+                    //TODO: Find a better solution
+                    item.ItemData["dur"] = item.Durabillity;
                     var itembase = player.VanillaInventory.ServerAddItem(item.ItemType, item.Serial);
                     InventoryItemProvider.OnItemProvided?.Invoke(player.Hub, itembase);
+
+                    if (!item.ItemData.ContainsKey("setup") && item.ItemData["dur"] is float dur)
+                        item.Durabillity = dur;
                 }
 
                 if(args.IsEscaping) foreach(var item in args.EscapeItems) item.PickUp(player);
@@ -161,16 +175,58 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     internal static class HandleHealthPatch
     {
         [HarmonyPrefix]
-        private static void OnClassChanged(HealthStat __instance)
+        private static bool OnClassChanged(HealthStat __instance)
         {
             try
             {
                 var player = __instance.GetPlayer();
+                if (player.setClassEventArgs == null) return false;
+
                 player.MaxHealth = player.ClassManager.CurRole.maxHP;
+                return true;
             }
             catch(Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: PlayerSetClass(Health) failed!!\n{e}");
+                return true;
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(UsableItemsController),nameof(UsableItemsController.ResetPlayerOnRoleChange))]
+    internal static class HandleUsableItemsController
+    {
+        [HarmonyPrefix]
+        private static bool OnReset(ReferenceHub ply)
+        {
+            try
+            {
+                if (ply?.GetPlayer()?.setClassEventArgs == null) return false;
+                return true;
+            }
+            catch(Exception ex)
+            {
+                Logger.Get.Error($"Synapse-Event: PlayerSetClass(UsableItem) failed!!\n{ex}");
+                return true;
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(PlayerEffectsController), nameof(PlayerEffectsController.CharacterClassManager_OnClassChanged))]
+    internal static class HandlePlayerEffectController
+    {
+        [HarmonyPrefix]
+        private static bool OnReset(ReferenceHub targetHub)
+        {
+            try
+            {
+                if (targetHub?.GetPlayer()?.setClassEventArgs == null) return false;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Get.Error($"Synapse-Event: PlayerSetClass(EffetController) failed!!\n{ex}");
+                return true;
             }
         }
     }

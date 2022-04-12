@@ -32,7 +32,14 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 					var item = player.ItemInHand;
 
 					if (item.ItemCategory == ItemCategory.Keycard)
-						EventHandler.Get.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref flag);
+                        try
+                        {
+							EventHandler.Get.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref flag);
+						}
+						catch (Exception ex)
+                        {
+							Logger.Get.Error($"Synapse-Event: ItemUseDoor Event failed!!\n{ex}");
+						}
 
 					if (flag) cardaccess = true;
 					else if (Server.Get.Configs.synapseConfiguration.RemoteKeyCard)
@@ -40,7 +47,14 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 						{
 							var allowcard = __instance.RequiredPermissions.CheckPermissions(item2.ItemBase, ply);
 
-							EventHandler.Get.Player.InvokePlayerItemUseEvent(player, item2, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allowcard);
+                            try
+                            {
+								EventHandler.Get.Player.InvokePlayerItemUseEvent(player, item2, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allowcard);
+							}
+							catch (Exception ex)
+                            {
+								Logger.Get.Error($"Synapse-Event: ItemUseDoor Event failed!!\n{ex}");
+							}
 
 							if (allowcard)
 							{
@@ -49,7 +63,14 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 							}
 						}
 
-					EventHandler.Get.Map.InvokeDoorInteractEvent(player, __instance.GetDoor(), ref cardaccess);
+					try
+					{
+						EventHandler.Get.Map.InvokeDoorInteractEvent(player, __instance.GetDoor(), ref cardaccess);
+					}
+					catch(Exception ex)
+                    {
+						Logger.Get.Error($"Synapse-Event: DoorInteract failed!!\n{ex}");
+					}
 
 					if (cardaccess)
 					{
@@ -65,7 +86,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 			}
 			catch (Exception e)
 			{
-				Logger.Get.Error($"Synapse-Event: DoorInteract failed!!\n{e}");
+				Logger.Get.Error($"Synapse-Event: DoorInteract Patch failed!!\n{e}");
 				return true;
 			}
 		}
