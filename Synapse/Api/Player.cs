@@ -179,20 +179,7 @@ namespace Synapse.Api
         }
 
         public void ShakeScreen(bool achieve = false)
-        {
-            var component = AlphaWarheadController.Host;
-            var writer = NetworkWriterPool.GetWriter();
-            writer.WriteBoolean(achieve);
-            var msg = new RpcMessage
-            {
-                netId = component.netId,
-                componentIndex = component.ComponentIndex,
-                functionHash = typeof(AlphaWarheadController).FullName.GetStableHashCode() * 503 + "RpcShake".GetStableHashCode(),
-                payload = writer.ToArraySegment()
-            };
-            Connection.Send(msg);
-            NetworkWriterPool.Recycle(writer);
-        }
+            => AlphaWarheadController.Host.TargetRpcShake(Connection, achieve, GodMode);
 
         public void PlaceBlood(Vector3 pos, int type = 1, float size = 2f)
         {
@@ -525,13 +512,23 @@ namespace Synapse.Api
         public Vector3 Position
         {
             get => PlayerMovementSync.GetRealPosition();
-            set => PlayerMovementSync.OverridePosition(value, 0f);
+            set => PlayerMovementSync.OverridePosition(value, PlayerRotation);
         }
 
         public Vector2 Rotation
         {
             get => PlayerMovementSync.RotationSync;
             set => PlayerMovementSync.NetworkRotationSync = value;
+        }
+
+        public PlayerMovementSync.PlayerRotation PlayerRotation
+        {
+            get
+            {
+                var vec2 = Rotation;
+                return new PlayerMovementSync.PlayerRotation(vec2.x, vec2.y);
+            }
+            set => Rotation = new Vector2(value.x.Value, value.y.Value);
         }
 
         public Vector3 DeathPosition

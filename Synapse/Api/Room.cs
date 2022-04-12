@@ -121,7 +121,7 @@ namespace Synapse.Api
             if(networkIdentities == null) networkIdentities = GameObject.FindObjectsOfType<NetworkIdentity>().Where(x => x.name.Contains("All")).ToList();
             switch (room)
             {
-                case MapGeneration.RoomName.Lcz012:
+                case MapGeneration.RoomName.Lcz330:
                     return networkIdentities.FirstOrDefault(x => x.assetId == new System.Guid("17f38aa5-1bc8-8bc4-0ad1-fffcbe4214ae"));
 
                 case MapGeneration.RoomName.Hcz939:

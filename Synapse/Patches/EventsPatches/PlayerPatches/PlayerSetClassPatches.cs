@@ -114,7 +114,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var player = __instance.GetPlayer();
                 var args = player.setClassEventArgs;
                 if (args == null) return false;
-                Timing.RunCoroutine(__instance.SafelySpawnPlayer(args.Position, args.Rotation), Segment.FixedUpdate);
+                var rot = new PlayerMovementSync.PlayerRotation?(new PlayerMovementSync.PlayerRotation(new float?(0f), new float?(args.Rotation)));
+                Timing.RunCoroutine(__instance.SafelySpawnPlayer(args.Position, rot), Segment.FixedUpdate);
                 return false;
             }
             catch(Exception e)

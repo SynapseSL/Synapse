@@ -11,5 +11,6 @@
         Revolver = 39,
         AK = 40,
         Shotgun = 41,
+        ParticleDisruptor = 47,
     }
 }

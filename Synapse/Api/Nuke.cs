@@ -36,7 +36,11 @@ namespace Synapse.Api
 
         public void InstantPrepare() => WarheadController.InstantPrepare();
 
-        public void Shake() => WarheadController.RpcShake(false);
+        public void Shake()
+        {
+            foreach (var player in Server.Get.Players)
+                WarheadController.TargetRpcShake(player.Connection, true, false);
+        }
 
         public class NukeInsidePanel
         {

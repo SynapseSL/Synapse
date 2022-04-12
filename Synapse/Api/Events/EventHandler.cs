@@ -16,7 +16,20 @@ namespace Synapse.Api.Events
             Server.UpdateEvent += OnUpdate;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
+            Player.PlayerItemUseEvent += Player_PlayerItemUseEvent;
 #endif
+        }
+
+        private void Player_PlayerItemUseEvent(SynapseEventArguments.PlayerItemInteractEventArgs ev)
+        {
+            if (ev.CurrentItem.ItemType == ItemType.SCP018 && ev.State == SynapseEventArguments.ItemInteractState.Initiating)
+                ev.Allow = false;
+
+            if (ev.CurrentItem.ItemType == ItemType.GrenadeHE && ev.State == SynapseEventArguments.ItemInteractState.Finalizing)
+                ev.Allow = false;
+
+            if (ev.CurrentItem.ItemType == ItemType.GrenadeFlash && ev.State == SynapseEventArguments.ItemInteractState.Stopping)
+                ev.Allow = false;
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)

@@ -9,7 +9,7 @@ namespace Synapse.Api.Items
     {
         public static ItemManager Get => Server.Get.ItemManager;
 
-        public const int HighestItem = (int)ItemType.SCP244b;
+        public const int HighestItem = (int)ItemType.ParticleDisruptor;
 
         private readonly List<CustomItemInformation> customItems = new List<CustomItemInformation>();
 
@@ -40,10 +40,13 @@ namespace Synapse.Api.Items
         public SynapseSchematic GetSchematic(int id)
         {
             if (id >= 0 && id <= HighestItem)
+            {
+                if (!overridenVanillaSchematics.ContainsKey((ItemType)id)) return null;
                 return overridenVanillaSchematics.FirstOrDefault(x => x.Key == (ItemType)id).Value;
+            }
 
             var item = customItems.FirstOrDefault(x => x.ID == id);
-            if (item.SchematicID < 0) return null;
+            if (item == null || item.SchematicID < 0) return null;
             return SchematicHandler.Get.GetSchematic(item.SchematicID);
         }
 
