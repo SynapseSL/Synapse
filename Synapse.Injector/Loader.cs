@@ -21,10 +21,17 @@ namespace Synapse.Injector
                 if (!Directory.Exists(synapsepath)) Directory.CreateDirectory(synapsepath);
 
                 var dependencyAssemblies = new List<Assembly>();
-                foreach (var depend in Directory.GetFiles(Path.Combine(synapsepath, "dependencies"),"*.dll"))
+                foreach (var depend in Directory.GetFiles(Path.Combine(synapsepath, "dependencies"), "*.dll"))
                 {
-                    var assembly = Assembly.Load(File.ReadAllBytes(depend));
-                    dependencyAssemblies.Add(assembly);
+                    try
+                    {
+                        var assembly = Assembly.Load(File.ReadAllBytes(depend));
+                        dependencyAssemblies.Add(assembly);
+                    }
+                    catch (BadImageFormatException e)
+                    {
+                        ServerConsole.AddLog($"SynapseLoader: Failed to load Assembly \"{depend}\"! \n{e}", ConsoleColor.Red);
+                    }
                 };
 
                 var synapseAssembly = Assembly.Load(File.ReadAllBytes(Path.Combine(synapsepath, "Synapse.dll")));
@@ -33,7 +40,7 @@ namespace Synapse.Injector
 
                 InvokeAssembly(synapseAssembly);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 ServerConsole.AddLog($"SynapseLoader: Error occured while loading the assemblies. Please check if all required dll are installed. If you can't fix it join our Discord and show us this Error:\n{e}", ConsoleColor.Red);
             }
