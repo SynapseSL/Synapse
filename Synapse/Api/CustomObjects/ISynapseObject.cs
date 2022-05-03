@@ -1,7 +1,6 @@
 ﻿using Synapse.Api.Enum;
 using System.Collections.Generic;
 using UnityEngine;
-using Synapse.Api.CustomObjects.CustomAttributes;
 
 namespace Synapse.Api.CustomObjects
 {

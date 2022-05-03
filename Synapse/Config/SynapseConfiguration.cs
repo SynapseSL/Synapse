@@ -75,5 +75,12 @@ namespace Synapse.Config
         [Description("Changes whether or not the instance should use a shared or an instance specific database")]
         public bool DatabaseShared { get; set; } = true;
         #endregion
+
+        #region Development
+        [Description("Enables or disables the local Synapse RCE Server. Used for troubleshooting and dynamic coding")]
+        public bool UseLocalRceServer { get; set; } = false;
+        [Description("Port used for local RCE communication")]
+        public int RceServerPort { get; set; } = 9090;
+        #endregion
     }
 }

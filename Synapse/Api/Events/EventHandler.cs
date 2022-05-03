@@ -117,7 +117,7 @@ namespace Synapse.Api.Events
         }
 
 #region HookedEvents
-        private SynapseConfiguration Conf => SynapseController.Server.Configs.synapseConfiguration;
+        private SynapseConfiguration Conf => SynapseController.Server.Configs.SynapseConfiguration;
 
         private void LoadPlayer(SynapseEventArguments.LoadComponentEventArgs ev)
         {

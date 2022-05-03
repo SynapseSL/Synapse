@@ -78,7 +78,7 @@ namespace Synapse.Api
             var save = $"{DateTime.Now} | {name}.dll | {type} | {message}";
             if (logEnabled)
                 File.AppendAllText(Server.Get.Files.LogFile, save + "\n");
-            else if(Server.Get.Configs?.synapseConfiguration?.LogMessages != false)
+            else if(Server.Get.Configs?.SynapseConfiguration?.LogMessages != false)
                 messages.Add(save);
         }
 
@@ -88,7 +88,7 @@ namespace Synapse.Api
 
         internal void Refresh()
         {
-            if (Server.Get.Configs.synapseConfiguration.LogMessages)
+            if (Server.Get.Configs.SynapseConfiguration.LogMessages)
             {
                 logEnabled = true;
                 Server.Get.Files.InitLogDirectories();

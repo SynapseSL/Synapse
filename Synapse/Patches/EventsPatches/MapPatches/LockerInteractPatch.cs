@@ -55,7 +55,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
                 if (ply.Bypass)
                     return true;
                 
-                if (Server.Get.Configs.synapseConfiguration.RemoteKeyCard)
+                if (Server.Get.Configs.SynapseConfiguration.RemoteKeyCard)
                 {
                     foreach (var item in ply.Inventory.Items.Where(x => x.ItemCategory == ItemCategory.Keycard))
                     {

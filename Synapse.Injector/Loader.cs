@@ -16,7 +16,9 @@ namespace Synapse.Injector
             try
             {
                 var localpath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Synapse");
-                var synapsepath = Directory.Exists(localpath) ? localpath : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Synapse");
+                var synapsepath = Directory.Exists(localpath)
+                    ? localpath
+                    : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Synapse");
 
                 if (!Directory.Exists(synapsepath)) Directory.CreateDirectory(synapsepath);
 

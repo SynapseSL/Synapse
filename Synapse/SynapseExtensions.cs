@@ -166,7 +166,7 @@ public static class SynapseExtensions
         if (player.Team == Team.SCP || player.CustomRole?.GetFriendsID().Any(x => x == (int)Team.SCP) == true)
         {
             if (message)
-                player.GiveTextHint(Server.Get.Configs.synapseTranslation.ActiveTranslation.scpTeam);
+                player.GiveTextHint(Server.Get.Configs.SynapseTranslation.ActiveTranslation.scpTeam);
             return false;
         }
         return true;
@@ -180,7 +180,7 @@ public static class SynapseExtensions
 
             var result = true;
 
-            if (Map.Get.Round.RoundEnded && Server.Get.Configs.synapseConfiguration.AutoFF)
+            if (Map.Get.Round.RoundEnded && Server.Get.Configs.SynapseConfiguration.AutoFF)
                 result = true;
             else if (attacker == victim)
                 result = true;
@@ -203,7 +203,7 @@ public static class SynapseExtensions
                     if (attacker.CustomRole.GetFriendsID().Any(x => x == victim.TeamID))
                     {
                         result = false;
-                        attacker.GiveTextHint(Server.Get.Configs.synapseTranslation.ActiveTranslation.sameTeam);
+                        attacker.GiveTextHint(Server.Get.Configs.SynapseTranslation.ActiveTranslation.sameTeam);
                     }
                 }
                 if (victim.CustomRole != null)
@@ -211,7 +211,7 @@ public static class SynapseExtensions
                     if (victim.CustomRole.GetFriendsID().Any(x => x == attacker.TeamID))
                     {
                         result = false;
-                        attacker.GiveTextHint(Server.Get.Configs.synapseTranslation.ActiveTranslation.sameTeam);
+                        attacker.GiveTextHint(Server.Get.Configs.SynapseTranslation.ActiveTranslation.sameTeam);
                     }
                 }
             }

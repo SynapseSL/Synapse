@@ -1,5 +1,4 @@
 ﻿using LightContainmentZoneDecontamination;
-using Mirror;
 
 namespace Synapse.Api
 {

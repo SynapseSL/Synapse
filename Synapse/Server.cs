@@ -1,6 +1,5 @@
 ﻿using Synapse.Api;
 using Synapse.Api.CustomObjects;
-using Synapse.Api.Enum;
 using Synapse.Api.Items;
 using Synapse.Api.Plugin;
 using Synapse.Api.Roles;
@@ -66,7 +65,7 @@ namespace Synapse
         }
 
         public string Name
-        { 
+        {
             get => ServerConsole._serverName;
             set
             {
@@ -86,7 +85,8 @@ namespace Synapse
         public bool FF
         {
             get => ServerConsole.FriendlyFire;
-            set {
+            set
+            {
                 ServerConsole.FriendlyFire = value;
                 ServerConfigSynchronizer.RefreshAllConfigs();
             }
@@ -118,7 +118,7 @@ namespace Synapse
                 SynapseController.PluginLoader.ReloadConfigs();
                 Logger.Refresh();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Error($"Error ocurred while reloading Synapse:\n{e}");
             }
@@ -299,6 +299,7 @@ namespace Synapse
 
             //synapse
             private string _synapseDirectory;
+            private string _dependencyDirectory;
 
 
             internal FileLocations() => Refresh();
@@ -392,6 +393,18 @@ namespace Synapse
                 private set => _configDirectory = value;
             }
 
+            public string DependencyDirectory
+            {
+                get
+                {
+                    if (!Directory.Exists(_dependencyDirectory))
+                        Directory.CreateDirectory(_dependencyDirectory);
+
+                    return _dependencyDirectory;
+                }
+                private set => _dependencyDirectory = value;
+            }
+
             public string SharedConfigDirectory
             {
                 get
@@ -408,7 +421,7 @@ namespace Synapse
             {
                 get
                 {
-                    if(!Directory.Exists(_schematicDirectory))
+                    if (!Directory.Exists(_schematicDirectory))
                         Directory.CreateDirectory(_schematicDirectory);
 
                     return _schematicDirectory;
@@ -504,6 +517,8 @@ namespace Synapse
                 PermissionFile = File.Exists(permissionspath)
                     ? permissionspath
                     : Path.Combine(SharedConfigDirectory, "permission.syml");
+
+                DependencyDirectory = Path.Combine(SynapseDirectory, "dependencies");
             }
 
             public void InitLogDirectories()

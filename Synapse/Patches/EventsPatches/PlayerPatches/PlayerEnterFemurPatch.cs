@@ -25,7 +25,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     if (player.GodMode || !SynapseExtensions.CanHarmScp(player)) continue;
 
                     var allow = true;
-                    var closeFemur = FemurBrokePeople + 1 >= Server.Get.Configs.synapseConfiguration.RequiredForFemur;
+                    var closeFemur = FemurBrokePeople + 1 >= Server.Get.Configs.SynapseConfiguration.RequiredForFemur;
 
                     SynapseController.Server.Events.Player.InvokePlayerEnterFemurEvent(player, ref allow, ref closeFemur);
 

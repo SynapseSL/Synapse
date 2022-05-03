@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using HarmonyLib;
 using Interactables.Interobjects.DoorUtils;
 using Mirror;

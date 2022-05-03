@@ -1,7 +1,4 @@
-﻿using Synapse.Api;
-using System;
-
-namespace Synapse.Command
+﻿namespace Synapse.Command
 {
     public interface ICommand
     {

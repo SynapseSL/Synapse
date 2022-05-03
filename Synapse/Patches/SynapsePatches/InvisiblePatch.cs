@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using HarmonyLib;
-using Mirror;
 using PlayableScps;
 using UnityEngine;
 using CustomPlayerEffects;
@@ -59,7 +58,7 @@ namespace Synapse.Patches.SynapsePatches
                                 showinvoid = true;
                                 goto AA_001;
                             }
-                            else if ((playerToShow.RealTeam == Team.SCP && player.CustomRole != null && !Server.Get.Configs.synapseConfiguration.ScpTrigger173) || Server.Get.Configs.synapseConfiguration.CantLookAt173.Contains(playerToShow.RoleID) || player.Scp173Controller.TurnedPlayers.Contains(playerToShow) || playerToShow.Invisible)
+                            else if ((playerToShow.RealTeam == Team.SCP && player.CustomRole != null && !Server.Get.Configs.SynapseConfiguration.ScpTrigger173) || Server.Get.Configs.SynapseConfiguration.CantLookAt173.Contains(playerToShow.RoleID) || player.Scp173Controller.TurnedPlayers.Contains(playerToShow) || playerToShow.Invisible)
                             {
                                 var posinfo = __instance._transmitBuffer[k];
                                 var rot = Quaternion.LookRotation(playerToShow.Position - player.Position).eulerAngles.y;
@@ -120,7 +119,7 @@ namespace Synapse.Patches.SynapsePatches
 
                                     if (player.RoleType == RoleType.Scp079 || flag)
                                     {
-                                        if (Server.Get.Configs.synapseConfiguration.Better268)
+                                        if (Server.Get.Configs.SynapseConfiguration.Better268)
                                             showinvoid = true;
                                     }
                                     else
@@ -187,7 +186,7 @@ namespace Synapse.Patches.SynapsePatches
                 var player = ply.GetPlayer();
                 var flag = false;
 
-                if (player.Invisible || (player.RealTeam == Team.SCP && !Server.Get.Configs.synapseConfiguration.ScpTrigger173) || Server.Get.Configs.synapseConfiguration.CantLookAt173.Contains(player.RoleID))
+                if (player.Invisible || (player.RealTeam == Team.SCP && !Server.Get.Configs.SynapseConfiguration.ScpTrigger173) || Server.Get.Configs.SynapseConfiguration.CantLookAt173.Contains(player.RoleID))
                     flag = true;
 
                 if (peanut.Scp173Controller.IgnoredPlayers.Contains(player) || player.Scp173Controller.TurnedPlayers.Contains(player))

@@ -68,7 +68,7 @@ namespace Synapse.Patches.SynapsePatches
                 //If sender has no permission and permission is not null or empty
                 if (!__instance.GetPlayer().HasPermission(command.Permission) && !string.IsNullOrWhiteSpace(command.Permission))
                 {
-                    player.SendConsoleMessage(Server.Get.Configs.synapseTranslation.ActiveTranslation.noPermissions.Replace("%perm%",command.Permission), "red");
+                    player.SendConsoleMessage(Server.Get.Configs.SynapseTranslation.ActiveTranslation.noPermissions.Replace("%perm%",command.Permission), "red");
                     return false;
                 }
 
@@ -128,7 +128,7 @@ namespace Synapse.Patches.SynapsePatches
                 //If sender has no permission and permission is not null or empty
                 if (!player.HasPermission(command.Permission) && !string.IsNullOrWhiteSpace(command.Permission))
                 {
-                    player.SendRAConsoleMessage(Server.Get.Configs.synapseTranslation.ActiveTranslation.noPermissions.Replace("%perm%", command.Permission), false);
+                    player.SendRAConsoleMessage(Server.Get.Configs.SynapseTranslation.ActiveTranslation.noPermissions.Replace("%perm%", command.Permission), false);
                     return false;
                 }
 

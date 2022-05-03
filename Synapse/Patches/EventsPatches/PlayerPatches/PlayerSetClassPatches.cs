@@ -2,7 +2,6 @@
 using InventorySystem;
 using InventorySystem.Items.Usables;
 using MEC;
-using Mirror;
 using PlayerStatsSystem;
 using Synapse.Api;
 using Synapse.Api.Enum;

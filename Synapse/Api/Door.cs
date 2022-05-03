@@ -1,6 +1,5 @@
 ﻿using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
-using Mirror;
 using Synapse.Api.CustomObjects;
 using Synapse.Api.Enum;
 using System;

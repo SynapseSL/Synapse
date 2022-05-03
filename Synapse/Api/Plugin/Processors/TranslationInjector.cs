@@ -1,5 +1,4 @@
-﻿using Synapse.Config;
-using System;
+﻿using System;
 using System.Reflection;
 
 namespace Synapse.Api.Plugin.Processors

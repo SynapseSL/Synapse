@@ -54,7 +54,7 @@ namespace Synapse.Events.Patches
 							var items = new List<SynapseItem>();
 							if (player.ItemInHand.ID != -1) items.Add(player.ItemInHand);
 
-							if (Server.Get.Configs.synapseConfiguration.RemoteKeyCard)
+							if (Server.Get.Configs.SynapseConfiguration.RemoteKeyCard)
 								items.AddRange(player.Inventory.Items.Where(x => x != player.ItemInHand));
 
 							var canOpen = false;

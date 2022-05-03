@@ -1,8 +1,11 @@
 ﻿using HarmonyLib;
 using Synapse.Api.Plugin;
 using Synapse.Command;
+using Synapse.RCE;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 
 public class SynapseController
 {
@@ -14,6 +17,10 @@ public class SynapseController
 
     public static Handlers CommandHandlers { get; } = new Handlers();
 
+    internal static Queue<QueueAction> ActionQueue { get; } = new Queue<QueueAction>();
+
+    private static SynapseRceServer _rceHandler;
+
     public static void Init()
     {
         if (IsLoaded) return;
@@ -21,11 +28,9 @@ public class SynapseController
         IsLoaded = true;
         new SynapseController();
     }
-
     internal SynapseController()
     {
         SynapseVersion.Init();
-
         if (StartupArgs.Args.Any(x => x.Equals("-nosynapse", StringComparison.OrdinalIgnoreCase)))
         {
             Server.Logger.Warn("Server started with -nosynapse argument! Synapse will not be loaded");
@@ -42,6 +47,13 @@ public class SynapseController
             CommandHandlers.RegisterSynapseCommands();
             PluginLoader.ActivatePlugins();
             Server.Logger.Refresh();
+
+            if (Server.Configs.SynapseConfiguration.UseLocalRceServer)
+            {
+                _rceHandler = new SynapseRceServer(IPAddress.Loopback, Server.Configs.SynapseConfiguration.RceServerPort);
+                Synapse.Api.Events.EventHandler.Get.Server.UpdateEvent += DequeueInConcurrentUnityContext;
+                _rceHandler.Start();
+            }
         }
         catch (Exception e)
         {
@@ -50,6 +62,26 @@ public class SynapseController
         }
 
         Server.Logger.Info("Synapse is now ready!");
+    }
+
+    private void DequeueInConcurrentUnityContext()
+    {
+        if (ActionQueue.Count != 0)
+        {
+            var qAction = ActionQueue.Dequeue();
+            try
+            {
+                qAction.Action.Invoke();
+            }
+            catch (Exception e)
+            {
+                qAction.Exception = e.InnerException;
+            }
+            finally
+            {
+                qAction.Ran = true;
+            }
+        }
     }
 
     private void PatchMethods()

@@ -1,6 +1,5 @@
 ﻿using Synapse.Api.Enum;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Synapse.Api

@@ -16,18 +16,18 @@ namespace Synapse.Api.Plugin
 
         private readonly List<PluginLoadContext> _contexts = new List<PluginLoadContext>();
 
-        public readonly List<PluginInformation> Plugins = new List<PluginInformation>(); 
-        
-        internal void ActivatePlugins() 
+        public readonly List<PluginInformation> Plugins = new List<PluginInformation>();
+
+        internal void ActivatePlugins()
         {
             var paths = Directory.GetFiles(SynapseController.Server.Files.SharedPluginDirectory, "*.dll").ToList();
             paths.AddRange(Directory.GetFiles(SynapseController.Server.Files.PluginDirectory, "*.dll").ToList());
 
             var dictionary = new Dictionary<PluginInformation, KeyValuePair<Type, List<Type>>>();
-            
+
             _contexts.Clear();
 
-            foreach(var pluginpath in paths)
+            foreach (var pluginpath in paths)
             {
                 try
                 {
@@ -54,12 +54,12 @@ namespace Synapse.Api.Plugin
                         break;
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     SynapseController.Server.Logger.Error($"Synapse-Controller: Loading Assembly of {pluginpath} failed!!\n{e}");
                 }
             }
-        
+
             foreach (var infoTypePair in dictionary.OrderByDescending(x => x.Key.LoadPriority))
             {
                 try
@@ -74,14 +74,14 @@ namespace Synapse.Api.Plugin
                     _plugins.Add(plugin);
                     Plugins.Add(infoTypePair.Key);
                 }
-                catch(Exception e) 
+                catch (Exception e)
                 {
                     SynapseController.Server.Logger.Error($"Synapse-Controller: Activation of {infoTypePair.Value.Key.Assembly.GetName().Name} failed!!\n{e}");
                 }
             }
 
-            foreach (var context in _contexts) 
-                foreach (var processor in _processors) 
+            foreach (var context in _contexts)
+                foreach (var processor in _processors)
                     processor.Process(context);
 
             LoadPlugins();

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using HarmonyLib;
-using MEC;
-using Mirror;
 using NorthwoodLib.Pools;
 using Synapse.Api;
 

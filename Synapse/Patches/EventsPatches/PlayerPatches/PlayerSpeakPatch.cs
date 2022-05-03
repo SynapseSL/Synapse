@@ -1,5 +1,4 @@
 ﻿using System;
-using Assets._Scripts.Dissonance;
 using HarmonyLib;
 using Synapse.Api.Events.SynapseEventArguments;
 
@@ -16,7 +15,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             {
                 var intercom = __instance._dissonanceSetup.IntercomAsHuman;
                 var radio = __instance._dissonanceSetup.RadioAsHuman;
-                var scp939 = Server.Get.Configs.synapseConfiguration.SpeakingScps.Contains(__instance.GetPlayer().RoleID);
+                var scp939 = Server.Get.Configs.SynapseConfiguration.SpeakingScps.Contains(__instance.GetPlayer().RoleID);
                 var scpChat = __instance._dissonanceSetup.SCPChat;
                 var specChat = __instance._dissonanceSetup.SpectatorChat;
                 var allow = true;

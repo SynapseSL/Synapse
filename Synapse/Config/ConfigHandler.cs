@@ -1,5 +1,4 @@
 ﻿using Synapse.Translation;
-using System.IO;
 
 namespace Synapse.Config
 {
@@ -7,22 +6,22 @@ namespace Synapse.Config
     {
         internal ConfigHandler() { }
 
-        internal SynapseConfiguration synapseConfiguration;
-        internal SynapseTranslation<Translation.Translation> synapseTranslation;
+        internal SynapseConfiguration SynapseConfiguration { get; set; }
+        internal SynapseTranslation<Translation.Translation> SynapseTranslation { get; set; }
 
         private SYML _syml;
         
         internal void Init()
         {
-            synapseTranslation = new SynapseTranslation<Translation.Translation>(Server.Get.Files.GetTranslationPath("Synapse"));
-            synapseTranslation.AddTranslation(new Synapse.Translation.Translation(), "ENGLISH");
-            synapseTranslation.AddTranslation(new Translation.Translation
+            SynapseTranslation = new SynapseTranslation<Translation.Translation>(Server.Get.Files.GetTranslationPath("Synapse"));
+            SynapseTranslation.AddTranslation(new Synapse.Translation.Translation(), "ENGLISH");
+            SynapseTranslation.AddTranslation(new Translation.Translation
             {
                 noPermissions = "Du hast keine Berechtigung diesen Command zu benutzen!(%perm%)",
                 sameTeam = "<b>Du kannst diese Person nicht verletzen!</b>",
                 scpTeam = "Als deine jetzige Rolle kannst du nichts machen was ein SCP verletzen würde!",
             }, "GERMAN");
-            synapseTranslation.AddTranslation(new Translation.Translation
+            SynapseTranslation.AddTranslation(new Translation.Translation
             {
                 noPermissions = "Vous ne disposez pas de la permission requise pour cette commande ! (%perm%)",
                 scpTeam = "Vous ne pouvez pas nuire à un SCP en cette classe !",
@@ -31,8 +30,8 @@ namespace Synapse.Config
 
             _syml = new SYML(SynapseController.Server.Files.ConfigFile);
             _syml.Load();
-            synapseConfiguration = new SynapseConfiguration();
-            synapseConfiguration = _syml.GetOrSetDefault("Synapse", synapseConfiguration);
+            SynapseConfiguration = new SynapseConfiguration();
+            SynapseConfiguration = _syml.GetOrSetDefault("Synapse", SynapseConfiguration);
         }
 
         public T GetOrSetDefault<T>(string section, T defValue) where T : IConfigSection
@@ -61,7 +60,7 @@ namespace Synapse.Config
         public void Reload()
         {
             _syml.Load();
-            synapseConfiguration = _syml.GetOrSetDefault("Synapse", new SynapseConfiguration());
+            SynapseConfiguration = _syml.GetOrSetDefault("Synapse", new SynapseConfiguration());
         }
     }
 }

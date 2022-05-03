@@ -1,8 +1,5 @@
-﻿using Mirror;
-using Scp914;
+﻿using Scp914;
 using UnityEngine;
-using System.Linq;
-using System.Collections.Generic;
 
 namespace Synapse.Api
 {
