@@ -6,6 +6,7 @@ using Synapse.Api.Roles;
 using Synapse.Api.Teams;
 using Synapse.Config;
 using Synapse.Permission;
+using Synapse.RCE;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -45,6 +46,8 @@ namespace Synapse
         public PermissionHandler PermissionHandler { get; } = new PermissionHandler();
 
         public SchematicHandler Schematic { get; } = new SchematicHandler();
+
+        internal RceHandler RceHandler { get; } = new RceHandler();
 
         public Player Host
         {
@@ -107,7 +110,6 @@ namespace Synapse
 
         public Console GameConsole => Console.singleton;
 
-
         public void Reload()
         {
             try
@@ -117,6 +119,7 @@ namespace Synapse
                 Schematic.Load();
                 SynapseController.PluginLoader.ReloadConfigs();
                 Logger.Refresh();
+                RceHandler.Reload();
             }
             catch (Exception e)
             {

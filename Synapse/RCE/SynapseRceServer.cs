@@ -27,12 +27,13 @@ namespace Synapse.RCE
 
         internal void Start()
         {
-            Server.Get.Logger.Info("Starting local RCE-Server");
+            Server.Get.Logger.Info("Starting RCE-Server...");
             _listener.Start(1);
             new Task(ListenForClient).Start();
         }
         internal void Stop()
         {
+            Server.Get.Logger.Info("Stopping RCE-Server...");
             _listener.Stop();
         }
         private void ListenForClient()
@@ -44,6 +45,11 @@ namespace Synapse.RCE
                     var client = _listener.AcceptTcpClient();
                     new Task(() => HandleClient(client)).Start();
                 }
+            }
+            catch (Exception e) when (e is IOException || e is SocketException)
+            {
+                Synapse.Api.Logger.Get.Error($"RCE-Server Connection forcibly closed");
+                // Connection forcibly closed, ignore and run out
             }
             catch (Exception e)
             {
@@ -82,7 +88,7 @@ namespace Synapse.RCE
                     };
 
                     // Send to concurrent Unity-Context, which dequeues and executes regularly
-                    SynapseController.ActionQueue.Enqueue(qAction);
+                    Server.Get.RceHandler.ActionQueue.Enqueue(qAction);
 
                     // Wait until qAction has been executed
                     while (!qAction.Ran) ;
@@ -94,17 +100,17 @@ namespace Synapse.RCE
 
                     netStreamWriter.WriteLine(JsonConvert.SerializeObject(response));
                 }
-                catch (IOException e)
-                {
-                    Synapse.Api.Logger.Get.Error($"LocalCommunicationHandler Exception: {e}");
-                    // Connection forcibly closed, ignore and run out
-                    break;
-                }
                 catch (JsonSerializationException e)
                 {
                     var response = RceResponse.GetInvalidJsonResponse();
                     var responseJson = JsonConvert.SerializeObject(response);
                     netStreamWriter.WriteLine(responseJson);
+                }
+                catch (Exception e) when (e is IOException || e is SocketException)
+                {
+                    Synapse.Api.Logger.Get.Error($"RCE-Server Connection forcibly closed");
+                    // Connection forcibly closed, ignore and run out
+                    break;
                 }
                 catch (Exception e)
                 {
