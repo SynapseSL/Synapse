@@ -113,7 +113,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             {
                 var player = __instance.GetPlayer();
                 var args = player.setClassEventArgs;
-                if (args == null) return false;
+                if (player.LiteRoleSet) return false;
+                if (args == null) return true;
                 var rot = new PlayerMovementSync.PlayerRotation?(new PlayerMovementSync.PlayerRotation(new float?(0f), new float?(args.Rotation)));
                 Timing.RunCoroutine(__instance.SafelySpawnPlayer(args.Position, rot), Segment.FixedUpdate);
                 return false;
@@ -180,7 +181,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             try
             {
                 var player = __instance.GetPlayer();
-                if (player.setClassEventArgs == null) return false;
+                if (player.LiteRoleSet) return false;
 
                 player.MaxHealth = player.ClassManager.CurRole.maxHP;
                 return true;
@@ -201,7 +202,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                if (ply?.GetPlayer()?.setClassEventArgs == null) return false;
+                if (ply?.GetPlayer().LiteRoleSet == true) return false;
                 return true;
             }
             catch(Exception ex)
@@ -220,7 +221,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                if (targetHub?.GetPlayer()?.setClassEventArgs == null) return false;
+                if (targetHub?.GetPlayer()?.LiteRoleSet == true) return false;
                 return true;
             }
             catch (Exception ex)
