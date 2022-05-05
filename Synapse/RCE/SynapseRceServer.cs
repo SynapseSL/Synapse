@@ -29,7 +29,7 @@ namespace Synapse.RCE
         {
             Server.Get.Logger.Info("Starting RCE-Server...");
             _listener.Start(1);
-            new Task(ListenForClient).Start();
+            Task.Run(ListenForClient);
         }
         internal void Stop()
         {
@@ -43,7 +43,7 @@ namespace Synapse.RCE
                 while (true)
                 {
                     var client = _listener.AcceptTcpClient();
-                    new Task(() => HandleClient(client)).Start();
+                    Task.Run(() => HandleClient(client));
                 }
             }
             catch (Exception e) when (e is IOException || e is SocketException)
