@@ -27,7 +27,7 @@ namespace Synapse.Tests
         }
 
         [Test]
-        public void Publicizes_EveryMember()
+        public void AllMember_Publicized()
         {
             foreach (var type in _injectedDataAssembly.Types)
             {
@@ -74,7 +74,7 @@ namespace Synapse.Tests
                 );
         }
         [Test]
-        public void HasInjected_MethodCall()
+        public void MethodCall_IsInjected()
         {
             var networkManagerType = _injectedDataAssembly.Types.First(_ => _.Name == "CustomNetworkManager");
             var method = networkManagerType.FindMethod("CreateMatch");
@@ -86,12 +86,12 @@ namespace Synapse.Tests
             Assert.AreEqual((firstInstruction.Operand as dynamic).DeclaringType.FullName, "Synapse.Injector.Loader");
         }
         [Test]
-        public void HasInjected_LoaderType()
+        public void LoaderType_IsInjected()
         {
             Assert.That(_injectedDataAssembly.Types.Any(_ => _.FullName == "Synapse.Injector.Loader"));
         }
         [Test]
-        public void HasExpected_TypesCount()
+        public void TypesCount_AsExpected()
         {
             Assert.AreEqual(_cleanDataAssembly.Types.Count, _injectedDataAssembly.Types.Count - 1);
         }
