@@ -34,12 +34,11 @@ namespace Synapse.Injector
                     {
                         ServerConsole.AddLog($"SynapseLoader: Failed to load Assembly \"{depend}\"! \n{e}", ConsoleColor.Red);
                     }
-                };
+                }
 
                 var synapseAssembly = Assembly.Load(File.ReadAllBytes(Path.Combine(synapsepath, "Synapse.dll")));
 
                 PrintBanner(synapseAssembly, dependencyAssemblies);
-
                 InvokeAssembly(synapseAssembly);
             }
             catch (Exception e)

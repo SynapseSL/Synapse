@@ -15,7 +15,12 @@ public static class SynapseVersion
 
     public const string BasedGameVersion = "11.2.0";
 
-    public static bool Debug { get; private set; } = false;
+    public static bool Debug { get; }
+#if DEBUG
+    = true;
+#else
+    = false;
+#endif
 
     public static string GetVersionName()
     {
@@ -32,9 +37,6 @@ public static class SynapseVersion
 
     internal static void Init()
     {
-#if DEBUG
-        Debug = true;
-#endif
         CustomNetworkManager.Modded = true;
         BuildInfoCommand.ModDescription = $"Plugin Framework: Synapse\nSynapse Version: {GetVersionName()}\nDescription: Synapse is a heavily modded server software using extensive runtime patching to make development faster and the usage more accessible to end-users";
 
