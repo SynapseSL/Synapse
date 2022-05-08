@@ -42,6 +42,7 @@ namespace Synapse.Tests.Regression.Patches
         [Test, Sequential]
         public async Task Server_Can_Execute_Logging()
         {
+            var logIndexBefore = TestServer.Logs.Count;
             const string outputText = "Testing-Output";
             var response = _client.ExecuteFromCode($"Synapse.Api.Logger.Get.Info(\"{outputText}\");");
             Assert.IsTrue(response.IsSuccess);
@@ -50,7 +51,7 @@ namespace Synapse.Tests.Regression.Patches
 
             await Task.Delay(50);
 
-            var logs = TestServer.Logs.TakeLast(250);
+            var logs = TestServer.Logs.Skip(logIndexBefore);
             var targetLog = logs.FirstOrDefault(_ => _.Contains("[INF]") && _.Contains(outputText));
             Assert.IsNotNull(targetLog);
         }
@@ -58,6 +59,7 @@ namespace Synapse.Tests.Regression.Patches
         [Test, Sequential]
         public async Task Client_Cannot_Execute_Twice_For_Same_Assembly()
         {
+            var logIndexBefore = TestServer.Logs.Count;
             _ = _client.ExecuteFromCode($"int i = 10;", "Testing");
             var response2 = _client.ExecuteFromCode($"int i = 10;", "Testing");
 
@@ -66,7 +68,7 @@ namespace Synapse.Tests.Regression.Patches
 
             await Task.Delay(50);
 
-            var logs = TestServer.Logs.TakeLast(250);
+            var logs = TestServer.Logs.Skip(logIndexBefore);
             var targetLog = logs.FirstOrDefault(_ => _.Contains("[WRN]") && _.Contains("RCE attempted to load an already loaded assembly"));
             Assert.IsNotNull(targetLog);
         }
