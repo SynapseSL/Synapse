@@ -6,7 +6,7 @@ using System;
 using System.IO;
 using System.Linq;
 
-namespace Synapse.Tests
+namespace Synapse.Tests.Injector
 {
     public class InjectorTests
     {
@@ -35,7 +35,7 @@ namespace Synapse.Tests
                 // Fields
                 foreach (var field in type.Fields)
                 {
-                    var isEventBackingField = events.Any(_ => String.Equals(_, field.Name, StringComparison.InvariantCultureIgnoreCase));
+                    var isEventBackingField = events.Any(_ => string.Equals(_, field.Name, StringComparison.InvariantCultureIgnoreCase));
                     // wenn kein Event backing-field
                     if (!isEventBackingField)
                     {
@@ -61,7 +61,7 @@ namespace Synapse.Tests
         public void Types_StayAbstract()
         {
             Assert.That(
-                _injectedDataAssembly.Types.Where(_ => _.IsAbstract).Select(_ => _.FullName), 
+                _injectedDataAssembly.Types.Where(_ => _.IsAbstract).Select(_ => _.FullName),
                 Is.EquivalentTo(_cleanDataAssembly.Types.Where(_ => _.IsAbstract).Select(_ => _.FullName))
                 );
         }
@@ -69,7 +69,7 @@ namespace Synapse.Tests
         public void Types_StayInterface()
         {
             Assert.That(
-                _injectedDataAssembly.Types.Where(_ => _.IsInterface).Select(_ => _.FullName), 
+                _injectedDataAssembly.Types.Where(_ => _.IsInterface).Select(_ => _.FullName),
                 Is.EquivalentTo(_cleanDataAssembly.Types.Where(_ => _.IsInterface).Select(_ => _.FullName))
                 );
         }

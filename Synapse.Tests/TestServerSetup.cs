@@ -17,15 +17,15 @@ namespace Synapse.Tests
         private const string InstallationArgs = "+force_install_dir \"{0}\" +login anonymous +app_update 996560 +app_update 996560 validate +quit";
 
         public static IReadOnlyList<string> Logs { get; private set; }
-        public static string SynapseInstallationDirectory { get; private set; }
-        public static string SynapsePluginDirectory { get; private set; }
-        public static string ServerDirectory { get; private set; }
-        public static string AssemblyCSharpDirectory { get; private set; }
-        public static string AssemblyCSharpPath { get; private set; }
-        public static string SynapseBuildFolder { get; private set; }
-        public static string InjectorOutputDirectory { get; private set; }
         public static StreamWriter LocalAdminInputStream { get; private set; }
 
+        private static string SynapseInstallationDirectory;
+        private static string SynapsePluginDirectory;
+        private static string ServerDirectory;
+        private static string AssemblyCSharpDirectory;
+        private static string AssemblyCSharpPath;
+        private static string SynapseBuildFolder;
+        private static string InjectorOutputDirectory;
         private static Process _localAdminProcess;
         private static ProcessStartInfo _localAdminStartInfo;
         private static List<string> _logs;

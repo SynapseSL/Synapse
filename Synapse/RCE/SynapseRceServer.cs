@@ -4,7 +4,6 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Synapse.RCE

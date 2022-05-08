@@ -1,17 +1,11 @@
-﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
-using NUnit.Framework;
-using Synapse.Api;
-using Synapse.Injector;
+﻿using NUnit.Framework;
 using Synapse.RCE;
-using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Synapse.Tests.Regression.Patches.EventsPatches
 {
-    internal class RoundPatchesTests
+    public class RoundPatchesTests
     {
         private SynapseRceClient _client;
 

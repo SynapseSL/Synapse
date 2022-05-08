@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 using FieldAttributes = dnlib.DotNet.FieldAttributes;

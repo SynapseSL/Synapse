@@ -1,15 +1,10 @@
-using dnlib.DotNet;
-using dnlib.DotNet.Emit;
 using NUnit.Framework;
-using Synapse.Injector;
 using Synapse.RCE;
 using Synapse.RCE.Models;
-using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Synapse.Tests.Regression.Patches
+namespace Synapse.Tests.Regression
 {
     public class RceTests
     {

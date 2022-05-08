@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Synapse.Tests
 {
-    internal static class Extensions
+    public static class Extensions
     {
-        internal static IEnumerable<TSource> TakeLast<TSource>(this IReadOnlyList<TSource> source, int count)
+        public static IEnumerable<TSource> TakeLast<TSource>(this IReadOnlyList<TSource> source, int count)
         {
             int sourceCount = source.Count();
             int beginning = sourceCount - 1;
