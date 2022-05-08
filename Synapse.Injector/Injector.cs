@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 using FieldAttributes = dnlib.DotNet.FieldAttributes;
@@ -14,10 +15,12 @@ namespace Synapse.Injector
     public class SynapseInjector
     {
         private bool _writeToDisk;
+        private string _outputPath;
 
-        public SynapseInjector(bool writeToDisk = true)
+        public SynapseInjector(bool writeToDisk = true, string outputPath = null)
         {
             _writeToDisk = writeToDisk;
+            _outputPath = outputPath ?? Path.Combine(Environment.CurrentDirectory + "/Delivery");
         }
 
         public void Start(ModuleDefMD loadModule)
@@ -78,7 +81,7 @@ namespace Synapse.Injector
             }
             if (_writeToDisk)
             {
-                md.Write("./Delivery/Assembly-CSharp-Publicized.dll");
+                md.Write(Path.Combine(_outputPath, "Assembly-CSharp-Publicized.dll"));
                 Console.WriteLine("Wrote Assembly-CSharp-Publicized.dll to Delivery directory");
             }
         }
@@ -87,10 +90,10 @@ namespace Synapse.Injector
             if (!_writeToDisk)
                 return;
 
-            if (!Directory.Exists(Path.Combine(Environment.CurrentDirectory + "/Delivery")))
-                Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory + "/Delivery"));
+            if (!Directory.Exists(_outputPath))
+                Directory.CreateDirectory(_outputPath);
 
-            def.Write("./Delivery/Assembly-CSharp.dll");
+            def.Write(Path.Combine(_outputPath, "Assembly-CSharp.dll"));
             Console.WriteLine("Wrote Assembly-CSharp.dll to Delivery directory");
         }
         private void SwapTypes(ModuleDef a, ModuleDef b, TypeDef type)

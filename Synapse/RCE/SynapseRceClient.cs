@@ -17,17 +17,17 @@ namespace Synapse.RCE
             Port = port;
         }
 
-        public RceResponse ExecuteFromFile(string path, string assemblyName = null)
+        public RceResponse ExecuteFromFile(string path, string assemblyName = null, int? timeout = null)
         {
             var code = File.ReadAllText(path);
-            return ExecuteFromCode(code, assemblyName);
+            return ExecuteFromCode(code, assemblyName, timeout);
         }
-        public async Task<RceResponse> ExecuteFromFileAsync(string path, string assemblyName = null)
+        public async Task<RceResponse> ExecuteFromFileAsync(string path, string assemblyName = null, int? timeout = null)
         {
             var code = File.ReadAllText(path);
             return await ExecuteFromCodeAsync(code, assemblyName);
         }
-        public RceResponse ExecuteFromCode(string code, string assemblyName = null)
+        public RceResponse ExecuteFromCode(string code, string assemblyName = null, int? timeout = null)
         {
             RceResponse retVal = null;
             assemblyName ??= Guid.NewGuid().ToString();
@@ -35,6 +35,11 @@ namespace Synapse.RCE
             {
                 using TcpClient client = new TcpClient();
                 client.Connect(IPAddress.Loopback, Port);
+                if (timeout is { } timeoutVal)
+                {
+                    client.SendTimeout = timeoutVal;
+                    client.ReceiveTimeout = timeoutVal;
+                }
 
                 using var streamWriter = new StreamWriter(client.GetStream());
                 streamWriter.AutoFlush = true;
@@ -61,7 +66,7 @@ namespace Synapse.RCE
             }
             return retVal;
         }
-        public async Task<RceResponse> ExecuteFromCodeAsync(string code, string assemblyName = null)
+        public async Task<RceResponse> ExecuteFromCodeAsync(string code, string assemblyName = null, int? timeout = null)
         {
             RceResponse retVal = null;
             assemblyName ??= Guid.NewGuid().ToString();
@@ -69,6 +74,11 @@ namespace Synapse.RCE
             {
                 using TcpClient client = new TcpClient();
                 await client.ConnectAsync(IPAddress.Loopback, Port);
+                if (timeout is { } timeoutVal)
+                {
+                    client.SendTimeout = timeoutVal;
+                    client.ReceiveTimeout = timeoutVal;
+                }
 
                 using var streamWriter = new StreamWriter(client.GetStream());
                 streamWriter.AutoFlush = true;

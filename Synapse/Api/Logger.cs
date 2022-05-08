@@ -8,50 +8,49 @@ namespace Synapse.Api
 {
     public class Logger
     {
-        #region API
         public static Logger Get => SynapseController.Server.Logger;
-        
+
         internal Logger() { }
 
         public void Info(string message)
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
-            Send($"{name}: {message}", ConsoleColor.Cyan);
+            Send($"[INF] {name}: {message}", ConsoleColor.Cyan);
             SaveMessage(message, MessageType.Info, name);
         }
 
         public void Info(object message)
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
-            Send($"{name}: {message}", ConsoleColor.Cyan);
+            Send($"[INF] {name}: {message}", ConsoleColor.Cyan);
             SaveMessage(message, MessageType.Info, name);
         }
 
         public void Warn(string message)
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
-            Send($"{name}: {message}", ConsoleColor.Green);
+            Send($"[WRN] {name}: {message}", ConsoleColor.Green);
             SaveMessage(message, MessageType.Warn, name);
         }
 
         public void Warn(object message)
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
-            Send($"{name}: {message}", ConsoleColor.Green);
+            Send($"[WRN] {name}: {message}", ConsoleColor.Green);
             SaveMessage(message, MessageType.Warn, name);
         }
 
         public void Error(string message)
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
-            Send($"{name}: {message}", ConsoleColor.Red);
+            Send($"[ERR] {name}: {message}", ConsoleColor.Red);
             SaveMessage(message, MessageType.Error, name);
         }
 
         public void Error(object message)
         {
             var name = Assembly.GetCallingAssembly().GetName().Name;
-            Send($"{name}: {message}", ConsoleColor.Red);
+            Send($"[ERR] {name}: {message}", ConsoleColor.Red);
             SaveMessage(message, MessageType.Error, name);
         }
 
@@ -78,11 +77,11 @@ namespace Synapse.Api
             var save = $"{DateTime.Now} | {name}.dll | {type} | {message}";
             if (logEnabled)
                 File.AppendAllText(Server.Get.Files.LogFile, save + "\n");
-            else if(Server.Get.Configs?.SynapseConfiguration?.LogMessages != false)
+            else if (Server.Get.Configs?.SynapseConfiguration?.LogMessages != false)
                 messages.Add(save);
         }
 
-        #endregion
+
         private List<string> messages = new List<string>();
         private bool logEnabled = false;
 

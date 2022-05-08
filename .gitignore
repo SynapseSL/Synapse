@@ -10,3 +10,5 @@ riderModule.iml
 /Synapse/Api/Events/SynapseEvents.cs
 Synapse.nuspec
 *.nupkg
+TestServer/
+Injector_Output/

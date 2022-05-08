@@ -10,15 +10,15 @@ namespace Synapse.Tests
 {
     public class InjectorTests
     {
+        private const string InjectionTargetName = "InjectionTarget.dll";
         private ModuleDefMD _cleanDataAssembly;
         private ModuleDefMD _injectedDataAssembly;
 
         [SetUp]
         public void Setup()
         {
-            var exampleAssemblyName = "ExampleAssembly.dll";
             var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            var exampleAssemblyDir = Path.Combine(baseDir, "Data", exampleAssemblyName);
+            var exampleAssemblyDir = Path.Combine(baseDir, "Data", InjectionTargetName);
 
             var injector = new SynapseInjector(false);
             _injectedDataAssembly = ModuleDefMD.Load(@exampleAssemblyDir);
