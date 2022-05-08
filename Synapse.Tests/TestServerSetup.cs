@@ -58,8 +58,6 @@ namespace Synapse.Tests
             InjectSynapse();
             CreateLocalSynapseFolders();
             await GenerateConfigs();
-            // Give it 1.5 seconds to boot up and generate configs
-            await Task.Delay(1500);
             ActivateRceConfig();
 
             _localAdminProcess = new Process();
