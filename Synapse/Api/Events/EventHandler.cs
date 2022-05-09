@@ -17,7 +17,26 @@ namespace Synapse.Api.Events
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
             Player.PlayerItemUseEvent += Player_PlayerItemUseEvent;
+            Map.GeneratorEngageEvent += Map_GeneratorEngageEvent;
 #endif
+        }
+
+        private int count = 0;
+
+        private void Map_GeneratorEngageEvent(SynapseEventArguments.GeneratorEngageEventArgs ev)
+        {
+            count++;
+            ev.Allow = false;
+
+            Logger.Get.Debug("ENGAGE");
+            if (count == 51)
+                ev.ResetTime();
+
+            if (count == 100)
+                ev.Deactivate();
+
+            if (count == 200)
+                ev.Deactivate();
         }
 
         private void Player_PlayerItemUseEvent(SynapseEventArguments.PlayerItemInteractEventArgs ev)

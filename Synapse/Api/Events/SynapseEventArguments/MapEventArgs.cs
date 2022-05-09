@@ -90,14 +90,18 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public bool Allow { get; set; } = true;
 
+        internal bool forceDisAllow = false;
+
         public void ResetTime()
         {
+            forceDisAllow = true;
             Generator.generator._currentTime = 0;
             Generator.generator.Network_syncTime = 0;
         }
 
         public void Deactivate(bool resetTime = true)
         {
+            forceDisAllow = true;
             Generator.generator.Activating = false;
             if (resetTime) ResetTime();
         }

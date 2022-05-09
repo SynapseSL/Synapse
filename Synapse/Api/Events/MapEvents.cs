@@ -41,7 +41,7 @@ namespace Synapse.Api.Events
 
             GeneratorEngageEvent?.Invoke(ev);
 
-            allow = ev.Allow;
+            allow = ev.forceDisAllow? false : ev.Allow;
         }
 
         internal void InvokeWarheadStart(Player player, out bool allow)
