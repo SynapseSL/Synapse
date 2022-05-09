@@ -29,7 +29,21 @@ namespace Synapse.Api.Events
 
         public event EventHandler.OnSynapseEvent<WarheadStartDetonationEventArgs> WarheadStartDetonationEvent;
 
+        public event EventHandler.OnSynapseEvent<GeneratorEngageEventArgs> GeneratorEngageEvent;
+
         #region Invoke
+        internal void InvokeGenEngage(Generator generator, out bool allow)
+        {
+            var ev = new GeneratorEngageEventArgs
+            {
+                Generator = generator,
+            };
+
+            GeneratorEngageEvent?.Invoke(ev);
+
+            allow = ev.Allow;
+        }
+
         internal void InvokeWarheadStart(Player player, out bool allow)
         {
             var ev = new WarheadStartDetonationEventArgs

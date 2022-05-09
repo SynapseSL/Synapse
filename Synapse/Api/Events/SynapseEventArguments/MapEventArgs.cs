@@ -83,4 +83,23 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Nuke Nuke => Nuke.Get;
         public bool Allow { get; set; } = true;
     }
+
+    public class GeneratorEngageEventArgs : EventHandler.ISynapseEventArgs
+    {
+        public Generator Generator { get; internal set; }
+
+        public bool Allow { get; set; } = true;
+
+        public void ResetTime()
+        {
+            Generator.generator._currentTime = 0;
+            Generator.generator.Network_syncTime = 0;
+        }
+
+        public void Deactivate(bool resetTime = true)
+        {
+            Generator.generator.Activating = false;
+            if (resetTime) ResetTime();
+        }
+    }
 }

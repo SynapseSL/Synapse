@@ -92,6 +92,7 @@
     <Compile Include="Api\Items\ThrowableAPI.cs" />
     <Compile Include="Api\Locker.cs" />
     <Compile Include="Api\LockerChamber.cs" />
+    <Compile Include="Patches\EventsPatches\MapPatches\GeneratorEngagePatch.cs" />
     <Compile Include="RCE\RceHandler.cs" />
     <Compile Include="RCE\Models\RceStatus.cs" />
     <Compile Include="RCE\SynapseRceClient.cs" />
