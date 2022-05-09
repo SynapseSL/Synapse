@@ -417,7 +417,8 @@ mkdir $(ProjectDir)bin\Synapse\dependencies
 
 xcopy $(TargetDir)*.dll $(ProjectDir)bin\Synapse\dependencies
 
-move $(ProjectDir)bin\Synapse\dependencies\Synapse.dll $(ProjectDir)bin\Synapse</PostBuildEvent>
+move $(ProjectDir)bin\Synapse\dependencies\Synapse.dll $(ProjectDir)bin\Synapse
+</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.

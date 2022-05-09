@@ -17,6 +17,7 @@ namespace Synapse.Tests.Injector
         [SetUp]
         public void Setup()
         {
+            // Replace with TestContext.CurrentContext.TestDirectory at some point
             var baseDir = AppDomain.CurrentDomain.BaseDirectory;
             var exampleAssemblyDir = Path.Combine(baseDir, "Data", InjectionTargetName);
 
@@ -31,7 +32,7 @@ namespace Synapse.Tests.Injector
         {
             foreach (var type in _injectedDataAssembly.Types)
             {
-                var events = type.Events.Select(_ => _.Name).ToArray();
+                var events = type.Events.Select(_ => _.Name).ToList();
                 // Fields
                 foreach (var field in type.Fields)
                 {
@@ -39,21 +40,21 @@ namespace Synapse.Tests.Injector
                     // wenn kein Event backing-field
                     if (!isEventBackingField)
                     {
-                        Assert.That(field.IsPublic);
+                        Assert.IsTrue(field.IsPublic);
                     }
                 }
                 // Methods
                 foreach (var method in type.Methods)
                 {
-                    Assert.That(method.IsPublic);
+                    Assert.IsTrue(method.IsPublic);
                 }
                 // Properties, getters & setters
                 foreach (var method in type.Properties)
                 {
                     if (method.SetMethod is not null)
-                        Assert.That(method.SetMethod.IsPublic);
+                        Assert.IsTrue(method.SetMethod.IsPublic);
                     if (method.GetMethod is not null)
-                        Assert.That(method.GetMethod.IsPublic);
+                        Assert.IsTrue(method.GetMethod.IsPublic);
                 }
             }
         }

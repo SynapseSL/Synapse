@@ -47,11 +47,8 @@ namespace Synapse.Tests
                 FileName = Path.Combine(ServerDirectory, "localadmin.exe"),
                 Arguments = "7777",
                 WorkingDirectory = ServerDirectory,
-                //WorkingDirectory = ServerDirectory,
                 RedirectStandardInput = true,
                 UseShellExecute = false,
-                //CreateNoWindow = false,
-                //WindowStyle = ProcessWindowStyle.Normal,
                 RedirectStandardOutput = true
             };
             DownloadSlServer();
@@ -110,16 +107,7 @@ namespace Synapse.Tests
                 injector.Start(assembly);
                 assembly.Dispose();
 
-                // Throws without admin
                 File.Delete(AssemblyCSharpPath);
-                // So, just rename and move it to something and somewhere trivial, to not be in the way
-
-                //var testDirectoryInfo = new DirectoryInfo(TestContext.CurrentContext.TestDirectory);
-                //var filePath = Path.Combine(testDirectoryInfo.FullName, "d.s");
-                //
-                //File.Delete(filePath);
-
-                //File.Move(AssemblyCSharpPath, filePath);
                 File.Move(Path.Combine(InjectorOutputDirectory, "Assembly-CSharp.dll"), AssemblyCSharpPath);
             }
             void DownloadSlServer()
