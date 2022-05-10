@@ -1,4 +1,4 @@
-﻿using Synapse.Api.Enum;
+using Synapse.Api.Enum;
 using Synapse.Api.Events.SynapseEventArguments;
 using UnityEngine;
 
@@ -279,8 +279,6 @@ namespace Synapse.Api.Events
 
             public event EventHandler.OnSynapseEvent<Scp173PlaceTantrumEventArgs> Scp173PlaceTantrum;
 
-            public event EventHandler.OnSynapseEvent<Scp173BreakNeckEventArgs> Scp173BreakNeckEvent;
-
             internal void InvokeScp173PlaceTantrumEvent(Player scp173, out bool allow)
             {
                 var ev = new Scp173PlaceTantrumEventArgs()
@@ -306,13 +304,6 @@ namespace Synapse.Api.Events
                 allow = ev.Allow;
                 pos = ev.Position;
             }
-
-            internal void InvokeScp173BreakNeckEvent(Player scp173, out bool allow)
-            {
-                Scp173BreakNeckEventArgs ev = new Scp173BreakNeckEventArgs { Scp173 = scp173 };
-                Scp173BreakNeckEvent?.Invoke(ev);
-                allow = ev.Allow;
-            }
         }
 
         public class Scp049Events
@@ -337,7 +328,7 @@ namespace Synapse.Api.Events
             }
         }
 
-        internal void InvokeScpAttack(Player scp, Player target, ScpAttackType attackType, out bool allow)
+        internal void InvokeScpAttack(Player scp, Player target, Enum.ScpAttackType attackType, out bool allow)
         {
             var ev = new ScpAttackEventArgs
             {
