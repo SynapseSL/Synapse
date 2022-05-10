@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace Synapse.Api.Events.SynapseEventArguments
 {
@@ -66,14 +66,6 @@ namespace Synapse.Api.Events.SynapseEventArguments
     }
 
     public class Scp173PlaceTantrumEventArgs : EventHandler.ISynapseEventArgs
-    {
-        public Player Scp173 { get; internal set; }
-
-        public bool Allow { get; set; } = true;
-    }
-
-    // I thought I could combine both but I'll you guys do it if you wan to
-    public class Scp173BreakNeckEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Scp173 { get; internal set; }
 
