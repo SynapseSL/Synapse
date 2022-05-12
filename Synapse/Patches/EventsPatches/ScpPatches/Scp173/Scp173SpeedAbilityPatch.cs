@@ -4,10 +4,10 @@ using HarmonyLib;
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp173
 {
     [HarmonyPatch(typeof(PlayableScps.Scp173), nameof(PlayableScps.Scp173.ServerDoBreakneckSpeeds))]
-    internal static class Scp173BreackNeckPatch
+    internal static class Scp173SpeedAbilityPatch
     {
         [HarmonyPrefix]
-        private static bool ServerScp173BreackNeckPatch(PlayableScps.Scp173 __instance)
+        private static bool ServerScp173SpeedAbilityPatch(PlayableScps.Scp173 __instance)
         {
             try
             {
