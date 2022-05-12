@@ -279,7 +279,7 @@ namespace Synapse.Api.Events
 
             public event EventHandler.OnSynapseEvent<Scp173PlaceTantrumEventArgs> Scp173PlaceTantrum;
 
-            public event EventHandler.OnSynapseEvent<Scp173BreakNeckEventArgs> Scp173BreakNeckEvent;
+            public event EventHandler.OnSynapseEvent<Scp173SpeedAbilityEventArgs> Scp173SpeedAbilityEvent;
 
             internal void InvokeScp173PlaceTantrumEvent(Player scp173, out bool allow)
             {
@@ -307,10 +307,10 @@ namespace Synapse.Api.Events
                 pos = ev.Position;
             }
 
-            internal void InvokeScp173BreakNeckEvent(Player scp173, out bool allow)
+            internal void InvokeScp173SpeedAbilityEvent(Player scp173, out bool allow)
             {
-                Scp173BreakNeckEventArgs ev = new Scp173BreakNeckEventArgs { Scp173 = scp173 };
-                Scp173BreakNeckEvent?.Invoke(ev);
+                Scp173SpeedAbilityEventArgs ev = new Scp173SpeedAbilityEventArgs { Scp173 = scp173 };
+                Scp173SpeedAbilityEvent?.Invoke(ev);
                 allow = ev.Allow;
             }
         }
