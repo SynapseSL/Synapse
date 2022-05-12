@@ -1,7 +1,7 @@
 ﻿namespace Synapse.Api.Enum
 {
     public enum AmbientSound
-    {// 
+    {
         PowerEngaged = 0,
         HeavyObjectFall = 1,
         Tile = 2,

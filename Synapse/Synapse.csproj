@@ -411,6 +411,16 @@
   <Import Project="..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\build\Microsoft.CodeAnalysis.Analyzers.targets" Condition="Exists('..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\build\Microsoft.CodeAnalysis.Analyzers.targets')" />
   <PropertyGroup>
     <PostBuildEvent>
+      <PostBuildEvent>IF EXIST $(ProjectDir)bin\Synapse (
+@RD /S /Q $(ProjectDir)bin\Synapse
+)
+
+mkdir $(ProjectDir)bin\Synapse\dependencies
+
+xcopy $(TargetDir)*.dll $(ProjectDir)bin\Synapse\dependencies
+
+move $(ProjectDir)bin\Synapse\dependencies\Synapse.dll $(ProjectDir)bin\Synapse
+</PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
