@@ -90,6 +90,19 @@ namespace Synapse.Api
 
         public int Seed => MapGeneration.SeedSynchronizer.Seed;
 
+        public void PlayAmbientSound(AmbientSound id)
+            => Server.Get.Host.GetComponent<AmbientSoundPlayer>().RpcPlaySound((int)id);
+
+
+        /// <returns>1 activated <see cref="Generator"/> gives 1000 volts</returns>
+        public int GetVoltage()
+        {
+            float totalvoltagefloat = 0;
+            foreach (var generator in Generators)
+                totalvoltagefloat += generator.generator._currentTime / generator.generator._totalActivationTime * 1000;
+            return (int)totalvoltagefloat;
+        }
+
         public Room GetRoom(RoomName roomType)
             => Rooms.FirstOrDefault(x => x.RoomType == roomType);
 
@@ -122,8 +135,11 @@ namespace Synapse.Api
         });
 
         public void Cassie(string words, bool makehold = true, bool makenoise = true)
-            => Respawning.RespawnEffectsController.PlayCassieAnnouncement(words, makehold, makenoise);
+            => Respawning.RespawnEffectsController.PlayCassieAnnouncement(words, makehold, makenoise, false);
 
+        public void SubtitleCassie(string words, bool makehold = true, bool makenoise = true)
+            => Respawning.RespawnEffectsController.PlayCassieAnnouncement(words, makehold, makenoise, true);
+        
         public void GlitchedCassie(string words)
         {
             float num2 = (AlphaWarheadController.Host.timeToDetonation <= 0f) ? 3.5f : 1f;

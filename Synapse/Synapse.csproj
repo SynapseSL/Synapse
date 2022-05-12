@@ -64,6 +64,7 @@
     <Compile Include="Api\CustomObjects\SynapseObjectScript.cs" />
     <Compile Include="Api\CustomObjects\SynapseRagdollObject.cs" />
     <Compile Include="Api\CustomObjects\SynapseWorkStationObject.cs" />
+    <Compile Include="Api\Enum\AmbientSound.cs" />
     <Compile Include="Api\Enum\MenuType.cs" />
     <Compile Include="Api\Enum\MessageType.cs" />
     <Compile Include="Api\Enum\ObjectType.cs" />
@@ -409,7 +410,8 @@
   </Target>
   <Import Project="..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\build\Microsoft.CodeAnalysis.Analyzers.targets" Condition="Exists('..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.3\build\Microsoft.CodeAnalysis.Analyzers.targets')" />
   <PropertyGroup>
-    <PostBuildEvent>IF EXIST $(ProjectDir)bin\Synapse (
+    <PostBuildEvent>
+      <PostBuildEvent>IF EXIST $(ProjectDir)bin\Synapse (
 @RD /S /Q $(ProjectDir)bin\Synapse
 )
 
@@ -419,6 +421,7 @@ xcopy $(TargetDir)*.dll $(ProjectDir)bin\Synapse\dependencies
 
 move $(ProjectDir)bin\Synapse\dependencies\Synapse.dll $(ProjectDir)bin\Synapse
 </PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.
