@@ -11,12 +11,12 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp173
         {
             try
             {
-                SynapseController.Server.Events.Scp.Scp173.InvokeScp173BreakNeckEvent(__instance.GetPlayer(), out bool allow);
+                SynapseController.Server.Events.Scp.Scp173.InvokeScp173SpeedAbilityEvent(__instance.GetPlayer(), out bool allow);
                 return allow;
             }
             catch(Exception e)
             {
-                Api.Logger.Get.Error($"Synapse-Event: Scp173BreackNeckPatch(Scp173) failed!!\n{e}");
+                Api.Logger.Get.Error($"Synapse-Event: Scp173SpeedAbilityPatch(Scp173) failed!!\n{e}");
                 return true;
             }
         }
