@@ -93,6 +93,8 @@ namespace Synapse.Api
         public void PlayAmbientSound(AmbientSound id)
             => Server.Get.Host.GetComponent<AmbientSoundPlayer>().RpcPlaySound((int)id);
 
+
+        /// <returns>1 activated <see cref="Generator"/> gives 1000 volts</returns>
         public int GetVoltage()
         {
             float totalvoltagefloat = 0;
