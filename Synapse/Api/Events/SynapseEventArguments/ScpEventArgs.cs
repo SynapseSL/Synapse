@@ -72,8 +72,8 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; } = true;
     }
 
-    // I thought I could combine both but I'll you guys do it if you wan to
-    public class Scp173BreakNeckEventArgs : EventHandler.ISynapseEventArgs
+    // I thought I could combine both but I'll let you guys do it if you want to
+    public class Scp173SpeedAbilityEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Scp173 { get; internal set; }
 
