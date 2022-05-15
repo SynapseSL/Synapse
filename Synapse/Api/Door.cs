@@ -20,7 +20,7 @@ namespace Synapse.Api
 
         public vDoor VDoor { get; internal set; }
 
-        public GameObject GameObject => VDoor.gameObject;
+        public GameObject GameObject => VDoor?.gameObject;
 
         private string name;
         public string Name

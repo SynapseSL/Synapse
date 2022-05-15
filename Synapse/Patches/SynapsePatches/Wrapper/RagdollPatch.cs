@@ -19,7 +19,10 @@ namespace Synapse.Patches.SynapsePatches.Wrapper
 		    if (model_ragdoll == null || !Object.Instantiate(model_ragdoll).TryGetComponent<Ragdoll>(out var ragdoll)) return false;
 
 		    ragdoll.NetworkInfo = new RagdollInfo(hub, handler, model_ragdoll.transform.localPosition, model_ragdoll.transform.localRotation);
-		    NetworkServer.Spawn(ragdoll.gameObject);
+			//Size the ragdoll to the size of the player
+			ragdoll.transform.localScale = hub.transform.localScale;
+			ragdoll.netIdentity.UpdatePositionRotationScale();
+			NetworkServer.Spawn(ragdoll.gameObject);
 		    
 		    Map.Get.Ragdolls.Add(new Synapse.Api.Ragdoll(ragdoll));
 		    return false;

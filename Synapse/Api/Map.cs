@@ -107,7 +107,7 @@ namespace Synapse.Api
             => Rooms.FirstOrDefault(x => x.RoomType == roomType);
 
         public Door GetDoor(Enum.DoorType doorType)
-            => Doors.FirstOrDefault(x => x.DoorType == doorType);
+            => Doors.FirstOrDefault(x => x?.DoorType == doorType);
 
         public Elevator GetElevator(Enum.ElevatorType elevatorType)
             => Elevators.FirstOrDefault(x => x.ElevatorType == elevatorType);
