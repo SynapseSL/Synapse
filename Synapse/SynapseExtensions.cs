@@ -292,6 +292,21 @@ public static class SynapseExtensions
         NetworkServer.SendToAll(msg);
     }
 
+    public static bool ExecuteSafely(this Action action, string errorMsg = "failed to execute code")
+    {
+        try
+        {
+            action();
+            return true;
+        }
+        catch(Exception ex)
+        {
+            var name = Assembly.GetCallingAssembly()?.GetName()?.Name;
+            Synapse.Api.Logger.Get.Send($"[ERR] {name}: {errorMsg}\n" + ex, ConsoleColor.Red);
+            return false;
+        }
+    }
+
     [Obsolete("Use SynapseExtensions.CanHarmScp() and check if it is false")]
     public static bool CanNotHurtByScp(Player player) => !CanHarmScp(player, false);
 }

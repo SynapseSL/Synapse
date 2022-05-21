@@ -1,4 +1,5 @@
-﻿using static Synapse.Api.Events.EventHandler;
+﻿using System;
+using static Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Api.CustomObjects.CustomAttributes
 {
@@ -22,7 +23,7 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
                     if (attribute == null) continue;
 
                     var args = attribute.Split(':');
-                    if (args[0].ToLower() != handler.Name.ToLower()) continue;
+                    if (args[0].Equals(handler.Name, StringComparison.InvariantCultureIgnoreCase)) continue;
                     var newargs = args.Segment(1);
 
                     handler.SynapseObjects.Add(ev.Object);

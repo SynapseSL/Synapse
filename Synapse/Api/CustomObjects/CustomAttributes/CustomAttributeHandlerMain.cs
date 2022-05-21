@@ -34,7 +34,7 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
 
                 if (!(handlerobject is AttributeHandler handler)) return;
                 if (string.IsNullOrWhiteSpace(handler.Name)) return;
-                if (Handlers.Any(x => x.Name.ToLower() == handler.Name.ToLower())) return;
+                if (Handlers.Any(x => x.Name.Equals(handler.Name, StringComparison.InvariantCultureIgnoreCase))) return;
 
                 Handlers.Add(handler);
                 handler.Init();
