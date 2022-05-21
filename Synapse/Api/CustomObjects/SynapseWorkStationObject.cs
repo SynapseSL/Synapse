@@ -44,6 +44,11 @@ namespace Synapse.Api.CustomObjects
         public override GameObject GameObject => WorkStation.GameObject;
         public override NetworkIdentity NetworkIdentity => WorkStation.workStation.netIdentity;
         public override ObjectType Type => ObjectType.Workstation;
+        public override void Destroy()
+        {
+            Map.Get.WorkStations.Remove(WorkStation);
+            base.Destroy();
+        }
 
 
         public WorkStation WorkStation { get; }

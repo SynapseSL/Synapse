@@ -32,6 +32,12 @@ namespace Synapse.Api.CustomObjects
         public override GameObject GameObject => Generator.GameObject;
         public override NetworkIdentity NetworkIdentity => Generator.generator.netIdentity;
         public override ObjectType Type => ObjectType.Generator;
+        public override void Destroy()
+        {
+            //The Generator will add itself on first Start to Map.Generators
+            Map.Get.Generators.Remove(Generator);
+            base.Destroy();
+        }
 
         public Generator Generator { get; }
     }
