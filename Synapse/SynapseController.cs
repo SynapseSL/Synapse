@@ -35,15 +35,15 @@ public class SynapseController
 
         try
         {
-            Server.Configs.Init();
-            Server.PermissionHandler.Init();
-            Server.RoleManager.Init();
-            Server.Schematic.Init();
-            Server.RceHandler.Init();
-            CommandHandlers.RegisterSynapseCommands();
-            PluginLoader.ActivatePlugins();
-            Server.Logger.Refresh();
-            Server.RceHandler.Reload();
+            TryInit(() => Server.Configs.Init(), "Initialising Configs failed");
+            TryInit(() => Server.PermissionHandler.Init(), "Initialising Permissions failed");
+            TryInit(() => Server.RoleManager.Init(), "Initialising Roles failed");
+            TryInit(() => Server.Schematic.Init(), "Initialising Schematics failed");
+            TryInit(() => Server.RceHandler.Init(), "Initialising RCE failed");
+            TryInit(() => CommandHandlers.RegisterSynapseCommands(), "Initialising SynapseCommands failed");
+            TryInit(() => PluginLoader.ActivatePlugins(), "Initialising Plugins failed");
+            TryInit(() => Server.Logger.Refresh(), "Initialising Logger File failed");
+            TryInit(() => Server.RceHandler.Reload(), "Reloading RCE failed. Try updating your dependencies");
         }
         catch (Exception e)
         {
@@ -52,6 +52,18 @@ public class SynapseController
         }
 
         Server.Logger.Info("Synapse is now ready!");
+    }
+
+    private void TryInit(Action init, string msg)
+    {
+        try
+        {
+            init();
+        }
+        catch(Exception ex)
+        {
+            Server.Logger.Error("Synapse-Loader: " + msg + "\n" + ex);
+        }
     }
 
     private void PatchMethods()

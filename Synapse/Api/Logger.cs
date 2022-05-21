@@ -74,11 +74,19 @@ namespace Synapse.Api
 
         public void SaveMessage(object message, MessageType type, string name)
         {
-            var save = $"{DateTime.Now} | {name}.dll | {type} | {message}";
-            if (logEnabled)
-                File.AppendAllText(Server.Get.Files.LogFile, save + "\n");
-            else if (Server.Get.Configs?.SynapseConfiguration?.LogMessages != false)
-                messages.Add(save);
+            try
+            {
+                var save = $"{DateTime.Now} | {name}.dll | {type} | {message}";
+
+                if (logEnabled)
+                    File.AppendAllText(Server.Get.Files.LogFile, save + "\n");
+                else if (Server.Get.Configs?.SynapseConfiguration?.LogMessages != false)
+                    messages.Add(save);
+            }
+            catch(Exception ex)
+            {
+                Send($"[ERR] Synapse-Logger: Saving the last log into a file failed:\n{ex}", ConsoleColor.Red);
+            }
         }
 
 

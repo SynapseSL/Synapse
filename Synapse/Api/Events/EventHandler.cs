@@ -16,39 +16,7 @@ namespace Synapse.Api.Events
             Server.UpdateEvent += OnUpdate;
 #if DEBUG
             Player.PlayerKeyPressEvent += KeyPress;
-            Player.PlayerItemUseEvent += Player_PlayerItemUseEvent;
-            Map.GeneratorEngageEvent += Map_GeneratorEngageEvent;
 #endif
-        }
-
-        private int count = 0;
-
-        private void Map_GeneratorEngageEvent(SynapseEventArguments.GeneratorEngageEventArgs ev)
-        {
-            count++;
-            ev.Allow = false;
-
-            Logger.Get.Debug("ENGAGE");
-            if (count == 51)
-                ev.ResetTime();
-
-            if (count == 100)
-                ev.Deactivate();
-
-            if (count == 200)
-                ev.Deactivate();
-        }
-
-        private void Player_PlayerItemUseEvent(SynapseEventArguments.PlayerItemInteractEventArgs ev)
-        {
-            if (ev.CurrentItem.ItemType == ItemType.SCP018 && ev.State == SynapseEventArguments.ItemInteractState.Initiating)
-                ev.Allow = false;
-
-            if (ev.CurrentItem.ItemType == ItemType.GrenadeHE && ev.State == SynapseEventArguments.ItemInteractState.Finalizing)
-                ev.Allow = false;
-
-            if (ev.CurrentItem.ItemType == ItemType.GrenadeFlash && ev.State == SynapseEventArguments.ItemInteractState.Stopping)
-                ev.Allow = false;
         }
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
@@ -56,61 +24,7 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    var schematic = SchematicHandler.Get.SpawnSchematic(new SynapseSchematic()
-                    {
-                        PrimitiveObjects = new List<SynapseSchematic.PrimitiveConfiguration>
-                        {
-                            new SynapseSchematic.PrimitiveConfiguration
-                            {
-                                PrimitiveType = PrimitiveType.Cube,
-                                Scale = new SerializedVector3(1f,2f,0.01f),
-                                Position = Vector3.zero,
-                                Rotation = Quaternion.identity,
-                                Color = Color.white
-                                
-                            }
-                        },
-                        CustomAttributes = new List<string>
-                        {
-                            "MapTeleporter:1:Outside:0:-45:0"
-                        }
-                    }, ev.Player.Position);
-                    break;
-
-                case KeyCode.Alpha2:
-                    Items.ItemManager.Get.SetSchematicForVanillaItem(ItemType.Coin, new SynapseSchematic
-                    {
-                        PrimitiveObjects = new List<SynapseSchematic.PrimitiveConfiguration>
-                        {
-                            new SynapseSchematic.PrimitiveConfiguration
-                            {
-                                PrimitiveType = PrimitiveType.Sphere,
-                                Color = Color.blue,
-                                Position = Vector3.zero,
-                                Rotation = Quaternion.identity,
-                                Scale = Vector3.one * 0.1f,
-                            },
-                           
-                        },
-                        ItemObjects = new List<SynapseSchematic.ItemConfiguration>
-                        {
-                            new SynapseSchematic.ItemConfiguration
-                            {
-                                ItemType = ItemType.Medkit,
-                                CanBePickedUp = true,
-                                Rotation = Quaternion.identity,
-                                Scale = Vector3.one * 0.5f,
-                                Position = Vector3.up * 0.7f,
-                                Attachments = 0,
-                                Durabillity = 0,
-                            }
-                        }
-                    });
-                    break;
-
-                case KeyCode.Alpha3:
-                    var turret = new Turret(ev.Player.Position);
-                    turret.ShootAutomatic = true;
+                    
                     break;
             }
         }
