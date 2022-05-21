@@ -258,7 +258,7 @@ namespace Synapse
                     return player;
             }
 
-            return players.FirstOrDefault(x => x.NickName.ToLower() == argument.ToLower());
+            return players.FirstOrDefault(x => x.NickName.Equals(argument, StringComparison.OrdinalIgnoreCase));
         }
 
         public Player GetPlayer(int playerid)

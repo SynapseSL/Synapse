@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Synapse.Command.Commands
@@ -45,11 +46,11 @@ namespace Synapse.Command.Commands
 
             if (context.Arguments.Count > 0 && !string.IsNullOrWhiteSpace(context.Arguments.First()))
             {
-                var command = commandlist.FirstOrDefault(x => x.Name.ToLower() == context.Arguments.First());
+                var command = commandlist.FirstOrDefault(x => x.Name.Equals(context.Arguments.First(), StringComparison.OrdinalIgnoreCase));
 
                 if (command == null)
                 {
-                    foreach (ICommand c in commandlist.Where(c => c.Aliases.FirstOrDefault(i => i.ToLower() == context.Arguments.First()) != null))
+                    foreach (ICommand c in commandlist.Where(c => c.Aliases.Any(alias => alias.Equals(context.Arguments.First(), StringComparison.OrdinalIgnoreCase))))
                     {
                         command = c;
                     }

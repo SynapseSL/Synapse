@@ -32,7 +32,7 @@ namespace Synapse.Api.Roles
 
         public IRole GetCustomRole(string name)
         {
-            var roleinformation = CustomRoles.FirstOrDefault(x => x.Name.ToLower() == name.ToLower());
+            var roleinformation = CustomRoles.FirstOrDefault(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
 
             if(roleinformation == null)
                 throw new SynapseRoleNotFoundException("A Role was requested that is not registered in Synapse.Please check your configs and plugins", name);

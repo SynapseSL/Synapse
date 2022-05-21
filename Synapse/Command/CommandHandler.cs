@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Synapse.Command
@@ -25,7 +26,7 @@ namespace Synapse.Command
             if (string.IsNullOrWhiteSpace(command.Name))
                 return false;
 
-            if (commands.Any(x => x.Key == command.Name.ToLower()))
+            if (commands.Any(x => x.Key.Equals(command.Name, StringComparison.InvariantCultureIgnoreCase)))
             {
                 Synapse.Api.Logger.Get.Warn($"Command {command.Name} was registered twice");
                 return false;
