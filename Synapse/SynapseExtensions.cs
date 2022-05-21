@@ -60,10 +60,8 @@ public static class SynapseExtensions
 
     public static Generator GetGenerator(this Scp079Generator generator079) => Map.Get.Generators.FirstOrDefault(x => x?.GameObject == generator079.gameObject);
 
-    public static Door GetDoor(this Interactables.Interobjects.DoorUtils.DoorVariant door)
-    {
-        return Map.Get.Doors.FirstOrDefault(x => x.VDoor != null && x.GameObject == door.gameObject);
-    }
+    public static Door GetDoor(this Interactables.Interobjects.DoorUtils.DoorVariant door) => Map.Get.Doors.FirstOrDefault(x => x.VDoor != null && x.GameObject == door.gameObject);
+    
 
     public static Tesla GetTesla(this TeslaGate teslaGate) => Map.Get.Teslas.FirstOrDefault(x => x.GameObject == teslaGate.gameObject);
 
@@ -75,7 +73,7 @@ public static class SynapseExtensions
 
     public static Synapse.Api.Locker GetLocker(this MapGeneration.Distributors.Locker locker) => Map.Get.Lockers.FirstOrDefault(x => x.locker != null && x.GameObject == locker.gameObject);
 
-    public static Synapse.Api.Ragdoll GetRagdoll(this Ragdoll rag) => Map.Get.Ragdolls.FirstOrDefault(x => x.ragdoll == null && x.ragdoll == rag);
+    public static Synapse.Api.Ragdoll GetRagdoll(this Ragdoll rag) => Map.Get.Ragdolls.FirstOrDefault(x => x.ragdoll != null && x.ragdoll == rag);
 
     public static List<Vector3> GetSpawnPoints(this RoleType role)
     {

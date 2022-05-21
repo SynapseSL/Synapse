@@ -21,7 +21,6 @@ namespace Synapse.Patches.SynapsePatches.Wrapper
 		    ragdoll.NetworkInfo = new RagdollInfo(hub, handler, model_ragdoll.transform.localPosition, model_ragdoll.transform.localRotation);
 			//Size the ragdoll to the size of the player
 			ragdoll.transform.localScale = hub.transform.localScale;
-			ragdoll.netIdentity.UpdatePositionRotationScale();
 			NetworkServer.Spawn(ragdoll.gameObject);
 		    
 		    Map.Get.Ragdolls.Add(new Synapse.Api.Ragdoll(ragdoll));
