@@ -33,23 +33,15 @@ public class SynapseController
 
         PatchMethods();
 
-        try
-        {
-            TryInit(() => Server.Configs.Init(), "Initialising Configs failed");
-            TryInit(() => Server.PermissionHandler.Init(), "Initialising Permissions failed");
-            TryInit(() => Server.RoleManager.Init(), "Initialising Roles failed");
-            TryInit(() => Server.Schematic.Init(), "Initialising Schematics failed");
-            TryInit(() => Server.RceHandler.Init(), "Initialising RCE failed");
-            TryInit(() => CommandHandlers.RegisterSynapseCommands(), "Initialising SynapseCommands failed");
-            TryInit(() => PluginLoader.ActivatePlugins(), "Initialising Plugins failed");
-            TryInit(() => Server.Logger.Refresh(), "Initialising Logger File failed");
-            TryInit(() => Server.RceHandler.Reload(), "Reloading RCE failed. Try updating your dependencies");
-        }
-        catch (Exception e)
-        {
-            Server.Logger.Error($"Error while Initialising Synapse! Please fix the Issue and restart your Server:\n{e}");
-            return;
-        }
+        TryInit(Server.Configs.Init, "Initialising Configs failed");
+        TryInit(Server.PermissionHandler.Init, "Initialising Permissions failed");
+        TryInit(Server.RoleManager.Init, "Initialising Roles failed");
+        TryInit(Server.Schematic.Init, "Initialising Schematics failed");
+        TryInit(Server.RceHandler.Init, "Initialising RCE failed");
+        TryInit(CommandHandlers.RegisterSynapseCommands, "Initialising SynapseCommands failed");
+        TryInit(PluginLoader.ActivatePlugins, "Initialising Plugins failed");
+        TryInit(Server.Logger.Refresh, "Initialising Logger File failed");
+        TryInit(Server.RceHandler.Reload, "Reloading RCE failed. Try updating your dependencies");
 
         Server.Logger.Info("Synapse is now ready!");
     }
@@ -60,7 +52,7 @@ public class SynapseController
         {
             init();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Server.Logger.Error("Synapse-Loader: " + msg + "\n" + ex);
         }
