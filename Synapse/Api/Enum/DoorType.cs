@@ -42,6 +42,15 @@
         EZ_Door,
         PrisonDoor,
         Airlock,
-        Other
+        Other,
+
+
+
+        [System.Obsolete("012 is no longer in the game", true)]
+        LCZ_012 = 0,
+        [System.Obsolete("012 is no longer in the game", true)]
+        LCZ_012_Bottom = 1,
+        [System.Obsolete("012 is no longer in the game", true)]
+        LCZ_012_Locker = 2,
     }
 }

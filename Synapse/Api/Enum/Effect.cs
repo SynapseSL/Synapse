@@ -7,6 +7,8 @@
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Amnesia,
+        [System.Obsolete("ArtificialRegen is no longer in the game", true)]
+        ArtificialRegen,
         /// <summary>
         /// Quickly drains stamina then health if there is none left
         /// </summary>
@@ -51,6 +53,10 @@
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Disabled,
+        [System.Obsolete("Disarmed is no longer in the game", true)]
+        Disarmed,
+        [System.Obsolete("Discharge is no longer in the game", true)]
+        Discharge,
         /// <summary>
         /// Prevents all movement
         /// </summary>
@@ -61,6 +67,8 @@
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Exhausted,
+        [System.Obsolete("Exsanguination is no longer in the game", true)]
+        Exsanguination,
         /// <summary>
         /// Flash the Player
         /// </summary>
@@ -71,6 +79,8 @@
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Hemorrhage,
+        [System.Obsolete("Panic is no longer in the game", true)]
+        Panic,
         /// <summary>
         /// Infinite stamina
         /// </summary>
@@ -86,6 +96,10 @@
         /// </summary>
         /// <remarks>0 = Disabled, 1 = 1xCola, 2 = 2xCola, 3 = 3xCola, 4 = 4xCola</remarks>
         Scp207,
+        /// use <see cref="Invisible"/>
+        /// </summary>
+        [System.Obsolete("Scp268 effect is no longer in the game, use Invisible", true)]
+        Scp268,
         /// <summary>
         /// Slows down player (No effect on SCPs)
         /// </summary>
