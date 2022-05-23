@@ -9,9 +9,10 @@ namespace Synapse.Api.CustomObjects
     {
         public static PrimitiveObjectToy Prefab { get; internal set; }
 
-        public SynapsePrimitiveObject(PrimitiveType primitiveType, Vector3 position) : this(primitiveType, Color.white, position, Quaternion.identity, Vector3.one, false) { }
+        public SynapsePrimitiveObject(PrimitiveType primitiveType, Vector3 position) :
+            this(primitiveType, Color.white, position, Quaternion.identity, Vector3.one, false) { }
 
-        public SynapsePrimitiveObject(PrimitiveType primitiveType,Color color, Vector3 position, Quaternion rotation, Vector3 scale, bool applyPhyics)
+        public SynapsePrimitiveObject(PrimitiveType primitiveType, Color color, Vector3 position, Quaternion rotation, Vector3 scale, bool applyPhyics)
         {
             ToyBase = CreatePrimitive(primitiveType, color, position, rotation, scale);
             if (applyPhyics) ApplyPhysics();
@@ -37,7 +38,7 @@ namespace Synapse.Api.CustomObjects
 
         private PrimitiveObjectToy CreatePrimitive(PrimitiveType primitiveType, Color color, Vector3 position, Quaternion rotation, Vector3 scale)
         {
-            var ot = UnityEngine.Object.Instantiate(Prefab, position, rotation);
+            var ot = Object.Instantiate(Prefab, position, rotation);
             NetworkServer.Spawn(ot.gameObject);
             ot.NetworkPrimitiveType = primitiveType;
             ot.NetworkMaterialColor = color;

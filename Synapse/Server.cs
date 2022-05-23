@@ -20,43 +20,42 @@ namespace Synapse
 {
     public class Server
     {
-        internal Server()
-        {
-        }
+        internal Server() { }
 
         public static Server Get => SynapseController.Server;
 
         //Synapse Api
-        public Logger Logger { get; } = new Logger();
+        public Logger Logger { get; } = new(); //maybe better use "readonly"?
 
-        public Map Map { get; } = new Map();
+        public Map Map { get; } = new();
 
-        public FileLocations Files { get; } = new FileLocations();
+        public FileLocations Files { get; } = new();
 
-        public EventHandler Events { get; } = new EventHandler();
+        public EventHandler Events { get; } = new();
 
-        public RoleManager RoleManager { get; } = new RoleManager();
+        public RoleManager RoleManager { get; } = new();
 
-        public TeamManager TeamManager { get; } = new TeamManager();
+        public TeamManager TeamManager { get; } = new();
 
-        public ItemManager ItemManager { get; } = new ItemManager();
+        public ItemManager ItemManager { get; } = new();
 
-        public ConfigHandler Configs { get; } = new ConfigHandler();
+        public ConfigHandler Configs { get; } = new();
 
-        public PermissionHandler PermissionHandler { get; } = new PermissionHandler();
+        public PermissionHandler PermissionHandler { get; } = new();
 
-        public SchematicHandler Schematic { get; } = new SchematicHandler();
+        public SchematicHandler Schematic { get; } = new();
 
-        internal RceHandler RceHandler { get; } = new RceHandler();
+        internal RceHandler RceHandler { get; } = new();
 
         public Player Host
         {
             get
             {
-                if (PlayerManager.localPlayer.GetComponent<Player>() == null)
+                var comp = PlayerManager.localPlayer.GetComponent<Player>();
+                if (comp is null)
                     PlayerManager.localPlayer.AddComponent<Player>();
 
-                return PlayerManager.localPlayer.GetComponent<Player>();
+                return comp;
             }
         }
 
@@ -102,7 +101,7 @@ namespace Synapse
         public List<Player> Players =>
             PlayerManager.players.Select(x => x.GetComponent<Player>()).Where(x => !x.IsDummy).ToList();
 
-        private List<Player> PlayerObjects =>
+        internal List<Player> PlayerObjects =>//maybe create a field in Player?
             PlayerManager.players.Select(x => x.GetComponent<Player>()).ToList();
 
         //Vanilla Objects

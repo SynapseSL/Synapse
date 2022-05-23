@@ -30,16 +30,10 @@ namespace Synapse.Config
         public bool Better268 { get; set; } = false;
 
         [Description("All roles that can look at 173 without stopping him")]
-        public List<int> CantLookAt173 { get; set; } = new List<int>
-        {
-            (int) RoleType.Tutorial
-        };
+        public List<int> CantLookAt173 { get; set; } = new() { (int)RoleType.Tutorial };
 
         [Description("All roles in the list can't rage SCP-096")]
-        public List<int> CantRage096 { get; set; } = new List<int>
-        {
-            (int) RoleType.Tutorial
-        };
+        public List<int> CantRage096 { get; set; } = new() { (int)RoleType.Tutorial };
 
         [Description("If enabled custom Scps such as 035 can trigger SCP-096's rage")]
         public bool ScpTrigger096 { get; set; } = false;
@@ -48,7 +42,7 @@ namespace Synapse.Config
         public bool ScpTrigger173 { get; set; } = false;
 
         [Description("The IDs of the Scps which can speak")]
-        public List<int> SpeakingScps { get; set; } = new List<int> { 16, 17 };
+        public List<int> SpeakingScps { get; set; } = new() { 16, 17 };
 
         [Description("The amount of people needed to contain Scp-106")]
         public int RequiredForFemur { get; set; } = 1;

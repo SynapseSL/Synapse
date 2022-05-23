@@ -74,9 +74,23 @@ public static class SynapseExtensions
 
     public static Synapse.Api.Ragdoll GetRagdoll(this Ragdoll rag) => Map.Get.Ragdolls.FirstOrDefault(x => x.ragdoll == rag);
 
+    public static bool TryFind<TSource>(this IEnumerable<TSource> source, out TSource found, Func<TSource, bool> predicate)
+    {
+        foreach (TSource t in source)
+        {
+            if (predicate(t))
+            {
+                found = t;
+                return true;
+            }
+        }
+        found = default;
+        return false;
+    }
+
     public static List<Vector3> GetSpawnPoints(this RoleType role)
     {
-        List<Vector3> spawnPointsPose = new List<Vector3>();
+        List<Vector3> spawnPointsPose = new();
         GameObject[] spawnPoints = null;
         switch (role.GetTeam())
         {
@@ -97,7 +111,7 @@ public static class SynapseExtensions
                         break;
                     case RoleType.Scp93953:
                     case RoleType.Scp93989:
-                        spawnPoints = GameObject.FindGameObjectsWithTag("SCP_939"); 
+                        spawnPoints = GameObject.FindGameObjectsWithTag("SCP_939");
                         break;
                     case RoleType.Scp173:
                         spawnPoints = GameObject.FindGameObjectsWithTag("SP_173");
@@ -130,40 +144,36 @@ public static class SynapseExtensions
     public static SynapseItem GetSynapseItem(this ItemBase itembase)
     {
         //If the List doesn't even contain the Serial then it is destroyed or a item with this ID was never spawned
-        if (!SynapseItem.AllItems.ContainsKey(itembase.ItemSerial)) return null;
-
-        var item = SynapseItem.GetSynapseItem(itembase.ItemSerial);
+        if (!SynapseItem.AllItems.TryFind(out var item, x => x.Key == itembase.ItemSerial)) return SynapseItem.None;
 
         //This is a simple fallback if the item is not registered
-        if (item == null)
+        if (item.Value is null)
         {
             Synapse.Api.Logger.Get.Warn($"Found unregistered ItemBase with Serial: {itembase.ItemSerial} - Create a new SynapseItem Instance");
             return new SynapseItem(itembase);
         }
 
-        return item;
+        return item.Value;
     }
 
     public static SynapseItem GetSynapseItem(this ItemPickupBase pickupbase)
     {
         //If the List doesn't even contain the Serial then it is destroyed or a item with this ID was never spawned
-        if (!SynapseItem.AllItems.ContainsKey(pickupbase.Info.Serial)) return null;
-
-        var item = SynapseItem.GetSynapseItem(pickupbase.Info.Serial);
+        if (!SynapseItem.AllItems.TryFind(out var item, x => x.Key == pickupbase.Info.Serial)) return SynapseItem.None;
 
         //This is a simple fallback if the item is not registered
-        if (item == null)
+        if (item.Value is null)
         {
             Synapse.Api.Logger.Get.Warn($"Found unregistered ItemPickup with Serial: {pickupbase.Info.Serial}");
             return new SynapseItem(pickupbase);
         }
 
-        return item;
+        return item.Value;
     }
 
     public static bool CanHarmScp(Player player, bool message = true)
     {
-        if (player.Team == Team.SCP || player.CustomRole?.GetFriendsID().Any(x => x == (int)Team.SCP) == true)
+        if (player.Team is Team.SCP || player.CustomRole?.GetFriendsID().Any(x => x == (int)Team.SCP) == true)
         {
             if (message)
                 player.GiveTextHint(Server.Get.Configs.SynapseTranslation.ActiveTranslation.scpTeam);
@@ -184,11 +194,11 @@ public static class SynapseExtensions
                 result = true;
             else if (attacker == victim)
                 result = true;
-            else if (attacker.Team == Team.RIP || victim.Team == Team.RIP)
+            else if (attacker.Team is Team.RIP || victim.Team is Team.RIP)
                 result = false;
-            else if (attacker.CustomRole == null && victim.CustomRole == null)
+            else if (attacker.CustomRole is null && victim.CustomRole is null)
             {
-                if (attacker.Team == Team.SCP && victim.Team == Team.SCP) result = false;
+                if (attacker.Team is Team.SCP && victim.Team is Team.SCP) result = false;
 
                 var ff = Server.Get.FF;
                 if (ignoreConfig)
@@ -198,7 +208,7 @@ public static class SynapseExtensions
             }
             else
             {
-                if (attacker.CustomRole != null)
+                if (attacker.CustomRole is not null)
                 {
                     if (attacker.CustomRole.GetFriendsID().Any(x => x == victim.TeamID))
                     {
@@ -206,7 +216,7 @@ public static class SynapseExtensions
                         attacker.GiveTextHint(Server.Get.Configs.SynapseTranslation.ActiveTranslation.sameTeam);
                     }
                 }
-                if (victim.CustomRole != null)
+                if (victim.CustomRole is not null)
                 {
                     if (victim.CustomRole.GetFriendsID().Any(x => x == attacker.TeamID))
                     {
@@ -231,11 +241,11 @@ public static class SynapseExtensions
 
     public static DamageType GetDamageType(this DamageHandlerBase handler)
     {
-        if (handler == null) return DamageType.Unknown;
-                
-        if(Enum.TryParse<DamageType>(handler.GetType().Name.Replace("DamageHandler",""),out var type))
+        if (handler is null) return DamageType.Unknown;
+
+        if (Enum.TryParse<DamageType>(handler.GetType().Name.Replace("DamageHandler", ""), out var type))
         {
-            if(type == DamageType.Universal)
+            if (type is DamageType.Universal)
             {
                 var id = (handler as UniversalDamageHandler).TranslationId;
 
@@ -252,7 +262,7 @@ public static class SynapseExtensions
 
     public static UniversalDamageHandler GetUniversalDamageHandler(this DamageType type)
     {
-        if((int)type < 0 || (int)type > 23) return new UniversalDamageHandler(0f,DeathTranslations.Unknown);
+        if ((int)type < 0 || (int)type > 23) return new UniversalDamageHandler(0f, DeathTranslations.Unknown);
 
         return new UniversalDamageHandler(0f, DeathTranslations.TranslationsById[(byte)type]);
     }
@@ -298,7 +308,7 @@ public static class SynapseExtensions
             action();
             return true;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             var name = Assembly.GetCallingAssembly()?.GetName()?.Name;
             Synapse.Api.Logger.Get.Send($"[ERR] {name}: {errorMsg}\n" + ex, ConsoleColor.Red);

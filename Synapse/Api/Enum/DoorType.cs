@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Synapse.Api.Enum
+﻿namespace Synapse.Api.Enum
 {
     public enum DoorType
     {
@@ -44,13 +42,6 @@ namespace Synapse.Api.Enum
         EZ_Door,
         PrisonDoor,
         Airlock,
-        Other,
-
-        [Obsolete("012 is no longer in the game", true)]
-        LCZ_012 = 0,
-        [Obsolete("012 is no longer in the game", true)]
-        LCZ_012_Bottom = 1,
-        [Obsolete("012 is no longer in the game", true)]
-        LCZ_012_Locker = 2,
+        Other
     }
 }

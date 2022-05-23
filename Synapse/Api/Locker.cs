@@ -12,7 +12,7 @@ namespace Synapse.Api
         {
             locker = vanillalocker;
             for (ushort i = 0; i < locker.Chambers.Count(); i++)
-                Chambers.Add(new LockerChamber(locker.Chambers[i], this, i));
+                Chambers.Add(new(locker.Chambers[i], this, i));
         }
 
         public readonly MapGeneration.Distributors.Locker locker;
@@ -55,19 +55,25 @@ namespace Synapse.Api
             }
         }
 
-        public List<LockerChamber> Chambers { get; } = new List<LockerChamber>();
+        public List<LockerChamber> Chambers { get; } = new();
 
+        private LockerType _typeCached = LockerType.Default;
         public LockerType LockerType
         {
             get
             {
-                if (Name.Contains("AdrenalineMedkit")) return Enum.LockerType.MedkitWallCabinet;
-                else if (Name.Contains("RegularMedkit")) return Enum.LockerType.AdrenalineWallCabinet;
-                else if (Name.Contains("Pedestal")) return Enum.LockerType.ScpPedestal;
-                else if (Name.Contains("MiscLocker")) return Enum.LockerType.StandardLocker;
-                else if (Name.Contains("RifleRack")) return Enum.LockerType.RifleRackLocker;
-                else if (Name.Contains("LargeGunLocker")) return Enum.LockerType.LargeGunLocker;
-                return default;
+                if (_typeCached is LockerType.Default) _typeCached = _get();
+                return _typeCached;
+                LockerType _get()
+                {
+                    if (Name.Contains("AdrenalineMedkit")) return LockerType.MedkitWallCabinet;
+                    else if (Name.Contains("RegularMedkit")) return LockerType.AdrenalineWallCabinet;
+                    else if (Name.Contains("Pedestal")) return LockerType.ScpPedestal;
+                    else if (Name.Contains("MiscLocker")) return LockerType.StandardLocker;
+                    else if (Name.Contains("RifleRack")) return LockerType.RifleRackLocker;
+                    else if (Name.Contains("LargeGunLocker")) return LockerType.LargeGunLocker;
+                    return LockerType.Default;
+                };
             }
         }
 

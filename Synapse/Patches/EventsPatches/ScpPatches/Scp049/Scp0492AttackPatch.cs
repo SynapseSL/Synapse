@@ -6,7 +6,7 @@ using ev = Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp049
 {
-    [HarmonyPatch(typeof(Scp049_2PlayerScript),nameof(Scp049_2PlayerScript.UserCode_CmdHurtPlayer))]
+    [HarmonyPatch(typeof(Scp049_2PlayerScript), nameof(Scp049_2PlayerScript.UserCode_CmdHurtPlayer))]
     internal static class Scp0492AttackPatch
     {
         [HarmonyPrefix]
@@ -14,12 +14,12 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp049
         {
             try
             {
-                if (!__instance._iawRateLimit.CanExecute(true) || plyObj == null)  return false;
+                if (!__instance._iawRateLimit.CanExecute(true) || plyObj == null) return false;
 
                 var scp = __instance.GetPlayer();
                 var player = plyObj?.GetPlayer();
 
-                if (player == null) return false;
+                if (player is null) return false;
 
                 if (!__instance.iAm049_2 || Vector3.Distance(scp.Position, player.Position) > __instance.distance * 1.5f) return false;
 
@@ -31,12 +31,12 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp049
 
                 player.PlayerStats.DealDamage(new ScpDamageHandler(scp.Hub, __instance.damage, DeathTranslations.Zombie));
                 Hitmarker.SendHitmarker(scp.Connection, 1f);
-                scp.ClassManager.RpcPlaceBlood(player.Position, 0, player.RoleType == RoleType.Spectator ? 1.3f : 0.5f);
+                scp.ClassManager.RpcPlaceBlood(player.Position, 0, player.RoleType is RoleType.Spectator ? 1.3f : 0.5f);
                 return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp049-2) failed!!\n{e}");
+                Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp049-2) failed!!\n{e}");
                 return true;
             }
         }

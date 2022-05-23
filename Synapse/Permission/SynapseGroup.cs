@@ -35,21 +35,21 @@ namespace Synapse.Permission
         public byte RequiredKickPower = 1;
 
         [Description("The Permissions which the group has")]
-        public List<string> Permissions = new List<string> { };
+        public List<string> Permissions = new() { };
 
         [Description("Gives the Group the Permissions of all Groups in this List")]
-        public List<string> Inheritance = new List<string> { };
+        public List<string> Inheritance = new() { };
 
         [Description("The UserID's of the Players in the Group")]
-        public List<string> Members = new List<string> { };
+        public List<string> Members = new() { };
 
         public bool HasPermission(string permission) => HasPermission(permission, 0);
 
-        public bool HasPermission(string permission,int count)
+        public bool HasPermission(string permission, int count)
         {
-            if(count > 50) return false;
+            if (count > 50) return false;
 
-            if (permission != null && Permissions != null)
+            if (permission is not null && Permissions is not null)
                 foreach (var perm in Permissions)
                 {
                     if (perm == "*" || perm == "*.*" || perm == ".*") return true;
@@ -72,14 +72,14 @@ namespace Synapse.Permission
                         }
                 }
 
-            if (Inheritance == null) return false;
+            if (Inheritance is null) return false;
 
             foreach (var groupname in Inheritance)
             {
-                if (groupname == null) continue;
+                if (groupname is null) continue;
 
                 var group = PermissionHandler.Get.GetServerGroup(groupname);
-                if (group == null)
+                if (group is null)
                     continue;
 
                 if (group.HasPermission(permission, count + 1))
@@ -93,10 +93,10 @@ namespace Synapse.Permission
 
         public ulong GetVanillaPermissionValue()
         {
-            if (Permissions == null) return 0;
+            if (Permissions is null) return 0;
 
             var value = 0ul;
-            foreach(var perm in (PlayerPermissions[])Enum.GetValues(typeof(PlayerPermissions)))
+            foreach (var perm in (PlayerPermissions[])Enum.GetValues(typeof(PlayerPermissions)))
             {
                 if (HasPermission($"{VanillaPrefix}.{perm}"))
                     value += (ulong)perm;
@@ -105,7 +105,7 @@ namespace Synapse.Permission
             return value;
         }
 
-        public SynapseGroup Copy() => new SynapseGroup
+        public SynapseGroup Copy() => new()
         {
             Badge = Badge,
             Color = Color,

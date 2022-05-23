@@ -8,31 +8,32 @@ using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.RoundPatches
 {
-    [HarmonyPatch(typeof(RespawnManager),nameof(RespawnManager.Spawn))]
-    internal static class TeamRespawnPatch
-    {
+	[HarmonyPatch(typeof(RespawnManager), nameof(RespawnManager.Spawn))]
+	internal static class TeamRespawnPatch
+	{
 		[HarmonyPrefix]
 		private static bool Spawn(RespawnManager __instance)
-        {
-            try
-            {
-				if (!RespawnWaveGenerator.SpawnableTeams.TryGetValue(__instance.NextKnownTeam, out var spawnableTeam) || __instance.NextKnownTeam == SpawnableTeamType.None)
+		{
+			try
+			{
+				if (!RespawnWaveGenerator.SpawnableTeams.TryGetValue(__instance.NextKnownTeam, out var spawnableTeam) ||
+					__instance.NextKnownTeam is SpawnableTeamType.None)
 				{
 					ServerConsole.AddLog("Fatal error. Team '" + __instance.NextKnownTeam + "' is undefined.", ConsoleColor.Red);
 					return false;
 				}
 				List<ReferenceHub> list = (from item in ReferenceHub.GetAllHubs().Values
 										   where item.characterClassManager.CurClass == RoleType.Spectator && !item.serverRoles.OverwatchEnabled
-										   select item).ToList<ReferenceHub>();
+										   select item).ToList();
 
 				if (__instance._prioritySpawn)
 				{
 					list = (from item in list
 							orderby item.characterClassManager.DeathTime
-							select item).ToList<ReferenceHub>();
+							select item).ToList();
 				}
 				else
-					list.ShuffleList<ReferenceHub>();
+					list.ShuffleList();
 
 				var num = RespawnTickets.Singleton.GetAvailableTickets(__instance.NextKnownTeam);
 
@@ -60,11 +61,11 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 
 				if (!allow) return false;
 
-				if(team == SpawnableTeamType.None)
-                {
-					Server.Get.TeamManager.SpawnTeam(id,players);
+				if (team is SpawnableTeamType.None)
+				{
+					Server.Get.TeamManager.SpawnTeam(id, players);
 					return false;
-                }
+				}
 
 				list = players.Select(x => x.Hub).ToList();
 				__instance.NextKnownTeam = team;
@@ -72,7 +73,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 				var que = new Queue<RoleType>();
 				spawnableTeam.GenerateQueue(que, list.Count);
 
-				foreach (ReferenceHub referenceHub in list)
+				foreach (var referenceHub in list)
 				{
 					try
 					{
@@ -90,7 +91,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 					}
 					catch (Exception ex)
 					{
-						if (referenceHub != null)
+						if (referenceHub is not null)
 						{
 							ServerLogs.AddLog(ServerLogs.Modules.ClassChange, "Player " + referenceHub.LoggedNameFromRefHub() + " couldn't be spawned. Err msg: " + ex.Message, ServerLogs.ServerLogType.GameEvent, false);
 						}
@@ -105,34 +106,34 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 					ServerLogs.AddLog(ServerLogs.Modules.ClassChange, string.Concat(new object[]
 					{
 						"RespawnManager has successfully spawned ",
-			            list2.Count,
-			            " players as ",
-			           __instance.NextKnownTeam.ToString(),
-			          "!"
+						list2.Count,
+						" players as ",
+					   __instance.NextKnownTeam.ToString(),
+					  "!"
 					}), ServerLogs.ServerLogType.GameEvent, false);
 					RespawnTickets.Singleton.GrantTickets(__instance.NextKnownTeam, -list2.Count * spawnableTeam.TicketRespawnCost, false);
-                    if (Respawning.NamingRules.UnitNamingRules.TryGetNamingRule(__instance.NextKnownTeam, out var unitNamingRule))
-                    {
-                        unitNamingRule.GenerateNew(__instance.NextKnownTeam, out string text);
-                        foreach (ReferenceHub referenceHub2 in list2)
-                        {
-                            referenceHub2.characterClassManager.NetworkCurSpawnableTeamType = (byte)__instance.NextKnownTeam;
-                            referenceHub2.characterClassManager.NetworkCurUnitName = text;
-                        }
-                        unitNamingRule.PlayEntranceAnnouncement(text);
-                    }
-                    RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.UponRespawn, __instance.NextKnownTeam);
+					if (Respawning.NamingRules.UnitNamingRules.TryGetNamingRule(__instance.NextKnownTeam, out var unitNamingRule))
+					{
+						unitNamingRule.GenerateNew(__instance.NextKnownTeam, out string text);
+						foreach (ReferenceHub referenceHub2 in list2)
+						{
+							referenceHub2.characterClassManager.NetworkCurSpawnableTeamType = (byte)__instance.NextKnownTeam;
+							referenceHub2.characterClassManager.NetworkCurUnitName = text;
+						}
+						unitNamingRule.PlayEntranceAnnouncement(text);
+					}
+					RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.UponRespawn, __instance.NextKnownTeam);
 				}
 				ListPool<ReferenceHub>.Shared.Return(list2);
 				__instance.NextKnownTeam = SpawnableTeamType.None;
 
 				return false;
 			}
-            catch(Exception e)
-            {
-                SynapseController.Server.Logger.Error($"Synapse-Event: TeamRespawn failed!!\n{e}");
-                return true;
-            }
-        }
-    }
+			catch (Exception e)
+			{
+				SynapseController.Server.Logger.Error($"Synapse-Event: TeamRespawn failed!!\n{e}");
+				return true;
+			}
+		}
+	}
 }

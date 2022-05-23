@@ -9,7 +9,7 @@ using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.SynapsePatches.Item
 {
-    [HarmonyPatch(typeof(ThrowableItem),nameof(ThrowableItem.ServerThrow),new[] { typeof(float), typeof(float), typeof(Vector3), typeof(Vector3)})]
+    [HarmonyPatch(typeof(ThrowableItem), nameof(ThrowableItem.ServerThrow), new[] { typeof(float), typeof(float), typeof(Vector3), typeof(Vector3) })]
     internal static class ServerThrowPatch
     {
         [HarmonyPrefix]
@@ -45,7 +45,7 @@ namespace Synapse.Patches.SynapsePatches.Item
 
                 return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Item: ThrowableItem.ServerThrow Patch failed:\n{e}");
                 return true;
@@ -53,7 +53,7 @@ namespace Synapse.Patches.SynapsePatches.Item
         }
     }
 
-    [HarmonyPatch(typeof(TimedGrenadePickup),nameof(TimedGrenadePickup.Update))]
+    [HarmonyPatch(typeof(TimedGrenadePickup), nameof(TimedGrenadePickup.Update))]
     internal static class UpdateTimedGrenadePatch
     {
         [HarmonyPrefix]
@@ -67,10 +67,9 @@ namespace Synapse.Patches.SynapsePatches.Item
                 if (!InventoryItemLoader.AvailableItems.TryGetValue(__instance.Info.ItemId, out var itemBase))
                     return false;
 
-                if (!(itemBase is ThrowableItem throwableItem))
-                {
+                if (itemBase is not ThrowableItem throwableItem)
                     return false;
-                }
+
                 var thrownProjectile = UnityEngine.Object.Instantiate(throwableItem.Projectile);
                 if (thrownProjectile.TryGetComponent<Rigidbody>(out var rigidbody))
                 {
@@ -92,7 +91,7 @@ namespace Synapse.Patches.SynapsePatches.Item
                 item.DespawnPickup();
                 __instance._replaceNextFrame = false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Item: TimedGrenade Update Patch failed:\n{e}");
             }

@@ -11,9 +11,9 @@ namespace Synapse.Api.Items
 
         public const int HighestItem = (int)ItemType.ParticleDisruptor;
 
-        private readonly List<CustomItemInformation> customItems = new List<CustomItemInformation>();
+        private readonly List<CustomItemInformation> customItems = new();
 
-        private Dictionary<ItemType, SynapseSchematic> overridenVanillaSchematics = new Dictionary<ItemType, SynapseSchematic>();
+        private Dictionary<ItemType, SynapseSchematic> overridenVanillaSchematics = new();
 
         public ItemType GetBaseType(int id)
         {

@@ -16,17 +16,17 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
     {
         private static readonly MethodInfo
             CustomProcess = SymbolExtensions.GetMethodInfo(() => ProcessServerSide(null));
-        
+
         [HarmonyTranspiler]
         private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
         {
             var codes = new List<CodeInstruction>(instr);
 
-            foreach (var code in codes.Select((x,i) => new {Value =x, Index = i }))
+            foreach (var code in codes.Select((x, i) => new { Value = x, Index = i }))
             {
                 if (code.Value.opcode != OpCodes.Call) continue;
 
-                if (code.Value.operand != null && code.Value.operand is MethodBase methodBase &&
+                if (code.Value.operand is not null && code.Value.operand is MethodBase methodBase &&
                     methodBase.Name == nameof(RoundSummary._ProcessServerSideCode))
                 {
                     codes[code.Index].operand = CustomProcess;
@@ -38,10 +38,10 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 
         private static IEnumerator<float> ProcessServerSide(RoundSummary instance)
         {
-            while(instance != null)
+            while (instance is not null)
             {
-                while (Map.Get.Round.RoundLock || !RoundSummary.RoundInProgress() || (instance._keepRoundOnOne && Server.Get.Players.Count < 2) || Map.Get.Round.RoundLength.TotalSeconds <= 3)
-                    yield return Timing.WaitForOneFrame;
+                while (Map.Get.Round.RoundLock || !RoundSummary.RoundInProgress() || (instance._keepRoundOnOne && Server.Get.Players.Count < 2) ||
+                    Map.Get.Round.RoundLength.TotalSeconds <= 3) yield return Timing.WaitForOneFrame;
 
                 var teams = new List<Team>();
                 //I know it's a lazy solution but it should work
@@ -57,9 +57,9 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 
                 bool endround;
 
-                foreach(var player in Server.Get.Players)
+                foreach (var player in Server.Get.Players)
                 {
-                    if (player.CustomRole != null)
+                    if (player.CustomRole is not null)
                         customroles.Add(player.CustomRole);
 
                     teamids.Add(player.TeamID);
@@ -135,16 +135,16 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                     if (role.GetEnemiesID().Any(x => teamids.Contains(x)))
                         endround = false;
 
-                if (RoundSummary.EscapedClassD + teams.Count(x => x == Team.CDP) > 0)
+                if (RoundSummary.EscapedClassD + teams.Count(x => x is Team.CDP) > 0)
                 {
-                    if(teams.Contains(Team.SCP) || teams.Contains(Team.CHI) || teams.Contains(Team.CHI))
+                    if (teams.Contains(Team.SCP) || teams.Contains(Team.CHI) || teams.Contains(Team.CHI))
                         leadingTeam = RoundSummary.LeadingTeam.ChaosInsurgency;
                 }
                 else
                 {
                     if (teams.Contains(Team.MTF) || teams.Contains(Team.RSC))
                     {
-                        if (RoundSummary.EscapedScientists + teams.Count(x => x == Team.RSC) > 0)
+                        if (RoundSummary.EscapedScientists + teams.Count(x => x is Team.RSC) > 0)
                             leadingTeam = RoundSummary.LeadingTeam.FacilityForces;
                     }
                     else
@@ -169,7 +169,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 
                     var dpercentage = (float)instance.classlistStart.class_ds == 0 ? 0 : RoundSummary.EscapedClassD + result.class_ds / instance.classlistStart.class_ds;
                     var spercentage = (float)instance.classlistStart.scientists == 0 ? 0 : RoundSummary.EscapedScientists + result.scientists / instance.classlistStart.scientists;
-                    var text = $"Round finished! Anomalies: {teams.Where(x => x == Team.SCP).Count()} | Chaos: {teams.Where(x => x == Team.CHI || x == Team.CDP).Count()}" +
+                    var text = $"Round finished! Anomalies: {teams.Where(x => x == Team.SCP).Count()} | Chaos: {teams.Where(x => x is Team.CHI || x is Team.CDP).Count()}" +
                         $" | Facility Forces: {teams.Where(x => x == Team.MTF || x == Team.RSC).Count()} | D escaped percentage: {dpercentage} | S escaped percentage : {spercentage}";
                     GameCore.Console.AddLog(text, Color.gray, false);
                     ServerLogs.AddLog(ServerLogs.Modules.Logger, text, ServerLogs.ServerLogType.GameEvent, false);

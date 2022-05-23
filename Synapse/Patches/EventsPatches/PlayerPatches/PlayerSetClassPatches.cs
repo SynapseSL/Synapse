@@ -29,31 +29,31 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 if (player.Hub.isDedicatedServer || !player.Hub.Ready) return false;
 
                 //Initialise eventargs
-                var eventargs = new PlayerSetClassEventArgs
+                PlayerSetClassEventArgs eventargs = new()
                 {
                     Allow = true,
                     Player = player,
                     Role = classid,
                     SpawnReason = spawnReason,
-                    EscapeItems = new List<SynapseItem>(),
+                    EscapeItems = new(),
                     Position = Vector3.zero,
                     Rotation = 0f,
-                    Items = new List<SynapseItem>(),
-                    Ammo = new Dictionary<AmmoType, ushort>(),
+                    Items = new(),
+                    Ammo = new(),
                 };
 
                 //Set EscapeItems if the Player is escaping
                 if (eventargs.IsEscaping) eventargs.EscapeItems = player.Inventory.Items;
 
                 //Find the Position and Rotation if the player becomes a living Role
-                if(classid != RoleType.Spectator && classid != RoleType.None)
+                if (classid is not RoleType.Spectator && classid is not RoleType.None)
                 {
                     var randomPosition = SpawnpointManager.GetRandomPosition(classid);
                     if (Map.Get.RespawnPoint != Vector3.zero)
                     {
                         eventargs.Position = Map.Get.RespawnPoint;
                     }
-                    else if (randomPosition != null)
+                    else if (randomPosition is not null)
                     {
                         eventargs.Position = randomPosition.transform.position;
                         eventargs.Rotation = randomPosition.transform.rotation.eulerAngles.y;
@@ -65,7 +65,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 }
 
                 //Find and create the Items that the Player should spawn with
-                if(InventorySystem.Configs.StartingInventories.DefinedInventories.TryGetValue(classid,out var roleitems))
+                if (InventorySystem.Configs.StartingInventories.DefinedInventories.TryGetValue(classid, out var roleitems))
                 {
                     foreach (var ammo in roleitems.Ammo)
                         eventargs.Ammo[(AmmoType)ammo.Key] = ammo.Value;
@@ -87,7 +87,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 return eventargs.Allow;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: PlayerSetClass(SetPlayersClass) failed!!\n{e}");
                 return true;
@@ -97,12 +97,12 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         [HarmonyPostfix]
         private static void RemoveArgs(Player __state)
         {
-            if (__state != null)
+            if (__state is not null)
                 __state.setClassEventArgs = null;
         }
     }
 
-    [HarmonyPatch(typeof(PlayerMovementSync),nameof(PlayerMovementSync.OnPlayerClassChange))]
+    [HarmonyPatch(typeof(PlayerMovementSync), nameof(PlayerMovementSync.OnPlayerClassChange))]
     internal static class HandlePositionPatch
     {
         [HarmonyPrefix]
@@ -112,12 +112,12 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             {
                 var player = __instance.GetPlayer();
                 var args = player.setClassEventArgs;
-                if (args == null) return false;
+                if (args is null) return false;
                 var rot = new PlayerMovementSync.PlayerRotation?(new PlayerMovementSync.PlayerRotation(new float?(0f), new float?(args.Rotation)));
                 Timing.RunCoroutine(__instance.SafelySpawnPlayer(args.Position, rot), Segment.FixedUpdate);
                 return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: PlayerSetClass(Position) failed!!\n{e}");
                 return true;
@@ -137,7 +137,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var args = player.setClassEventArgs;
 
                 //If args is null he is SCP0492 and should not get any Items or Lite is active
-                if (args == null) return false;
+                if (args is null) return false;
 
                 var inventory = ply.inventory;
 
@@ -158,7 +158,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                         item.Durabillity = dur;
                 }
 
-                if(args.IsEscaping) foreach(var item in args.EscapeItems) item.PickUp(player);
+                if (args.IsEscaping) foreach (var item in args.EscapeItems) item.PickUp(player);
 
                 return false;
             }
@@ -170,7 +170,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         }
     }
 
-    [HarmonyPatch(typeof(HealthStat),nameof(HealthStat.ClassChanged))]
+    [HarmonyPatch(typeof(HealthStat), nameof(HealthStat.ClassChanged))]
     internal static class HandleHealthPatch
     {
         [HarmonyPrefix]
@@ -179,12 +179,12 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             try
             {
                 var player = __instance.GetPlayer();
-                if (player.setClassEventArgs == null) return false;
+                if (player.setClassEventArgs is null) return false;
 
                 player.MaxHealth = player.ClassManager.CurRole.maxHP;
                 return true;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: PlayerSetClass(Health) failed!!\n{e}");
                 return true;
@@ -192,7 +192,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         }
     }
 
-    [HarmonyPatch(typeof(UsableItemsController),nameof(UsableItemsController.ResetPlayerOnRoleChange))]
+    [HarmonyPatch(typeof(UsableItemsController), nameof(UsableItemsController.ResetPlayerOnRoleChange))]
     internal static class HandleUsableItemsController
     {
         [HarmonyPrefix]
@@ -200,10 +200,10 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                if (ply?.GetPlayer()?.setClassEventArgs == null) return false;
+                if (ply?.GetPlayer()?.setClassEventArgs is null) return false;
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.Get.Error($"Synapse-Event: PlayerSetClass(UsableItem) failed!!\n{ex}");
                 return true;
@@ -219,7 +219,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                if (targetHub?.GetPlayer()?.setClassEventArgs == null) return false;
+                if (targetHub?.GetPlayer()?.setClassEventArgs is null) return false;
                 return true;
             }
             catch (Exception ex)

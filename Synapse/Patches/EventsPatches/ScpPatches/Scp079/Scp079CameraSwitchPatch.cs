@@ -21,19 +21,14 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                     player.Scp079Controller.Spawned = true;
                 }
 
-                SynapseController.Server.Events.Scp.Scp079.Invoke079CameraSwitch(
-                    __instance.gameObject.GetPlayer(),
-                    camera,
-                    lookatRotation,
-                    spawning,
-                    out var allowed
-                    );
+                SynapseController.Server.Events.Scp.Scp079.Invoke079CameraSwitch(__instance.gameObject.GetPlayer(), camera,
+                    lookatRotation, spawning, out var allowed);
 
                 return allowed;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp079CameraSwitchEvent failed!!\n{e}");
+                Logger.Get.Error($"Synapse-Event: Scp079CameraSwitchEvent failed!!\n{e}");
                 return true;
             }
         }

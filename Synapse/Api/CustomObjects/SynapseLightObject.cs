@@ -21,7 +21,8 @@ namespace Synapse.Api.CustomObjects
 
         internal SynapseLightObject(SynapseSchematic.LightSourceConfiguration configuration)
         {
-            ToyBase = CreateLightSource(configuration.Color, configuration.LightIntensity, configuration.LightRange, configuration.LightShadows, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale);
+            ToyBase = CreateLightSource(configuration.Color, configuration.LightIntensity, configuration.LightRange, configuration.LightShadows,
+                configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale);
             OriginalScale = configuration.Scale;
             CustomAttributes = configuration.CustomAttributes;
 
@@ -53,9 +54,9 @@ namespace Synapse.Api.CustomObjects
             set => ToyBase.NetworkLightShadows = value;
         }
 
-        private LightSourceToy CreateLightSource(Color color, float lightIntensity, float range,bool shadows, Vector3 position, Quaternion rotation, Vector3 scale)
+        private LightSourceToy CreateLightSource(Color color, float lightIntensity, float range, bool shadows, Vector3 position, Quaternion rotation, Vector3 scale)
         {
-            var ot = UnityEngine.Object.Instantiate(Prefab, position, rotation);
+            var ot = Object.Instantiate(Prefab, position, rotation);
             NetworkServer.Spawn(ot.gameObject);
 
             ot.NetworkLightColor = color;

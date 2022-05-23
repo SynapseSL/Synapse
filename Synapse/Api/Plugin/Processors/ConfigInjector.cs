@@ -13,10 +13,10 @@ namespace Synapse.Api.Plugin.Processors
                 foreach (var field in context.PluginType.GetFields())
                 {
                     var configAttribute = field.GetCustomAttribute<Config>();
-                    if (configAttribute == null) continue;
+                    if (configAttribute is null) continue;
                     var section = configAttribute.section;
                     Type t = FieldInfo.GetFieldFromHandle(field.FieldHandle).FieldType;
-                    if (section == null) section = t.FullName?.Replace(".", " ");
+                    if (section is null) section = t.FullName?.Replace(".", " ");
 
                     if (!typeof(IConfigSection).IsAssignableFrom(t))
                         continue;
@@ -29,10 +29,10 @@ namespace Synapse.Api.Plugin.Processors
                 foreach (var property in context.PluginType.GetProperties())
                 {
                     var configAttribute = property.GetCustomAttribute<Config>();
-                    if (configAttribute == null) continue;
+                    if (configAttribute is null) continue;
                     var section = configAttribute.section;
                     Type t = property.PropertyType;
-                    if (section == null) section = t.FullName?.Replace(".", " ");
+                    if (section is null) section = t.FullName?.Replace(".", " ");
 
                     if (!typeof(IConfigSection).IsAssignableFrom(t))
                         continue;

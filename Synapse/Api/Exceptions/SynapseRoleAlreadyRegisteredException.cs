@@ -1,5 +1,4 @@
 ﻿using Synapse.Api.Roles;
-
 namespace Synapse.Api.Exceptions
 {
     public class SynapseRoleAlreadyRegisteredException : SynapseException

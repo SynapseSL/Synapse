@@ -3,7 +3,7 @@ using PlayerStatsSystem;
 
 namespace Synapse.Patches.SynapsePatches
 {
-    [HarmonyPatch(typeof(HealthStat),"get_MaxValue")]
+    [HarmonyPatch(typeof(HealthStat), "get_MaxValue")]
     internal static class HealthPatch
     {
         [HarmonyPrefix]
@@ -14,7 +14,7 @@ namespace Synapse.Patches.SynapsePatches
         }
     }
 
-    [HarmonyPatch(typeof(AhpStat), nameof(AhpStat.ServerAddProcess),new[] { typeof(float) })]
+    [HarmonyPatch(typeof(AhpStat), nameof(AhpStat.ServerAddProcess), new[] { typeof(float) })]
     internal static class AhpPatch
     {
         [HarmonyPrefix]

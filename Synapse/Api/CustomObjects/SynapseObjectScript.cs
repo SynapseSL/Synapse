@@ -21,14 +21,14 @@ namespace Synapse.Api.CustomObjects
         {
             Server.Get.Events.SynapseObject.InvokeUpdate(new Events.SynapseEventArguments.SOEventArgs(Object));
 
-            if(Object is IRefreshable refresh && refresh.UpdateEveryFrame)
+            if (Object is IRefreshable refresh && refresh.UpdateEveryFrame)
                 refresh.Refresh();
         }
 
         public void OnDestroy()
         {
             Server.Get.Events.SynapseObject.InvokeDestroy(new Events.SynapseEventArguments.SOEventArgs(Object));
-            if (Parent != null)
+            if (Parent is not null)
                 Parent.Childrens.Remove(Object);
             if (Map.Get.SynapseObjects.Contains(Object))
                 Map.Get.SynapseObjects.Remove(Object);

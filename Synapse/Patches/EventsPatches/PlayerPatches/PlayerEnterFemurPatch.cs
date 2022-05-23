@@ -21,7 +21,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 {
                     if (player.Hub.isDedicatedServer || !player.Hub.Ready) continue;
                     if (Vector3.Distance(player.Position, __instance._lureSpj.transform.position) >= 1.97f) continue;
-                    if (player.RoleType == RoleType.Spectator || player.Team == Team.SCP) continue;
+                    if (player.Team is Team.SCP or Team.RIP) continue;
                     if (player.GodMode || !SynapseExtensions.CanHarmScp(player)) continue;
 
                     var allow = true;

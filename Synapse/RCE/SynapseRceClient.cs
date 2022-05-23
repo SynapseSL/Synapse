@@ -12,10 +12,7 @@ namespace Synapse.RCE
     {
         public int Port { get; }
 
-        public SynapseRceClient(int port)
-        {
-            Port = port;
-        }
+        public SynapseRceClient(int port) => Port = port;
 
         public RceResponse ExecuteFromFile(string path, string assemblyName = null, int? timeout = null)
         {
@@ -25,7 +22,7 @@ namespace Synapse.RCE
         public async Task<RceResponse> ExecuteFromFileAsync(string path, string assemblyName = null, int? timeout = null)
         {
             var code = File.ReadAllText(path);
-            return await ExecuteFromCodeAsync(code, assemblyName);
+            return await ExecuteFromCodeAsync(code, assemblyName, timeout);
         }
         public RceResponse ExecuteFromCode(string code, string assemblyName = null, int? timeout = null)
         {
@@ -33,7 +30,7 @@ namespace Synapse.RCE
             assemblyName ??= Guid.NewGuid().ToString();
             try
             {
-                using TcpClient client = new TcpClient();
+                using TcpClient client = new();
                 client.Connect(IPAddress.Loopback, Port);
                 if (timeout is { } timeoutVal)
                 {
@@ -72,7 +69,7 @@ namespace Synapse.RCE
             assemblyName ??= Guid.NewGuid().ToString();
             try
             {
-                using TcpClient client = new TcpClient();
+                using TcpClient client = new();
                 await client.ConnectAsync(IPAddress.Loopback, Port);
                 if (timeout is { } timeoutVal)
                 {

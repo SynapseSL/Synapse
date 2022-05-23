@@ -17,9 +17,9 @@ namespace Synapse.Api.Items
 {
     public class SynapseItem
     {
-        public static SynapseItem None { get; } = new SynapseItem(-1);
+        public static SynapseItem None { get; } = new(-1);
 
-        public static Dictionary<ushort, SynapseItem> AllItems { get; } = new Dictionary<ushort, SynapseItem>();
+        public static Dictionary<ushort, SynapseItem> AllItems { get; } = new();
 
         public static SynapseItem GetSynapseItem(ushort serial)
         {
@@ -36,7 +36,7 @@ namespace Synapse.Api.Items
         #region Constructors
         private SynapseItem()
         {
-            Throwable = new ThrowableAPI(this);
+            Throwable = new(this);
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace Synapse.Api.Items
         /// <param name="type"></param>
         public SynapseItem(int id) : this()
         {
-            if (id == -1 && None == null)
+            if (id == -1 && None is null)
             {
                 ID = -1;
                 ItemType = ItemType.None;
@@ -198,13 +198,13 @@ namespace Synapse.Api.Items
         {
             get
             {
-                switch (State)
+                return State switch
                 {
-                    case ItemState.Map: return PickupBase.gameObject;
-                    case ItemState.Inventory: return ItemBase.gameObject;
-                    case ItemState.Thrown: return Throwable.ThrowableItem.gameObject;
-                    default: return null;
-                }
+                    ItemState.Map => PickupBase.gameObject,
+                    ItemState.Inventory => ItemBase.gameObject,
+                    ItemState.Thrown => Throwable.ThrowableItem.gameObject,
+                    _ => null,
+                };
             }
         }
         public ItemBase ItemBase { get; internal set; }
@@ -218,11 +218,11 @@ namespace Synapse.Api.Items
             {
                 if (deactivated) return Enum.ItemState.Destroyed;
 
-                if (Throwable.ThrowableItem != null) return Enum.ItemState.Thrown;
+                if (Throwable.ThrowableItem is not null) return Enum.ItemState.Thrown;
 
-                if (ItemBase != null) return Enum.ItemState.Inventory;
+                if (ItemBase is not null) return Enum.ItemState.Inventory;
 
-                if (PickupBase != null) return Enum.ItemState.Map;
+                if (PickupBase is not null) return Enum.ItemState.Map;
 
                 return Enum.ItemState.Despawned;
             }
@@ -232,18 +232,18 @@ namespace Synapse.Api.Items
         {
             get
             {
-                switch (State)
+                return State switch
                 {
                     //case ItemState.Map: return PickupBase.PreviousOwner.Hub.GetPlayer();
-                    case ItemState.Inventory: return ItemBase.Owner.GetPlayer();
-                    default: return null;
-                }
+                    ItemState.Inventory => ItemBase.Owner.GetPlayer(),
+                    _ => null,
+                };
             }
         }
         #endregion
 
         #region ChangableAPIValues
-        public Dictionary<string, object> ItemData { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, object> ItemData { get; set; } = new();
 
         public bool CanBePickedUp { get; set; } = true;
         public SynapseSchematic Schematic { get; set; }
@@ -254,20 +254,20 @@ namespace Synapse.Api.Items
         {
             get
             {
-                if (Throwable.ThrowableItem != null)
+                if (Throwable.ThrowableItem is not null)
                     return Throwable.ThrowableItem.transform.position;
 
-                if (ItemBase != null)
+                if (ItemBase is not null)
                     return ItemHolder.Position;
 
-                if (PickupBase != null)
+                if (PickupBase is not null)
                     return PickupBase.Info.Position;
 
                 return position;
             }
             set
             {
-                if (PickupBase != null)
+                if (PickupBase is not null)
                 {
                     PickupBase.Rb.position = position;
                     PickupBase.RefreshPositionAndRotation();
@@ -282,17 +282,17 @@ namespace Synapse.Api.Items
         {
             get
             {
-                if (ItemBase != null)
+                if (ItemBase is not null)
                     return ItemHolder.transform.rotation;
 
-                if (PickupBase != null)
+                if (PickupBase is not null)
                     return PickupBase.transform.rotation;
 
                 return rotation;
             }
             set
             {
-                if (PickupBase != null)
+                if (PickupBase is not null)
                 {
                     PickupBase.transform.rotation = rotation;
                     PickupBase.RefreshPositionAndRotation();
@@ -308,11 +308,11 @@ namespace Synapse.Api.Items
             get => scale;
             set
             {
-                if (PickupBase != null)
+                if (PickupBase is not null)
                 {
                     PickupBase.transform.localScale = value;
 
-                    if (SynapseObject == null)
+                    if (SynapseObject is null)
                         PickupBase.netIdentity.UpdatePositionRotationScale();
                     else
                         SynapseObject.Scale = SynapseObject.GameObject.transform.lossyScale;
@@ -330,29 +330,29 @@ namespace Synapse.Api.Items
                 switch (ItemCategory)
                 {
                     case ItemCategory.Radio:
-                        if (State == ItemState.Inventory)
+                        if (State is ItemState.Inventory)
                             return (ItemBase as RadioItem).BatteryPercent;
-                        else if (State == ItemState.Map)
+                        else if (State is ItemState.Map)
                             return (PickupBase as RadioPickup).SavedBattery * 100;
                         break;
 
                     case ItemCategory.MicroHID:
-                        if (State == ItemState.Inventory)
+                        if (State is ItemState.Inventory)
                             return (ItemBase as MicroHIDItem).RemainingEnergy * 100;
-                        else if (State == ItemState.Map)
+                        else if (State is ItemState.Map)
                             return (PickupBase as MicroHIDPickup).Energy * 100;
                         break;
 
                     case ItemCategory.Firearm:
-                        if (State == ItemState.Inventory)
+                        if (State is ItemState.Inventory)
                             return (ItemBase as Firearm).Status.Ammo;
-                        else if (State == ItemState.Map)
+                        else if (State is ItemState.Map)
                             return (PickupBase as FirearmPickup).Status.Ammo;
                         break;
 
                     case ItemCategory.Ammo:
                         //Ammo can't be in the inventory as Item
-                        if (State == ItemState.Map)
+                        if (State is ItemState.Map)
                             return (PickupBase as AmmoPickup).SavedAmmo;
                         break;
                 }
@@ -361,7 +361,7 @@ namespace Synapse.Api.Items
             }
             set
             {
-                if(State == ItemState.Despawned)
+                if (State is ItemState.Despawned)
                 {
                     durabillity = value;
                     return;
@@ -370,26 +370,26 @@ namespace Synapse.Api.Items
                 switch (ItemCategory)
                 {
                     case ItemCategory.Radio:
-                        if (State == ItemState.Inventory)
+                        if (State is ItemState.Inventory)
                             (ItemBase as RadioItem)._battery = value / 100;
-                        else if (State == ItemState.Map)
+                        else if (State is ItemState.Map)
                             (PickupBase as RadioPickup).SavedBattery = value / 100;
                         break;
 
                     case ItemCategory.MicroHID:
-                        if (State == ItemState.Inventory)
+                        if (State is ItemState.Inventory)
                             (ItemBase as MicroHIDItem).RemainingEnergy = value / 100;
-                        else if (State == ItemState.Map)
+                        else if (State is ItemState.Map)
                             (PickupBase as MicroHIDPickup).Energy = value / 100;
                         break;
 
                     case ItemCategory.Firearm:
-                        if (State == ItemState.Inventory)
+                        if (State is ItemState.Inventory)
                         {
                             var arm = ItemBase as Firearm;
                             arm.Status = new FirearmStatus((byte)value, arm.Status.Flags, arm.Status.Attachments);
                         }
-                        else if (State == ItemState.Map)
+                        else if (State is ItemState.Map)
                         {
                             var armpickup = PickupBase as FirearmPickup;
                             armpickup.Status = new FirearmStatus((byte)value, armpickup.Status.Flags, armpickup.Status.Attachments);
@@ -397,7 +397,7 @@ namespace Synapse.Api.Items
                         break;
 
                     case ItemCategory.Ammo:
-                        if (State == ItemState.Map)
+                        if (State is ItemState.Map)
                             (PickupBase as AmmoPickup).SavedAmmo = (ushort)value;
                         break;
                 }
@@ -409,7 +409,7 @@ namespace Synapse.Api.Items
         {
             get
             {
-                if(ItemBase is Firearm arm)
+                if (ItemBase is Firearm arm)
                 {
                     return arm.Status.Attachments;
                 }
@@ -421,7 +421,7 @@ namespace Synapse.Api.Items
             }
             set
             {
-                if (State == ItemState.Despawned)
+                if (State is ItemState.Despawned)
                 {
                     attachments = value;
                     return;
@@ -431,7 +431,7 @@ namespace Synapse.Api.Items
                     arm.ApplyAttachmentsCode(value, true);
                 else if (PickupBase is FirearmPickup armpickup)
                     armpickup.NetworkStatus = new FirearmStatus(armpickup.Status.Ammo, armpickup.Status.Flags, value);
-                
+
             }
         }
         #endregion
@@ -524,9 +524,9 @@ namespace Synapse.Api.Items
 
         public void DespawnItemBase()
         {
-            if (ItemBase != null)
+            if (ItemBase is not null)
             {
-                if(ItemHolder != null)
+                if (ItemHolder is not null)
                 {
                     ItemBase.OnRemoved(null);
 
@@ -559,12 +559,14 @@ namespace Synapse.Api.Items
         {
             try
             {
-                if (Schematic == null) return;
-                if (PickupBase == null) return;
+                if (Schematic is null) return;
+                if (PickupBase is null) return;
 
-                SynapseObject = new SynapseObject(Schematic);
-                SynapseObject.Position = Position;
-                SynapseObject.ItemParent = this;
+                SynapseObject = new(Schematic)
+                {
+                    Position = Position,
+                    ItemParent = this
+                };
 
                 var scale = Scale;
                 Scale = Vector3.one;
@@ -574,28 +576,11 @@ namespace Synapse.Api.Items
 
                 PickupBase?.netIdentity.DespawnForAllPlayers();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.Get.Error($"Synapse-Item: Creating the Schematic {Schematic?.ID} for a Item failed\n" + ex);
             }
         }
-        #endregion
-
-        #region Obsolete
-        [Obsolete("Since 11.0 only FireArms can be modified and they are using a new system", false)]
-        public int Sight { get; set; }
-
-        [Obsolete("Since 11.0 only FireArms can be modified and they are using a new system", false)]
-        public int Barrel { get; set; }
-
-        [Obsolete("Since 11.0 only FireArms can be modified and they are using a new system", false)]
-        public int Other { get; set; }
-
-        [Obsolete("Since 11.0 only FireArms can be modified and they are using a new system", false)]
-        public SynapseItem(int id, float durability, int sight, int barrel, int other) : this(id) => Durabillity = durability;
-
-        [Obsolete("Since 11.0 only FireArms can be modified and they are using a new system", false)]
-        public SynapseItem(ItemType item, float durability, int sight, int barrel, int other) : this(item) => Durabillity = durability;
         #endregion
     }
 }

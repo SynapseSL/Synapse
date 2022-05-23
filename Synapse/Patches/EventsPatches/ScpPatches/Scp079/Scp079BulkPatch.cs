@@ -18,20 +18,14 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
             try
             {
                 if (!__instance._interactRateLimit.CanExecute(true))
-                {
                     return false;
-                }
                 if (!__instance.iAm079)
-                {
                     return false;
-                }
                 string[] array = args.Split(':');
                 GameCore.Console.AddDebugLog("SCP079", "Command received from a client: " + command, MessageImportance.LessImportant, false);
                 __instance.RefreshCurrentRoom();
                 if (!__instance.CheckInteractableLegitness(__instance.CurrentRoom, target, true))
-                {
                     return false;
-                }
 
                 DoorVariant doorVariant = null; // F you, compiler
                 bool gotDoorVariant = target?.TryGetComponent(out doorVariant) ?? false;
@@ -42,30 +36,29 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                     case Command079.Door:
                         {
                             if (AlphaWarheadController.Host.inProgress)
-                            {
                                 return false;
-                            }
-                            if (target == null)
+                            if (target is null)
                             {
                                 GameCore.Console.AddDebugLog("SCP079", "The door command requires a target.", MessageImportance.LessImportant, false);
                                 return false;
                             }
                             if (!gotDoorVariant)
-                            {
                                 return false;
-                            }
-                            if (doorVariant.TryGetComponent(out DoorNametagExtension doorNametagExtension) && list.Count > 0 && list.Contains(doorNametagExtension.GetName))
+                            if (doorVariant.TryGetComponent(out DoorNametagExtension doorNametagExtension) && list.Count > 0 &&
+                                list.Contains(doorNametagExtension.GetName))
                             {
                                 GameCore.Console.AddDebugLog("SCP079", "Door access denied by the server.", MessageImportance.LeastImportant, false);
                                 return false;
                             }
                             string text = doorVariant.RequiredPermissions.RequiredPermissions.ToString();
-                            float manaFromLabel = __instance.GetManaFromLabel("Door Interaction " + (text.Contains(",") ? text.Split(',')[0] : text), __instance.abilities);
+                            float manaFromLabel = __instance.GetManaFromLabel("Door Interaction " + (text.Contains(",") ? text.Split(',')[0] : text),
+                                __instance.abilities);
 
 
 
                             var action = doorVariant.TargetState ? Scp079EventMisc.DoorAction.Closing : Scp079EventMisc.DoorAction.Opening;
-                            var intendedResult = manaFromLabel <= __instance.Mana ? Scp079EventMisc.InteractionResult.Allow : Scp079EventMisc.InteractionResult.NoEnergy;
+                            var intendedResult = manaFromLabel <= __instance.Mana ? Scp079EventMisc.InteractionResult.Allow :
+                                Scp079EventMisc.InteractionResult.NoEnergy;
 
                             SynapseController.Server.Events.Scp.Scp079.Invoke079DoorInteract(
                                 __instance.gameObject.GetPlayer(),
@@ -112,37 +105,33 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                     case Command079.Doorlock:
                         {
                             if (AlphaWarheadController.Host.inProgress)
-                            {
                                 return false;
-                            }
-                            if (target == null)
+                            if (target is null)
                             {
                                 GameCore.Console.AddDebugLog("SCP079", "The door lock command requires a target.", MessageImportance.LessImportant, false);
                                 return false;
                             }
-                            if (doorVariant == null)
-                            {
+                            if (doorVariant is null)
                                 return false;
-                            }
-                            ;
-                            if (doorVariant.TryGetComponent(out DoorNametagExtension doorNametagExtension2) && list.Count > 0 && list.Contains(doorNametagExtension2.GetName))
+
+                            if (doorVariant.TryGetComponent(out DoorNametagExtension doorNametagExtension2) && list.Count > 0 &&
+                                list.Contains(doorNametagExtension2.GetName))
                             {
                                 GameCore.Console.AddDebugLog("SCP079", "Door access denied by the server.", MessageImportance.LeastImportant, false);
                                 return false;
                             }
 
                             float manaFromLabel = __instance.GetManaFromLabel("Door Lock Minimum", __instance.abilities);
-                            var action = ((DoorLockReason)doorVariant.ActiveLocks).HasFlag(DoorLockReason.Regular079) ? Scp079EventMisc.DoorAction.Unlocking : Scp079EventMisc.DoorAction.Locking;
+                            var action = ((DoorLockReason)doorVariant.ActiveLocks).HasFlag(DoorLockReason.Regular079) ?
+                                Scp079EventMisc.DoorAction.Unlocking : Scp079EventMisc.DoorAction.Locking;
 
                             Scp079EventMisc.InteractionResult intendedResult;
-                            if (action == Scp079EventMisc.DoorAction.Unlocking)
-                            {
-                                intendedResult = __instance.lockedDoors.Contains(doorVariant.netId) ? Scp079EventMisc.InteractionResult.Allow : Scp079EventMisc.InteractionResult.Disallow;
-                            }
+                            if (action is Scp079EventMisc.DoorAction.Unlocking)
+                                intendedResult = __instance.lockedDoors.Contains(doorVariant.netId) ? Scp079EventMisc.InteractionResult.Allow :
+                                    Scp079EventMisc.InteractionResult.Disallow;
                             else
-                            {
-                                intendedResult = manaFromLabel <= __instance.Mana ? Scp079EventMisc.InteractionResult.Allow : Scp079EventMisc.InteractionResult.NoEnergy;
-                            }
+                                intendedResult = manaFromLabel <= __instance.Mana ? Scp079EventMisc.InteractionResult.Allow :
+                                    Scp079EventMisc.InteractionResult.NoEnergy;
 
                             SynapseController.Server.Events.Scp.Scp079.Invoke079DoorInteract(
                                 __instance.gameObject.GetPlayer(),
@@ -155,31 +144,25 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 
                             switch (actualResult)
                             {
-                                case Scp079EventMisc.InteractionResult.Allow when action == Scp079EventMisc.DoorAction.Unlocking:
+                                case Scp079EventMisc.InteractionResult.Allow when action is Scp079EventMisc.DoorAction.Unlocking:
                                     {
                                         if (!__instance.lockedDoors.Contains(doorVariant.netId))
-                                        {
                                             return false;
-                                        }
                                         __instance.lockedDoors.Remove(doorVariant.netId);
                                         doorVariant.ServerChangeLock(DoorLockReason.Regular079, false);
                                         return false;
                                     }
-                                case Scp079EventMisc.InteractionResult.Allow when action == Scp079EventMisc.DoorAction.Locking:
+                                case Scp079EventMisc.InteractionResult.Allow when action is Scp079EventMisc.DoorAction.Locking:
                                     {
                                         if (!__instance.lockedDoors.Contains(doorVariant.netId))
-                                        {
                                             __instance.lockedDoors.Add(doorVariant.netId);
-                                        }
                                         doorVariant.ServerChangeLock(DoorLockReason.Regular079, true);
                                         __instance.AddInteractionToHistory(doorVariant.gameObject, true);
                                         __instance.Mana -= __instance.GetManaFromLabel("Door Lock Start", __instance.abilities);
                                         return false;
                                     }
                                 case Scp079EventMisc.InteractionResult.Disallow:
-                                    {
-                                        return false;
-                                    }
+                                    return false;
                                 case Scp079EventMisc.InteractionResult.NoEnergy:
                                     {
                                         // might wanna change __instance.Mana to 0,
@@ -198,18 +181,12 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                             float manaFromLabel = __instance.GetManaFromLabel("Speaker Start", __instance.abilities);
 
                             Scp079EventMisc.InteractionResult intendedResult;
-                            if (speaker == null)
-                            {
+                            if (speaker is null)
                                 intendedResult = Scp079EventMisc.InteractionResult.Disallow;
-                            }
                             else if (manaFromLabel * 1.5f <= __instance.Mana)
-                            {
                                 intendedResult = Scp079EventMisc.InteractionResult.Allow;
-                            }
                             else
-                            {
                                 intendedResult = Scp079EventMisc.InteractionResult.NoEnergy;
-                            }
 
                             SynapseController.Server.Events.Scp.Scp079.Invoke079SpeakerInteract(
                                 __instance.gameObject.GetPlayer(),
@@ -258,12 +235,10 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                             Camera079 camera = null;
                             foreach (Scp079Interactable scp079Interactable in __instance.nearbyInteractables)
                             {
-                                if (scp079Interactable.type == Scp079Interactable.InteractableType.ElevatorTeleport)
-                                {
+                                if (scp079Interactable.type is Scp079Interactable.InteractableType.ElevatorTeleport)
                                     camera = scp079Interactable.optionalObject.GetComponent<Camera079>();
-                                }
                             }
-                            if (camera != null)
+                            if (camera is not null)
                             {
                                 __instance.RpcSwitchCamera(camera.cameraId, false);
                                 __instance.Mana -= manaFromLabel;
@@ -273,7 +248,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                             if (ConsoleDebugMode.CheckImportance("SCP079", MessageImportance.LeastImportant, out Color32 color))
                             {
                                 Scp079Interactable scp079Interactable2 = null;
-                                Dictionary<Scp079Interactable.InteractableType, byte> dictionary = new Dictionary<Scp079Interactable.InteractableType, byte>();
+                                Dictionary<Scp079Interactable.InteractableType, byte> dictionary = new();
                                 foreach (Scp079Interactable scp079Interactable3 in __instance.nearbyInteractables)
                                 {
                                     if (dictionary.ContainsKey(scp079Interactable3.type))
@@ -284,13 +259,9 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                         dictionary2[type] = (byte)(b + 1);
                                     }
                                     else
-                                    {
                                         dictionary[scp079Interactable3.type] = 1;
-                                    }
-                                    if (scp079Interactable3.type == Scp079Interactable.InteractableType.ElevatorTeleport)
-                                    {
+                                    if (scp079Interactable3.type is Scp079Interactable.InteractableType.ElevatorTeleport)
                                         scp079Interactable2 = scp079Interactable3;
-                                    }
                                 }
                                 string text2;
                                 if (scp079Interactable2 == null)
@@ -313,30 +284,24 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                         goto IL_755;
                                     }
                                 }
-                                if (scp079Interactable2.optionalObject == null)
-                                {
+                                if (scp079Interactable2.optionalObject is null)
                                     text2 = "Optional object is missing.";
-                                }
-                                else if (scp079Interactable2.optionalObject.GetComponent<Camera079>() == null)
+                                else if (scp079Interactable2.optionalObject.GetComponent<Camera079>() is null)
                                 {
                                     string str = "";
                                     Transform transform = scp079Interactable2.optionalObject.transform;
                                     for (int i = 0; i < 5; i++)
                                     {
                                         str = transform.name + str;
-                                        if (!(transform.parent != null))
-                                        {
+                                        if (transform.parent is null)
                                             break;
-                                        }
                                         transform = transform.parent;
                                     }
                                     text2 = "Camera is missing at " + str;
                                 }
                                 else
-                                {
                                     text2 = "Unknown error";
-                                }
-                            IL_755:
+                                IL_755:
                                 GameCore.Console.AddDebugLog("SCP079", "Could not find the second elevator: " + text2, MessageImportance.LeastImportant, false);
                                 return false;
                             }
@@ -347,24 +312,17 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                             float manaFromLabel = __instance.GetManaFromLabel("Elevator Use", __instance.abilities);
                             string elevatorName = string.Empty;
                             if (array.Length > 0)
-                            {
                                 elevatorName = array[0];
-                            }
-                           
+
                             Elevator synElevator = Map.Get.Elevators.Find(_ => _.Name == elevatorName);
                             Scp079EventMisc.InteractionResult intendedResult;
                             if (manaFromLabel <= __instance.Mana)
-                            {
                                 intendedResult = Scp079EventMisc.InteractionResult.NoEnergy;
-                            }
-                            else if (synElevator == null || (AlphaWarheadController.Host.timeToDetonation == 0f || !synElevator.Operative || synElevator.Locked))
-                            {
+                            else if (synElevator is null || AlphaWarheadController.Host.timeToDetonation == 0f ||
+                                !synElevator.Operative || synElevator.Locked)
                                 intendedResult = Scp079EventMisc.InteractionResult.Disallow;
-                            }
                             else
-                            {
                                 intendedResult = Scp079EventMisc.InteractionResult.Allow;
-                            }
 
                             intendedResult = manaFromLabel <= __instance.Mana ? Scp079EventMisc.InteractionResult.Allow : Scp079EventMisc.InteractionResult.NoEnergy;
 
@@ -394,9 +352,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                         return false;
                                     }
                                 case Scp079EventMisc.InteractionResult.Disallow:
-                                    {
-                                        return false;
-                                    }
+                                    return false;
                                 case Scp079EventMisc.InteractionResult.NoEnergy:
                                     {
                                         // might wanna change __instance.Mana to 0,
@@ -412,12 +368,13 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                     case Command079.Tesla:
                         {
                             float manaFromLabel = __instance.GetManaFromLabel("Tesla Gate Burst", __instance.abilities);
-                            if (__instance.CurrentRoom != null)
+                            if (__instance.CurrentRoom is not null)
                             {
                                 TeslaGate vanillaTesla = __instance.CurrentRoom.GetComponentInChildren<TeslaGate>();
-                                Tesla synapseTesla = vanillaTesla != null ? Server.Get.Map.Teslas.Find(_ => _.Gate == vanillaTesla) : null;
+                                Tesla synapseTesla = vanillaTesla is not null ? Server.Get.Map.Teslas.Find(_ => _.Gate == vanillaTesla) : null;
 
-                                var intendedResult = manaFromLabel <= __instance.Mana ? Scp079EventMisc.InteractionResult.Allow : Scp079EventMisc.InteractionResult.NoEnergy;
+                                var intendedResult = manaFromLabel <= __instance.Mana ? Scp079EventMisc.InteractionResult.Allow :
+                                    Scp079EventMisc.InteractionResult.NoEnergy;
 
                                 SynapseController.Server.Events.Scp.Scp079.Invoke079TeslaInteract(
                                     __instance.gameObject.GetPlayer(),
@@ -432,18 +389,14 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                 {
                                     case Scp079EventMisc.InteractionResult.Allow:
                                         {
-                                            if (vanillaTesla != null)
-                                            {
+                                            if (vanillaTesla is not null)
                                                 vanillaTesla.RpcInstantBurst();
-                                            }
                                             __instance.AddInteractionToHistory(vanillaTesla.gameObject, true);
                                             __instance.Mana -= manaFromLabel;
                                             return false;
                                         }
                                     case Scp079EventMisc.InteractionResult.Disallow:
-                                        {
-                                            return false;
-                                        }
+                                        return false;
                                     case Scp079EventMisc.InteractionResult.NoEnergy:
                                         {
                                             // might wanna change __instance.Mana to 0,
@@ -470,28 +423,23 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                             if (__instance.CurrentRoom != null)
                             {
                                 HashSet<Scp079Interactable> roomInteractablesHashSet = Scp079Interactable.InteractablesByRoomId[__instance.CurrentRoom.UniqueId];
-                                HashSet<DoorVariant> doorHashSet = new HashSet<DoorVariant>();
+                                HashSet<DoorVariant> doorHashSet = new();
 
                                 GameCore.Console.AddDebugLog("SCP079", "Loaded all interactables", MessageImportance.LeastImportant, false);
                                 GameObject lockdownInteractable = null;
                                 foreach (Scp079Interactable interactable in roomInteractablesHashSet)
-                                {
-                                    if (interactable != null)
-                                    {
-                                        if (interactable.type != Scp079Interactable.InteractableType.Door)
+                                    if (interactable is not null)
+                                        if (interactable.type is not Scp079Interactable.InteractableType.Door)
                                         {
-                                            if (interactable.type == Scp079Interactable.InteractableType.Lockdown)
-                                            {
+                                            if (interactable.type is Scp079Interactable.InteractableType.Lockdown)
                                                 lockdownInteractable = interactable.gameObject;
-                                            }
                                         }
-                                        else if (interactable.TryGetComponent(out DoorVariant doorVariant2) && (object)doorVariant2 is IDamageableDoor damageableDoor && damageableDoor.IsDestroyed)
+                                        else if (interactable.TryGetComponent(out DoorVariant doorVariant2) && (object)doorVariant2 is
+                                            IDamageableDoor damageableDoor && damageableDoor.IsDestroyed)
                                         {
                                             GameCore.Console.AddDebugLog("SCP079", "Lockdown can't initiate, one of the doors were destroyed.", MessageImportance.LessImportant, false);
                                             return false;
                                         }
-                                    }
-                                }
 
                                 if (__instance.CurrentLDCooldown > 0f)
                                 {
@@ -501,8 +449,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 
                                 GameCore.Console.AddDebugLog("SCP079", "Looking for doors to lock...", MessageImportance.LeastImportant, false);
                                 foreach (Scp079Interactable scp079Interactable5 in roomInteractablesHashSet)
-                                {
-                                    if (!(scp079Interactable5 == null) && scp079Interactable5.TryGetComponent(out DoorVariant doorVariant3))
+                                    if (scp079Interactable5 is not null && scp079Interactable5.TryGetComponent(out DoorVariant doorVariant3))
                                     {
                                         bool doorLocked = doorVariant3.ActiveLocks == (ushort)DoorLockReason.None;
                                         if (!doorLocked)
@@ -513,17 +460,15 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                         if (doorLocked)
                                         {
                                             if (doorVariant3.TargetState)
-                                            {
                                                 doorVariant3.NetworkTargetState = false;
-                                            }
                                             doorVariant3.ServerChangeLock(DoorLockReason.Lockdown079, true);
                                             doorVariant3.UnlockLater(__instance.LockdownDuration, DoorLockReason.Lockdown079);
                                             doorHashSet.Add(doorVariant3);
                                         }
                                     }
-                                }
 
-                                var intendedResult = manaFromLabel <= __instance.Mana ? Scp079EventMisc.InteractionResult.Allow : Scp079EventMisc.InteractionResult.NoEnergy;
+                                var intendedResult = manaFromLabel <= __instance.Mana ? Scp079EventMisc.InteractionResult.Allow :
+                                    Scp079EventMisc.InteractionResult.NoEnergy;
                                 bool lightsOut = true;
 
                                 SynapseController.Server.Events.Scp.Scp079.Invoke079RoomLockdown(
@@ -539,13 +484,10 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                 {
                                     case Scp079EventMisc.InteractionResult.Allow:
                                         {
-                                            foreach (FlickerableLightController flickerableLightController in __instance.CurrentRoom.GetComponentsInChildren<FlickerableLightController>())
-                                            {
-                                                if (flickerableLightController != null)
-                                                {
+                                            foreach (FlickerableLightController flickerableLightController in
+                                                __instance.CurrentRoom.GetComponentsInChildren<FlickerableLightController>())
+                                                if (flickerableLightController is not null)
                                                     flickerableLightController.ServerFlickerLights(8f);
-                                                }
-                                            }
                                             __instance.CurrentLDCooldown = __instance.LockdownCooldown + __instance.LockdownDuration;
                                             __instance.TargetSetLockdownCooldown(__instance.connectionToClient, __instance.CurrentLDCooldown);
                                             GameCore.Console.AddDebugLog("SCP079", "Lockdown initiated.", MessageImportance.LessImportant, false);
@@ -554,9 +496,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                             return false;
                                         }
                                     case Scp079EventMisc.InteractionResult.Disallow:
-                                        {
-                                            return false;
-                                        }
+                                        return false;
                                     case Scp079EventMisc.InteractionResult.NoEnergy:
                                         {
                                             // might wanna change __instance.Mana to 0,
@@ -569,9 +509,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                 }
                             }
                             else
-                            {
                                 GameCore.Console.AddDebugLog("SCP079", "Room couldn't be specified.", MessageImportance.Normal, false);
-                            }
                             return false;
                         }
                     default:

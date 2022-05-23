@@ -6,15 +6,15 @@ namespace Synapse.Command
 {
     public class Handlers
     {
-        private static readonly List<ISynapseCommand> AwaitingFinalization = new List<ISynapseCommand>();
+        private static readonly List<ISynapseCommand> AwaitingFinalization = new();
 
         internal Handlers() { }
 
-        public CommandHandler RemoteAdminHandler { get; } = new CommandHandler();
+        public CommandHandler RemoteAdminHandler { get; } = new();
 
-        public CommandHandler ClientCommandHandler { get; } = new CommandHandler();
+        public CommandHandler ClientCommandHandler { get; } = new();
 
-        public CommandHandler ServerConsoleHandler { get; } = new CommandHandler();
+        public CommandHandler ServerConsoleHandler { get; } = new();
 
 
         internal void RegisterSynapseCommands()
@@ -71,7 +71,7 @@ namespace Synapse.Command
         internal void GenerateCommandCompletion()
         {
             var list = RemoteAdmin.QueryProcessor._commands.ToList();
-            foreach(var command in RemoteAdminHandler.Commands)
+            foreach (var command in RemoteAdminHandler.Commands)
             {
                 list.Add(new RemoteAdmin.QueryProcessor.CommandData
                 {
@@ -82,8 +82,8 @@ namespace Synapse.Command
                     Usage = command.Arguments
                 });
 
-                if (command.Aliases == null) continue;
-                
+                if (command.Aliases is null) continue;
+
                 foreach (var ali in command.Aliases)
                     list.Add(new RemoteAdmin.QueryProcessor.CommandData
                     {

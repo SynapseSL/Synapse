@@ -29,11 +29,11 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 Physics.Raycast(player.CameraReference.transform.position, player.CameraReference.transform.forward, out var raycastthit, 1000f);
                 if (raycastthit.collider == null)
                     return true;
-                
+
                 targetPos = raycastthit.point;
                 raycastthit.transform.gameObject.TryGetComponent(out Player target);
 
-                
+
                 Server.Get.Events.Player.InvokePlayerShootEvent(player, target, targetPos, item, out var allow);
                 Server.Get.Events.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allow);
 

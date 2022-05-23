@@ -3,14 +3,14 @@ using HarmonyLib;
 
 namespace Synapse.Patches.EventsPatches.RoundPatches
 {
-    [HarmonyPatch(typeof(ServerConsole), nameof(ServerConsole.AddLog))]
-	internal class WaitingandEndPatch
+	[HarmonyPatch(typeof(ServerConsole), nameof(ServerConsole.AddLog))]
+	internal class WaitingandEndPatch // It is not safe
 	{
 		[HarmonyPrefix]
 		private static void WaitForPlayers(ref string q)
 		{
 			if (q.StartsWith("Round finished! Anomalies: "))
-            {
+			{
 				try
 				{
 					Server.Get.Events.Round.InvokeRoundEndEvent();

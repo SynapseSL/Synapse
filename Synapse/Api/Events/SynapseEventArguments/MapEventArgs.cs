@@ -43,9 +43,6 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Vector3 MoveVector { get; set; }
 
         public bool Allow { get; set; } = true;
-
-        [Obsolete("Use MoveVector instead and set it to Vector3.zero")]
-        public bool Move { get; set; } = true;
     }
 
     public class LiftMoveObjectsEventArgs : EventHandler.ISynapseEventArgs

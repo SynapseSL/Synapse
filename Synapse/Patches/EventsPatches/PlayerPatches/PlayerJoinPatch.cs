@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using HarmonyLib;
 using Synapse.Database;
@@ -21,12 +20,12 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     if (!SynapseController.Server.Configs.SynapseConfiguration.DatabaseEnabled) return;
                     if (!DatabaseManager.PlayerRepository.ExistGameId(player.UserId))
                     {
-                        var dbo = new PlayerDbo()
+                        PlayerDbo dbo = new()
                         {
                             GameIdentifier = player.UserId,
                             Name = player.DisplayName,
                             DoNotTrack = player.DoNotTrack,
-                            Data = new Dictionary<string, string>()
+                            Data = new()
                         };
                         DatabaseManager.PlayerRepository.Insert(dbo);
                     }

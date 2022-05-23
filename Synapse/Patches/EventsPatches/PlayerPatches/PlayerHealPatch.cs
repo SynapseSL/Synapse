@@ -13,7 +13,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             try
             {
                 var player = __instance?.Hub?.GetPlayer();
-                if (player == null) return false;
+                if (player is null) return false;
 
                 var allow = true;
                 SynapseController.Server.Events.Player.InvokePlayerHealEvent(player, ref healAmount, ref allow);

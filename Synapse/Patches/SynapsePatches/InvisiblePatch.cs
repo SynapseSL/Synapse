@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using HarmonyLib;
 using PlayableScps;
 using UnityEngine;
@@ -22,22 +21,21 @@ namespace Synapse.Patches.SynapsePatches
 
                 __instance._frame = 0;
 
-                var players = Server.Get.Players;
-                players.AddRange(Synapse.Api.Map.Get.Dummies.Select(x => x.Player));
+                var players = Server.Get.PlayerObjects;
                 __instance._usedData = players.Count;
 
-                if (__instance.ReceivedData == null || __instance.ReceivedData.Length < __instance._usedData)
+                if (__instance.ReceivedData is null || __instance.ReceivedData.Length < __instance._usedData)
                     __instance.ReceivedData = new PlayerPositionData[__instance._usedData * 2];
 
                 for (var i = 0; i < __instance._usedData; i++)
                     __instance.ReceivedData[i] = new PlayerPositionData(players[i].Hub);
 
-                if (__instance._transmitBuffer == null || __instance._transmitBuffer.Length < __instance._usedData)
+                if (__instance._transmitBuffer is null || __instance._transmitBuffer.Length < __instance._usedData)
                     __instance._transmitBuffer = new PlayerPositionData[__instance._usedData * 2];
 
                 foreach (var player in players)
                 {
-                    if (player.Connection == null) continue;
+                    if (player.Connection is null) continue;
 
                     Array.Copy(__instance.ReceivedData, __instance._transmitBuffer, __instance._usedData);
                     for (int k = 0; k < __instance._usedData; k++)
@@ -48,17 +46,20 @@ namespace Synapse.Patches.SynapsePatches
 
                         var vector = __instance._transmitBuffer[k].position - player.Position;
 
-                        if (player.RoleType == RoleType.Spectator)
+                        if (player.RoleType is RoleType.Spectator)
                             continue;
 
-                        if (player.RoleType == RoleType.Scp173)
+                        if (player.RoleType is RoleType.Scp173)
                         {
                             if (player.Scp173Controller.IgnoredPlayers.Contains(playerToShow))
                             {
                                 showinvoid = true;
                                 goto AA_001;
                             }
-                            else if ((playerToShow.RealTeam == Team.SCP && player.CustomRole != null && !Server.Get.Configs.SynapseConfiguration.ScpTrigger173) || Server.Get.Configs.SynapseConfiguration.CantLookAt173.Contains(playerToShow.RoleID) || player.Scp173Controller.TurnedPlayers.Contains(playerToShow) || playerToShow.Invisible)
+                            else if ((playerToShow.RealTeam is Team.SCP && player.CustomRole is not null &&
+                                !Server.Get.Configs.SynapseConfiguration.ScpTrigger173) ||
+                                Server.Get.Configs.SynapseConfiguration.CantLookAt173.Contains(playerToShow.RoleID) ||
+                                player.Scp173Controller.TurnedPlayers.Contains(playerToShow) || playerToShow.Invisible)
                             {
                                 var posinfo = __instance._transmitBuffer[k];
                                 var rot = Quaternion.LookRotation(playerToShow.Position - player.Position).eulerAngles.y;
@@ -67,7 +68,9 @@ namespace Synapse.Patches.SynapsePatches
                         }
                         else if (player.RoleID == (int)RoleType.Scp93953 || player.RoleID == (int)RoleType.Scp93989)
                         {
-                            if (__instance._transmitBuffer[k].position.y < 800f && SynapseExtensions.CanHarmScp(playerToShow, false) && playerToShow.RealTeam != Team.RIP && !playerToShow.GetComponent<Scp939_VisionController>().CanSee(player.PlayerEffectsController.GetEffect<CustomPlayerEffects.Visuals939>()))
+                            if (__instance._transmitBuffer[k].position.y < 800f && SynapseExtensions.CanHarmScp(playerToShow, false) &&
+                                playerToShow.RealTeam is not Team.RIP &&
+                                !playerToShow.GetComponent<Scp939_VisionController>().CanSee(player.PlayerEffectsController.GetEffect<Visuals939>()))
                             {
                                 showinvoid = true;
                                 goto AA_001;
@@ -102,11 +105,11 @@ namespace Synapse.Patches.SynapsePatches
                                 goto AA_001;
                             }
 
-                            if (playerToShow != null)
+                            if (playerToShow is not null)
                             {
                                 var scp = player.Hub.scpsController.CurrentScp as Scp096;
 
-                                if (scp != null && scp.Enraged && !scp.HasTarget(playerToShow.Hub) && SynapseExtensions.CanHarmScp(playerToShow, false))
+                                if (scp is not null && scp.Enraged && !scp.HasTarget(playerToShow.Hub) && SynapseExtensions.CanHarmScp(playerToShow, false))
                                 {
                                     showinvoid = true;
                                     goto AA_001;
@@ -114,16 +117,15 @@ namespace Synapse.Patches.SynapsePatches
                                 if (playerToShow.Hub.playerEffectsController.GetEffect<Invisible>().IsEnabled)
                                 {
                                     var flag = false;
-                                    if (scp != null)
+                                    if (scp is not null)
                                         flag = scp.HasTarget(playerToShow.Hub);
 
-                                    if (player.RoleType == RoleType.Scp079 || flag)
+                                    if (player.RoleType is RoleType.Scp079 || flag)
                                     {
                                         if (Server.Get.Configs.SynapseConfiguration.Better268)
                                             showinvoid = true;
                                     }
-                                    else
-                                        showinvoid = true;
+                                    else showinvoid = true;
                                 }
                             }
                         }
@@ -138,9 +140,9 @@ namespace Synapse.Patches.SynapsePatches
                         Server.Get.Events.Server.InvokeTransmitPlayerDataEvent(player, playerToShow, ref pos, ref rotation, ref showinvoid);
 
                         if (showinvoid)
-                            __instance._transmitBuffer[k] = new PlayerPositionData(Vector3.up * 6000f, 0.0f, playerToShow.PlayerId);
+                            __instance._transmitBuffer[k] = new(Vector3.up * 6000f, 0.0f, playerToShow.PlayerId);
                         else
-                            __instance._transmitBuffer[k] = new PlayerPositionData(pos, rotation, playerToShow.PlayerId);
+                            __instance._transmitBuffer[k] = new(pos, rotation, playerToShow.PlayerId);
                     }
 
 
@@ -150,13 +152,13 @@ namespace Synapse.Patches.SynapsePatches
                     else
                     {
                         byte b = 0;
-                        while ((int)b < __instance._usedData / 20)
+                        while (b < __instance._usedData / 20)
                         {
                             conn.Send(new PositionPPMMessage(__instance._transmitBuffer, 20, b), 1);
                             b += 1;
                         }
 
-                        byte b2 = (byte)(__instance._usedData % (int)(b * 20));
+                        byte b2 = (byte)(__instance._usedData % (b * 20));
 
                         if (b2 > 0)
                             conn.Send(new PositionPPMMessage(__instance._transmitBuffer, b2, b), 1);
@@ -181,12 +183,13 @@ namespace Synapse.Patches.SynapsePatches
         private static void Postfix(Scp173 __instance, int __state)
         {
             var peanut = __instance.GetPlayer();
-            foreach(var ply in __instance._observingPlayers)
+            foreach (var ply in __instance._observingPlayers)
             {
                 var player = ply.GetPlayer();
                 var flag = false;
 
-                if (player.Invisible || (player.RealTeam == Team.SCP && !Server.Get.Configs.SynapseConfiguration.ScpTrigger173) || Server.Get.Configs.SynapseConfiguration.CantLookAt173.Contains(player.RoleID))
+                if (player.Invisible || (player.RealTeam is Team.SCP && !Server.Get.Configs.SynapseConfiguration.ScpTrigger173) ||
+                    Server.Get.Configs.SynapseConfiguration.CantLookAt173.Contains(player.RoleID))
                     flag = true;
 
                 if (peanut.Scp173Controller.IgnoredPlayers.Contains(player) || player.Scp173Controller.TurnedPlayers.Contains(player))
@@ -196,7 +199,7 @@ namespace Synapse.Patches.SynapsePatches
                 {
                     __instance._observingPlayers.Remove(player.Hub);
                     __instance._isObserved = __instance._observingPlayers.Count > 0;
-                    if(__state != __instance._observingPlayers.Count && __instance._blinkCooldownRemaining > 0f)
+                    if (__state != __instance._observingPlayers.Count && __instance._blinkCooldownRemaining > 0f)
                     {
                         __instance._blinkCooldownRemaining = Mathf.Max(0f, __instance._blinkCooldownRemaining + (__instance._observingPlayers.Count - __state));
                         if (__instance._blinkCooldownRemaining <= 0f)

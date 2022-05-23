@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Synapse.Api.Enum
+﻿namespace Synapse.Api.Enum
 {
     public enum Effect
     {
@@ -9,8 +7,6 @@ namespace Synapse.Api.Enum
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Amnesia,
-        [Obsolete("ArtificialRegen is no longer in the game", true)]
-        ArtificialRegen,
         /// <summary>
         /// Quickly drains stamina then health if there is none left
         /// </summary>
@@ -55,10 +51,6 @@ namespace Synapse.Api.Enum
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Disabled,
-        [Obsolete("Disarmed is no longer in the game", true)]
-        Disarmed,
-        [Obsolete("Discharge is no longer in the game", true)]
-        Discharge,
         /// <summary>
         /// Prevents all movement
         /// </summary>
@@ -69,8 +61,6 @@ namespace Synapse.Api.Enum
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Exhausted,
-        [Obsolete("Exsanguination is no longer in the game", true)]
-        Exsanguination,
         /// <summary>
         /// Flash the Player
         /// </summary>
@@ -86,8 +76,6 @@ namespace Synapse.Api.Enum
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Invigorated,
-        [Obsolete("Panic is no longer in the game", true)]
-        Panic,
         /// <summary>
         /// Ascending damage over time. Ticks every 5s.
         /// </summary>
@@ -98,11 +86,6 @@ namespace Synapse.Api.Enum
         /// </summary>
         /// <remarks>0 = Disabled, 1 = 1xCola, 2 = 2xCola, 3 = 3xCola, 4 = 4xCola</remarks>
         Scp207,
-        /// <summary>
-        /// use <see cref="Invisible"/>
-        /// </summary>
-        [Obsolete("Scp268 effect is no longer in the game, use Invisible", true)]
-        Scp268,
         /// <summary>
         /// Slows down player (No effect on SCPs)
         /// </summary>

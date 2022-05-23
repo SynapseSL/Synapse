@@ -19,7 +19,8 @@ namespace Synapse.Api.CustomObjects
 
         internal SynapseItemObject(SynapseSchematic.ItemConfiguration configuration)
         {
-            Item = CreateItem(configuration.ItemType, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale, configuration.CanBePickedUp);
+            Item = CreateItem(configuration.ItemType, configuration.Position, Quaternion.Euler(configuration.Rotation),
+                configuration.Scale, configuration.CanBePickedUp);
             Item.Durabillity = configuration.Durabillity;
             Item.WeaponAttachments = configuration.Attachments;
             OriginalScale = configuration.Scale;
@@ -52,11 +53,13 @@ namespace Synapse.Api.CustomObjects
 
         private SynapseItem CreateItem(ItemType type, Vector3 position, Quaternion rotation, Vector3 scale, bool pickup = false)
         {
-            var item = new SynapseItem(type);
-            item.Schematic = null;
-            item.Rotation = rotation;
-            item.Scale = scale;
-            item.Position = position;
+            SynapseItem item = new(type)
+            {
+                Schematic = null,
+                Rotation = rotation,
+                Scale = scale,
+                Position = position
+            };
             item.Drop(position);
             item.PickupBase.Rb.isKinematic = true;
             item.PickupBase.Rb.useGravity = false;

@@ -10,7 +10,7 @@ namespace Synapse.Config
         internal SynapseTranslation<Translation.Translation> SynapseTranslation { get; set; }
 
         private SYML _syml;
-        
+
         internal void Init()
         {
             SynapseTranslation = new SynapseTranslation<Translation.Translation>(Server.Get.Files.GetTranslationPath("Synapse"));
@@ -30,7 +30,7 @@ namespace Synapse.Config
 
             _syml = new SYML(SynapseController.Server.Files.ConfigFile);
             _syml.Load();
-            SynapseConfiguration = new SynapseConfiguration();
+            SynapseConfiguration = new();
             SynapseConfiguration = _syml.GetOrSetDefault("Synapse", SynapseConfiguration);
         }
 
@@ -38,12 +38,12 @@ namespace Synapse.Config
         {
             return _syml.GetOrSetDefault(section, defValue);
         }
-        
+
         public object GetOrSetDefault(string section, object o)
         {
             return _syml.GetOrSetDefaultUnsafe(section, o);
         }
-        
+
         public void UpdateSection<T>(string section, T replacement) where T : IConfigSection
         {
             var sec = new ConfigSection(section, "");
@@ -56,7 +56,7 @@ namespace Synapse.Config
             _syml.Sections[section] = sec;
             _syml.Store();
         }
-        
+
         public void Reload()
         {
             _syml.Load();

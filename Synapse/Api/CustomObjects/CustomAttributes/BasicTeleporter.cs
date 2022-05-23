@@ -6,8 +6,8 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
 {
     public abstract class BasicTeleporter : AttributeHandler
     {
-        public Dictionary<ISynapseObject, ArraySegment<string>> Args = new Dictionary<ISynapseObject, ArraySegment<string>>();
-        public Dictionary<ISynapseObject, float> Distance = new Dictionary<ISynapseObject, float>();
+        public Dictionary<ISynapseObject, ArraySegment<string>> Args = new();
+        public Dictionary<ISynapseObject, float> Distance = new();
 
         public override void OnLoad(ISynapseObject synapseObject, ArraySegment<string> args)
         {

@@ -1,5 +1,4 @@
 ﻿using System;
-
 namespace Synapse.Api
 {
     /// <summary>
@@ -18,11 +17,11 @@ namespace Synapse.Api
     /// itself in 
     /// </summary>
     public class Unstable : Attribute { }
-    
+
     /// <summary>
     /// An Annotation that marks a class/method of a plugin as
     /// safe to use in other plugins
     /// </summary>
     public class API : Attribute { }
-    
+
 }

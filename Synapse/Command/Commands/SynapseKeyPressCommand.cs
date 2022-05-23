@@ -19,14 +19,14 @@ namespace Synapse.Command.Commands
         {
             var result = new CommandResult();
 
-            if(context.Player == Server.Get.Host)
+            if (context.Player == Server.Get.Host)
             {
                 result.Message = "The ServerConsole cant use this command";
                 result.State = CommandResultState.Error;
                 return result;
             }
 
-            if(context.Arguments.Count < 1)
+            if (context.Arguments.Count < 1)
             {
                 result.Message = "Use .keypress sync in order to sync your binds and use all Features of the Plugins!";
                 result.State = CommandResultState.Error;

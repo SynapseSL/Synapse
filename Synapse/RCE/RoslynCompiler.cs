@@ -19,13 +19,13 @@ namespace Synapse.RCE
             string assemblyName = "RCE-" + request.AssemblyName;
             var syntaxTree = SyntaxFactory.ParseSyntaxTree(SourceText.From(request.Code));
 
-            List<MetadataReference> references = new List<MetadataReference>();
+            List<MetadataReference> references = new();
 
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
             if (assemblies.Any(_ => _.GetName().Name == assemblyName))
             {
-                Synapse.Api.Logger.Get.Warn("RCE attempted to load an already loaded assembly");
+                Api.Logger.Get.Warn("RCE attempted to load an already loaded assembly");
                 failResponse = RceResponse.GetAssemblyAlreadyLoadedResponse(assemblyName);
                 return null;
             }
@@ -71,7 +71,7 @@ namespace Synapse.RCE
                 ));
 
                 foreach (var assembly in assemblies.Where(_ => !_.IsDynamic))
-                    if (!String.IsNullOrWhiteSpace(assembly.Location))
+                    if (!string.IsNullOrWhiteSpace(assembly.Location))
                         references.Add(MetadataReference.CreateFromFile(assembly.Location));
 
                 foreach (var depend in Directory.GetFiles(Server.Get.Files.DependencyDirectory, "*.dll"))

@@ -8,7 +8,7 @@ namespace Synapse.Api.CustomObjects
 {
     public class SynapseTargetObject : SynapseToyObject<ShootingTarget>
     {
-        public static Dictionary<TargetType, ShootingTarget> Prefabs { get; } = new Dictionary<TargetType, ShootingTarget>();
+        public static Dictionary<TargetType, ShootingTarget> Prefabs { get; } = new();
 
         public SynapseTargetObject(TargetType type, Vector3 position, Quaternion rotation, Vector3 scale)
         {

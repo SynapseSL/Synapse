@@ -4,11 +4,11 @@ namespace Synapse.Command.Commands
 {
     [CommandInformation(
         Name = "Plugin",
-        Aliases = new[] { "pl","plugins" },
+        Aliases = new[] { "pl", "plugins" },
         Description = "A command which provides information about the currently installed Plugins",
         Usage = "\"plugin\" for a list of all plugins or \"plugin {pluginname}\" for information about a specific plugin",
         Permission = "synapse.command.plugins",
-        Platforms = new[] { Platform.ClientConsole,Platform.RemoteAdmin,Platform.ServerConsole },
+        Platforms = new[] { Platform.ClientConsole, Platform.RemoteAdmin, Platform.ServerConsole },
         Arguments = new[] { "(PluginName)" }
     )]
     public class SynapsePluginCommand : ISynapseCommand
@@ -17,10 +17,10 @@ namespace Synapse.Command.Commands
         {
             var result = new CommandResult();
 
-            if(context.Arguments.Count > 0)
+            if (context.Arguments.Count > 0)
             {
                 var pl = SynapseController.PluginLoader.Plugins.FirstOrDefault(x => x.Name.ToUpper() == context.Arguments.First().ToUpper());
-                if(pl == null)
+                if (pl is null)
                 {
                     result.Message = "No Plugin was found";
                     result.State = CommandResultState.Error;
@@ -44,7 +44,7 @@ namespace Synapse.Command.Commands
             }
 
             result.Message = "All Plugins:";
-            foreach(var pl in SynapseController.PluginLoader.Plugins)
+            foreach (var pl in SynapseController.PluginLoader.Plugins)
                 result.Message += $"\n{pl.Name} Version: {pl.Version} by {pl.Author}";
 
             result.State = CommandResultState.Ok;

@@ -1,5 +1,4 @@
 ﻿using Synapse.Api.Items;
-
 namespace Synapse.Api.Exceptions
 {
     public class SynapseItemAlreadyRegisteredException : SynapseException

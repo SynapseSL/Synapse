@@ -9,13 +9,13 @@
             get;
             set;
         }
-        
+
         string[] Aliases
         {
             get;
             set;
         }
-        
+
         string Permission
         {
             get;
@@ -33,7 +33,7 @@
             get;
             set;
         }
-        
+
         string Description
         {
             get;
@@ -46,6 +46,4 @@
             set;
         }
     }
-    
-
 }

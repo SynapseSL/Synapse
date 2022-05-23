@@ -1,6 +1,6 @@
 ﻿namespace Synapse.Api.Enum
 {
-   public enum ZoneType
+    public enum ZoneType
     {
         None,
         LCZ,

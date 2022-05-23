@@ -6,14 +6,14 @@ namespace Synapse.RCE
 {
     internal class RceHandler
     {
-        internal Queue<QueueAction> ActionQueue { get; } = new Queue<QueueAction>();
+        internal Queue<QueueAction> ActionQueue { get; } = new();
 
         private SynapseRceServer _rceHandler;
 
 
         internal void Init()
         {
-            Synapse.Api.Events.EventHandler.Get.Server.UpdateEvent += DequeueInConcurrentUnityContext;
+            Api.Events.EventHandler.Get.Server.UpdateEvent += DequeueInConcurrentUnityContext;
         }
 
         internal void Reload()
@@ -21,23 +21,23 @@ namespace Synapse.RCE
             if (Server.Get.Configs.SynapseConfiguration.UseLocalRceServer)
             {
                 // only activate if it hasnt been activated yet
-                if (_rceHandler == null)
+                if (_rceHandler is null)
                 {
-                    _rceHandler = new SynapseRceServer(IPAddress.Loopback, Server.Get.Configs.SynapseConfiguration.RceServerPort);
+                    _rceHandler = new(IPAddress.Loopback, Server.Get.Configs.SynapseConfiguration.RceServerPort);
                     _rceHandler.Start();
 
-                    Synapse.Api.Logger.Get.Info("RCE Server started!");
+                    Api.Logger.Get.Info("RCE Server started!");
                 }
             }
             else
             {
                 // only deactivate if it has been activated yet
-                if (_rceHandler != null)
+                if (_rceHandler is not null)
                 {
                     _rceHandler.Stop();
                     _rceHandler = null;
 
-                    Synapse.Api.Logger.Get.Info("RCE Server stopped!");
+                    Api.Logger.Get.Info("RCE Server stopped!");
                 }
             }
         }

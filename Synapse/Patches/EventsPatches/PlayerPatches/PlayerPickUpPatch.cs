@@ -20,9 +20,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var schematic = item.PickupBase?.GetComponent<SynapseObjectScript>();
                 var def = schematic?.Object as DefaultSynapseObject;
 
-                if (item == null) return true;
+                if (item is null) return true;
 
-                if(!item.CanBePickedUp && (def == null || def.Parent.ItemParent == null))
+                if (!item.CanBePickedUp && (def is null || def.Parent.ItemParent is null))
                 {
                     __instance.SessionPipe.Invalidate();
                     return false;
@@ -35,13 +35,13 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     var player = __instance.GetPlayer();
                     var allow = true;
 
-                    var change = def?.Parent?.ItemParent != null;
+                    var change = def?.Parent?.ItemParent is not null;
                     if (change)
                         item = def.Parent.ItemParent;
 
                     try
                     {
-                        if (schematic != null)
+                        if (schematic is not null)
                         {
                             var ev = new SOPickupEventArgs
                             {
@@ -89,7 +89,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: PlayerPickUp Patch failed!!\n{e}");
                 return true;

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-
 namespace Synapse.Api.Teams
 {
     public abstract class SynapseTeam : ISynapseTeam

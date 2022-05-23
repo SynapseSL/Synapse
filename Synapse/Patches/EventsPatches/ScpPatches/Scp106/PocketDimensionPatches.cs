@@ -20,12 +20,12 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
         {
             try
             {
-                if (!__instance._iawRateLimit.CanExecute(true) || ply == null || !__instance.iAm106) return false;
+                if (!__instance._iawRateLimit.CanExecute(true) || ply is null || !__instance.iAm106) return false;
 
                 var scp = __instance.GetPlayer();
                 var player = ply.GetPlayer();
 
-                if (player == null || player.GodMode || !ServerTime.CheckSynchronization(t) || !player.ClassManager.IsHuman()) 
+                if (player is null || player.GodMode || !ServerTime.CheckSynchronization(t) || !player.ClassManager.IsHuman())
                     return false;
 
                 if (!SynapseExtensions.GetHarmPermission(scp, player))
@@ -36,12 +36,14 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                 var num2 = Math.Abs(scp.Position.y - pos.y);
                 if ((num >= 1.818f && num2 < 1.02f) || (num >= 3.4f && num2 < 1.95f) || (num >= 3.7f && num2 < 2.2f) || (num >= 3.9f && num2 < 3f) || num >= 4.2f)
                 {
-                    __instance._hub.characterClassManager.TargetConsolePrint(scp.Connection, string.Format("106 MovePlayer command rejected - too big distance (code: T1). Distance: {0}, Y Diff: {1}.", num, num2), "gray");
+                    __instance._hub.characterClassManager.TargetConsolePrint(scp.Connection,
+                        $"106 MovePlayer command rejected - too big distance (code: T1). Distance: {num}, Y Diff: {num2}.", "gray");
                     return false;
                 }
                 if (Physics.Linecast(scp.Position, player.Position, MicroHIDItem.WallMask))
                 {
-                    __instance._hub.characterClassManager.TargetConsolePrint(scp.Connection, string.Format("106 MovePlayer command rejected - collider found between you and the target (code: T2). Distance: {0}, Y Diff: {1}.", num, num2), "gray");
+                    __instance._hub.characterClassManager.TargetConsolePrint(scp.Connection,
+                        $"106 MovePlayer command rejected - collider found between you and the target (code: T2). Distance: {num}, Y Diff: {num2}.", "gray");
                     return false;
                 }
 
@@ -54,7 +56,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                 if (Scp106PlayerScript._blastDoor.isClosed)
                 {
                     __instance._hub.characterClassManager.RpcPlaceBlood(player.Position, 1, 2f);
-                    player.PlayerStats.DealDamage(new ScpDamageHandler(__instance._hub, PlayerStatsSystem.DeathTranslations.PocketDecay));
+                    player.PlayerStats.DealDamage(new ScpDamageHandler(__instance._hub, DeathTranslations.PocketDecay));
                 }
                 else
                 {
@@ -65,7 +67,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                         script.ServerProcessKillAssist(player.Hub, ExpGainType.PocketAssist);
 
                     player.Hub.scp106PlayerScript.GrabbedPosition = player.Hub.playerMovementSync.RealModelPosition;
-                    player.PlayerStats.DealDamage(new ScpDamageHandler(__instance._hub, 40f, PlayerStatsSystem.DeathTranslations.PocketDecay));
+                    player.PlayerStats.DealDamage(new ScpDamageHandler(__instance._hub, 40f, DeathTranslations.PocketDecay));
                     player.Position = Vector3.down * 1998.5f;
                     scp.Scp106Controller.PocketPlayers.Add(player);
                 }
@@ -90,26 +92,24 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
             try
             {
                 var component = other.GetComponent<NetworkIdentity>();
-                if (component == null) return false;
+                if (component is null) return false;
 
                 var type = __instance._type;
                 var player = component.GetPlayer();
                 var pos = Vector3.zero;
-                if (player == null) return false;
+                if (player is null) return false;
 
                 var forceEscape = !SynapseExtensions.CanHarmScp(player, false);
                 if (player.Hub.scp106PlayerScript.GrabbedPosition == Vector3.zero)
                     player.Hub.scp106PlayerScript.GrabbedPosition = new Vector3(0f, -1997f, 0f);
 
-                var identifier = MapGeneration.RoomIdUtils.RoomAtPosition(player.Hub.scp106PlayerScript.GrabbedPosition);
-                if (identifier.Zone == FacilityZone.Surface)
+                var identifier = RoomIdUtils.RoomAtPosition(player.Hub.scp106PlayerScript.GrabbedPosition);
+                if (identifier.Zone is FacilityZone.Surface)
                 {
-                    foreach(var player2 in Server.Get.Players)
-                        if(player2.RoleType == RoleType.Scp106)
+                    foreach (var player2 in Server.Get.Players)
+                        if (player2.RoleType is RoleType.Scp106)
                         {
-                            Vector3 objPos = (player2 == null)
-                                ? Vector3.zero
-                                : player2.PlayerMovementSync.RealModelPosition;
+                            Vector3 objPos = (player2 is null) ? Vector3.zero : player2.PlayerMovementSync.RealModelPosition;
                             SafeTeleportPosition componentInChildren = identifier.GetComponentInChildren<SafeTeleportPosition>();
                             float num = Vector3.Distance(objPos, componentInChildren.SafePositions[0].position);
                             float num2 = Vector3.Distance(objPos, componentInChildren.SafePositions[1].position);
@@ -119,7 +119,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                 }
                 else
                 {
-                    var hashSet = MapGeneration.RoomIdUtils.FindRooms(MapGeneration.RoomName.Unnamed, identifier.Zone, MapGeneration.RoomShape.Undefined);
+                    var hashSet = RoomIdUtils.FindRooms(RoomName.Unnamed, identifier.Zone, RoomShape.Undefined);
                     /*hashSet.RemoveWhere((MapGeneration.RoomIdentifier room) => 
                     room.Name == MapGeneration.RoomName.Hcz106 || room.Name == MapGeneration.RoomName.EzGateA || 
                     room.Name == MapGeneration.RoomName.EzGateB || room.Name == MapGeneration.RoomName.EzEvacShelter ||
@@ -131,7 +131,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                     {
                         while (hashSet.Count > 0)
                         {
-                            MapGeneration.RoomIdentifier roomIdentifier2 = hashSet.ElementAt(UnityEngine.Random.Range(0, hashSet.Count));
+                            RoomIdentifier roomIdentifier2 = hashSet.ElementAt(UnityEngine.Random.Range(0, hashSet.Count));
                             var safepos = roomIdentifier2.transform.position;
                             var safeTeleport = roomIdentifier2.GetComponentInChildren<SafeTeleportPosition>();
                             if (safeTeleport != null && safeTeleport.SafePositions?.Length != 0)
@@ -142,7 +142,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                             hashSet.Remove(roomIdentifier2);
                         }
                     }
-                    catch(Exception ex)
+                    catch/* (Exception ex)*/
                     {
                         //I don't know how but for some Reason this fails sometimes and the method is called a second time
                         //Logger.Get.Debug(ex);
@@ -150,10 +150,10 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                     }
                 }
                 EventHandler.Get.Scp.Scp106.InvokePocketDimensionLeaveEvent(player, ref pos, ref type, out var allow);
-                
+
                 if (!allow) return false;
 
-                if (!forceEscape && (type == PocketDimensionTeleport.PDTeleportType.Killer || Synapse.Api.Nuke.Get.Detonated))
+                if (!forceEscape && (type is PocketDimensionTeleport.PDTeleportType.Killer || Api.Nuke.Get.Detonated))
                 {
                     player.PlayerStats.DealDamage(new UniversalDamageHandler(-1f, DeathTranslations.PocketDecay));
                     return false;
@@ -163,12 +163,12 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                     player.Position = pos;
                     player.PlayerEffectsController.EnableEffect<CustomPlayerEffects.Disabled>(10f, true);
                     player.PlayerEffectsController.GetEffect<CustomPlayerEffects.Corroding>().Intensity = 0;
-                    Achievements.AchievementHandlerBase.ServerAchieve(component.connectionToClient, AchievementName.LarryFriend);
+                    AchievementHandlerBase.ServerAchieve(component.connectionToClient, AchievementName.LarryFriend);
                 }
-                MapGeneration.ImageGenerator.pocketDimensionGenerator.GenerateRandom();
+                ImageGenerator.pocketDimensionGenerator.GenerateRandom();
 
                 return false;
-            } 
+            }
             catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: PocketDimLeave failed!!\n{e}");

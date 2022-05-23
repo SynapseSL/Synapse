@@ -5,11 +5,11 @@ using static Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp049
 {
-    [HarmonyPatch(typeof(PlayableScps.Scp049),nameof(PlayableScps.Scp049.BodyCmd_ByteAndGameObject))]
+    [HarmonyPatch(typeof(PlayableScps.Scp049), nameof(PlayableScps.Scp049.BodyCmd_ByteAndGameObject))]
     internal static class ReviveEvent
     {
         [HarmonyPrefix]
-        private static bool OnInteract(PlayableScps.Scp049 __instance,byte num, GameObject go)
+        private static bool OnInteract(PlayableScps.Scp049 __instance, byte num, GameObject go)
         {
             try
             {
@@ -22,9 +22,9 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp049
                 Get.Scp.Scp049.InvokeRevive(scp, target, ragdoll, num == 2, out var allow);
                 return allow;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp049ReviveEvent failed!!\n{ex}");
+                Api.Logger.Get.Error($"Synapse-Event: Scp049ReviveEvent failed!!\n{ex}");
                 return true;
             }
         }

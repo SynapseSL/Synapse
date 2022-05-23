@@ -7,15 +7,15 @@ using Synapse.Api.Items;
 
 namespace Synapse.Patches.SynapsePatches.Item
 {
-    [HarmonyPatch(typeof(ItemDistributor),nameof(ItemDistributor.SpawnPickup))]
-	internal static class SpawnPickupPatch
+    [HarmonyPatch(typeof(ItemDistributor), nameof(ItemDistributor.SpawnPickup))]
+    internal static class SpawnPickupPatch
     {
-		[HarmonyPrefix]
-		private static bool SpawnPickup(ItemPickupBase ipb)
+        [HarmonyPrefix]
+        private static bool SpawnPickup(ItemPickupBase ipb)
         {
             try
             {
-                if (ipb == null) return false;
+                if (ipb is null) return false;
                 NetworkServer.Spawn(ipb.gameObject);
 
                 var serial = InventorySystem.Items.ItemSerialGenerator.GenerateNext();
@@ -35,9 +35,9 @@ namespace Synapse.Patches.SynapsePatches.Item
                 ipb.InfoReceived(default, info);
                 new SynapseItem(ipb);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Item: Error while Spawning Pickup:\n{e}");
+                Api.Logger.Get.Error($"Synapse-Item: Error while Spawning Pickup:\n{e}");
             }
 
             return false;

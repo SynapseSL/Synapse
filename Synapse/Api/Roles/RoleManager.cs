@@ -34,7 +34,7 @@ namespace Synapse.Api.Roles
         {
             var roleinformation = CustomRoles.FirstOrDefault(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
 
-            if(roleinformation == null)
+            if (roleinformation is null)
                 throw new SynapseRoleNotFoundException("A Role was requested that is not registered in Synapse.Please check your configs and plugins", name);
 
             if (roleinformation.RoleScript.GetConstructors().Any(x => x.GetParameters().Count() == 1 && x.GetParameters().First().ParameterType == typeof(int)))
@@ -103,7 +103,7 @@ namespace Synapse.Api.Roles
                 var player = Server.Get.GetPlayer(int.Parse(id));
                 if (player == null) continue;
 
-                if (player.CustomRole != null)
+                if (player.CustomRole is not null)
                     player.CustomRole = null;
             }
         }

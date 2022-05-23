@@ -6,7 +6,7 @@ using ev = Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp939
 {
-    [HarmonyPatch(typeof(PlayableScps.Scp939),nameof(PlayableScps.Scp939.ServerAttack))]
+    [HarmonyPatch(typeof(PlayableScps.Scp939), nameof(PlayableScps.Scp939.ServerAttack))]
     internal static class Scp939AttackPatch
     {
         [HarmonyPrefix]
@@ -17,7 +17,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp939
             {
                 var scp = __instance.GetPlayer();
 
-                if(target.TryGetComponent<BreakableWindow>(out var window))
+                if (target.TryGetComponent<BreakableWindow>(out var window))
                 {
                     window.Damage(50f, new ScpDamageHandler(scp.Hub, 50f, DeathTranslations.Scp939), Vector3.zero);
                     __result = true;
@@ -31,7 +31,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp939
                     ev.Get.Scp.InvokeScpAttack(scp, targetplayer, Api.Enum.ScpAttackType.Scp939_Bite, out var allow);
 
                     if (!allow) return false;
-                    
+
                     targetplayer.PlayerStats.DealDamage(new ScpDamageHandler(scp.Hub, 50f, DeathTranslations.Scp939));
                     scp.ClassManager.RpcPlaceBlood(targetplayer.Position, 0, 2f);
 
@@ -41,9 +41,9 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp939
 
                 return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp939) failed!!\n{e}");
+                Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp939) failed!!\n{e}");
                 return true;
             }
         }

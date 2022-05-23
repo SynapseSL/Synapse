@@ -20,39 +20,39 @@ namespace Synapse.Api
 
         public static Map Get => Server.Get.Map;
 
-        public Nuke Nuke { get; } = new Nuke();
+        public Nuke Nuke { get; } = new();
 
-        public Round Round { get; } = new Round();
+        public Round Round { get; } = new();
 
-        public Decontamination Decontamination { get; } = new Decontamination();
+        public Decontamination Decontamination { get; } = new();
 
-        public Scp914 Scp914 { get; } = new Scp914();
+        public Scp914 Scp914 { get; } = new();
 
-        public HeavyController HeavyController { get; } = new HeavyController();
+        public HeavyController HeavyController { get; } = new();
 
-        public List<Tesla> Teslas { get; } = new List<Tesla>();
+        public List<Tesla> Teslas { get; } = new();
 
-        public List<Elevator> Elevators { get; } = new List<Elevator>();
+        public List<Elevator> Elevators { get; } = new();
 
-        public List<Door> Doors { get; } = new List<Door>();
+        public List<Door> Doors { get; } = new();
 
-        public List<Room> Rooms { get; } = new List<Room>();
+        public List<Room> Rooms { get; } = new();
 
-        public List<Generator> Generators { get; } = new List<Generator>();
+        public List<Generator> Generators { get; } = new();
 
-        public List<WorkStation> WorkStations { get; } = new List<WorkStation>();
+        public List<WorkStation> WorkStations { get; } = new();
 
-        public List<Ragdoll> Ragdolls { get; } = new List<Ragdoll>();
+        public List<Ragdoll> Ragdolls { get; } = new();
 
-        public List<SynapseItem> Items => SynapseItem.AllItems.Values.Where(x => x != null).ToList();
+        public List<SynapseItem> Items => SynapseItem.AllItems.Values.Where(x => x is not null).ToList();
 
-        public List<Dummy> Dummies { get; } = new List<Dummy>();
+        public List<Dummy> Dummies { get; } = new();
 
-        public List<Camera> Cameras { get; } = new List<Camera>();
+        public List<Camera> Cameras { get; } = new();
 
-        public List<Locker> Lockers { get; } = new List<Locker>();
+        public List<Locker> Lockers { get; } = new();
 
-        public List<ISynapseObject> SynapseObjects { get; } = new List<ISynapseObject>();
+        public List<ISynapseObject> SynapseObjects { get; } = new();
 
         public string IntercomText
         {
@@ -139,7 +139,7 @@ namespace Synapse.Api
 
         public void SubtitleCassie(string words, bool makehold = true, bool makenoise = true)
             => Respawning.RespawnEffectsController.PlayCassieAnnouncement(words, makehold, makenoise, true);
-        
+
         public void GlitchedCassie(string words)
         {
             float num2 = (AlphaWarheadController.Host.timeToDetonation <= 0f) ? 3.5f : 1f;
@@ -155,7 +155,7 @@ namespace Synapse.Api
             if (player != null)
                 grenadeitem.Throwable.ThrowableItem.PreviousOwner = new Footprinting.Footprint(player.Hub);
 
-            if(grenadeitem.Throwable.ThrowableItem.TryGetComponent<Rigidbody>(out var rgb))
+            if (grenadeitem.Throwable.ThrowableItem.TryGetComponent<Rigidbody>(out var rgb))
                 rgb.velocity = velocity;
 
             return grenadeitem;
@@ -163,7 +163,8 @@ namespace Synapse.Api
 
         public NetworkIdentity SpawnOldGrenade(Vector3 position, Quaternion rotation, bool flash = false)
         {
-            var prefab = flash ? NetworkClient.prefabs[Guid.Parse("c69da0e5-a829-6a04-c8d9-f404a1073cfe")] : NetworkClient.prefabs[Guid.Parse("8063e113-c1f1-1514-7bc5-840ea8ee5f01")];
+            var prefab = flash ? NetworkClient.prefabs[Guid.Parse("c69da0e5-a829-6a04-c8d9-f404a1073cfe")] :
+                NetworkClient.prefabs[Guid.Parse("8063e113-c1f1-1514-7bc5-840ea8ee5f01")];
             var gameObject = UnityEngine.Object.Instantiate(prefab, position, rotation);
             NetworkServer.Spawn(gameObject.gameObject);
             return gameObject.GetComponent<NetworkIdentity>();
@@ -176,7 +177,7 @@ namespace Synapse.Api
             NetworkServer.Spawn(gameObject.gameObject);
 
             if (destroy >= 0)
-                MEC.Timing.CallDelayed(destroy,() => NetworkServer.Destroy(gameObject));
+                MEC.Timing.CallDelayed(destroy, () => NetworkServer.Destroy(gameObject));
 
             return gameObject;
         }
@@ -186,29 +187,13 @@ namespace Synapse.Api
             var itemtype = (ItemType)grenadeType;
             var grenadeitem = new SynapseItem(itemtype, position);
             grenadeitem.Throwable.Fuse();
-            if (player != null)
+            if (player is not null)
                 grenadeitem.Throwable.ThrowableItem.PreviousOwner = new Footprinting.Footprint(player.Hub);
             MEC.Timing.CallDelayed(0.1f, () => grenadeitem.Destroy());
         }
 
         public void PlaceBlood(Vector3 pos, int type = 0, float size = 2)
             => Server.Get.Host.ClassManager.RpcPlaceBlood(pos, type, size);
-
-        [Obsolete("Instantiate a Dummy instead", true)]
-        public Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "")
-            => new Dummy(pos, rot, role, name, badgetext, badgecolor);
-
-        [Obsolete("Moved to Workstation.CreateWorkStation()", true)]
-        public WorkStation CreateWorkStation(Vector3 position, Vector3 rotation, Vector3 scale)
-            => new WorkStation(position, rotation, scale);
-
-        //[Obsolete("Moved to Ragdoll.CreateRagdoll()", true)]
-        //public Ragdoll CreateRagdoll(RoleType roletype, Vector3 pos, Quaternion rot, DamageHandlerBase handler, Player owner) 
-        //    => new Ragdoll(roletype, pos, rot, handler, owner);
-
-        [Obsolete("Moved to Door.SpawnDoorVariant()", true)]
-        public Door SpawnDoorVariant(Vector3 position, Quaternion? rotation = null, DoorPermissions permissions = null)
-            => Door.SpawnDoorVariant(position, rotation, permissions);
 
         internal void AddObjects()
         {
@@ -220,13 +205,13 @@ namespace Synapse.Api
             }
 
             foreach (var tesla in SynapseController.Server.GetObjectsOf<TeslaGate>())
-                Teslas.Add(new Tesla(tesla));
+                Teslas.Add(new(tesla));
 
             foreach (var station in WorkstationController.AllWorkstations)
-                WorkStations.Add(new WorkStation(station));
+                WorkStations.Add(new(station));
 
             foreach (var door in SynapseController.Server.GetObjectsOf<DoorVariant>())
-                Doors.Add(new Door(door));
+                Doors.Add(new(door));
 
             foreach (var pair in Scp079Interactable.InteractablesByRoomId)
             {
@@ -236,7 +221,7 @@ namespace Synapse.Api
                     {
                         var room = Rooms.FirstOrDefault(x => x.ID == pair.Key);
                         var door = interactable.GetComponentInParent<DoorVariant>();
-                        if (room == null || door == null) continue;
+                        if (room is null || door is null) continue;
                         var sdoor = door.GetDoor();
                         sdoor.Rooms.Add(room);
                         room.Doors.Add(sdoor);
@@ -247,7 +232,7 @@ namespace Synapse.Api
 
             Scp914.Scp914Controller = UnityEngine.Object.FindObjectOfType<Scp914Controller>();
 
-            SynapseController.Server.Map.Elevators.RemoveAll(x => x.GameObject == null);
+            SynapseController.Server.Map.Elevators.RemoveAll(x => x.GameObject is null);
         }
 
         internal void ClearObjects()

@@ -15,7 +15,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
             {
                 Server.Get.Events.Round.InvokeRoundRestartEvent();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: RoundRestartEvent failed!!\n{e}");
             }

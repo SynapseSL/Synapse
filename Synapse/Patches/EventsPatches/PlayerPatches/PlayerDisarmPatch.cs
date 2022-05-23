@@ -6,7 +6,7 @@ using Mirror;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(DisarmingHandlers),nameof(DisarmingHandlers.ServerProcessDisarmMessage))]
+    [HarmonyPatch(typeof(DisarmingHandlers), nameof(DisarmingHandlers.ServerProcessDisarmMessage))]
     internal static class PlayerDisarmPatch
     {
         [HarmonyPrefix]
@@ -22,14 +22,14 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     if ((msg.PlayerToDisarm.transform.position - cuffer.Position).sqrMagnitude > 20f)
                         return false;
 
-                    if (msg.PlayerToDisarm.inventory.CurInstance != null && msg.PlayerToDisarm.inventory.CurInstance.TierFlags != ItemTierFlags.Common)
+                    if (msg.PlayerToDisarm.inventory.CurInstance is not null && msg.PlayerToDisarm.inventory.CurInstance.TierFlags is not ItemTierFlags.Common)
                         return false;
                 }
 
                 var flag = !msg.PlayerIsNull && msg.PlayerToDisarm.inventory.IsDisarmed();
                 var flag2 = !msg.PlayerIsNull && DisarmedPlayers.CanDisarm(cuffer.Hub, msg.PlayerToDisarm);
 
-                if(flag && !msg.Disarm)
+                if (flag && !msg.Disarm)
                 {
                     if (!cuffer.IsCuffed)
                     {
@@ -40,12 +40,12 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 }
                 else
                 {
-                    if(flag || !flag2 || !msg.Disarm)
+                    if (flag || !flag2 || !msg.Disarm)
                     {
                         cuffer.NetworkIdentity.connectionToClient.Send(DisarmingHandlers.NewDisarmedList, 0);
                         return false;
                     }
-                    if(msg.PlayerToDisarm.inventory.CurInstance == null || msg.PlayerToDisarm.inventory.CurInstance.CanHolster())
+                    if (msg.PlayerToDisarm.inventory.CurInstance is null || msg.PlayerToDisarm.inventory.CurInstance.CanHolster())
                     {
                         SynapseController.Server.Events.Player.InvokePlayerCuffTargetEvent(target, cuffer, out var allow2);
 

@@ -6,7 +6,7 @@ using Synapse.Api;
 
 namespace Synapse.Patches.EventsPatches.RoundPatches
 {
-    [HarmonyPatch(typeof(CharacterClassManager),nameof(CharacterClassManager.SetRandomRoles))]
+    [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.SetRandomRoles))]
     internal static class SpawnPlayersPatch
     {
         [HarmonyPrefix]
@@ -38,7 +38,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                         continue;
                     }
 
-                    if (__instance.IsCIOnStart && pair.Value == RoleType.FacilityGuard)
+                    if (__instance.IsCIOnStart && pair.Value is RoleType.FacilityGuard)
                         newDictionary.Add(player, (int)RoleType.ChaosRifleman);
                     else
                         newDictionary.Add(player, (int)pair.Value);
@@ -70,7 +70,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 
                 return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 SynapseController.Server.Logger.Error($"Synapse-Event: SpawnPlayers failed!!\n{e}");
                 return true;

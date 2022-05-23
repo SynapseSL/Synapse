@@ -23,7 +23,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 return allow;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: DropItem failed!!\n{e}");
                 return true;

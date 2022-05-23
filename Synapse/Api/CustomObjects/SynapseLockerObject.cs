@@ -9,7 +9,7 @@ namespace Synapse.Api.CustomObjects
 {
     public class SynapseLockerObject : StructureSyncSynapseObject
     {
-        public static Dictionary<LockerType, MapGeneration.Distributors.Locker> Prefabs = new Dictionary<LockerType, MapGeneration.Distributors.Locker>();
+        public static Dictionary<LockerType, MapGeneration.Distributors.Locker> Prefabs = new();
 
         public SynapseLockerObject(LockerType lockerType, Vector3 pos, Quaternion rotation, Vector3 scale, bool removeDefaultItems = false)
         {
@@ -23,7 +23,8 @@ namespace Synapse.Api.CustomObjects
         }
         internal SynapseLockerObject(SynapseSchematic.LockerConfiguration configuration)
         {
-            Locker = CreateLocker(configuration.LockerType, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale, configuration.DeleteDefaultItems);
+            Locker = CreateLocker(configuration.LockerType, configuration.Position, Quaternion.Euler(configuration.Rotation),
+                configuration.Scale, configuration.DeleteDefaultItems);
             LockerType = configuration.LockerType;
             OriginalScale = configuration.Scale;
             CustomAttributes = configuration.CustomAttributes;
@@ -47,8 +48,8 @@ namespace Synapse.Api.CustomObjects
 
         public void SpawnItem(ItemType type, int chamber, int amount = 1)
         {
-            if(chamber >= 0 && Locker.Chambers.Count > chamber)
-            Locker.Chambers[chamber].SpawnItem(type, amount);
+            if (chamber >= 0 && Locker.Chambers.Count > chamber)
+                Locker.Chambers[chamber].SpawnItem(type, amount);
             UnfreezeAll();
         }
 
@@ -82,7 +83,7 @@ namespace Synapse.Api.CustomObjects
         private void UnfreezeAll()
         {
             foreach (Rigidbody rigidbody in SpawnablesDistributorBase.BodiesToUnfreeze)
-                if (rigidbody != null)
+                if (rigidbody is not null)
                 {
                     rigidbody.isKinematic = false;
                     rigidbody.useGravity = true;

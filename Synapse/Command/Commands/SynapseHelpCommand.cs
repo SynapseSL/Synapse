@@ -48,14 +48,14 @@ namespace Synapse.Command.Commands
             {
                 var command = commandlist.FirstOrDefault(x => x.Name.Equals(context.Arguments.First(), StringComparison.OrdinalIgnoreCase));
 
-                if (command == null)
+                if (command is null)
                 {
                     foreach (ICommand c in commandlist.Where(c => c.Aliases.Any(alias => alias.Equals(context.Arguments.First(), StringComparison.OrdinalIgnoreCase))))
                     {
                         command = c;
                     }
 
-                    if (command == null)
+                    if (command is null)
                     {
                         result.State = CommandResultState.Error;
                         result.Message = "No Command with this Name found";

@@ -16,12 +16,9 @@ namespace Synapse.RCE
 
         internal SynapseRceServer(IPAddress address, int port)
         {
-            _roslynCompiler = new RoslynCompiler();
-            _listener = new TcpListener(address, port);
-            _serializerSettings = new JsonSerializerSettings()
-            {
-                MissingMemberHandling = MissingMemberHandling.Error
-            };
+            _roslynCompiler = new();
+            _listener = new(address, port);
+            _serializerSettings = new() { MissingMemberHandling = MissingMemberHandling.Error };
         }
 
         internal void Start()
@@ -47,12 +44,12 @@ namespace Synapse.RCE
             }
             catch (Exception e) when (e is IOException || e is SocketException)
             {
-                Synapse.Api.Logger.Get.Error($"RCE-Server Connection forcibly closed");
+                Api.Logger.Get.Error($"RCE-Server Connection forcibly closed");
                 // Connection forcibly closed, ignore and run out
             }
             catch (Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"LocalCommunicationHandler Exception: {e}");
+                Api.Logger.Get.Error($"LocalCommunicationHandler Exception: {e}");
             }
         }
         private void HandleClient(TcpClient client)
@@ -78,7 +75,7 @@ namespace Synapse.RCE
                     }
 
                     // Prepare object to be handed over to concurrent Unity-Context
-                    Action action = () => methodInfo.Invoke(null, new object[] { new string[0] });
+                    void action() => methodInfo.Invoke(null, new object[] { new string[0] });
                     var qAction = new QueueAction()
                     {
                         Action = action,
@@ -104,16 +101,17 @@ namespace Synapse.RCE
                     var response = RceResponse.GetInvalidJsonResponse();
                     var responseJson = JsonConvert.SerializeObject(response);
                     netStreamWriter.WriteLine(responseJson);
+                    Api.Logger.Get.Debug($"RCE-Server Json Serialization Error: {e}");
                 }
                 catch (Exception e) when (e is IOException || e is SocketException)
                 {
-                    Synapse.Api.Logger.Get.Error($"RCE-Server Connection forcibly closed");
+                    Api.Logger.Get.Error("RCE-Server Connection forcibly closed");
                     // Connection forcibly closed, ignore and run out
                     break;
                 }
                 catch (Exception e)
                 {
-                    Synapse.Api.Logger.Get.Error($"LocalCommunicationHandler Exception: {e}");
+                    Api.Logger.Get.Error($"LocalCommunicationHandler Exception: {e}");
                 }
             }
         }

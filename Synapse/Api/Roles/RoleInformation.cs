@@ -1,5 +1,4 @@
 ﻿using System;
-
 namespace Synapse.Api.Roles
 {
     public class RoleInformation

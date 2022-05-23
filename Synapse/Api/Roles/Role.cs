@@ -27,22 +27,24 @@ namespace Synapse.Api.Roles
 
         public abstract int GetRoleID();
 
+#pragma warning disable CS0618
         public virtual int GetTeamID() => (int)GetTeam();
 
         public virtual List<int> GetFriendsID() => GetFriends().Select(x => (int)x).ToList();
 
         public virtual List<int> GetEnemiesID() => GetEnemys().Select(x => (int)x).ToList();
+#pragma warning restore CS0618
 
         public abstract void Spawn();
 
         public virtual void DeSpawn() { }
 
         public virtual void Escape() { }
-
+        // why?
         #region Obsolete
         [Obsolete("CustomRoles will now be ignored when Escape and the Escape method is called so use it instead")]
         public virtual int GetEscapeRole() => -1;
-        [Obsolete("Use GetTeamID()",false)]
+        [Obsolete("Use GetTeamID()", false)]
         public virtual Team GetTeam() => Team.RIP;
         [Obsolete("Use GetFriendsID()", false)]
         public virtual List<Team> GetFriends() => new List<Team>();

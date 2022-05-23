@@ -11,7 +11,7 @@ namespace Synapse.Api.CustomObjects
         public abstract GameObject GameObject { get; }
         public abstract ObjectType Type { get; }
 
-        public Dictionary<string, object> ObjectData { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, object> ObjectData { get; set; } = new();
         public List<string> CustomAttributes { get; set; }
 
         public Vector3 OriginalScale { get; internal set; }
@@ -40,7 +40,7 @@ namespace Synapse.Api.CustomObjects
 
         public virtual void ApplyPhysics()
         {
-            if (GameObject.GetComponent<Rigidbody>() == null)
+            if (GameObject.GetComponent<Rigidbody>() is null)
                 Rigidbody = GameObject.AddComponent<Rigidbody>();
         }
 

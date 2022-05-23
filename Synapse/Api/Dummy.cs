@@ -118,7 +118,7 @@ namespace Synapse.Api
         //Thanks to GameHunt.I used some of his code for the Dummy API https://github.com/gamehunt/CustomNPCs
         private IEnumerator<float> Update()
         {
-            for(; ; )
+            for (; ; )
             {
                 yield return MEC.Timing.WaitForSeconds(0.1f);
                 try
@@ -187,14 +187,15 @@ namespace Synapse.Api
                         Direction = MovementDirection.Stop;
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Logger.Get.Error($"Synapse-Dummy: Dummy Update Failed:\n{e}");
                 }
             }
         }
 
-        public Dummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "") : this(pos, new Vector2(rot.eulerAngles.x, rot.eulerAngles.y),role,name,badgetext,badgecolor) { }
+        public Dummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "",
+            string badgecolor = "") : this(pos, new Vector2(rot.eulerAngles.x, rot.eulerAngles.y), role, name, badgetext, badgecolor) { }
 
         /// <summary>
         /// Creates a new Dummy and spawns it
@@ -270,7 +271,7 @@ namespace Synapse.Api
             Map.Get.Dummies.Remove(this);
         }
 
-        public static Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "")
-            => new Dummy(pos, rot, role, name, badgetext, badgecolor);
+        public static Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)",
+            string badgetext = "", string badgecolor = "") => new(pos, rot, role, name, badgetext, badgecolor);
     }
 }

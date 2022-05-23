@@ -1,5 +1,4 @@
 ﻿using System;
-
 namespace Synapse.RCE
 {
     internal class QueueAction

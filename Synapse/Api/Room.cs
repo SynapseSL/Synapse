@@ -21,7 +21,7 @@ namespace Synapse.Api
             LightController = GameObject.GetComponentInChildren<FlickerableLightController>();
 
             foreach (var cam in GameObject.GetComponentsInChildren<Camera079>())
-                Cameras.Add(new Camera(cam,this));
+                Cameras.Add(new Camera(cam, this));
 
             NetworkIdentity = GetNetworkIdentity(RoomType);
         }
@@ -41,7 +41,7 @@ namespace Synapse.Api
             get => GameObject.transform.position;
             set
             {
-                if (NetworkIdentity == null) return;
+                if (NetworkIdentity is null) return;
                 NetworkIdentity.transform.position = value;
                 NetworkIdentity.UpdatePositionRotationScale();
             }
@@ -52,7 +52,7 @@ namespace Synapse.Api
             get => GameObject.transform.rotation;
             set
             {
-                if (NetworkIdentity == null) return;
+                if (NetworkIdentity is null) return;
                 NetworkIdentity.transform.rotation = value;
                 NetworkIdentity.UpdatePositionRotationScale();
             }
@@ -63,7 +63,7 @@ namespace Synapse.Api
             get => GameObject.transform.localScale;
             set
             {
-                if (NetworkIdentity == null) return;
+                if (NetworkIdentity is null) return;
                 NetworkIdentity.transform.localScale = value;
                 NetworkIdentity.UpdatePositionRotationScale();
             }
@@ -75,9 +75,9 @@ namespace Synapse.Api
 
         public FlickerableLightController LightController { get; }
 
-        public List<Door> Doors { get; } = new List<Door>();
+        public List<Door> Doors { get; } = new();
 
-        public List<Camera> Cameras { get; } = new List<Camera>();
+        public List<Camera> Cameras { get; } = new();
 
         public int ID { get; }
 
@@ -118,20 +118,14 @@ namespace Synapse.Api
 
         private static NetworkIdentity GetNetworkIdentity(RoomName room)
         {
-            if(networkIdentities == null) networkIdentities = GameObject.FindObjectsOfType<NetworkIdentity>().Where(x => x.name.Contains("All")).ToList();
-            switch (room)
+            if (networkIdentities is null) networkIdentities = Object.FindObjectsOfType<NetworkIdentity>().Where(x => x.name.Contains("All")).ToList();
+            return room switch
             {
-                case MapGeneration.RoomName.Lcz330:
-                    return networkIdentities.FirstOrDefault(x => x.assetId == new System.Guid("17f38aa5-1bc8-8bc4-0ad1-fffcbe4214ae"));
-
-                case MapGeneration.RoomName.Hcz939:
-                    return networkIdentities.FirstOrDefault(x => x.assetId == new System.Guid("d1566564-d477-24c4-c953-c619898e4751"));
-
-                case MapGeneration.RoomName.Hcz106:
-                    return networkIdentities.FirstOrDefault(x => x.assetId == new System.Guid("c1ae9ee4-cc8e-0794-3b2c-358aa6e57565"));
-
-                default: return null;
-            }
+                MapGeneration.RoomName.Lcz330 => networkIdentities.FirstOrDefault(x => x.assetId == new System.Guid("17f38aa5-1bc8-8bc4-0ad1-fffcbe4214ae")),
+                MapGeneration.RoomName.Hcz939 => networkIdentities.FirstOrDefault(x => x.assetId == new System.Guid("d1566564-d477-24c4-c953-c619898e4751")),
+                MapGeneration.RoomName.Hcz106 => networkIdentities.FirstOrDefault(x => x.assetId == new System.Guid("c1ae9ee4-cc8e-0794-3b2c-358aa6e57565")),
+                _ => null,
+            };
         }
     }
 }

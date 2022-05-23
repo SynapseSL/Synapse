@@ -4,7 +4,7 @@ using Synapse.Api.Events.SynapseEventArguments;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    //TODO: Rework
+    //TODO: Rework ;; okay..
     [HarmonyPatch(typeof(Radio), nameof(Radio.UserCode_CmdSyncTransmissionStatus))]
     internal static class PlayerSpeakPatch
     {
@@ -20,7 +20,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var specChat = __instance._dissonanceSetup.SpectatorChat;
                 var allow = true;
 
-                SynapseController.Server.Events.Player.InvokePlayerSpeakEvent(__instance._dissonanceSetup, ref intercom, ref radio, ref scp939, ref scpChat, ref specChat, ref allow);
+                SynapseController.Server.Events.Player.InvokePlayerSpeakEvent(__instance._dissonanceSetup, ref intercom,
+                    ref radio, ref scp939, ref scpChat, ref specChat, ref allow);
 
                 __instance._dissonanceSetup.SCPChat = scpChat;
                 __instance._dissonanceSetup.SpectatorChat = specChat;
@@ -38,10 +39,11 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                         var player = __instance.GetPlayer();
                         var item = __instance.RadioItem;
 
-                        if (item != null)
+                        if (item is not null)
                         {
                             var allowradio = true;
-                            SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(player, item.GetSynapseItem(), ItemInteractState.Finalizing, ref allowradio);
+                            SynapseController.Server.Events.Player.InvokePlayerItemUseEvent(player, item.GetSynapseItem(),
+                                ItemInteractState.Finalizing, ref allowradio);
                             __instance._dissonanceSetup.RadioAsHuman = allowradio;
                         }
                     }

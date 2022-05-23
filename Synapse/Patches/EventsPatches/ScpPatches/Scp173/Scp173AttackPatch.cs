@@ -14,7 +14,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp173
                 var scp = __instance.GetPlayer();
                 var player = target.GetPlayer();
 
-                if (target == __instance.Hub || player.ClassManager.IsAnyScp() || player.ClassManager.CurClass == RoleType.Spectator)
+                if (target == __instance.Hub || player.ClassManager.IsAnyScp() || player.ClassManager.CurClass is RoleType.Spectator)
                     return false;
 
                 if (!SynapseExtensions.GetHarmPermission(scp, player))
@@ -24,7 +24,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp173
 
                 return allow;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Synapse.Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp173) failed!!\n{e}");
                 return true;

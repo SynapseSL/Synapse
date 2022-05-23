@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Synapse.Api.Enum
+﻿namespace Synapse.Api.Enum
 {
     public enum GeneratorInteraction
     {
@@ -9,10 +7,5 @@ namespace Synapse.Api.Enum
         Unlocked,
         OpenDoor,
         CloseDoor,
-
-        [Obsolete("Use Activated",true)]
-        TabletInjected = 0,
-        [Obsolete("Use Disabled",true)]
-        TabledEjected = 1,
     }
 }

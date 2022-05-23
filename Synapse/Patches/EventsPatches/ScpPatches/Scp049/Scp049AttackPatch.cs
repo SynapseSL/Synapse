@@ -6,7 +6,7 @@ using ev = Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp049
 {
-    [HarmonyPatch(typeof(PlayableScps.Scp049),nameof(PlayableScps.Scp049.BodyCmd_ByteAndGameObject))]
+    [HarmonyPatch(typeof(PlayableScps.Scp049), nameof(PlayableScps.Scp049.BodyCmd_ByteAndGameObject))]
     internal static class Scp049AttackPatch
     {
         [HarmonyPrefix]
@@ -17,14 +17,14 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp049
             try
             {
                 if (!__instance._interactRateLimit.CanExecute(true)) return false;
-                if (go == null || __instance.RemainingServerKillCooldown > 0f) return false;
+                if (go is null || __instance.RemainingServerKillCooldown > 0f) return false;
 
                 var scp = __instance.GetPlayer();
                 var player = go.GetPlayer();
 
                 if (!SynapseExtensions.GetHarmPermission(scp, player)) return false;
 
-                if (Vector3.Distance(scp.Position, player.Position) >= PlayableScps.Scp049.AttackDistance * 1.25f) 
+                if (Vector3.Distance(scp.Position, player.Position) >= PlayableScps.Scp049.AttackDistance * 1.25f)
                     return false;
 
                 if (Physics.Linecast(scp.Position, player.Position, InventorySystem.Items.MicroHID.MicroHIDItem.WallMask)) return false;
@@ -38,9 +38,9 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp049
                 __instance.RemainingServerKillCooldown = PlayableScps.Scp049.KillCooldown;
                 return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp049) failed!!\n{e}");
+                Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp049) failed!!\n{e}");
                 return true;
             }
         }

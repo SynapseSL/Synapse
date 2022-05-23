@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-
 namespace Synapse.Command
 {
     public interface ICommandHandler

@@ -1,7 +1,6 @@
 ﻿using System;
 using HarmonyLib;
 using Synapse.Api;
-
 namespace Synapse.Patches.SynapsePatches.PermissionSystem
 {
     [HarmonyPatch(typeof(ServerRoles), nameof(ServerRoles.RefreshPermissions))]
@@ -15,7 +14,7 @@ namespace Synapse.Patches.SynapsePatches.PermissionSystem
                 var player = __instance.GetPlayer();
                 player.RefreshPermission(disp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Permission: RefreshPermissionPatch failed!!\n{e}");
             }

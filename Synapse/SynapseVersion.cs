@@ -26,9 +26,6 @@ public static class SynapseVersion
     {
         var version = $"{Major}.{Minor}.{Patch}";
 
-        if (Type != VersionType.None)
-            version += $" {Type} {SubVersion}";
-
         if (Debug)
             version += " DEBUG";
 

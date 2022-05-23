@@ -10,7 +10,7 @@
 
         internal bool Spawned { get; set; }
 
-        public bool Is079 => player.RoleType == RoleType.Scp079;
+        public bool Is079 => player.RoleType is RoleType.Scp079;
 
         public byte Level { get => (byte)(Script.Lvl + 1); set => Script.Lvl = (byte)(value - 1); }
 

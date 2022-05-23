@@ -1,5 +1,4 @@
 ﻿using LightContainmentZoneDecontamination;
-
 namespace Synapse.Api
 {
     public class Decontamination

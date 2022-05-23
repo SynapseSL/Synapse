@@ -41,7 +41,7 @@ namespace Synapse.Api.Items
                 foreach (var ammo in player.VanillaInventory.UserInventory.ReserveAmmo.ToList())
                     player.VanillaInventory.ServerDropAmmo(ammo.Key, ammo.Value);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Error while Dropping all Items:\n{e}");
             }

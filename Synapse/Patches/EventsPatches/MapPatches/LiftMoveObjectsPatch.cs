@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.MapPatches
 {
-    [HarmonyPatch(typeof(Lift),nameof(Lift.MovePlayers))]
+    [HarmonyPatch(typeof(Lift), nameof(Lift.MovePlayers))]
     internal class LiftMoveObjectsPatch
     {
         [HarmonyPrefix]
@@ -13,19 +13,19 @@ namespace Synapse.Patches.EventsPatches.MapPatches
         {
             try
             {
-                __state = new LiftMoveObjectsEventArgs
+                __state = new()
                 {
                     Elevator = __instance.GetElevator(),
                     Transform = target,
                 };
                 Server.Get.Events.Map.InvokeLiftMoveObjects(__state);
-                if(!__state.Allow) return false;
+                if (!__state.Allow) return false;
                 target = __state.Transform;
                 return true;
             }
             catch (Exception ex)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Event: LiftMovePlayers Event failed!!\n{ex}");
+                Api.Logger.Get.Error($"Synapse-Event: LiftMovePlayers Event failed!!\n{ex}");
                 return true;
             }
         }

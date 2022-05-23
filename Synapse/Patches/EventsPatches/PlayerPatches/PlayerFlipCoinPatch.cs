@@ -14,12 +14,12 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                if (ReferenceHub.TryGetHub(conn.identity.gameObject, out var hub) && hub.inventory.CurItem.TypeId == ItemType.Coin)
+                if (ReferenceHub.TryGetHub(conn.identity.gameObject, out var hub) && hub.inventory.CurItem.TypeId is ItemType.Coin)
                 {
                     var isTails = UnityEngine.Random.value >= 0.5f;
 
                     Server.Get.Events.Player.InvokeFlipCoinEvent(hub.GetPlayer(), ref isTails, out var allow);
-                    
+
                     if (allow)
                         new CoinNetworkHandler.CoinFlipMessage(hub.inventory.CurItem.SerialNumber, isTails).SendToAuthenticated();
                 }

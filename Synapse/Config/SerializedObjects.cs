@@ -26,9 +26,7 @@ namespace Synapse.Config
             Z = point.RelativePosition.z;
         }
 
-        public SerializedMapPoint()
-        {
-        }
+        public SerializedMapPoint() { }
 
         public string Room { get; set; }
         public float X { get; set; } = 0f;
@@ -40,7 +38,7 @@ namespace Synapse.Config
         public override string ToString() => $"{Room}:{X}:{Y}:{Z}";
 
         public static explicit operator MapPoint(SerializedMapPoint point) => point.Parse();
-        public static implicit operator SerializedMapPoint(MapPoint point) => new SerializedMapPoint(point);
+        public static implicit operator SerializedMapPoint(MapPoint point) => new(point);
     }
 
     [Serializable]
@@ -68,15 +66,15 @@ namespace Synapse.Config
         public float YSize { get; set; } = 1f;
         public float ZSize { get; set; } = 1f;
 
-        public SynapseItem Parse() => new SynapseItem(ID) 
-        { 
-            Scale = new Vector3(XSize,YSize,ZSize),
+        public SynapseItem Parse() => new(ID)
+        {
+            Scale = new Vector3(XSize, YSize, ZSize),
             Durabillity = Durabillity,
             WeaponAttachments = WeaponAttachments
         };
 
         public static explicit operator SynapseItem(SerializedItem item) => item.Parse();
-        public static implicit operator SerializedItem(SynapseItem item) => new SerializedItem(item);
+        public static implicit operator SerializedItem(SynapseItem item) => new(item);
 
         [Obsolete("Please use the Attachments code now")]
         public SerializedItem(int id, float durabillity, int barrel, int sight, int other, Vector3 scale)
@@ -94,10 +92,10 @@ namespace Synapse.Config
     {
         public SerializedPlayerItem() { }
 
-        public SerializedPlayerItem(SynapseItem item, short chance, bool preference) 
+        public SerializedPlayerItem(SynapseItem item, short chance, bool preference)
             : this(item.ID, item.Durabillity, item.WeaponAttachments, item.Scale, chance, preference) { }
 
-        public SerializedPlayerItem(int id, float durabillity, uint weaponattachement, Vector3 scale, short chance, bool preference) 
+        public SerializedPlayerItem(int id, float durabillity, uint weaponattachement, Vector3 scale, short chance, bool preference)
             : base(id, durabillity, weaponattachement, scale)
         {
             Chance = chance;
@@ -111,9 +109,9 @@ namespace Synapse.Config
         {
             var item = Parse();
 
-            if (UsePreferences && item.ItemCategory == ItemCategory.Firearm) item.WeaponAttachments = player.GetPreference(ItemManager.Get.GetBaseType(ID));
+            if (UsePreferences && item.ItemCategory is ItemCategory.Firearm) item.WeaponAttachments = player.GetPreference(ItemManager.Get.GetBaseType(ID));
 
-            if(UnityEngine.Random.Range(1f,100f) <= Chance)
+            if (UnityEngine.Random.Range(1f, 100f) <= Chance)
                 item.PickUp(player);
 
             return item;
@@ -209,15 +207,15 @@ namespace Synapse.Config
 
         public SerializedVector3() { }
 
-        public Vector3 Parse() => new Vector3(X, Y, Z);
+        public Vector3 Parse() => new(X, Y, Z);
 
         public float X { get; set; } = 0f;
         public float Y { get; set; } = 0f;
         public float Z { get; set; } = 0f;
 
-        public static implicit operator Vector3(SerializedVector3 vector) => vector == null ? Vector3.zero : vector.Parse();
-        public static implicit operator SerializedVector3(Vector3 vector) => new SerializedVector3(vector);
-        public static implicit operator SerializedVector3(Quaternion rotation) => new SerializedVector3(rotation.eulerAngles);
+        public static implicit operator Vector3(SerializedVector3 vector) => vector is null ? Vector3.zero : vector.Parse();
+        public static implicit operator SerializedVector3(Vector3 vector) => new(vector);
+        public static implicit operator SerializedVector3(Quaternion rotation) => new(rotation.eulerAngles);
         public static implicit operator Quaternion(SerializedVector3 vector) => Quaternion.Euler(vector);
     }
 
@@ -253,12 +251,12 @@ namespace Synapse.Config
         public float B { get; set; } = 0f;
         public float A { get; set; } = 1f;
 
-        public Color Parse() => new Color(R, G, B, A);
+        public Color Parse() => new(R, G, B, A);
 
         public static implicit operator Color(SerializedColor color) => color.Parse();
-        public static implicit operator SerializedColor(Color color) => new SerializedColor(color);
+        public static implicit operator SerializedColor(Color color) => new(color);
         public static implicit operator Color32(SerializedColor color) => color.Parse();
-        public static implicit operator SerializedColor(Color32 color) => new SerializedColor(color);
+        public static implicit operator SerializedColor(Color32 color) => new(color);
 
     }
 }

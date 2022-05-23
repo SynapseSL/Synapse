@@ -3,16 +3,15 @@ using InventorySystem.Items.MicroHID;
 using InventorySystem.Items.Radio;
 using Synapse.Api.Enum;
 using Synapse.Api.Items;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Synapse.Api.Events.SynapseEventArguments
 {
-    public class PlayerJoinEventArgs: EventHandler.ISynapseEventArgs
+    public class PlayerJoinEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Player { internal set; get; }
-        
+
         public string Nickname { set; get; }
     }
 
@@ -20,52 +19,45 @@ namespace Synapse.Api.Events.SynapseEventArguments
     {
         public Player Player { get; internal set; }
     }
-    
+
     public class PlayerBanEventArgs : EventHandler.ISynapseEventArgs
     {
         public bool Allow { get; set; } = true;
-        
+
         public Player BannedPlayer { get; internal set; }
-        
+
         public Player Issuer { get; internal set; }
-        
+
         public long BanDuration { get; set; }
 
-        [Obsolete("Use BanDuration",true)]
-        public int Duration
-        {
-            get => (int)BanDuration;
-            set => BanDuration = value;
-        }
-        
         public string Reason { get; set; }
     }
 
     public class PlayerSpeakEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Player { get; internal set; }
-        
+
         public DissonanceUserSetup DissonanceUserSetup { get; internal set; }
 
         public bool Scp939Talk { get; set; }
-        
+
         public bool IntercomTalk { get; set; }
-        
+
         public bool RadioTalk { get; set; }
-        
+
         public bool ScpChat { get; set; }
-        
+
         public bool SpectatorChat { get; set; }
-        
+
         public bool Allow { get; set; }
     }
 
     public class PlayerDeathEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Victim { get; internal set; }
-        
+
         public Player Killer { get; internal set; }
-        
+
         public DamageType DamageType { get; internal set; }
 
         public bool Allow { get; set; } = true;
@@ -74,7 +66,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
     public class PlayerDamageEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Killer { get; internal set; }
-        
+
         public Player Victim { get; internal set; }
 
         public float Damage { get; set; }
@@ -88,15 +80,15 @@ namespace Synapse.Api.Events.SynapseEventArguments
     {
         public GameObject Player { get; internal set; }
     }
-    
+
     public class PlayerItemInteractEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Player { get; internal set; }
-        
+
         public ItemInteractState State { get; internal set; }
-        
+
         public Items.SynapseItem CurrentItem { get; internal set; }
-        
+
         public bool Allow { get; set; }
     }
 
@@ -106,15 +98,9 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         public Items.SynapseItem Item { get; internal set; }
 
-        [Obsolete("Removed Since 11.0.0")]
-        public float ForceMultiplier { get; set; }
-        
-        [Obsolete("Removed since 11.0.0")]
-        public float Delay { get; set; }
-        
         public bool Allow { get; set; }
     }
-    
+
     public enum ItemInteractState
     {
         Initiating,
@@ -125,9 +111,9 @@ namespace Synapse.Api.Events.SynapseEventArguments
     public class PlayerHealEventArgs : EventHandler.ISynapseEventArgs
     {
         public Player Player { get; internal set; }
-        
+
         public float Amount { get; set; }
-        
+
         public bool Allow { get; set; }
     }
 
@@ -160,7 +146,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Player Player { get; internal set; }
 
         public bool Allow { get; set; } = true;
-        
+
         public Items.SynapseItem Item { get; internal set; }
     }
 
@@ -169,7 +155,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Player Player { get; internal set; }
 
         public bool Allow { get; set; } = true;
-        
+
         public bool CloseFemur { get; set; }
     }
 
@@ -260,9 +246,6 @@ namespace Synapse.Api.Events.SynapseEventArguments
     {
         public Player Player { get; internal set; }
 
-        [Obsolete("Workstations no longer needs a Item")]
-        public SynapseItem Item { get; internal set; }
-
         public WorkStation WorkStation { get; internal set; }
 
         public bool Allow { get; set; } = true;
@@ -286,9 +269,6 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public uint Amount { get; set; }
 
         public bool Allow { get; set; } = true;
-
-        [Obsolete("Tablets are no longer required to drop ammo")]
-        public SynapseItem Tablet { get; internal set; }
     }
 
     public class PlayerCuffTargetEventArgs : EventHandler.ISynapseEventArgs
@@ -298,9 +278,6 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Player Cuffer { get; internal set; }
 
         public bool Allow { get; set; } = true;
-
-        [Obsolete("Disarmer are removed from the game")]
-        public SynapseItem Disarmer { get; internal set; }
     }
 
     public class PlayerUseMicroEventArgs : EventHandler.ISynapseEventArgs
@@ -323,9 +300,6 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Player Player { get; internal set; }
 
         public SinkholeEnvironmentalHazard Sinkhole { get; internal set; }
-
-        [Obsolete("Use SlowDown instead")]
-        public bool Allow { get => SlowDown; set => SlowDown = value; }
 
         public bool SlowDown { get; set; }
     }
@@ -368,9 +342,6 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Player Cuffed { get; internal set; }
 
         public bool Allow { get; set; }
-
-        [Obsolete("Disarmers does no longer exists")]
-        public bool FreeWithDisarmer { get; internal set; }
     }
 
     public class PlayerChangeItemEventArgs : EventHandler.ISynapseEventArgs

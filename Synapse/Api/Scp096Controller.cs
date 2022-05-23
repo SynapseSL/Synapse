@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using PlayableScps;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Synapse.Api
@@ -9,9 +10,9 @@ namespace Synapse.Api
 
         private readonly Player player;
 
-        private PlayableScps.Scp096 Scp096 => player.Hub.scpsController.CurrentScp as PlayableScps.Scp096;
+        private Scp096 Scp096 => player.Hub.scpsController.CurrentScp as Scp096;
 
-        public bool Is096 => player.RoleType == RoleType.Scp096;
+        public bool Is096 => player.RoleType is RoleType.Scp096;
 
         public float ShieldAmount
         {
@@ -69,47 +70,45 @@ namespace Synapse.Api
                 if (!Is096) return;
                 switch (value)
                 {
-                    case PlayableScps.Scp096PlayerState.Charging:
-                        if (RageState != PlayableScps.Scp096PlayerState.Enraged)
-                            RageState = PlayableScps.Scp096PlayerState.Enraged;
+                    case Scp096PlayerState.Charging:
+                        if (RageState is not Scp096PlayerState.Enraged)
+                            RageState = Scp096PlayerState.Enraged;
                         Scp096.Charge();
                         break;
 
-                    case PlayableScps.Scp096PlayerState.Calming:
+                    case Scp096PlayerState.Calming:
                         Scp096.EndEnrage();
                         break;
 
-                    case PlayableScps.Scp096PlayerState.Enraged when RageState != PlayableScps.Scp096PlayerState.Attacking:
-                        if (RageState == PlayableScps.Scp096PlayerState.Docile
-                            || RageState == PlayableScps.Scp096PlayerState.TryNotToCry
-                            || RageState == PlayableScps.Scp096PlayerState.Calming)
-                            RageState = PlayableScps.Scp096PlayerState.Enraging;
+                    case Scp096PlayerState.Enraged when RageState is not Scp096PlayerState.Attacking:
+                        if (RageState is Scp096PlayerState.Docile or Scp096PlayerState.TryNotToCry or Scp096PlayerState.Calming)
+                            RageState = Scp096PlayerState.Enraging;
                         Scp096.Enrage();
                         break;
 
-                    case PlayableScps.Scp096PlayerState.Enraged when RageState == PlayableScps.Scp096PlayerState.Attacking:
+                    case Scp096PlayerState.Enraged when RageState is Scp096PlayerState.Attacking:
                         Scp096.EndAttack();
                         break;
 
-                    case PlayableScps.Scp096PlayerState.TryNotToCry:
-                        if (RageState != PlayableScps.Scp096PlayerState.Docile)
-                            RageState = PlayableScps.Scp096PlayerState.Docile;
+                    case Scp096PlayerState.TryNotToCry:
+                        if (RageState is not Scp096PlayerState.Docile)
+                            RageState = Scp096PlayerState.Docile;
                         Scp096.TryNotToCry();
                         break;
 
                     case PlayableScps.Scp096PlayerState.Attacking:
-                        if (RageState != PlayableScps.Scp096PlayerState.Enraged)
-                            RageState = PlayableScps.Scp096PlayerState.Enraged;
+                        if (RageState is not Scp096PlayerState.Enraged)
+                            RageState = Scp096PlayerState.Enraged;
                         PlayableScps.Scp096.ServerDoAttack(player.Connection, default);
                         break;
 
-                    case PlayableScps.Scp096PlayerState.Enraging:
-                        if (RageState != PlayableScps.Scp096PlayerState.Docile)
-                            RageState = PlayableScps.Scp096PlayerState.Docile;
+                    case Scp096PlayerState.Enraging:
+                        if (RageState is not Scp096PlayerState.Docile)
+                            RageState = Scp096PlayerState.Docile;
                         Scp096.Windup();
                         break;
 
-                    case PlayableScps.Scp096PlayerState.Docile:
+                    case Scp096PlayerState.Docile:
                         Scp096.ResetEnrage();
                         break;
 
@@ -122,7 +121,7 @@ namespace Synapse.Api
         {
             get
             {
-                if (!Is096) return new List<Player>();
+                if (!Is096) return new();
                 return Scp096._targets.Select(x => x.GetPlayer()).ToList();
             }
         }

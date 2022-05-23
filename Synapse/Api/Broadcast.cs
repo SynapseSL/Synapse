@@ -7,7 +7,7 @@ namespace Synapse.Api
 {
     public class Broadcast
     {
-        public Broadcast(string msg,ushort time,Player player)
+        public Broadcast(string msg, ushort time, Player player)
         {
             Message = msg;
             Time = time;
@@ -25,7 +25,7 @@ namespace Synapse.Api
             get => msg;
             set
             {
-                if(value != msg)
+                if (value != msg)
                 {
                     msg = value;
 
@@ -68,7 +68,7 @@ namespace Synapse.Api
             Active = false;
 
             _player.ActiveBroadcasts.Remove(this);
-            
+
             _player.ClearBroadcasts();
 
             if (_player.ActiveBroadcasts.FirstOrDefault() != null)
@@ -82,9 +82,9 @@ namespace Synapse.Api
 
         private readonly Player _player;
 
-        private List<Broadcast> bcs = new List<Broadcast>();
+        private List<Broadcast> bcs = new();
 
-        public void Add(Broadcast bc,bool instant = false)
+        public void Add(Broadcast bc, bool instant = false)
         {
             if (bc == null)
                 return;
@@ -93,14 +93,11 @@ namespace Synapse.Api
             {
                 var currentbc = bcs.FirstOrDefault();
 
-                var list = new List<Broadcast>
-                {
-                    bc
-                };
+                var list = new List<Broadcast> { bc };
                 list.AddRange(bcs);
                 bcs = list;
 
-                if (currentbc != null)
+                if (currentbc is not null)
                     currentbc.EndBc();
                 else
                     bcs.First().StartBc(_player);
@@ -116,7 +113,7 @@ namespace Synapse.Api
 
         public void Remove(Broadcast bc)
         {
-            if(bcs.Any(x => x == bc))
+            if (bcs.Any(x => x == bc))
             {
                 bcs.Remove(bc);
 

@@ -6,11 +6,11 @@ namespace Synapse.Command
 {
     public class CommandHandler : ICommandHandler
     {
-        private readonly Dictionary<string, string> commandAliases = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> commandAliases = new();
 
-        private readonly Dictionary<string, ICommand> commands = new Dictionary<string, ICommand>();
+        private readonly Dictionary<string, ICommand> commands = new();
 
-        
+
         public List<ICommand> Commands => commands.Values.ToList();
 
         public bool TryGetCommand(string name, out ICommand cmd)
@@ -28,13 +28,13 @@ namespace Synapse.Command
 
             if (commands.Any(x => x.Key.Equals(command.Name, StringComparison.InvariantCultureIgnoreCase)))
             {
-                Synapse.Api.Logger.Get.Warn($"Command {command.Name} was registered twice");
+                Api.Logger.Get.Warn($"Command {command.Name} was registered twice");
                 return false;
-            } 
+            }
 
             commands.Add(command.Name.ToLower(), command);
 
-            if (command.Aliases != null)
+            if (command.Aliases is not null)
                 foreach (var alias in command.Aliases)
                     if (!string.IsNullOrWhiteSpace(alias))
                         commandAliases.Add(alias.ToLower(), command.Name.ToLower());

@@ -6,17 +6,18 @@ using Synapse.Api.Items;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(Inventory),nameof(Inventory.ServerSelectItem))]
-    internal static class PlayerChangeItemPatch
-    {
+	[HarmonyPatch(typeof(Inventory), nameof(Inventory.ServerSelectItem))]
+	internal static class PlayerChangeItemPatch
+	{
 		[HarmonyPrefix]
-        private static bool SelectItem(Inventory __instance, ushort itemSerial)
-        {
-            try
-            {
+		private static bool SelectItem(Inventory __instance, ushort itemSerial)
+		{
+			try
+			{
 				if (itemSerial == __instance.CurItem.SerialNumber) return false;
 
-				bool flag = (__instance.UserInventory.Items.TryGetValue(__instance.CurItem.SerialNumber, out var oldItem) && __instance.CurInstance != null) || __instance.CurItem.SerialNumber == 0;
+				bool flag = (__instance.UserInventory.Items.TryGetValue(__instance.CurItem.SerialNumber, out var oldItem)
+					&& __instance.CurInstance is not null) || __instance.CurItem.SerialNumber == 0;
 				if (__instance.UserInventory.Items.TryGetValue(itemSerial, out var newItem) || itemSerial == 0)
 				{
 					if (__instance.CurItem.SerialNumber > 0 && flag && !oldItem.CanHolster()) return false;
@@ -30,7 +31,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
 						if (!allow) return false;
 
-						__instance.NetworkCurItem = InventorySystem.Items.ItemIdentifier.None;
+						__instance.NetworkCurItem = ItemIdentifier.None;
 						if (!__instance.isLocalPlayer)
 						{
 							__instance.CurInstance = null;
@@ -44,7 +45,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
 						if (!allow) return false;
 
-						__instance.NetworkCurItem = new InventorySystem.Items.ItemIdentifier(newItem.ItemTypeId, itemSerial);
+						__instance.NetworkCurItem = new ItemIdentifier(newItem.ItemTypeId, itemSerial);
 						if (!__instance.isLocalPlayer)
 						{
 							__instance.CurInstance = newItem;
@@ -57,19 +58,19 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 					var player = __instance._hub.GetPlayer();
 					Server.Get.Events.Player.InvokeChangeItem(player, player.ItemInHand, SynapseItem.None, out var allow);
 
-					if (!allow) return false; 
+					if (!allow) return false;
 
-					__instance.NetworkCurItem = InventorySystem.Items.ItemIdentifier.None;
+					__instance.NetworkCurItem = ItemIdentifier.None;
 					if (!__instance.isLocalPlayer) __instance.CurInstance = null;
 				}
 
-                return true;
-            }
-            catch(Exception e)
-            {
-                SynapseController.Server.Logger.Error($"Synapse-Event: PlayerChangeItem event failed!!\n{e}");
-                return true;
-            }
-        }
-    }
+				return true;
+			}
+			catch (Exception e)
+			{
+				SynapseController.Server.Logger.Error($"Synapse-Event: PlayerChangeItem event failed!!\n{e}");
+				return true;
+			}
+		}
+	}
 }

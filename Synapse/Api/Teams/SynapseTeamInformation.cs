@@ -1,5 +1,4 @@
 ﻿using System;
-
 namespace Synapse.Api.Teams
 {
     public class SynapseTeamInformation : Attribute

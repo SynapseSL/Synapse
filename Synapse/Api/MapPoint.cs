@@ -32,7 +32,7 @@ namespace Synapse.Api
         /// </summary>
         /// <param name="mappointstring">The String you want to Parse</param>
         /// <returns>The MapPoint which was parsed</returns>
-        public static MapPoint Parse(string mappointstring) => new MapPoint(mappointstring);
+        public static MapPoint Parse(string mappointstring) => new(mappointstring);
 
         /// <summary>
         /// Creates a MapPoint 

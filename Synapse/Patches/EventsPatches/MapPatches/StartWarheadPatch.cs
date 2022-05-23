@@ -5,7 +5,7 @@ using static Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Patches.EventsPatches.MapPatches
 {
-    [HarmonyPatch(typeof(PlayerInteract),nameof(PlayerInteract.UserCode_CmdDetonateWarhead))]
+    [HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.UserCode_CmdDetonateWarhead))]
     internal static class StartWarheadPatch
     {
         [HarmonyPrefix]
@@ -20,7 +20,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 
                 return allow;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: WarheadStart Event failed!!\n{e}");
                 return true;

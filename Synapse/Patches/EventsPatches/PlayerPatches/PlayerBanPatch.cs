@@ -16,10 +16,11 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             {
                 var player = user.GetPlayer();
                 Api.Player banIssuer;
-                if (issuer.Contains("(")) {
+                if (issuer.Contains("("))
+                {
                     banIssuer = SynapseController.Server.GetPlayer(issuer.Substring(issuer.LastIndexOf('(') + 1, issuer.Length - 2 - issuer.LastIndexOf('(')));
                 }
-                else 
+                else
                 {
                     banIssuer = SynapseController.Server.GetPlayer(issuer);
                 }

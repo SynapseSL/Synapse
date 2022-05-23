@@ -6,7 +6,7 @@ using static Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(RadioItem),nameof(RadioItem.ServerProcessCmd))]
+    [HarmonyPatch(typeof(RadioItem), nameof(RadioItem.ServerProcessCmd))]
     internal static class PlayerRadioInteractPatch
     {
         [HarmonyPrefix]
@@ -43,7 +43,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: RadioInteractEvent failed!!\n{e}");
                 return true;

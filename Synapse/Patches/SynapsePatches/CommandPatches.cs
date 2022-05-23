@@ -21,16 +21,16 @@ namespace Synapse.Patches.SynapsePatches
             {
                 try
                 {
-                    var flag = command.Execute(new Command.CommandContext { Arguments = args.Segment(1), Player = Server.Get.Host, Platform = Command.Platform.ServerConsole });
+                    var flag = command.Execute(new() { Arguments = args.Segment(1), Player = Server.Get.Host, Platform = Platform.ServerConsole });
 
                     var color = ConsoleColor.DarkBlue;
                     switch (flag.State)
                     {
-                        case Command.CommandResultState.Ok:
+                        case CommandResultState.Ok:
                             color = ConsoleColor.Gray;
                             break;
 
-                        case Command.CommandResultState.Error:
+                        case CommandResultState.Error:
                             color = ConsoleColor.Red;
                             break;
 
@@ -54,13 +54,13 @@ namespace Synapse.Patches.SynapsePatches
         [HarmonyPrefix]
         private static bool GameConsoleQuery(QueryProcessor __instance, string query)
         {
-            if (__instance._sender == null) return false;
+            if (__instance._sender is null) return false;
 
             var player = __instance._sender.GetPlayer();
 
             SynapseController.Server.Events.Server.InvokeConsoleCommandEvent(player, query);
 
-            if (player == null) return false;
+            if (player is null) return false;
             var args = query.Split(' ');
 
             if (SynapseController.CommandHandlers.ClientCommandHandler.TryGetCommand(args[0], out var command))
@@ -68,22 +68,22 @@ namespace Synapse.Patches.SynapsePatches
                 //If sender has no permission and permission is not null or empty
                 if (!__instance.GetPlayer().HasPermission(command.Permission) && !string.IsNullOrWhiteSpace(command.Permission))
                 {
-                    player.SendConsoleMessage(Server.Get.Configs.SynapseTranslation.ActiveTranslation.noPermissions.Replace("%perm%",command.Permission), "red");
+                    player.SendConsoleMessage(Server.Get.Configs.SynapseTranslation.ActiveTranslation.noPermissions.Replace("%perm%", command.Permission), "red");
                     return false;
                 }
 
                 try
                 {
-                    var flag = command.Execute(new Command.CommandContext { Arguments = args.Segment(1), Player = player, Platform = Command.Platform.ClientConsole });
+                    var flag = command.Execute(new() { Arguments = args.Segment(1), Player = player, Platform = Platform.ClientConsole });
 
                     var color = "blue";
                     switch (flag.State)
                     {
-                        case Command.CommandResultState.Ok:
+                        case CommandResultState.Ok:
                             color = "gray";
                             break;
 
-                        case Command.CommandResultState.Error:
+                        case CommandResultState.Error:
                             color = "red";
                             break;
 
@@ -116,7 +116,7 @@ namespace Synapse.Patches.SynapsePatches
             if (q.StartsWith("@"))
                 return true;
 
-            if (q.StartsWith("REQUEST_DATA PLAYER_LIST SILENT"))
+            if (q.StartsWith("$0 1"))
                 return true;
 
             var allow = true;
@@ -134,7 +134,7 @@ namespace Synapse.Patches.SynapsePatches
 
                 try
                 {
-                    var flag = command.Execute(new Command.CommandContext { Arguments = args.Segment(1), Player = player, Platform = Command.Platform.RemoteAdmin });
+                    var flag = command.Execute(new() { Arguments = args.Segment(1), Player = player, Platform = Command.Platform.RemoteAdmin });
 
                     player.SendRAConsoleMessage(flag.Message, flag.State == CommandResultState.Ok);
                 }

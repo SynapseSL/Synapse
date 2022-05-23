@@ -10,9 +10,9 @@ namespace Synapse.Api
 
         private AlphaWarheadController WarheadController => AlphaWarheadController.Host;
 
-        public NukeInsidePanel InsidePanel { get; } = new NukeInsidePanel();
+        public NukeInsidePanel InsidePanel { get; } = new();
 
-        public NukeOutsidePanel OutsidePanel { get; } = new NukeOutsidePanel();
+        public NukeOutsidePanel OutsidePanel { get; } = new();
 
         public float CountdownTime
         {
@@ -78,8 +78,5 @@ namespace Synapse.Api
                 set => Panel.NetworkkeycardEntered = value;
             }
         }
-
-        [System.Obsolete("Use Detonate()",true)]
-        public void Detoante() => WarheadController.Detonate();
     }
 }

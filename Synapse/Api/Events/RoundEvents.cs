@@ -29,7 +29,7 @@ namespace Synapse.Api.Events
         internal void InvokeRoundEndEvent() => RoundEndEvent?.Invoke();
 
 
-        internal void InvokeRoundCheckEvent(ref bool allow,ref RoundSummary.LeadingTeam leadingTeam)
+        internal void InvokeRoundCheckEvent(ref bool allow, ref RoundSummary.LeadingTeam leadingTeam)
         {
             var ev = new RoundCheckEventArgs
             {
@@ -56,7 +56,7 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void InvokeTeamRespawn(ref List<Player> players,ref Respawning.SpawnableTeamType teamType, out bool allow,out int teamid)
+        internal void InvokeTeamRespawn(ref List<Player> players, ref Respawning.SpawnableTeamType teamType, out bool allow, out int teamid)
         {
             var ev = new TeamRespawnEventArgs
             {

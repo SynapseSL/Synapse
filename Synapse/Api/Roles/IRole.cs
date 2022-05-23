@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-
 namespace Synapse.Api.Roles
 {
     public interface IRole

@@ -2,6 +2,7 @@
 {
     public enum LockerType
     {
+        Default = -1,
         StandardLocker,
         LargeGunLocker,
         RifleRackLocker,

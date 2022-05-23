@@ -30,13 +30,13 @@ namespace Synapse.Api
         internal Player()
         {
             Hub = GetComponent<ReferenceHub>();
-            Scp106Controller = new Scp106Controller(this);
-            Scp079Controller = new Scp079Controller(this);
-            Scp096Controller = new Scp096Controller(this);
-            Scp173Controller = new Scp173Controller();
-            Jail = new Jail(this);
-            ActiveBroadcasts = new BroadcastList(this);
-            Inventory = new PlayerInventory(this);
+            Scp106Controller = new(this);
+            Scp079Controller = new(this);
+            Scp096Controller = new(this);
+            Scp173Controller = new();
+            Jail = new(this);
+            ActiveBroadcasts = new(this);
+            Inventory = new(this);
             GameConsoleTransmission = GetComponent<GameConsoleTransmission>();
             DissonanceUserSetup = GetComponent<Assets._Scripts.Dissonance.DissonanceUserSetup>();
             Radio = GetComponent<Radio>();
@@ -51,18 +51,6 @@ namespace Synapse.Api
             so.Position = transform.TransformPoint(offset);
             so.GameObject.transform.parent = transform;
         }
-
-        [Obsolete("Use GetPreference()", true)]
-        public int GetSightPreference(ItemType item) => GetPreference(item, 0);
-
-        [Obsolete("Use GetPreference()", true)]
-        public int GetBarrelPreference(ItemType item) => GetPreference(item, 1);
-
-        [Obsolete("Use GetPreference()", true)]
-        public int GetOtherPreference(ItemType item) => GetPreference(item, 2);
-
-        [Obsolete("Use GetPreference(ItemType) without type", true)]
-        private int GetPreference(ItemType item, int type) => (int)GetPreference(item);
 
         public uint GetPreference(ItemType item)
         {
@@ -84,16 +72,11 @@ namespace Synapse.Api
         }
 
         public void GiveTextHint(string message, float duration = 5f)
-        {
-            Hub.hints.Show(new TextHint(message, new HintParameter[]
-                {
-                    new StringHintParameter("")
-                }, HintEffectPresets.FadeInAndOut(duration), duration));
-        }
+            => Hub.hints.Show(new TextHint(message, new[] { new StringHintParameter("") }, HintEffectPresets.FadeInAndOut(duration), duration));
 
         internal void ClearBroadcasts() => GetComponent<global::Broadcast>().TargetClearElements(Connection);
 
-        internal void Broadcast(ushort time, string message) => GetComponent<global::Broadcast>().TargetAddElement(Connection, message, time, new global::Broadcast.BroadcastFlags());
+        internal void Broadcast(ushort time, string message) => GetComponent<global::Broadcast>().TargetAddElement(Connection, message, time, new());
 
         internal void InstantBroadcast(ushort time, string message)
         {
@@ -103,9 +86,11 @@ namespace Synapse.Api
 
         public void SendConsoleMessage(string message, string color = "red") => ClassManager.TargetConsolePrint(Connection, message, color);
 
-        public void SendRAConsoleMessage(string message, bool success = true, RaCategory type = RaCategory.None) => SynapseExtensions.RaMessage(CommandSender, message, success, type);
+        public void SendRAConsoleMessage(string message, bool success = true, RaCategory type = RaCategory.None)
+            => SynapseExtensions.RaMessage(CommandSender, message, success, type);
 
-        public void GiveEffect(Effect effect, byte intensity = 1, float duration = -1f) => PlayerEffectsController.ChangeByString(effect.ToString().ToLower(), intensity, duration);
+        public void GiveEffect(Effect effect, byte intensity = 1, float duration = -1f)
+            => PlayerEffectsController.ChangeByString(effect.ToString().ToLower(), intensity, duration);
 
         public void RaLogin()
         {
@@ -138,9 +123,9 @@ namespace Synapse.Api
         public bool Hurt(DamageHandlerBase handlerbase) => PlayerStats.DealDamage(handlerbase);
 
         public void Kill() => Kill("Unknown Reason");
-        
+
         public bool Kill(string reason) => PlayerStats.DealDamage(new CustomReasonDamageHandler(reason));
-        
+
         public bool Kill(string reason, string cassie)
         {
             bool result = Kill(reason);
@@ -156,7 +141,7 @@ namespace Synapse.Api
 
         public void ExecuteCommand(string command, bool RA = true)
         {
-            if (RA) RemoteAdmin.CommandProcessor.ProcessQuery(command, CommandSender);
+            if (RA) CommandProcessor.ProcessQuery(command, CommandSender);
             else QueryProcessor.ProcessGameConsoleQuery(command);
         }
 
@@ -287,10 +272,10 @@ namespace Synapse.Api
 
                 _role = value;
 
-                if (oldRole != null)
+                if (oldRole is not null)
                     oldRole.DeSpawn();
 
-                if (_role == null) return;
+                if (_role is null) return;
 
                 _role.Player = this;
                 _role.Spawn();
@@ -301,7 +286,7 @@ namespace Synapse.Api
         {
             get
             {
-                if (CustomRole == null) return (int)RoleType;
+                if (CustomRole is null) return (int)RoleType;
                 else return CustomRole.GetRoleID();
             }
             set
@@ -334,14 +319,14 @@ namespace Synapse.Api
         {
             get
             {
-                if (synapseGroup == null)
+                if (synapseGroup is null)
                     return Server.Get.PermissionHandler.GetPlayerGroup(this);
 
                 return synapseGroup;
             }
             set
             {
-                if (value == null)
+                if (value is null)
                     return;
 
                 synapseGroup = value;
@@ -426,14 +411,15 @@ namespace Synapse.Api
             if (flag || flag2)
                 foreach (var player in Server.Get.Players)
                 {
-                    if (!string.IsNullOrEmpty(player.ServerRoles.HiddenBadge) && (!player.ServerRoles.GlobalHidden || flag2) && (player.ServerRoles.GlobalHidden || flag))
+                    if (!string.IsNullOrEmpty(player.ServerRoles.HiddenBadge) && (!player.ServerRoles.GlobalHidden || flag2) &&
+                        (player.ServerRoles.GlobalHidden || flag))
                         player.ServerRoles.TargetSetHiddenRole(Connection, player.ServerRoles.HiddenBadge);
                 }
         }
 
         public ulong GlobalPerms => ServerRoles._globalPerms;
 
-        public bool GlobalRemoteAdmin => ServerRoles.RemoteAdminMode == ServerRoles.AccessMode.GlobalAccess;
+        public bool GlobalRemoteAdmin => ServerRoles.RemoteAdminMode is ServerRoles.AccessMode.GlobalAccess;
 
         public bool IsDummy { get; internal set; } = false;
         #endregion
@@ -526,7 +512,7 @@ namespace Synapse.Api
             get
             {
                 var vec2 = Rotation;
-                return new PlayerMovementSync.PlayerRotation(vec2.x, vec2.y);
+                return new(vec2.x, vec2.y);
             }
             set => Rotation = new Vector2(value.x.Value, value.y.Value);
         }
@@ -558,7 +544,8 @@ namespace Synapse.Api
                 {
                     transform.localScale = value;
 
-                    var method = typeof(NetworkServer).GetMethod("SendSpawnMessage", BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public);
+                    var method = typeof(NetworkServer).GetMethod("SendSpawnMessage",
+                        BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public);
 
                     foreach (var ply in Server.Get.Players)
                         method.Invoke(null, new object[] { NetworkIdentity, ply.Connection });
@@ -581,7 +568,7 @@ namespace Synapse.Api
         public float ArtificialHealth
         {
             get => GetStatBase<AhpStat>().CurValue;
-            set => GetStatBase<AhpStat>().ServerAddProcess(value,value, 1.2f, 0f, 0f, false);
+            set => GetStatBase<AhpStat>().ServerAddProcess(value, value, 1.2f, 0f, 0f, false);
         }
 
         private int maxahp = 75;
@@ -623,7 +610,7 @@ namespace Synapse.Api
 
         public MapPoint MapPoint
         {
-            get => new MapPoint(Room, Position);
+            get => new(Room, Position);
             set => Position = value.Position;
         }
 
@@ -637,11 +624,10 @@ namespace Synapse.Api
         {
             get
             {
-                if (DisarmedPlayers.Entries.All(x => x.DisarmedPlayer != NetworkIdentity.netId)) return null;
+                if (!DisarmedPlayers.Entries.TryFind(out var _v, x => x.DisarmedPlayer == NetworkIdentity.netId)) return null;
 
-                var id = DisarmedPlayers.Entries.FirstOrDefault(x => x.DisarmedPlayer == NetworkIdentity.netId).Disarmer;
-                if (id == 0)
-                    return ReferenceHub.LocalHub.GetPlayer();
+                var id = _v.Disarmer;
+                if (id == 0) return ReferenceHub.LocalHub.GetPlayer();
                 return Server.Get.Players.FirstOrDefault(x => x.NetworkIdentity.netId == id);
             }
             set => VanillaInventory.SetDisarmedStatus(value.VanillaInventory);
@@ -784,7 +770,7 @@ namespace Synapse.Api
 
         public Team Team => ClassManager.CurRole.team;
 
-        public int TeamID => CustomRole == null ? (int)Team : CustomRole.GetTeamID();
+        public int TeamID => CustomRole is null ? (int)Team : CustomRole.GetTeamID();
 
         public Team RealTeam => Server.Get.TeamManager.IsDefaultID(TeamID) ? (Team)TeamID : Team.RIP;
 
@@ -796,13 +782,13 @@ namespace Synapse.Api
         {
             get
             {
-                if (VanillaInventory.CurItem == ItemIdentifier.None || VanillaInventory.CurInstance == null) return SynapseItem.None;
+                if (VanillaInventory.CurItem == ItemIdentifier.None || VanillaInventory.CurInstance is null) return SynapseItem.None;
 
                 return SynapseItem.GetSynapseItem(VanillaInventory.CurItem.SerialNumber);
             }
             set
             {
-                if (value == null || value == SynapseItem.None || !Inventory.Items.Contains(value))
+                if (value is null || value == SynapseItem.None || !Inventory.Items.Contains(value))
                 {
                     VanillaInventory.NetworkCurItem = ItemIdentifier.None;
                     VanillaInventory.CurInstance = null;
@@ -882,7 +868,7 @@ namespace Synapse.Api
             DatabaseManager.CheckEnabledOrThrow();
             var dbo = DatabaseManager.PlayerRepository.FindByGameId(UserId);
             dbo.Data[key] = value;
-            if (value == null) dbo.Data.Remove(key);
+            if (value is null) dbo.Data.Remove(key);
             DatabaseManager.PlayerRepository.Save(dbo);
         }
 
@@ -892,7 +878,7 @@ namespace Synapse.Api
 
         public void TriggerEscape()
         {
-            if (CustomRole == null)
+            if (CustomRole is null)
             {
                 var newRole = -1;
                 var allow = true;
@@ -910,9 +896,9 @@ namespace Synapse.Api
 
                         var cuffer = Cuffer;
 
-                        if (RoleType == RoleType.Scientist && cuffer.Faction == Faction.FoundationEnemy)
+                        if (RoleType is RoleType.Scientist && cuffer.Faction is Faction.FoundationEnemy)
                             changeTeam = true;
-                        else if (RoleType == RoleType.ClassD && cuffer.Faction == Faction.FoundationStaff)
+                        else if (RoleType is RoleType.ClassD && cuffer.Faction is Faction.FoundationStaff)
                             changeTeam = true;
                     }
 
@@ -985,7 +971,7 @@ namespace Synapse.Api
 
         public static implicit operator Player(Footprinting.Footprint footprint) => footprint.Hub.GetPlayer();
         public static implicit operator Player(ReferenceHub hub) => hub.GetPlayer();
-        public static implicit operator Footprinting.Footprint(Player player) => new Footprinting.Footprint(player.Hub);
+        public static implicit operator Footprinting.Footprint(Player player) => new(player.Hub);
         public static implicit operator ReferenceHub(Player player) => player.Hub;
     }
 }

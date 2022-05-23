@@ -5,7 +5,7 @@ using Synapse.Api.Enum;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(Inventory),nameof(Inventory.UserCode_CmdDropAmmo))]
+    [HarmonyPatch(typeof(Inventory), nameof(Inventory.UserCode_CmdDropAmmo))]
     internal static class PlayerDropAmmoPatch
     {
         [HarmonyPrefix]
@@ -22,7 +22,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 ammoType = (byte)type;
                 return allow;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Synapse.Api.Logger.Get.Error($"Synapse-Event: PlayerAmmoDrop failed!!\n{e}");
                 return false;

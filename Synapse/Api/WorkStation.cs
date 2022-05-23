@@ -16,8 +16,7 @@ namespace Synapse.Api
             => new SynapseWorkStationObject(position, Quaternion.Euler(rotation), scale);
 
         [Obsolete("Please create a Synapse.Api.CustomObjects.SynapseWorkStationObject")]
-        public static WorkStation CreateWorkStation(Vector3 position, Vector3 rotation, Vector3 scale)
-            => new WorkStation(position, rotation, scale);
+        public static WorkStation CreateWorkStation(Vector3 position, Vector3 rotation, Vector3 scale) => new(position, rotation, scale);
 
         public WorkstationController workStation;
 

@@ -11,8 +11,8 @@ namespace Synapse.Api.Events
 {
     public class PlayerEvents
     {
-        internal PlayerEvents() {}
-        
+        internal PlayerEvents() { }
+
         public event EventHandler.OnSynapseEvent<PlayerJoinEventArgs> PlayerJoinEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerLeaveEventArgs> PlayerLeaveEvent;
@@ -76,7 +76,7 @@ namespace Synapse.Api.Events
         public event EventHandler.OnSynapseEvent<PlayerUnCuffTargetEventArgs> PlayerUncuffTargetEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerChangeItemEventArgs> PlayerChangeItemEvent;
-        
+
         public event EventHandler.OnSynapseEvent<PlayerRadioInteractEventArgs> PlayerRadioInteractEvent;
 
         public event EventHandler.OnSynapseEvent<PlayerFlipCoinEventArgs> PlayerFlipCoinEvent;
@@ -131,21 +131,21 @@ namespace Synapse.Api.Events
 
         internal void InvokePlayerJoinEvent(Player player, ref string nickname)
         {
-            var ev = new PlayerJoinEventArgs {Player = player, Nickname = nickname};
+            var ev = new PlayerJoinEventArgs { Player = player, Nickname = nickname };
             PlayerJoinEvent?.Invoke(ev);
             nickname = ev.Nickname;
         }
 
         internal void InvokePlayerLeaveEvent(Player player)
         {
-            var ev = new PlayerLeaveEventArgs {Player = player};
+            var ev = new PlayerLeaveEventArgs { Player = player };
             PlayerLeaveEvent?.Invoke(ev);
         }
 
         internal void InvokePlayerBanEvent(Player bannedPlayer, Player issuer, ref long duration, ref string reason,
             ref bool allow)
         {
-            var ev = new PlayerBanEventArgs {Allow = allow, BanDuration = duration, Issuer = issuer, Reason = reason, BannedPlayer = bannedPlayer};
+            var ev = new PlayerBanEventArgs { Allow = allow, BanDuration = duration, Issuer = issuer, Reason = reason, BannedPlayer = bannedPlayer };
             PlayerBanEvent?.Invoke(ev);
 
             duration = ev.BanDuration;
@@ -158,8 +158,14 @@ namespace Synapse.Api.Events
         {
             var ev = new PlayerSpeakEventArgs
             {
-                Allow = allow, Player = userSetup.GetPlayer(), IntercomTalk = intercom, RadioTalk = radio,
-                Scp939Talk = scp939, ScpChat = scpChat, SpectatorChat = specChat, DissonanceUserSetup = userSetup
+                Allow = allow,
+                Player = userSetup.GetPlayer(),
+                IntercomTalk = intercom,
+                RadioTalk = radio,
+                Scp939Talk = scp939,
+                ScpChat = scpChat,
+                SpectatorChat = specChat,
+                DissonanceUserSetup = userSetup
             };
             PlayerSpeakEvent?.Invoke(ev);
 
@@ -193,7 +199,7 @@ namespace Synapse.Api.Events
                 Damage = damage,
                 DamageType = type,
             };
-            
+
             PlayerDamageEvent?.Invoke(ev);
 
             damage = ev.Damage;
@@ -222,7 +228,7 @@ namespace Synapse.Api.Events
 
         internal void InvokePlayerHealEvent(Player player, ref float amount, ref bool allow)
         {
-            var ev = new PlayerHealEventArgs() { Player = player, Amount = amount, Allow = allow};
+            var ev = new PlayerHealEventArgs() { Player = player, Amount = amount, Allow = allow };
             PlayerHealEvent?.Invoke(ev);
 
             amount = ev.Amount;
@@ -263,7 +269,7 @@ namespace Synapse.Api.Events
 
         internal void InvokePlayerReloadEvent(Player player, ref bool allow, Items.SynapseItem syncItemInfo)
         {
-            var ev = new PlayerReloadEventArgs {Allow = allow, Item = syncItemInfo,Player = player};
+            var ev = new PlayerReloadEventArgs { Allow = allow, Item = syncItemInfo, Player = player };
             PlayerReloadEvent?.Invoke(ev);
 
             allow = ev.Allow;
@@ -271,14 +277,14 @@ namespace Synapse.Api.Events
 
         internal void InvokePlayerEnterFemurEvent(Player player, ref bool allow, ref bool closeFemur)
         {
-            var ev = new PlayerEnterFemurEventArgs {Allow = allow, Player = player, CloseFemur = closeFemur};
+            var ev = new PlayerEnterFemurEventArgs { Allow = allow, Player = player, CloseFemur = closeFemur };
             PlayerEnterFemurEvent?.Invoke(ev);
 
             allow = ev.Allow;
             closeFemur = ev.CloseFemur;
         }
 
-        internal void InvokePlayerGeneratorInteractEvent(Player player,Generator generator,Enum.GeneratorInteraction interaction,ref bool allow)
+        internal void InvokePlayerGeneratorInteractEvent(Player player, Generator generator, Enum.GeneratorInteraction interaction, ref bool allow)
         {
             if (PlayerGeneratorInteractEvent == null) return;
 
@@ -316,7 +322,7 @@ namespace Synapse.Api.Events
             throwitem = ev.Throw;
         }
 
-        internal void InvokePlayerPickUpEvent(Player player,Items.SynapseItem item,out bool allow)
+        internal void InvokePlayerPickUpEvent(Player player, Items.SynapseItem item, out bool allow)
         {
             allow = true;
 
@@ -334,7 +340,7 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void InvokePlayerShootEvent(Player player,Player target,Vector3 targetpos,SynapseItem weapon,out bool allow)
+        internal void InvokePlayerShootEvent(Player player, Player target, Vector3 targetpos, SynapseItem weapon, out bool allow)
         {
             var ev = new PlayerShootEventArgs
             {
@@ -373,7 +379,7 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void InvokePlayerDropAmmoEvent(Player player, ref AmmoType type,ref ushort amount, out bool allow)
+        internal void InvokePlayerDropAmmoEvent(Player player, ref AmmoType type, ref ushort amount, out bool allow)
         {
             var ev = new PlayerDropAmmoEventArgs
             {
@@ -431,7 +437,7 @@ namespace Synapse.Api.Events
             allow = ev.SlowDown;
         }
 
-        internal void InvokeSinkhole(Player player,SinkholeEnvironmentalHazard sinkhole,ref bool allow)
+        internal void InvokeSinkhole(Player player, SinkholeEnvironmentalHazard sinkhole, ref bool allow)
         {
             var ev = new PlayerWalkOnSinkholeEventArgs
             {

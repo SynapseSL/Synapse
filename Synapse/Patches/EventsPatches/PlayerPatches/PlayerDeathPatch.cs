@@ -11,7 +11,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     internal class PlayerDeathPatch
     {
         [HarmonyPrefix]
-        private static bool OnDeath(PlayerStats __instance, DamageHandlerBase handler,out bool __state)
+        private static bool OnDeath(PlayerStats __instance, DamageHandlerBase handler, out bool __state)
         {
             try
             {
@@ -20,7 +20,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var victim = __instance.GetPlayer();
                 var attacker = handler is AttackerDamageHandler ahandler ? ahandler.Attacker.GetPlayer() : null;
 
-                if (type == DamageType.PocketDecay)
+                if (type is DamageType.PocketDecay)
                     attacker = Server.Get.Players.FirstOrDefault(x => x.Scp106Controller.PocketPlayers.Contains(victim));
 
                 SynapseController.Server.Events.Player.InvokePlayerDeathEvent(victim, attacker, type, out var allow);
@@ -39,20 +39,20 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         }
 
         [HarmonyPostfix]
-        private static void OnPostDeath(PlayerStats __instance,bool __state)
+        private static void OnPostDeath(PlayerStats __instance, bool __state)
         {
             if (__state)
             {
                 var victim = __instance.GetPlayer();
 
-                foreach (var larry in Server.Get.Players.Where(x => x.Scp106Controller.PocketPlayers.Contains(victim)))
-                    larry.Scp106Controller.PocketPlayers.Remove(victim);
+                foreach (var larry in Server.Get.Players)
+                    if (larry.Scp106Controller.PocketPlayers.Contains(victim)) larry.Scp106Controller.PocketPlayers.Remove(victim);
 
                 if (victim.IsDummy)
                     Map.Get.Dummies.FirstOrDefault(x => x.Player == victim)?.Destroy();
 
-                foreach (var larry in Server.Get.Players.Where(x => x.Scp106Controller.PocketPlayers.Contains(victim)))
-                    larry.Scp106Controller.PocketPlayers.Remove(victim);
+                foreach (var larry in Server.Get.Players)
+                    if (larry.Scp106Controller.PocketPlayers.Contains(victim)) larry.Scp106Controller.PocketPlayers.Remove(victim);
 
                 if (victim.IsDummy)
                     Map.Get.Dummies.FirstOrDefault(x => x.Player == victim)?.Destroy();

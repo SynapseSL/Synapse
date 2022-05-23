@@ -13,7 +13,7 @@ namespace Synapse.RCE.Models
 
         internal static RceResponse GetInvalidJsonResponse()
         {
-            return new RceResponse()
+            return new()
             {
                 Status = RceStatus.InvalidJson,
                 Content = "Invalid Json has been transmitted",
@@ -22,7 +22,7 @@ namespace Synapse.RCE.Models
         }
         internal static RceResponse GetSuccessResponse()
         {
-            return new RceResponse()
+            return new()
             {
                 Status = RceStatus.Success,
                 Content = "Code compiled and ran sucessfully",
@@ -31,7 +31,7 @@ namespace Synapse.RCE.Models
         }
         internal static RceResponse GetFailedRunResponse(Exception e)
         {
-            return new RceResponse()
+            return new()
             {
                 Status = RceStatus.RunFailed,
                 Content = $"Exception thrown: {e}",
@@ -40,7 +40,7 @@ namespace Synapse.RCE.Models
         }
         internal static RceResponse GetAssemblyAlreadyLoadedResponse(string name)
         {
-            return new RceResponse()
+            return new()
             {
                 Status = RceStatus.AssemblyAlreadyLoaded,
                 Content = $"An Assembly with the name \"{name}\" is already loaded",
@@ -49,7 +49,7 @@ namespace Synapse.RCE.Models
         }
         internal static RceResponse GetFailedBuildResponse(Exception e)
         {
-            return new RceResponse()
+            return new()
             {
                 Status = RceStatus.CompilationFailed,
                 Content = e.ToString(),
@@ -58,11 +58,11 @@ namespace Synapse.RCE.Models
         }
         internal static RceResponse GetFailedBuildResponse(IEnumerable<Diagnostic> failures)
         {
-            StringBuilder builder = new StringBuilder();
+            StringBuilder builder = new();
             foreach (Diagnostic diagnostic in failures)
-                builder.AppendLine(String.Format("{0}: {1}", diagnostic?.Id, diagnostic?.GetMessage()));
+                builder.AppendLine(string.Format("{0}: {1}", diagnostic?.Id, diagnostic?.GetMessage()));
 
-            return new RceResponse()
+            return new()
             {
                 Status = RceStatus.CompilationFailed,
                 Content = builder.ToString(),

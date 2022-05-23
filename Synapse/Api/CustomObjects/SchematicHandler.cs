@@ -21,7 +21,7 @@ namespace Synapse.Api.CustomObjects
 
         public static SchematicHandler Get => Server.Get.Schematic;
 
-        public CustomAttributeHandler AttributeHandler { get; } = new CustomAttributeHandler();
+        public CustomAttributeHandler AttributeHandler { get; } = new();
 
         internal void Init()
         {
@@ -72,7 +72,7 @@ namespace Synapse.Api.CustomObjects
                 Load();
                 AttributeHandler.Init();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.Get.Error("Synapse-Object: Error while Initialising Synapse Objects and Schematics:\n" + ex);
             }
@@ -116,7 +116,7 @@ namespace Synapse.Api.CustomObjects
             }
 
             foreach (var role in CharacterClassManager._staticClasses)
-                if (role != null)
+                if (role is not null)
                     SynapseRagdollObject.Prefabs[role.roleId] = role.model_ragdoll?.GetComponent<global::Ragdoll>();
         }
 
@@ -129,33 +129,34 @@ namespace Synapse.Api.CustomObjects
         public SynapseObject SpawnSchematic(string name, Vector3 position) => SpawnSchematic(GetSchematic(name), position);
 
         public SynapseObject SpawnSchematic(string name, Vector3 position, Vector3 rotation) => SpawnSchematic(GetSchematic(name), position, Quaternion.Euler(rotation));
-        
+
         public SynapseObject SpawnSchematic(string name, Vector3 position, Quaternion rotation) => SpawnSchematic(GetSchematic(name), position, rotation);
 
         public SynapseObject SpawnSchematic(int id, Vector3 position) => SpawnSchematic(GetSchematic(id), position);
-        
+
         public SynapseObject SpawnSchematic(int id, Vector3 position, Vector3 rotation) => SpawnSchematic(GetSchematic(id), position, Quaternion.Euler(rotation));
 
         public SynapseObject SpawnSchematic(int id, Vector3 position, Quaternion rotation) => SpawnSchematic(GetSchematic(id), position, rotation);
 
         public SynapseObject SpawnSchematic(SynapseSchematic schematic, Vector3 position, Vector3 rotation) => SpawnSchematic(schematic, position, Quaternion.Euler(rotation));
-        
+
         public SynapseObject SpawnSchematic(SynapseSchematic schematic, Vector3 position, Quaternion rotation)
         {
-            if (schematic == null) return null;
+            if (schematic is null) return null;
 
-            var so = new SynapseObject(schematic);
-            so.Position = position;
-            so.Rotation = rotation;
+            SynapseObject so = new(schematic)
+            {
+                Position = position,
+                Rotation = rotation
+            };
             return so;
         }
 
         public SynapseObject SpawnSchematic(SynapseSchematic schematic, Vector3 position)
         {
-            if (schematic == null) return null;
+            if (schematic is null) return null;
 
-            var so = new SynapseObject(schematic);
-            so.Position = position;
+            SynapseObject so = new(schematic) { Position = position };
             return so;
         }
 
@@ -186,12 +187,12 @@ namespace Synapse.Api.CustomObjects
         {
             var list = Schematics.ToList();
 
-            foreach(var schematic in list.ToList())
-                if(schematic.reload) list.Remove(schematic);
+            foreach (var schematic in list.ToList())
+                if (schematic.reload) list.Remove(schematic);
 
             Schematics = list.AsReadOnly();
 
-            foreach(var file in Directory.GetFiles(Server.Get.Files.SchematicDirectory, "*.syml"))
+            foreach (var file in Directory.GetFiles(Server.Get.Files.SchematicDirectory, "*.syml"))
             {
                 try
                 {
@@ -205,7 +206,7 @@ namespace Synapse.Api.CustomObjects
 
                     AddSchematic(schematic);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Logger.Get.Error($"Synapse-Schematic: Loading Schematic failed - path: {file}\n{ex}");
                 }

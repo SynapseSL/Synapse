@@ -91,13 +91,14 @@ namespace Synapse.Api
 
         public void DimScreens() => Rs.RpcDimScreen();
 
-        public void ShowRoundSummary(RoundSummary.SumInfo_ClassList remainingPlayers,RoundSummary.LeadingTeam team)
+        public void ShowRoundSummary(RoundSummary.SumInfo_ClassList remainingPlayers, RoundSummary.LeadingTeam team)
         {
-            var timeToRoundRestart = Mathf.Clamp(GameCore.ConfigFile.ServerConfig.GetInt("auto_round_restart_time", 10), 5, 1000);
+            var timeToRoundRestart = Mathf.Clamp(ConfigFile.ServerConfig.GetInt("auto_round_restart_time", 10), 5, 1000);
 
-            Rs.RpcShowRoundSummary(Rs.classlistStart,remainingPlayers, team, EscapedDPersonnel, EscapedScientists, ScpKills, timeToRoundRestart);
+            Rs.RpcShowRoundSummary(Rs.classlistStart, remainingPlayers, team, EscapedDPersonnel, EscapedScientists, ScpKills, timeToRoundRestart);
         }
 
-        public void MtfRespawn(bool isCI = false) => Respawning.RespawnManager.Singleton.ForceSpawnTeam(isCI ? SpawnableTeamType.ChaosInsurgency : SpawnableTeamType.NineTailedFox);
+        public void MtfRespawn(bool isCI = false) => RespawnManager.Singleton.ForceSpawnTeam(isCI ?
+            SpawnableTeamType.ChaosInsurgency : SpawnableTeamType.NineTailedFox);
     }
 }

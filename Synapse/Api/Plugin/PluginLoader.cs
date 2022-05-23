@@ -10,13 +10,13 @@ namespace Synapse.Api.Plugin
 {
     public class PluginLoader
     {
-        private readonly List<IContextProcessor> _processors = new List<IContextProcessor> { new ConfigInjector(), new CommandProcessor(), new TranslationInjector(), new SynapseObjectAttributeProcessor() };
+        private readonly List<IContextProcessor> _processors = new() { new ConfigInjector(), new CommandProcessor(), new TranslationInjector(), new SynapseObjectAttributeProcessor() };
 
-        private readonly List<IPlugin> _plugins = new List<IPlugin>();
+        private readonly List<IPlugin> _plugins = new();
 
-        private readonly List<PluginLoadContext> _contexts = new List<PluginLoadContext>();
+        private readonly List<PluginLoadContext> _contexts = new();
 
-        public readonly List<PluginInformation> Plugins = new List<PluginInformation>();
+        public readonly List<PluginInformation> Plugins = new();
 
         internal void ActivatePlugins()
         {
@@ -39,7 +39,7 @@ namespace Synapse.Api.Plugin
 
                         var infos = type.GetCustomAttribute<PluginInformation>();
 
-                        if (infos == null)
+                        if (infos is null)
                         {
                             SynapseController.Server.Logger.Info($"The File {assembly.GetName().Name} has a class which inherits from IPlugin but has no PluginInformation ... Default Values will be added");
                             infos = new PluginInformation();

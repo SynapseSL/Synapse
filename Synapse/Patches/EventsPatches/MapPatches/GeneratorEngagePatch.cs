@@ -6,14 +6,14 @@ using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.MapPatches
 {
-    [HarmonyPatch(typeof(Scp079Generator), nameof(Scp079Generator.ServerUpdate))]
-    internal static class GeneratorEngagePatch
-    {
-        [HarmonyPrefix]
-        private static bool OnUpdate(Scp079Generator __instance)
-        {
-            try
-            {
+	[HarmonyPatch(typeof(Scp079Generator), nameof(Scp079Generator.ServerUpdate))]
+	internal static class GeneratorEngagePatch
+	{
+		[HarmonyPrefix]
+		private static bool OnUpdate(Scp079Generator __instance)
+		{
+			try
+			{
 				var flag = __instance._currentTime >= __instance._totalActivationTime;
 
 				if (!flag)
@@ -27,7 +27,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 				{
 					if (flag && !__instance.Engaged)
 					{
-						Synapse.Api.Events.EventHandler.Get.Map.InvokeGenEngage(__instance.GetGenerator(), out var allow);
+						Api.Events.EventHandler.Get.Map.InvokeGenEngage(__instance.GetGenerator(), out var allow);
 
 						if (!allow) return false;
 
@@ -48,11 +48,11 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 				__instance._currentTime = Mathf.Clamp(__instance._currentTime, 0f, __instance._totalActivationTime);
 				return false;
 			}
-            catch (Exception ex)
-            {
-                Logger.Get.Error($"Synapse-Event: GeneratorEngaged Patch failed!!\n{ex}");
-                return true;
-            }
-        }
-    }
+			catch (Exception ex)
+			{
+				Logger.Get.Error($"Synapse-Event: GeneratorEngaged Patch failed!!\n{ex}");
+				return true;
+			}
+		}
+	}
 }

@@ -5,10 +5,10 @@ namespace Synapse.Command.Commands
 {
     [CommandInformation(
         Name = "MapPoint",
-        Aliases = new [] { "GetMapPoint","MP" },
+        Aliases = new[] { "GetMapPoint", "MP" },
         Description = "A command to get the current location as MapPoint",
         Permission = "synapse.command.mappoint",
-        Platforms = new [] { Platform.RemoteAdmin },
+        Platforms = new[] { Platform.RemoteAdmin },
         Usage = "Just use the command for the Point"
         )]
     public class SynapseMapPointCommand : ISynapseCommand

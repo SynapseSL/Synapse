@@ -12,32 +12,32 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                if (player == null || __instance.DisableEffect || __instance._correctPosition == null)
+                if (player is null || __instance.DisableEffect || __instance._correctPosition is null)
                     return false;
 
                 var synapseplayer = player.GetPlayer();
-                
+
                 if (Vector3.Distance(player.transform.position, __instance._correctPosition.position) > __instance.DistanceToBeAffected)
                     return false;
-                
+
                 var allow = true;
 
                 if ((__instance.SCPImmune && synapseplayer.Team == (int)Team.SCP) || !SynapseExtensions.CanHarmScp(synapseplayer, false) || synapseplayer.GodMode)
                     allow = false;
-               
-                Synapse.Api.Events.EventHandler.Get.Player.InvokeTantrum(synapseplayer, __instance, ref allow);
+
+                Api.Events.EventHandler.Get.Player.InvokeTantrum(synapseplayer, __instance, ref allow);
 
                 if (allow)
                 {
-                    Synapse.Api.Logger.Get.Debug("ALLOW TANTRUM");
+                    Api.Logger.Get.Debug("ALLOW TANTRUM");
                     synapseplayer.PlayerEffectsController.EnableEffect<CustomPlayerEffects.Stained>(2f, false);
                 }
-                
+
                 return false;
             }
             catch (Exception ex)
             {
-                Synapse.Api.Logger.Get.Error("Synapse-Event: PlayerWalkOnSinkholeEvent failed!!\n" + ex);
+                Api.Logger.Get.Error("Synapse-Event: PlayerWalkOnSinkholeEvent failed!!\n" + ex);
                 return true;
             }
         }

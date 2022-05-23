@@ -10,7 +10,7 @@ namespace Synapse.Patches.SynapsePatches.Dummy
         private static bool TargetRPC(NetworkBehaviour __instance)
         {
             var player = __instance.GetPlayer();
-            if (player != null && player.IsDummy) return false;
+            if (player is not null && player.IsDummy) return false;
             return true;
         }
     }

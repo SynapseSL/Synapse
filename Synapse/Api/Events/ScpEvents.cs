@@ -289,7 +289,7 @@ namespace Synapse.Api.Events
                 };
 
                 Scp173PlaceTantrum?.Invoke(ev);
-                
+
                 allow = ev.Allow;
             }
 
@@ -321,7 +321,7 @@ namespace Synapse.Api.Events
 
             public event EventHandler.OnSynapseEvent<Scp049ReviveEvent> Scp049ReviveEvent;
 
-            internal void InvokeRevive(Player scp, Player target, Ragdoll rag,bool finish,out bool allow)
+            internal void InvokeRevive(Player scp, Player target, Ragdoll rag, bool finish, out bool allow)
             {
                 var ev = new Scp049ReviveEvent
                 {

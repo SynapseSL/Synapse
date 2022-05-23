@@ -23,10 +23,9 @@ namespace Synapse.Patches.SynapsePatches.Item
                 if (inv.UserInventory.Items.Count >= 8) return false;
 
                 var itemBase = inv.CreateItemInstance(type, inv.isLocalPlayer);
-                if (itemBase == null) return false;
+                if (itemBase is null) return false;
 
-                SynapseItem item;
-                if (itemSerial == 0 || !SynapseItem.AllItems.TryGetValue(itemSerial, out item))
+                if (itemSerial == 0 || !SynapseItem.AllItems.TryGetValue(itemSerial, out var item))
                 {
                     itemSerial = ItemSerialGenerator.GenerateNext();
                     itemBase.ItemSerial = itemSerial;
@@ -66,14 +65,14 @@ namespace Synapse.Patches.SynapsePatches.Item
             {
                 __result = null;
 
-                if (item == null) return false;
+                if (item is null) return false;
 
                 var pickup = UnityEngine.Object.Instantiate(item.PickupDropModel, inv.transform.position,
-                    ReferenceHub.GetHub(inv.gameObject).PlayerCameraReference.rotation * 
+                    ReferenceHub.GetHub(inv.gameObject).PlayerCameraReference.rotation *
                     item.PickupDropModel.transform.rotation);
 
                 //The Value to the Serial can also be null but every Serial should be as key inside AllItems
-                if (!SynapseItem.AllItems.TryGetValue(psi.Serial, out var sitem)) 
+                if (!SynapseItem.AllItems.TryGetValue(psi.Serial, out var sitem))
                 {
                     Logger.Get.Warn($"Found unregistered ItemSerial in PickupSyncInfo (CreatePickupPatch): {psi.Serial}");
                     psi.Serial = ItemSerialGenerator.GenerateNext();
@@ -82,7 +81,7 @@ namespace Synapse.Patches.SynapsePatches.Item
                 pickup.NetworkInfo = psi;
                 pickup.Info = psi;
 
-                if (sitem == null) sitem = new SynapseItem(pickup);
+                if (sitem is null) sitem = new SynapseItem(pickup);
                 else sitem.PickupBase = pickup;
 
                 pickup.transform.localScale = sitem.Scale;
@@ -97,7 +96,7 @@ namespace Synapse.Patches.SynapsePatches.Item
                 __result = pickup;
                 return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Items: CreatePickup failed!!\n{e}");
                 return false;
@@ -123,7 +122,7 @@ namespace Synapse.Patches.SynapsePatches.Item
                 }
 
                 //When ipb is null then this Method is used to destroy the entire object if not it is used to switch to a pickup
-                if (ipb == null && item.State != ItemState.Thrown)
+                if (ipb is null && item.State is not ItemState.Thrown)
                 {
                     item.Destroy();
                 }
@@ -144,7 +143,7 @@ namespace Synapse.Patches.SynapsePatches.Item
 
                 return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Items: RemoveItem failed!!\n{e}");
                 return false;

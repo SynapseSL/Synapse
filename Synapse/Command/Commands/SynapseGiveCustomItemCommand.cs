@@ -4,10 +4,10 @@ namespace Synapse.Command.Commands
 {
     [CommandInformation(
         Name = "GiveItem",
-        Aliases = new string[] {"gi"},
+        Aliases = new string[] { "gi" },
         Description = "A Command to give a Player an Item",
         Permission = "synapse.command.give",
-        Platforms = new[] {Platform.RemoteAdmin,Platform.ServerConsole},
+        Platforms = new[] { Platform.RemoteAdmin, Platform.ServerConsole },
         Usage = "give player id or give player id durabillity sight barrel other xsize ysize zsize",
         Arguments = new[] { "Player", "ItemID", "(Durabillity)", "(Attachments)", "(X Size)", "(Y Size)", "(Z Size)" }
         )]
@@ -17,7 +17,7 @@ namespace Synapse.Command.Commands
         {
             var result = new CommandResult();
 
-            if(context.Arguments.Count < 2)
+            if (context.Arguments.Count < 2)
             {
                 result.Message = "Missing parameter! Command Usage: give player itemid";
                 result.State = CommandResultState.Error;
@@ -25,14 +25,14 @@ namespace Synapse.Command.Commands
             }
 
             var player = Server.Get.GetPlayer(context.Arguments.FirstElement());
-            if(player == null)
+            if (player is null)
             {
                 result.Message = "No Player was found";
                 result.State = CommandResultState.Error;
                 return result;
             }
 
-            if(!int.TryParse(context.Arguments.ElementAt(1),out var id))
+            if (!int.TryParse(context.Arguments.ElementAt(1), out var id))
             {
                 result.Message = "Invalid Parameter for ItemID";
                 result.State = CommandResultState.Error;
@@ -45,8 +45,8 @@ namespace Synapse.Command.Commands
             float ysize = 1;
             float zsize = 1;
 
-            if(context.Arguments.Count > 2)
-                if(!float.TryParse(context.Arguments.ElementAt(2),out durabillity))
+            if (context.Arguments.Count > 2)
+                if (!float.TryParse(context.Arguments.ElementAt(2), out durabillity))
                 {
                     result.Message = "Invalid Parameter for Durabillity";
                     result.State = CommandResultState.Error;
@@ -92,10 +92,7 @@ namespace Synapse.Command.Commands
                 return result;
             }
 
-            var item = new Api.Items.SynapseItem(id)
-            {
-                Scale = new UnityEngine.Vector3(xsize, ysize, zsize),
-            };
+            var item = new Api.Items.SynapseItem(id) { Scale = new(xsize, ysize, zsize) };
             player.Inventory.AddItem(item);
             item.Durabillity = durabillity;
             item.WeaponAttachments = sight;

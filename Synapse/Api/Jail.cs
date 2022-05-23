@@ -29,9 +29,9 @@ namespace Synapse.Api
 
         public Vector3 Position { get; set; }
 
-        public List<Items.SynapseItem> Items { get; set; } = new List<Items.SynapseItem>();
+        public List<Items.SynapseItem> Items { get; set; } = new();
 
-        public Dictionary<AmmoType, ushort> Ammos { get; set; } = new Dictionary<AmmoType, ushort>();
+        public Dictionary<AmmoType, ushort> Ammos { get; set; } = new();
 
         public float Health { get; set; }
 
@@ -73,7 +73,7 @@ namespace Synapse.Api
             Player.Health = Health;
 
             Player.Inventory.Clear();
-            
+
 
             foreach (var item in Items)
                 Player.Inventory.AddItem(item);

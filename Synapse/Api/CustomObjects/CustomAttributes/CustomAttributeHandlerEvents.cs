@@ -18,9 +18,9 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
             {
                 var name = handler.Name;
 
-                foreach(var attribute in ev.Object.CustomAttributes)
+                foreach (var attribute in ev.Object.CustomAttributes)
                 {
-                    if (attribute == null) continue;
+                    if (attribute is null) continue;
 
                     var args = attribute.Split(':');
                     if (args[0].Equals(handler.Name, StringComparison.InvariantCultureIgnoreCase)) continue;

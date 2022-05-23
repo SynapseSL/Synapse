@@ -15,10 +15,10 @@ namespace Synapse.Api.Items
 
         public float FuseTime
         {
-            get => ThrowableItem == null ? 0 : ThrowableItem.GetComponent<TimeGrenade>().TargetTime - Time.timeSinceLevelLoad;
+            get => ThrowableItem is null ? 0 : ThrowableItem.GetComponent<TimeGrenade>().TargetTime - Time.timeSinceLevelLoad;
             set
             {
-                if (ThrowableItem == null) return;
+                if (ThrowableItem is null) return;
                 var comp = ThrowableItem.GetComponent<TimeGrenade>();
 
                 comp.RpcSetTime(value);
@@ -28,15 +28,15 @@ namespace Synapse.Api.Items
 
         public void Fuse()
         {
-            if (Item.State != Enum.ItemState.Map) return;
+            if (Item.State is not Enum.ItemState.Map) return;
 
             if (!InventoryItemLoader.AvailableItems.TryGetValue(Item.ItemType, out var itemBase))
                 return;
 
-            if (!(itemBase is ThrowableItem throwableItem))
+            if (itemBase is not ThrowableItem throwableItem)
                 return;
 
-            var thrownProjectile = UnityEngine.Object.Instantiate(throwableItem.Projectile);
+            var thrownProjectile = Object.Instantiate(throwableItem.Projectile);
             if (thrownProjectile.TryGetComponent<Rigidbody>(out var rigidbody))
             {
                 rigidbody.position = Item.PickupBase.Rb.position;

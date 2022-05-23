@@ -7,7 +7,7 @@ namespace Synapse.Api.Plugin
     {
         PluginInformation Information { get; set; }
 
-        [Obsolete("The old Translation System is not recommended to use",false)]
+        [Obsolete("The old Translation System is not recommended to use", false)]
         Translation Translation { get; set; }
 
         string PluginDirectory { get; set; }
@@ -24,9 +24,7 @@ namespace Synapse.Api.Plugin
 
         public virtual void Load() => Logger.Get.Info($"{Information.Name} by {Information.Author} has loaded!");
 
-        public virtual void ReloadConfigs()
-        {
-        }
+        public virtual void ReloadConfigs() { }
 
         [Obsolete("The old Translation System is not recommended to use", false)]
         public Translation Translation { get; set; }
@@ -37,7 +35,7 @@ namespace Synapse.Api.Plugin
         {
             get
             {
-                if (_pluginDirectory == null)
+                if (_pluginDirectory is null)
                     return null;
 
                 if (!Directory.Exists(_pluginDirectory))
@@ -46,6 +44,6 @@ namespace Synapse.Api.Plugin
                 return _pluginDirectory;
             }
             set => _pluginDirectory = value;
-        } 
+        }
     }
 }

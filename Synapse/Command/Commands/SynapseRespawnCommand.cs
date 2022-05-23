@@ -15,13 +15,13 @@ namespace Synapse.Command.Commands
     {
         public CommandResult Execute(CommandContext context)
         {
-            if (context.Arguments.Count < 1) return new CommandResult
+            if (context.Arguments.Count < 1) return new()
             {
                 Message = "Missing parameter! Usage: spawn teamid",
                 State = CommandResultState.Error
             };
 
-            if (!int.TryParse(context.Arguments.At(0), out var id)) return new CommandResult
+            if (!int.TryParse(context.Arguments.At(0), out var id)) return new()
             {
                 Message = "Invalid Team ID",
                 State = CommandResultState.Error
@@ -34,14 +34,14 @@ namespace Synapse.Command.Commands
                     players = players.GetRange(0, size);
             }
 
-            if (players.Count < 1) return new CommandResult
+            if (players.Count < 1) return new()
             {
                 Message = "Not enough players to respawn",
                 State = CommandResultState.Error
             };
 
-            Server.Get.TeamManager.SpawnTeam(id,players);
-            return new CommandResult
+            Server.Get.TeamManager.SpawnTeam(id, players);
+            return new()
             {
                 Message = "Team was spawned",
                 State = CommandResultState.Ok

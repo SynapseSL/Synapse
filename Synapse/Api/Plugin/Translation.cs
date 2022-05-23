@@ -9,7 +9,7 @@ namespace Synapse.Api.Plugin
         internal Translation(PluginInformation info) => Information = info;
 
         private Dictionary<string, string> _rawtranslation;
-        private Dictionary<string, string> _translation = new Dictionary<string, string>();
+        private Dictionary<string, string> _translation = new();
         internal PluginInformation Information { private get; set; }
 
         public void CreateTranslations(Dictionary<string, string> translations)
@@ -55,7 +55,7 @@ namespace Synapse.Api.Plugin
 
         public void ReloadTranslations()
         {
-            if (_rawtranslation != null)
+            if (_rawtranslation is not null)
                 CreateTranslations(_rawtranslation);
         }
 
@@ -64,7 +64,7 @@ namespace Synapse.Api.Plugin
             try
             {
                 var trans = _translation.FirstOrDefault(x => x.Key == translationName).Value;
-                return trans == null ? "Plugin requested a non-existing Translation!" : trans.Replace("\\n", "\n");
+                return trans is null ? "Plugin requested a non-existing Translation!" : trans.Replace("\\n", "\n");
             }
             catch
             {

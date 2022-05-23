@@ -9,7 +9,7 @@ namespace Synapse.Api
         {
             lockerChamber = vanilalockerChamber;
             vanillalocker = locker.locker;
-            Locker = locker; 
+            Locker = locker;
             colliderId = id;
             byteId = (ushort)(1 << id);
         }
@@ -38,7 +38,7 @@ namespace Synapse.Api
 
         public Vector3 Position => GameObject.transform.position;
 
-        public bool Open 
+        public bool Open
         {
             get => (vanillalocker.OpenedChambers & byteId) == byteId;
             set

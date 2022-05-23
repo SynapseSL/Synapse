@@ -54,12 +54,12 @@ namespace Synapse.Api
 
         public void PlayAudio(ShootSound sound)
         {
-            foreach(var player in Server.Get.Players)
+            foreach (var player in Server.Get.Players)
             {
                 var msg = new GunAudioMessage(player, 0, (byte)Distance, player);
                 var to = Position - player.Position;
 
-                if(player.RoleType != RoleType.Spectator && to.sqrMagnitude > 1760f)
+                if (player.RoleType != RoleType.Spectator && to.sqrMagnitude > 1760f)
                 {
                     to.y = 0f;
                     var num = Vector3.Angle(Vector3.forward, to);
@@ -110,10 +110,9 @@ namespace Synapse.Api
             return ray;
         }
 
-        private float time = 0f;
         private void Update()
         {
-            if (!ShootAutomatic || time > Time.time) return;
+            if (!ShootAutomatic || 0f > Time.time) return;
 
             foreach (var player in Server.Get.Players)
                 if (Vector3.Distance(player.Position, Position) <= Distance)
@@ -141,15 +140,11 @@ namespace Synapse.Api
             {
                 get
                 {
-                    var cassie = new CassieAnnouncement();
-                    cassie.Announcement = Cassie;
-                    //TODO: Fix Subtitle
-                    cassie.SubtitleParts = new Subtitles.SubtitlePart[]
+                    var cassie = new CassieAnnouncement
                     {
-                    new Subtitles.SubtitlePart(Subtitles.SubtitleType.Custom, new string[]
-                    {
-                        Cassie
-                    })
+                        Announcement = Cassie,
+                        //TODO: Fix Subtitle ;; Subtitles may cause the server to crash
+                        //SubtitleParts = new Subtitles.SubtitlePart[] { new(Subtitles.SubtitleType.Custom, new string[] { Cassie }) }
                     };
 
                     return cassie;

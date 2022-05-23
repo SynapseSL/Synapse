@@ -14,12 +14,12 @@ namespace Synapse.Api
 
         public Ragdoll(RoleType roleType, string name, Vector3 pos, Quaternion rot, DamageHandlerBase handler)
         {
-            var gameObject = Server.Get.Host.ClassManager.Classes.SafeGet((int) roleType).model_ragdoll;
+            var gameObject = Server.Get.Host.ClassManager.Classes.SafeGet((int)roleType).model_ragdoll;
 
-            if (gameObject == null || !Object.Instantiate(gameObject).TryGetComponent(out ragdoll))
+            if (gameObject is null || !Object.Instantiate(gameObject).TryGetComponent(out ragdoll))
                 return;
 
-            ragdoll.NetworkInfo = new RagdollInfo(Server.Get.Host.Hub, handler, roleType, pos, rot, name, NetworkTime.time);
+            ragdoll.NetworkInfo = new(Server.Get.Host.Hub, handler, roleType, pos, rot, name, NetworkTime.time);
             NetworkServer.Spawn(GameObject);
 
             Map.Get.Ragdolls.Add(this);
@@ -54,8 +54,8 @@ namespace Synapse.Api
             Object.Destroy(GameObject);
             Map.Get.Ragdolls.Remove(this);
         }
-        
-        public static Ragdoll CreateRagdoll(RoleType roletype,string name, Vector3 pos, Quaternion rot, DamageType type) 
-            => new Ragdoll(roletype,name, pos, rot, type);
+
+        public static Ragdoll CreateRagdoll(RoleType roletype, string name, Vector3 pos, Quaternion rot, DamageType type)
+            => new(roletype, name, pos, rot, type);
     }
 }

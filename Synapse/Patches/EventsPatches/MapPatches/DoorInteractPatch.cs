@@ -2,12 +2,13 @@
 using System.Linq;
 using HarmonyLib;
 using Interactables.Interobjects.DoorUtils;
+using Synapse.Api.Events.SynapseEventArguments;
 using EventHandler = Synapse.Api.Events.EventHandler;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.MapPatches
 {
-    [HarmonyPatch(typeof(DoorVariant), nameof(DoorVariant.ServerInteract))]
+	[HarmonyPatch(typeof(DoorVariant), nameof(DoorVariant.ServerInteract))]
 	internal static class DoorInteractPatch
 	{
 		[HarmonyPrefix]
@@ -18,7 +19,10 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 				if (__instance.ActiveLocks > 0)
 				{
 					DoorLockMode mode = DoorLockUtils.GetMode((DoorLockReason)__instance.ActiveLocks);
-					if ((!mode.HasFlagFast(DoorLockMode.CanClose) || !mode.HasFlagFast(DoorLockMode.CanOpen)) && (!mode.HasFlagFast(DoorLockMode.ScpOverride) || ply.characterClassManager.CurRole.team != Team.SCP) && (mode == DoorLockMode.FullLock || (__instance.TargetState && !mode.HasFlagFast(DoorLockMode.CanClose)) || (!__instance.TargetState && !mode.HasFlagFast(DoorLockMode.CanOpen))))
+					if ((!mode.HasFlagFast(DoorLockMode.CanClose) || !mode.HasFlagFast(DoorLockMode.CanOpen)) &&
+						(!mode.HasFlagFast(DoorLockMode.ScpOverride) || ply.characterClassManager.CurRole.team is not Team.SCP) &&
+						(mode == DoorLockMode.FullLock || (__instance.TargetState && !mode.HasFlagFast(DoorLockMode.CanClose)) ||
+						(!__instance.TargetState && !mode.HasFlagFast(DoorLockMode.CanOpen))))
 					{
 						__instance.LockBypassDenied(ply, colliderId);
 						return false;
@@ -27,32 +31,33 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 				if (__instance.AllowInteracting(ply, colliderId))
 				{
 					var player = ply.GetPlayer();
-					var flag = player.RoleType == RoleType.Scp079 || __instance.RequiredPermissions.CheckPermissions(player.VanillaInventory.CurInstance, ply);
+					var flag = player.RoleType is RoleType.Scp079 || __instance.RequiredPermissions.CheckPermissions(player.VanillaInventory.CurInstance, ply);
 					var cardaccess = false;
 					var item = player.ItemInHand;
 
-					if (item.ItemCategory == ItemCategory.Keycard)
-                        try
-                        {
-							EventHandler.Get.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref flag);
+					if (item.ItemCategory is ItemCategory.Keycard)
+						try
+						{
+							EventHandler.Get.Player.InvokePlayerItemUseEvent(player, item, ItemInteractState.Finalizing, ref flag);
 						}
 						catch (Exception ex)
-                        {
+						{
 							Logger.Get.Error($"Synapse-Event: ItemUseDoor Event failed!!\n{ex}");
 						}
 
 					if (flag) cardaccess = true;
 					else if (Server.Get.Configs.SynapseConfiguration.RemoteKeyCard)
-						foreach (var item2 in player.Inventory.Items.Where(x => x != item && x.ItemCategory == ItemCategory.Keycard))
+						foreach (var item2 in player.Inventory.Items)
 						{
+							if (item2 == item || item2.ItemCategory is not ItemCategory.Keycard) continue;
 							var allowcard = __instance.RequiredPermissions.CheckPermissions(item2.ItemBase, ply);
 
-                            try
-                            {
-								EventHandler.Get.Player.InvokePlayerItemUseEvent(player, item2, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allowcard);
+							try
+							{
+								EventHandler.Get.Player.InvokePlayerItemUseEvent(player, item2, ItemInteractState.Finalizing, ref allowcard);
 							}
 							catch (Exception ex)
-                            {
+							{
 								Logger.Get.Error($"Synapse-Event: ItemUseDoor Event failed!!\n{ex}");
 							}
 
@@ -67,8 +72,8 @@ namespace Synapse.Patches.EventsPatches.MapPatches
 					{
 						EventHandler.Get.Map.InvokeDoorInteractEvent(player, __instance.GetDoor(), ref cardaccess);
 					}
-					catch(Exception ex)
-                    {
+					catch (Exception ex)
+					{
 						Logger.Get.Error($"Synapse-Event: DoorInteract failed!!\n{ex}");
 					}
 

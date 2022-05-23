@@ -23,7 +23,7 @@ namespace Synapse.Patches.EventsPatches.ServerPatches
 
                 var userId = "";
 
-                if(CustomLiteNetLib4MirrorTransport.UserIds.ContainsKey(request.RemoteEndPoint))
+                if (CustomLiteNetLib4MirrorTransport.UserIds.ContainsKey(request.RemoteEndPoint))
                     userId = CustomLiteNetLib4MirrorTransport.UserIds[request.RemoteEndPoint].UserId;
 
                 SynapseController.Server.Events.Server.InvokePreAuthenticationEvent(userId, ref allow, ref reason, request);
@@ -41,7 +41,7 @@ namespace Synapse.Patches.EventsPatches.ServerPatches
             }
             catch (Exception e)
             {
-                Synapse.Api.Logger.Get.Error($"Synapse-Event: PreAuthenticationFailed failed!!\n{e}");
+                Api.Logger.Get.Error($"Synapse-Event: PreAuthenticationFailed failed!!\n{e}");
                 //Just casually accept if Synapse messes up here.
                 request.Accept();
             }

@@ -6,7 +6,7 @@ using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(WorkstationController),nameof(WorkstationController.ServerInteract))]
+    [HarmonyPatch(typeof(WorkstationController), nameof(WorkstationController.ServerInteract))]
     internal static class WorkStationPatch
     {
         [HarmonyPrefix]
@@ -16,19 +16,19 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             {
                 if (colliderId != __instance._activateCollder?.ColliderId || __instance.Status != 0) return false;
 
-                if (ply == null) return false;
+                if (ply is null) return false;
 
                 var player = ply.GetPlayer();
                 var station = __instance.GetWorkStation();
 
-                if (station != null)
+                if (station is not null)
                     station.KnownUser = player;
 
                 Event.Get.Player.InvokePlayerStartWorkstation(player, station, out var allow);
 
                 return allow;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Item: Connect Workstation Tablet failed!!\n{e}");
                 return false;

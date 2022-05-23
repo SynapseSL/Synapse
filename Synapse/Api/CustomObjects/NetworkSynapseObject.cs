@@ -41,9 +41,10 @@ namespace Synapse.Api.CustomObjects
             }
         }
 
-        protected virtual TComponent CreateNetworkObject<TComponent>(TComponent component, Vector3 pos, Quaternion rot, Vector3 scale) where TComponent : NetworkBehaviour
+        protected virtual TComponent CreateNetworkObject<TComponent>(TComponent component, Vector3 pos, Quaternion rot, Vector3 scale)
+            where TComponent : NetworkBehaviour
         {
-            var gameObject = UnityEngine.Object.Instantiate(component, pos, rot);
+            var gameObject = Object.Instantiate(component, pos, rot);
             gameObject.transform.localScale = scale;
             NetworkServer.Spawn(gameObject.gameObject);
             return gameObject;

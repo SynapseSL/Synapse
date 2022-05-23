@@ -1,5 +1,4 @@
 ﻿using System;
-
 namespace Synapse.Api.Plugin
 {
     public class Config : Attribute

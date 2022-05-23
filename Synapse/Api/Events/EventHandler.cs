@@ -1,6 +1,5 @@
 using Synapse.Api.CustomObjects;
 using Synapse.Config;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Synapse.Api.Events
@@ -24,7 +23,7 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    
+
                     break;
             }
         }
@@ -33,28 +32,26 @@ namespace Synapse.Api.Events
 
         public delegate void OnSynapseEvent<TEvent>(TEvent ev) where TEvent : ISynapseEventArgs;
 
-        public ServerEvents Server { get; } = new ServerEvents();
+        public ServerEvents Server { get; } = new();
 
-        public PlayerEvents Player { get; } = new PlayerEvents();
+        public PlayerEvents Player { get; } = new();
 
-        public RoundEvents Round { get; } = new RoundEvents();
+        public RoundEvents Round { get; } = new();
 
-        public MapEvents Map { get; } = new MapEvents();
+        public MapEvents Map { get; } = new();
 
-        public ScpEvents Scp { get; } = new ScpEvents();
+        public ScpEvents Scp { get; } = new();
 
-        public SynapseObjectEvent SynapseObject { get; } = new SynapseObjectEvent();
+        public SynapseObjectEvent SynapseObject { get; } = new();
 
-        public interface ISynapseEventArgs
-        {
-        }
+        public interface ISynapseEventArgs { }
 
-#region HookedEvents
+        #region HookedEvents
         private SynapseConfiguration Conf => SynapseController.Server.Configs.SynapseConfiguration;
 
         private void LoadPlayer(SynapseEventArguments.LoadComponentEventArgs ev)
         {
-            if (ev.Player.GetComponent<Player>() == null)
+            if (ev.Player.GetComponent<Player>() is null)
                 ev.Player.gameObject.AddComponent<Player>();
         }
 
@@ -74,14 +71,14 @@ namespace Synapse.Api.Events
             }
         }
 
-        private void RounRestart() => Synapse.Api.Map.Get.ClearObjects();
+        private void RounRestart() => Api.Map.Get.ClearObjects();
 
         private void PlayerJoin(SynapseEventArguments.PlayerJoinEventArgs ev)
         {
             ev.Player.Broadcast(Conf.JoinMessagesDuration, Conf.JoinBroadcast);
             ev.Player.GiveTextHint(Conf.JoinTextHint, Conf.JoinMessagesDuration);
             if (!string.IsNullOrWhiteSpace(Conf.JoinWindow))
-                ev.Player.OpenReportWindow(Conf.JoinWindow.Replace("\\n","\n"));
+                ev.Player.OpenReportWindow(Conf.JoinWindow.Replace("\\n", "\n"));
         }
 
         private void OnUpdate()

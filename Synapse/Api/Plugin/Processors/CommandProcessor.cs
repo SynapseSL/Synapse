@@ -16,7 +16,7 @@ namespace Synapse.Api.Plugin.Processors
                     if (!typeof(ISynapseCommand).IsAssignableFrom(commandType))
                         continue;
                     var cmdInfoAttribute = commandType.GetCustomAttribute<CommandInformation>();
-                    if (cmdInfoAttribute == null)
+                    if (cmdInfoAttribute is null)
                         continue;
 
                     object classObject;
@@ -24,11 +24,11 @@ namespace Synapse.Api.Plugin.Processors
                     ConstructorInfo diCtor = allCtors.FirstOrDefault(ctorInfo => ctorInfo.GetParameters()
                         .Any(paramInfo => paramInfo.ParameterType == context.PluginType));
 
-                    if (diCtor != null) //If DI-Ctor is found
+                    if (diCtor is not null) //If DI-Ctor is found
                         classObject = Activator.CreateInstance(commandType, args: new object[] { context.Plugin });
                     else                //There is no DI-Ctor
                         classObject = Activator.CreateInstance(commandType);
-                    
+
                     Handlers.RegisterCommand(classObject as ISynapseCommand, true);
                 }
                 catch (Exception e)

@@ -17,15 +17,16 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             try
             {
                 var player = conn.GetPlayer();
-                if (player == null || player.ItemInHand?.Serial != msg.Serial) return false;
-                if (!(player.ItemInHand.ItemBase is ThrowableItem throwable)) return false;
+                if (player is null || player.ItemInHand?.Serial != msg.Serial) return false;
+                if (player.ItemInHand.ItemBase is not ThrowableItem throwable) return false;
                 var allow = true;
 
                 switch (msg.Request)
                 {
                     case ThrowableNetworkHandler.RequestType.BeginThrow:
                         if (!throwable.AllowHolster) return false;
-                        Server.Get.Events.Player.InvokePlayerItemUseEvent(player, player.ItemInHand, Api.Events.SynapseEventArguments.ItemInteractState.Initiating, ref allow);
+                        Server.Get.Events.Player.InvokePlayerItemUseEvent(player, player.ItemInHand,
+                            Api.Events.SynapseEventArguments.ItemInteractState.Initiating, ref allow);
                         if (!allow)
                         {
                             ForceStop(throwable, player);
@@ -38,7 +39,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     case ThrowableNetworkHandler.RequestType.ConfirmThrowFullForce:
 
                         Server.Get.Events.Player.InvokeThrowGrenade(player, player.ItemInHand, out allow);
-                        Server.Get.Events.Player.InvokePlayerItemUseEvent(player, player.ItemInHand, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allow);
+                        Server.Get.Events.Player.InvokePlayerItemUseEvent(player, player.ItemInHand,
+                            Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allow);
 
                         if (!allow)
                         {
@@ -50,7 +52,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                     case ThrowableNetworkHandler.RequestType.CancelThrow:
                         allow = true;
-                        Server.Get.Events.Player.InvokePlayerItemUseEvent(player, player.ItemInHand, Api.Events.SynapseEventArguments.ItemInteractState.Stopping, ref allow);
+                        Server.Get.Events.Player.InvokePlayerItemUseEvent(player, player.ItemInHand,
+                            Api.Events.SynapseEventArguments.ItemInteractState.Stopping, ref allow);
 
                         if (!allow)
                         {
@@ -62,7 +65,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 }
                 return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 SynapseController.Server.Logger.Error($"Synapse-Event: PlayerThrowGrenade failed!!\n{e}");
                 return true;
@@ -79,9 +82,11 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
         private static void ReCreateItem(Player player, SynapseItem item)
         {
-            var newitem = new SynapseItem(item.ID);
-            newitem.Durabillity = item.Durabillity;
-            newitem.ItemData = item.ItemData;
+            SynapseItem newitem = new(item.ID)
+            {
+                Durabillity = item.Durabillity,
+                ItemData = item.ItemData
+            };
             item.Destroy();
             newitem.PickUp(player);
         }

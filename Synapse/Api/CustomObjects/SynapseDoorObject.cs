@@ -8,11 +8,12 @@ namespace Synapse.Api.CustomObjects
 {
     public class SynapseDoorObject : NetworkSynapseObject
     {
-        public static Dictionary<SpawnableDoorType, BreakableDoor> Prefab { get; internal set; } = new Dictionary<SpawnableDoorType, BreakableDoor>();
+        public static Dictionary<SpawnableDoorType, BreakableDoor> Prefab { get; internal set; } = new();
 
         internal SynapseDoorObject(SynapseSchematic.DoorConfiguration configuration)
         {
-            Door = CreateDoor(configuration.DoorType, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale, configuration.Open, configuration.Locked);
+            Door = CreateDoor(configuration.DoorType, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale,
+                configuration.Open, configuration.Locked);
             OriginalScale = configuration.Scale;
             CustomAttributes = configuration.CustomAttributes;
             UpdateEveryFrame = configuration.UpdateEveryFrame;
@@ -52,9 +53,11 @@ namespace Synapse.Api.CustomObjects
         private Door CreateDoor(SpawnableDoorType type, Vector3 position, Quaternion rotation, Vector3 scale, bool open, bool locked)
         {
             var ot = CreateNetworkObject(Prefab[type], position, rotation, scale);
-            var door = new Door(ot);
-            door.Open = open;
-            door.Locked = locked;
+            Door door = new(ot)
+            {
+                Open = open,
+                Locked = locked
+            };
 
             Map.Get.Doors.Add(door);
             return door;

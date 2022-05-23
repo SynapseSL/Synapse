@@ -1,6 +1,4 @@
 ﻿using HarmonyLib;
-using Synapse.Api;
-
 namespace Synapse.Patches.SynapsePatches
 {
     [HarmonyPatch(typeof(Lift), nameof(Lift.Start))]
@@ -9,7 +7,7 @@ namespace Synapse.Patches.SynapsePatches
         [HarmonyPostfix]
         private static void Start(Lift __instance)
         {
-            SynapseController.Server.Map.Elevators.Add(new Elevator(__instance));
+            SynapseController.Server.Map.Elevators.Add(new(__instance));
         }
     }
 }

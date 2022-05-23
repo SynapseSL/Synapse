@@ -21,7 +21,7 @@ namespace Synapse.Patches.SynapsePatches.Dummy
                 return false;
             }
             var player = referenceHub.GetPlayer();
-            if (player == null || player.IsDummy)
+            if (player is null || player.IsDummy)
             {
                 return false;
             }
@@ -42,7 +42,8 @@ namespace Synapse.Patches.SynapsePatches.Dummy
             FirearmAudioClip firearmAudioClip = firearm.AudioClips[clipId];
             ReferenceHub owner = firearm.Owner;
 
-            float num = firearmAudioClip.HasFlag(FirearmAudioFlags.ScaleDistance) ? (firearmAudioClip.MaxDistance * firearm.AttachmentsValue(AttachmentParam.GunshotLoudnessMultiplier)) : firearmAudioClip.MaxDistance;
+            float num = firearmAudioClip.HasFlag(FirearmAudioFlags.ScaleDistance) ?
+                (firearmAudioClip.MaxDistance * firearm.AttachmentsValue(AttachmentParam.GunshotLoudnessMultiplier)) : firearmAudioClip.MaxDistance;
             if (firearmAudioClip.HasFlag(FirearmAudioFlags.IsGunshot) && owner.transform.position.y > 900f)
             {
                 num *= 2.3f;
@@ -52,32 +53,32 @@ namespace Synapse.Patches.SynapsePatches.Dummy
             foreach (ReferenceHub referenceHub in ReferenceHub.GetAllHubs().Values)
             {
                 var player = referenceHub.GetPlayer();
-                if (player == null || player.IsDummy)
+                if (player is null || player.IsDummy)
                 {
                     return false;
                 }
                 if (referenceHub != firearm.Owner)
                 {
                     RoleType curClass = referenceHub.characterClassManager.CurClass;
-                    if (curClass == RoleType.Spectator || curClass == RoleType.Scp079 || (referenceHub.transform.position - owner.transform.position).sqrMagnitude <= soundReach)
+                    if (curClass is RoleType.Spectator || curClass is RoleType.Scp079 ||
+                        (referenceHub.transform.position - owner.transform.position).sqrMagnitude <= soundReach)
                     {
-                        referenceHub.networkIdentity.connectionToClient.Send(new GunAudioMessage(owner, clipId, (byte)Mathf.RoundToInt(Mathf.Clamp(num, 0f, 255f)), referenceHub), 0);
+                        referenceHub.networkIdentity.connectionToClient.Send(new GunAudioMessage(owner, clipId,
+                            (byte)Mathf.RoundToInt(Mathf.Clamp(num, 0f, 255f)), referenceHub), 0);
                     }
                 }
             }
 
-            Action<Firearm, byte, float> serverSoundPlayed = FirearmExtensions.ServerSoundPlayed;
-            if (serverSoundPlayed == null)
-            {
+            var serverSoundPlayed = FirearmExtensions.ServerSoundPlayed;
+            if (serverSoundPlayed is null)
                 return false;
-            }
 
             serverSoundPlayed.Invoke(firearm, clipId, num);
             return false;
         }
     }
 
-    [HarmonyPatch(typeof(AchievementHandlerBase),nameof(AchievementHandlerBase.ServerAchieve))]
+    [HarmonyPatch(typeof(AchievementHandlerBase), nameof(AchievementHandlerBase.ServerAchieve))]
     internal static class AchievePatch
     {
         [HarmonyPrefix]
