@@ -11,15 +11,12 @@ namespace Synapse.Tests.Regression
         private SynapseRceClient _client;
 
         [SetUp]
-        public void Setup()
-        {
-            _client = new SynapseRceClient(9090);
-        }
+        public void Setup() => _client = new SynapseRceClient(9090);
 
         [Test, Sequential]
         public void Client_Can_Connect_When_Correct_Port()
         {
-            SynapseRceClient client = new SynapseRceClient(9090);
+            var client = new SynapseRceClient(9090);
             var response = client.ExecuteFromCode("int i = 10;");
             Assert.IsTrue(response.IsSuccess);
             Assert.AreEqual(RceStatus.Success, response.Status);
@@ -28,7 +25,7 @@ namespace Synapse.Tests.Regression
         [Test, Sequential]
         public void Client_Cannot_Connect_When_Wrong_Port()
         {
-            SynapseRceClient client = new SynapseRceClient(10_000);
+            var client = new SynapseRceClient(10_000);
             var response = client.ExecuteFromCode("int i = 10;");
             Assert.IsFalse(response.IsSuccess);
             Assert.AreEqual(RceStatus.ConnectionFailed, response.Status);

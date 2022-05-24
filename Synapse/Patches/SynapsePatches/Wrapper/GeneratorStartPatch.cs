@@ -1,7 +1,7 @@
-﻿using System.Linq;
-using HarmonyLib;
+﻿using HarmonyLib;
 using MapGeneration.Distributors;
 using Synapse.Api;
+using System.Linq;
 
 namespace Synapse.Patches.SynapsePatches
 {
@@ -12,7 +12,7 @@ namespace Synapse.Patches.SynapsePatches
         private static void Start(Scp079Generator __instance)
         {
             while (Map.Get.Generators.Select(x => x.GameObject).Contains(null))
-                Map.Get.Doors.Remove(Map.Get.Doors.FirstOrDefault(x => x.GameObject is null));
+                _ = Map.Get.Doors.Remove(Map.Get.Doors.FirstOrDefault(x => x.GameObject is null));
 
             Map.Get.Generators.Add(new Api.Generator(__instance));
         }

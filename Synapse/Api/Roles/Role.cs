@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System;
 
 namespace Synapse.Api.Roles
 {
@@ -42,7 +42,7 @@ namespace Synapse.Api.Roles
         #region Obsolete
         [Obsolete("CustomRoles will now be ignored when Escape and the Escape method is called so use it instead")]
         public virtual int GetEscapeRole() => -1;
-        [Obsolete("Use GetTeamID()",false)]
+        [Obsolete("Use GetTeamID()", false)]
         public virtual Team GetTeam() => Team.RIP;
         [Obsolete("Use GetFriendsID()", false)]
         public virtual List<Team> GetFriends() => new List<Team>();

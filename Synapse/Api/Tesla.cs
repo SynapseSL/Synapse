@@ -17,7 +17,7 @@ namespace Synapse.Api
 
         public GameObject GameObject => Gate.gameObject;
 
-        public Vector3 Position { get => Gate.localPosition; }
+        public Vector3 Position => Gate.localPosition;
 
         public void Trigger() => Gate.RpcPlayAnimation();
 

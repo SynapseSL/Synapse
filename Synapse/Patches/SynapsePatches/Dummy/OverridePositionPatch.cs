@@ -1,9 +1,9 @@
-﻿using UnityEngine;
-using HarmonyLib;
+﻿using HarmonyLib;
+using UnityEngine;
 
 namespace Synapse.Patches.SynapsePatches.Dummy
 {
-    [HarmonyPatch(typeof(PlayerMovementSync),nameof(PlayerMovementSync.OverridePosition))]
+    [HarmonyPatch(typeof(PlayerMovementSync), nameof(PlayerMovementSync.OverridePosition))]
     internal static class OverridePositionPatch
     {
         [HarmonyPrefix]
@@ -13,8 +13,9 @@ namespace Synapse.Patches.SynapsePatches.Dummy
             {
                 if (forceGround && Physics.Raycast(pos, Vector3.down, out var raycastHit, 100f, __instance.CollidableSurfaces))
                 {
-                    pos = raycastHit.point + Vector3.up * 1.23f * __instance.transform.localScale.y;
+                    pos = raycastHit.point + (Vector3.up * 1.23f * __instance.transform.localScale.y);
                 }
+
                 __instance.ForcePosition(pos);
 
                 if (rot != null)

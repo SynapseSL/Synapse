@@ -61,12 +61,18 @@ namespace Synapse.Api
         {
             get
             {
-                if (Name.Contains("AdrenalineMedkit")) return Enum.LockerType.MedkitWallCabinet;
-                else if (Name.Contains("RegularMedkit")) return Enum.LockerType.AdrenalineWallCabinet;
-                else if (Name.Contains("Pedestal")) return Enum.LockerType.ScpPedestal;
-                else if (Name.Contains("MiscLocker")) return Enum.LockerType.StandardLocker;
-                else if (Name.Contains("RifleRack")) return Enum.LockerType.RifleRackLocker;
-                else if (Name.Contains("LargeGunLocker")) return Enum.LockerType.LargeGunLocker;
+                if (Name.Contains("AdrenalineMedkit"))
+                    return Enum.LockerType.MedkitWallCabinet;
+                else if (Name.Contains("RegularMedkit"))
+                    return Enum.LockerType.AdrenalineWallCabinet;
+                else if (Name.Contains("Pedestal"))
+                    return Enum.LockerType.ScpPedestal;
+                else if (Name.Contains("MiscLocker"))
+                    return Enum.LockerType.StandardLocker;
+                else if (Name.Contains("RifleRack"))
+                    return Enum.LockerType.RifleRackLocker;
+                else if (Name.Contains("LargeGunLocker"))
+                    return Enum.LockerType.LargeGunLocker;
                 return default;
             }
         }

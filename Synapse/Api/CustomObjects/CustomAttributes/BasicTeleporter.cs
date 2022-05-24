@@ -12,23 +12,22 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
         public override void OnLoad(ISynapseObject synapseObject, ArraySegment<string> args)
         {
             Args[synapseObject] = args;
-            if (args.Count > 0 && float.TryParse(args.At(0), out var distance))
-                Distance[synapseObject] = distance;
-            else
-                Distance[synapseObject] = 1;
+            Distance[synapseObject] = args.Count > 0 && Single.TryParse(args.At(0), out var distance) ? distance : 1;
         }
 
         public override void OnDestroy(ISynapseObject synapseObject)
         {
-            Args.Remove(synapseObject);
-            Distance.Remove(synapseObject);
+            _ = Args.Remove(synapseObject);
+            _ = Distance.Remove(synapseObject);
         }
 
         public override void OnUpdate(ISynapseObject synapseObject)
         {
             foreach (var player in Server.Get.Players)
+            {
                 if (Vector3.Distance(player.Position, synapseObject.Position) < Distance[synapseObject])
                     player.Position = GetTeleportPosition(Args[synapseObject], synapseObject);
+            }
         }
 
         public abstract Vector3 GetTeleportPosition(ArraySegment<string> args, ISynapseObject synapseObject);

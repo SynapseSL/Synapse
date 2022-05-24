@@ -89,7 +89,6 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Vector3 Position { get; set; }
     }
 
-
     public class Scp079EventMisc
     {
         public enum InteractionResult
@@ -113,7 +112,6 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public float EnergyNeeded { get; internal set; }
         public Door Door { get; internal set; }
         public Scp079EventMisc.InteractionResult Result { get; set; }
-
     }
     public class Scp079SpeakerInteractEventArgs : EventHandler.ISynapseEventArgs
     {

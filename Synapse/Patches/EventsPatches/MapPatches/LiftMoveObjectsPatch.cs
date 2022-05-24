@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.MapPatches
 {
-    [HarmonyPatch(typeof(Lift),nameof(Lift.MovePlayers))]
+    [HarmonyPatch(typeof(Lift), nameof(Lift.MovePlayers))]
     internal class LiftMoveObjectsPatch
     {
         [HarmonyPrefix]
@@ -19,7 +19,8 @@ namespace Synapse.Patches.EventsPatches.MapPatches
                     Transform = target,
                 };
                 Server.Get.Events.Map.InvokeLiftMoveObjects(__state);
-                if(!__state.Allow) return false;
+                if (!__state.Allow)
+                    return false;
                 target = __state.Transform;
                 return true;
             }

@@ -1,7 +1,7 @@
 ﻿using GameCore;
 using Respawning;
-using System;
 using RoundRestarting;
+using System;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -19,8 +19,8 @@ namespace Synapse.Api
 
         public float NextRespawn
         {
-            get => Rm._timeForNextSequence - (Rm._stopwatch.Elapsed.Hours * 3600 + Rm._stopwatch.Elapsed.Minutes * 60 + Rm._stopwatch.Elapsed.Seconds);
-            set => Rm._timeForNextSequence = value + (Rm._stopwatch.Elapsed.Hours * 3600 + Rm._stopwatch.Elapsed.Minutes * 60 + Rm._stopwatch.Elapsed.Seconds);
+            get => Rm._timeForNextSequence - ((Rm._stopwatch.Elapsed.Hours * 3600) + (Rm._stopwatch.Elapsed.Minutes * 60) + Rm._stopwatch.Elapsed.Seconds);
+            set => Rm._timeForNextSequence = value + ((Rm._stopwatch.Elapsed.Hours * 3600) + (Rm._stopwatch.Elapsed.Minutes * 60) + Rm._stopwatch.Elapsed.Seconds);
         }
 
         public bool PrioritySpawn
@@ -91,11 +91,11 @@ namespace Synapse.Api
 
         public void DimScreens() => Rs.RpcDimScreen();
 
-        public void ShowRoundSummary(RoundSummary.SumInfo_ClassList remainingPlayers,RoundSummary.LeadingTeam team)
+        public void ShowRoundSummary(RoundSummary.SumInfo_ClassList remainingPlayers, RoundSummary.LeadingTeam team)
         {
             var timeToRoundRestart = Mathf.Clamp(GameCore.ConfigFile.ServerConfig.GetInt("auto_round_restart_time", 10), 5, 1000);
 
-            Rs.RpcShowRoundSummary(Rs.classlistStart,remainingPlayers, team, EscapedDPersonnel, EscapedScientists, ScpKills, timeToRoundRestart);
+            Rs.RpcShowRoundSummary(Rs.classlistStart, remainingPlayers, team, EscapedDPersonnel, EscapedScientists, ScpKills, timeToRoundRestart);
         }
 
         public void MtfRespawn(bool isCI = false) => Respawning.RespawnManager.Singleton.ForceSpawnTeam(isCI ? SpawnableTeamType.ChaosInsurgency : SpawnableTeamType.NineTailedFox);

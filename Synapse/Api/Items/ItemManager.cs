@@ -13,14 +13,15 @@ namespace Synapse.Api.Items
 
         private readonly List<CustomItemInformation> customItems = new List<CustomItemInformation>();
 
-        private Dictionary<ItemType, SynapseSchematic> overridenVanillaSchematics = new Dictionary<ItemType, SynapseSchematic>();
+        private readonly Dictionary<ItemType, SynapseSchematic> overridenVanillaSchematics = new Dictionary<ItemType, SynapseSchematic>();
 
         public ItemType GetBaseType(int id)
         {
             if (id >= 0 && id <= HighestItem)
                 return (ItemType)id;
 
-            if (!IsIDRegistered(id)) throw new SynapseItemNotFoundException("The BaseType was requested from an not registered Item ID", id);
+            if (!IsIDRegistered(id))
+                throw new SynapseItemNotFoundException("The BaseType was requested from an not registered Item ID", id);
 
             var item = customItems.FirstOrDefault(x => x.ID == id);
             return item.BasedItemType;
@@ -31,7 +32,8 @@ namespace Synapse.Api.Items
             if (id >= 0 && id <= HighestItem)
                 return ((ItemType)id).ToString();
 
-            if (!IsIDRegistered(id)) throw new SynapseItemNotFoundException("The name was requested from an not registered Item ID", id);
+            if (!IsIDRegistered(id))
+                throw new SynapseItemNotFoundException("The name was requested from an not registered Item ID", id);
 
             var item = customItems.FirstOrDefault(x => x.ID == id);
             return item.Name;
@@ -41,13 +43,13 @@ namespace Synapse.Api.Items
         {
             if (id >= 0 && id <= HighestItem)
             {
-                if (!overridenVanillaSchematics.ContainsKey((ItemType)id)) return null;
-                return overridenVanillaSchematics.FirstOrDefault(x => x.Key == (ItemType)id).Value;
+                return !overridenVanillaSchematics.ContainsKey((ItemType)id)
+                    ? null
+                    : overridenVanillaSchematics.FirstOrDefault(x => x.Key == (ItemType)id).Value;
             }
 
             var item = customItems.FirstOrDefault(x => x.ID == id);
-            if (item is null || item.SchematicID < 0) return null;
-            return SchematicHandler.Get.GetSchematic(item.SchematicID);
+            return item is null || item.SchematicID < 0 ? null : SchematicHandler.Get.GetSchematic(item.SchematicID);
         }
 
         public CustomItemInformation GetInfo(int id) => customItems.FirstOrDefault(x => x.ID == id);
@@ -66,11 +68,6 @@ namespace Synapse.Api.Items
         public void SetSchematicForVanillaItem(ItemType item, SynapseSchematic schematic)
             => overridenVanillaSchematics[item] = schematic;
 
-        public bool IsIDRegistered(int id)
-        {
-            if (id >= 0 && id <= HighestItem) return true;
-            if (customItems.Any(x => x.ID == id)) return true;
-            return false;
-        }
+        public bool IsIDRegistered(int id) => (id >= 0 && id <= HighestItem) || customItems.Any(x => x.ID == id);
     }
 }

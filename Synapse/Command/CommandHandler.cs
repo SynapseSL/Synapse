@@ -10,7 +10,6 @@ namespace Synapse.Command
 
         private readonly Dictionary<string, ICommand> commands = new Dictionary<string, ICommand>();
 
-        
         public List<ICommand> Commands => commands.Values.ToList();
 
         public bool TryGetCommand(string name, out ICommand cmd)
@@ -23,21 +22,25 @@ namespace Synapse.Command
 
         public bool RegisterCommand(ICommand command)
         {
-            if (string.IsNullOrWhiteSpace(command.Name))
+            if (String.IsNullOrWhiteSpace(command.Name))
                 return false;
 
             if (commands.Any(x => x.Key.Equals(command.Name, StringComparison.InvariantCultureIgnoreCase)))
             {
                 Synapse.Api.Logger.Get.Warn($"Command {command.Name} was registered twice");
                 return false;
-            } 
+            }
 
             commands.Add(command.Name.ToLower(), command);
 
             if (command.Aliases != null)
+            {
                 foreach (var alias in command.Aliases)
-                    if (!string.IsNullOrWhiteSpace(alias))
+                {
+                    if (!String.IsNullOrWhiteSpace(alias))
                         commandAliases.Add(alias.ToLower(), command.Name.ToLower());
+                }
+            }
 
             return true;
         }

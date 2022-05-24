@@ -1,5 +1,5 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
+using System;
 using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.MapPatches
@@ -14,8 +14,8 @@ namespace Synapse.Patches.EventsPatches.MapPatches
             {
                 if (!__instance.inProgress || __instance.timeToDetonation <= 10.0 || __instance._isLocked)
                     return true;
-                
-                SynapseController.Server.Events.Map.InvokeWarheadDetonationCanceledEvent(out bool allow, ref disabler);
+
+                SynapseController.Server.Events.Map.InvokeWarheadDetonationCanceledEvent(out var allow, ref disabler);
                 return allow;
             }
             catch (Exception e)

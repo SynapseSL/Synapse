@@ -1,6 +1,6 @@
-﻿using System;
-using MapGeneration.Distributors;
+﻿using MapGeneration.Distributors;
 using Synapse.Api.Items;
+using System;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -35,7 +35,7 @@ namespace Synapse.Api
 
         public bool Open
         {
-            get => generator.HasFlag(generator._flags,Scp079Generator.GeneratorFlags.Open);
+            get => generator.HasFlag(generator._flags, Scp079Generator.GeneratorFlags.Open);
             set
             {
                 generator.ServerSetFlag(Scp079Generator.GeneratorFlags.Open, value);
@@ -45,7 +45,7 @@ namespace Synapse.Api
 
         public bool Locked
         {
-            get => !generator.HasFlag(generator._flags,Scp079Generator.GeneratorFlags.Unlocked);
+            get => !generator.HasFlag(generator._flags, Scp079Generator.GeneratorFlags.Unlocked);
             set
             {
                 generator.ServerSetFlag(Scp079Generator.GeneratorFlags.Unlocked, !value);

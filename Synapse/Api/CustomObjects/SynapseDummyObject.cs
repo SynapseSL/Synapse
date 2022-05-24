@@ -48,9 +48,11 @@ namespace Synapse.Api.CustomObjects
 
         private Dummy CreateDummy(Vector3 pos, Quaternion rot, Vector3 scale, RoleType role, ItemType held, string name, string badge, string badgecolor)
         {
-            var dummy = new Dummy(pos, rot, role, name, badge, badgecolor);
-            dummy.HeldItem = held;
-            dummy.Scale = scale;
+            var dummy = new Dummy(pos, rot, role, name, badge, badgecolor)
+            {
+                HeldItem = held,
+                Scale = scale
+            };
             return dummy;
         }
     }

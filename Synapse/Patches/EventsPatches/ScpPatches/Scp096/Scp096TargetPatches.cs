@@ -1,7 +1,7 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using PlayableScps;
 using PlayerStatsSystem;
+using System;
 using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
@@ -22,7 +22,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                         var visionInformation = VisionInformation.GetVisionInformation(player.Hub, vector, -0.1f, 60f, true, true, __instance.Hub.localCurrentRoomEffects);
                         if (visionInformation.IsLooking)
                         {
-                            float delay = visionInformation.LookingAmount / 0.25f * (visionInformation.Distance * 0.1f);
+                            var delay = visionInformation.LookingAmount / 0.25f * (visionInformation.Distance * 0.1f);
                             if (!__instance.Calming)
                             {
                                 if (player.Invisible || Server.Get.Configs.SynapseConfiguration.CantRage096.Contains(player.RoleID))
@@ -32,10 +32,12 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                                     continue;
 
                                 Server.Get.Events.Scp.Scp096.InvokeScpTargetEvent(player, __instance.GetPlayer(), __instance.PlayerState, out var allow);
-                                if (!allow) continue;
+                                if (!allow)
+                                    continue;
 
                                 __instance.AddTarget(player.gameObject);
                             }
+
                             if (__instance.CanEnrage && player.gameObject != null)
                             {
                                 __instance.PreWindup(delay);
@@ -62,8 +64,8 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
         {
             try
             {
-                AttackerDamageHandler attackerDamageHandler = handler as AttackerDamageHandler;
-                if (attackerDamageHandler is null || attackerDamageHandler.Attacker.Hub is null || !__instance.CanEnrage) return false;
+                if (!(handler is AttackerDamageHandler attackerDamageHandler) || attackerDamageHandler.Attacker.Hub is null || !__instance.CanEnrage)
+                    return false;
 
                 var player = attackerDamageHandler.Attacker.Hub.GetPlayer();
 
@@ -80,6 +82,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                     __instance.AddTarget(attackerDamageHandler.Attacker.Hub.gameObject);
                     __instance.Windup(false);
                 }
+
                 return allow;
             }
             catch (Exception e)

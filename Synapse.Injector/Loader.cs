@@ -20,7 +20,8 @@ namespace Synapse.Injector
                     ? localpath
                     : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Synapse");
 
-                if (!Directory.Exists(synapsepath)) Directory.CreateDirectory(synapsepath);
+                if (!Directory.Exists(synapsepath))
+                    _ = Directory.CreateDirectory(synapsepath);
 
                 var dependencyAssemblies = new List<Assembly>();
                 foreach (var depend in Directory.GetFiles(Path.Combine(synapsepath, "dependencies"), "*.dll"))
@@ -62,7 +63,7 @@ namespace Synapse.Injector
                 $"SynapseVersion {syn.GetName().Version}\n" +
                 $"LoaderVersion: 1.0.1.0\n" +
                 $"RuntimeVersion: {Assembly.GetExecutingAssembly().ImageRuntimeVersion}\n\n" +
-                string.Join("\n", dep.Select(assembly => $"{assembly.GetName().Name}: {assembly.GetName().Version}").ToList()) + "\n" +
+                String.Join("\n", dep.Select(assembly => $"{assembly.GetName().Name}: {assembly.GetName().Version}").ToList()) + "\n" +
                 "-------------------===Loader===-------------------", ConsoleColor.Yellow);
 
         }
@@ -76,7 +77,7 @@ namespace Synapse.Injector
         {
             try
             {
-                assembly.GetTypes()
+                _ = assembly.GetTypes()
                     .First((Type t) => t.Name == "SynapseController").GetMethods()
                     .First((MethodInfo m) => m.Name == "Init")
                     .Invoke(null, null);

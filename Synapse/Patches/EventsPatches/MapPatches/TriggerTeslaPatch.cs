@@ -1,5 +1,5 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
+using System;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.MapPatches
@@ -14,7 +14,8 @@ namespace Synapse.Patches.EventsPatches.MapPatches
             try
             {
                 var synapseplayer = player.GetPlayer();
-                if (synapseplayer.Invisible) return false;
+                if (synapseplayer.Invisible)
+                    return false;
 
                 __result = __instance.InRange(synapseplayer.Position);
 

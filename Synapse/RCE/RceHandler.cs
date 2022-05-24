@@ -10,11 +10,7 @@ namespace Synapse.RCE
 
         private SynapseRceServer _rceHandler;
 
-
-        internal void Init()
-        {
-            Synapse.Api.Events.EventHandler.Get.Server.UpdateEvent += DequeueInConcurrentUnityContext;
-        }
+        internal void Init() => Synapse.Api.Events.EventHandler.Get.Server.UpdateEvent += DequeueInConcurrentUnityContext;
 
         internal void Reload()
         {

@@ -19,7 +19,6 @@ namespace Synapse.Command.Commands
         {
             var result = new CommandResult();
 
-
             List<ICommand> commandlist;
 
             switch (context.Platform)
@@ -42,15 +41,15 @@ namespace Synapse.Command.Commands
                     return result;
             }
 
-            commandlist = commandlist.Where(x => context.Player.HasPermission(x.Permission) || string.IsNullOrWhiteSpace(x.Permission) || x.Permission.ToUpper() == "NONE").ToList();
+            commandlist = commandlist.Where(x => context.Player.HasPermission(x.Permission) || String.IsNullOrWhiteSpace(x.Permission) || x.Permission.ToUpper() == "NONE").ToList();
 
-            if (context.Arguments.Count > 0 && !string.IsNullOrWhiteSpace(context.Arguments.First()))
+            if (context.Arguments.Count > 0 && !String.IsNullOrWhiteSpace(context.Arguments.First()))
             {
                 var command = commandlist.FirstOrDefault(x => x.Name.Equals(context.Arguments.First(), StringComparison.OrdinalIgnoreCase));
 
                 if (command is null)
                 {
-                    foreach (ICommand c in commandlist.Where(c => c.Aliases.Any(alias => alias.Equals(context.Arguments.First(), StringComparison.OrdinalIgnoreCase))))
+                    foreach (var c in commandlist.Where(c => c.Aliases.Any(alias => alias.Equals(context.Arguments.First(), StringComparison.OrdinalIgnoreCase))))
                     {
                         command = c;
                     }
@@ -63,13 +62,12 @@ namespace Synapse.Command.Commands
                     }
                 }
 
-                string platforms = "{ " + string.Join(", ", command.Platforms) + " }";
-                string aliases = "{ " + string.Join(", ", command.Aliases) + " }";
+                var platforms = "{ " + String.Join(", ", command.Platforms) + " }";
+                var aliases = "{ " + String.Join(", ", command.Aliases) + " }";
 
-                if (string.IsNullOrWhiteSpace(command.Permission))
-                    result.Message = $"\n{command.Name}\n    - Description: {command.Description}\n    - Usage: {command.Usage}\n    - Platforms: {platforms}\n    - Aliases: {aliases}";
-                else
-                    result.Message = $"\n{command.Name}\n    - Permission: {command.Permission}\n    - Description: {command.Description}\n    - Usage: {command.Usage}\n    - Platforms: {platforms}\n    - Aliases: {aliases}";
+                result.Message = String.IsNullOrWhiteSpace(command.Permission)
+                    ? $"\n{command.Name}\n    - Description: {command.Description}\n    - Usage: {command.Usage}\n    - Platforms: {platforms}\n    - Aliases: {aliases}"
+                    : $"\n{command.Name}\n    - Permission: {command.Permission}\n    - Description: {command.Description}\n    - Usage: {command.Usage}\n    - Platforms: {platforms}\n    - Aliases: {aliases}";
 
                 result.State = CommandResultState.Ok;
                 return result;
@@ -79,7 +77,7 @@ namespace Synapse.Command.Commands
 
             foreach (var command in commandlist)
             {
-                string alias = "{ " + string.Join(", ", command.Aliases) + " }";
+                var alias = "{ " + String.Join(", ", command.Aliases) + " }";
 
                 msg += $"\n{command.Name}:\n    -Usage: {command.Usage}\n    -Description: {command.Description}\n    -Aliases: {alias}";
             }

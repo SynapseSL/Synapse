@@ -1,7 +1,4 @@
-﻿using Synapse.Api.Enum;
-using System.Collections.Generic;
-using Synapse.Config;
-using UnityEngine;
+﻿using Synapse.Config;
 
 namespace Synapse.Api
 {
@@ -26,15 +23,16 @@ namespace Synapse.Api
 
         public Player Admin { get; set; }
 
-        public  SerializedPlayerState State { get; set; }
+        public SerializedPlayerState State { get; set; }
 
         public void JailPlayer(Player admin)
         {
-            if (IsJailed) return;
+            if (IsJailed)
+                return;
 
             Admin = admin;
             State = Player;
-            
+
             new SerializedPlayerState()
             {
                 Position = Admin.Position,
@@ -46,7 +44,8 @@ namespace Synapse.Api
 
         public void UnJailPlayer()
         {
-            if (!IsJailed) return;
+            if (!IsJailed)
+                return;
 
             State.Apply(Player, true);
 

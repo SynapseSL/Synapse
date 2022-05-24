@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Synapse.Api.Enum;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using Synapse.Api.Enum;
-using System.Collections.Generic;
 
 namespace Synapse.Api
 {
@@ -83,14 +83,13 @@ namespace Synapse.Api
                 else if (Server.Get.Configs?.SynapseConfiguration?.LogMessages != false)
                     messages.Add(save);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Send($"[ERR] Synapse-Logger: Saving the last log into a file failed:\n{ex}", ConsoleColor.Red);
             }
         }
 
-
-        private List<string> messages = new List<string>();
+        private readonly List<string> messages = new List<string>();
         private bool logEnabled = false;
 
         internal void Refresh()
@@ -102,7 +101,9 @@ namespace Synapse.Api
                 File.AppendAllLines(Server.Get.Files.LogFile, messages);
             }
             else
+            {
                 logEnabled = false;
+            }
 
             messages.Clear();
         }

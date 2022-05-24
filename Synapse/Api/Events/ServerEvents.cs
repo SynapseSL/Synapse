@@ -21,7 +21,7 @@ namespace Synapse.Api.Events
 
         internal void InvokePreAuthenticationEvent(string userid, ref bool allow, ref string reason, ConnectionRequest request)
         {
-            var ev = new PreAuthenticationEventArgs {Allow = allow, Request = request,UserId = userid, Reason = reason};
+            var ev = new PreAuthenticationEventArgs { Allow = allow, Request = request, UserId = userid, Reason = reason };
             PreAuthenticationEvent?.Invoke(ev);
 
             allow = ev.Allow;
@@ -30,7 +30,7 @@ namespace Synapse.Api.Events
 
         internal void InvokeRemoteAdminCommandEvent(CommandSender sender, string command, ref bool allow)
         {
-            var ev = new RemoteAdminCommandEventArgs {Allow = allow, Command = command, Sender = sender};
+            var ev = new RemoteAdminCommandEventArgs { Allow = allow, Command = command, Sender = sender };
             RemoteAdminCommandEvent?.Invoke(ev);
 
             allow = ev.Allow;
@@ -38,13 +38,13 @@ namespace Synapse.Api.Events
 
         internal void InvokeConsoleCommandEvent(Player player, string command)
         {
-            var ev = new ConsoleCommandEventArgs {Command = command, Player = player};
+            var ev = new ConsoleCommandEventArgs { Command = command, Player = player };
             ConsoleCommandEvent?.Invoke(ev);
         }
 
         internal void InvokeUpdateEvent() => UpdateEvent?.Invoke();
 
-        internal void InvokeTransmitPlayerDataEvent(Player player, Player playerToShow,ref Vector3 pos,ref float rot,ref bool invisible)
+        internal void InvokeTransmitPlayerDataEvent(Player player, Player playerToShow, ref Vector3 pos, ref float rot, ref bool invisible)
         {
             var ev = new TransmitPlayerDataEventArgs
             {

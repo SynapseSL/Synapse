@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using InventorySystem;
+﻿using InventorySystem;
 using Mirror;
 using RemoteAdmin;
 using Synapse.Api.Enum;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -118,12 +118,13 @@ namespace Synapse.Api
         //Thanks to GameHunt.I used some of his code for the Dummy API https://github.com/gamehunt/CustomNPCs
         private IEnumerator<float> Update()
         {
-            for(; ; )
+            for (; ; )
             {
                 yield return MEC.Timing.WaitForSeconds(0.1f);
                 try
                 {
-                    if (GameObject is null) yield break;
+                    if (GameObject is null)
+                        yield break;
                     if (Direction == MovementDirection.Stop)
                     {
                         continue;
@@ -150,35 +151,39 @@ namespace Synapse.Api
                     switch (Direction)
                     {
                         case MovementDirection.Forward:
-                            var pos = Position + Player.CameraReference.forward / 10 * speed;
+                            var pos = Position + (Player.CameraReference.forward / 10 * speed);
 
                             if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
                                 Player.PlayerMovementSync.OverridePosition(pos, null, true);
-                            else wall = true;
+                            else
+                                wall = true;
                             break;
 
                         case MovementDirection.BackWards:
-                            pos = Position - Player.CameraReference.forward / 10 * speed;
+                            pos = Position - (Player.CameraReference.forward / 10 * speed);
 
                             if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
                                 Player.PlayerMovementSync.OverridePosition(pos, null, true);
-                            else wall = true;
+                            else
+                                wall = true;
                             break;
 
                         case MovementDirection.Right:
-                            pos = Position + Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed;
+                            pos = Position + (Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed);
 
                             if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
                                 Player.PlayerMovementSync.OverridePosition(pos, null, true);
-                            else wall = true;
+                            else
+                                wall = true;
                             break;
 
                         case MovementDirection.Left:
-                            pos = Position - Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed;
+                            pos = Position - (Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed);
 
                             if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
                                 Player.PlayerMovementSync.OverridePosition(pos, null, true);
-                            else wall = true;
+                            else
+                                wall = true;
                             break;
                     }
 
@@ -187,14 +192,14 @@ namespace Synapse.Api
                         Direction = MovementDirection.Stop;
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Logger.Get.Error($"Synapse-Dummy: Dummy Update Failed:\n{e}");
                 }
             }
         }
 
-        public Dummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "") : this(pos, new Vector2(rot.eulerAngles.x, rot.eulerAngles.y),role,name,badgetext,badgecolor) { }
+        public Dummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "") : this(pos, new Vector2(rot.eulerAngles.x, rot.eulerAngles.y), role, name, badgetext, badgecolor) { }
 
         /// <summary>
         /// Creates a new Dummy and spawns it
@@ -207,14 +212,13 @@ namespace Synapse.Api
         /// <param name="badgecolor">The displayed BadgeColor of the Dummy</param>
         public Dummy(Vector3 pos, Vector2 rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "")
         {
-            GameObject obj =
+            var obj =
                 UnityEngine.Object.Instantiate(
                     NetworkManager.singleton.playerPrefab);
 
             GameObject = obj;
             Player = GameObject.GetPlayer();
             Player.IsDummy = true;
-
 
             Player.transform.localScale = Vector3.one;
             Player.transform.position = pos;
@@ -231,7 +235,7 @@ namespace Synapse.Api
             Player.PlayerMovementSync.NetworkGrounded = true;
             RunSpeed = CharacterClassManager._staticClasses[(int)role].runSpeed;
             WalkSpeed = CharacterClassManager._staticClasses[(int)role].walkSpeed;
-            MEC.Timing.RunCoroutine(Update());
+            _ = MEC.Timing.RunCoroutine(Update());
 
             NetworkServer.Spawn(GameObject);
             Map.Get.Dummies.Add(this);
@@ -249,7 +253,7 @@ namespace Synapse.Api
         public void Despawn()
         {
             NetworkServer.UnSpawn(GameObject);
-            Map.Get.Dummies.Remove(this);
+            _ = Map.Get.Dummies.Remove(this);
         }
 
         /// <summary>
@@ -267,7 +271,7 @@ namespace Synapse.Api
         public void Destroy()
         {
             UnityEngine.Object.Destroy(GameObject);
-            Map.Get.Dummies.Remove(this);
+            _ = Map.Get.Dummies.Remove(this);
         }
 
         public static Dummy CreateDummy(Vector3 pos, Quaternion rot, RoleType role = RoleType.ClassD, string name = "(null)", string badgetext = "", string badgecolor = "")

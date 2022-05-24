@@ -4,7 +4,7 @@ namespace Synapse.Api
 {
     public class Camera
     {
-        internal Camera(Camera079 camera,Room room)
+        internal Camera(Camera079 camera, Room room)
         {
             cam = camera;
             Room = room;

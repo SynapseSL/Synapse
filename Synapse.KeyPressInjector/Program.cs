@@ -3,9 +3,9 @@ using System.IO;
 
 namespace KeyPressInjector
 {
-    class Program
+    internal class Program
     {
-        static void Main()
+        private static void Main()
         {
             var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SCP Secret Laboratory");
             if (!Directory.Exists(path))
@@ -35,7 +35,7 @@ namespace KeyPressInjector
         private static void End()
         {
             Console.WriteLine("Press any Key to close the Console ...");
-            Console.ReadKey();
+            _ = Console.ReadKey();
         }
     }
 }

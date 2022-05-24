@@ -7,7 +7,7 @@ namespace Synapse.Api
 {
     public class Broadcast
     {
-        public Broadcast(string msg,ushort time,Player player)
+        public Broadcast(string msg, ushort time, Player player)
         {
             Message = msg;
             Time = time;
@@ -16,7 +16,7 @@ namespace Synapse.Api
 
         private readonly Player _player;
 
-        public float DisplayTime { get; internal set; } = float.MinValue;
+        public float DisplayTime { get; internal set; } = Single.MinValue;
 
         private string msg;
 
@@ -25,7 +25,7 @@ namespace Synapse.Api
             get => msg;
             set
             {
-                if(value != msg)
+                if (value != msg)
                 {
                     msg = value;
 
@@ -51,7 +51,7 @@ namespace Synapse.Api
 
             DisplayTime = UnityEngine.Time.time;
             _player.Broadcast(Time, Message);
-            Timing.CallDelayed(Time, () => EndBc());
+            _ = Timing.CallDelayed(Time, () => EndBc());
         }
 
         public void Refresh()
@@ -68,7 +68,7 @@ namespace Synapse.Api
             Active = false;
 
             _player.ActiveBroadcasts.Remove(this);
-            
+
             _player.ClearBroadcasts();
 
             if (_player.ActiveBroadcasts.FirstOrDefault() is { } broadcast)
@@ -84,7 +84,7 @@ namespace Synapse.Api
 
         private List<Broadcast> bcs = new List<Broadcast>();
 
-        public void Add(Broadcast bc,bool instant = false)
+        public void Add(Broadcast bc, bool instant = false)
         {
             if (bc is null)
                 return;
@@ -116,9 +116,9 @@ namespace Synapse.Api
 
         public void Remove(Broadcast bc)
         {
-            if(bcs.Any(x => x == bc))
+            if (bcs.Any(x => x == bc))
             {
-                bcs.Remove(bc);
+                _ = bcs.Remove(bc);
 
                 if (bc.Active)
                     bc.EndBc();
@@ -135,8 +135,6 @@ namespace Synapse.Api
         }
 
         public IEnumerator<Broadcast> GetEnumerator() => bcs.GetEnumerator();
-
-
 
         public bool Contains(Broadcast bc) => bcs.Contains(bc);
 

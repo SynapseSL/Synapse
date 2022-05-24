@@ -36,14 +36,17 @@ namespace Synapse.Patches.SynapsePatches
 
                             //Since the Console always has all Permissions, a check for NoPermission is not needed!
                     }
+
                     Logger.Get.Send(flag.Message, color);
                 }
                 catch (Exception e)
                 {
                     Logger.Get.Error($"Synapse-Commands: Command Execution failed!!\n{e}");
                 }
+
                 return false;
             }
+
             return true;
         }
     }
@@ -54,21 +57,23 @@ namespace Synapse.Patches.SynapsePatches
         [HarmonyPrefix]
         private static bool GameConsoleQuery(QueryProcessor __instance, string query)
         {
-            if (__instance._sender is null) return false;
+            if (__instance._sender is null)
+                return false;
 
             var player = __instance._sender.GetPlayer();
 
             SynapseController.Server.Events.Server.InvokeConsoleCommandEvent(player, query);
 
-            if (player is null) return false;
+            if (player is null)
+                return false;
             var args = query.Split(' ');
 
             if (SynapseController.CommandHandlers.ClientCommandHandler.TryGetCommand(args[0], out var command))
             {
                 //If sender has no permission and permission is not null or empty
-                if (!__instance.GetPlayer().HasPermission(command.Permission) && !string.IsNullOrWhiteSpace(command.Permission))
+                if (!__instance.GetPlayer().HasPermission(command.Permission) && !String.IsNullOrWhiteSpace(command.Permission))
                 {
-                    player.SendConsoleMessage(Server.Get.Configs.SynapseTranslation.ActiveTranslation.noPermissions.Replace("%perm%",command.Permission), "red");
+                    player.SendConsoleMessage(Server.Get.Configs.SynapseTranslation.ActiveTranslation.noPermissions.Replace("%perm%", command.Permission), "red");
                     return false;
                 }
 
@@ -98,8 +103,10 @@ namespace Synapse.Patches.SynapsePatches
                 {
                     Logger.Get.Error($"Synapse-Commands: Command Execution failed!!\n{e}");
                 }
+
                 return false;
             }
+
             return true;
         }
     }
@@ -121,12 +128,13 @@ namespace Synapse.Patches.SynapsePatches
 
             var allow = true;
             SynapseController.Server.Events.Server.InvokeRemoteAdminCommandEvent(sender, q, ref allow);
-            if (!allow) return false;
+            if (!allow)
+                return false;
 
             if (SynapseController.CommandHandlers.RemoteAdminHandler.TryGetCommand(args[0], out var command))
             {
                 //If sender has no permission and permission is not null or empty
-                if (!player.HasPermission(command.Permission) && !string.IsNullOrWhiteSpace(command.Permission))
+                if (!player.HasPermission(command.Permission) && !String.IsNullOrWhiteSpace(command.Permission))
                 {
                     player.SendRAConsoleMessage(Server.Get.Configs.SynapseTranslation.ActiveTranslation.noPermissions.Replace("%perm%", command.Permission), false);
                     return false;
@@ -142,6 +150,7 @@ namespace Synapse.Patches.SynapsePatches
                 {
                     Logger.Get.Error($"Synapse-Commands: Command Execution failed!!\n{e}");
                 }
+
                 return false;
             }
 

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using CustomPlayerEffects;
 using HarmonyLib;
 using PlayableScps;
+using System;
+using System.Linq;
 using UnityEngine;
-using CustomPlayerEffects;
 
 namespace Synapse.Patches.SynapsePatches
 {
@@ -37,14 +37,16 @@ namespace Synapse.Patches.SynapsePatches
 
                 foreach (var player in players)
                 {
-                    if (player.Connection is null) continue;
+                    if (player.Connection is null)
+                        continue;
 
                     Array.Copy(__instance.ReceivedData, __instance._transmitBuffer, __instance._usedData);
-                    for (int k = 0; k < __instance._usedData; k++)
+                    for (var k = 0; k < __instance._usedData; k++)
                     {
                         var showinvoid = false;
                         var playerToShow = players[k];
-                        if (playerToShow == player) continue;
+                        if (playerToShow == player)
+                            continue;
 
                         var vector = __instance._transmitBuffer[k].position - player.Position;
 
@@ -111,6 +113,7 @@ namespace Synapse.Patches.SynapsePatches
                                     showinvoid = true;
                                     goto AA_001;
                                 }
+
                                 if (playerToShow.Hub.playerEffectsController.GetEffect<Invisible>().IsEnabled)
                                 {
                                     var flag = false;
@@ -123,11 +126,12 @@ namespace Synapse.Patches.SynapsePatches
                                             showinvoid = true;
                                     }
                                     else
+                                    {
                                         showinvoid = true;
+                                    }
                                 }
                             }
                         }
-
 
                     AA_001:
 
@@ -137,26 +141,26 @@ namespace Synapse.Patches.SynapsePatches
 
                         Server.Get.Events.Server.InvokeTransmitPlayerDataEvent(player, playerToShow, ref pos, ref rotation, ref showinvoid);
 
-                        if (showinvoid)
-                            __instance._transmitBuffer[k] = new PlayerPositionData(Vector3.up * 6000f, 0.0f, playerToShow.PlayerId);
-                        else
-                            __instance._transmitBuffer[k] = new PlayerPositionData(pos, rotation, playerToShow.PlayerId);
+                        __instance._transmitBuffer[k] = showinvoid
+                            ? new PlayerPositionData(Vector3.up * 6000f, 0.0f, playerToShow.PlayerId)
+                            : new PlayerPositionData(pos, rotation, playerToShow.PlayerId);
                     }
-
 
                     var conn = player.Connection;
                     if (__instance._usedData <= 20)
+                    {
                         conn.Send(new PositionPPMMessage(__instance._transmitBuffer, (byte)__instance._usedData, 0), 1);
+                    }
                     else
                     {
                         byte b = 0;
-                        while ((int)b < __instance._usedData / 20)
+                        while (b < __instance._usedData / 20)
                         {
                             conn.Send(new PositionPPMMessage(__instance._transmitBuffer, 20, b), 1);
                             b += 1;
                         }
 
-                        byte b2 = (byte)(__instance._usedData % (int)(b * 20));
+                        var b2 = (byte)(__instance._usedData % (b * 20));
 
                         if (b2 > 0)
                             conn.Send(new PositionPPMMessage(__instance._transmitBuffer, b2, b), 1);
@@ -181,7 +185,7 @@ namespace Synapse.Patches.SynapsePatches
         private static void Postfix(Scp173 __instance, int __state)
         {
             var peanut = __instance.GetPlayer();
-            foreach(var ply in __instance._observingPlayers)
+            foreach (var ply in __instance._observingPlayers)
             {
                 var player = ply.GetPlayer();
                 var flag = false;
@@ -194,9 +198,9 @@ namespace Synapse.Patches.SynapsePatches
 
                 if (flag)
                 {
-                    __instance._observingPlayers.Remove(player.Hub);
+                    _ = __instance._observingPlayers.Remove(player.Hub);
                     __instance._isObserved = __instance._observingPlayers.Count > 0;
-                    if(__state != __instance._observingPlayers.Count && __instance._blinkCooldownRemaining > 0f)
+                    if (__state != __instance._observingPlayers.Count && __instance._blinkCooldownRemaining > 0f)
                     {
                         __instance._blinkCooldownRemaining = Mathf.Max(0f, __instance._blinkCooldownRemaining + (__instance._observingPlayers.Count - __state));
                         if (__instance._blinkCooldownRemaining <= 0f)

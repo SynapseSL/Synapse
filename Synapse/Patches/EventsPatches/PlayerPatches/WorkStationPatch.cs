@@ -1,12 +1,12 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using InventorySystem.Items.Firearms.Attachments;
+using System;
 using Event = Synapse.Api.Events.EventHandler;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(WorkstationController),nameof(WorkstationController.ServerInteract))]
+    [HarmonyPatch(typeof(WorkstationController), nameof(WorkstationController.ServerInteract))]
     internal static class WorkStationPatch
     {
         [HarmonyPrefix]
@@ -14,9 +14,11 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                if (colliderId != __instance._activateCollder?.ColliderId || __instance.Status != 0) return false;
+                if (colliderId != __instance._activateCollder?.ColliderId || __instance.Status != 0)
+                    return false;
 
-                if (ply is null) return false;
+                if (ply is null)
+                    return false;
 
                 var player = ply.GetPlayer();
                 var station = __instance.GetWorkStation();
@@ -28,7 +30,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 return allow;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Item: Connect Workstation Tablet failed!!\n{e}");
                 return false;

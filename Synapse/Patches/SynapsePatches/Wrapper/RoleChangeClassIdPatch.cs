@@ -2,7 +2,7 @@
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    
+
     [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.SetClassIDHook))]
     internal static class RoleChangeClassIdPatch
     {
@@ -16,7 +16,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         }
     }
 
-    [HarmonyPatch(typeof(CharacterClassManager),nameof(CharacterClassManager.SetClassID))]
+    [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.SetClassID))]
     internal static class RoleChangeClassIdPatch2
     {
         [HarmonyPrefix]

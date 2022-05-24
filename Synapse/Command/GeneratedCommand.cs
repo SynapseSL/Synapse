@@ -1,24 +1,21 @@
+using Synapse.Api;
 using System;
 using System.Reflection;
-using Synapse.Api;
 
 namespace Synapse.Command
 {
     public class GeneratedCommand : ICommand
     {
-        public CommandResult Execute(CommandContext command)
-        {
-            return OnCommand.Invoke(command);
-        }
+        public CommandResult Execute(CommandContext command) => OnCommand.Invoke(command);
 
-        public Func<CommandContext,CommandResult> OnCommand { get; set; }
+        public Func<CommandContext, CommandResult> OnCommand { get; set; }
         public string Name { get; set; }
         public string[] Aliases { get; set; }
         public string Permission { get; set; }
         public string Usage { get; set; }
         public string[] Arguments { get; set; }
         public string Description { get; set; }
-        
+
         public Platform[] Platforms { get; set; }
 
         public static GeneratedCommand FromSynapseCommand(ISynapseCommand command)
@@ -30,15 +27,15 @@ namespace Synapse.Command
                 OnCommand = command.Execute,
                 Name = cmdInf.Name,
                 Aliases = cmdInf.Aliases,
-                Permission = cmdInf.Permission??"",
+                Permission = cmdInf.Permission ?? "",
                 Usage = cmdInf.Usage,
                 Arguments = cmdInf.Arguments,
-                Description = cmdInf.Description??"",
-                Platforms = cmdInf.Platforms??new []{Platform.RemoteAdmin, Platform.ServerConsole}
+                Description = cmdInf.Description ?? "",
+                Platforms = cmdInf.Platforms ?? new[] { Platform.RemoteAdmin, Platform.ServerConsole }
             };
         }
     }
-    
+
     public class CommandContext
     {
         public ArraySegment<string> Arguments;
@@ -58,5 +55,4 @@ namespace Synapse.Command
         Error,
         NoPermission
     }
-    
 }

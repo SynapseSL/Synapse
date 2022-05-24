@@ -25,11 +25,7 @@ namespace Synapse.Api
         private string name;
         public string Name
         {
-            get
-            {
-                if (string.IsNullOrEmpty(name)) return GameObject.name;
-                return name;
-            }
+            get => String.IsNullOrEmpty(name) ? GameObject.name : name;
             set => name = value;
         }
 
@@ -80,13 +76,20 @@ namespace Synapse.Api
                     }
                 }
 
-                if (Name.Contains("EZ BreakableDoor")) doorType = Enum.DoorType.EZ_Door;
-                else if (Name.Contains("LCZ BreakableDoor")) doorType = Enum.DoorType.LCZ_Door;
-                else if (Name.Contains("HCZ BreakableDoor")) doorType = Enum.DoorType.HCZ_Door;
-                else if (Name.Contains("Prison BreakableDoor")) doorType = Enum.DoorType.PrisonDoor;
-                else if (Name.Contains("LCZ PortallessBreakableDoor")) doorType = Enum.DoorType.Airlock;
-                else if (Name.Contains("Unsecured Pryable GateDoor")) doorType = Enum.DoorType.HCZ_049_Gate;
-                else doorType = Enum.DoorType.Other;
+                if (Name.Contains("EZ BreakableDoor"))
+                    doorType = Enum.DoorType.EZ_Door;
+                else if (Name.Contains("LCZ BreakableDoor"))
+                    doorType = Enum.DoorType.LCZ_Door;
+                else if (Name.Contains("HCZ BreakableDoor"))
+                    doorType = Enum.DoorType.HCZ_Door;
+                else
+                {
+                    doorType = Name.Contains("Prison BreakableDoor")
+                    ? Enum.DoorType.PrisonDoor
+                    : Name.Contains("LCZ PortallessBreakableDoor")
+                    ? Enum.DoorType.Airlock
+                    : Name.Contains("Unsecured Pryable GateDoor") ? Enum.DoorType.HCZ_049_Gate : Enum.DoorType.Other;
+                }
 
                 return doorType;
             }
@@ -123,20 +126,15 @@ namespace Synapse.Api
             }
         }
 
-        public bool TryPry()
-        {
-            if (VDoor is PryableDoor pry)
-                return pry.TryPryGate();
-            else
-                return false;
-        }
+        public bool TryPry() => VDoor is PryableDoor pry && pry.TryPryGate();
 
         public List<Room> Rooms { get; } = new List<Room>();
 
         [Obsolete("Please create a Synapse.Api.CustomObjects.SynapseDoorObject")]
         public static Door SpawnDoorVariant(Vector3 position, Quaternion? rotation = null, DoorPermissions permissions = null)
         {
-            if(rotation is null) rotation = Quaternion.identity;
+            if (rotation is null)
+                rotation = Quaternion.identity;
             var obj = new SynapseDoorObject(SpawnableDoorType.HCZ, position, rotation.Value, Vector3.one);
             obj.Door.DoorPermissions = permissions;
             return obj.Door;

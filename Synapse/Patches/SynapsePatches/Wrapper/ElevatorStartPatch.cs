@@ -7,9 +7,6 @@ namespace Synapse.Patches.SynapsePatches
     internal static class ElevatorStartPatch
     {
         [HarmonyPostfix]
-        private static void Start(Lift __instance)
-        {
-            SynapseController.Server.Map.Elevators.Add(new Elevator(__instance));
-        }
+        private static void Start(Lift __instance) => SynapseController.Server.Map.Elevators.Add(new Elevator(__instance));
     }
 }

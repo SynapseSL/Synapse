@@ -16,10 +16,11 @@ public class SynapseController
 
     public static void Init()
     {
-        if (IsLoaded) return;
+        if (IsLoaded)
+            return;
         ServerConsole.AddLog("Welcome to Synapse! :)", ConsoleColor.Cyan);
         IsLoaded = true;
-        new SynapseController();
+        _ = new SynapseController();
     }
     internal SynapseController()
     {
@@ -40,7 +41,7 @@ public class SynapseController
         TryInit(Server.RceHandler.Init, "Initialising RCE failed");
         TryInit(CommandHandlers.RegisterSynapseCommands, "Initialising SynapseCommands failed");
         TryInit(PluginLoader.ActivatePlugins, "Initialising Plugins failed");
-        TryInit(Server.Events.LateInit,"Initialising EventHandler late failed");
+        TryInit(Server.Events.LateInit, "Initialising EventHandler late failed");
         TryInit(Server.Logger.Refresh, "Initialising Logger File failed");
         TryInit(Server.RceHandler.Reload, "Reloading RCE failed. Try updating your dependencies");
 

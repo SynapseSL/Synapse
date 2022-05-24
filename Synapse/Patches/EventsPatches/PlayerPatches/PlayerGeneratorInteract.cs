@@ -1,128 +1,139 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items.Keycards;
 using MapGeneration.Distributors;
 using Synapse.Api.Enum;
 using Synapse.Api.Items;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Events.Patches
 {
     [HarmonyPatch(typeof(Scp079Generator), nameof(Scp079Generator.ServerInteract))]
-	internal static class GeneratorInteractPatch
+    internal static class GeneratorInteractPatch
     {
-		[HarmonyPrefix]
-		private static bool OnInteract(Scp079Generator __instance, ReferenceHub ply, byte colliderId)
+        [HarmonyPrefix]
+        private static bool OnInteract(Scp079Generator __instance, ReferenceHub ply, byte colliderId)
         {
             try
             {
-				var gen = __instance.GetGenerator();
-				var player = ply.GetPlayer();
+                var gen = __instance.GetGenerator();
+                var player = ply.GetPlayer();
 
-				if (__instance._cooldownStopwatch.IsRunning && __instance._cooldownStopwatch.Elapsed.TotalSeconds < __instance._targetCooldown)
-					return false;
+                if (__instance._cooldownStopwatch.IsRunning && __instance._cooldownStopwatch.Elapsed.TotalSeconds < __instance._targetCooldown)
+                    return false;
 
-				if (colliderId != 0 && !gen.Open) return false;
+                if (colliderId != 0 && !gen.Open)
+                    return false;
 
-				__instance._cooldownStopwatch.Stop();
+                __instance._cooldownStopwatch.Stop();
 
                 switch (colliderId)
                 {
-					case 0:
+                    case 0:
                         if (!gen.Locked)
                         {
-							var allow = true;
-							Server.Get.Events.Player.InvokePlayerGeneratorInteractEvent(player, gen, 
-								gen.Open ? GeneratorInteraction.CloseDoor : GeneratorInteraction.OpenDoor, ref allow);
+                            var allow = true;
+                            Server.Get.Events.Player.InvokePlayerGeneratorInteractEvent(player, gen,
+                                gen.Open ? GeneratorInteraction.CloseDoor : GeneratorInteraction.OpenDoor, ref allow);
 
-							if (!allow) return false;
+                            if (!allow)
+                                return false;
 
-							gen.Open = !gen.Open;
-							__instance._targetCooldown = __instance._doorToggleCooldownTime;
+                            gen.Open = !gen.Open;
+                            __instance._targetCooldown = __instance._doorToggleCooldownTime;
                         }
                         else
                         {
-							if (!SynapseExtensions.CanHarmScp(player))
+                            if (!SynapseExtensions.CanHarmScp(player))
                             {
-								__instance.RpcDenied();
-								return false;
-							}
+                                __instance.RpcDenied();
+                                return false;
+                            }
 
-							var items = new List<SynapseItem>();
-							if (player.ItemInHand.ID != -1) items.Add(player.ItemInHand);
+                            var items = new List<SynapseItem>();
+                            if (player.ItemInHand.ID != -1)
+                                items.Add(player.ItemInHand);
 
-							if (Server.Get.Configs.SynapseConfiguration.RemoteKeyCard)
-								items.AddRange(player.Inventory.Items.Where(x => x != player.ItemInHand));
+                            if (Server.Get.Configs.SynapseConfiguration.RemoteKeyCard)
+                                items.AddRange(player.Inventory.Items.Where(x => x != player.ItemInHand));
 
-							var canOpen = false;
+                            var canOpen = false;
 
-							foreach (var item in items.Where(x => x.ItemCategory == ItemCategory.Keycard))
-								if ((item.ItemBase as KeycardItem).Permissions.HasFlagFast(__instance._requiredPermission))
+                            foreach (var item in items.Where(x => x.ItemCategory == ItemCategory.Keycard))
+                            {
+                                if ((item.ItemBase as KeycardItem).Permissions.HasFlagFast(__instance._requiredPermission))
                                 {
-									canOpen = true;
-									Server.Get.Events.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref canOpen);
-									break;
-								}
+                                    canOpen = true;
+                                    Server.Get.Events.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref canOpen);
+                                    break;
+                                }
+                            }
 
-							Server.Get.Events.Player.InvokePlayerGeneratorInteractEvent(player, gen, GeneratorInteraction.Unlocked, ref canOpen);
+                            Server.Get.Events.Player.InvokePlayerGeneratorInteractEvent(player, gen, GeneratorInteraction.Unlocked, ref canOpen);
 
-							if (canOpen) gen.Locked = false;
-							else __instance.RpcDenied();
+                            if (canOpen)
+                                gen.Locked = false;
+                            else
+                                __instance.RpcDenied();
 
-							__instance._targetCooldown = __instance._unlockCooldownTime;
+                            __instance._targetCooldown = __instance._unlockCooldownTime;
                         }
-						break;
 
-					case 1:
-						if((__instance.Activating || SynapseExtensions.CanHarmScp(player)) && !__instance.Engaged)
+                        break;
+
+                    case 1:
+                        if ((__instance.Activating || SynapseExtensions.CanHarmScp(player)) && !__instance.Engaged)
                         {
-							var allow = true;
-							Server.Get.Events.Player.InvokePlayerGeneratorInteractEvent(player, gen,
-								gen.Active ? GeneratorInteraction.Disabled : GeneratorInteraction.Activated, ref allow);
+                            var allow = true;
+                            Server.Get.Events.Player.InvokePlayerGeneratorInteractEvent(player, gen,
+                                gen.Active ? GeneratorInteraction.Disabled : GeneratorInteraction.Activated, ref allow);
 
-							if (!allow) return false;
+                            if (!allow)
+                                return false;
 
-							__instance.Activating = !__instance.Activating;
+                            __instance.Activating = !__instance.Activating;
 
-							if (__instance.Activating)
-								__instance._leverStopwatch.Restart();
+                            if (__instance.Activating)
+                                __instance._leverStopwatch.Restart();
 
-							__instance._targetCooldown = __instance._doorToggleCooldownTime;
+                            __instance._targetCooldown = __instance._doorToggleCooldownTime;
                         }
-						break;
 
-					case 2:
-						if (__instance.Activating && !__instance.Engaged)
-						{
-							var allow = true;
-							Server.Get.Events.Player.InvokePlayerGeneratorInteractEvent(player, gen,
-								GeneratorInteraction.Disabled, ref allow);
+                        break;
 
-							if (!allow) return false;
+                    case 2:
+                        if (__instance.Activating && !__instance.Engaged)
+                        {
+                            var allow = true;
+                            Server.Get.Events.Player.InvokePlayerGeneratorInteractEvent(player, gen,
+                                GeneratorInteraction.Disabled, ref allow);
 
-							gen.Active = false;
-							__instance._targetCooldown = __instance._unlockCooldownTime;
-						}
-						break;
+                            if (!allow)
+                                return false;
 
+                            gen.Active = false;
+                            __instance._targetCooldown = __instance._unlockCooldownTime;
+                        }
 
-					default:
-						__instance._targetCooldown = 1;
-						break;
+                        break;
+
+                    default:
+                        __instance._targetCooldown = 1;
+                        break;
                 }
 
-				__instance._cooldownStopwatch.Restart();
+                __instance._cooldownStopwatch.Restart();
 
-				return false;
+                return false;
             }
-			catch(Exception e)
+            catch (Exception e)
             {
-				Logger.Get.Error($"Synapse-Event: PlayerGeneratorInteract event failed!!\n{e}");
-				return true;
-			}
+                Logger.Get.Error($"Synapse-Event: PlayerGeneratorInteract event failed!!\n{e}");
+                return true;
+            }
         }
     }
 }

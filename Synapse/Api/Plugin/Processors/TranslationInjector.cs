@@ -12,26 +12,32 @@ namespace Synapse.Api.Plugin.Processors
                 foreach (var field in context.PluginType.GetFields())
                 {
                     var translationattribute = field.GetCustomAttribute<SynapseTranslation>();
-                    if (translationattribute is null) continue;
+                    if (translationattribute is null)
+                        continue;
 
-                    if (!FieldInfo.GetFieldFromHandle(field.FieldHandle).FieldType.Name.Contains("SynapseTranslation")) continue;
+                    if (!FieldInfo.GetFieldFromHandle(field.FieldHandle).FieldType.Name.Contains("SynapseTranslation"))
+                        continue;
 
-                    if(field.GetValue(context.Plugin) is null)
+                    if (field.GetValue(context.Plugin) is null)
                     {
                         var translation = Activator.CreateInstance(FieldInfo.GetFieldFromHandle(field.FieldHandle).FieldType, new object[] { Server.Get.Files.GetTranslationPath(context.Information.Name) });
 
                         field.SetValue(context.Plugin, translation);
                     }
                     else
-                        field.FieldType.GetMethod("Reload").Invoke(field.GetValue(context.Plugin), new object[] { });
+                    {
+                        _ = field.FieldType.GetMethod("Reload").Invoke(field.GetValue(context.Plugin), new object[] { });
+                    }
                 }
 
                 foreach (var property in context.PluginType.GetProperties())
                 {
                     var translationattribute = property.GetCustomAttribute<SynapseTranslation>();
-                    if (translationattribute is null) continue;
+                    if (translationattribute is null)
+                        continue;
 
-                    if (property.Name.Contains("SynapseTranslation")) continue;
+                    if (property.Name.Contains("SynapseTranslation"))
+                        continue;
 
                     if (property.GetValue(context.Plugin) is null)
                     {
@@ -40,7 +46,9 @@ namespace Synapse.Api.Plugin.Processors
                         property.SetValue(context.Plugin, translation);
                     }
                     else
-                        property.PropertyType.GetMethod("Reload").Invoke(property.GetValue(context.Plugin), new object[] { });
+                    {
+                        _ = property.PropertyType.GetMethod("Reload").Invoke(property.GetValue(context.Plugin), new object[] { });
+                    }
                 }
             }
             catch (Exception e)

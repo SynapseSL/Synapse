@@ -18,12 +18,14 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
             {
                 var name = handler.Name;
 
-                foreach(var attribute in ev.Object.CustomAttributes)
+                foreach (var attribute in ev.Object.CustomAttributes)
                 {
-                    if (attribute is null) continue;
+                    if (attribute is null)
+                        continue;
 
                     var args = attribute.Split(':');
-                    if (!args[0].Equals(handler.Name, StringComparison.InvariantCultureIgnoreCase)) continue;
+                    if (!args[0].Equals(handler.Name, StringComparison.InvariantCultureIgnoreCase))
+                        continue;
                     var newargs = args.Segment(1);
 
                     handler.SynapseObjects.Add(ev.Object);
@@ -40,7 +42,7 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
                 if (handler.SynapseObjects.Contains(ev.Object))
                 {
                     handler.OnDestroy(ev.Object);
-                    handler.SynapseObjects.Remove(ev.Object);
+                    _ = handler.SynapseObjects.Remove(ev.Object);
                 }
             }
         }

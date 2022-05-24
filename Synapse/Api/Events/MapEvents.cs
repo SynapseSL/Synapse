@@ -13,7 +13,7 @@ namespace Synapse.Api.Events
 
         public event Action WarheadDetonationEvent;
 
-        public event EventHandler.OnSynapseEvent<WarheadDetonationCanceledEventArgs> WarheadDetonationCanceledEvent; 
+        public event EventHandler.OnSynapseEvent<WarheadDetonationCanceledEventArgs> WarheadDetonationCanceledEvent;
 
         public event EventHandler.OnSynapseEvent<DoorInteractEventArgs> DoorInteractEvent;
 
@@ -41,7 +41,7 @@ namespace Synapse.Api.Events
 
             GeneratorEngageEvent?.Invoke(ev);
 
-            allow = ev.forceDisAllow? false : ev.Allow;
+            allow = !ev.forceDisAllow && ev.Allow;
         }
 
         internal void InvokeWarheadStart(Player player, out bool allow)
@@ -84,9 +84,10 @@ namespace Synapse.Api.Events
             trigger = ev.Trigger;
         }
 
-        internal void InvokeDoorInteractEvent(Player player,Door door,ref bool allow)
+        internal void InvokeDoorInteractEvent(Player player, Door door, ref bool allow)
         {
-            if (DoorInteractEvent is null) return;
+            if (DoorInteractEvent is null)
+                return;
 
             var ev = new DoorInteractEventArgs
             {
@@ -123,7 +124,7 @@ namespace Synapse.Api.Events
                 Disabler = disabler,
                 Allow = true,
             };
-            
+
             WarheadDetonationCanceledEvent?.Invoke(ev);
 
             disabler = ev.Disabler;
@@ -158,7 +159,7 @@ namespace Synapse.Api.Events
             items = ev.Items;
             moveVector = ev.MoveVector;
         }
-        
+
         internal void InvokeLiftMoveObjects(LiftMoveObjectsEventArgs ev) => LiftMoveObjectsEvent?.Invoke(ev);
         #endregion
     }

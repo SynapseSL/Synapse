@@ -1,9 +1,9 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Firearms.BasicMessages;
 using Mirror;
 using Synapse.Api;
+using System;
 using UnityEngine;
 using Logger = Synapse.Api.Logger;
 
@@ -24,29 +24,30 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 var item = itembase.GetSynapseItem();
 
-                Vector3 targetPos = Vector3.zero;
+                var targetPos = Vector3.zero;
 
-                Physics.Raycast(player.CameraReference.transform.position, player.CameraReference.transform.forward, out var raycastthit, 1000f);
+                _ = Physics.Raycast(player.CameraReference.transform.position, player.CameraReference.transform.forward, out var raycastthit, 1000f);
                 if (raycastthit.collider is null)
                     return true;
-                
-                targetPos = raycastthit.point;
-                raycastthit.transform.gameObject.TryGetComponent(out Player target);
 
-                
+                targetPos = raycastthit.point;
+                _ = raycastthit.transform.gameObject.TryGetComponent(out Player target);
+
                 Server.Get.Events.Player.InvokePlayerShootEvent(player, target, targetPos, item, out var allow);
                 Server.Get.Events.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allow);
 
                 if (allow)
                 {
-                    if (!ReferenceHub.TryGetHub(conn.identity.gameObject, out ReferenceHub referenceHub))
+                    if (!ReferenceHub.TryGetHub(conn.identity.gameObject, out var referenceHub))
                     {
                         return false;
                     }
+
                     if (msg.ShooterWeaponSerial != referenceHub.inventory.CurItem.SerialNumber)
                     {
                         return false;
                     }
+
                     if (referenceHub.inventory.CurInstance is Firearm firearm && firearm.ActionModule.ServerAuthorizeShot())
                     {
                         firearm.HitregModule.ServerProcessShot(msg);

@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Synapse.Api.Teams
@@ -19,7 +19,8 @@ namespace Synapse.Api.Teams
             if (team.Info is null)
                 team.Info = typeof(TTeam).GetCustomAttribute<SynapseTeamInformation>();
 
-            if (IsIDRegistered(team.Info.ID)) throw new Exception("A Plugin tried to register a CustomTeam with an already used Id");
+            if (IsIDRegistered(team.Info.ID))
+                throw new Exception("A Plugin tried to register a CustomTeam with an already used Id");
 
             teams.Add(team);
             team.Initialise();
@@ -38,8 +39,10 @@ namespace Synapse.Api.Teams
                 Round.Get.MtfRespawn(id == (int)Team.MTF);
                 return;
             }
+
             var team = teams.FirstOrDefault(x => x.Info.ID == id);
-            if (team is null) return;
+            if (team is null)
+                return;
             team.Spawn(players);
         }
 

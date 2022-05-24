@@ -1,9 +1,9 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
+using System;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(CheaterReport),nameof(CheaterReport.UserCode_CmdReport))]
+    [HarmonyPatch(typeof(CheaterReport), nameof(CheaterReport.UserCode_CmdReport))]
     internal static class PlayerReportPatch
     {
         [HarmonyPrefix]
@@ -19,7 +19,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 return allow;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 SynapseController.Server.Logger.Error($"Synapse-Event: PlayerReport failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
                 return true;

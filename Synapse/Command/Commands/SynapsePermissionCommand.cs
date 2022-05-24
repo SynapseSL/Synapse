@@ -8,7 +8,7 @@ namespace Synapse.Command.Commands
         Description = "A command to manage the Permission System",
         Usage = "Execute the command without parameters for help",
         Permission = "",
-        Platforms = new[] { Platform.RemoteAdmin,Platform.ServerConsole },
+        Platforms = new[] { Platform.RemoteAdmin, Platform.ServerConsole },
         Arguments = new[] { "ME/GROUPS/SETGROUP/DELETE" }
     )]
     public class SynapsePermissionCommand : ISynapseCommand
@@ -17,7 +17,7 @@ namespace Synapse.Command.Commands
         {
             var result = new CommandResult();
 
-            if(context.Arguments.Count < 1)
+            if (context.Arguments.Count < 1)
                 context.Arguments = new System.ArraySegment<string>(new string[] { "" });
 
             switch (context.Arguments.First().ToUpper())
@@ -46,7 +46,7 @@ namespace Synapse.Command.Commands
                     break;
 
                 case "GROUPS":
-                    if(!context.Player.HasPermission("synapse.permission.groups"))
+                    if (!context.Player.HasPermission("synapse.permission.groups"))
                     {
                         result.Message = "You don't have permission to get all groups (synapse.permission.groups)";
                         result.State = CommandResultState.NoPermission;
@@ -60,7 +60,7 @@ namespace Synapse.Command.Commands
                     result.Message = msg;
                     result.State = CommandResultState.Ok;
                     break;
-                
+
                 case "SETGROUP":
                     if (!context.Player.HasPermission("synapse.permission.setgroup"))
                     {
@@ -69,7 +69,7 @@ namespace Synapse.Command.Commands
                         break;
                     }
 
-                    if(context.Arguments.Count() < 3)
+                    if (context.Arguments.Count() < 3)
                     {
                         result.Message = "Missing parameters";
                         result.State = CommandResultState.Error;
@@ -78,9 +78,9 @@ namespace Synapse.Command.Commands
 
                     var playerid = context.Arguments.ElementAt(2);
 
-                    if(context.Arguments.ElementAt(1) == "-1")
+                    if (context.Arguments.ElementAt(1) == "-1")
                     {
-                        Server.Get.PermissionHandler.RemovePlayerGroup(playerid);
+                        _ = Server.Get.PermissionHandler.RemovePlayerGroup(playerid);
                         result.Message = $"Removed {playerid} player group.";
                         result.State = CommandResultState.Ok;
                         break;
@@ -105,6 +105,7 @@ namespace Synapse.Command.Commands
                         result.Message = "Invalid GroupName";
                         result.State = CommandResultState.Error;
                     }
+
                     break;
 
                 case "DELETE":
@@ -115,20 +116,22 @@ namespace Synapse.Command.Commands
                         break;
                     }
 
-                    if (context.Arguments.Count < 2) return new CommandResult
+                    if (context.Arguments.Count < 2)
                     {
-                        Message = "Missing group name",
-                        State = CommandResultState.Error
-                    };
-
-                    if (Server.Get.PermissionHandler.DeleteServerGroup(context.Arguments.At(1)))
                         return new CommandResult
+                        {
+                            Message = "Missing group name",
+                            State = CommandResultState.Error
+                        };
+                    }
+
+                    return Server.Get.PermissionHandler.DeleteServerGroup(context.Arguments.At(1))
+                        ? new CommandResult
                         {
                             Message = "Group successfully deleted",
                             State = CommandResultState.Ok
-                        };
-                    else
-                        return new CommandResult
+                        }
+                        : new CommandResult
                         {
                             Message = "No Group with that Name was found",
                             State = CommandResultState.Error
@@ -137,7 +140,7 @@ namespace Synapse.Command.Commands
                 default:
                     result.Message = "All Permission Commands:" +
                         "\nPermission me - Gives you information about your Role" +
-                        "\nPermission groups - Gives you a List of All Groups" + 
+                        "\nPermission groups - Gives you a List of All Groups" +
                         "\nPermission setgroup {Group} {UserID} - Sets a User group" +
                         "\nPermission delte {Group}";
                     result.State = CommandResultState.Ok;

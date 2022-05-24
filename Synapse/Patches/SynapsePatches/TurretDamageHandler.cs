@@ -6,7 +6,7 @@ using System;
 
 namespace Synapse.Patches.SynapsePatches
 {
-    [HarmonyPatch(typeof(DamageHandlerReaderWriter),nameof(DamageHandlerReaderWriter.WriteDamageHandler))]
+    [HarmonyPatch(typeof(DamageHandlerReaderWriter), nameof(DamageHandlerReaderWriter.WriteDamageHandler))]
     internal static class TurretDamageHandler
     {
         [HarmonyPrefix]
@@ -20,9 +20,10 @@ namespace Synapse.Patches.SynapsePatches
                     info?.WriteAdditionalData(writer);
                     return false;
                 }
+
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.Get.Error("Synapse-Turret: Failed to write Data of SynapseTurretDamageHandler:\n" + ex);
                 return true;

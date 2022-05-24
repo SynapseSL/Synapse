@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using Synapse.Api.Enum;
+﻿using Synapse.Api.Enum;
+using UnityEngine;
 
 namespace Synapse.Api
 {
@@ -19,7 +19,7 @@ namespace Synapse.Api
 
         public bool Locked { get => Lift._locked; set => Lift.SetLock(Locked, value); }
 
-        public bool Operative { get => Lift.operative; }
+        public bool Operative => Lift.operative;
 
         public float MaxDistance { get => Lift.maxDistance; set => Lift.maxDistance = value; }
 

@@ -19,7 +19,6 @@ namespace Synapse.Api
 
         public HashSet<Player> PocketPlayers { get; } = new HashSet<Player>();
 
-
         public void UsePortal() => Script.UserCode_CmdUsePortal();
 
         public void DeletePortal() => Script.DeletePortal();

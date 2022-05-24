@@ -52,9 +52,11 @@ namespace Synapse.Api.CustomObjects
         private Door CreateDoor(SpawnableDoorType type, Vector3 position, Quaternion rotation, Vector3 scale, bool open, bool locked)
         {
             var ot = CreateNetworkObject(Prefab[type], position, rotation, scale);
-            var door = new Door(ot);
-            door.Open = open;
-            door.Locked = locked;
+            var door = new Door(ot)
+            {
+                Open = open,
+                Locked = locked
+            };
 
             Map.Get.Doors.Add(door);
             return door;

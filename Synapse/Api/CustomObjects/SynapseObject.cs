@@ -23,7 +23,7 @@ namespace Synapse.Api.CustomObjects
                 obj.Parent = this;
             }
 
-            foreach(var light in schematic.LightObjects)
+            foreach (var light in schematic.LightObjects)
             {
                 var obj = new SynapseLightObject(light);
                 LightChildrens.Add(obj);
@@ -32,7 +32,7 @@ namespace Synapse.Api.CustomObjects
                 obj.Parent = this;
             }
 
-            foreach(var target in schematic.TargetObjects)
+            foreach (var target in schematic.TargetObjects)
             {
                 var obj = new SynapseTargetObject(target);
                 TargetChildrens.Add(obj);
@@ -41,7 +41,7 @@ namespace Synapse.Api.CustomObjects
                 obj.Parent = this;
             }
 
-            foreach(var item in schematic.ItemObjects)
+            foreach (var item in schematic.ItemObjects)
             {
                 var obj = new SynapseItemObject(item);
                 ItemChildrens.Add(obj);
@@ -50,7 +50,7 @@ namespace Synapse.Api.CustomObjects
                 obj.Parent = this;
             }
 
-            foreach(var station in schematic.WorkStationObjects)
+            foreach (var station in schematic.WorkStationObjects)
             {
                 var obj = new SynapseWorkStationObject(station);
                 WorkStationChildrens.Add(obj);
@@ -59,7 +59,7 @@ namespace Synapse.Api.CustomObjects
                 obj.Parent = this;
             }
 
-            foreach(var door in schematic.DoorObjects)
+            foreach (var door in schematic.DoorObjects)
             {
                 var obj = new SynapseDoorObject(door);
                 DoorChildrens.Add(obj);
@@ -68,7 +68,7 @@ namespace Synapse.Api.CustomObjects
                 obj.Parent = this;
             }
 
-            foreach(var custom in schematic.CustomObjects)
+            foreach (var custom in schematic.CustomObjects)
             {
                 var obj = new SynapseCustomObject(custom);
                 CustomChildrens.Add(obj);
@@ -121,10 +121,7 @@ namespace Synapse.Api.CustomObjects
 
         public override Vector3 Position
         {
-            get
-            {
-                return base.Position;
-            }
+            get => base.Position;
             set
             {
                 base.Position = value;
@@ -175,14 +172,16 @@ namespace Synapse.Api.CustomObjects
 
         public void DespawnForOnePlayer(Player player)
         {
-            foreach(var child in Childrens)
+            foreach (var child in Childrens)
+            {
                 if (child.GameObject.TryGetComponent<NetworkIdentity>(out var net))
                     net.DespawnForOnePlayer(player);
+            }
         }
 
         public override void Destroy()
         {
-            foreach(var child in Childrens)
+            foreach (var child in Childrens)
                 child.Destroy();
 
             Object.Destroy(GameObject);
@@ -191,13 +190,15 @@ namespace Synapse.Api.CustomObjects
         private void UpdatePositionAndRotation()
         {
             foreach (var child in Childrens)
+            {
                 if (child is IRefreshable refresh)
                     refresh.Refresh();
+            }
         }
 
         private void UpdateScale()
         {
-            foreach(var ichild in Childrens)
+            foreach (var ichild in Childrens)
             {
                 var child = ichild as DefaultSynapseObject;
                 child.Scale = new Vector3(child.OriginalScale.x * Scale.x, child.OriginalScale.y * Scale.y, child.OriginalScale.z * Scale.z);

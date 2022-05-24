@@ -20,15 +20,14 @@ namespace Synapse.Api.Plugin.Processors
                         continue;
 
                     object classObject;
-                    ConstructorInfo[] allCtors = commandType.GetConstructors();
-                    ConstructorInfo diCtor = allCtors.FirstOrDefault(ctorInfo => ctorInfo.GetParameters()
+                    var allCtors = commandType.GetConstructors();
+                    var diCtor = allCtors.FirstOrDefault(ctorInfo => ctorInfo.GetParameters()
                         .Any(paramInfo => paramInfo.ParameterType == context.PluginType));
 
-                    if (diCtor != null) //If DI-Ctor is found
-                        classObject = Activator.CreateInstance(commandType, args: new object[] { context.Plugin });
-                    else                //There is no DI-Ctor
-                        classObject = Activator.CreateInstance(commandType);
-                    
+                    classObject = diCtor != null
+                        ? Activator.CreateInstance(commandType, args: new object[] { context.Plugin })
+                        : Activator.CreateInstance(commandType);
+
                     Handlers.RegisterCommand(classObject as ISynapseCommand, true);
                 }
                 catch (Exception e)

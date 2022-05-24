@@ -1,5 +1,5 @@
-﻿using Mirror;
-using HarmonyLib;
+﻿using HarmonyLib;
+using Mirror;
 
 namespace Synapse.Patches.SynapsePatches.Dummy
 {
@@ -10,8 +10,7 @@ namespace Synapse.Patches.SynapsePatches.Dummy
         private static bool TargetRPC(NetworkBehaviour __instance)
         {
             var player = __instance.GetPlayer();
-            if (player != null && player.IsDummy) return false;
-            return true;
+            return player == null || !player.IsDummy;
         }
     }
 }

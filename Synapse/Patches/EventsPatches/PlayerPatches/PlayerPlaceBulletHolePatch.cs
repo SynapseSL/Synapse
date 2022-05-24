@@ -14,16 +14,14 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             try
             {
                 var player = __instance?.Hub?.GetPlayer();
-                if (player is null) return false;
+                if (player is null)
+                    return false;
                 var point = hit.point;
                 var normal = hit.normal;
-                
-                Server.Get.Events.Player.InvokePlaceBulletHoleEvent(player, point, out var allow);
-                
-                if (!allow)
-                    return false;
 
-                return true;
+                Server.Get.Events.Player.InvokePlaceBulletHoleEvent(player, point, out var allow);
+
+                return allow;
             }
             catch (Exception ex)
             {

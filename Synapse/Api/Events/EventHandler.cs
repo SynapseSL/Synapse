@@ -1,9 +1,7 @@
 using Synapse.Api.CustomObjects;
-using Synapse.Config;
-using System.Collections.Generic;
 using Synapse.Api.Events.SynapseEventArguments;
+using Synapse.Config;
 using UnityEngine;
-using YamlDotNet.Core.Tokens;
 
 namespace Synapse.Api.Events
 {
@@ -22,10 +20,7 @@ namespace Synapse.Api.Events
         }
 
         //This will be called last after every plugins therefore the event's hooked here will change the values last and overwrites therefore any plugin instructions
-        internal void LateInit()
-        {
-            Player.PlayerSetClassEvent += PlayerOnPlayerSetClassEvent;
-        }
+        internal void LateInit() => Player.PlayerSetClassEvent += PlayerOnPlayerSetClassEvent;
 
         private SerializedPlayerState state;
 
@@ -36,15 +31,15 @@ namespace Synapse.Api.Events
                 case KeyCode.Alpha1:
                     state = ev.Player;
                     break;
-                
-                case  KeyCode.Alpha2:
+
+                case KeyCode.Alpha2:
                     ev.Player.PlayerState = state;
                     break;
-                
-                case  KeyCode.Alpha3:
+
+                case KeyCode.Alpha3:
                     ev.Player.Jail.JailPlayer(ev.Player);
                     break;
-                    
+
                 case KeyCode.Alpha4:
                     ev.Player.Jail.UnJailPlayer();
                     break;
@@ -71,13 +66,13 @@ namespace Synapse.Api.Events
         {
         }
 
-#region HookedEvents
+        #region HookedEvents
         private SynapseConfiguration Conf => SynapseController.Server.Configs.SynapseConfiguration;
 
         private void LoadPlayer(SynapseEventArguments.LoadComponentEventArgs ev)
         {
             if (ev.Player.GetComponent<Player>() is null)
-                ev.Player.gameObject.AddComponent<Player>();
+                _ = ev.Player.gameObject.AddComponent<Player>();
         }
 
         private bool firstLoaded = false;
@@ -102,8 +97,8 @@ namespace Synapse.Api.Events
         {
             ev.Player.Broadcast(Conf.JoinMessagesDuration, Conf.JoinBroadcast);
             ev.Player.GiveTextHint(Conf.JoinTextHint, Conf.JoinMessagesDuration);
-            if (!string.IsNullOrWhiteSpace(Conf.JoinWindow))
-                ev.Player.OpenReportWindow(Conf.JoinWindow.Replace("\\n","\n"));
+            if (!System.String.IsNullOrWhiteSpace(Conf.JoinWindow))
+                ev.Player.OpenReportWindow(Conf.JoinWindow.Replace("\\n", "\n"));
         }
 
         private void OnUpdate()
@@ -116,7 +111,7 @@ namespace Synapse.Api.Events
                 Player.InvokePlayerSyncDataEvent(player, out _);
             }
         }
-        
+
         private void PlayerOnPlayerSetClassEvent(PlayerSetClassEventArgs ev)
         {
             if (ev.Player.storedState != null)

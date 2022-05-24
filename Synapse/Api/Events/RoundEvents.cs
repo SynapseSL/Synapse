@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Synapse.Api.Events.SynapseEventArguments;
+using System;
 using System.Collections.Generic;
-using Synapse.Api.Events.SynapseEventArguments;
 
 namespace Synapse.Api.Events
 {
@@ -28,8 +28,7 @@ namespace Synapse.Api.Events
         internal void InvokeRoundRestartEvent() => RoundRestartEvent?.Invoke();
         internal void InvokeRoundEndEvent() => RoundEndEvent?.Invoke();
 
-
-        internal void InvokeRoundCheckEvent(ref bool allow,ref RoundSummary.LeadingTeam leadingTeam)
+        internal void InvokeRoundCheckEvent(ref bool allow, ref RoundSummary.LeadingTeam leadingTeam)
         {
             var ev = new RoundCheckEventArgs
             {
@@ -56,7 +55,7 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void InvokeTeamRespawn(ref List<Player> players,ref Respawning.SpawnableTeamType teamType, out bool allow,out int teamid)
+        internal void InvokeTeamRespawn(ref List<Player> players, ref Respawning.SpawnableTeamType teamType, out bool allow, out int teamid)
         {
             var ev = new TeamRespawnEventArgs
             {

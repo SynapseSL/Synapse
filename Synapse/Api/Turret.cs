@@ -26,8 +26,6 @@ namespace Synapse.Api
             Server.Get.Events.Server.UpdateEvent += Update;
         }
 
-
-
         public ShootSound Sound { get; set; } = ShootSound.Com15;
         public float Damage { get; set; } = 10f;
         public string DeathReason { get; set; } = "Killed by a Turret";
@@ -40,26 +38,24 @@ namespace Synapse.Api
         public GameObject GameObject { get; }
         public Vector3 Position { get => GameObject.transform.position; set => GameObject.transform.position = value; }
 
-
-
         public void SingleShootDirection(Vector3 direction)
         {
             var ray = GetRay(direction);
 
             if (Physics.Raycast(ray, out var hit, Distance, StandardHitregBase.HitregMask))
-                ExecuteShoot(ray, hit);
+                _ = ExecuteShoot(ray, hit);
 
             PlayAudio(Sound);
         }
 
         public void PlayAudio(ShootSound sound)
         {
-            foreach(var player in Server.Get.Players)
+            foreach (var player in Server.Get.Players)
             {
                 var msg = new GunAudioMessage(player, 0, (byte)Distance, player);
                 var to = Position - player.Position;
 
-                if(player.RoleType != RoleType.Spectator && to.sqrMagnitude > 1760f)
+                if (player.RoleType != RoleType.Spectator && to.sqrMagnitude > 1760f)
                 {
                     to.y = 0f;
                     var num = Vector3.Angle(Vector3.forward, to);
@@ -94,30 +90,37 @@ namespace Synapse.Api
                         if (player.ClassManager.IsHuman())
                             new GunHitMessage(hit.point + (ray.origin - hit.point).normalized, ray.direction, true).SendToAuthenticated();
                     }
+
                     return true;
                 }
             }
-            else new GunHitMessage(hit.point + (ray.origin - hit.point).normalized, ray.direction, false).SendToAuthenticated();
+            else
+            {
+                new GunHitMessage(hit.point + (ray.origin - hit.point).normalized, ray.direction, false).SendToAuthenticated();
+            }
+
             return false;
         }
-
 
         private Ray GetRay(Vector3 direction)
         {
             var ray = new Ray(Position, direction);
-            var a = (new Vector3(Random.value, Random.value, Random.value) - Vector3.one / 2f).normalized * Random.value;
+            var a = (new Vector3(Random.value, Random.value, Random.value) - (Vector3.one / 2f)).normalized * Random.value;
             ray.direction = Quaternion.Euler(a * Inaccuracy) * ray.direction;
             return ray;
         }
 
-        private float time = 0f;
+        private readonly float time = 0f;
         private void Update()
         {
-            if (!ShootAutomatic || time > Time.time) return;
+            if (!ShootAutomatic || time > Time.time)
+                return;
 
             foreach (var player in Server.Get.Players)
+            {
                 if (Vector3.Distance(player.Position, Position) <= Distance)
                     SingleShootDirection(player.Position - Position);
+            }
         }
 
         public class SynapseTurretDamageHandler : StandardDamageHandler
@@ -141,15 +144,17 @@ namespace Synapse.Api
             {
                 get
                 {
-                    var cassie = new CassieAnnouncement();
-                    cassie.Announcement = Cassie;
-                    //TODO: Fix Subtitle
-                    cassie.SubtitleParts = new Subtitles.SubtitlePart[]
+                    var cassie = new CassieAnnouncement
+                    {
+                        Announcement = Cassie,
+                        //TODO: Fix Subtitle
+                        SubtitleParts = new Subtitles.SubtitlePart[]
                     {
                     new Subtitles.SubtitlePart(Subtitles.SubtitleType.Custom, new string[]
                     {
                         Cassie
                     })
+                    }
                     };
 
                     return cassie;

@@ -53,7 +53,7 @@ namespace Synapse.Api.CustomObjects
             set => ToyBase.NetworkLightShadows = value;
         }
 
-        private LightSourceToy CreateLightSource(Color color, float lightIntensity, float range,bool shadows, Vector3 position, Quaternion rotation, Vector3 scale)
+        private LightSourceToy CreateLightSource(Color color, float lightIntensity, float range, bool shadows, Vector3 position, Quaternion rotation, Vector3 scale)
         {
             var ot = UnityEngine.Object.Instantiate(Prefab, position, rotation);
             NetworkServer.Spawn(ot.gameObject);

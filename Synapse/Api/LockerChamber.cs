@@ -9,7 +9,7 @@ namespace Synapse.Api
         {
             lockerChamber = vanilalockerChamber;
             vanillalocker = locker.locker;
-            Locker = locker; 
+            Locker = locker;
             colliderId = id;
             byteId = (ushort)(1 << id);
         }
@@ -38,17 +38,14 @@ namespace Synapse.Api
 
         public Vector3 Position => GameObject.transform.position;
 
-        public bool Open 
+        public bool Open
         {
             get => (vanillalocker.OpenedChambers & byteId) == byteId;
             set
             {
                 lockerChamber.IsOpen = value;
                 vanillalocker.RefreshOpenedSyncvar();
-                if (value)
-                    vanillalocker.OpenedChambers = (ushort)(vanillalocker.OpenedChambers | byteId);
-                else
-                    vanillalocker.OpenedChambers = (ushort)(vanillalocker.OpenedChambers & (~byteId));
+                vanillalocker.OpenedChambers = value ? (ushort)(vanillalocker.OpenedChambers | byteId) : (ushort)(vanillalocker.OpenedChambers & (~byteId));
                 lockerChamber._targetCooldown = 1f;
                 lockerChamber._stopwatch.Restart();
             }

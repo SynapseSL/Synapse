@@ -30,7 +30,8 @@ namespace Synapse.Api.Events
             internal void InvokeScpTargetEvent(Player player, Player scp096, PlayableScps.Scp096PlayerState state, out bool allow)
             {
                 allow = true;
-                if (Scp096AddTargetEvent is null) return;
+                if (Scp096AddTargetEvent is null)
+                    return;
 
                 var ev = new Scp096AddTargetEventArgument()
                 {
@@ -289,7 +290,7 @@ namespace Synapse.Api.Events
                 };
 
                 Scp173PlaceTantrum?.Invoke(ev);
-                
+
                 allow = ev.Allow;
             }
 
@@ -309,7 +310,7 @@ namespace Synapse.Api.Events
 
             internal void InvokeScp173SpeedAbilityEvent(Player scp173, out bool allow)
             {
-                Scp173SpeedAbilityEventArgs ev = new Scp173SpeedAbilityEventArgs { Scp173 = scp173 };
+                var ev = new Scp173SpeedAbilityEventArgs { Scp173 = scp173 };
                 Scp173SpeedAbilityEvent?.Invoke(ev);
                 allow = ev.Allow;
             }
@@ -321,7 +322,7 @@ namespace Synapse.Api.Events
 
             public event EventHandler.OnSynapseEvent<Scp049ReviveEvent> Scp049ReviveEvent;
 
-            internal void InvokeRevive(Player scp, Player target, Ragdoll rag,bool finish,out bool allow)
+            internal void InvokeRevive(Player scp, Player target, Ragdoll rag, bool finish, out bool allow)
             {
                 var ev = new Scp049ReviveEvent
                 {

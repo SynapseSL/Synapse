@@ -29,7 +29,7 @@ namespace Synapse.Api.Plugin
             {
                 if (lines.Length > position)
                 {
-                    if (string.IsNullOrEmpty(lines[position]))
+                    if (System.String.IsNullOrEmpty(lines[position]))
                     {
                         dictionary.Add(pair.Key, pair.Value);
                         newlines.Add(pair.Value);

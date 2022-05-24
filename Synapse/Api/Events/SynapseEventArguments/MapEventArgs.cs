@@ -103,7 +103,8 @@ namespace Synapse.Api.Events.SynapseEventArguments
         {
             forceDisAllow = true;
             Generator.generator.Activating = false;
-            if (resetTime) ResetTime();
+            if (resetTime)
+                ResetTime();
         }
     }
 }

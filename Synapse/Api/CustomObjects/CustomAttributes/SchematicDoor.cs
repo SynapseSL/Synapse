@@ -8,8 +8,10 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
 
         public override void OnLoad(ISynapseObject synapseObject, ArraySegment<string> args)
         {
-            if(!(synapseObject is SynapseDoorObject door)) return;
-            if (args.Count == 0 || !int.TryParse(args.At(0), out var leftschematicID) || !SchematicHandler.Get.IsIDRegistered(leftschematicID)) return;
+            if (!(synapseObject is SynapseDoorObject door))
+                return;
+            if (args.Count == 0 || !Int32.TryParse(args.At(0), out var leftschematicID) || !SchematicHandler.Get.IsIDRegistered(leftschematicID))
+                return;
 
             var leftDoor = door.GameObject.transform.GetChild(2).GetChild(1).GetChild(0);
             var leftschematic = SchematicHandler.Get.SpawnSchematic(leftschematicID, leftDoor.transform.position);
@@ -17,7 +19,8 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
 
             if (door.DoorType != Enum.SpawnableDoorType.EZ)
             {
-                if (args.Count < 2 || !int.TryParse(args.At(1), out var righttschematicID) || !SchematicHandler.Get.IsIDRegistered(righttschematicID)) return;
+                if (args.Count < 2 || !Int32.TryParse(args.At(1), out var righttschematicID) || !SchematicHandler.Get.IsIDRegistered(righttschematicID))
+                    return;
 
                 var rightDoor = door.GameObject.transform.GetChild(2).GetChild(1).GetChild(1);
                 var rightschematic = SchematicHandler.Get.SpawnSchematic(righttschematicID, rightDoor.transform.position);

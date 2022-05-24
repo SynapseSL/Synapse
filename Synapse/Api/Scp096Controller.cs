@@ -15,14 +15,11 @@ namespace Synapse.Api
 
         public float ShieldAmount
         {
-            get
-            {
-                if (Is096) return Scp096.ShieldAmount;
-                return 0;
-            }
+            get => Is096 ? Scp096.ShieldAmount : 0;
             set
             {
-                if (!Is096) return;
+                if (!Is096)
+                    return;
                 Scp096.ShieldAmount = value;
             }
         }
@@ -31,42 +28,33 @@ namespace Synapse.Api
 
         public float CurMaxShield
         {
-            get
-            {
-                if (Is096) return Scp096.CurMaxShield;
-                return 0f;
-            }
+            get => Is096 ? Scp096.CurMaxShield : 0f;
             set
             {
-                if (!Is096) return;
+                if (!Is096)
+                    return;
                 Scp096.CurMaxShield = value;
             }
         }
 
         public float EnrageTimeLeft
         {
-            get
-            {
-                if (Is096) return Scp096.EnrageTimeLeft;
-                return 0f;
-            }
+            get => Is096 ? Scp096.EnrageTimeLeft : 0f;
             set
             {
-                if (!Is096) return;
+                if (!Is096)
+                    return;
                 Scp096.EnrageTimeLeft = value;
             }
         }
 
         public PlayableScps.Scp096PlayerState RageState
         {
-            get
-            {
-                if (Is096) return Scp096.PlayerState;
-                return PlayableScps.Scp096PlayerState.Docile;
-            }
+            get => Is096 ? Scp096.PlayerState : PlayableScps.Scp096PlayerState.Docile;
             set
             {
-                if (!Is096) return;
+                if (!Is096)
+                    return;
                 switch (value)
                 {
                     case PlayableScps.Scp096PlayerState.Charging:
@@ -83,7 +71,10 @@ namespace Synapse.Api
                         if (RageState == PlayableScps.Scp096PlayerState.Docile
                             || RageState == PlayableScps.Scp096PlayerState.TryNotToCry
                             || RageState == PlayableScps.Scp096PlayerState.Calming)
+                        {
                             RageState = PlayableScps.Scp096PlayerState.Enraging;
+                        }
+
                         Scp096.Enrage();
                         break;
 
@@ -118,50 +109,32 @@ namespace Synapse.Api
             }
         }
 
-        public List<Player> Targets
-        {
-            get
-            {
-                if (!Is096) return new List<Player>();
-                return Scp096._targets.Select(x => x.GetPlayer()).ToList();
-            }
-        }
+        public List<Player> Targets => !Is096 ? new List<Player>() : Scp096._targets.Select(x => x.GetPlayer()).ToList();
 
-        public bool CanAttack
-        {
-            get
-            {
-                if (Is096) return Scp096.CanAttack;
-                return false;
-            }
-        }
+        public bool CanAttack => Is096 && Scp096.CanAttack;
 
-        public bool CanCharge
-        {
-            get
-            {
-                if (Is096) return Scp096.CanCharge;
-                return false;
-            }
-        }
+        public bool CanCharge => Is096 && Scp096.CanCharge;
 
         public void AddTarget(Player player)
         {
-            if (!Is096 || !Scp096.CanReceiveTargets) return;
+            if (!Is096 || !Scp096.CanReceiveTargets)
+                return;
 
             Scp096.AddTarget(player.gameObject);
         }
 
         public void RemoveTarget(Player player)
         {
-            if (!Is096) return;
+            if (!Is096)
+                return;
 
-            Scp096._targets.Remove(player.Hub);
+            _ = Scp096._targets.Remove(player.Hub);
         }
 
         public void ChargeDoor(Door door)
         {
-            if (!Is096) return;
+            if (!Is096)
+                return;
             Scp096.ChargeDoor(door.VDoor);
         }
     }

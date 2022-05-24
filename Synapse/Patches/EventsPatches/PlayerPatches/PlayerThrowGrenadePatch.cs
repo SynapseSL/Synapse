@@ -1,9 +1,9 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using InventorySystem.Items.ThrowableProjectiles;
 using Mirror;
 using Synapse.Api;
 using Synapse.Api.Items;
+using System;
 using Utils.Networking;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
@@ -17,20 +17,24 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             try
             {
                 var player = conn.GetPlayer();
-                if (player is null || player.ItemInHand?.Serial != msg.Serial) return false;
-                if (!(player.ItemInHand.ItemBase is ThrowableItem throwable)) return false;
+                if (player is null || player.ItemInHand?.Serial != msg.Serial)
+                    return false;
+                if (!(player.ItemInHand.ItemBase is ThrowableItem throwable))
+                    return false;
                 var allow = true;
 
                 switch (msg.Request)
                 {
                     case ThrowableNetworkHandler.RequestType.BeginThrow:
-                        if (!throwable.AllowHolster) return false;
+                        if (!throwable.AllowHolster)
+                            return false;
                         Server.Get.Events.Player.InvokePlayerItemUseEvent(player, player.ItemInHand, Api.Events.SynapseEventArguments.ItemInteractState.Initiating, ref allow);
                         if (!allow)
                         {
                             ForceStop(throwable, player);
                             return false;
                         }
+
                         throwable.ServerProcessInitiation();
                         break;
 
@@ -60,9 +64,10 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                         return true;
                 }
+
                 return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 SynapseController.Server.Logger.Error($"Synapse-Event: PlayerThrowGrenade failed!!\n{e}");
                 return true;
@@ -79,9 +84,11 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
         private static void ReCreateItem(Player player, SynapseItem item)
         {
-            var newitem = new SynapseItem(item.ID);
-            newitem.Durabillity = item.Durabillity;
-            newitem.ItemData = item.ItemData;
+            var newitem = new SynapseItem(item.ID)
+            {
+                Durabillity = item.Durabillity,
+                ItemData = item.ItemData
+            };
             item.Destroy();
             newitem.PickUp(player);
         }

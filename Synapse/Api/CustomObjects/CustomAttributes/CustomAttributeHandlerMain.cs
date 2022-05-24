@@ -17,7 +17,7 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
 
         internal void Init()
         {
-            foreach(var type in DefaultAttributes)
+            foreach (var type in DefaultAttributes)
                 LoadHandlerFromType(type);
 
             RegisterEvents();
@@ -27,14 +27,19 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
         {
             try
             {
-                if (!typeof(AttributeHandler).IsAssignableFrom(type)) return;
-                if (type.IsAbstract) return;
+                if (!typeof(AttributeHandler).IsAssignableFrom(type))
+                    return;
+                if (type.IsAbstract)
+                    return;
 
                 var handlerobject = Activator.CreateInstance(type);
 
-                if (!(handlerobject is AttributeHandler handler)) return;
-                if (string.IsNullOrWhiteSpace(handler.Name)) return;
-                if (Handlers.Any(x => x.Name.Equals(handler.Name, StringComparison.InvariantCultureIgnoreCase))) return;
+                if (!(handlerobject is AttributeHandler handler))
+                    return;
+                if (String.IsNullOrWhiteSpace(handler.Name))
+                    return;
+                if (Handlers.Any(x => x.Name.Equals(handler.Name, StringComparison.InvariantCultureIgnoreCase)))
+                    return;
 
                 Handlers.Add(handler);
                 handler.Init();

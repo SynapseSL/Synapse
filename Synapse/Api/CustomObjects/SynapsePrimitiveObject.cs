@@ -11,10 +11,11 @@ namespace Synapse.Api.CustomObjects
 
         public SynapsePrimitiveObject(PrimitiveType primitiveType, Vector3 position) : this(primitiveType, Color.white, position, Quaternion.identity, Vector3.one, false) { }
 
-        public SynapsePrimitiveObject(PrimitiveType primitiveType,Color color, Vector3 position, Quaternion rotation, Vector3 scale, bool applyPhyics)
+        public SynapsePrimitiveObject(PrimitiveType primitiveType, Color color, Vector3 position, Quaternion rotation, Vector3 scale, bool applyPhyics)
         {
             ToyBase = CreatePrimitive(primitiveType, color, position, rotation, scale);
-            if (applyPhyics) ApplyPhysics();
+            if (applyPhyics)
+                ApplyPhysics();
 
             Map.Get.SynapseObjects.Add(this);
 

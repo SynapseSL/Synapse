@@ -8,6 +8,6 @@ namespace Synapse.Api.Exceptions
 
         public SynapseException(string message) : base(message) { }
 
-        public SynapseException(string message, Exception inner) : base(message,inner) { }
+        public SynapseException(string message, Exception inner) : base(message, inner) { }
     }
 }

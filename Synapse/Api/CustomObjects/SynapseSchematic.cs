@@ -27,7 +27,6 @@ namespace Synapse.Api.CustomObjects
         public List<GeneratorConfiguration> GeneratorObjects { get; set; } = new List<GeneratorConfiguration>();
         public List<LockerConfiguration> LockerObjects { get; set; } = new List<LockerConfiguration>();
 
-
         public class PrimitiveConfiguration
         {
             public PrimitiveType PrimitiveType { get; set; }

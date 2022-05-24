@@ -40,14 +40,11 @@ namespace Synapse.Api.CustomObjects
             script.Object = this;
         }
 
-
         public override GameObject GameObject => WorkStation.GameObject;
         public override NetworkIdentity NetworkIdentity => WorkStation.workStation.netIdentity;
         public override ObjectType Type => ObjectType.Workstation;
 
-
         public WorkStation WorkStation { get; }
-
 
         private WorkStation CreateStation(Vector3 position, Quaternion rotation, Vector3 scale)
         {

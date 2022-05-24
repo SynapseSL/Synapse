@@ -3,6 +3,7 @@ using MapGeneration.Distributors;
 using Mirror;
 using Synapse.Api.Enum;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Synapse.Api.CustomObjects
@@ -32,7 +33,7 @@ namespace Synapse.Api.CustomObjects
             var script = GameObject.AddComponent<SynapseObjectScript>();
             script.Object = this;
 
-            for (int i = 0; i < configuration.Chambers.Count; i++)
+            for (var i = 0; i < configuration.Chambers.Count; i++)
             {
                 foreach (var item in configuration.Chambers[i].Items)
                     SpawnItem(item, i);
@@ -47,8 +48,8 @@ namespace Synapse.Api.CustomObjects
 
         public void SpawnItem(ItemType type, int chamber, int amount = 1)
         {
-            if(chamber >= 0 && Locker.Chambers.Count > chamber)
-            Locker.Chambers[chamber].SpawnItem(type, amount);
+            if (chamber >= 0 && Locker.Chambers.Count > chamber)
+                Locker.Chambers[chamber].SpawnItem(type, amount);
             UnfreezeAll();
         }
 
@@ -81,12 +82,11 @@ namespace Synapse.Api.CustomObjects
 
         private void UnfreezeAll()
         {
-            foreach (Rigidbody rigidbody in SpawnablesDistributorBase.BodiesToUnfreeze)
-                if (rigidbody != null)
-                {
-                    rigidbody.isKinematic = false;
-                    rigidbody.useGravity = true;
-                }
+            foreach (var rigidbody in SpawnablesDistributorBase.BodiesToUnfreeze.Where(rigidbody => rigidbody != null))
+            {
+                rigidbody.isKinematic = false;
+                rigidbody.useGravity = true;
+            }
         }
     }
 }

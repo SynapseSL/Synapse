@@ -72,7 +72,7 @@ namespace Synapse.Api.CustomObjects
                 Load();
                 AttributeHandler.Init();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.Get.Error("Synapse-Object: Error while Initialising Synapse Objects and Schematics:\n" + ex);
             }
@@ -116,8 +116,10 @@ namespace Synapse.Api.CustomObjects
             }
 
             foreach (var role in CharacterClassManager._staticClasses)
+            {
                 if (role != null)
                     SynapseRagdollObject.Prefabs[role.roleId] = role.model_ragdoll?.GetComponent<global::Ragdoll>();
+            }
         }
 
         public ReadOnlyCollection<SynapseSchematic> Schematics { get; private set; } = new List<SynapseSchematic>().AsReadOnly();
@@ -129,33 +131,39 @@ namespace Synapse.Api.CustomObjects
         public SynapseObject SpawnSchematic(string name, Vector3 position) => SpawnSchematic(GetSchematic(name), position);
 
         public SynapseObject SpawnSchematic(string name, Vector3 position, Vector3 rotation) => SpawnSchematic(GetSchematic(name), position, Quaternion.Euler(rotation));
-        
+
         public SynapseObject SpawnSchematic(string name, Vector3 position, Quaternion rotation) => SpawnSchematic(GetSchematic(name), position, rotation);
 
         public SynapseObject SpawnSchematic(int id, Vector3 position) => SpawnSchematic(GetSchematic(id), position);
-        
+
         public SynapseObject SpawnSchematic(int id, Vector3 position, Vector3 rotation) => SpawnSchematic(GetSchematic(id), position, Quaternion.Euler(rotation));
 
         public SynapseObject SpawnSchematic(int id, Vector3 position, Quaternion rotation) => SpawnSchematic(GetSchematic(id), position, rotation);
 
         public SynapseObject SpawnSchematic(SynapseSchematic schematic, Vector3 position, Vector3 rotation) => SpawnSchematic(schematic, position, Quaternion.Euler(rotation));
-        
+
         public SynapseObject SpawnSchematic(SynapseSchematic schematic, Vector3 position, Quaternion rotation)
         {
-            if (schematic is null) return null;
+            if (schematic is null)
+                return null;
 
-            var so = new SynapseObject(schematic);
-            so.Position = position;
-            so.Rotation = rotation;
+            var so = new SynapseObject(schematic)
+            {
+                Position = position,
+                Rotation = rotation
+            };
             return so;
         }
 
         public SynapseObject SpawnSchematic(SynapseSchematic schematic, Vector3 position)
         {
-            if (schematic is null) return null;
+            if (schematic is null)
+                return null;
 
-            var so = new SynapseObject(schematic);
-            so.Position = position;
+            var so = new SynapseObject(schematic)
+            {
+                Position = position
+            };
             return so;
         }
 
@@ -163,7 +171,8 @@ namespace Synapse.Api.CustomObjects
 
         public void AddSchematic(SynapseSchematic schematic, bool removeOnReload = true)
         {
-            if (IsIDRegistered(schematic.ID)) return;
+            if (IsIDRegistered(schematic.ID))
+                return;
             schematic.reload = removeOnReload;
             var list = Schematics.ToList();
             list.Add(schematic);
@@ -172,12 +181,13 @@ namespace Synapse.Api.CustomObjects
 
         public void SaveSchematic(SynapseSchematic schematic, string fileName)
         {
-            if (IsIDRegistered(schematic.ID)) return;
+            if (IsIDRegistered(schematic.ID))
+                return;
             AddSchematic(schematic);
 
             var syml = new SYML(Path.Combine(Server.Get.Files.SchematicDirectory, fileName + ".syml"));
             var section = new ConfigSection { Section = schematic.Name };
-            section.Import(schematic);
+            _ = section.Import(schematic);
             syml.Sections.Add(schematic.Name, section);
             syml.Store();
         }
@@ -186,26 +196,31 @@ namespace Synapse.Api.CustomObjects
         {
             var list = Schematics.ToList();
 
-            foreach(var schematic in list.ToList())
-                if(schematic.reload) list.Remove(schematic);
+            foreach (var schematic in list.ToList())
+            {
+                if (schematic.reload)
+                    _ = list.Remove(schematic);
+            }
 
             Schematics = list.AsReadOnly();
 
-            foreach(var file in Directory.GetFiles(Server.Get.Files.SchematicDirectory, "*.syml"))
+            foreach (var file in Directory.GetFiles(Server.Get.Files.SchematicDirectory, "*.syml"))
             {
                 try
                 {
                     var syml = new SYML(file);
                     syml.Load();
-                    if (syml.Sections.Count == 0) continue;
+                    if (syml.Sections.Count == 0)
+                        continue;
                     var section = syml.Sections.First().Value;
                     var schematic = section.LoadAs<SynapseSchematic>();
 
-                    if (IsIDRegistered(schematic.ID)) continue;
+                    if (IsIDRegistered(schematic.ID))
+                        continue;
 
                     AddSchematic(schematic);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Logger.Get.Error($"Synapse-Schematic: Loading Schematic failed - path: {file}\n{ex}");
                 }

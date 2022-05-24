@@ -1,8 +1,8 @@
-﻿using System;
+﻿using InventorySystem;
+using Synapse.Api.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using InventorySystem;
-using Synapse.Api.Enum;
 
 namespace Synapse.Api.Items
 {
@@ -12,10 +12,7 @@ namespace Synapse.Api.Items
 
         internal PlayerInventory(Player player1) => player = player1;
 
-        public SynapseItem this[int index]
-        {
-            get => Items[index];
-        }
+        public SynapseItem this[int index] => Items[index];
 
         public List<Items.SynapseItem> Items => player.VanillaInventory.UserInventory.Items.Select(x => x.Value.GetSynapseItem()).Where(x => x != null).ToList();
 
@@ -39,9 +36,9 @@ namespace Synapse.Api.Items
                     item?.Drop();
 
                 foreach (var ammo in player.VanillaInventory.UserInventory.ReserveAmmo.ToList())
-                    player.VanillaInventory.ServerDropAmmo(ammo.Key, ammo.Value);
+                    _ = player.VanillaInventory.ServerDropAmmo(ammo.Key, ammo.Value);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Error while Dropping all Items:\n{e}");
             }
