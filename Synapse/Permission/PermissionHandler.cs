@@ -33,7 +33,8 @@ namespace Synapse.Permission
             groups.Clear();
 
             foreach (var pair in _permissionSYML.Sections)
-                if (pair.Key.Equals("server", StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (!pair.Key.Equals("server", StringComparison.InvariantCultureIgnoreCase))
                 {
                     try
                     {
@@ -45,6 +46,7 @@ namespace Synapse.Permission
                         Logger.Get.Error($"Synapse-Permission: Section {pair.Key} in permission.syml is no SynapseGroup or ServerGroup\n{e}");
                     }
                 }
+            }
 
             if (groups.Count == 0)
             {
