@@ -12,11 +12,11 @@ namespace Synapse.Api.Plugin.Processors
                 foreach (var field in context.PluginType.GetFields())
                 {
                     var translationattribute = field.GetCustomAttribute<SynapseTranslation>();
-                    if (translationattribute == null) continue;
+                    if (translationattribute is null) continue;
 
                     if (!FieldInfo.GetFieldFromHandle(field.FieldHandle).FieldType.Name.Contains("SynapseTranslation")) continue;
 
-                    if(field.GetValue(context.Plugin) == null)
+                    if(field.GetValue(context.Plugin) is null)
                     {
                         var translation = Activator.CreateInstance(FieldInfo.GetFieldFromHandle(field.FieldHandle).FieldType, new object[] { Server.Get.Files.GetTranslationPath(context.Information.Name) });
 
@@ -29,11 +29,11 @@ namespace Synapse.Api.Plugin.Processors
                 foreach (var property in context.PluginType.GetProperties())
                 {
                     var translationattribute = property.GetCustomAttribute<SynapseTranslation>();
-                    if (translationattribute == null) continue;
+                    if (translationattribute is null) continue;
 
                     if (property.Name.Contains("SynapseTranslation")) continue;
 
-                    if (property.GetValue(context.Plugin) == null)
+                    if (property.GetValue(context.Plugin) is null)
                     {
                         var translation = Activator.CreateInstance(property.PropertyType, new object[] { Server.Get.Files.GetTranslationPath(context.Information.Name) });
 

@@ -135,7 +135,7 @@ public static class SynapseExtensions
         var item = SynapseItem.GetSynapseItem(itembase.ItemSerial);
 
         //This is a simple fallback if the item is not registered
-        if (item == null)
+        if (item is null)
         {
             Synapse.Api.Logger.Get.Warn($"Found unregistered ItemBase with Serial: {itembase.ItemSerial} - Create a new SynapseItem Instance");
             return new SynapseItem(itembase);
@@ -152,7 +152,7 @@ public static class SynapseExtensions
         var item = SynapseItem.GetSynapseItem(pickupbase.Info.Serial);
 
         //This is a simple fallback if the item is not registered
-        if (item == null)
+        if (item is null)
         {
             Synapse.Api.Logger.Get.Warn($"Found unregistered ItemPickup with Serial: {pickupbase.Info.Serial}");
             return new SynapseItem(pickupbase);
@@ -186,7 +186,7 @@ public static class SynapseExtensions
                 result = true;
             else if (attacker.Team == Team.RIP || victim.Team == Team.RIP)
                 result = false;
-            else if (attacker.CustomRole == null && victim.CustomRole == null)
+            else if (attacker.CustomRole is null && victim.CustomRole is null)
             {
                 if (attacker.Team == Team.SCP && victim.Team == Team.SCP) result = false;
 
@@ -231,7 +231,7 @@ public static class SynapseExtensions
 
     public static DamageType GetDamageType(this DamageHandlerBase handler)
     {
-        if (handler == null) return DamageType.Unknown;
+        if (handler is null) return DamageType.Unknown;
                 
         if(Enum.TryParse<DamageType>(handler.GetType().Name.Replace("DamageHandler",""),out var type))
         {

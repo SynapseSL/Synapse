@@ -64,7 +64,7 @@ namespace Synapse.Api.Plugin
             try
             {
                 var trans = _translation.FirstOrDefault(x => x.Key == translationName).Value;
-                return trans == null ? "Plugin requested a non-existing Translation!" : trans.Replace("\\n", "\n");
+                return trans is null ? "Plugin requested a non-existing Translation!" : trans.Replace("\\n", "\n");
             }
             catch
             {

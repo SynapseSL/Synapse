@@ -142,7 +142,7 @@ namespace Synapse.Api.CustomObjects
         
         public SynapseObject SpawnSchematic(SynapseSchematic schematic, Vector3 position, Quaternion rotation)
         {
-            if (schematic == null) return null;
+            if (schematic is null) return null;
 
             var so = new SynapseObject(schematic);
             so.Position = position;
@@ -152,7 +152,7 @@ namespace Synapse.Api.CustomObjects
 
         public SynapseObject SpawnSchematic(SynapseSchematic schematic, Vector3 position)
         {
-            if (schematic == null) return null;
+            if (schematic is null) return null;
 
             var so = new SynapseObject(schematic);
             so.Position = position;

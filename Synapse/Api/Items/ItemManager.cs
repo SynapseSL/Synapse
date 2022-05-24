@@ -46,7 +46,7 @@ namespace Synapse.Api.Items
             }
 
             var item = customItems.FirstOrDefault(x => x.ID == id);
-            if (item == null || item.SchematicID < 0) return null;
+            if (item is null || item.SchematicID < 0) return null;
             return SchematicHandler.Get.GetSchematic(item.SchematicID);
         }
 

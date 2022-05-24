@@ -123,7 +123,7 @@ namespace Synapse.Api
                 yield return MEC.Timing.WaitForSeconds(0.1f);
                 try
                 {
-                    if (GameObject == null) yield break;
+                    if (GameObject is null) yield break;
                     if (Direction == MovementDirection.Stop)
                     {
                         continue;

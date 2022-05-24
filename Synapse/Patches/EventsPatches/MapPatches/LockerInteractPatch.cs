@@ -69,7 +69,7 @@ namespace Synapse.Patches.EventsPatches.MapPatches
                 }
                 else
                 {
-                    if (ply.ItemInHand == null || !(ply.ItemInHand.ItemBase is KeycardItem keycardItem))
+                    if (ply.ItemInHand is null || !(ply.ItemInHand.ItemBase is KeycardItem keycardItem))
                         return false;
                     
                     var allowcard = (keycardItem.Permissions & RequiredPermissions) == RequiredPermissions;

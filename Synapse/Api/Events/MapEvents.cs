@@ -86,7 +86,7 @@ namespace Synapse.Api.Events
 
         internal void InvokeDoorInteractEvent(Player player,Door door,ref bool allow)
         {
-            if (DoorInteractEvent == null) return;
+            if (DoorInteractEvent is null) return;
 
             var ev = new DoorInteractEventArgs
             {

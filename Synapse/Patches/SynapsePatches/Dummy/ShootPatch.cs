@@ -21,7 +21,7 @@ namespace Synapse.Patches.SynapsePatches.Dummy
                 return false;
             }
             var player = referenceHub.GetPlayer();
-            if (player == null || player.IsDummy)
+            if (player is null || player.IsDummy)
             {
                 return false;
             }
@@ -52,7 +52,7 @@ namespace Synapse.Patches.SynapsePatches.Dummy
             foreach (ReferenceHub referenceHub in ReferenceHub.GetAllHubs().Values)
             {
                 var player = referenceHub.GetPlayer();
-                if (player == null || player.IsDummy)
+                if (player is null || player.IsDummy)
                 {
                     return false;
                 }
@@ -67,7 +67,7 @@ namespace Synapse.Patches.SynapsePatches.Dummy
             }
 
             Action<Firearm, byte, float> serverSoundPlayed = FirearmExtensions.ServerSoundPlayed;
-            if (serverSoundPlayed == null)
+            if (serverSoundPlayed is null)
             {
                 return false;
             }

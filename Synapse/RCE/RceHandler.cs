@@ -21,7 +21,7 @@ namespace Synapse.RCE
             if (Server.Get.Configs.SynapseConfiguration.UseLocalRceServer)
             {
                 // only activate if it hasnt been activated yet
-                if (_rceHandler == null)
+                if (_rceHandler is null)
                 {
                     _rceHandler = new SynapseRceServer(IPAddress.Loopback, Server.Get.Configs.SynapseConfiguration.RceServerPort);
                     _rceHandler.Start();

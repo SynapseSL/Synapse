@@ -39,7 +39,7 @@ namespace Synapse.Api.Plugin
 
                         var infos = type.GetCustomAttribute<PluginInformation>();
 
-                        if (infos == null)
+                        if (infos is null)
                         {
                             SynapseController.Server.Logger.Info($"The File {assembly.GetName().Name} has a class which inherits from IPlugin but has no PluginInformation ... Default Values will be added");
                             infos = new PluginInformation();

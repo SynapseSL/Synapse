@@ -17,7 +17,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             try
             {
                 var player = conn.GetPlayer();
-                if (player == null || player.ItemInHand?.Serial != msg.Serial) return false;
+                if (player is null || player.ItemInHand?.Serial != msg.Serial) return false;
                 if (!(player.ItemInHand.ItemBase is ThrowableItem throwable)) return false;
                 var allow = true;
 

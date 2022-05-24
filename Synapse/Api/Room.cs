@@ -12,7 +12,7 @@ namespace Synapse.Api
         internal Room(RoomIdentifier identifier)
         {
             Identifier = identifier;
-            if (Identifier == null) Logger.Get.Warn("NULL Room");
+            if (Identifier is null) Logger.Get.Warn("NULL Room");
             RoomType = Identifier.Name;
             RoomShape = Identifier.Shape;
             GameObject = identifier.gameObject;
@@ -41,7 +41,7 @@ namespace Synapse.Api
             get => GameObject.transform.position;
             set
             {
-                if (NetworkIdentity == null) return;
+                if (NetworkIdentity is null) return;
                 NetworkIdentity.transform.position = value;
                 NetworkIdentity.UpdatePositionRotationScale();
             }
@@ -52,7 +52,7 @@ namespace Synapse.Api
             get => GameObject.transform.rotation;
             set
             {
-                if (NetworkIdentity == null) return;
+                if (NetworkIdentity is null) return;
                 NetworkIdentity.transform.rotation = value;
                 NetworkIdentity.UpdatePositionRotationScale();
             }
@@ -63,7 +63,7 @@ namespace Synapse.Api
             get => GameObject.transform.localScale;
             set
             {
-                if (NetworkIdentity == null) return;
+                if (NetworkIdentity is null) return;
                 NetworkIdentity.transform.localScale = value;
                 NetworkIdentity.UpdatePositionRotationScale();
             }
@@ -118,7 +118,7 @@ namespace Synapse.Api
 
         private static NetworkIdentity GetNetworkIdentity(RoomName room)
         {
-            if(networkIdentities == null) networkIdentities = GameObject.FindObjectsOfType<NetworkIdentity>().Where(x => x.name.Contains("All")).ToList();
+            if(networkIdentities is null) networkIdentities = GameObject.FindObjectsOfType<NetworkIdentity>().Where(x => x.name.Contains("All")).ToList();
             switch (room)
             {
                 case MapGeneration.RoomName.Lcz330:

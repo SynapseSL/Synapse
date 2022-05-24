@@ -63,7 +63,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
             try
             {
                 AttackerDamageHandler attackerDamageHandler = handler as AttackerDamageHandler;
-                if (attackerDamageHandler == null || attackerDamageHandler.Attacker.Hub == null || !__instance.CanEnrage) return false;
+                if (attackerDamageHandler is null || attackerDamageHandler.Attacker.Hub is null || !__instance.CanEnrage) return false;
 
                 var player = attackerDamageHandler.Attacker.Hub.GetPlayer();
 

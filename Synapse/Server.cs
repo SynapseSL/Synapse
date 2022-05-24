@@ -53,7 +53,7 @@ namespace Synapse
         {
             get
             {
-                if (PlayerManager.localPlayer.GetComponent<Player>() == null)
+                if (PlayerManager.localPlayer.GetComponent<Player>() is null)
                     PlayerManager.localPlayer.AddComponent<Player>();
 
                 return PlayerManager.localPlayer.GetComponent<Player>();
@@ -195,7 +195,7 @@ namespace Synapse
                 {
                     case "SELF":
                     case "ME":
-                        if (me == null) continue;
+                        if (me is null) continue;
 
                         if (!players.Contains(me))
                             players.Add(me);
@@ -228,7 +228,7 @@ namespace Synapse
 
                     default:
                         var player3 = GetPlayer(parameter);
-                        if (player3 == null) continue;
+                        if (player3 is null) continue;
                         if (!players.Contains(player3))
                             players.Add(player3);
                         continue;

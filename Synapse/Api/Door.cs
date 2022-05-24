@@ -136,7 +136,7 @@ namespace Synapse.Api
         [Obsolete("Please create a Synapse.Api.CustomObjects.SynapseDoorObject")]
         public static Door SpawnDoorVariant(Vector3 position, Quaternion? rotation = null, DoorPermissions permissions = null)
         {
-            if(rotation == null) rotation = Quaternion.identity;
+            if(rotation is null) rotation = Quaternion.identity;
             var obj = new SynapseDoorObject(SpawnableDoorType.HCZ, position, rotation.Value, Vector3.one);
             obj.Door.DoorPermissions = permissions;
             return obj.Door;

@@ -168,7 +168,7 @@ namespace Synapse.Permission
         {
             var group = GetServerGroup(groupname);
 
-            if (group == null)
+            if (group is null)
             {
                 Logger.Get.Warn($"Group {groupname} does not exist!");
                 return false;
@@ -179,7 +179,7 @@ namespace Synapse.Permission
 
             RemovePlayerGroup(userid);
 
-            if (group.Members == null)
+            if (group.Members is null)
                 group.Members = new List<string>();
 
             group.Members.Add(userid);

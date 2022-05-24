@@ -280,7 +280,7 @@ namespace Synapse.Api.Events
 
         internal void InvokePlayerGeneratorInteractEvent(Player player,Generator generator,Enum.GeneratorInteraction interaction,ref bool allow)
         {
-            if (PlayerGeneratorInteractEvent == null) return;
+            if (PlayerGeneratorInteractEvent is null) return;
 
             var ev = new PlayerGeneratorInteractEventArgs
             {
@@ -300,7 +300,7 @@ namespace Synapse.Api.Events
         internal void InvokePlayerDropItemPatch(Player player, Items.SynapseItem item, ref bool throwitem, out bool allow)
         {
             allow = true;
-            if (PlayerDropItemEvent == null) return;
+            if (PlayerDropItemEvent is null) return;
 
             var ev = new PlayerDropItemEventArgs
             {
@@ -320,7 +320,7 @@ namespace Synapse.Api.Events
         {
             allow = true;
 
-            if (PlayerPickUpItemEvent == null) return;
+            if (PlayerPickUpItemEvent is null) return;
 
             var ev = new PlayerPickUpItemEventArgs
             {

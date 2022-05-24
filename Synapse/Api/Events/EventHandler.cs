@@ -76,7 +76,7 @@ namespace Synapse.Api.Events
 
         private void LoadPlayer(SynapseEventArguments.LoadComponentEventArgs ev)
         {
-            if (ev.Player.GetComponent<Player>() == null)
+            if (ev.Player.GetComponent<Player>() is null)
                 ev.Player.gameObject.AddComponent<Player>();
         }
 

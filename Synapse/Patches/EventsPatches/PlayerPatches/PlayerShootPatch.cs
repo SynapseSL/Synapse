@@ -27,7 +27,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 Vector3 targetPos = Vector3.zero;
 
                 Physics.Raycast(player.CameraReference.transform.position, player.CameraReference.transform.forward, out var raycastthit, 1000f);
-                if (raycastthit.collider == null)
+                if (raycastthit.collider is null)
                     return true;
                 
                 targetPos = raycastthit.point;

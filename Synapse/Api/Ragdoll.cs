@@ -16,7 +16,7 @@ namespace Synapse.Api
         {
             var gameObject = Server.Get.Host.ClassManager.Classes.SafeGet((int) roleType).model_ragdoll;
 
-            if (gameObject == null || !Object.Instantiate(gameObject).TryGetComponent(out ragdoll))
+            if (gameObject is null || !Object.Instantiate(gameObject).TryGetComponent(out ragdoll))
                 return;
 
             ragdoll.NetworkInfo = new RagdollInfo(Server.Get.Host.Hub, handler, roleType, pos, rot, name, NetworkTime.time);

@@ -30,7 +30,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                     return false;
                 }
 
-                if(!ReferenceHub.TryGetHub(target, out var hub) || hub == null || hub == __instance.Hub || hub.characterClassManager.IsAnyScp())
+                if(!ReferenceHub.TryGetHub(target, out var hub) || hub is null || hub == __instance.Hub || hub.characterClassManager.IsAnyScp())
                     return false;
 
                 var scp = __instance.GetPlayer();
@@ -152,7 +152,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp096
                 {
                     ReferenceHub componentInParent = PlayableScps.Scp096._sphereHits[i].gameObject.GetComponentInParent<ReferenceHub>();
 
-                    if (componentInParent == null || componentInParent == __instance.Hub) continue;
+                    if (componentInParent is null || componentInParent == __instance.Hub) continue;
 
                     var scp = __instance.GetPlayer();
                     var target = componentInParent.GetPlayer();

@@ -291,7 +291,7 @@ namespace Synapse.Api
                 if (oldRole != null)
                     oldRole.DeSpawn();
 
-                if (_role == null) return;
+                if (_role is null) return;
 
                 _role.Player = this;
                 _role.Spawn();
@@ -302,7 +302,7 @@ namespace Synapse.Api
         {
             get
             {
-                if (CustomRole == null) return (int)RoleType;
+                if (CustomRole is null) return (int)RoleType;
                 else return CustomRole.GetRoleID();
             }
             set
@@ -321,7 +321,7 @@ namespace Synapse.Api
             }
         }
 
-        public string RoleName => CustomRole == null ? RoleType.ToString() : CustomRole.GetRoleName();
+        public string RoleName => CustomRole is null ? RoleType.ToString() : CustomRole.GetRoleName();
 
         /// <summary>
         /// This field is just for storing some setclass information between multiple Harmony Patches
@@ -337,14 +337,14 @@ namespace Synapse.Api
         {
             get
             {
-                if (synapseGroup == null)
+                if (synapseGroup is null)
                     return Server.Get.PermissionHandler.GetPlayerGroup(this);
 
                 return synapseGroup;
             }
             set
             {
-                if (value == null)
+                if (value is null)
                     return;
 
                 synapseGroup = value;
@@ -793,7 +793,7 @@ namespace Synapse.Api
 
         public Team Team => ClassManager.CurRole.team;
 
-        public int TeamID => CustomRole == null ? (int)Team : CustomRole.GetTeamID();
+        public int TeamID => CustomRole is null ? (int)Team : CustomRole.GetTeamID();
 
         public Team RealTeam => Server.Get.TeamManager.IsDefaultID(TeamID) ? (Team)TeamID : Team.RIP;
 
@@ -805,13 +805,13 @@ namespace Synapse.Api
         {
             get
             {
-                if (VanillaInventory.CurItem == ItemIdentifier.None || VanillaInventory.CurInstance == null) return SynapseItem.None;
+                if (VanillaInventory.CurItem == ItemIdentifier.None || VanillaInventory.CurInstance is null) return SynapseItem.None;
 
                 return SynapseItem.GetSynapseItem(VanillaInventory.CurItem.SerialNumber);
             }
             set
             {
-                if (value == null || value == SynapseItem.None || !Inventory.Items.Contains(value))
+                if (value is null || value == SynapseItem.None || !Inventory.Items.Contains(value))
                 {
                     VanillaInventory.NetworkCurItem = ItemIdentifier.None;
                     VanillaInventory.CurInstance = null;
@@ -891,7 +891,7 @@ namespace Synapse.Api
             DatabaseManager.CheckEnabledOrThrow();
             var dbo = DatabaseManager.PlayerRepository.FindByGameId(UserId);
             dbo.Data[key] = value;
-            if (value == null) dbo.Data.Remove(key);
+            if (value is null) dbo.Data.Remove(key);
             DatabaseManager.PlayerRepository.Save(dbo);
         }
 
@@ -901,7 +901,7 @@ namespace Synapse.Api
 
         public void TriggerEscape()
         {
-            if (CustomRole == null)
+            if (CustomRole is null)
             {
                 var newRole = -1;
                 var allow = true;

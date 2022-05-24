@@ -112,7 +112,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             {
                 var player = __instance.GetPlayer();
                 var args = player.setClassEventArgs;
-                if (args == null) return false;
+                if (args is null) return false;
                 var rot = new PlayerMovementSync.PlayerRotation?(new PlayerMovementSync.PlayerRotation(new float?(0f), new float?(args.Rotation)));
                 Timing.RunCoroutine(__instance.SafelySpawnPlayer(args.Position, rot), Segment.FixedUpdate);
                 return false;
@@ -137,7 +137,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var args = player.setClassEventArgs;
 
                 //If args is null he is SCP0492 and should not get any Items or Lite is active
-                if (args == null) return false;
+                if (args is null) return false;
 
                 var inventory = ply.inventory;
 
@@ -179,7 +179,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             try
             {
                 var player = __instance.GetPlayer();
-                if (player.setClassEventArgs == null) return false;
+                if (player.setClassEventArgs is null) return false;
 
                 player.MaxHealth = player.ClassManager.CurRole.maxHP;
                 return true;
@@ -200,7 +200,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                if (ply?.GetPlayer()?.setClassEventArgs == null) return false;
+                if (ply?.GetPlayer()?.setClassEventArgs is null) return false;
                 return true;
             }
             catch(Exception ex)
@@ -219,7 +219,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                if (targetHub?.GetPlayer()?.setClassEventArgs == null) return false;
+                if (targetHub?.GetPlayer()?.setClassEventArgs is null) return false;
                 return true;
             }
             catch (Exception ex)

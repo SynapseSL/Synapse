@@ -45,7 +45,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                         cuffer.NetworkIdentity.connectionToClient.Send(DisarmingHandlers.NewDisarmedList, 0);
                         return false;
                     }
-                    if(msg.PlayerToDisarm.inventory.CurInstance == null || msg.PlayerToDisarm.inventory.CurInstance.CanHolster())
+                    if(msg.PlayerToDisarm.inventory.CurInstance is null || msg.PlayerToDisarm.inventory.CurInstance.CanHolster())
                     {
                         SynapseController.Server.Events.Player.InvokePlayerCuffTargetEvent(target, cuffer, out var allow2);
 

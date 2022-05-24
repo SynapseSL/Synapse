@@ -45,7 +45,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                             {
                                 return false;
                             }
-                            if (target == null)
+                            if (target is null)
                             {
                                 GameCore.Console.AddDebugLog("SCP079", "The door command requires a target.", MessageImportance.LessImportant, false);
                                 return false;
@@ -115,12 +115,12 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                             {
                                 return false;
                             }
-                            if (target == null)
+                            if (target is null)
                             {
                                 GameCore.Console.AddDebugLog("SCP079", "The door lock command requires a target.", MessageImportance.LessImportant, false);
                                 return false;
                             }
-                            if (doorVariant == null)
+                            if (doorVariant is null)
                             {
                                 return false;
                             }
@@ -198,7 +198,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                             float manaFromLabel = __instance.GetManaFromLabel("Speaker Start", __instance.abilities);
 
                             Scp079EventMisc.InteractionResult intendedResult;
-                            if (speaker == null)
+                            if (speaker is null)
                             {
                                 intendedResult = Scp079EventMisc.InteractionResult.Disallow;
                             }
@@ -293,7 +293,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                     }
                                 }
                                 string text2;
-                                if (scp079Interactable2 == null)
+                                if (scp079Interactable2 is null)
                                 {
                                     text2 = "None of the " + __instance.nearbyInteractables.Count + " were an ElevatorTeleport, found: ";
                                     using (Dictionary<Scp079Interactable.InteractableType, byte>.Enumerator enumerator2 = dictionary.GetEnumerator())
@@ -313,11 +313,11 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                         goto IL_755;
                                     }
                                 }
-                                if (scp079Interactable2.optionalObject == null)
+                                if (scp079Interactable2.optionalObject is null)
                                 {
                                     text2 = "Optional object is missing.";
                                 }
-                                else if (scp079Interactable2.optionalObject.GetComponent<Camera079>() == null)
+                                else if (scp079Interactable2.optionalObject.GetComponent<Camera079>() is null)
                                 {
                                     string str = "";
                                     Transform transform = scp079Interactable2.optionalObject.transform;
@@ -357,7 +357,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                             {
                                 intendedResult = Scp079EventMisc.InteractionResult.NoEnergy;
                             }
-                            else if (synElevator == null || (AlphaWarheadController.Host.timeToDetonation == 0f || !synElevator.Operative || synElevator.Locked))
+                            else if (synElevator is null || (AlphaWarheadController.Host.timeToDetonation == 0f || !synElevator.Operative || synElevator.Locked))
                             {
                                 intendedResult = Scp079EventMisc.InteractionResult.Disallow;
                             }
@@ -502,7 +502,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
                                 GameCore.Console.AddDebugLog("SCP079", "Looking for doors to lock...", MessageImportance.LeastImportant, false);
                                 foreach (Scp079Interactable scp079Interactable5 in roomInteractablesHashSet)
                                 {
-                                    if (!(scp079Interactable5 == null) && scp079Interactable5.TryGetComponent(out DoorVariant doorVariant3))
+                                    if (!(scp079Interactable5 is null) && scp079Interactable5.TryGetComponent(out DoorVariant doorVariant3))
                                     {
                                         bool doorLocked = doorVariant3.ActiveLocks == (ushort)DoorLockReason.None;
                                         if (!doorLocked)

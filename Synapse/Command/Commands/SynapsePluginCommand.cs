@@ -20,7 +20,7 @@ namespace Synapse.Command.Commands
             if(context.Arguments.Count > 0)
             {
                 var pl = SynapseController.PluginLoader.Plugins.FirstOrDefault(x => x.Name.ToUpper() == context.Arguments.First().ToUpper());
-                if(pl == null)
+                if(pl is null)
                 {
                     result.Message = "No Plugin was found";
                     result.State = CommandResultState.Error;

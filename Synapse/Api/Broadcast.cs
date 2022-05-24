@@ -71,8 +71,8 @@ namespace Synapse.Api
             
             _player.ClearBroadcasts();
 
-            if (_player.ActiveBroadcasts.FirstOrDefault() != null)
-                _player.ActiveBroadcasts.FirstOrDefault().StartBc(_player);
+            if (_player.ActiveBroadcasts.FirstOrDefault() is { } broadcast)
+                broadcast.StartBc(_player);
         }
     }
 
@@ -86,7 +86,7 @@ namespace Synapse.Api
 
         public void Add(Broadcast bc,bool instant = false)
         {
-            if (bc == null)
+            if (bc is null)
                 return;
 
             if (instant)

@@ -243,7 +243,7 @@ namespace Synapse.Config
         public float Y { get; set; } = 0f;
         public float Z { get; set; } = 0f;
 
-        public static implicit operator Vector3(SerializedVector3 vector) => vector == null ? Vector3.zero : vector.Parse();
+        public static implicit operator Vector3(SerializedVector3 vector) => vector is null ? Vector3.zero : vector.Parse();
         public static implicit operator SerializedVector3(Vector3 vector) => new SerializedVector3(vector);
         public static implicit operator SerializedVector3(Quaternion rotation) => new SerializedVector3(rotation.eulerAngles);
         public static implicit operator Quaternion(SerializedVector3 vector) => Quaternion.Euler(vector);

@@ -26,18 +26,18 @@ namespace Synapse.Patches.SynapsePatches
                 players.AddRange(Synapse.Api.Map.Get.Dummies.Select(x => x.Player));
                 __instance._usedData = players.Count;
 
-                if (__instance.ReceivedData == null || __instance.ReceivedData.Length < __instance._usedData)
+                if (__instance.ReceivedData is null || __instance.ReceivedData.Length < __instance._usedData)
                     __instance.ReceivedData = new PlayerPositionData[__instance._usedData * 2];
 
                 for (var i = 0; i < __instance._usedData; i++)
                     __instance.ReceivedData[i] = new PlayerPositionData(players[i].Hub);
 
-                if (__instance._transmitBuffer == null || __instance._transmitBuffer.Length < __instance._usedData)
+                if (__instance._transmitBuffer is null || __instance._transmitBuffer.Length < __instance._usedData)
                     __instance._transmitBuffer = new PlayerPositionData[__instance._usedData * 2];
 
                 foreach (var player in players)
                 {
-                    if (player.Connection == null) continue;
+                    if (player.Connection is null) continue;
 
                     Array.Copy(__instance.ReceivedData, __instance._transmitBuffer, __instance._usedData);
                     for (int k = 0; k < __instance._usedData; k++)

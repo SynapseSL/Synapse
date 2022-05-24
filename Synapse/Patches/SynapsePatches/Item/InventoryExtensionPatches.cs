@@ -23,7 +23,7 @@ namespace Synapse.Patches.SynapsePatches.Item
                 if (inv.UserInventory.Items.Count >= 8) return false;
 
                 var itemBase = inv.CreateItemInstance(type, inv.isLocalPlayer);
-                if (itemBase == null) return false;
+                if (itemBase is null) return false;
 
                 SynapseItem item;
                 if (itemSerial == 0 || !SynapseItem.AllItems.TryGetValue(itemSerial, out item))
@@ -66,7 +66,7 @@ namespace Synapse.Patches.SynapsePatches.Item
             {
                 __result = null;
 
-                if (item == null) return false;
+                if (item is null) return false;
 
                 var pickup = UnityEngine.Object.Instantiate(item.PickupDropModel, inv.transform.position,
                     ReferenceHub.GetHub(inv.gameObject).PlayerCameraReference.rotation * 
@@ -82,7 +82,7 @@ namespace Synapse.Patches.SynapsePatches.Item
                 pickup.NetworkInfo = psi;
                 pickup.Info = psi;
 
-                if (sitem == null) sitem = new SynapseItem(pickup);
+                if (sitem is null) sitem = new SynapseItem(pickup);
                 else sitem.PickupBase = pickup;
 
                 pickup.transform.localScale = sitem.Scale;
@@ -123,7 +123,7 @@ namespace Synapse.Patches.SynapsePatches.Item
                 }
 
                 //When ipb is null then this Method is used to destroy the entire object if not it is used to switch to a pickup
-                if (ipb == null && item.State != ItemState.Thrown)
+                if (ipb is null && item.State != ItemState.Thrown)
                 {
                     item.Destroy();
                 }

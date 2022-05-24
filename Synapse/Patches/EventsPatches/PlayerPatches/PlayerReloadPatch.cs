@@ -20,7 +20,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var item = player.ItemInHand;
                 var allow = true;
 
-                if (player == null || item == null) return false;
+                if (player is null || item is null) return false;
                 if (item.Serial != msg.Serial) return false;
                 if (!(item.ItemBase is Firearm)) return false;
 

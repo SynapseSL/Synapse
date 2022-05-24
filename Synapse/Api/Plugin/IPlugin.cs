@@ -37,7 +37,7 @@ namespace Synapse.Api.Plugin
         {
             get
             {
-                if (_pluginDirectory == null)
+                if (_pluginDirectory is null)
                     return null;
 
                 if (!Directory.Exists(_pluginDirectory))

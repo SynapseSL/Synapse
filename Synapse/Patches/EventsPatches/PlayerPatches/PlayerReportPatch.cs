@@ -13,7 +13,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             {
                 var player = __instance.GetPlayer();
                 var target = Server.Get.GetPlayer(playerId);
-                if (target == null)
+                if (target is null)
                     return false;
                 Server.Get.Events.Player.InvokePlayerReport(player, target, reason, ref notifyGm, out var allow);
 

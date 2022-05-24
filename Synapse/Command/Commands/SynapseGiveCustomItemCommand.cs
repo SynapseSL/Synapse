@@ -25,7 +25,7 @@ namespace Synapse.Command.Commands
             }
 
             var player = Server.Get.GetPlayer(context.Arguments.FirstElement());
-            if(player == null)
+            if(player is null)
             {
                 result.Message = "No Player was found";
                 result.State = CommandResultState.Error;

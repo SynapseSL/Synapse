@@ -17,7 +17,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp049
             try
             {
                 if (!__instance._interactRateLimit.CanExecute(true)) return false;
-                if (go == null || __instance.RemainingServerKillCooldown > 0f) return false;
+                if (go is null || __instance.RemainingServerKillCooldown > 0f) return false;
 
                 var scp = __instance.GetPlayer();
                 var player = go.GetPlayer();

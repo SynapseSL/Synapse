@@ -12,7 +12,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                if (player == null || __instance.DisableEffect || __instance._correctPosition == null)
+                if (player is null || __instance.DisableEffect || __instance._correctPosition is null)
                     return false;
 
                 var synapseplayer = player.GetPlayer();

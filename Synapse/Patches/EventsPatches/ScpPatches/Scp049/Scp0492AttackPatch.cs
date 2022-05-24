@@ -14,12 +14,12 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp049
         {
             try
             {
-                if (!__instance._iawRateLimit.CanExecute(true) || plyObj == null)  return false;
+                if (!__instance._iawRateLimit.CanExecute(true) || plyObj is null)  return false;
 
                 var scp = __instance.GetPlayer();
                 var player = plyObj?.GetPlayer();
 
-                if (player == null) return false;
+                if (player is null) return false;
 
                 if (!__instance.iAm049_2 || Vector3.Distance(scp.Position, player.Position) > __instance.distance * 1.5f) return false;
 

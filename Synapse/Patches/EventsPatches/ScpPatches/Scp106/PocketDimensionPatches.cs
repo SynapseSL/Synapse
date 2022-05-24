@@ -20,12 +20,12 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
         {
             try
             {
-                if (!__instance._iawRateLimit.CanExecute(true) || ply == null || !__instance.iAm106) return false;
+                if (!__instance._iawRateLimit.CanExecute(true) || ply is null || !__instance.iAm106) return false;
 
                 var scp = __instance.GetPlayer();
                 var player = ply.GetPlayer();
 
-                if (player == null || player.GodMode || !ServerTime.CheckSynchronization(t) || !player.ClassManager.IsHuman()) 
+                if (player is null || player.GodMode || !ServerTime.CheckSynchronization(t) || !player.ClassManager.IsHuman()) 
                     return false;
 
                 if (!SynapseExtensions.GetHarmPermission(scp, player))
@@ -90,12 +90,12 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
             try
             {
                 var component = other.GetComponent<NetworkIdentity>();
-                if (component == null) return false;
+                if (component is null) return false;
 
                 var type = __instance._type;
                 var player = component.GetPlayer();
                 var pos = Vector3.zero;
-                if (player == null) return false;
+                if (player is null) return false;
 
                 var forceEscape = !SynapseExtensions.CanHarmScp(player, false);
                 if (player.Hub.scp106PlayerScript.GrabbedPosition == Vector3.zero)
@@ -107,7 +107,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                     foreach(var player2 in Server.Get.Players)
                         if(player2.RoleType == RoleType.Scp106)
                         {
-                            Vector3 objPos = (player2 == null)
+                            Vector3 objPos = (player2 is null)
                                 ? Vector3.zero
                                 : player2.PlayerMovementSync.RealModelPosition;
                             SafeTeleportPosition componentInChildren = identifier.GetComponentInChildren<SafeTeleportPosition>();

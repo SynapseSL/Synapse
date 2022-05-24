@@ -81,7 +81,7 @@ namespace Synapse.Api.Items
         /// <param name="type"></param>
         public SynapseItem(int id) : this()
         {
-            if (id == -1 && None == null)
+            if (id == -1 && None is null)
             {
                 ID = -1;
                 ItemType = ItemType.None;
@@ -312,7 +312,7 @@ namespace Synapse.Api.Items
                 {
                     PickupBase.transform.localScale = value;
 
-                    if (SynapseObject == null)
+                    if (SynapseObject is null)
                         PickupBase.netIdentity.UpdatePositionRotationScale();
                     else
                         SynapseObject.Scale = SynapseObject.GameObject.transform.lossyScale;
@@ -559,8 +559,8 @@ namespace Synapse.Api.Items
         {
             try
             {
-                if (Schematic == null) return;
-                if (PickupBase == null) return;
+                if (Schematic is null) return;
+                if (PickupBase is null) return;
 
                 SynapseObject = new SynapseObject(Schematic);
                 SynapseObject.Position = Position;

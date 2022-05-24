@@ -15,10 +15,10 @@ namespace Synapse.Api.Items
 
         public float FuseTime
         {
-            get => ThrowableItem == null ? 0 : ThrowableItem.GetComponent<TimeGrenade>().TargetTime - Time.timeSinceLevelLoad;
+            get => ThrowableItem is null ? 0 : ThrowableItem.GetComponent<TimeGrenade>().TargetTime - Time.timeSinceLevelLoad;
             set
             {
-                if (ThrowableItem == null) return;
+                if (ThrowableItem is null) return;
                 var comp = ThrowableItem.GetComponent<TimeGrenade>();
 
                 comp.RpcSetTime(value);

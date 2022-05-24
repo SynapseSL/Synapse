@@ -16,7 +16,7 @@ namespace Synapse.Api.Teams
         public void RegisterTeam<TTeam>() where TTeam : ISynapseTeam
         {
             var team = Activator.CreateInstance(typeof(TTeam)) as ISynapseTeam;
-            if (team.Info == null)
+            if (team.Info is null)
                 team.Info = typeof(TTeam).GetCustomAttribute<SynapseTeamInformation>();
 
             if (IsIDRegistered(team.Info.ID)) throw new Exception("A Plugin tried to register a CustomTeam with an already used Id");
@@ -39,7 +39,7 @@ namespace Synapse.Api.Teams
                 return;
             }
             var team = teams.FirstOrDefault(x => x.Info.ID == id);
-            if (team == null) return;
+            if (team is null) return;
             team.Spawn(players);
         }
 

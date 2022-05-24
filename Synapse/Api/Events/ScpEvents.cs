@@ -30,7 +30,7 @@ namespace Synapse.Api.Events
             internal void InvokeScpTargetEvent(Player player, Player scp096, PlayableScps.Scp096PlayerState state, out bool allow)
             {
                 allow = true;
-                if (Scp096AddTargetEvent == null) return;
+                if (Scp096AddTargetEvent is null) return;
 
                 var ev = new Scp096AddTargetEventArgument()
                 {

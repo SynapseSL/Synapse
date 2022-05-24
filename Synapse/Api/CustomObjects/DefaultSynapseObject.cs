@@ -40,7 +40,7 @@ namespace Synapse.Api.CustomObjects
 
         public virtual void ApplyPhysics()
         {
-            if (GameObject.GetComponent<Rigidbody>() == null)
+            if (GameObject.GetComponent<Rigidbody>() is null)
                 Rigidbody = GameObject.AddComponent<Rigidbody>();
         }
 

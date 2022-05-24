@@ -73,7 +73,7 @@ namespace Synapse.Patches.SynapsePatches
 				float num = time * time;
 				foreach (KeyValuePair<GameObject, ReferenceHub> keyValuePair in ReferenceHub.GetAllHubs())
 				{
-					if (!(keyValuePair.Value == null) && (__instance.transform.position - keyValuePair.Value.transform.position).sqrMagnitude <= num && !(keyValuePair.Value == __instance.PreviousOwner.Hub) && HitboxIdentity.CheckFriendlyFire(__instance.PreviousOwner.Hub, keyValuePair.Value, false))
+					if (!(keyValuePair.Value is null) && (__instance.transform.position - keyValuePair.Value.transform.position).sqrMagnitude <= num && !(keyValuePair.Value == __instance.PreviousOwner.Hub) && HitboxIdentity.CheckFriendlyFire(__instance.PreviousOwner.Hub, keyValuePair.Value, false))
 					{
 						__instance.ProcessPlayer(keyValuePair.Value);
 					}
@@ -101,7 +101,7 @@ namespace Synapse.Patches.SynapsePatches
 				{
 					var ply = __instance.TargetHub.GetPlayer();
 					var attacker = ahandler.Attacker.GetPlayer();
-					Logger.Get.Debug($"{ply == null} - {attacker == null}");
+					Logger.Get.Debug($"{ply is null} - {attacker is null}");
 					return SynapseExtensions.GetHarmPermission(attacker, ply);
 				}
 			}

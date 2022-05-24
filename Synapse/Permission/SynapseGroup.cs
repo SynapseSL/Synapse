@@ -72,14 +72,14 @@ namespace Synapse.Permission
                         }
                 }
 
-            if (Inheritance == null) return false;
+            if (Inheritance is null) return false;
 
             foreach (var groupname in Inheritance)
             {
-                if (groupname == null) continue;
+                if (groupname is null) continue;
 
                 var group = PermissionHandler.Get.GetServerGroup(groupname);
-                if (group == null)
+                if (group is null)
                     continue;
 
                 if (group.HasPermission(permission, count + 1))
@@ -93,7 +93,7 @@ namespace Synapse.Permission
 
         public ulong GetVanillaPermissionValue()
         {
-            if (Permissions == null) return 0;
+            if (Permissions is null) return 0;
 
             var value = 0ul;
             foreach(var perm in (PlayerPermissions[])Enum.GetValues(typeof(PlayerPermissions)))

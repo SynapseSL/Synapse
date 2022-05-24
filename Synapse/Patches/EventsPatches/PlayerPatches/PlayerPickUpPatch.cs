@@ -20,9 +20,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var schematic = item.PickupBase?.GetComponent<SynapseObjectScript>();
                 var def = schematic?.Object as DefaultSynapseObject;
 
-                if (item == null) return true;
+                if (item is null) return true;
 
-                if(!item.CanBePickedUp && (def == null || def.Parent.ItemParent == null))
+                if(!item.CanBePickedUp && (def is null || def.Parent.ItemParent is null))
                 {
                     __instance.SessionPipe.Invalidate();
                     return false;

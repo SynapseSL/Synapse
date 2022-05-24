@@ -12,11 +12,11 @@ namespace Synapse.Patches.SynapsePatches.Wrapper
 		[HarmonyPrefix]
 	    private static bool ServerSpawnRagdoll(ReferenceHub hub, PlayerStatsSystem.DamageHandlerBase handler)
 	    {
-		    if (hub == null) return false;
+		    if (hub is null) return false;
 
 		    var model_ragdoll = hub.characterClassManager.CurRole.model_ragdoll;
 
-		    if (model_ragdoll == null || !Object.Instantiate(model_ragdoll).TryGetComponent<Ragdoll>(out var ragdoll)) return false;
+		    if (model_ragdoll is null || !Object.Instantiate(model_ragdoll).TryGetComponent<Ragdoll>(out var ragdoll)) return false;
 
 		    ragdoll.NetworkInfo = new RagdollInfo(hub, handler, model_ragdoll.transform.localPosition, model_ragdoll.transform.localRotation);
 		    NetworkServer.Spawn(ragdoll.gameObject);

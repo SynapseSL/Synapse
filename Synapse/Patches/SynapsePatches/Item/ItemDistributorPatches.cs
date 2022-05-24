@@ -15,7 +15,7 @@ namespace Synapse.Patches.SynapsePatches.Item
         {
             try
             {
-                if (ipb == null) return false;
+                if (ipb is null) return false;
                 NetworkServer.Spawn(ipb.gameObject);
 
                 var serial = InventorySystem.Items.ItemSerialGenerator.GenerateNext();

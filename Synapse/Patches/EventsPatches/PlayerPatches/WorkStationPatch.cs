@@ -16,7 +16,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             {
                 if (colliderId != __instance._activateCollder?.ColliderId || __instance.Status != 0) return false;
 
-                if (ply == null) return false;
+                if (ply is null) return false;
 
                 var player = ply.GetPlayer();
                 var station = __instance.GetWorkStation();

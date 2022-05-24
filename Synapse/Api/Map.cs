@@ -236,7 +236,7 @@ namespace Synapse.Api
                     {
                         var room = Rooms.FirstOrDefault(x => x.ID == pair.Key);
                         var door = interactable.GetComponentInParent<DoorVariant>();
-                        if (room == null || door == null) continue;
+                        if (room is null || door is null) continue;
                         var sdoor = door.GetDoor();
                         sdoor.Rooms.Add(room);
                         room.Doors.Add(sdoor);
@@ -247,7 +247,7 @@ namespace Synapse.Api
 
             Scp914.Scp914Controller = UnityEngine.Object.FindObjectOfType<Scp914Controller>();
 
-            SynapseController.Server.Map.Elevators.RemoveAll(x => x.GameObject == null);
+            SynapseController.Server.Map.Elevators.RemoveAll(x => x.GameObject is null);
         }
 
         internal void ClearObjects()

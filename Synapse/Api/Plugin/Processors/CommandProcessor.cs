@@ -16,7 +16,7 @@ namespace Synapse.Api.Plugin.Processors
                     if (!typeof(ISynapseCommand).IsAssignableFrom(commandType))
                         continue;
                     var cmdInfoAttribute = commandType.GetCustomAttribute<CommandInformation>();
-                    if (cmdInfoAttribute == null)
+                    if (cmdInfoAttribute is null)
                         continue;
 
                     object classObject;

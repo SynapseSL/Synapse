@@ -54,13 +54,13 @@ namespace Synapse.Patches.SynapsePatches
         [HarmonyPrefix]
         private static bool GameConsoleQuery(QueryProcessor __instance, string query)
         {
-            if (__instance._sender == null) return false;
+            if (__instance._sender is null) return false;
 
             var player = __instance._sender.GetPlayer();
 
             SynapseController.Server.Events.Server.InvokeConsoleCommandEvent(player, query);
 
-            if (player == null) return false;
+            if (player is null) return false;
             var args = query.Split(' ');
 
             if (SynapseController.CommandHandlers.ClientCommandHandler.TryGetCommand(args[0], out var command))
