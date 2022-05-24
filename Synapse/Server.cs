@@ -187,58 +187,65 @@ namespace Synapse
                 {
                     case "SELF":
                     case "ME":
-                        if (me is null)
+                        {
+                            if (me is null)
+                                continue;
+                            if (!players.Contains(me))
+                                players.Add(me);
+
                             continue;
-
-                        if (!players.Contains(me))
-                            players.Add(me);
-                        continue;
-
+                        }
                     case "REMOTEADMIN":
                     case "ADMIN":
                     case "STAFF":
-                        foreach (var player in Players)
                         {
-                            if (player.ServerRoles.RemoteAdmin)
+                            foreach (var player in Players)
                             {
-                                if (!players.Contains(player))
-                                    players.Add(player);
+                                if (player.ServerRoles.RemoteAdmin)
+                                {
+                                    if (!players.Contains(player))
+                                        players.Add(player);
+                                }
                             }
+
+                            continue;
                         }
-
-                        continue;
-
                     case "NW":
                     case "NORTHWOOD":
-                        foreach (var player in Players)
                         {
-                            if (player.ServerRoles.Staff)
+                            foreach (var player in Players)
                             {
-                                if (!players.Contains(player))
-                                    players.Add(player);
+                                if (player.ServerRoles.Staff)
+                                {
+                                    if (!players.Contains(player))
+                                        players.Add(player);
+                                }
                             }
+
+                            break;
                         }
-
-                        break;
-
                     case "*":
                     case "ALL":
                     case "EVERYONE":
-                        foreach (var player2 in Server.Get.Players)
                         {
-                            if (!players.Contains(player2))
-                                players.Add(player2);
+                            foreach (var player in Server.Get.Players)
+                            {
+                                if (!players.Contains(player))
+                                    players.Add(player);
+                            }
+
+                            continue;
                         }
 
-                        continue;
-
                     default:
-                        var player3 = GetPlayer(parameter);
-                        if (player3 is null)
+                        {
+                            var player = GetPlayer(parameter);
+                            if (player is null)
+                                continue;
+                            if (!players.Contains(player))
+                                players.Add(player);
                             continue;
-                        if (!players.Contains(player3))
-                            players.Add(player3);
-                        continue;
+                        }
                 }
             }
 
@@ -331,7 +338,8 @@ namespace Synapse
                 private set => _databaseDirectory = value;
             }
 
-            public string DatabaseFile => Path.Combine(DatabaseDirectory, "database.db");
+            public string DatabaseFile 
+                => Path.Combine(DatabaseDirectory, "database.db");
 
             //Plugin
             public string MainPluginDirectory

@@ -57,7 +57,7 @@ namespace Synapse.Permission
                     if (perm == "*" || perm == "*.*" || perm == ".*")
                         return true;
 
-                    if (permission.ToUpper() == perm.ToUpper())
+                    if (permission.Equals(perm, StringComparison.InvariantCultureIgnoreCase))
                         return true;
 
                     var args = permission.Split('.');
@@ -66,7 +66,7 @@ namespace Synapse.Permission
                     if (args.Length == 1 || args2.Length == 1)
                         continue;
 
-                    if (args2[0].ToUpper() == args[0].ToUpper())
+                    if (args2[0].Equals(args[0], StringComparison.InvariantCultureIgnoreCase))
                     {
                         for (var i = 1; i < args.Length; i++)
                         {
