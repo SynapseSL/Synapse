@@ -16,6 +16,48 @@ namespace Synapse.Api
             VDoor = vanilladoor;
             if (VDoor.TryGetComponent<DoorNametagExtension>(out var nametag))
                 Name = nametag.GetName;
+
+            DoorType = DetermineDoorType();
+
+            DoorType DetermineDoorType()
+            {
+                foreach (var type in (DoorType[])System.Enum.GetValues(typeof(DoorType)))
+                {
+                    if (type.ToString().ToUpper().Contains(Name.ToUpper()))
+                    {
+                        return type;
+                    }
+                }
+
+                if (Name.Contains("EZ BreakableDoor"))
+                {
+                    return DoorType.EZ_Door;
+                }
+                else if (Name.Contains("LCZ BreakableDoor"))
+                {
+                    return DoorType.LCZ_Door;
+                }
+                else if (Name.Contains("HCZ BreakableDoor"))
+                {
+                    return DoorType.HCZ_Door;
+                }
+                else if (Name.Contains("Prison BreakableDoor"))
+                {
+                    return DoorType.PrisonDoor;
+                }
+                else if (Name.Contains("LCZ PortallessBreakableDoor"))
+                {
+                    return DoorType.Airlock;
+                }
+                else if (Name.Contains("Unsecured Pryable GateDoor"))
+                {
+                    return DoorType.HCZ_049_Gate;
+                }
+                else
+                {
+                    return DoorType.Other;
+                }
+            }
         }
 
         public vDoor VDoor { get; internal set; }
@@ -62,52 +104,7 @@ namespace Synapse.Api
 
         public DoorPermissions DoorPermissions { get => VDoor.RequiredPermissions; set => VDoor.RequiredPermissions = value; }
 
-        private Enum.DoorType doorType;
-        public Enum.DoorType DoorType
-        {
-            get
-            {
-                foreach (var type in (Enum.DoorType[])System.Enum.GetValues(typeof(Enum.DoorType)))
-                {
-                    if (type.ToString().ToUpper().Contains(Name.ToUpper()))
-                    {
-                        doorType = type;
-                        return doorType;
-                    }
-                }
-
-                if (Name.Contains("EZ BreakableDoor"))
-                {
-                    doorType = Enum.DoorType.EZ_Door;
-                }
-                else if (Name.Contains("LCZ BreakableDoor"))
-                {
-                    doorType = Enum.DoorType.LCZ_Door;
-                }
-                else if (Name.Contains("HCZ BreakableDoor"))
-                {
-                    doorType = Enum.DoorType.HCZ_Door;
-                }
-                else if (Name.Contains("Prison BreakableDoor"))
-                {
-                    doorType = Enum.DoorType.PrisonDoor;
-                }
-                else if (Name.Contains("LCZ PortallessBreakableDoor"))
-                {
-                    doorType = Enum.DoorType.Airlock;
-                }
-                else if (Name.Contains("Unsecured Pryable GateDoor"))
-                {
-                    doorType = Enum.DoorType.HCZ_049_Gate;
-                }
-                else
-                {
-                    doorType = Enum.DoorType.Other;
-                }
-
-                return doorType;
-            }
-        }
+        public DoorType DoorType { get; }
 
         public bool IsBreakable => VDoor is BreakableDoor;
 

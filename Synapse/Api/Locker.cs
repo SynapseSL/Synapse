@@ -13,6 +13,26 @@ namespace Synapse.Api
             locker = vanillalocker;
             for (ushort i = 0; i < locker.Chambers.Count(); i++)
                 Chambers.Add(new LockerChamber(locker.Chambers[i], this, i));
+
+            LockerType = DetermineType();
+
+            LockerType DetermineType()
+            {
+                if (Name.Contains("AdrenalineMedkit"))
+                    return LockerType.MedkitWallCabinet;
+                else if (Name.Contains("RegularMedkit"))
+                    return LockerType.AdrenalineWallCabinet;
+                else if (Name.Contains("Pedestal"))
+                    return LockerType.ScpPedestal;
+                else if (Name.Contains("MiscLocker"))
+                    return LockerType.StandardLocker;
+                else if (Name.Contains("RifleRack"))
+                    return LockerType.RifleRackLocker;
+                else if (Name.Contains("LargeGunLocker"))
+                    return LockerType.LargeGunLocker;
+                else
+                    return default;
+            }
         }
 
         public readonly MapGeneration.Distributors.Locker locker;
@@ -57,25 +77,7 @@ namespace Synapse.Api
 
         public List<LockerChamber> Chambers { get; } = new List<LockerChamber>();
 
-        public LockerType LockerType
-        {
-            get
-            {
-                if (Name.Contains("AdrenalineMedkit"))
-                    return Enum.LockerType.MedkitWallCabinet;
-                else if (Name.Contains("RegularMedkit"))
-                    return Enum.LockerType.AdrenalineWallCabinet;
-                else if (Name.Contains("Pedestal"))
-                    return Enum.LockerType.ScpPedestal;
-                else if (Name.Contains("MiscLocker"))
-                    return Enum.LockerType.StandardLocker;
-                else if (Name.Contains("RifleRack"))
-                    return Enum.LockerType.RifleRackLocker;
-                else if (Name.Contains("LargeGunLocker"))
-                    return Enum.LockerType.LargeGunLocker;
-                return default;
-            }
-        }
+        public LockerType LockerType { get; }
 
         public override string ToString() => Name;
     }
