@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using CommandSystem.Commands.RemoteAdmin;
+using CustomPlayerEffects;
+using Respawning;
 using Synapse.Api;
 using Synapse.Api.Enum;
 using Synapse.Api.Items;
 using UnityEngine;
+using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Config
 {
@@ -30,7 +34,7 @@ namespace Synapse.Config
         {
         }
 
-        public string Room { get; set; }
+        public string Room { get; set; } = "Outside";
         public float X { get; set; } = 0f;
         public float Y { get; set; } = 0f;
         public float Z { get; set; } = 0f;
@@ -105,7 +109,7 @@ namespace Synapse.Config
         }
 
         public short Chance { get; set; } = 100;
-        public bool UsePreferences { get; set; }
+        public bool UsePreferences { get; set; } = false;
 
         public SynapseItem Apply(Player player)
         {
@@ -175,9 +179,33 @@ namespace Synapse.Config
     [Serializable]
     public class SerializedPlayerInventory
     {
-        public List<SerializedPlayerItem> Items { get; set; }
+        public  SerializedPlayerInventory() { }
 
-        public SerializedAmmo Ammo { get; set; }
+        public SerializedPlayerInventory(Player player)
+        {
+            Ammo.Ammo5 = player.AmmoBox[AmmoType.Ammo556x45];
+            Ammo.Ammo7 = player.AmmoBox[AmmoType.Ammo762x39];
+            Ammo.Ammo9 = player.AmmoBox[AmmoType.Ammo9x19];
+            Ammo.Ammo12 = player.AmmoBox[AmmoType.Ammo12gauge];
+            Ammo.Ammo44 = player.AmmoBox[AmmoType.Ammo44cal];
+
+            foreach (var item in player.Inventory.Items)
+                Items.Add(new SerializedPlayerItem
+                {
+                    Chance = 100,
+                    UsePreferences = false,
+                    Durabillity = item.Durabillity,
+                    ID = item.ID,
+                    WeaponAttachments = item.WeaponAttachments,
+                    XSize = item.Scale.x,
+                    YSize = item.Scale.y,
+                    ZSize = item.Scale.z,
+                });
+        }
+        
+        public List<SerializedPlayerItem> Items { get; set; } = new List<SerializedPlayerItem>();
+
+        public SerializedAmmo Ammo { get; set; } = new SerializedAmmo();
 
         public void Apply(Player player)
         {
@@ -220,6 +248,32 @@ namespace Synapse.Config
         public static implicit operator SerializedVector3(Quaternion rotation) => new SerializedVector3(rotation.eulerAngles);
         public static implicit operator Quaternion(SerializedVector3 vector) => Quaternion.Euler(vector);
     }
+    
+    [Serializable]
+    public class SerializedVector2
+    {
+        public SerializedVector2(Vector2 vector)
+        {
+            X = vector.x;
+            Y = vector.y;
+        }
+
+        public SerializedVector2(float x, float y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        public SerializedVector2() { }
+
+        public Vector2 Parse() => new Vector2(X, Y);
+
+        public float X { get; set; } = 0f;
+        public float Y { get; set; } = 0f;
+
+        public static implicit operator Vector2(SerializedVector2 vector) => vector?.Parse() ?? Vector2.zero;
+        public static implicit operator SerializedVector2(Vector2 vector) => new SerializedVector2(vector);
+    }
 
     [Serializable]
     public class SerializedColor
@@ -260,5 +314,127 @@ namespace Synapse.Config
         public static implicit operator Color32(SerializedColor color) => color.Parse();
         public static implicit operator SerializedColor(Color32 color) => new SerializedColor(color);
 
+    }
+
+    [Serializable]
+    public class SerializedEffect
+    {
+        public  SerializedEffect() { }
+        
+        public SerializedEffect(PlayerEffect effect)
+        {
+            Intensity = effect.Intensity;
+            Duration = effect.Duration;
+            if (Enum.TryParse(effect.ToString().Split(' ')[0], true, out Effect effectType))
+                Effect = effectType;
+            else
+            {
+                 Logger.Get.Warn("Missing Effect: " + effect?.ToString());
+            }
+        }
+
+        public SerializedEffect(Effect effect, byte intensity, float duration)
+        {
+            Effect = effect;
+            Intensity = intensity;
+            Duration = duration;
+        }
+        
+        public Effect Effect { get; set; } = Effect.Asphyxiated;
+
+        public byte Intensity { get; set; } = 1;
+
+        public float Duration { get; set; } = -1;
+
+        public void Apply(Player player) => player.GiveEffect(Effect, Intensity, Duration);
+
+        public static implicit operator SerializedEffect(PlayerEffect effect) => new SerializedEffect(effect);
+    }
+    
+    [Serializable]
+    public class SerializedPlayerState
+    {
+        public  SerializedPlayerState() { }
+
+        public SerializedPlayerState(Player player)
+        {
+            Position = player.Position;
+            Rotation = player.transform.rotation.eulerAngles.y;
+            Scale = player.Scale;
+            RoleType = player.RoleType;
+            Health = player.Health;
+            ArtificialHealth = player.ArtificialHealth;
+            Stamina = player.Stamina;
+            GodMode = player.GodMode;
+            NoClip = player.NoClip;
+            Bypass = player.Bypass;
+            OverWatch = player.OverWatch;
+            Invisible = player.Invisible;
+
+            Inventory = new SerializedPlayerInventory(player);
+
+            foreach (var effect in player.PlayerEffectsController._allEffects)
+            {
+                if(!effect.IsEnabled) continue;
+                
+                Effects.Add(effect);
+            }
+        }
+        
+        public SerializedVector3 Position { get; set; } = Vector3.zero;
+
+        public float Rotation { get; set; } = 0f;
+
+        public SerializedVector3 Scale { get; set; } = Vector3.one;
+
+        public SerializedPlayerInventory Inventory { get; set; } = new SerializedPlayerInventory();
+
+        public List<SerializedEffect> Effects { get; set; } = new List<SerializedEffect>();
+
+        public RoleType RoleType { get; set; } = RoleType.None;
+
+        public float Health { get; set; } = 100;
+
+        public float ArtificialHealth { get; set; } = 0;
+
+        public float Stamina { get; set; } = 100f;
+
+        public bool GodMode { get; set; } = false;
+
+        public bool NoClip { get; set; } = false;
+
+        public bool Bypass { get; set; } = false;
+
+        public bool OverWatch { get; set; } = false;
+
+        public bool Invisible { get; set; } = false;
+
+        public void Apply(Player player, bool applyModes = false)
+        {
+            if (applyModes)
+            {
+                player.GodMode = GodMode;
+                player.NoClip = NoClip;
+                player.Bypass = Bypass;
+                player.OverWatch = OverWatch;
+                player.Invisible = Invisible;
+            }
+            
+            player.storedState = this;
+            player.RoleType = RoleType;
+            player.storedState = null;
+            
+            player.Health = Health;
+            player.ArtificialHealth = ArtificialHealth;
+            player.Stamina = Stamina;
+            player.Scale = Scale;
+            
+            Inventory.Apply(player);
+
+            foreach (var effect in Effects)
+                effect.Apply(player);
+        }
+        
+        public static implicit operator SerializedPlayerState(Player player) => new SerializedPlayerState(player);
     }
 }

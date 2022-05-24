@@ -1,5 +1,6 @@
 ﻿using Synapse.Api.Enum;
 using System.Collections.Generic;
+using Synapse.Config;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -25,41 +26,20 @@ namespace Synapse.Api
 
         public Player Admin { get; set; }
 
-        public RoleType Role { get; set; }
-
-        public Vector3 Position { get; set; }
-
-        public List<Items.SynapseItem> Items { get; set; } = new List<Items.SynapseItem>();
-
-        public Dictionary<AmmoType, ushort> Ammos { get; set; } = new Dictionary<AmmoType, ushort>();
-
-        public float Health { get; set; }
+        public  SerializedPlayerState State { get; set; }
 
         public void JailPlayer(Player admin)
         {
             if (IsJailed) return;
 
             Admin = admin;
-            Role = Player.RoleType;
-            Position = Player.Position;
-
-            Ammos.Clear();
-            foreach (var ammoType in (AmmoType[])System.Enum.GetValues(typeof(AmmoType)))
+            State = Player;
+            
+            new SerializedPlayerState()
             {
-                Ammos.Add(ammoType, Player.AmmoBox[ammoType]);
-                Player.AmmoBox[ammoType] = 0;
-            }
-
-            Items.Clear();
-            foreach (var item in Player.Inventory.Items)
-            {
-                Items.Add(item);
-                item.Despawn();
-            }
-
-            Health = Player.Health;
-
-            Player.RoleType = RoleType.Tutorial;
+                Position = Admin.Position,
+                RoleType = RoleType.Tutorial,
+            }.Apply(Player);
 
             isjailed = true;
         }
@@ -68,18 +48,7 @@ namespace Synapse.Api
         {
             if (!IsJailed) return;
 
-            Player.ChangeRoleAtPosition(Role);
-            Player.Position = Position;
-            Player.Health = Health;
-
-            Player.Inventory.Clear();
-            
-
-            foreach (var item in Items)
-                Player.Inventory.AddItem(item);
-
-            foreach (var ammo in Ammos)
-                Player.AmmoBox[ammo.Key] = ammo.Value;
+            State.Apply(Player, true);
 
             isjailed = false;
         }

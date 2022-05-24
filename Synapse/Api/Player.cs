@@ -21,6 +21,7 @@ using Synapse.Permission;
 using System;
 using System.Linq;
 using System.Reflection;
+using Synapse.Config;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -327,6 +328,8 @@ namespace Synapse.Api
         /// </summary>
         internal PlayerSetClassEventArgs setClassEventArgs;
 
+        internal SerializedPlayerState storedState = null;
+
         //Stuff for the Permission System
         private SynapseGroup synapseGroup;
 
@@ -481,6 +484,12 @@ namespace Synapse.Api
                 else
                     RaLogout();
             }
+        }
+
+        public SerializedPlayerState PlayerState
+        {
+            get => this;
+            set => value.Apply(this, true);
         }
 
         public bool NoClip
