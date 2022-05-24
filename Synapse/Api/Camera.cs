@@ -12,12 +12,12 @@ namespace Synapse.Api
 
         private readonly Camera079 _camera;
 
-        public GameObject GameObject 
+        public GameObject GameObject
             => _camera.gameObject;
 
         public Room Room { get; private set; }
 
-        public string Name 
+        public string Name
             => _camera.cameraName;
 
         public ushort ID

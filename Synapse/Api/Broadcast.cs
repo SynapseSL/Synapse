@@ -140,16 +140,16 @@ namespace Synapse.Api
             activebc.EndBc();
         }
 
-        public IEnumerator<Broadcast> GetEnumerator() 
+        public IEnumerator<Broadcast> GetEnumerator()
             => broadcasts.GetEnumerator();
 
-        public bool Contains(Broadcast bc) 
+        public bool Contains(Broadcast bc)
             => broadcasts.Contains(bc);
 
         public bool Any(Func<Broadcast, bool> func)
             => broadcasts.Any(func);
 
-        public Broadcast FirstOrDefault() 
+        public Broadcast FirstOrDefault()
             => broadcasts.FirstOrDefault();
 
         public Broadcast FirstOrDefault(Func<Broadcast, bool> func)

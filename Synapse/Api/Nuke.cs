@@ -27,28 +27,28 @@ namespace Synapse.Api
         }
 
         public int NukeKills
-        => WarheadController.warheadKills;
+          => WarheadController.warheadKills;
 
         public bool Active
-        => WarheadController.NetworkinProgress;
+          => WarheadController.NetworkinProgress;
 
         public bool Detonated
-        => WarheadController.detonated;
+          => WarheadController.detonated;
 
         public bool CanDetoante
-        => WarheadController.CanDetonate;
+            => WarheadController.CanDetonate;
 
         public void StartDetonation()
-        => WarheadController.StartDetonation();
+            => WarheadController.StartDetonation();
 
         public void CancelDetonation()
-        => WarheadController.CancelDetonation();
+            => WarheadController.CancelDetonation();
 
         public void Detonate()
-        => WarheadController.Detonate();
+            => WarheadController.Detonate();
 
         public void InstantPrepare()
-        => WarheadController.InstantPrepare();
+            => WarheadController.InstantPrepare();
 
         public void Shake()
         {
@@ -59,12 +59,12 @@ namespace Synapse.Api
         public class NukeInsidePanel
         {
             public static NukeInsidePanel Get
-            => Nuke.Get.InsidePanel;
+                => Nuke.Get.InsidePanel;
 
             internal NukeInsidePanel() { }
 
             private AlphaWarheadNukesitePanel Panel
-            => AlphaWarheadOutsitePanel.nukeside;
+                => AlphaWarheadOutsitePanel.nukeside;
 
             public bool Enabled
             {
@@ -76,10 +76,10 @@ namespace Synapse.Api
             public bool Locked { get; set; }
 
             public Transform Lever
-            => Panel.lever;
+                => Panel.lever;
 
             public Vector3 Position
-            => Panel.transform.position;
+                => Panel.transform.position;
         }
 
         public class NukeOutsidePanel
@@ -99,6 +99,6 @@ namespace Synapse.Api
 
         [System.Obsolete("Use Detonate()", true)]
         public void Detoante()
-        => WarheadController.Detonate();
+            => WarheadController.Detonate();
     }
 }
