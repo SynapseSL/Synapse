@@ -8,9 +8,15 @@ namespace Synapse.Api
 {
     public class Logger
     {
-        public static Logger Get => SynapseController.Server.Logger;
+        public static Logger Get
+            => SynapseController.Server.Logger;
 
-        internal Logger() { }
+        private readonly List<string> fileLogBuffer;
+
+        internal Logger()
+        {
+            fileLogBuffer = new List<string>();
+        }
 
         public void Info(string message)
         {
@@ -78,10 +84,10 @@ namespace Synapse.Api
             {
                 var save = $"{DateTime.Now} | {name}.dll | {type} | {message}";
 
-                if (logEnabled)
+                if (Server.Get.Configs.SynapseConfiguration.LogMessages)
                     File.AppendAllText(Server.Get.Files.LogFile, save + "\n");
                 else if (Server.Get.Configs?.SynapseConfiguration?.LogMessages != false)
-                    messages.Add(save);
+                    fileLogBuffer.Add(save);
             }
             catch (Exception ex)
             {
@@ -89,23 +95,15 @@ namespace Synapse.Api
             }
         }
 
-        private readonly List<string> messages = new List<string>();
-        private bool logEnabled = false;
-
         internal void Refresh()
         {
             if (Server.Get.Configs.SynapseConfiguration.LogMessages)
             {
-                logEnabled = true;
                 Server.Get.Files.InitLogDirectories();
-                File.AppendAllLines(Server.Get.Files.LogFile, messages);
-            }
-            else
-            {
-                logEnabled = false;
+                File.AppendAllLines(Server.Get.Files.LogFile, fileLogBuffer);
             }
 
-            messages.Clear();
+            fileLogBuffer.Clear();
         }
     }
 }

@@ -19,6 +19,8 @@ namespace Synapse.Api
 
             DoorType = DetermineDoorType();
 
+            Rooms = new List<Room>();
+
             DoorType DetermineDoorType()
             {
                 foreach (var type in (DoorType[])System.Enum.GetValues(typeof(DoorType)))
@@ -62,12 +64,13 @@ namespace Synapse.Api
 
         public vDoor VDoor { get; internal set; }
 
-        public GameObject GameObject => VDoor.gameObject;
+        public GameObject GameObject
+            => VDoor.gameObject;
 
         private string name;
         public string Name
         {
-            get => String.IsNullOrEmpty(name) ? GameObject.name : name;
+            get => name ?? GameObject.name;
             set => name = value;
         }
 
@@ -102,15 +105,22 @@ namespace Synapse.Api
             }
         }
 
-        public DoorPermissions DoorPermissions { get => VDoor.RequiredPermissions; set => VDoor.RequiredPermissions = value; }
+        public DoorPermissions DoorPermissions
+        {
+            get => VDoor.RequiredPermissions;
+            set => VDoor.RequiredPermissions = value;
+        }
 
         public DoorType DoorType { get; }
 
-        public bool IsBreakable => VDoor is BreakableDoor;
+        public bool IsBreakable
+            => VDoor is BreakableDoor;
 
-        public bool IsDestroyed => VDoor is BreakableDoor bd && bd.IsDestroyed;
+        public bool IsDestroyed
+            => VDoor is BreakableDoor bd && bd.IsDestroyed;
 
-        public bool IsPryable => VDoor is PryableDoor;
+        public bool IsPryable
+            => VDoor is PryableDoor;
 
         public bool Open
         {
@@ -137,9 +147,10 @@ namespace Synapse.Api
             }
         }
 
-        public bool TryPry() => VDoor is PryableDoor pry && pry.TryPryGate();
+        public bool TryPry()
+            => VDoor is PryableDoor pry && pry.TryPryGate();
 
-        public List<Room> Rooms { get; } = new List<Room>();
+        public List<Room> Rooms { get; }
 
         [Obsolete("Please create a Synapse.Api.CustomObjects.SynapseDoorObject")]
         public static Door SpawnDoorVariant(Vector3 position, Quaternion? rotation = null, DoorPermissions permissions = null)
@@ -151,6 +162,7 @@ namespace Synapse.Api
             return obj.Door;
         }
 
-        public override string ToString() => Name;
+        public override string ToString()
+            => Name;
     }
 }

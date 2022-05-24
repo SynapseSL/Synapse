@@ -163,10 +163,10 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                     Logger.Get.Error($"Synapse-Event: RoundCheckEvent failed!!\n{e}");
                 }
 
-                if (endround || Map.Get.Round.Forceend)
+                if (endround || Map.Get.Round.ForceEnd)
                 {
                     instance.RoundEnded = true;
-                    Map.Get.Round.Forceend = false;
+                    Map.Get.Round.ForceEnd = false;
                     FriendlyFireConfig.PauseDetector = true;
 
                     var dpercentage = (float)instance.classlistStart.class_ds == 0 ? 0 : RoundSummary.EscapedClassD + (result.class_ds / instance.classlistStart.class_ds);

@@ -6,20 +6,24 @@ namespace Synapse.Api
     {
         internal Camera(Camera079 camera, Room room)
         {
-            cam = camera;
+            _camera = camera;
             Room = room;
         }
 
-        private readonly Camera079 cam;
+        private readonly Camera079 _camera;
 
-        public GameObject GameObject => cam.gameObject;
+        public GameObject GameObject 
+            => _camera.gameObject;
 
         public Room Room { get; private set; }
 
-        public string Name => cam.cameraName;
+        public string Name 
+            => _camera.cameraName;
 
-        public ushort ID => cam.cameraId;
+        public ushort ID
+            => _camera.cameraId;
 
-        public bool IsMainCamera => cam.isMain;
+        public bool IsMainCamera
+            => _camera.isMain;
     }
 }

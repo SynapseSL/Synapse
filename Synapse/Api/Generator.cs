@@ -17,9 +17,11 @@ namespace Synapse.Api
 
         public readonly StructurePositionSync positionsync;
 
-        public GameObject GameObject => generator.gameObject;
+        public GameObject GameObject
+            => generator.gameObject;
 
-        public string Name => GameObject.name;
+        public string Name
+            => GameObject.name;
 
         public Vector3 Position
         {
@@ -66,11 +68,19 @@ namespace Synapse.Api
             }
         }
 
-        public bool Engaged { get => generator.Engaged; set => generator.Engaged = value; }
+        public bool Engaged
+        {
+            get => generator.Engaged;
+            set => generator.Engaged = value;
+        }
 
-        public short Time { get => generator._syncTime; set => generator.Network_syncTime = value; }
+        public short Time
+        {
+            get => generator._syncTime;
+            set => generator.Network_syncTime = value;
+        }
 
-        [Obsolete()]
+        [Obsolete]
         public Room Room => null;
 
         [Obsolete("Use Engaged")]

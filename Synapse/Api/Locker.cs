@@ -33,13 +33,17 @@ namespace Synapse.Api
                 else
                     return default;
             }
+
+            Chambers = new List<LockerChamber>();
         }
 
         public readonly MapGeneration.Distributors.Locker locker;
 
-        public GameObject GameObject => locker.gameObject;
+        public GameObject GameObject
+            => locker.gameObject;
 
-        public string Name => GameObject.name;
+        public string Name
+            => GameObject.name;
 
         public Vector3 Position
         {
@@ -75,10 +79,11 @@ namespace Synapse.Api
             }
         }
 
-        public List<LockerChamber> Chambers { get; } = new List<LockerChamber>();
+        public List<LockerChamber> Chambers { get; }
 
         public LockerType LockerType { get; }
 
-        public override string ToString() => Name;
+        public override string ToString()
+            => Name;
     }
 }

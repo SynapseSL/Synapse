@@ -4,10 +4,11 @@ namespace Synapse.Api
 {
     public class Jail
     {
-        internal Jail(Player player) => Player = player;
+        internal Jail(Player player) 
+            => _player = player;
 
-        private readonly Player Player;
-        private bool isjailed = false;
+        private readonly Player _player;
+        private bool isjailed;
 
         public bool IsJailed
         {
@@ -21,9 +22,9 @@ namespace Synapse.Api
             }
         }
 
-        public Player Admin { get; set; }
+        public Player Admin { get; private set; }
 
-        public SerializedPlayerState State { get; set; }
+        public SerializedPlayerState State { get; private set; }
 
         public void JailPlayer(Player admin)
         {
@@ -31,13 +32,13 @@ namespace Synapse.Api
                 return;
 
             Admin = admin;
-            State = Player;
+            State = _player;
 
             new SerializedPlayerState()
             {
                 Position = Admin.Position,
                 RoleType = RoleType.Tutorial,
-            }.Apply(Player);
+            }.Apply(_player);
 
             isjailed = true;
         }
@@ -47,7 +48,7 @@ namespace Synapse.Api
             if (!IsJailed)
                 return;
 
-            State.Apply(Player, true);
+            State.Apply(_player, true);
 
             isjailed = false;
         }

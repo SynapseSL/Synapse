@@ -18,7 +18,12 @@ namespace Synapse.Config
     {
         private readonly string _path;
 
-        public Dictionary<string, ConfigSection> Sections = new Dictionary<string, ConfigSection>();
+        public Dictionary<string, ConfigSection> Sections { get; private set; }
+
+        public SYML()
+        {
+            Sections = new Dictionary<string, ConfigSection>();
+        }
 
         public SYML(string path)
         {
@@ -112,14 +117,13 @@ namespace Synapse.Config
         [CanBeNull]
         private static string WriteSections(Dictionary<string, ConfigSection> sections)
         {
-            var s = "";
+            var builder = new StringBuilder();
             foreach (var value in sections.Values)
             {
-                s += value.Serialize();
-                s += "\n";
+                builder.AppendLine(value.Serialize());
             }
 
-            return s;
+            return builder.ToString();
         }
     }
 

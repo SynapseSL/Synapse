@@ -4,13 +4,16 @@ namespace Synapse.Api
 {
     public class HeavyController
     {
-        public static HeavyController Get => Map.Get.HeavyController;
+        public static HeavyController Get
+            => Map.Get.HeavyController;
 
         internal HeavyController() { }
 
-        private Recontainer079 Container => Server.Get.GetObjectOf<Recontainer079>();
+        private Recontainer079 Container
+            => Server.Get.GetObjectOf<Recontainer079>();
 
-        public byte ActiveGenerators => (byte)Container._prevEngaged;
+        public byte ActiveGenerators
+            => (byte)Container._prevEngaged;
 
         public bool Is079Recontained
         {
@@ -29,7 +32,8 @@ namespace Synapse.Api
             recontainer.PlayAnnouncement(recontainer._announcementSuccess + " Unknown", 1f);
         }
 
-        public void Overcharge() => Container.Recontain();
+        public void Overcharge()
+            => Container.Recontain();
 
         public void LightsOut(float duration, bool onlyHeavy = true)
         {

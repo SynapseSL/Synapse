@@ -1,6 +1,7 @@
 ﻿using MapGeneration;
 using Mirror;
 using Synapse.Api.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -25,6 +26,9 @@ namespace Synapse.Api
                 Cameras.Add(new Camera(cam, this));
 
             NetworkIdentity = GetNetworkIdentity(RoomType);
+
+            Doors = new List<Door>();
+            Cameras = new List<Camera>();
         }
 
         public void LightsOut(float duration)
@@ -73,15 +77,16 @@ namespace Synapse.Api
             }
         }
 
-        public string RoomName => GameObject.name;
+        public string RoomName
+            => GameObject.name;
 
         public NetworkIdentity NetworkIdentity { get; }
 
         public FlickerableLightController LightController { get; }
 
-        public List<Door> Doors { get; } = new List<Door>();
+        public List<Door> Doors { get; }
 
-        public List<Camera> Cameras { get; } = new List<Camera>();
+        public List<Camera> Cameras { get; }
 
         public int ID { get; }
 
@@ -116,19 +121,23 @@ namespace Synapse.Api
 
         public RoomShape RoomShape { get; }
 
-        public Color WarheadColor { get => LightController.Network_warheadLightColor; set => LightController.Network_warheadLightColor = value; }
+        public Color WarheadColor
+        {
+            get => LightController.Network_warheadLightColor;
+            set => LightController.Network_warheadLightColor = value;
+        }
 
-        internal static List<NetworkIdentity> networkIdentities;
+        internal static List<NetworkIdentity> NetworkIdentities { get; set; }
 
         private static NetworkIdentity GetNetworkIdentity(RoomName room)
         {
-            if (networkIdentities is null)
-                networkIdentities = GameObject.FindObjectsOfType<NetworkIdentity>().Where(x => x.name.Contains("All")).ToList();
+            if (NetworkIdentities is null)
+                NetworkIdentities = GameObject.FindObjectsOfType<NetworkIdentity>().Where(x => x.name.Contains("All")).ToList();
             return room switch
             {
-                MapGeneration.RoomName.Lcz330 => networkIdentities.FirstOrDefault(x => x.assetId == new System.Guid("17f38aa5-1bc8-8bc4-0ad1-fffcbe4214ae")),
-                MapGeneration.RoomName.Hcz939 => networkIdentities.FirstOrDefault(x => x.assetId == new System.Guid("d1566564-d477-24c4-c953-c619898e4751")),
-                MapGeneration.RoomName.Hcz106 => networkIdentities.FirstOrDefault(x => x.assetId == new System.Guid("c1ae9ee4-cc8e-0794-3b2c-358aa6e57565")),
+                MapGeneration.RoomName.Lcz330 => NetworkIdentities.FirstOrDefault(x => x.assetId == new Guid("17f38aa5-1bc8-8bc4-0ad1-fffcbe4214ae")),
+                MapGeneration.RoomName.Hcz939 => NetworkIdentities.FirstOrDefault(x => x.assetId == new Guid("d1566564-d477-24c4-c953-c619898e4751")),
+                MapGeneration.RoomName.Hcz106 => NetworkIdentities.FirstOrDefault(x => x.assetId == new Guid("c1ae9ee4-cc8e-0794-3b2c-358aa6e57565")),
                 _ => null,
             };
         }

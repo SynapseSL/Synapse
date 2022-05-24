@@ -34,7 +34,7 @@ namespace Synapse.Command.Commands
 
             if (!System.Int32.TryParse(context.Arguments.ElementAt(1), out var id))
             {
-                result.Message = "Invalid Paramter for RoleID";
+                result.Message = "Invalid Parameter for RoleID";
                 result.State = CommandResultState.Error;
                 return result;
             }

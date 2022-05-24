@@ -6,11 +6,18 @@ namespace Synapse.Command
 {
     public class CommandHandler : ICommandHandler
     {
-        private readonly Dictionary<string, string> commandAliases = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> commandAliases;
 
-        private readonly Dictionary<string, ICommand> commands = new Dictionary<string, ICommand>();
+        private readonly Dictionary<string, ICommand> commands;
 
-        public List<ICommand> Commands => commands.Values.ToList();
+        public CommandHandler()
+        {
+            commandAliases = new Dictionary<string, string>();
+            commands = new Dictionary<string, ICommand>();
+        }
+
+        public List<ICommand> Commands 
+            => commands.Values.ToList();
 
         public bool TryGetCommand(string name, out ICommand cmd)
         {

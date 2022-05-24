@@ -30,13 +30,17 @@ namespace Synapse.Api
 
         public Locker Locker { get; }
 
-        public GameObject GameObject => lockerChamber.gameObject;
+        public GameObject GameObject 
+            => lockerChamber.gameObject;
 
-        public string Name => GameObject.name;
+        public string Name
+            => GameObject.name;
 
-        public bool CanInteract => lockerChamber.CanInteract;
+        public bool CanInteract
+            => lockerChamber.CanInteract;
 
-        public Vector3 Position => GameObject.transform.position;
+        public Vector3 Position
+            => GameObject.transform.position;
 
         public bool Open
         {

@@ -37,30 +37,30 @@ namespace Synapse.Api.CustomObjects
         public static Dictionary<RoleType, Rag> Prefabs = new Dictionary<RoleType, Rag>();
 
         public override GameObject GameObject => Ragdoll.GameObject;
-        public override NetworkIdentity NetworkIdentity => Ragdoll.ragdoll.netIdentity;
+        public override NetworkIdentity NetworkIdentity => Ragdoll._ragdoll.netIdentity;
         public override ObjectType Type => ObjectType.Ragdoll;
         public override void Refresh()
         {
-            Ragdoll.ragdoll.NetworkInfo = new RagdollInfo(
+            Ragdoll._ragdoll.NetworkInfo = new RagdollInfo(
                 Server.Get.Host,
                 DamageType.GetUniversalDamageHandler(),
                 RoleType,
                 Position,
                 Rotation,
                 Nick,
-                Ragdoll.ragdoll.NetworkInfo.CreationTime
+                Ragdoll._ragdoll.NetworkInfo.CreationTime
                 );
             base.Refresh();
         }
         public override void ApplyPhysics()
         {
-            foreach (var rigid in Ragdoll.ragdoll.AllRigidbodies)
+            foreach (var rigid in Ragdoll._ragdoll.AllRigidbodies)
                 rigid.useGravity = true;
         }
 
         public RoleType RoleType => Ragdoll.RoleType;
-        public DamageType DamageType => Ragdoll.ragdoll.Info.Handler.GetDamageType();
-        public string Nick => Ragdoll.ragdoll.Info.Nickname;
+        public DamageType DamageType => Ragdoll._ragdoll.Info.Handler.GetDamageType();
+        public string Nick => Ragdoll._ragdoll.Info.Nickname;
         public Ragdoll Ragdoll { get; }
 
         public Ragdoll CreateRagDoll(RoleType role, DamageType damage, Vector3 pos, Quaternion rot, Vector3 scale, string nick)

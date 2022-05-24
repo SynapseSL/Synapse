@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace Synapse.Command.Commands
 {
@@ -18,133 +19,143 @@ namespace Synapse.Command.Commands
             var result = new CommandResult();
 
             if (context.Arguments.Count < 1)
-                context.Arguments = new System.ArraySegment<string>(new string[] { "" });
+                context.Arguments = new ArraySegment<string>(new string[] { "" });
 
             switch (context.Arguments.First().ToUpper())
             {
                 case "ME":
-                    var group = context.Player.SynapseGroup;
-                    result.Message = "\nYour Group:" +
-                        $"\nDefault: {group.Default}" +
-                        $"\nNorthWood: {group.Northwood}" +
-                        $"\nRemoteAdmin: {group.RemoteAdmin}" +
-                        $"\nBadge: {group.Badge}" +
-                        $"\nColor: {group.Color}" +
-                        $"\nCover: {group.Cover}" +
-                        $"\nHidden: {group.Hidden}" +
-                        $"\nKickPower: {group.KickPower}" +
-                        $"\nRequiredKickPower: {group.RequiredKickPower}" +
-                        $"\nPermissions:";
+                    {
+                        var group = context.Player.SynapseGroup;
+                        result.Message = "\nYour Group:" +
+                            $"\nDefault: {group.Default}" +
+                            $"\nNorthWood: {group.Northwood}" +
+                            $"\nRemoteAdmin: {group.RemoteAdmin}" +
+                            $"\nBadge: {group.Badge}" +
+                            $"\nColor: {group.Color}" +
+                            $"\nCover: {group.Cover}" +
+                            $"\nHidden: {group.Hidden}" +
+                            $"\nKickPower: {group.KickPower}" +
+                            $"\nRequiredKickPower: {group.RequiredKickPower}" +
+                            $"\nPermissions:";
 
-                    foreach (var perm in group.Permissions)
-                        result.Message += $"\n    - {perm}";
+                        foreach (var perm in group.Permissions)
+                            result.Message += $"\n    - {perm}";
 
-                    result.Message += $"\nInheritance:";
-                    foreach (var inherit in group.Inheritance)
-                        result.Message += $"\n    - {inherit}";
+                        result.Message += $"\nInheritance:";
+                        foreach (var inherit in group.Inheritance)
+                            result.Message += $"\n    - {inherit}";
 
-                    break;
+                        break;
+                    }
 
                 case "GROUPS":
-                    if (!context.Player.HasPermission("synapse.permission.groups"))
                     {
-                        result.Message = "You don't have permission to get all groups (synapse.permission.groups)";
-                        result.State = CommandResultState.NoPermission;
-                        break;
-                    }
+                        if (!context.Player.HasPermission("synapse.permission.groups"))
+                        {
+                            result.Message = "You don't have permission to get all groups (synapse.permission.groups)";
+                            result.State = CommandResultState.NoPermission;
+                            break;
+                        }
 
-                    var msg = "All Groups:";
-                    foreach (var pair in Server.Get.PermissionHandler.Groups)
-                        msg += $"\n{pair.Key} Badge: {pair.Value.Badge}";
+                        var msg = "All Groups:";
+                        foreach (var pair in Server.Get.PermissionHandler.Groups)
+                            msg += $"\n{pair.Key} Badge: {pair.Value.Badge}";
 
-                    result.Message = msg;
-                    result.State = CommandResultState.Ok;
-                    break;
-
-                case "SETGROUP":
-                    if (!context.Player.HasPermission("synapse.permission.setgroup"))
-                    {
-                        result.Message = "You don't have permission to set groups (synapse.permission.setgroup)";
-                        result.State = CommandResultState.NoPermission;
-                        break;
-                    }
-
-                    if (context.Arguments.Count() < 3)
-                    {
-                        result.Message = "Missing parameters";
-                        result.State = CommandResultState.Error;
-                        break;
-                    }
-
-                    var playerid = context.Arguments.ElementAt(2);
-
-                    if (context.Arguments.ElementAt(1) == "-1")
-                    {
-                        _ = Server.Get.PermissionHandler.RemovePlayerGroup(playerid);
-                        result.Message = $"Removed {playerid} player group.";
+                        result.Message = msg;
                         result.State = CommandResultState.Ok;
                         break;
                     }
 
-                    var setGroup = context.Arguments.ElementAt(1);
-
-                    try
+                case "SETGROUP":
                     {
-                        if (Server.Get.PermissionHandler.AddPlayerToGroup(setGroup, playerid))
+                        if (!context.Player.HasPermission("synapse.permission.setgroup"))
                         {
-                            result.Message = $"Set {playerid} player group to {setGroup}.";
+                            result.Message = "You don't have permission to set groups (synapse.permission.setgroup)";
+                            result.State = CommandResultState.NoPermission;
+                            break;
+                        }
+
+                        if (context.Arguments.Count() < 3)
+                        {
+                            result.Message = "Missing parameters";
+                            result.State = CommandResultState.Error;
+                            break;
+                        }
+
+                        var playerid = context.Arguments.ElementAt(2);
+
+                        if (context.Arguments.ElementAt(1) == "-1")
+                        {
+                            _ = Server.Get.PermissionHandler.RemovePlayerGroup(playerid);
+                            result.Message = $"Removed {playerid} player group.";
                             result.State = CommandResultState.Ok;
                             break;
                         }
 
-                        result.Message = "Invalid UserID or GroupName";
-                        result.State = CommandResultState.Error;
-                    }
-                    catch
-                    {
-                        result.Message = "Invalid GroupName";
-                        result.State = CommandResultState.Error;
-                    }
+                        var setGroup = context.Arguments.ElementAt(1);
 
-                    break;
+                        try
+                        {
+                            if (Server.Get.PermissionHandler.AddPlayerToGroup(setGroup, playerid))
+                            {
+                                result.Message = $"Set {playerid} player group to {setGroup}.";
+                                result.State = CommandResultState.Ok;
+                                break;
+                            }
 
-                case "DELETE":
-                    if (!context.Player.HasPermission("synapse.permission.delete"))
-                    {
-                        result.Message = "You don't have permission to delete groups (synapse.permission.delete)";
-                        result.State = CommandResultState.NoPermission;
+                            result.Message = "Invalid UserID or GroupName";
+                            result.State = CommandResultState.Error;
+                        }
+                        catch
+                        {
+                            result.Message = "Invalid GroupName";
+                            result.State = CommandResultState.Error;
+                        }
+
                         break;
                     }
 
-                    if (context.Arguments.Count < 2)
+                case "DELETE":
                     {
-                        return new CommandResult
+                        if (!context.Player.HasPermission("synapse.permission.delete"))
                         {
-                            Message = "Missing group name",
-                            State = CommandResultState.Error
-                        };
+                            result.Message = "You don't have permission to delete groups (synapse.permission.delete)";
+                            result.State = CommandResultState.NoPermission;
+                            break;
+                        }
+
+                        if (context.Arguments.Count < 2)
+                        {
+                            return new CommandResult
+                            {
+                                Message = "Missing group name",
+                                State = CommandResultState.Error
+                            };
+                        }
+
+                        return Server.Get.PermissionHandler.DeleteServerGroup(context.Arguments.At(1))
+                            ? new CommandResult
+                            {
+                                Message = "Group successfully deleted",
+                                State = CommandResultState.Ok
+                            }
+                            : new CommandResult
+                            {
+                                Message = "No Group with that Name was found",
+                                State = CommandResultState.Error
+                            };
                     }
 
-                    return Server.Get.PermissionHandler.DeleteServerGroup(context.Arguments.At(1))
-                        ? new CommandResult
-                        {
-                            Message = "Group successfully deleted",
-                            State = CommandResultState.Ok
-                        }
-                        : new CommandResult
-                        {
-                            Message = "No Group with that Name was found",
-                            State = CommandResultState.Error
-                        };
-
                 default:
-                    result.Message = "All Permission Commands:" +
+                    {
+                        result.Message = "All Permission Commands:" +
                         "\nPermission me - Gives you information about your Role" +
                         "\nPermission groups - Gives you a List of All Groups" +
                         "\nPermission setgroup {Group} {UserID} - Sets a User group" +
                         "\nPermission delte {Group}";
-                    result.State = CommandResultState.Ok;
-                    break;
+                        result.State = CommandResultState.Ok;
+                        break;
+                    }
             }
 
             return result;

@@ -15,14 +15,22 @@ namespace Synapse.Api
 
         public Room Room { get; internal set; }
 
-        public GameObject GameObject => Gate.gameObject;
+        public GameObject GameObject
+            => Gate.gameObject;
 
-        public Vector3 Position => Gate.localPosition;
+        public Vector3 Position
+            => Gate.localPosition;
 
-        public void Trigger() => Gate.RpcPlayAnimation();
+        public void Trigger()
+            => Gate.RpcPlayAnimation();
 
-        public void InstantTrigger() => Gate.UserCode_RpcInstantBurst();
+        public void InstantTrigger()
+            => Gate.UserCode_RpcInstantBurst();
 
-        public float SizeOfTrigger { get => Gate.sizeOfTrigger; set => Gate.sizeOfTrigger = value; }
+        public float SizeOfTrigger
+        {
+            get => Gate.sizeOfTrigger;
+            set => Gate.sizeOfTrigger = value;
+        }
     }
 }
