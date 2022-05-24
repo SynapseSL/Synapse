@@ -19,7 +19,14 @@ namespace Synapse.Api.CustomObjects
         }
         internal SynapseRagdollObject(SynapseSchematic.RagdollConfiguration configuration)
         {
-            Ragdoll = CreateRagDoll(configuration.RoleType, configuration.DamageType, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale, configuration.Nick);
+            Ragdoll = CreateRagDoll(
+                configuration.RoleType,
+                configuration.DamageType,
+                configuration.Position,
+                Quaternion.Euler(configuration.Rotation),
+                configuration.Scale,
+                configuration.Nick
+                );
             OriginalScale = configuration.Scale;
             CustomAttributes = configuration.CustomAttributes;
 
@@ -34,7 +41,15 @@ namespace Synapse.Api.CustomObjects
         public override ObjectType Type => ObjectType.Ragdoll;
         public override void Refresh()
         {
-            Ragdoll.ragdoll.NetworkInfo = new RagdollInfo(Server.Get.Host, DamageType.GetUniversalDamageHandler(), RoleType, Position, Rotation, Nick, Ragdoll.ragdoll.NetworkInfo.CreationTime);
+            Ragdoll.ragdoll.NetworkInfo = new RagdollInfo(
+                Server.Get.Host,
+                DamageType.GetUniversalDamageHandler(),
+                RoleType,
+                Position,
+                Rotation,
+                Nick,
+                Ragdoll.ragdoll.NetworkInfo.CreationTime
+                );
             base.Refresh();
         }
         public override void ApplyPhysics()
@@ -51,7 +66,15 @@ namespace Synapse.Api.CustomObjects
         public Ragdoll CreateRagDoll(RoleType role, DamageType damage, Vector3 pos, Quaternion rot, Vector3 scale, string nick)
         {
             var rag = CreateNetworkObject(Prefabs[role], pos, rot, scale);
-            rag.NetworkInfo = new RagdollInfo(Server.Get.Host, damage.GetUniversalDamageHandler(), role, pos, rot, nick, NetworkTime.time);
+            rag.NetworkInfo = new RagdollInfo(
+                Server.Get.Host,
+                damage.GetUniversalDamageHandler(),
+                role,
+                pos,
+                rot,
+                nick,
+                NetworkTime.time
+                );
 
             var srag = new Ragdoll(rag);
             Map.Get.Ragdolls.Add(srag);
