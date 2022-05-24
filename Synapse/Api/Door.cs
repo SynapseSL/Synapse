@@ -77,18 +77,32 @@ namespace Synapse.Api
                 }
 
                 if (Name.Contains("EZ BreakableDoor"))
+                {
                     doorType = Enum.DoorType.EZ_Door;
+                }
                 else if (Name.Contains("LCZ BreakableDoor"))
+                {
                     doorType = Enum.DoorType.LCZ_Door;
+                }
                 else if (Name.Contains("HCZ BreakableDoor"))
+                {
                     doorType = Enum.DoorType.HCZ_Door;
+                }
+                else if (Name.Contains("Prison BreakableDoor"))
+                {
+                    doorType = Enum.DoorType.PrisonDoor;
+                }
+                else if (Name.Contains("LCZ PortallessBreakableDoor"))
+                {
+                    doorType = Enum.DoorType.Airlock;
+                }
+                else if (Name.Contains("Unsecured Pryable GateDoor"))
+                {
+                    doorType = Enum.DoorType.HCZ_049_Gate;
+                }
                 else
                 {
-                    doorType = Name.Contains("Prison BreakableDoor")
-                    ? Enum.DoorType.PrisonDoor
-                    : Name.Contains("LCZ PortallessBreakableDoor")
-                    ? Enum.DoorType.Airlock
-                    : Name.Contains("Unsecured Pryable GateDoor") ? Enum.DoorType.HCZ_049_Gate : Enum.DoorType.Other;
+                    doorType = Enum.DoorType.Other;
                 }
 
                 return doorType;
