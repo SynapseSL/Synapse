@@ -12,6 +12,9 @@ namespace Synapse.Api
     {
         internal Room(RoomIdentifier identifier)
         {
+            Doors = new List<Door>();
+            Cameras = new List<Camera>();
+
             Identifier = identifier;
             if (Identifier is null)
                 Logger.Get.Warn("NULL Room");
@@ -26,9 +29,6 @@ namespace Synapse.Api
                 Cameras.Add(new Camera(cam, this));
 
             NetworkIdentity = GetNetworkIdentity(RoomType);
-
-            Doors = new List<Door>();
-            Cameras = new List<Camera>();
         }
 
         public void LightsOut(float duration)

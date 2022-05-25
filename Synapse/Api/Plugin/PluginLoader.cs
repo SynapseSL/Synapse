@@ -10,13 +10,19 @@ namespace Synapse.Api.Plugin
 {
     public class PluginLoader
     {
-        private readonly List<IContextProcessor> _processors = new List<IContextProcessor> { new ConfigInjector(), new CommandProcessor(), new TranslationInjector(), new SynapseObjectAttributeProcessor() };
+        public readonly List<PluginInformation> Plugins;
 
-        private readonly List<IPlugin> _plugins = new List<IPlugin>();
+        private readonly List<IContextProcessor> _processors;
+        private readonly List<IPlugin> _plugins;
+        private readonly List<PluginLoadContext> _contexts;
 
-        private readonly List<PluginLoadContext> _contexts = new List<PluginLoadContext>();
-
-        public readonly List<PluginInformation> Plugins = new List<PluginInformation>();
+        public PluginLoader()
+        {
+            _processors = new List<IContextProcessor> { new ConfigInjector(), new CommandProcessor(), new TranslationInjector(), new SynapseObjectAttributeProcessor() };
+            _plugins = new List<IPlugin>();
+            _contexts = new List<PluginLoadContext>();
+            Plugins = new List<PluginInformation>();
+        }
 
         internal void ActivatePlugins()
         {
@@ -46,7 +52,7 @@ namespace Synapse.Api.Plugin
                         }
 
                         if (pluginpath.Contains("server-shared"))
-                            infos.shared = true;
+                            infos.Shared = true;
 
                         var allTypes = assembly.GetTypes().ToList();
                         _ = allTypes.Remove(type);

@@ -11,10 +11,10 @@ namespace Synapse.Api.Plugin.Processors
         {
             foreach (var commandType in context.Classes)
             {
+                if (!typeof(ISynapseCommand).IsAssignableFrom(commandType))
+                    continue;
                 try
                 {
-                    if (!typeof(ISynapseCommand).IsAssignableFrom(commandType))
-                        continue;
                     var cmdInfoAttribute = commandType.GetCustomAttribute<CommandInformation>();
                     if (cmdInfoAttribute is null)
                         continue;

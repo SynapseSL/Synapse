@@ -6,14 +6,19 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
 {
     public partial class CustomAttributeHandler
     {
-        public List<AttributeHandler> Handlers { get; } = new List<AttributeHandler>();
+        public List<AttributeHandler> Handlers { get; }
+        public List<Type> DefaultAttributes { get; }
 
-        public List<Type> DefaultAttributes { get; } = new List<Type>
+        public CustomAttributeHandler()
         {
-            typeof(SchematicDoor),
-            typeof(StaticTeleporter),
-            typeof(MapTeleporter),
-        };
+            Handlers = new List<AttributeHandler>();
+            DefaultAttributes = new List<Type>
+            {
+                typeof(SchematicDoor),
+                typeof(StaticTeleporter),
+                typeof(MapTeleporter),
+            };
+        }
 
         internal void Init()
         {
@@ -22,7 +27,6 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
 
             RegisterEvents();
         }
-
         public void LoadHandlerFromType(Type type)
         {
             try

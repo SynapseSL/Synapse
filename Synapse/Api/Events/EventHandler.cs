@@ -5,10 +5,36 @@ using UnityEngine;
 
 namespace Synapse.Api.Events
 {
+    public interface ISynapseEventArgs { }
+    public delegate void OnSynapseEvent<TEvent>(TEvent ev) where TEvent : ISynapseEventArgs;
+
     public class EventHandler
     {
+        public static EventHandler Get
+            => SynapseController.Server.Events;
+
+        public ServerEvents Server { get; }
+        public PlayerEvents Player { get; }
+        public RoundEvents Round { get; }
+        public MapEvents Map { get; }
+        public ScpEvents Scp { get; }
+        public SynapseObjectEvent SynapseObject { get; }
+
+        private SynapseConfiguration Conf
+            => SynapseController.Server.Configs.SynapseConfiguration;
+
+        private SerializedPlayerState state;
+        private bool firstLoaded = false;
+
         internal EventHandler()
         {
+            Server = new ServerEvents();
+            Player = new PlayerEvents();
+            Round = new RoundEvents();
+            Map = new MapEvents();
+            Scp = new ScpEvents();
+            SynapseObject = new SynapseObjectEvent();
+            
             Player.PlayerJoinEvent += PlayerJoin;
             Round.RoundRestartEvent += RounRestart;
             Round.WaitingForPlayersEvent += Waiting;
@@ -20,11 +46,10 @@ namespace Synapse.Api.Events
         }
 
         //This will be called last after every plugins therefore the event's hooked here will change the values last and overwrites therefore any plugin instructions
-        internal void LateInit() => Player.PlayerSetClassEvent += PlayerOnPlayerSetClassEvent;
+        internal void LateInit()
+            => Player.PlayerSetClassEvent += PlayerOnPlayerSetClassEvent;
 
-        private SerializedPlayerState state;
-
-        private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
+        private void KeyPress(PlayerKeyPressEventArgs ev)
         {
             switch (ev.KeyCode)
             {
@@ -46,36 +71,11 @@ namespace Synapse.Api.Events
             }
         }
 
-        public static EventHandler Get => SynapseController.Server.Events;
-
-        public delegate void OnSynapseEvent<TEvent>(TEvent ev) where TEvent : ISynapseEventArgs;
-
-        public ServerEvents Server { get; } = new ServerEvents();
-
-        public PlayerEvents Player { get; } = new PlayerEvents();
-
-        public RoundEvents Round { get; } = new RoundEvents();
-
-        public MapEvents Map { get; } = new MapEvents();
-
-        public ScpEvents Scp { get; } = new ScpEvents();
-
-        public SynapseObjectEvent SynapseObject { get; } = new SynapseObjectEvent();
-
-        public interface ISynapseEventArgs
-        {
-        }
-
-        #region HookedEvents
-        private SynapseConfiguration Conf => SynapseController.Server.Configs.SynapseConfiguration;
-
-        private void LoadPlayer(SynapseEventArguments.LoadComponentEventArgs ev)
+        private void LoadPlayer(LoadComponentEventArgs ev)
         {
             if (ev.Player.GetComponent<Player>() is null)
                 _ = ev.Player.gameObject.AddComponent<Player>();
         }
-
-        private bool firstLoaded = false;
 
         private void Waiting()
         {
@@ -91,9 +91,10 @@ namespace Synapse.Api.Events
             }
         }
 
-        private void RounRestart() => Synapse.Api.Map.Get.ClearObjects();
+        private void RounRestart()
+            => Api.Map.Get.ClearObjects();
 
-        private void PlayerJoin(SynapseEventArguments.PlayerJoinEventArgs ev)
+        private void PlayerJoin(PlayerJoinEventArgs ev)
         {
             ev.Player.Broadcast(Conf.JoinMessagesDuration, Conf.JoinBroadcast);
             ev.Player.GiveTextHint(Conf.JoinTextHint, Conf.JoinMessagesDuration);
@@ -120,6 +121,5 @@ namespace Synapse.Api.Events
                 ev.Rotation = ev.Player.storedState.Rotation;
             }
         }
-        #endregion
     }
 }

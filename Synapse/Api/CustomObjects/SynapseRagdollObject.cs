@@ -8,9 +8,36 @@ namespace Synapse.Api.CustomObjects
 {
     public class SynapseRagdollObject : NetworkSynapseObject
     {
+        public static Dictionary<RoleType, Rag> Prefabs = new Dictionary<RoleType, Rag>();
+
+        public override GameObject GameObject
+            => Ragdoll.GameObject;
+        public override NetworkIdentity NetworkIdentity
+            => Ragdoll._ragdoll.netIdentity;
+        public override ObjectType Type
+            => ObjectType.Ragdoll;
+        public RoleType RoleType
+            => Ragdoll.RoleType;
+        public DamageType DamageType
+            => Ragdoll._ragdoll.Info.Handler.GetDamageType();
+        public string Nick
+            => Ragdoll._ragdoll.Info.Nickname;
+        public Ragdoll Ragdoll { get; }
+
         public SynapseRagdollObject(RoleType role, DamageType damage, Vector3 pos, Quaternion rot, Vector3 scale, string nick)
         {
-            Ragdoll = CreateRagDoll(role, damage, pos, rot, scale, nick);
+            var vanillaRagdoll = CreateNetworkObject(Prefabs[role], pos, rot, scale);
+            vanillaRagdoll.NetworkInfo = new RagdollInfo(
+                Server.Get.Host,
+                damage.GetUniversalDamageHandler(),
+                role,
+                pos,
+                rot,
+                nick,
+                NetworkTime.time
+                );
+            Ragdoll = new Ragdoll(vanillaRagdoll);
+            Map.Get.Ragdolls.Add(Ragdoll);
 
             Map.Get.SynapseObjects.Add(this);
 
@@ -19,14 +46,19 @@ namespace Synapse.Api.CustomObjects
         }
         internal SynapseRagdollObject(SynapseSchematic.RagdollConfiguration configuration)
         {
-            Ragdoll = CreateRagDoll(
+            var vanillaRagdoll = CreateNetworkObject(Prefabs[configuration.RoleType], configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale);
+            vanillaRagdoll.NetworkInfo = new RagdollInfo(
+                Server.Get.Host,
+                configuration.DamageType.GetUniversalDamageHandler(),
                 configuration.RoleType,
-                configuration.DamageType,
                 configuration.Position,
                 Quaternion.Euler(configuration.Rotation),
-                configuration.Scale,
-                configuration.Nick
+                configuration.Nick,
+                NetworkTime.time
                 );
+            Ragdoll = new Ragdoll(vanillaRagdoll);
+            Map.Get.Ragdolls.Add(Ragdoll);
+
             OriginalScale = configuration.Scale;
             CustomAttributes = configuration.CustomAttributes;
 
@@ -34,11 +66,6 @@ namespace Synapse.Api.CustomObjects
             script.Object = this;
         }
 
-        public static Dictionary<RoleType, Rag> Prefabs = new Dictionary<RoleType, Rag>();
-
-        public override GameObject GameObject => Ragdoll.GameObject;
-        public override NetworkIdentity NetworkIdentity => Ragdoll._ragdoll.netIdentity;
-        public override ObjectType Type => ObjectType.Ragdoll;
         public override void Refresh()
         {
             Ragdoll._ragdoll.NetworkInfo = new RagdollInfo(
@@ -56,29 +83,6 @@ namespace Synapse.Api.CustomObjects
         {
             foreach (var rigid in Ragdoll._ragdoll.AllRigidbodies)
                 rigid.useGravity = true;
-        }
-
-        public RoleType RoleType => Ragdoll.RoleType;
-        public DamageType DamageType => Ragdoll._ragdoll.Info.Handler.GetDamageType();
-        public string Nick => Ragdoll._ragdoll.Info.Nickname;
-        public Ragdoll Ragdoll { get; }
-
-        public Ragdoll CreateRagDoll(RoleType role, DamageType damage, Vector3 pos, Quaternion rot, Vector3 scale, string nick)
-        {
-            var rag = CreateNetworkObject(Prefabs[role], pos, rot, scale);
-            rag.NetworkInfo = new RagdollInfo(
-                Server.Get.Host,
-                damage.GetUniversalDamageHandler(),
-                role,
-                pos,
-                rot,
-                nick,
-                NetworkTime.time
-                );
-
-            var srag = new Ragdoll(rag);
-            Map.Get.Ragdolls.Add(srag);
-            return srag;
         }
     }
 }

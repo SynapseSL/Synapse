@@ -9,29 +9,18 @@ namespace Synapse.Api.Events
     {
         internal MapEvents() { }
 
-        public event EventHandler.OnSynapseEvent<TriggerTeslaEventArgs> TriggerTeslaEvent;
-
+        public event OnSynapseEvent<TriggerTeslaEventArgs> TriggerTeslaEvent;
         public event Action WarheadDetonationEvent;
+        public event OnSynapseEvent<WarheadDetonationCanceledEventArgs> WarheadDetonationCanceledEvent;
+        public event OnSynapseEvent<DoorInteractEventArgs> DoorInteractEvent;
+        public event OnSynapseEvent<LCZDecontaminationEventArgs> LCZDecontaminationEvent;
+        public event OnSynapseEvent<Scp914ActivateEventArgs> Scp914ActivateEvent;
+        public event OnSynapseEvent<LockerInteractEventArgs> LockerInteractEvent;
+        public event OnSynapseEvent<LiftMoveObjectsEventArgs> LiftMoveObjectsEvent;
+        public event OnSynapseEvent<WarheadInsidePanelInteractEventArgs> WarheadInsidePanelInteractEvent;
+        public event OnSynapseEvent<WarheadStartDetonationEventArgs> WarheadStartDetonationEvent;
+        public event OnSynapseEvent<GeneratorEngageEventArgs> GeneratorEngageEvent;
 
-        public event EventHandler.OnSynapseEvent<WarheadDetonationCanceledEventArgs> WarheadDetonationCanceledEvent;
-
-        public event EventHandler.OnSynapseEvent<DoorInteractEventArgs> DoorInteractEvent;
-
-        public event EventHandler.OnSynapseEvent<LCZDecontaminationEventArgs> LCZDecontaminationEvent;
-
-        public event EventHandler.OnSynapseEvent<Scp914ActivateEventArgs> Scp914ActivateEvent;
-
-        public event EventHandler.OnSynapseEvent<LockerInteractEventArgs> LockerInteractEvent;
-
-        public event EventHandler.OnSynapseEvent<LiftMoveObjectsEventArgs> LiftMoveObjectsEvent;
-
-        public event EventHandler.OnSynapseEvent<WarheadInsidePanelInteractEventArgs> WarheadInsidePanelInteractEvent;
-
-        public event EventHandler.OnSynapseEvent<WarheadStartDetonationEventArgs> WarheadStartDetonationEvent;
-
-        public event EventHandler.OnSynapseEvent<GeneratorEngageEventArgs> GeneratorEngageEvent;
-
-        #region Invoke
         internal void InvokeGenEngage(Generator generator, out bool allow)
         {
             var ev = new GeneratorEngageEventArgs
@@ -43,7 +32,6 @@ namespace Synapse.Api.Events
 
             allow = !ev.forceDisAllow && ev.Allow;
         }
-
         internal void InvokeWarheadStart(Player player, out bool allow)
         {
             var ev = new WarheadStartDetonationEventArgs
@@ -55,7 +43,6 @@ namespace Synapse.Api.Events
 
             allow = ev.Allow;
         }
-
         internal void InvokeWarheadPanel(Player player, bool cancel, out bool allow)
         {
             var ev = new WarheadInsidePanelInteractEventArgs
@@ -68,7 +55,6 @@ namespace Synapse.Api.Events
 
             allow = ev.Allow;
         }
-
         internal void InvokeTriggerTeslaEv(Player player, Tesla tesla, ref bool trigger)
         {
             trigger = true;
@@ -83,7 +69,6 @@ namespace Synapse.Api.Events
 
             trigger = ev.Trigger;
         }
-
         internal void InvokeDoorInteractEvent(Player player, Door door, ref bool allow)
         {
             if (DoorInteractEvent is null)
@@ -100,7 +85,6 @@ namespace Synapse.Api.Events
 
             allow = ev.Allow;
         }
-
         internal void InvokeLockerInteractEvent(Player player, LockerChamber locker, ref bool allow)
         {
             var ev = new LockerInteractEventArgs
@@ -114,9 +98,8 @@ namespace Synapse.Api.Events
 
             allow = ev.Allow;
         }
-
-        internal void InvokeWarheadDetonationEvent() => WarheadDetonationEvent?.Invoke();
-
+        internal void InvokeWarheadDetonationEvent()
+            => WarheadDetonationEvent?.Invoke();
         internal void InvokeWarheadDetonationCanceledEvent(out bool allow, ref GameObject disabler)
         {
             var ev = new WarheadDetonationCanceledEventArgs
@@ -130,7 +113,6 @@ namespace Synapse.Api.Events
             disabler = ev.Disabler;
             allow = ev.Allow;
         }
-
         internal void InvokeLCZDeconEvent(out bool allow)
         {
             var ev = new LCZDecontaminationEventArgs
@@ -142,8 +124,7 @@ namespace Synapse.Api.Events
 
             allow = ev.Allow;
         }
-
-        internal void Invoke914Activate(ref List<Player> players, ref List<Synapse.Api.Items.SynapseItem> items, ref Vector3 moveVector, out bool allow)
+        internal void Invoke914Activate(ref List<Player> players, ref List<Items.SynapseItem> items, ref Vector3 moveVector, out bool allow)
         {
             var ev = new Scp914ActivateEventArgs
             {
@@ -159,8 +140,7 @@ namespace Synapse.Api.Events
             items = ev.Items;
             moveVector = ev.MoveVector;
         }
-
-        internal void InvokeLiftMoveObjects(LiftMoveObjectsEventArgs ev) => LiftMoveObjectsEvent?.Invoke(ev);
-        #endregion
+        internal void InvokeLiftMoveObjects(LiftMoveObjectsEventArgs ev) 
+            => LiftMoveObjectsEvent?.Invoke(ev);
     }
 }

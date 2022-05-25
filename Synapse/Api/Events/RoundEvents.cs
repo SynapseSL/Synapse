@@ -9,25 +9,21 @@ namespace Synapse.Api.Events
         internal RoundEvents() { }
 
         public event Action WaitingForPlayersEvent;
-
         public event Action RoundStartEvent;
-
         public event Action RoundRestartEvent;
-
         public event Action RoundEndEvent;
+        public event OnSynapseEvent<RoundCheckEventArgs> RoundCheckEvent;
+        public event OnSynapseEvent<SpawnPlayersEventArgs> SpawnPlayersEvent;
+        public event OnSynapseEvent<TeamRespawnEventArgs> TeamRespawnEvent;
 
-        public event EventHandler.OnSynapseEvent<RoundCheckEventArgs> RoundCheckEvent;
-
-        public event EventHandler.OnSynapseEvent<SpawnPlayersEventArgs> SpawnPlayersEvent;
-
-        public event EventHandler.OnSynapseEvent<TeamRespawnEventArgs> TeamRespawnEvent;
-
-        #region RoundEventsInvoke
-        internal void InvokeWaitingForPlayers() => WaitingForPlayersEvent?.Invoke();
-        internal void InvokeRoundStartEvent() => RoundStartEvent?.Invoke();
-        internal void InvokeRoundRestartEvent() => RoundRestartEvent?.Invoke();
-        internal void InvokeRoundEndEvent() => RoundEndEvent?.Invoke();
-
+        internal void InvokeWaitingForPlayers() 
+            => WaitingForPlayersEvent?.Invoke();
+        internal void InvokeRoundStartEvent() 
+            => RoundStartEvent?.Invoke();
+        internal void InvokeRoundRestartEvent()
+            => RoundRestartEvent?.Invoke();
+        internal void InvokeRoundEndEvent()
+            => RoundEndEvent?.Invoke();
         internal void InvokeRoundCheckEvent(ref bool allow, ref RoundSummary.LeadingTeam leadingTeam)
         {
             var ev = new RoundCheckEventArgs
@@ -41,7 +37,6 @@ namespace Synapse.Api.Events
             allow = ev.EndRound;
             leadingTeam = ev.Team;
         }
-
         internal void InvokeSpawnPlayersEvent(ref Dictionary<Player, int> spawnplayers, out bool allow)
         {
             var ev = new SpawnPlayersEventArgs
@@ -54,7 +49,6 @@ namespace Synapse.Api.Events
 
             allow = ev.Allow;
         }
-
         internal void InvokeTeamRespawn(ref List<Player> players, ref Respawning.SpawnableTeamType teamType, out bool allow, out int teamid)
         {
             var ev = new TeamRespawnEventArgs
@@ -70,6 +64,5 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
             teamid = ev.TeamID;
         }
-        #endregion
     }
 }

@@ -7,7 +7,8 @@ namespace Synapse.Api.Events.SynapseEventArguments
     {
         public ISynapseObject Object { get; }
 
-        internal SOEventArgs(ISynapseObject so) => Object = so;
+        internal SOEventArgs(ISynapseObject so) 
+            => Object = so;
     }
 
     public class SOPickupEventArgs : ISynapseEventArgs

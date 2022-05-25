@@ -9,11 +9,11 @@ namespace Synapse.Api.Plugin.Processors
         {
             foreach (var type in context.Classes)
             {
+                if (!typeof(AttributeHandler).IsAssignableFrom(type))
+                    continue;
+
                 try
                 {
-                    if (!typeof(AttributeHandler).IsAssignableFrom(type))
-                        continue;
-
                     Server.Get.Schematic.AttributeHandler.LoadHandlerFromType(type);
                 }
                 catch (Exception e)

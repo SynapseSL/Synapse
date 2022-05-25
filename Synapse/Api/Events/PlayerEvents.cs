@@ -13,77 +13,43 @@ namespace Synapse.Api.Events
     {
         internal PlayerEvents() { }
 
-        public event EventHandler.OnSynapseEvent<PlayerJoinEventArgs> PlayerJoinEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerLeaveEventArgs> PlayerLeaveEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerBanEventArgs> PlayerBanEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerSpeakEventArgs> PlayerSpeakEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerDeathEventArgs> PlayerDeathEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerDamageEventArgs> PlayerDamageEvent;
-
-        public event EventHandler.OnSynapseEvent<LoadComponentEventArgs> LoadComponentsEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerItemInteractEventArgs> PlayerItemUseEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerThrowGrenadeEventArgs> PlayerThrowGrenadeEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerHealEventArgs> PlayerHealEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerEscapeEventArgs> PlayerEscapesEvent;
-
+        public event OnSynapseEvent<PlayerJoinEventArgs> PlayerJoinEvent;
+        public event OnSynapseEvent<PlayerLeaveEventArgs> PlayerLeaveEvent;
+        public event OnSynapseEvent<PlayerBanEventArgs> PlayerBanEvent;
+        public event OnSynapseEvent<PlayerSpeakEventArgs> PlayerSpeakEvent;
+        public event OnSynapseEvent<PlayerDeathEventArgs> PlayerDeathEvent;
+        public event OnSynapseEvent<PlayerDamageEventArgs> PlayerDamageEvent;
+        public event OnSynapseEvent<LoadComponentEventArgs> LoadComponentsEvent;
+        public event OnSynapseEvent<PlayerItemInteractEventArgs> PlayerItemUseEvent;
+        public event OnSynapseEvent<PlayerThrowGrenadeEventArgs> PlayerThrowGrenadeEvent;
+        public event OnSynapseEvent<PlayerHealEventArgs> PlayerHealEvent;
+        public event OnSynapseEvent<PlayerEscapeEventArgs> PlayerEscapesEvent;
         [Obsolete("Use Server.Update Event instead and go through all players")]
-        public event EventHandler.OnSynapseEvent<PlayerSyncDataEventArgs> PlayerSyncDataEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerReloadEventArgs> PlayerReloadEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerEnterFemurEventArgs> PlayerEnterFemurEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerGeneratorInteractEventArgs> PlayerGeneratorInteractEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerKeyPressEventArgs> PlayerKeyPressEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerDropItemEventArgs> PlayerDropItemEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerPickUpItemEventArgs> PlayerPickUpItemEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerShootEventArgs> PlayerShootEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerSetClassEventArgs> PlayerSetClassEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerStartWorkstationEventArgs> PlayerStartWorkstationEvent;
-
+        public event OnSynapseEvent<PlayerSyncDataEventArgs> PlayerSyncDataEvent;
+        public event OnSynapseEvent<PlayerReloadEventArgs> PlayerReloadEvent;
+        public event OnSynapseEvent<PlayerEnterFemurEventArgs> PlayerEnterFemurEvent;
+        public event OnSynapseEvent<PlayerGeneratorInteractEventArgs> PlayerGeneratorInteractEvent;
+        public event OnSynapseEvent<PlayerKeyPressEventArgs> PlayerKeyPressEvent;
+        public event OnSynapseEvent<PlayerDropItemEventArgs> PlayerDropItemEvent;
+        public event OnSynapseEvent<PlayerPickUpItemEventArgs> PlayerPickUpItemEvent;
+        public event OnSynapseEvent<PlayerShootEventArgs> PlayerShootEvent;
+        public event OnSynapseEvent<PlayerSetClassEventArgs> PlayerSetClassEvent;
+        public event OnSynapseEvent<PlayerStartWorkstationEventArgs> PlayerStartWorkstationEvent;
         [Obsolete("Tablets are removed use PlayerStartWorkstationEvent")]
-        public event EventHandler.OnSynapseEvent<PlayerConnectWorkstationEventArgs> PlayerConnectWorkstationEvent;
+        public event OnSynapseEvent<PlayerConnectWorkstationEventArgs> PlayerConnectWorkstationEvent;
+        public event OnSynapseEvent<PlayerDropAmmoEventArgs> PlayerDropAmmoEvent;
+        public event OnSynapseEvent<PlayerCuffTargetEventArgs> PlayerCuffTargetEvent;
+        public event OnSynapseEvent<PlayerUseMicroEventArgs> PlayerUseMicroEvent;
+        public event OnSynapseEvent<PlayerWalkOnSinkholeEventArgs> PlayerWalkOnSinkholeEvent;
+        public event OnSynapseEvent<PlayerWalkOnTantrumEventArgs> PlayerWalkOnTantrumEvent;
+        public event OnSynapseEvent<PlayerReportEventArgs> PlayerReportEvent;
+        public event OnSynapseEvent<PlayerDamagePermissionEventArgs> PlayerDamagePermissionEvent;
+        public event OnSynapseEvent<PlayerUnCuffTargetEventArgs> PlayerUncuffTargetEvent;
+        public event OnSynapseEvent<PlayerChangeItemEventArgs> PlayerChangeItemEvent;
+        public event OnSynapseEvent<PlayerRadioInteractEventArgs> PlayerRadioInteractEvent;
+        public event OnSynapseEvent<PlayerFlipCoinEventArgs> PlayerFlipCoinEvent;
+        public event OnSynapseEvent<PlaceBulletHoleEventArgs> PlaceBulletHoleEvent;
 
-        public event EventHandler.OnSynapseEvent<PlayerDropAmmoEventArgs> PlayerDropAmmoEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerCuffTargetEventArgs> PlayerCuffTargetEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerUseMicroEventArgs> PlayerUseMicroEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerWalkOnSinkholeEventArgs> PlayerWalkOnSinkholeEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerWalkOnTantrumEventArgs> PlayerWalkOnTantrumEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerReportEventArgs> PlayerReportEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerDamagePermissionEventArgs> PlayerDamagePermissionEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerUnCuffTargetEventArgs> PlayerUncuffTargetEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerChangeItemEventArgs> PlayerChangeItemEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerRadioInteractEventArgs> PlayerRadioInteractEvent;
-
-        public event EventHandler.OnSynapseEvent<PlayerFlipCoinEventArgs> PlayerFlipCoinEvent;
-
-        public event EventHandler.OnSynapseEvent<PlaceBulletHoleEventArgs> PlaceBulletHoleEvent;
-
-        #region PlayerEventsInvoke
         internal void InvokePlaceBulletHoleEvent(Player player, Vector3 postion, out bool allow)
         {
             var ev = new PlaceBulletHoleEventArgs()
@@ -142,8 +108,7 @@ namespace Synapse.Api.Events
             PlayerLeaveEvent?.Invoke(ev);
         }
 
-        internal void InvokePlayerBanEvent(Player bannedPlayer, Player issuer, ref long duration, ref string reason,
-            ref bool allow)
+        internal void InvokePlayerBanEvent(Player bannedPlayer, Player issuer, ref long duration, ref string reason, ref bool allow)
         {
             var ev = new PlayerBanEventArgs { Allow = allow, BanDuration = duration, Issuer = issuer, Reason = reason, BannedPlayer = bannedPlayer };
             PlayerBanEvent?.Invoke(ev);
@@ -153,8 +118,7 @@ namespace Synapse.Api.Events
             allow = ev.Allow;
         }
 
-        internal void InvokePlayerSpeakEvent(DissonanceUserSetup userSetup, ref bool intercom, ref bool radio,
-            ref bool scp939, ref bool scpChat, ref bool specChat, ref bool allow)
+        internal void InvokePlayerSpeakEvent(DissonanceUserSetup userSetup, ref bool intercom, ref bool radio, ref bool scp939, ref bool scpChat, ref bool specChat, ref bool allow)
         {
             var ev = new PlayerSpeakEventArgs
             {
@@ -525,6 +489,5 @@ namespace Synapse.Api.Events
 
             allow = ev.Allow;
         }
-        #endregion
     }
 }

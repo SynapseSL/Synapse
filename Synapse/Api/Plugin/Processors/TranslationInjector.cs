@@ -26,7 +26,7 @@ namespace Synapse.Api.Plugin.Processors
                     }
                     else
                     {
-                        _ = field.FieldType.GetMethod("Reload").Invoke(field.GetValue(context.Plugin), new object[] { });
+                        _ = field.FieldType.GetMethod("Reload").Invoke(field.GetValue(context.Plugin), new object[0]);
                     }
                 }
 
@@ -47,7 +47,7 @@ namespace Synapse.Api.Plugin.Processors
                     }
                     else
                     {
-                        _ = property.PropertyType.GetMethod("Reload").Invoke(property.GetValue(context.Plugin), new object[] { });
+                        _ = property.PropertyType.GetMethod("Reload").Invoke(property.GetValue(context.Plugin), new object[0]);
                     }
                 }
             }

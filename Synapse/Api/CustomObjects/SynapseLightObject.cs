@@ -9,29 +9,9 @@ namespace Synapse.Api.CustomObjects
     {
         public static LightSourceToy Prefab { get; internal set; }
 
-        public SynapseLightObject(Color color, float lightIntensity, float range, bool shadows, Vector3 position, Quaternion rotation, Vector3 scale)
-        {
-            ToyBase = CreateLightSource(color, lightIntensity, range, shadows, position, rotation, scale);
-
-            Map.Get.SynapseObjects.Add(this);
-
-            var script = GameObject.AddComponent<SynapseObjectScript>();
-            script.Object = this;
-        }
-
-        internal SynapseLightObject(SynapseSchematic.LightSourceConfiguration configuration)
-        {
-            ToyBase = CreateLightSource(configuration.Color, configuration.LightIntensity, configuration.LightRange, configuration.LightShadows, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale);
-            OriginalScale = configuration.Scale;
-            CustomAttributes = configuration.CustomAttributes;
-
-            var script = GameObject.AddComponent<SynapseObjectScript>();
-            script.Object = this;
-        }
-
-        public override ObjectType Type => ObjectType.LightSource;
         public override LightSourceToy ToyBase { get; }
-
+        public override ObjectType Type 
+            => ObjectType.LightSource;
         public Color LightColor
         {
             get => ToyBase.LightColor;
@@ -51,6 +31,25 @@ namespace Synapse.Api.CustomObjects
         {
             get => ToyBase.LightShadows;
             set => ToyBase.NetworkLightShadows = value;
+        }
+
+        public SynapseLightObject(Color color, float lightIntensity, float range, bool shadows, Vector3 position, Quaternion rotation, Vector3 scale)
+        {
+            ToyBase = CreateLightSource(color, lightIntensity, range, shadows, position, rotation, scale);
+
+            Map.Get.SynapseObjects.Add(this);
+
+            var script = GameObject.AddComponent<SynapseObjectScript>();
+            script.Object = this;
+        }
+        internal SynapseLightObject(SynapseSchematic.LightSourceConfiguration configuration)
+        {
+            ToyBase = CreateLightSource(configuration.Color, configuration.LightIntensity, configuration.LightRange, configuration.LightShadows, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale);
+            OriginalScale = configuration.Scale;
+            CustomAttributes = configuration.CustomAttributes;
+
+            var script = GameObject.AddComponent<SynapseObjectScript>();
+            script.Object = this;
         }
 
         private LightSourceToy CreateLightSource(Color color, float lightIntensity, float range, bool shadows, Vector3 position, Quaternion rotation, Vector3 scale)

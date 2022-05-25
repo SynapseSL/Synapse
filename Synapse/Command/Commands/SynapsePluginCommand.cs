@@ -36,7 +36,7 @@ namespace Synapse.Command.Commands
                 if (context.Player.HasPermission("synapse.debug"))
                 {
                     result.Message += $"\n    - LoadPriority: {pl.LoadPriority}" +
-                    $"\n    - Is Shared: {pl.shared}";
+                    $"\n    - Is Shared: {pl.Shared}";
                 }
 
                 result.State = CommandResultState.Ok;

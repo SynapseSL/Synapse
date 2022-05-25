@@ -4,7 +4,8 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
 {
     public class SchematicDoor : AttributeHandler
     {
-        public override string Name => "SchematicDoor";
+        public override string Name
+            => "SchematicDoor";
 
         public override void OnLoad(ISynapseObject synapseObject, ArraySegment<string> args)
         {

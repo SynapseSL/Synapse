@@ -8,9 +8,15 @@ namespace Synapse.Api.CustomObjects
     public class SynapsePrimitiveObject : SynapseToyObject<PrimitiveObjectToy>
     {
         public static PrimitiveObjectToy Prefab { get; internal set; }
+        public override ObjectType Type
+            => ObjectType.Primitive;
+        public override PrimitiveObjectToy ToyBase { get; }
+        public Color Color
+            => ToyBase.MaterialColor;
+        public PrimitiveType PrimitiveType
+            => ToyBase.PrimitiveType;
 
         public SynapsePrimitiveObject(PrimitiveType primitiveType, Vector3 position) : this(primitiveType, Color.white, position, Quaternion.identity, Vector3.one, false) { }
-
         public SynapsePrimitiveObject(PrimitiveType primitiveType, Color color, Vector3 position, Quaternion rotation, Vector3 scale, bool applyPhyics)
         {
             ToyBase = CreatePrimitive(primitiveType, color, position, rotation, scale);
@@ -22,7 +28,6 @@ namespace Synapse.Api.CustomObjects
             var script = GameObject.AddComponent<SynapseObjectScript>();
             script.Object = this;
         }
-
         //This constructor is only used for creating Childrens of a Synapse Object
         internal SynapsePrimitiveObject(SynapseSchematic.PrimitiveConfiguration configuration)
         {
@@ -49,15 +54,5 @@ namespace Synapse.Api.CustomObjects
 
             return ot;
         }
-
-        public override ObjectType Type => ObjectType.Primitive;
-
-        public override PrimitiveObjectToy ToyBase { get; }
-
-        public Color Color
-            => ToyBase.MaterialColor;
-
-        public PrimitiveType PrimitiveType
-            => ToyBase.PrimitiveType;
     }
 }

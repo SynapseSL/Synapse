@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Synapse.Api.Events.SynapseEventArguments
 {
-    public class PreAuthenticationEventArgs : EventHandler.ISynapseEventArgs
+    public class PreAuthenticationEventArgs : ISynapseEventArgs
     {
         public string UserId { get; internal set; }
         public bool Allow { get; set; } = true;
@@ -15,7 +15,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public string Reason { get; set; }
     }
 
-    public class RemoteAdminCommandEventArgs : EventHandler.ISynapseEventArgs
+    public class RemoteAdminCommandEventArgs : ISynapseEventArgs
     {
         public CommandSender Sender { get; internal set; }
 
@@ -24,14 +24,14 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; } = true;
     }
 
-    public class ConsoleCommandEventArgs : EventHandler.ISynapseEventArgs
+    public class ConsoleCommandEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
         public string Command { get; internal set; }
     }
 
-    public class TransmitPlayerDataEventArgs : EventHandler.ISynapseEventArgs
+    public class TransmitPlayerDataEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 

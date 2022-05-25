@@ -10,6 +10,25 @@ namespace Synapse.Api.CustomObjects
     {
         public static Dictionary<SpawnableDoorType, BreakableDoor> Prefab { get; internal set; } = new Dictionary<SpawnableDoorType, BreakableDoor>();
 
+        public Door Door { get; }
+        public SpawnableDoorType DoorType { get; }
+        public override GameObject GameObject
+            => Door.GameObject;
+        public override NetworkIdentity NetworkIdentity
+            => Door.VDoor.netIdentity;
+        public override ObjectType Type
+            => ObjectType.Door;
+        public bool Open
+        {
+            get => Door.Open;
+            set => Door.Open = value;
+        }
+        public bool Locked
+        {
+            get => Door.Locked;
+            set => Door.Locked = value;
+        }
+
         internal SynapseDoorObject(SynapseSchematic.DoorConfiguration configuration)
         {
             Door = CreateDoor(configuration.DoorType, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale, configuration.Open, configuration.Locked);
@@ -21,7 +40,6 @@ namespace Synapse.Api.CustomObjects
             var script = GameObject.AddComponent<SynapseObjectScript>();
             script.Object = this;
         }
-
         public SynapseDoorObject(SpawnableDoorType type, Vector3 position, Quaternion rotation, Vector3 scale, bool open = false, bool locked = false)
         {
             Door = CreateDoor(type, position, rotation, scale, open, locked);
@@ -30,23 +48,6 @@ namespace Synapse.Api.CustomObjects
             Map.Get.SynapseObjects.Add(this);
             var script = GameObject.AddComponent<SynapseObjectScript>();
             script.Object = this;
-        }
-
-        public override GameObject GameObject => Door.GameObject;
-        public override NetworkIdentity NetworkIdentity => Door.VDoor.netIdentity;
-        public override ObjectType Type => ObjectType.Door;
-
-        public Door Door { get; }
-        public SpawnableDoorType DoorType { get; }
-        public bool Open
-        {
-            get => Door.Open;
-            set => Door.Open = value;
-        }
-        public bool Locked
-        {
-            get => Door.Locked;
-            set => Door.Locked = value;
         }
 
         private Door CreateDoor(SpawnableDoorType type, Vector3 position, Quaternion rotation, Vector3 scale, bool open, bool locked)

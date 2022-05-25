@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Synapse.Api.Events.SynapseEventArguments
 {
-    public class TriggerTeslaEventArgs : EventHandler.ISynapseEventArgs
+    public class TriggerTeslaEventArgs : ISynapseEventArgs
     {
         public Tesla Tesla { get; internal set; }
 
@@ -13,7 +13,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Trigger { get; set; }
     }
 
-    public class DoorInteractEventArgs : EventHandler.ISynapseEventArgs
+    public class DoorInteractEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -22,19 +22,19 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; }
     }
 
-    public class LockerInteractEventArgs : Synapse.Api.Events.EventHandler.ISynapseEventArgs
+    public class LockerInteractEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
         public LockerChamber LockerChamber { get; internal set; }
         public bool Allow { get; set; }
     }
 
-    public class LCZDecontaminationEventArgs : EventHandler.ISynapseEventArgs
+    public class LCZDecontaminationEventArgs : ISynapseEventArgs
     {
         public bool Allow { get; set; }
     }
 
-    public class Scp914ActivateEventArgs : EventHandler.ISynapseEventArgs
+    public class Scp914ActivateEventArgs : ISynapseEventArgs
     {
         public List<Player> Players { get; set; }
 
@@ -48,7 +48,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Move { get; set; } = true;
     }
 
-    public class LiftMoveObjectsEventArgs : EventHandler.ISynapseEventArgs
+    public class LiftMoveObjectsEventArgs : ISynapseEventArgs
     {
         public Elevator Elevator { get; internal set; }
 
@@ -69,7 +69,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; } = true;
     }
 
-    public class WarheadInsidePanelInteractEventArgs : EventHandler.ISynapseEventArgs
+    public class WarheadInsidePanelInteractEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
         public bool CancelDetonation { get; internal set; }
@@ -77,14 +77,14 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Nuke.NukeInsidePanel Panel => Nuke.Get.InsidePanel;
     }
 
-    public class WarheadStartDetonationEventArgs : EventHandler.ISynapseEventArgs
+    public class WarheadStartDetonationEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
         public Nuke Nuke => Nuke.Get;
         public bool Allow { get; set; } = true;
     }
 
-    public class GeneratorEngageEventArgs : EventHandler.ISynapseEventArgs
+    public class GeneratorEngageEventArgs : ISynapseEventArgs
     {
         public Generator Generator { get; internal set; }
 

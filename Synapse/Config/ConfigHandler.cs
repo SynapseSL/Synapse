@@ -33,11 +33,10 @@ namespace Synapse.Config
             SynapseConfiguration = new SynapseConfiguration();
             SynapseConfiguration = _syml.GetOrSetDefault("Synapse", SynapseConfiguration);
         }
-
-        public T GetOrSetDefault<T>(string section, T defValue) where T : IConfigSection => _syml.GetOrSetDefault(section, defValue);
-
-        public object GetOrSetDefault(string section, object o) => _syml.GetOrSetDefaultUnsafe(section, o);
-
+        public T GetOrSetDefault<T>(string section, T defValue) where T : IConfigSection
+            => _syml.GetOrSetDefault(section, defValue);
+        public object GetOrSetDefault(string section, object o)
+            => _syml.GetOrSetDefaultUnsafe(section, o);
         public void UpdateSection<T>(string section, T replacement) where T : IConfigSection
         {
             var sec = new ConfigSection(section, "");
@@ -50,7 +49,6 @@ namespace Synapse.Config
             _syml.Sections[section] = sec;
             _syml.Store();
         }
-
         public void Reload()
         {
             _syml.Load();

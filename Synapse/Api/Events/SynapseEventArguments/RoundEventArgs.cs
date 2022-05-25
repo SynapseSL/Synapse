@@ -3,14 +3,14 @@ using UnityEngine;
 
 namespace Synapse.Api.Events.SynapseEventArguments
 {
-    public class RoundCheckEventArgs : EventHandler.ISynapseEventArgs
+    public class RoundCheckEventArgs : ISynapseEventArgs
     {
         public bool EndRound { get; set; }
 
         public RoundSummary.LeadingTeam Team { get; set; }
     }
 
-    public class SpawnPlayersEventArgs : EventHandler.ISynapseEventArgs
+    public class SpawnPlayersEventArgs : ISynapseEventArgs
     {
         /// <summary>
         /// Determines which Player has which RoleID
@@ -20,14 +20,14 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; } = true;
     }
 
-    public class WarheadDetonationCanceledEventArgs : EventHandler.ISynapseEventArgs
+    public class WarheadDetonationCanceledEventArgs : ISynapseEventArgs
     {
         public GameObject Disabler { get; set; }
 
         public bool Allow { get; set; } = true;
     }
 
-    public class TeamRespawnEventArgs : EventHandler.ISynapseEventArgs
+    public class TeamRespawnEventArgs : ISynapseEventArgs
     {
         public Respawning.SpawnableTeamType Team
         {

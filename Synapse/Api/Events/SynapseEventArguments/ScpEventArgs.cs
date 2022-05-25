@@ -1,26 +1,27 @@
-﻿using UnityEngine;
+﻿using PlayableScps;
+using UnityEngine;
 
 namespace Synapse.Api.Events.SynapseEventArguments
 {
-    public class Scp096AddTargetEventArgument : EventHandler.ISynapseEventArgs
+    public class Scp096AddTargetEventArgument : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
         public Player Scp096 { get; internal set; }
 
-        public PlayableScps.Scp096PlayerState RageState { get; internal set; }
+        public Scp096PlayerState RageState { get; internal set; }
 
         public bool Allow { get; set; }
     }
 
-    public class Scp106ContainmentEventArgs : EventHandler.ISynapseEventArgs
+    public class Scp106ContainmentEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
         public bool Allow { get; set; }
     }
 
-    public class PocketDimensionEnterEventArgs : EventHandler.ISynapseEventArgs
+    public class PocketDimensionEnterEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -29,7 +30,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; }
     }
 
-    public class PocketDimensionLeaveEventArgs : EventHandler.ISynapseEventArgs
+    public class PocketDimensionLeaveEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -40,21 +41,21 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; } = true;
     }
 
-    public class PortalCreateEventArgs : EventHandler.ISynapseEventArgs
+    public class PortalCreateEventArgs : ISynapseEventArgs
     {
         public Player Scp106 { get; internal set; }
 
         public bool Allow { get; set; }
     }
 
-    public class Scp079RecontainEventArgs : EventHandler.ISynapseEventArgs
+    public class Scp079RecontainEventArgs : ISynapseEventArgs
     {
         public Enum.Recontain079Status Status { get; internal set; }
 
         public bool Allow { get; set; } = true;
     }
 
-    public class ScpAttackEventArgs : EventHandler.ISynapseEventArgs
+    public class ScpAttackEventArgs : ISynapseEventArgs
     {
         public Enum.ScpAttackType AttackType { get; internal set; }
 
@@ -65,7 +66,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; } = true;
     }
 
-    public class Scp173PlaceTantrumEventArgs : EventHandler.ISynapseEventArgs
+    public class Scp173PlaceTantrumEventArgs : ISynapseEventArgs
     {
         public Player Scp173 { get; internal set; }
 
@@ -73,14 +74,14 @@ namespace Synapse.Api.Events.SynapseEventArguments
     }
 
     // I thought I could combine both but I'll let you guys do it if you want to
-    public class Scp173SpeedAbilityEventArgs : EventHandler.ISynapseEventArgs
+    public class Scp173SpeedAbilityEventArgs : ISynapseEventArgs
     {
         public Player Scp173 { get; internal set; }
 
         public bool Allow { get; set; } = true;
     }
 
-    public class Scp173BlinkEventArgs : EventHandler.ISynapseEventArgs
+    public class Scp173BlinkEventArgs : ISynapseEventArgs
     {
         public Player Scp173 { get; internal set; }
 
@@ -105,7 +106,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
             Unlocking
         }
     }
-    public class Scp079DoorInteractEventArgs : EventHandler.ISynapseEventArgs
+    public class Scp079DoorInteractEventArgs : ISynapseEventArgs
     {
         public Player Scp079 { get; internal set; }
         public Scp079EventMisc.DoorAction Action { get; internal set; }
@@ -113,20 +114,20 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Door Door { get; internal set; }
         public Scp079EventMisc.InteractionResult Result { get; set; }
     }
-    public class Scp079SpeakerInteractEventArgs : EventHandler.ISynapseEventArgs
+    public class Scp079SpeakerInteractEventArgs : ISynapseEventArgs
     {
         public Player Scp079 { get; internal set; }
         public float EnergyNeeded { get; internal set; }
         public Scp079EventMisc.InteractionResult Result { get; set; }
     }
-    public class Scp079ElevatorInteractEventArgs : EventHandler.ISynapseEventArgs
+    public class Scp079ElevatorInteractEventArgs : ISynapseEventArgs
     {
         public Player Scp079 { get; internal set; }
         public float EnergyNeeded { get; internal set; }
         public Elevator Elevator { get; internal set; }
         public Scp079EventMisc.InteractionResult Result { get; set; }
     }
-    public class Scp079RoomLockdownEventArgs : EventHandler.ISynapseEventArgs
+    public class Scp079RoomLockdownEventArgs : ISynapseEventArgs
     {
         public Player Scp079 { get; internal set; }
         public float EnergyNeeded { get; internal set; }
@@ -134,7 +135,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool LightsOut { get; set; }
         public Scp079EventMisc.InteractionResult Result { get; set; }
     }
-    public class Scp079TeslaInteractEventArgs : EventHandler.ISynapseEventArgs
+    public class Scp079TeslaInteractEventArgs : ISynapseEventArgs
     {
         public Player Scp079 { get; internal set; }
         public float EnergyNeeded { get; internal set; }
@@ -142,7 +143,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Tesla Tesla { get; internal set; }
         public Scp079EventMisc.InteractionResult Result { get; set; }
     }
-    public class Scp079CameraSwitchEventArgs : EventHandler.ISynapseEventArgs
+    public class Scp079CameraSwitchEventArgs : ISynapseEventArgs
     {
         public Player Scp079 { get; internal set; }
         public Camera Camera { get; internal set; }
@@ -150,7 +151,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool MapSwitch { get; internal set; }
         public bool Allow { get; set; }
     }
-    public class Scp049ReviveEvent : EventHandler.ISynapseEventArgs
+    public class Scp049ReviveEvent : ISynapseEventArgs
     {
         public Player Scp049 { get; internal set; }
         public Player Target { get; internal set; }

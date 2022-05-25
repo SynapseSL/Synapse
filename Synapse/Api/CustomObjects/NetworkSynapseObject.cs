@@ -6,11 +6,7 @@ namespace Synapse.Api.CustomObjects
     public abstract class NetworkSynapseObject : DefaultSynapseObject, IRefreshable
     {
         public abstract NetworkIdentity NetworkIdentity { get; }
-
-        public bool UpdateEveryFrame { get; set; } = false;
-
-        public virtual void Refresh() => NetworkIdentity.UpdatePositionRotationScale();
-
+        public bool UpdateEveryFrame { get; set; }
         public override Vector3 Position
         {
             get => base.Position;
@@ -20,7 +16,6 @@ namespace Synapse.Api.CustomObjects
                 Refresh();
             }
         }
-
         public override Quaternion Rotation
         {
             get => base.Rotation;
@@ -30,7 +25,6 @@ namespace Synapse.Api.CustomObjects
                 Refresh();
             }
         }
-
         public override Vector3 Scale
         {
             get => base.Scale;
@@ -41,6 +35,13 @@ namespace Synapse.Api.CustomObjects
             }
         }
 
+        public NetworkSynapseObject()
+        {
+            UpdateEveryFrame = false;
+        }
+
+        public virtual void Refresh()
+            => NetworkIdentity.UpdatePositionRotationScale();
         protected virtual TComponent CreateNetworkObject<TComponent>(TComponent component, Vector3 pos, Quaternion rot, Vector3 scale) where TComponent : NetworkBehaviour
         {
             var gameObject = UnityEngine.Object.Instantiate(component, pos, rot);

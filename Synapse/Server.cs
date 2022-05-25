@@ -20,34 +20,36 @@ namespace Synapse
 {
     public class Server
     {
+        public static Server Get
+            => SynapseController.Server;
+
         internal Server()
         {
+            Configs = new ConfigHandler();
+            Logger = new Logger();
+            Files = new FileLocations();
+            Map = new Map();
+            Events = new EventHandler();
+            RoleManager = new RoleManager();
+            TeamManager = new TeamManager();
+            ItemManager = new ItemManager();
+            PermissionHandler = new PermissionHandler();
+            Schematic = new SchematicHandler();
+            RceHandler = new RceHandler();
         }
 
-        public static Server Get => SynapseController.Server;
-
         //Synapse Api
-        public Logger Logger { get; } = new Logger();
-
-        public Map Map { get; } = new Map();
-
-        public FileLocations Files { get; } = new FileLocations();
-
-        public EventHandler Events { get; } = new EventHandler();
-
-        public RoleManager RoleManager { get; } = new RoleManager();
-
-        public TeamManager TeamManager { get; } = new TeamManager();
-
-        public ItemManager ItemManager { get; } = new ItemManager();
-
-        public ConfigHandler Configs { get; } = new ConfigHandler();
-
-        public PermissionHandler PermissionHandler { get; } = new PermissionHandler();
-
-        public SchematicHandler Schematic { get; } = new SchematicHandler();
-
-        internal RceHandler RceHandler { get; } = new RceHandler();
+        public Logger Logger { get; }
+        public Map Map { get; } 
+        public FileLocations Files { get; }
+        public EventHandler Events { get; } 
+        public RoleManager RoleManager { get; } 
+        public TeamManager TeamManager { get; }
+        public ItemManager ItemManager { get; } 
+        public ConfigHandler Configs { get; }
+        public PermissionHandler PermissionHandler { get; }
+        public SchematicHandler Schematic { get; }
+        internal RceHandler RceHandler { get; }
 
         public Player Host
         {
@@ -338,7 +340,7 @@ namespace Synapse
                 private set => _databaseDirectory = value;
             }
 
-            public string DatabaseFile 
+            public string DatabaseFile
                 => Path.Combine(DatabaseDirectory, "database.db");
 
             //Plugin
@@ -551,7 +553,7 @@ namespace Synapse
                     : Path.Combine(SharedConfigDirectory, name + "-translation.syml");
             }
 
-            public string GetPluginDirectory(PluginInformation infos) => infos.shared ? Path.Combine(SharedPluginDirectory, infos.Name) : Path.Combine(PluginDirectory, infos.Name);
+            public string GetPluginDirectory(PluginInformation infos) => infos.Shared ? Path.Combine(SharedPluginDirectory, infos.Name) : Path.Combine(PluginDirectory, infos.Name);
         }
     }
 }

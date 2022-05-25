@@ -9,7 +9,8 @@ namespace Synapse.Api.Items
     {
         private SynapseItem Item { get; }
 
-        public ThrowableAPI(SynapseItem item) => Item = item;
+        public ThrowableAPI(SynapseItem item) 
+            => Item = item;
 
         public ThrownProjectile ThrowableItem { get; internal set; }
 

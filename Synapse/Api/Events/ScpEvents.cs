@@ -6,27 +6,29 @@ namespace Synapse.Api.Events
 {
     public class ScpEvents
     {
-        internal ScpEvents() { }
+        internal ScpEvents()
+        {
+            Scp096 = new Scp096Events();
+            Scp106 = new Scp106Events();
+            Scp079 = new Scp079Events();
+            Scp173 = new Scp173Events();
+            Scp049 = new Scp049Events();
+        }
 
-        public Scp096Events Scp096 { get; } = new Scp096Events();
+        public Scp096Events Scp096 { get; }
+        public Scp106Events Scp106 { get; }
+        public Scp079Events Scp079 { get; }
+        public Scp173Events Scp173 { get; }
+        public Scp049Events Scp049 { get; }
 
-        public Scp106Events Scp106 { get; } = new Scp106Events();
-
-        public Scp079Events Scp079 { get; } = new Scp079Events();
-
-        public Scp173Events Scp173 { get; } = new Scp173Events();
-
-        public Scp049Events Scp049 { get; } = new Scp049Events();
-
-        public event EventHandler.OnSynapseEvent<ScpAttackEventArgs> ScpAttackEvent;
+        public event OnSynapseEvent<ScpAttackEventArgs> ScpAttackEvent;
 
         public class Scp096Events
         {
             internal Scp096Events() { }
 
-            public event EventHandler.OnSynapseEvent<Scp096AddTargetEventArgument> Scp096AddTargetEvent;
+            public event OnSynapseEvent<Scp096AddTargetEventArgument> Scp096AddTargetEvent;
 
-            #region InvokeEvents
             internal void InvokeScpTargetEvent(Player player, Player scp096, PlayableScps.Scp096PlayerState state, out bool allow)
             {
                 allow = true;
@@ -45,22 +47,19 @@ namespace Synapse.Api.Events
 
                 allow = ev.Allow;
             }
-            #endregion
         }
 
         public class Scp106Events
         {
             internal Scp106Events() { }
 
-            public event EventHandler.OnSynapseEvent<Scp106ContainmentEventArgs> Scp106ContainmentEvent;
+            public event OnSynapseEvent<Scp106ContainmentEventArgs> Scp106ContainmentEvent;
 
-            public event EventHandler.OnSynapseEvent<PocketDimensionEnterEventArgs> PocketDimensionEnterEvent;
+            public event OnSynapseEvent<PocketDimensionEnterEventArgs> PocketDimensionEnterEvent;
 
-            public event EventHandler.OnSynapseEvent<PocketDimensionLeaveEventArgs> PocketDimensionLeaveEvent;
+            public event OnSynapseEvent<PocketDimensionLeaveEventArgs> PocketDimensionLeaveEvent;
 
-            public event EventHandler.OnSynapseEvent<PortalCreateEventArgs> PortalCreateEvent;
-
-            #region Invoke106Events
+            public event OnSynapseEvent<PortalCreateEventArgs> PortalCreateEvent;
 
             internal void InvokeScp106ContainmentEvent(Player player, ref bool allow)
             {
@@ -106,26 +105,25 @@ namespace Synapse.Api.Events
 
                 allow = ev.Allow;
             }
-            #endregion
         }
 
         public class Scp079Events
         {
             internal Scp079Events() { }
 
-            public event EventHandler.OnSynapseEvent<Scp079RecontainEventArgs> RecontainEvent;
+            public event OnSynapseEvent<Scp079RecontainEventArgs> RecontainEvent;
 
-            public event EventHandler.OnSynapseEvent<Scp079DoorInteractEventArgs> DoorInteract;
+            public event OnSynapseEvent<Scp079DoorInteractEventArgs> DoorInteract;
 
-            public event EventHandler.OnSynapseEvent<Scp079SpeakerInteractEventArgs> SpeakerInteract;
+            public event OnSynapseEvent<Scp079SpeakerInteractEventArgs> SpeakerInteract;
 
-            public event EventHandler.OnSynapseEvent<Scp079ElevatorInteractEventArgs> ElevatorInteract;
+            public event OnSynapseEvent<Scp079ElevatorInteractEventArgs> ElevatorInteract;
 
-            public event EventHandler.OnSynapseEvent<Scp079RoomLockdownEventArgs> RoomLockdown;
+            public event OnSynapseEvent<Scp079RoomLockdownEventArgs> RoomLockdown;
 
-            public event EventHandler.OnSynapseEvent<Scp079TeslaInteractEventArgs> TeslaInteract;
+            public event OnSynapseEvent<Scp079TeslaInteractEventArgs> TeslaInteract;
 
-            public event EventHandler.OnSynapseEvent<Scp079CameraSwitchEventArgs> CameraSwitch;
+            public event OnSynapseEvent<Scp079CameraSwitchEventArgs> CameraSwitch;
 
             internal void Invoke079RecontainEvent(Recontain079Status status, out bool allow)
             {
@@ -276,11 +274,11 @@ namespace Synapse.Api.Events
         {
             internal Scp173Events() { }
 
-            public event EventHandler.OnSynapseEvent<Scp173BlinkEventArgs> Scp173BlinkEvent;
+            public event OnSynapseEvent<Scp173BlinkEventArgs> Scp173BlinkEvent;
 
-            public event EventHandler.OnSynapseEvent<Scp173PlaceTantrumEventArgs> Scp173PlaceTantrum;
+            public event OnSynapseEvent<Scp173PlaceTantrumEventArgs> Scp173PlaceTantrum;
 
-            public event EventHandler.OnSynapseEvent<Scp173SpeedAbilityEventArgs> Scp173SpeedAbilityEvent;
+            public event OnSynapseEvent<Scp173SpeedAbilityEventArgs> Scp173SpeedAbilityEvent;
 
             internal void InvokeScp173PlaceTantrumEvent(Player scp173, out bool allow)
             {
@@ -320,7 +318,7 @@ namespace Synapse.Api.Events
         {
             internal Scp049Events() { }
 
-            public event EventHandler.OnSynapseEvent<Scp049ReviveEvent> Scp049ReviveEvent;
+            public event OnSynapseEvent<Scp049ReviveEvent> Scp049ReviveEvent;
 
             internal void InvokeRevive(Player scp, Player target, Ragdoll rag, bool finish, out bool allow)
             {

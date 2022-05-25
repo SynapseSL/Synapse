@@ -7,7 +7,8 @@ namespace Synapse.Api.CustomObjects
     {
         public abstract TToy ToyBase { get; }
 
-        public override GameObject GameObject => ToyBase.gameObject;
+        public override GameObject GameObject 
+            => ToyBase.gameObject;
 
         public override Vector3 Scale
         {

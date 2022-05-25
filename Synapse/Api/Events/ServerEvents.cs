@@ -9,13 +9,13 @@ namespace Synapse.Api.Events
     {
         internal ServerEvents() { }
 
-        public event EventHandler.OnSynapseEvent<PreAuthenticationEventArgs> PreAuthenticationEvent;
+        public event OnSynapseEvent<PreAuthenticationEventArgs> PreAuthenticationEvent;
 
-        public event EventHandler.OnSynapseEvent<RemoteAdminCommandEventArgs> RemoteAdminCommandEvent;
+        public event OnSynapseEvent<RemoteAdminCommandEventArgs> RemoteAdminCommandEvent;
 
-        public event EventHandler.OnSynapseEvent<ConsoleCommandEventArgs> ConsoleCommandEvent;
+        public event OnSynapseEvent<ConsoleCommandEventArgs> ConsoleCommandEvent;
 
-        public event EventHandler.OnSynapseEvent<TransmitPlayerDataEventArgs> TransmitPlayerDataEvent;
+        public event OnSynapseEvent<TransmitPlayerDataEventArgs> TransmitPlayerDataEvent;
 
         public event Action UpdateEvent;
 
@@ -42,7 +42,8 @@ namespace Synapse.Api.Events
             ConsoleCommandEvent?.Invoke(ev);
         }
 
-        internal void InvokeUpdateEvent() => UpdateEvent?.Invoke();
+        internal void InvokeUpdateEvent()
+            => UpdateEvent?.Invoke();
 
         internal void InvokeTransmitPlayerDataEvent(Player player, Player playerToShow, ref Vector3 pos, ref float rot, ref bool invisible)
         {

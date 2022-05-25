@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Synapse.Api.Events.SynapseEventArguments;
+using System;
 using static Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Api.CustomObjects.CustomAttributes
@@ -11,8 +12,7 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
             Get.SynapseObject.DestroyEvent += OnDestroy;
             Get.SynapseObject.UpdateEvent += OnUpdate;
         }
-
-        public void OnLoad(Events.SynapseEventArguments.SOEventArgs ev)
+        public void OnLoad(SOEventArgs ev)
         {
             foreach (var handler in Handlers)
             {
@@ -34,8 +34,7 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
                 }
             }
         }
-
-        public void OnDestroy(Events.SynapseEventArguments.SOEventArgs ev)
+        public void OnDestroy(SOEventArgs ev)
         {
             foreach (var handler in Handlers)
             {
@@ -46,8 +45,7 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
                 }
             }
         }
-
-        public void OnUpdate(Events.SynapseEventArguments.SOEventArgs ev)
+        public void OnUpdate(SOEventArgs ev)
         {
             foreach (var handler in Handlers)
             {

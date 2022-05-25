@@ -5,7 +5,8 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
 {
     public class MapTeleporter : BasicTeleporter
     {
-        public override string Name => "MapTeleporter";
+        public override string Name 
+            => "MapTeleporter";
 
         public override Vector3 GetTeleportPosition(ArraySegment<string> args, ISynapseObject synapseObject)
         {

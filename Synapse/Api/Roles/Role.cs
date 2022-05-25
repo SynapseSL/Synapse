@@ -6,20 +6,20 @@ namespace Synapse.Api.Roles
 {
     public abstract class Role : IRole
     {
-        private Player player;
+        private Player _player;
 
         public Player Player
         {
-            get => player;
+            get => _player;
             set
             {
-                if (player == value)
+                if (_player == value)
                     return;
 
-                if (player != null)
-                    player.CustomRole = null;
+                if (_player != null)
+                    _player.CustomRole = null;
 
-                player = value;
+                _player = value;
             }
         }
 
@@ -27,11 +27,14 @@ namespace Synapse.Api.Roles
 
         public abstract int GetRoleID();
 
-        public virtual int GetTeamID() => (int)GetTeam();
+        public virtual int GetTeamID()
+            => (int)GetTeam();
 
-        public virtual List<int> GetFriendsID() => GetFriends().Select(x => (int)x).ToList();
+        public virtual List<int> GetFriendsID() 
+            => GetFriends().Select(x => (int)x).ToList();
 
-        public virtual List<int> GetEnemiesID() => GetEnemys().Select(x => (int)x).ToList();
+        public virtual List<int> GetEnemiesID() 
+            => GetEnemys().Select(x => (int)x).ToList();
 
         public abstract void Spawn();
 

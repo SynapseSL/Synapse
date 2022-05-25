@@ -8,6 +8,12 @@ namespace Synapse.Api.CustomObjects
     public class SynapseGeneratorObject : StructureSyncSynapseObject
     {
         public static Scp079Generator GeneratorPrefab { get; internal set; }
+        public override GameObject GameObject
+            => Generator.GameObject;
+        public override NetworkIdentity NetworkIdentity
+            => Generator.generator.netIdentity;
+        public override ObjectType Type
+            => ObjectType.Generator;
 
         public SynapseGeneratorObject(Vector3 pos, Quaternion rotation, Vector3 scale)
         {
@@ -28,10 +34,6 @@ namespace Synapse.Api.CustomObjects
             var script = GameObject.AddComponent<SynapseObjectScript>();
             script.Object = this;
         }
-
-        public override GameObject GameObject => Generator.GameObject;
-        public override NetworkIdentity NetworkIdentity => Generator.generator.netIdentity;
-        public override ObjectType Type => ObjectType.Generator;
 
         public Generator Generator { get; }
     }

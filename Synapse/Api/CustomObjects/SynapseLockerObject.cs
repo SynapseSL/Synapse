@@ -12,6 +12,15 @@ namespace Synapse.Api.CustomObjects
     {
         public static Dictionary<LockerType, MapGeneration.Distributors.Locker> Prefabs = new Dictionary<LockerType, MapGeneration.Distributors.Locker>();
 
+        public override NetworkIdentity NetworkIdentity
+            => Locker.locker.netIdentity;
+        public override GameObject GameObject
+            => Locker.GameObject;
+        public override ObjectType Type
+            => ObjectType.Locker;
+        public LockerType LockerType { get; }
+        public Locker Locker { get; }
+
         public SynapseLockerObject(LockerType lockerType, Vector3 pos, Quaternion rotation, Vector3 scale, bool removeDefaultItems = false)
         {
             Locker = CreateLocker(lockerType, pos, rotation, scale, removeDefaultItems);
@@ -40,21 +49,12 @@ namespace Synapse.Api.CustomObjects
             }
         }
 
-        public override NetworkIdentity NetworkIdentity => Locker.locker.netIdentity;
-        public override GameObject GameObject => Locker.GameObject;
-        public override ObjectType Type => ObjectType.Locker;
-
-        public LockerType LockerType { get; }
-
         public void SpawnItem(ItemType type, int chamber, int amount = 1)
         {
             if (chamber >= 0 && Locker.Chambers.Count > chamber)
                 Locker.Chambers[chamber].SpawnItem(type, amount);
             UnfreezeAll();
         }
-
-        public Locker Locker { get; }
-
         public Locker CreateLocker(LockerType lockerType, Vector3 pos, Quaternion rotation, Vector3 scale, bool removeDefaultItems = false)
         {
             var synapselocker = new Locker(CreateNetworkObject(Prefabs[lockerType], pos, rotation, scale));
@@ -79,7 +79,6 @@ namespace Synapse.Api.CustomObjects
 
             return synapselocker;
         }
-
         private void UnfreezeAll()
         {
             foreach (var rigidbody in SpawnablesDistributorBase.BodiesToUnfreeze.Where(rigidbody => rigidbody != null))

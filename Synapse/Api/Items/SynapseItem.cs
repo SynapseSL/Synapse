@@ -35,7 +35,13 @@ namespace Synapse.Api.Items
         private bool deactivated = false;
 
         #region Constructors
-        private SynapseItem() => Throwable = new ThrowableAPI(this);
+        private SynapseItem()
+        {
+            Throwable = new ThrowableAPI(this);
+            ItemData = new Dictionary<string, object>();
+            CanBePickedUp = true;
+            position = Vector3.zero;
+        }
 
         /// <summary>
         /// This constructor creates a completely new Item from a ItemType but wont spawn it
@@ -64,14 +70,16 @@ namespace Synapse.Api.Items
         /// </summary>
         /// <param name="type"></param>
         /// <param name="player"></param>
-        public SynapseItem(ItemType type, Player player) : this(type) => PickUp(player);
+        public SynapseItem(ItemType type, Player player) : this(type)
+            => PickUp(player);
 
         /// <summary>
         /// This constructor creates a completely new Item from a ItemType and Drops it
         /// </summary>
         /// <param name="type"></param>
         /// <param name="pos"></param>
-        public SynapseItem(ItemType type, Vector3 pos) : this(type) => Drop(pos);
+        public SynapseItem(ItemType type, Vector3 pos) : this(type)
+            => Drop(pos);
 
         /// <summary>
         /// This constructor creates a completely new Item from a ItemID but wont spawn it
@@ -118,14 +126,16 @@ namespace Synapse.Api.Items
         /// </summary>
         /// <param name="type"></param>
         /// <param name="player"></param>
-        public SynapseItem(int id, Player player) : this(id) => PickUp(player);
+        public SynapseItem(int id, Player player) : this(id)
+            => PickUp(player);
 
         /// <summary>
         /// This constructor creates a completely new Item from a ItemID and Drops it
         /// </summary>
         /// <param name="type"></param>
         /// <param name="pos"></param>
-        public SynapseItem(int id, Vector3 pos) : this(id) => Drop(pos);
+        public SynapseItem(int id, Vector3 pos) : this(id)
+            => Drop(pos);
 
         /// <summary>
         /// This Constructor should be used to register a ItemBase that is not already registered
@@ -211,16 +221,23 @@ namespace Synapse.Api.Items
         #endregion
 
         #region DynamicValues
-        public Enum.ItemState State
+        public ItemState State
         {
             get
             {
                 if (deactivated)
-                    return Enum.ItemState.Destroyed;
+                    return ItemState.Destroyed;
 
-                return Throwable.ThrowableItem != null
-                    ? Enum.ItemState.Thrown
-                    : ItemBase != null ? Enum.ItemState.Inventory : PickupBase != null ? Enum.ItemState.Map : Enum.ItemState.Despawned;
+                if (Throwable.ThrowableItem != null)
+                    return ItemState.Thrown;
+
+                if (ItemBase != null)
+                    return ItemState.Inventory;
+
+                if (PickupBase != null)
+                    return ItemState.Map;
+
+                return ItemState.Despawned;
             }
         }
 
@@ -239,20 +256,25 @@ namespace Synapse.Api.Items
         #endregion
 
         #region ChangableAPIValues
-        public Dictionary<string, object> ItemData { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, object> ItemData { get; set; }
 
-        public bool CanBePickedUp { get; set; } = true;
+        public bool CanBePickedUp { get; set; }
         public SynapseSchematic Schematic { get; set; }
         public SynapseObject SynapseObject { get; set; }
 
-        private Vector3 position = Vector3.zero;
+        private Vector3 position;
         public Vector3 Position
         {
             get
             {
-                return Throwable.ThrowableItem != null
-                    ? Throwable.ThrowableItem.transform.position
-                    : ItemBase != null ? ItemHolder.Position : PickupBase != null ? PickupBase.Info.Position : position;
+                if (Throwable.ThrowableItem != null)
+                    return Throwable.ThrowableItem.transform.position;
+                if (ItemBase != null)
+                    return ItemHolder.Position;
+                if (PickupBase != null)
+                    return PickupBase.Info.Position;
+
+                return position;
             }
             set
             {

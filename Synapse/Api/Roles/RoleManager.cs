@@ -7,46 +7,73 @@ namespace Synapse.Api.Roles
 {
     public class RoleManager
     {
-        public static RoleManager Get => Server.Get.RoleManager;
+        public static RoleManager Get
+            => Server.Get.RoleManager;
 
         public static readonly int HighestRole = (int)RoleType.ChaosMarauder;
 
-        internal RoleManager() { }
+        internal RoleManager()
+        {
+            CustomRoles = new List<RoleInformation>();
+        }
 
-        internal void Init() => SynapseController.Server.Events.Server.RemoteAdminCommandEvent += OnRa;
+        internal void Init()
+            => SynapseController.Server.Events.Server.RemoteAdminCommandEvent += OnRa;
 
-        public List<RoleInformation> CustomRoles { get; } = new List<RoleInformation>();
+        public List<RoleInformation> CustomRoles { get; }
 
         public string GetRoleName(int id)
         {
-            return id >= -1 && id <= HighestRole
-                ? ((RoleType)id).ToString()
-                : !IsIDRegistered(id)
-                ? throw new SynapseRoleNotFoundException("A Role was requested that is not registered in Synapse.Please check your configs and plugins", id)
-                : CustomRoles.FirstOrDefault(x => x.ID == id).Name;
+            if (id >= -1 && id <= HighestRole)
+            {
+                return ((RoleType)id).ToString();
+            }
+            else if (IsIDRegistered(id))
+            {
+                return CustomRoles.FirstOrDefault(x => x.ID == id).Name;
+            }
+            else
+            {
+                throw new SynapseRoleNotFoundException("A Role was requested that is not registered in Synapse.Please check your configs and plugins", id);
+            }
         }
 
         public IRole GetCustomRole(string name)
         {
             var roleinformation = CustomRoles.FirstOrDefault(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            if (roleinformation is null)
+                throw new SynapseRoleNotFoundException("A Role was requested that is not registered in Synapse.Please check your configs and plugins", name);
 
-            return roleinformation is null
-                ? throw new SynapseRoleNotFoundException("A Role was requested that is not registered in Synapse.Please check your configs and plugins", name)
-                : roleinformation.RoleScript.GetConstructors().Any(x => x.GetParameters().Count() == 1 && x.GetParameters().First().ParameterType == typeof(int))
-                ? (IRole)Activator.CreateInstance(roleinformation.RoleScript, new object[] { roleinformation.ID })
-                : (IRole)Activator.CreateInstance(roleinformation.RoleScript);
+            var ctors = roleinformation.RoleScript.GetConstructors();
+            var preferredCtor = ctors.FirstOrDefault(x => x.GetParameters().FirstOrDefault()?.ParameterType == typeof(int));
+
+            if (preferredCtor != null)
+            {
+                return (IRole)Activator.CreateInstance(roleinformation.RoleScript, new object[] { roleinformation.ID });
+            }
+            else
+            {
+                return (IRole)Activator.CreateInstance(roleinformation.RoleScript);
+            }
         }
 
         public IRole GetCustomRole(int id)
         {
-            if (!IsIDRegistered(id))
-                throw new SynapseRoleNotFoundException("A Role was requested that is not registered in Synapse.Please check your configs and plugins", id);
-
             var roleinformation = CustomRoles.FirstOrDefault(x => x.ID == id);
+            if (roleinformation is null)
+                throw new SynapseRoleNotFoundException("A Role was requested that is not registered in Synapse. Please check your configs and plugins", id);
 
-            return roleinformation.RoleScript.GetConstructors().Any(x => x.GetParameters().Count() == 1 && x.GetParameters().First().ParameterType == typeof(int))
-                ? (IRole)Activator.CreateInstance(roleinformation.RoleScript, new object[] { roleinformation.ID })
-                : (IRole)Activator.CreateInstance(roleinformation.RoleScript);
+            var ctors = roleinformation.RoleScript.GetConstructors();
+            var preferredCtor = ctors.FirstOrDefault(x => x.GetParameters().FirstOrDefault()?.ParameterType == typeof(int));
+
+            if (preferredCtor != null)
+            {
+                return (IRole)Activator.CreateInstance(roleinformation.RoleScript, new object[] { roleinformation.ID });
+            }
+            else
+            {
+                return (IRole)Activator.CreateInstance(roleinformation.RoleScript);
+            }
         }
 
         public void RegisterCustomRole<TRole>() where TRole : IRole
@@ -79,13 +106,14 @@ namespace Synapse.Api.Roles
                 _ = CustomRoles.Remove(role);
         }
 
-        public bool IsIDRegistered(int id) => (id >= 0 && id <= HighestRole) || CustomRoles.Any(x => x.ID == id);
+        public bool IsIDRegistered(int id)
+            => CustomRoles.Any(x => x.ID == id) || (id >= 0 && id <= HighestRole);
 
         #region Events
         private void OnRa(Events.SynapseEventArguments.RemoteAdminCommandEventArgs ev)
         {
             var args = ev.Command.Split(' ');
-            if ((args[0].ToUpper() != "OVERWATCH" && args[0].ToUpper() != "KILL" && args[0].ToUpper() != "FORCECLASS") || args.Count() <= 1)
+            if ((!args[0].Equals("OVERWATCH", StringComparison.InvariantCultureIgnoreCase) && !args[0].Equals("KILL", StringComparison.InvariantCultureIgnoreCase) && !args[0].Equals("FORCECLASS", StringComparison.InvariantCultureIgnoreCase)) || args.Length <= 1)
                 return;
             var ids = args[1].Split('.');
             foreach (var id in ids)

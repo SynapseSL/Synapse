@@ -40,9 +40,12 @@ namespace Synapse.Api.CustomObjects
             script.Object = this;
         }
 
-        public override GameObject GameObject => WorkStation.GameObject;
-        public override NetworkIdentity NetworkIdentity => WorkStation.workStation.netIdentity;
-        public override ObjectType Type => ObjectType.Workstation;
+        public override GameObject GameObject 
+            => WorkStation.GameObject;
+        public override NetworkIdentity NetworkIdentity
+            => WorkStation.workStation.netIdentity;
+        public override ObjectType Type
+            => ObjectType.Workstation;
 
         public WorkStation WorkStation { get; }
 

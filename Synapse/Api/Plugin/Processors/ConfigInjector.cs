@@ -16,14 +16,14 @@ namespace Synapse.Api.Plugin.Processors
                     if (configAttribute is null)
                         continue;
                     var section = configAttribute.section;
-                    var t = FieldInfo.GetFieldFromHandle(field.FieldHandle).FieldType;
+                    var type = FieldInfo.GetFieldFromHandle(field.FieldHandle).FieldType;
                     if (section is null)
-                        section = t.FullName?.Replace(".", " ");
+                        section = type.FullName?.Replace(".", " ");
 
-                    if (!typeof(IConfigSection).IsAssignableFrom(t))
+                    if (!typeof(IConfigSection).IsAssignableFrom(type))
                         continue;
 
-                    var typeObj = Activator.CreateInstance(t);
+                    var typeObj = Activator.CreateInstance(type);
                     var config = SynapseController.Server.Configs.GetOrSetDefault(section, typeObj);
                     field.SetValue(context.Plugin, config);
                 }
@@ -34,14 +34,14 @@ namespace Synapse.Api.Plugin.Processors
                     if (configAttribute is null)
                         continue;
                     var section = configAttribute.section;
-                    var t = property.PropertyType;
+                    var type = property.PropertyType;
                     if (section is null)
-                        section = t.FullName?.Replace(".", " ");
+                        section = type.FullName?.Replace(".", " ");
 
-                    if (!typeof(IConfigSection).IsAssignableFrom(t))
+                    if (!typeof(IConfigSection).IsAssignableFrom(type))
                         continue;
 
-                    var typeObj = Activator.CreateInstance(t);
+                    var typeObj = Activator.CreateInstance(type);
                     var config = SynapseController.Server.Configs.GetOrSetDefault(section, typeObj);
                     property.SetValue(context.Plugin, config);
                 }

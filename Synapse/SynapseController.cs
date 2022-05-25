@@ -8,11 +8,9 @@ public class SynapseController
 {
     private static bool IsLoaded = false;
 
-    public static Synapse.Server Server { get; } = new Synapse.Server();
-
-    public static PluginLoader PluginLoader { get; } = new PluginLoader();
-
-    public static Handlers CommandHandlers { get; } = new Handlers();
+    public static Synapse.Server Server { get; }
+    public static PluginLoader PluginLoader { get; }
+    public static Handlers CommandHandlers { get; }
 
     public static void Init()
     {
@@ -21,6 +19,12 @@ public class SynapseController
         ServerConsole.AddLog("Welcome to Synapse! :)", ConsoleColor.Cyan);
         IsLoaded = true;
         _ = new SynapseController();
+    }
+    static SynapseController()
+    {
+        Server = new Synapse.Server();
+        PluginLoader = new PluginLoader();
+        CommandHandlers = new Handlers();
     }
     internal SynapseController()
     {
