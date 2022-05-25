@@ -63,7 +63,7 @@ namespace Synapse.Api.CustomObjects
             script.Object = this;
         }
 
-        public override void Destroy() 
+        public override void Destroy()
             => Item.Destroy();
         public override void ApplyPhysics()
         {

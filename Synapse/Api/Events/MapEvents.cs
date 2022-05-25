@@ -140,7 +140,7 @@ namespace Synapse.Api.Events
             items = ev.Items;
             moveVector = ev.MoveVector;
         }
-        internal void InvokeLiftMoveObjects(LiftMoveObjectsEventArgs ev) 
+        internal void InvokeLiftMoveObjects(LiftMoveObjectsEventArgs ev)
             => LiftMoveObjectsEvent?.Invoke(ev);
     }
 }

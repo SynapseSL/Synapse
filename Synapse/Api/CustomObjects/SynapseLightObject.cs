@@ -10,7 +10,7 @@ namespace Synapse.Api.CustomObjects
         public static LightSourceToy Prefab { get; internal set; }
 
         public override LightSourceToy ToyBase { get; }
-        public override ObjectType Type 
+        public override ObjectType Type
             => ObjectType.LightSource;
         public Color LightColor
         {

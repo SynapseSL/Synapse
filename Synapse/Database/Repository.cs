@@ -18,7 +18,7 @@ namespace Synapse.Database
         /// other transactions on the system 
         /// </summary>
         [Unstable]
-        public RepositoryTransaction<TK> Transaction 
+        public RepositoryTransaction<TK> Transaction
             => new RepositoryTransaction<TK>();
 
         [API]

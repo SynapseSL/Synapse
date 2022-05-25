@@ -32,10 +32,8 @@ namespace Synapse.Api.CustomObjects
         }
         public virtual Rigidbody Rigidbody { get; set; }
 
-        public DefaultSynapseObject()
-        {
-            ObjectData = new Dictionary<string, object>();
-        }
+        public DefaultSynapseObject() 
+            => ObjectData = new Dictionary<string, object>();
 
         public virtual void ApplyPhysics()
         {

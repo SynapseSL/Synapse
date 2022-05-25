@@ -40,12 +40,12 @@ namespace Synapse
 
         //Synapse Api
         public Logger Logger { get; }
-        public Map Map { get; } 
+        public Map Map { get; }
         public FileLocations Files { get; }
-        public EventHandler Events { get; } 
-        public RoleManager RoleManager { get; } 
+        public EventHandler Events { get; }
+        public RoleManager RoleManager { get; }
         public TeamManager TeamManager { get; }
-        public ItemManager ItemManager { get; } 
+        public ItemManager ItemManager { get; }
         public ConfigHandler Configs { get; }
         public PermissionHandler PermissionHandler { get; }
         public SchematicHandler Schematic { get; }

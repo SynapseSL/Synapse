@@ -8,14 +8,14 @@ namespace Synapse.Api
 {
     public class Round
     {
-        public static Round Get 
+        public static Round Get
             => Map.Get.Round;
 
         internal Round() { }
 
-        private RoundSummary Rs 
+        private RoundSummary Rs
             => RoundSummary.singleton;
-        private RespawnManager Rm 
+        private RespawnManager Rm
             => RespawnManager.Singleton;
 
         public int CurrentRound { get; internal set; } = 0;
@@ -76,31 +76,31 @@ namespace Synapse.Api
 
         internal bool ForceEnd { get; set; }
 
-        public TimeSpan RoundLength 
+        public TimeSpan RoundLength
             => RoundStart.RoundLength;
 
-        public bool RoundIsActive 
+        public bool RoundIsActive
             => RoundSummary.RoundInProgress();
 
         public bool RoundEnded
             => Rs.RoundEnded;
 
-        public void StartRound() 
+        public void StartRound()
             => CharacterClassManager.ForceRoundStart();
 
-        public void EndRound() 
+        public void EndRound()
             => ForceEnd = true;
 
         public void RestartRound()
             => RoundRestart.InitiateRoundRestart();
 
-        public void SpawnVehicle(bool IsCI = false) 
+        public void SpawnVehicle(bool IsCI = false)
             => RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.Selection, IsCI ? SpawnableTeamType.ChaosInsurgency : SpawnableTeamType.NineTailedFox);
 
-        public void PlayChaosSpawnSound() 
+        public void PlayChaosSpawnSound()
             => RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.UponRespawn, SpawnableTeamType.ChaosInsurgency);
 
-        public void DimScreens() 
+        public void DimScreens()
             => Rs.RpcDimScreen();
 
         public void ShowRoundSummary(RoundSummary.SumInfo_ClassList remainingPlayers, RoundSummary.LeadingTeam team)
@@ -110,7 +110,7 @@ namespace Synapse.Api
             Rs.RpcShowRoundSummary(Rs.classlistStart, remainingPlayers, team, EscapedDPersonnel, EscapedScientists, ScpKills, timeToRoundRestart);
         }
 
-        public void MtfRespawn(bool isCI = false) 
+        public void MtfRespawn(bool isCI = false)
             => RespawnManager.Singleton.ForceSpawnTeam(isCI ? SpawnableTeamType.ChaosInsurgency : SpawnableTeamType.NineTailedFox);
     }
 }

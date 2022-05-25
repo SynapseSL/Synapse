@@ -42,12 +42,12 @@ namespace Synapse.Api.CustomObjects
         public List<ISynapseObject> Childrens { get; }
         public List<SynapsePrimitiveObject> PrimitivesChildrens { get; }
         public List<SynapseLightObject> LightChildrens { get; }
-        public List<SynapseTargetObject> TargetChildrens { get; } 
+        public List<SynapseTargetObject> TargetChildrens { get; }
         public List<SynapseItemObject> ItemChildrens { get; }
-        public List<SynapseWorkStationObject> WorkStationChildrens { get; } 
+        public List<SynapseWorkStationObject> WorkStationChildrens { get; }
         public List<SynapseDoorObject> DoorChildrens { get; }
         public List<SynapseCustomObject> CustomChildrens { get; }
-        public List<SynapseRagdollObject> RagdollChildrens { get; } 
+        public List<SynapseRagdollObject> RagdollChildrens { get; }
         public List<SynapseDummyObject> DummyChildrens { get; }
         public List<SynapseGeneratorObject> GeneratorChildrens { get; }
         public List<SynapseLockerObject> LockerChildrens { get; }

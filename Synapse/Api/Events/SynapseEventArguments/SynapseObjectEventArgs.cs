@@ -1,5 +1,4 @@
 ﻿using Synapse.Api.CustomObjects;
-using static Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Api.Events.SynapseEventArguments
 {
@@ -7,7 +6,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
     {
         public ISynapseObject Object { get; }
 
-        internal SOEventArgs(ISynapseObject so) 
+        internal SOEventArgs(ISynapseObject so)
             => Object = so;
     }
 

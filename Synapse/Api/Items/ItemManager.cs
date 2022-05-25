@@ -60,7 +60,7 @@ namespace Synapse.Api.Items
             return item is null || item.SchematicID < 0 ? null : SchematicHandler.Get.GetSchematic(item.SchematicID);
         }
 
-        public CustomItemInformation GetInfo(int id) 
+        public CustomItemInformation GetInfo(int id)
             => _customItems.FirstOrDefault(x => x.ID == id);
 
         public void RegisterCustomItem(CustomItemInformation info)
@@ -77,7 +77,7 @@ namespace Synapse.Api.Items
         public void SetSchematicForVanillaItem(ItemType item, SynapseSchematic schematic)
             => _overridenVanillaSchematics[item] = schematic;
 
-        public bool IsIDRegistered(int id) 
+        public bool IsIDRegistered(int id)
             => (id >= 0 && id <= HighestItem) || _customItems.Any(x => x.ID == id);
     }
 }

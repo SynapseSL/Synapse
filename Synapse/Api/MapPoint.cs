@@ -109,7 +109,7 @@ namespace Synapse.Api
         /// <summary>
         /// The calculated end Position on the Map
         /// </summary>
-        public Vector3 Position 
+        public Vector3 Position
             => Room.GameObject.transform.TransformPoint(RelativePosition);
 
         /// <summary>

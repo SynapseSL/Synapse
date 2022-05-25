@@ -17,10 +17,8 @@ namespace Synapse.Api.CustomObjects
 {
     public class SchematicHandler
     {
-        internal SchematicHandler()
-        {
-            AttributeHandler = new CustomAttributeHandler();
-        }
+        internal SchematicHandler() 
+            => AttributeHandler = new CustomAttributeHandler();
 
         public static SchematicHandler Get
             => Server.Get.Schematic;

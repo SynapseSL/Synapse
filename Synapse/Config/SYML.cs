@@ -20,10 +20,8 @@ namespace Synapse.Config
 
         public Dictionary<string, ConfigSection> Sections { get; private set; }
 
-        public SYML()
-        {
-            Sections = new Dictionary<string, ConfigSection>();
-        }
+        public SYML() 
+            => Sections = new Dictionary<string, ConfigSection>();
 
         public SYML(string path)
         {
@@ -120,7 +118,7 @@ namespace Synapse.Config
             var builder = new StringBuilder();
             foreach (var value in sections.Values)
             {
-                builder.AppendLine(value.Serialize());
+                _ = builder.AppendLine(value.Serialize());
             }
 
             return builder.ToString();

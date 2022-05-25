@@ -34,7 +34,7 @@ namespace Synapse.Api.Events
             Map = new MapEvents();
             Scp = new ScpEvents();
             SynapseObject = new SynapseObjectEvent();
-            
+
             Player.PlayerJoinEvent += PlayerJoin;
             Round.RoundRestartEvent += RounRestart;
             Round.WaitingForPlayersEvent += Waiting;

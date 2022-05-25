@@ -35,10 +35,8 @@ namespace Synapse.Api.CustomObjects
             }
         }
 
-        public NetworkSynapseObject()
-        {
-            UpdateEveryFrame = false;
-        }
+        public NetworkSynapseObject() 
+            => UpdateEveryFrame = false;
 
         public virtual void Refresh()
             => NetworkIdentity.UpdatePositionRotationScale();

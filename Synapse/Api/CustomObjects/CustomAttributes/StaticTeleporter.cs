@@ -5,7 +5,7 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
 {
     public class StaticTeleporter : BasicTeleporter
     {
-        public override string Name 
+        public override string Name
             => "StaticTeleporter";
 
         public override Vector3 GetTeleportPosition(ArraySegment<string> args, ISynapseObject synapseObject)

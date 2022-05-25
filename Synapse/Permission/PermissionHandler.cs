@@ -18,7 +18,7 @@ namespace Synapse.Permission
         public static PermissionHandler Get
             => Server.Get.PermissionHandler;
 
-        public Dictionary<string, SynapseGroup> Groups 
+        public Dictionary<string, SynapseGroup> Groups
             => new Dictionary<string, SynapseGroup>(groups);
 
         internal void Init()

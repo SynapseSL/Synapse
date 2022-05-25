@@ -13,9 +13,7 @@ namespace Synapse.Api.Roles
         public static readonly int HighestRole = (int)RoleType.ChaosMarauder;
 
         internal RoleManager()
-        {
-            CustomRoles = new List<RoleInformation>();
-        }
+            => CustomRoles = new List<RoleInformation>();
 
         internal void Init()
             => SynapseController.Server.Events.Server.RemoteAdminCommandEvent += OnRa;

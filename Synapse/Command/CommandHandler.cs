@@ -16,7 +16,7 @@ namespace Synapse.Command
             commands = new Dictionary<string, ICommand>();
         }
 
-        public List<ICommand> Commands 
+        public List<ICommand> Commands
             => commands.Values.ToList();
 
         public bool TryGetCommand(string name, out ICommand cmd)

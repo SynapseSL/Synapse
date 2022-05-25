@@ -4,7 +4,7 @@ namespace Synapse.Api
 {
     public class Jail
     {
-        internal Jail(Player player) 
+        internal Jail(Player player)
             => _player = player;
 
         private readonly Player _player;

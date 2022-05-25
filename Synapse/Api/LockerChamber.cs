@@ -5,15 +5,6 @@ namespace Synapse.Api
 {
     public class LockerChamber
     {
-        internal LockerChamber(MapGeneration.Distributors.LockerChamber vanilalockerChamber, Locker locker, ushort id)
-        {
-            lockerChamber = vanilalockerChamber;
-            vanillalocker = locker.locker;
-            Locker = locker;
-            colliderId = id;
-            byteId = (ushort)(1 << id);
-        }
-
         private readonly MapGeneration.Distributors.Locker vanillalocker;
 
         public readonly ushort byteId;
@@ -30,7 +21,7 @@ namespace Synapse.Api
 
         public Locker Locker { get; }
 
-        public GameObject GameObject 
+        public GameObject GameObject
             => lockerChamber.gameObject;
 
         public string Name
@@ -53,6 +44,15 @@ namespace Synapse.Api
                 lockerChamber._targetCooldown = 1f;
                 lockerChamber._stopwatch.Restart();
             }
+        }
+
+        internal LockerChamber(MapGeneration.Distributors.LockerChamber vanilalockerChamber, Locker locker, ushort id)
+        {
+            lockerChamber = vanilalockerChamber;
+            vanillalocker = locker.locker;
+            Locker = locker;
+            colliderId = id;
+            byteId = (ushort)(1 << id);
         }
 
         public void SpawnItem(ItemType type, int amount = 1)

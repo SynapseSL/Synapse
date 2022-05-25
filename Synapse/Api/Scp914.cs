@@ -5,14 +5,14 @@ namespace Synapse.Api
 {
     public class Scp914
     {
-        public static Scp914 Get 
+        public static Scp914 Get
             => Map.Get.Scp914;
 
         internal Scp914() { }
 
         public Scp914Controller Scp914Controller { get; internal set; }
 
-        public GameObject GameObject 
+        public GameObject GameObject
             => Scp914Controller.gameObject;
 
         public Scp914KnobSetting KnobState
@@ -21,7 +21,7 @@ namespace Synapse.Api
             set => Scp914Controller.Network_knobSetting = value;
         }
 
-        public bool IsActive 
+        public bool IsActive
             => Scp914Controller._isUpgrading;
 
         public Transform Intake
@@ -36,7 +36,7 @@ namespace Synapse.Api
             set => Scp914Controller._outputChamber = value;
         }
 
-        public void Activate() 
+        public void Activate()
             => Scp914Controller.ServerInteract(null, 0);
     }
 }

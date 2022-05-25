@@ -3,9 +3,7 @@
     public class Scp079Controller
     {
         internal Scp079Controller(Player player)
-        {
-            _player = player;
-        }
+            => _player = player;
 
         private readonly Player _player;
 

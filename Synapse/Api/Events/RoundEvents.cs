@@ -16,9 +16,9 @@ namespace Synapse.Api.Events
         public event OnSynapseEvent<SpawnPlayersEventArgs> SpawnPlayersEvent;
         public event OnSynapseEvent<TeamRespawnEventArgs> TeamRespawnEvent;
 
-        internal void InvokeWaitingForPlayers() 
+        internal void InvokeWaitingForPlayers()
             => WaitingForPlayersEvent?.Invoke();
-        internal void InvokeRoundStartEvent() 
+        internal void InvokeRoundStartEvent()
             => RoundStartEvent?.Invoke();
         internal void InvokeRoundRestartEvent()
             => RoundRestartEvent?.Invoke();

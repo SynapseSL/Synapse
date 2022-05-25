@@ -14,7 +14,7 @@ namespace Synapse.Api
 
         private readonly Player _player;
 
-        private Scp096 Scp096 
+        private Scp096 Scp096
             => _player.Hub.scpsController.CurrentScp as Scp096;
 
         public bool Is096
@@ -138,7 +138,7 @@ namespace Synapse.Api
         public bool CanAttack
             => Is096 && Scp096.CanAttack;
 
-        public bool CanCharge 
+        public bool CanCharge
             => Is096 && Scp096.CanCharge;
 
         public void AddTarget(Player player)

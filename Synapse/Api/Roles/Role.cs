@@ -30,10 +30,10 @@ namespace Synapse.Api.Roles
         public virtual int GetTeamID()
             => (int)GetTeam();
 
-        public virtual List<int> GetFriendsID() 
+        public virtual List<int> GetFriendsID()
             => GetFriends().Select(x => (int)x).ToList();
 
-        public virtual List<int> GetEnemiesID() 
+        public virtual List<int> GetEnemiesID()
             => GetEnemys().Select(x => (int)x).ToList();
 
         public abstract void Spawn();
