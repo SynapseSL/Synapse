@@ -13,6 +13,10 @@ namespace Synapse.Api
 
         private readonly List<string> fileLogBuffer;
         private readonly ushort bufferLengthThreshold;
+        private bool IsConfigSet
+            => Server.Get.Configs?.SynapseConfiguration != null;
+        private bool LoggingEnabled
+            => Server.Get.Configs.SynapseConfiguration.LogMessages;
 
         internal Logger()
         {
@@ -74,7 +78,7 @@ namespace Synapse.Api
         {
             var save = $"{DateTime.Now} | {name}.dll | {type} | {message}";
 
-            if (Server.Get.Configs?.SynapseConfiguration?.LogMessages ?? false)
+            if (!IsConfigSet || LoggingEnabled)
             {
                 fileLogBuffer.Add(save);
                 if (fileLogBuffer.Count >= bufferLengthThreshold)
@@ -87,15 +91,16 @@ namespace Synapse.Api
         {
             try
             {
-                if (Server.Get.Configs?.SynapseConfiguration?.LogMessages ?? false)
+                if (IsConfigSet && LoggingEnabled)
+                {
                     File.AppendAllLines(Server.Get.Files.LogFile, fileLogBuffer);
+                    fileLogBuffer.Clear();
+                }
             }
             catch (Exception ex)
             {
                 Send($"[ERR] Synapse-Logger: Saving the last log into a file failed:\n{ex}", ConsoleColor.Red);
             }
-
-            fileLogBuffer.Clear();
         }
         internal void Refresh()
         {

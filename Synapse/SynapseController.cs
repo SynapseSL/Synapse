@@ -12,14 +12,6 @@ public class SynapseController
     public static PluginLoader PluginLoader { get; }
     public static Handlers CommandHandlers { get; }
 
-    public static void Init()
-    {
-        if (IsLoaded)
-            return;
-        ServerConsole.AddLog("Welcome to Synapse! :)", ConsoleColor.Cyan);
-        IsLoaded = true;
-        _ = new SynapseController();
-    }
     static SynapseController()
     {
         Server = new Synapse.Server();
@@ -28,13 +20,13 @@ public class SynapseController
     }
     internal SynapseController()
     {
+        SynapseVersion.Init();
+
         if (StartupArgs.Args.Any(x => x.Equals("-nosynapse", StringComparison.OrdinalIgnoreCase)))
         {
             ServerConsole.AddLog("Server started with -nosynapse argument! Synapse will not be loaded", ConsoleColor.Yellow);
             return;
         }
-
-        SynapseVersion.Init();
 
         PatchMethods();
 
@@ -52,6 +44,14 @@ public class SynapseController
         Server.Logger.Info("Synapse is now ready!");
     }
 
+    public static void Init()
+    {
+        if (IsLoaded)
+            return;
+        ServerConsole.AddLog("Welcome to Synapse! :)", ConsoleColor.Cyan);
+        IsLoaded = true;
+        _ = new SynapseController();
+    }
     private void TryInit(Action init, string msg)
     {
         try
@@ -63,7 +63,6 @@ public class SynapseController
             Server.Logger.Error("Synapse-Loader: " + msg + "\n" + ex);
         }
     }
-
     private void PatchMethods()
     {
         try
