@@ -39,6 +39,7 @@ public class SynapseController
         PatchMethods();
 
         TryInit(Server.Configs.Init, "Initialising Configs failed");
+        TryInit(Server.Logger.Refresh, "Initialising Logger File failed");
         TryInit(Server.PermissionHandler.Init, "Initialising Permissions failed");
         TryInit(Server.RoleManager.Init, "Initialising Roles failed");
         TryInit(Server.Schematic.Init, "Initialising Schematics failed");
@@ -46,7 +47,6 @@ public class SynapseController
         TryInit(CommandHandlers.RegisterSynapseCommands, "Initialising SynapseCommands failed");
         TryInit(PluginLoader.ActivatePlugins, "Initialising Plugins failed");
         TryInit(Server.Events.LateInit, "Initialising EventHandler late failed");
-        TryInit(Server.Logger.Refresh, "Initialising Logger File failed");
         TryInit(Server.RceHandler.Reload, "Reloading RCE failed. Try updating your dependencies");
 
         Server.Logger.Info("Synapse is now ready!");
