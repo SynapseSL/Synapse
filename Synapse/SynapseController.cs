@@ -28,13 +28,13 @@ public class SynapseController
     }
     internal SynapseController()
     {
-        SynapseVersion.Init();
-
         if (StartupArgs.Args.Any(x => x.Equals("-nosynapse", StringComparison.OrdinalIgnoreCase)))
         {
-            Server.Logger.Warn("Server started with -nosynapse argument! Synapse will not be loaded");
+            ServerConsole.AddLog("Server started with -nosynapse argument! Synapse will not be loaded", ConsoleColor.Yellow);
             return;
         }
+
+        SynapseVersion.Init();
 
         PatchMethods();
 
