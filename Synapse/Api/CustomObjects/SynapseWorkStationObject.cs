@@ -9,6 +9,15 @@ namespace Synapse.Api.CustomObjects
     {
         public static WorkstationController Prefab { get; internal set; }
 
+        public override GameObject GameObject
+            => WorkStation.GameObject;
+        public override NetworkIdentity NetworkIdentity
+            => WorkStation.workStation.netIdentity;
+        public override ObjectType Type
+            => ObjectType.Workstation;
+
+        public WorkStation WorkStation { get; }
+
         //This is just for compatibillity with older Versions
         internal SynapseWorkStationObject(WorkStation station, Vector3 position, Quaternion rotation, Vector3 scale)
         {
@@ -39,15 +48,6 @@ namespace Synapse.Api.CustomObjects
             var script = GameObject.AddComponent<SynapseObjectScript>();
             script.Object = this;
         }
-
-
-        public override GameObject GameObject => WorkStation.GameObject;
-        public override NetworkIdentity NetworkIdentity => WorkStation.workStation.netIdentity;
-        public override ObjectType Type => ObjectType.Workstation;
-
-
-        public WorkStation WorkStation { get; }
-
 
         private WorkStation CreateStation(Vector3 position, Quaternion rotation, Vector3 scale)
         {

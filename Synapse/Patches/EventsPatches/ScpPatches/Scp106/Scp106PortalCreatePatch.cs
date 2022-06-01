@@ -1,6 +1,6 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Synapse.Api;
+using System;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
 {
@@ -15,7 +15,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
                 Server.Get.Events.Scp.Scp106.InvokePortalCreateEvent(__instance.GetPlayer(), out var allow);
                 return allow;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: Scp106PortalCreate failed!!\n{e}");
                 return true;

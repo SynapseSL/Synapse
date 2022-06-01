@@ -1,10 +1,10 @@
-﻿using System;
+﻿using HarmonyLib;
+using LiteNetLib;
+using LiteNetLib.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
-using HarmonyLib;
-using LiteNetLib;
-using LiteNetLib.Utils;
 
 namespace Synapse.Patches.EventsPatches.ServerPatches
 {
@@ -19,18 +19,19 @@ namespace Synapse.Patches.EventsPatches.ServerPatches
                 var allow = true;
                 var reason = "No Reason";
 
-                if (!request.Data.EndOfData) return;
+                if (!request.Data.EndOfData)
+                    return;
 
                 var userId = "";
 
-                if(CustomLiteNetLib4MirrorTransport.UserIds.ContainsKey(request.RemoteEndPoint))
+                if (CustomLiteNetLib4MirrorTransport.UserIds.ContainsKey(request.RemoteEndPoint))
                     userId = CustomLiteNetLib4MirrorTransport.UserIds[request.RemoteEndPoint].UserId;
 
                 SynapseController.Server.Events.Server.InvokePreAuthenticationEvent(userId, ref allow, ref reason, request);
 
                 if (allow)
                 {
-                    request.Accept();
+                    _ = request.Accept();
                     return;
                 }
 
@@ -43,7 +44,7 @@ namespace Synapse.Patches.EventsPatches.ServerPatches
             {
                 Synapse.Api.Logger.Get.Error($"Synapse-Event: PreAuthenticationFailed failed!!\n{e}");
                 //Just casually accept if Synapse messes up here.
-                request.Accept();
+                _ = request.Accept();
             }
         }
 
@@ -53,12 +54,15 @@ namespace Synapse.Patches.EventsPatches.ServerPatches
 
             foreach (var code in codes.Select((x, i) => new { Value = x, Index = i }))
             {
-                if (code.Value.opcode != OpCodes.Callvirt) continue;
-                if (codes[code.Index + 2].opcode != OpCodes.Ldstr) continue;
+                if (code.Value.opcode != OpCodes.Callvirt)
+                    continue;
+                if (codes[code.Index + 2].opcode != OpCodes.Ldstr)
+                    continue;
 
                 var strOperand = codes[code.Index + 2].operand as string;
 
-                if (strOperand == "Player {0} preauthenticated from endpoint {1}.") code.Value.opcode = OpCodes.Nop;
+                if (strOperand == "Player {0} preauthenticated from endpoint {1}.")
+                    code.Value.opcode = OpCodes.Nop;
             }
 
             return codes.AsEnumerable();

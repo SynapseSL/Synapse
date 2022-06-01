@@ -4,5 +4,4 @@ namespace Synapse.Command
     {
         CommandResult Execute(CommandContext context);
     }
-
 }

@@ -1,6 +1,6 @@
-﻿using System;
-using MapGeneration.Distributors;
+﻿using MapGeneration.Distributors;
 using Synapse.Api.Items;
+using System;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -17,9 +17,11 @@ namespace Synapse.Api
 
         public readonly StructurePositionSync positionsync;
 
-        public GameObject GameObject => generator.gameObject;
+        public GameObject GameObject
+            => generator.gameObject;
 
-        public string Name => GameObject.name;
+        public string Name
+            => GameObject.name;
 
         public Vector3 Position
         {
@@ -35,7 +37,7 @@ namespace Synapse.Api
 
         public bool Open
         {
-            get => generator.HasFlag(generator._flags,Scp079Generator.GeneratorFlags.Open);
+            get => generator.HasFlag(generator._flags, Scp079Generator.GeneratorFlags.Open);
             set
             {
                 generator.ServerSetFlag(Scp079Generator.GeneratorFlags.Open, value);
@@ -45,7 +47,7 @@ namespace Synapse.Api
 
         public bool Locked
         {
-            get => !generator.HasFlag(generator._flags,Scp079Generator.GeneratorFlags.Unlocked);
+            get => !generator.HasFlag(generator._flags, Scp079Generator.GeneratorFlags.Unlocked);
             set
             {
                 generator.ServerSetFlag(Scp079Generator.GeneratorFlags.Unlocked, !value);
@@ -66,11 +68,19 @@ namespace Synapse.Api
             }
         }
 
-        public bool Engaged { get => generator.Engaged; set => generator.Engaged = value; }
+        public bool Engaged
+        {
+            get => generator.Engaged;
+            set => generator.Engaged = value;
+        }
 
-        public short Time { get => generator._syncTime; set => generator.Network_syncTime = value; }
+        public short Time
+        {
+            get => generator._syncTime;
+            set => generator.Network_syncTime = value;
+        }
 
-        [Obsolete()]
+        [Obsolete]
         public Room Room => null;
 
         [Obsolete("Use Engaged")]

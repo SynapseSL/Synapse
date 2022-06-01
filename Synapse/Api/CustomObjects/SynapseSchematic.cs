@@ -15,18 +15,32 @@ namespace Synapse.Api.CustomObjects
         public string Name { get; set; }
         public List<string> CustomAttributes { get; set; }
 
-        public List<PrimitiveConfiguration> PrimitiveObjects { get; set; } = new List<PrimitiveConfiguration>();
-        public List<LightSourceConfiguration> LightObjects { get; set; } = new List<LightSourceConfiguration>();
-        public List<TargetConfiguration> TargetObjects { get; set; } = new List<TargetConfiguration>();
-        public List<ItemConfiguration> ItemObjects { get; set; } = new List<ItemConfiguration>();
-        public List<WorkStationConfiguration> WorkStationObjects { get; set; } = new List<WorkStationConfiguration>();
-        public List<DoorConfiguration> DoorObjects { get; set; } = new List<DoorConfiguration>();
-        public List<CustomObjectConfiguration> CustomObjects { get; set; } = new List<CustomObjectConfiguration>();
-        public List<RagdollConfiguration> RagdollObjects { get; set; } = new List<RagdollConfiguration>();
-        public List<DummyConfiguration> DummyObjects { get; set; } = new List<DummyConfiguration>();
-        public List<GeneratorConfiguration> GeneratorObjects { get; set; } = new List<GeneratorConfiguration>();
-        public List<LockerConfiguration> LockerObjects { get; set; } = new List<LockerConfiguration>();
+        public List<PrimitiveConfiguration> PrimitiveObjects { get; set; }
+        public List<LightSourceConfiguration> LightObjects { get; set; }
+        public List<TargetConfiguration> TargetObjects { get; set; }
+        public List<ItemConfiguration> ItemObjects { get; set; }
+        public List<WorkStationConfiguration> WorkStationObjects { get; set; }
+        public List<DoorConfiguration> DoorObjects { get; set; }
+        public List<CustomObjectConfiguration> CustomObjects { get; set; }
+        public List<RagdollConfiguration> RagdollObjects { get; set; }
+        public List<DummyConfiguration> DummyObjects { get; set; }
+        public List<GeneratorConfiguration> GeneratorObjects { get; set; }
+        public List<LockerConfiguration> LockerObjects { get; set; }
 
+        public SynapseSchematic()
+        {
+            PrimitiveObjects = new List<PrimitiveConfiguration>();
+            LightObjects = new List<LightSourceConfiguration>();
+            TargetObjects = new List<TargetConfiguration>();
+            ItemObjects = new List<ItemConfiguration>();
+            WorkStationObjects = new List<WorkStationConfiguration>();
+            DoorObjects = new List<DoorConfiguration>();
+            CustomObjects = new List<CustomObjectConfiguration>();
+            RagdollObjects = new List<RagdollConfiguration>();
+            DummyObjects = new List<DummyConfiguration>();
+            GeneratorObjects = new List<GeneratorConfiguration>();
+            LockerObjects = new List<LockerConfiguration>();
+        }
 
         public class PrimitiveConfiguration
         {

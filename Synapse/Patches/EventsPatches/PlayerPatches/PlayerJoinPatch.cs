@@ -1,8 +1,8 @@
-﻿using System;
+﻿using HarmonyLib;
+using Synapse.Database;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using HarmonyLib;
-using Synapse.Database;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
@@ -16,9 +16,10 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             {
                 var player = __instance.GetPlayer();
 
-                Task.Run(() =>
+                _ = Task.Run(() =>
                 {
-                    if (!SynapseController.Server.Configs.SynapseConfiguration.DatabaseEnabled) return;
+                    if (!SynapseController.Server.Configs.SynapseConfiguration.DatabaseEnabled)
+                        return;
                     if (!DatabaseManager.PlayerRepository.ExistGameId(player.UserId))
                     {
                         var dbo = new PlayerDbo()
@@ -28,18 +29,18 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                             DoNotTrack = player.DoNotTrack,
                             Data = new Dictionary<string, string>()
                         };
-                        DatabaseManager.PlayerRepository.Insert(dbo);
+                        _ = DatabaseManager.PlayerRepository.Insert(dbo);
                     }
                     else
                     {
                         var dbo = DatabaseManager.PlayerRepository.FindByGameId(player.UserId);
                         dbo.Name = player.DisplayName;
                         dbo.DoNotTrack = player.DoNotTrack;
-                        DatabaseManager.PlayerRepository.Save(dbo);
+                        _ = DatabaseManager.PlayerRepository.Save(dbo);
                     }
                 });
 
-                if (!string.IsNullOrEmpty(player.UserId))
+                if (!String.IsNullOrEmpty(player.UserId))
                 {
                     SynapseController.Server.Events.Player.InvokePlayerJoinEvent(player, ref n);
                 }

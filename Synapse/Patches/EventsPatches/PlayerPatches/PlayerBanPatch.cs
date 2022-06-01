@@ -1,6 +1,6 @@
-﻿using System;
-using GameCore;
+﻿using GameCore;
 using HarmonyLib;
+using System;
 using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
@@ -15,18 +15,13 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             try
             {
                 var player = user.GetPlayer();
-                Api.Player banIssuer;
-                if (issuer.Contains("(")) {
-                    banIssuer = SynapseController.Server.GetPlayer(issuer.Substring(issuer.LastIndexOf('(') + 1, issuer.Length - 2 - issuer.LastIndexOf('(')));
-                }
-                else 
-                {
-                    banIssuer = SynapseController.Server.GetPlayer(issuer);
-                }
+                var banIssuer = issuer.Contains("(")
+                    ? SynapseController.Server.GetPlayer(issuer.Substring(issuer.LastIndexOf('(') + 1, issuer.Length - 2 - issuer.LastIndexOf('(')))
+                    : SynapseController.Server.GetPlayer(issuer);
                 var allow = true;
                 SynapseController.Server.Events.Player.InvokePlayerBanEvent(player, banIssuer, ref duration, ref reason, ref allow);
 
-                return isGlobalBan && ConfigFile.ServerConfig.GetBool("gban_ban_ip") || allow;
+                return (isGlobalBan && ConfigFile.ServerConfig.GetBool("gban_ban_ip")) || allow;
             }
             catch (Exception e)
             {

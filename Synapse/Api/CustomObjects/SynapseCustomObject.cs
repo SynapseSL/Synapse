@@ -8,6 +8,11 @@ namespace Synapse.Api.CustomObjects
     /// </summary>
     public class SynapseCustomObject : DefaultSynapseObject
     {
+        public int ID { get; }
+        public override GameObject GameObject { get; }
+        public override ObjectType Type
+            => ObjectType.Custom;
+
         public SynapseCustomObject(Vector3 position, Vector3 rotation, Vector3 scale, int id)
         {
             GameObject = new GameObject("SynapseCustomObject-" + id);
@@ -20,7 +25,6 @@ namespace Synapse.Api.CustomObjects
             var script = GameObject.AddComponent<SynapseObjectScript>();
             script.Object = this;
         }
-
         internal SynapseCustomObject(SynapseSchematic.CustomObjectConfiguration configuration)
         {
             GameObject = new GameObject("SynapseCustomObject-" + configuration.ID);
@@ -35,10 +39,6 @@ namespace Synapse.Api.CustomObjects
             script.Object = this;
         }
 
-        public int ID { get; }
-
-        public override GameObject GameObject { get; }
-        public override ObjectType Type => ObjectType.Custom;
         public override void Destroy()
             => Object.Destroy(GameObject);
     }

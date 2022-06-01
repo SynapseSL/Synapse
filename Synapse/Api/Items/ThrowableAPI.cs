@@ -9,16 +9,18 @@ namespace Synapse.Api.Items
     {
         private SynapseItem Item { get; }
 
-        public ThrowableAPI(SynapseItem item) => Item = item;
+        public ThrowableAPI(SynapseItem item)
+            => Item = item;
 
         public ThrownProjectile ThrowableItem { get; internal set; }
 
         public float FuseTime
         {
-            get => ThrowableItem == null ? 0 : ThrowableItem.GetComponent<TimeGrenade>().TargetTime - Time.timeSinceLevelLoad;
+            get => ThrowableItem is null ? 0 : ThrowableItem.GetComponent<TimeGrenade>().TargetTime - Time.timeSinceLevelLoad;
             set
             {
-                if (ThrowableItem == null) return;
+                if (ThrowableItem is null)
+                    return;
                 var comp = ThrowableItem.GetComponent<TimeGrenade>();
 
                 comp.RpcSetTime(value);
@@ -28,7 +30,8 @@ namespace Synapse.Api.Items
 
         public void Fuse()
         {
-            if (Item.State != Enum.ItemState.Map) return;
+            if (Item.State != Enum.ItemState.Map)
+                return;
 
             if (!InventoryItemLoader.AvailableItems.TryGetValue(Item.ItemType, out var itemBase))
                 return;
@@ -44,6 +47,7 @@ namespace Synapse.Api.Items
                 rigidbody.velocity = Item.PickupBase.Rb.velocity;
                 rigidbody.angularVelocity = rigidbody.angularVelocity;
             }
+
             Item.PickupBase.Info.Locked = true;
             thrownProjectile.NetworkInfo = Item.PickupBase.Info;
             NetworkServer.Spawn(thrownProjectile.gameObject);

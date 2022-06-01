@@ -7,16 +7,18 @@ namespace Synapse.Api
 {
     public class Broadcast
     {
-        public Broadcast(string msg,ushort time,Player player)
+        public Broadcast(string msg, ushort time, Player player)
         {
             Message = msg;
             Time = time;
             _player = player;
+
+            DisplayTime = Single.MinValue;
         }
 
         private readonly Player _player;
 
-        public float DisplayTime { get; internal set; } = float.MinValue;
+        public float DisplayTime { get; internal set; }
 
         private string msg;
 
@@ -25,7 +27,7 @@ namespace Synapse.Api
             get => msg;
             set
             {
-                if(value != msg)
+                if (value != msg)
                 {
                     msg = value;
 
@@ -51,7 +53,7 @@ namespace Synapse.Api
 
             DisplayTime = UnityEngine.Time.time;
             _player.Broadcast(Time, Message);
-            Timing.CallDelayed(Time, () => EndBc());
+            _ = Timing.CallDelayed(Time, () => EndBc());
         }
 
         public void Refresh()
@@ -68,57 +70,61 @@ namespace Synapse.Api
             Active = false;
 
             _player.ActiveBroadcasts.Remove(this);
-            
+
             _player.ClearBroadcasts();
 
-            if (_player.ActiveBroadcasts.FirstOrDefault() != null)
-                _player.ActiveBroadcasts.FirstOrDefault().StartBc(_player);
+            if (_player.ActiveBroadcasts.FirstOrDefault() is { } broadcast)
+                broadcast.StartBc(_player);
         }
     }
 
     public class BroadcastList
     {
-        public BroadcastList(Player player) => _player = player;
+        public BroadcastList(Player player)
+        {
+            _player = player;
+            broadcasts = new List<Broadcast>();
+        }
 
         private readonly Player _player;
 
-        private List<Broadcast> bcs = new List<Broadcast>();
+        private List<Broadcast> broadcasts;
 
-        public void Add(Broadcast bc,bool instant = false)
+        public void Add(Broadcast bc, bool instant = false)
         {
-            if (bc == null)
+            if (bc is null)
                 return;
 
             if (instant)
             {
-                var currentbc = bcs.FirstOrDefault();
+                var currentbc = broadcasts.FirstOrDefault();
 
                 var list = new List<Broadcast>
                 {
                     bc
                 };
-                list.AddRange(bcs);
-                bcs = list;
+                list.AddRange(broadcasts);
+                broadcasts = list;
 
                 if (currentbc != null)
                     currentbc.EndBc();
                 else
-                    bcs.First().StartBc(_player);
+                    broadcasts.First().StartBc(_player);
             }
             else
             {
-                bcs.Add(bc);
+                broadcasts.Add(bc);
 
-                if (!bcs.First().Active)
-                    bcs.First().StartBc(_player);
+                if (!broadcasts.First().Active)
+                    broadcasts.First().StartBc(_player);
             }
         }
 
         public void Remove(Broadcast bc)
         {
-            if(bcs.Any(x => x == bc))
+            if (broadcasts.Any(x => x == bc))
             {
-                bcs.Remove(bc);
+                _ = broadcasts.Remove(bc);
 
                 if (bc.Active)
                     bc.EndBc();
@@ -127,23 +133,26 @@ namespace Synapse.Api
 
         public void Clear()
         {
-            if (bcs.Count < 1)
+            if (broadcasts.Count < 1)
                 return;
-            var activebc = bcs.FirstOrDefault();
-            bcs.Clear();
+            var activebc = broadcasts.FirstOrDefault();
+            broadcasts.Clear();
             activebc.EndBc();
         }
 
-        public IEnumerator<Broadcast> GetEnumerator() => bcs.GetEnumerator();
+        public IEnumerator<Broadcast> GetEnumerator()
+            => broadcasts.GetEnumerator();
 
+        public bool Contains(Broadcast bc)
+            => broadcasts.Contains(bc);
 
+        public bool Any(Func<Broadcast, bool> func)
+            => broadcasts.Any(func);
 
-        public bool Contains(Broadcast bc) => bcs.Contains(bc);
+        public Broadcast FirstOrDefault()
+            => broadcasts.FirstOrDefault();
 
-        public bool Any(Func<Broadcast, bool> func) => bcs.Any(func);
-
-        public Broadcast FirstOrDefault() => bcs.FirstOrDefault();
-
-        public Broadcast FirstOrDefault(Func<Broadcast, bool> func) => bcs.FirstOrDefault(func);
+        public Broadcast FirstOrDefault(Func<Broadcast, bool> func)
+            => broadcasts.FirstOrDefault(func);
     }
 }

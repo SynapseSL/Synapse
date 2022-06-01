@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using HarmonyLib;
+﻿using HarmonyLib;
 using NorthwoodLib.Pools;
 using Synapse.Api;
+using System;
+using System.Collections.Generic;
 
 namespace Synapse.Patches.EventsPatches.RoundPatches
 {
-    [HarmonyPatch(typeof(CharacterClassManager),nameof(CharacterClassManager.SetRandomRoles))]
+    [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.SetRandomRoles))]
     internal static class SpawnPlayersPatch
     {
         [HarmonyPrefix]
@@ -29,7 +29,8 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                 foreach (var pair in dictionary)
                 {
                     var player = pair.Key.GetPlayer();
-                    if (player == Server.Get.Host) continue;
+                    if (player == Server.Get.Host)
+                        continue;
 
                     //This fix the Bug that Overwatch Players get spawned in for a sec and then get sets to Spectator again which results in many bugs
                     if (player.OverWatch)
@@ -61,7 +62,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                     {
                         pair.Key.RoleID = pair.Value;
 
-                        builder.Append((RoleType)pair.Value + " | ");
+                        _ = builder.Append((RoleType)pair.Value + " | ");
                     }
 
                     ServerLogs.AddLog(ServerLogs.Modules.Logger, "Class Picker Result: " + builder, ServerLogs.ServerLogType.GameEvent, false);
@@ -70,7 +71,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 
                 return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 SynapseController.Server.Logger.Error($"Synapse-Event: SpawnPlayers failed!!\n{e}");
                 return true;

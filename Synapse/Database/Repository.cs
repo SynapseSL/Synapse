@@ -1,15 +1,14 @@
+using LiteDB;
+using Synapse.Api;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using LiteDB;
-using Synapse.Api;
 
 namespace Synapse.Database
 {
     public abstract class Repository<TK> : IRawRepository where TK : IDatabaseEntity
     {
         public Type GenericType => typeof(TK);
-
 
         /// <summary>
         /// Creates a new Database transaction
@@ -19,8 +18,8 @@ namespace Synapse.Database
         /// other transactions on the system 
         /// </summary>
         [Unstable]
-        public RepositoryTransaction<TK> Transaction => new RepositoryTransaction<TK>();
-
+        public RepositoryTransaction<TK> Transaction
+            => new RepositoryTransaction<TK>();
 
         [API]
         public TK GetById(int id)
@@ -54,7 +53,7 @@ namespace Synapse.Database
         public TK Insert(TK tk)
         {
             using var trc = Transaction;
-            trc.Collection.Insert(tk);
+            _ = trc.Collection.Insert(tk);
             return tk;
         }
 
@@ -92,7 +91,6 @@ namespace Synapse.Database
             using var trc = Transaction;
             return trc.Collection.Find(query).ToList();
         }
-
     }
 
     public interface IRawRepository { }
@@ -109,17 +107,13 @@ namespace Synapse.Database
 
         }
 
-        public ILiteQueryable<TK> Query()
-        {
-            return Collection.Query();
-        }
+        public ILiteQueryable<TK> Query() => Collection.Query();
 
         public void Dispose()
         {
-            Database.Commit();
+            _ = Database.Commit();
             Database.Dispose();
         }
-
     }
 
     public interface IDatabaseEntity

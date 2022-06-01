@@ -59,13 +59,13 @@ namespace Synapse.Config
         public ushort JoinMessagesDuration { get; set; } = 5;
 
         [Description("The Broadcast Message a Player gets when joining the Server")]
-        public string JoinBroadcast { get; set; } = string.Empty;
+        public string JoinBroadcast { get; set; } = System.String.Empty;
 
         [Description("The TextHint a Player gets when joining the Server")]
-        public string JoinTextHint { get; set; } = string.Empty;
+        public string JoinTextHint { get; set; } = System.String.Empty;
 
         [Description("Opens a Window with the Text when a Player join the Server")]
-        public string JoinWindow { get; set; } = string.Empty;
+        public string JoinWindow { get; set; } = System.String.Empty;
         #endregion
 
         #region Database

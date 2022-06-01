@@ -1,15 +1,14 @@
-﻿using Synapse.Api.Enum;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using Synapse.Config;
 
 namespace Synapse.Api
 {
     public class Jail
     {
-        internal Jail(Player player) => Player = player;
+        internal Jail(Player player)
+            => _player = player;
 
-        private readonly Player Player;
-        private bool isjailed = false;
+        private readonly Player _player;
+        private bool isjailed;
 
         public bool IsJailed
         {
@@ -23,63 +22,33 @@ namespace Synapse.Api
             }
         }
 
-        public Player Admin { get; set; }
+        public Player Admin { get; private set; }
 
-        public RoleType Role { get; set; }
-
-        public Vector3 Position { get; set; }
-
-        public List<Items.SynapseItem> Items { get; set; } = new List<Items.SynapseItem>();
-
-        public Dictionary<AmmoType, ushort> Ammos { get; set; } = new Dictionary<AmmoType, ushort>();
-
-        public float Health { get; set; }
+        public SerializedPlayerState State { get; private set; }
 
         public void JailPlayer(Player admin)
         {
-            if (IsJailed) return;
+            if (IsJailed)
+                return;
 
             Admin = admin;
-            Role = Player.RoleType;
-            Position = Player.Position;
+            State = _player;
 
-            Ammos.Clear();
-            foreach (var ammoType in (AmmoType[])System.Enum.GetValues(typeof(AmmoType)))
+            new SerializedPlayerState()
             {
-                Ammos.Add(ammoType, Player.AmmoBox[ammoType]);
-                Player.AmmoBox[ammoType] = 0;
-            }
-
-            Items.Clear();
-            foreach (var item in Player.Inventory.Items)
-            {
-                Items.Add(item);
-                item.Despawn();
-            }
-
-            Health = Player.Health;
-
-            Player.RoleType = RoleType.Tutorial;
+                Position = Admin.Position,
+                RoleType = RoleType.Tutorial,
+            }.Apply(_player);
 
             isjailed = true;
         }
 
         public void UnJailPlayer()
         {
-            if (!IsJailed) return;
+            if (!IsJailed)
+                return;
 
-            Player.ChangeRoleAtPosition(Role);
-            Player.Position = Position;
-            Player.Health = Health;
-
-            Player.Inventory.Clear();
-            
-
-            foreach (var item in Items)
-                Player.Inventory.AddItem(item);
-
-            foreach (var ammo in Ammos)
-                Player.AmmoBox[ammo.Key] = ammo.Value;
+            State.Apply(_player, true);
 
             isjailed = false;
         }

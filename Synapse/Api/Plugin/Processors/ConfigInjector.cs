@@ -13,32 +13,36 @@ namespace Synapse.Api.Plugin.Processors
                 foreach (var field in context.PluginType.GetFields())
                 {
                     var configAttribute = field.GetCustomAttribute<Config>();
-                    if (configAttribute == null) continue;
+                    if (configAttribute is null)
+                        continue;
                     var section = configAttribute.section;
-                    Type t = FieldInfo.GetFieldFromHandle(field.FieldHandle).FieldType;
-                    if (section == null) section = t.FullName?.Replace(".", " ");
+                    var type = FieldInfo.GetFieldFromHandle(field.FieldHandle).FieldType;
+                    if (section is null)
+                        section = type.FullName?.Replace(".", " ");
 
-                    if (!typeof(IConfigSection).IsAssignableFrom(t))
+                    if (!typeof(IConfigSection).IsAssignableFrom(type))
                         continue;
 
-                    object typeObj = Activator.CreateInstance(t);
-                    object config = SynapseController.Server.Configs.GetOrSetDefault(section, typeObj);
+                    var typeObj = Activator.CreateInstance(type);
+                    var config = SynapseController.Server.Configs.GetOrSetDefault(section, typeObj);
                     field.SetValue(context.Plugin, config);
                 }
 
                 foreach (var property in context.PluginType.GetProperties())
                 {
                     var configAttribute = property.GetCustomAttribute<Config>();
-                    if (configAttribute == null) continue;
+                    if (configAttribute is null)
+                        continue;
                     var section = configAttribute.section;
-                    Type t = property.PropertyType;
-                    if (section == null) section = t.FullName?.Replace(".", " ");
+                    var type = property.PropertyType;
+                    if (section is null)
+                        section = type.FullName?.Replace(".", " ");
 
-                    if (!typeof(IConfigSection).IsAssignableFrom(t))
+                    if (!typeof(IConfigSection).IsAssignableFrom(type))
                         continue;
 
-                    object typeObj = Activator.CreateInstance(t);
-                    object config = SynapseController.Server.Configs.GetOrSetDefault(section, typeObj);
+                    var typeObj = Activator.CreateInstance(type);
+                    var config = SynapseController.Server.Configs.GetOrSetDefault(section, typeObj);
                     property.SetValue(context.Plugin, config);
                 }
             }

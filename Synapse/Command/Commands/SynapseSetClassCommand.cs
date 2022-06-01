@@ -4,10 +4,10 @@ namespace Synapse.Command.Commands
 {
     [CommandInformation(
         Name = "Setclass",
-        Aliases = new[] {"sc","class"},
+        Aliases = new[] { "sc", "class" },
         Description = "A command to set the class of a Player",
         Permission = "synapse.command.setclass",
-        Platforms = new[] {Platform.RemoteAdmin,Platform.ServerConsole},
+        Platforms = new[] { Platform.RemoteAdmin, Platform.ServerConsole },
         Usage = "setclass player RoleID",
         Arguments = new[] { "Player", "RoleID" }
         )]
@@ -17,7 +17,7 @@ namespace Synapse.Command.Commands
         {
             var result = new CommandResult();
 
-            if(context.Arguments.Count < 2)
+            if (context.Arguments.Count < 2)
             {
                 result.Message = "Missing Parameters! Command Usage: setclass player RoleID";
                 result.State = CommandResultState.Error;
@@ -25,16 +25,16 @@ namespace Synapse.Command.Commands
             }
 
             var player = Server.Get.GetPlayer(context.Arguments.FirstElement());
-            if(player == null)
+            if (player is null)
             {
                 result.Message = "No Player was found!";
                 result.State = CommandResultState.Error;
                 return result;
             }
 
-            if(!int.TryParse(context.Arguments.ElementAt(1),out var id))
+            if (!System.Int32.TryParse(context.Arguments.ElementAt(1), out var id))
             {
-                result.Message = "Invalid Paramter for RoleID";
+                result.Message = "Invalid Parameter for RoleID";
                 result.State = CommandResultState.Error;
                 return result;
             }

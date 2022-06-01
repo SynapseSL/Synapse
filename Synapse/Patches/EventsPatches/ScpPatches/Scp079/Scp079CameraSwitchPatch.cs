@@ -1,6 +1,5 @@
-﻿using System;
-using HarmonyLib;
-using Synapse.Api;
+﻿using HarmonyLib;
+using System;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 {
@@ -13,8 +12,8 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
             try
             {
                 var camera = Server.Get.Map.Cameras.Find(cam => cam.ID == camId);
-                Player player = __instance.GetPlayer();
-                bool spawning = false;
+                var player = __instance.GetPlayer();
+                var spawning = false;
                 if (!player.Scp079Controller.Spawned)
                 {
                     spawning = true;
@@ -31,7 +30,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp079
 
                 return allowed;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Synapse.Api.Logger.Get.Error($"Synapse-Event: Scp079CameraSwitchEvent failed!!\n{e}");
                 return true;

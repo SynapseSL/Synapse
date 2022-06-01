@@ -1,5 +1,5 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
+using System;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp173
 {
@@ -24,7 +24,7 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp173
 
                 return allow;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Synapse.Api.Logger.Get.Error($"Synapse-Event: ScpAttackEvent(Scp173) failed!!\n{e}");
                 return true;

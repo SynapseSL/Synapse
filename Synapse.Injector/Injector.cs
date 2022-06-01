@@ -1,10 +1,10 @@
-﻿using System;
+﻿using dnlib.DotNet;
+using dnlib.DotNet.Emit;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using dnlib.DotNet;
-using dnlib.DotNet.Emit;
 using FieldAttributes = dnlib.DotNet.FieldAttributes;
 using MethodAttributes = dnlib.DotNet.MethodAttributes;
 using TypeAttributes = dnlib.DotNet.TypeAttributes;
@@ -13,8 +13,8 @@ namespace Synapse.Injector
 {
     public class SynapseInjector
     {
-        private bool _writeToDisk;
-        private string _outputPath;
+        private readonly bool _writeToDisk;
+        private readonly string _outputPath;
 
         public SynapseInjector(bool writeToDisk = true, string outputPath = null)
         {
@@ -44,8 +44,8 @@ namespace Synapse.Injector
             {
                 if (!type.IsPublic)
                 {
-                    bool isInter = type.IsInterface;
-                    bool isAbstr = type.IsAbstract;
+                    var isInter = type.IsInterface;
+                    var isAbstr = type.IsAbstract;
 
                     type.Attributes = type.IsNested ? TypeAttributes.NestedPublic : TypeAttributes.Public;
 
@@ -54,14 +54,19 @@ namespace Synapse.Injector
                     if (isAbstr)
                         type.IsAbstract = true;
                 }
-                if (type.CustomAttributes.Find("System.Runtime.CompilerServices.CompilerGeneratedAttribute") != null) continue;
+
+                if (type.CustomAttributes.Find("System.Runtime.CompilerServices.CompilerGeneratedAttribute") != null)
+                    continue;
                 nested.AddRange(type.NestedTypes.ToList());
             }
+
             foreach (var def in nested)
             {
-                if (def.CustomAttributes.Find("System.Runtime.CompilerServices.CompilerGeneratedAttribute") != null) continue;
+                if (def.CustomAttributes.Find("System.Runtime.CompilerServices.CompilerGeneratedAttribute") != null)
+                    continue;
                 def.Attributes = def.IsNested ? TypeAttributes.NestedPublic : TypeAttributes.Public;
             }
+
             types.AddRange(nested);
 
             foreach (var def in types.SelectMany(t => t.Methods).Where(m => !m?.IsPublic ?? false))
@@ -78,6 +83,7 @@ namespace Synapse.Injector
                         field.Access = FieldAttributes.Public;
                 }
             }
+
             if (_writeToDisk)
             {
                 md.Write(Path.Combine(_outputPath, "Assembly-CSharp-Publicized.dll"));
@@ -90,14 +96,14 @@ namespace Synapse.Injector
                 return;
 
             if (!Directory.Exists(_outputPath))
-                Directory.CreateDirectory(_outputPath);
+                _ = Directory.CreateDirectory(_outputPath);
 
             def.Write(Path.Combine(_outputPath, "Assembly-CSharp.dll"));
             Console.WriteLine("Wrote Assembly-CSharp.dll to Delivery directory");
         }
         private void SwapTypes(ModuleDef a, ModuleDef b, TypeDef type)
         {
-            a.Types.Remove(type);
+            _ = a.Types.Remove(type);
             b.Types.Add(type);
         }
         private void InjectLoader(ModuleDef moduleDef, MethodDef callable)

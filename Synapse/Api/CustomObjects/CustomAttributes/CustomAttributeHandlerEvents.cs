@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Synapse.Api.Events.SynapseEventArguments;
+using System;
 using static Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Api.CustomObjects.CustomAttributes
@@ -11,19 +12,20 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
             Get.SynapseObject.DestroyEvent += OnDestroy;
             Get.SynapseObject.UpdateEvent += OnUpdate;
         }
-
-        public void OnLoad(Events.SynapseEventArguments.SOEventArgs ev)
+        public void OnLoad(SOEventArgs ev)
         {
             foreach (var handler in Handlers)
             {
                 var name = handler.Name;
 
-                foreach(var attribute in ev.Object.CustomAttributes)
+                foreach (var attribute in ev.Object.CustomAttributes)
                 {
-                    if (attribute == null) continue;
+                    if (attribute is null)
+                        continue;
 
                     var args = attribute.Split(':');
-                    if (args[0].Equals(handler.Name, StringComparison.InvariantCultureIgnoreCase)) continue;
+                    if (!args[0].Equals(handler.Name, StringComparison.InvariantCultureIgnoreCase))
+                        continue;
                     var newargs = args.Segment(1);
 
                     handler.SynapseObjects.Add(ev.Object);
@@ -32,20 +34,18 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
                 }
             }
         }
-
-        public void OnDestroy(Events.SynapseEventArguments.SOEventArgs ev)
+        public void OnDestroy(SOEventArgs ev)
         {
             foreach (var handler in Handlers)
             {
                 if (handler.SynapseObjects.Contains(ev.Object))
                 {
                     handler.OnDestroy(ev.Object);
-                    handler.SynapseObjects.Remove(ev.Object);
+                    _ = handler.SynapseObjects.Remove(ev.Object);
                 }
             }
         }
-
-        public void OnUpdate(Events.SynapseEventArguments.SOEventArgs ev)
+        public void OnUpdate(SOEventArgs ev)
         {
             foreach (var handler in Handlers)
             {

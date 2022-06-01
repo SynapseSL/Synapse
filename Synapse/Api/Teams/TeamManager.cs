@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Synapse.Api.Teams
@@ -16,33 +16,38 @@ namespace Synapse.Api.Teams
         public void RegisterTeam<TTeam>() where TTeam : ISynapseTeam
         {
             var team = Activator.CreateInstance(typeof(TTeam)) as ISynapseTeam;
-            if (team.Info == null)
-                team.Info = typeof(TTeam).GetCustomAttribute<SynapseTeamInformation>();
+            team.Info ??= typeof(TTeam).GetCustomAttribute<SynapseTeamInformation>();
 
-            if (IsIDRegistered(team.Info.ID)) throw new Exception("A Plugin tried to register a CustomTeam with an already used Id");
+            if (IsIDRegistered(team.Info.ID))
+                throw new Exception("A Plugin tried to register a CustomTeam with an already used Id");
 
             teams.Add(team);
             team.Initialise();
         }
 
-        public bool IsIDRegistered(int id) => (id >= (int)Team.SCP && id <= (int)Team.TUT) || teams.Any(x => x.Info.ID == id);
+        public bool IsIDRegistered(int id)
+            => (id >= (int)Team.SCP && id <= (int)Team.TUT) || teams.Any(x => x.Info.ID == id);
 
-        public bool IsDefaultID(int id) => id >= (int)Team.SCP && id <= (int)Team.TUT;
+        public bool IsDefaultID(int id)
+            => id >= (int)Team.SCP && id <= (int)Team.TUT;
 
-        public bool IsDefaultSpawnableID(int id) => id == (int)Team.MTF || id == (int)Team.CHI;
+        public bool IsDefaultSpawnableID(int id)
+            => id == (int)Team.MTF || id == (int)Team.CHI;
 
         public void SpawnTeam(int id, List<Player> players)
         {
             if (IsDefaultSpawnableID(id))
             {
                 Round.Get.MtfRespawn(id == (int)Team.MTF);
-                return;
             }
-            var team = teams.FirstOrDefault(x => x.Info.ID == id);
-            if (team == null) return;
-            team.Spawn(players);
+            else
+            {
+                var team = teams.FirstOrDefault(x => x.Info.ID == id);
+                team?.Spawn(players);
+            }
         }
 
-        public ISynapseTeam GetTeam(int id) => teams.FirstOrDefault(x => x.Info.ID == id);
+        public ISynapseTeam GetTeam(int id)
+            => teams.FirstOrDefault(x => x.Info.ID == id);
     }
 }
