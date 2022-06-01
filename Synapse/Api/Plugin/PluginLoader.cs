@@ -10,13 +10,19 @@ namespace Synapse.Api.Plugin
 {
     public class PluginLoader
     {
-        private readonly List<IContextProcessor> _processors = new List<IContextProcessor> { new ConfigInjector(), new CommandProcessor(), new TranslationInjector(), new SynapseObjectAttributeProcessor() };
+        public readonly List<PluginInformation> Plugins;
 
-        private readonly List<IPlugin> _plugins = new List<IPlugin>();
+        private readonly List<IContextProcessor> _processors;
+        private readonly List<IPlugin> _plugins;
+        private readonly List<PluginLoadContext> _contexts;
 
-        private readonly List<PluginLoadContext> _contexts = new List<PluginLoadContext>();
-
-        public readonly List<PluginInformation> Plugins = new List<PluginInformation>();
+        public PluginLoader()
+        {
+            _processors = new List<IContextProcessor> { new ConfigInjector(), new CommandProcessor(), new TranslationInjector(), new SynapseObjectAttributeProcessor() };
+            _plugins = new List<IPlugin>();
+            _contexts = new List<PluginLoadContext>();
+            Plugins = new List<PluginInformation>();
+        }
 
         internal void ActivatePlugins()
         {
@@ -39,17 +45,17 @@ namespace Synapse.Api.Plugin
 
                         var infos = type.GetCustomAttribute<PluginInformation>();
 
-                        if (infos == null)
+                        if (infos is null)
                         {
                             SynapseController.Server.Logger.Info($"The File {assembly.GetName().Name} has a class which inherits from IPlugin but has no PluginInformation ... Default Values will be added");
                             infos = new PluginInformation();
                         }
 
                         if (pluginpath.Contains("server-shared"))
-                            infos.shared = true;
+                            infos.Shared = true;
 
                         var allTypes = assembly.GetTypes().ToList();
-                        allTypes.Remove(type);
+                        _ = allTypes.Remove(type);
                         dictionary.Add(infos, new KeyValuePair<Type, List<Type>>(type, allTypes));
                         break;
                     }
@@ -66,7 +72,7 @@ namespace Synapse.Api.Plugin
                 {
                     SynapseController.Server.Logger.Info($"{infoTypePair.Key.Name} will now be activated!");
 
-                    IPlugin plugin = (IPlugin)Activator.CreateInstance(infoTypePair.Value.Key);
+                    var plugin = (IPlugin)Activator.CreateInstance(infoTypePair.Value.Key);
                     plugin.Information = infoTypePair.Key;
                     plugin.Translation = new Translation(plugin.Information);
                     plugin.PluginDirectory = SynapseController.Server.Files.GetPluginDirectory(plugin.Information);
@@ -81,8 +87,10 @@ namespace Synapse.Api.Plugin
             }
 
             foreach (var context in _contexts)
+            {
                 foreach (var processor in _processors)
                     processor.Process(context);
+            }
 
             LoadPlugins();
             Handlers.FinalizePluginsCommands();

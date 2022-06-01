@@ -13,6 +13,6 @@ namespace Synapse.Api.Plugin
         public string Version = "Unknown";
         public int LoadPriority = 0;
 
-        internal bool shared = false;
+        internal bool Shared { get; set; } = false;
     }
 }

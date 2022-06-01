@@ -6,35 +6,44 @@ namespace Synapse.Api.CustomObjects.CustomAttributes
 {
     public partial class CustomAttributeHandler
     {
-        public List<AttributeHandler> Handlers { get; } = new List<AttributeHandler>();
+        public List<AttributeHandler> Handlers { get; }
+        public List<Type> DefaultAttributes { get; }
 
-        public List<Type> DefaultAttributes { get; } = new List<Type>
+        public CustomAttributeHandler()
         {
-            typeof(SchematicDoor),
-            typeof(StaticTeleporter),
-            typeof(MapTeleporter),
-        };
+            Handlers = new List<AttributeHandler>();
+            DefaultAttributes = new List<Type>
+            {
+                typeof(SchematicDoor),
+                typeof(StaticTeleporter),
+                typeof(MapTeleporter),
+            };
+        }
 
         internal void Init()
         {
-            foreach(var type in DefaultAttributes)
+            foreach (var type in DefaultAttributes)
                 LoadHandlerFromType(type);
 
             RegisterEvents();
         }
-
         public void LoadHandlerFromType(Type type)
         {
             try
             {
-                if (!typeof(AttributeHandler).IsAssignableFrom(type)) return;
-                if (type.IsAbstract) return;
+                if (!typeof(AttributeHandler).IsAssignableFrom(type))
+                    return;
+                if (type.IsAbstract)
+                    return;
 
                 var handlerobject = Activator.CreateInstance(type);
 
-                if (!(handlerobject is AttributeHandler handler)) return;
-                if (string.IsNullOrWhiteSpace(handler.Name)) return;
-                if (Handlers.Any(x => x.Name.Equals(handler.Name, StringComparison.InvariantCultureIgnoreCase))) return;
+                if (!(handlerobject is AttributeHandler handler))
+                    return;
+                if (String.IsNullOrWhiteSpace(handler.Name))
+                    return;
+                if (Handlers.Any(x => x.Name.Equals(handler.Name, StringComparison.InvariantCultureIgnoreCase)))
+                    return;
 
                 Handlers.Add(handler);
                 handler.Init();

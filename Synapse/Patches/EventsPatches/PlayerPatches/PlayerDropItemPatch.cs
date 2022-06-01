@@ -1,8 +1,8 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using InventorySystem;
 using InventorySystem.Items;
 using Synapse.Api;
+using System;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
@@ -23,7 +23,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 return allow;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: DropItem failed!!\n{e}");
                 return true;

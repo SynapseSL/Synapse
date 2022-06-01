@@ -28,7 +28,7 @@ namespace Synapse.RCE
         {
             Server.Get.Logger.Info("Starting RCE-Server...");
             _listener.Start(1);
-            Task.Run(ListenForClient);
+            _ = Task.Run(ListenForClient);
         }
         internal void Stop()
         {
@@ -42,7 +42,7 @@ namespace Synapse.RCE
                 while (true)
                 {
                     var client = _listener.AcceptTcpClient();
-                    Task.Run(() => HandleClient(client));
+                    _ = Task.Run(() => HandleClient(client));
                 }
             }
             catch (Exception e) when (e is IOException || e is SocketException)
@@ -78,7 +78,7 @@ namespace Synapse.RCE
                     }
 
                     // Prepare object to be handed over to concurrent Unity-Context
-                    Action action = () => methodInfo.Invoke(null, new object[] { new string[0] });
+                    void action() => methodInfo.Invoke(null, new object[] { new string[0] });
                     var qAction = new QueueAction()
                     {
                         Action = action,
@@ -90,16 +90,17 @@ namespace Synapse.RCE
                     Server.Get.RceHandler.ActionQueue.Enqueue(qAction);
 
                     // Wait until qAction has been executed
-                    while (!qAction.Ran) ;
+                    while (!qAction.Ran)
+                        ;
 
                     // Choose response depending on whether it failed or not
-                    RceResponse response = qAction.Exception is null
+                    var response = qAction.Exception is null
                         ? RceResponse.GetSuccessResponse()
                         : RceResponse.GetFailedBuildResponse(qAction.Exception);
 
                     netStreamWriter.WriteLine(JsonConvert.SerializeObject(response));
                 }
-                catch (JsonSerializationException e)
+                catch (JsonSerializationException)
                 {
                     var response = RceResponse.GetInvalidJsonResponse();
                     var responseJson = JsonConvert.SerializeObject(response);

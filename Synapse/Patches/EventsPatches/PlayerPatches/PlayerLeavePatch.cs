@@ -1,6 +1,6 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Mirror;
+using System;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
@@ -12,10 +12,12 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                if (conn == null || conn.identity == null) return;
+                if (conn is null || conn.identity is null)
+                    return;
 
                 var player = conn.identity.GetPlayer();
-                if (player == null) return;
+                if (player is null)
+                    return;
 
                 if (player.CustomRole != null)
                     player.CustomRole = null;

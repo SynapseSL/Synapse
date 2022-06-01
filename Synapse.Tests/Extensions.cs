@@ -8,11 +8,11 @@ namespace Synapse.Tests
     {
         public static IEnumerable<TSource> TakeLast<TSource>(this IReadOnlyList<TSource> source, int count)
         {
-            int sourceCount = source.Count();
-            int beginning = sourceCount - 1;
-            int ending = Math.Max(sourceCount - count, 0);
+            var sourceCount = source.Count();
+            var beginning = sourceCount - 1;
+            var ending = Math.Max(sourceCount - count, 0);
 
-            for (int i = beginning; i >= ending; i--)
+            for (var i = beginning; i >= ending; i--)
             {
                 yield return source[i];
             }

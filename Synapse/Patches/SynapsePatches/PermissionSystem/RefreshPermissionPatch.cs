@@ -1,6 +1,6 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Synapse.Api;
+using System;
 
 namespace Synapse.Patches.SynapsePatches.PermissionSystem
 {
@@ -15,10 +15,11 @@ namespace Synapse.Patches.SynapsePatches.PermissionSystem
                 var player = __instance.GetPlayer();
                 player.RefreshPermission(disp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Permission: RefreshPermissionPatch failed!!\n{e}");
             }
+
             return false;
         }
     }

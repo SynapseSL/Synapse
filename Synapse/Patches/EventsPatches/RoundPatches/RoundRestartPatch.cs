@@ -1,7 +1,7 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using RoundRestarting;
 using Synapse.Api;
+using System;
 
 namespace Synapse.Patches.EventsPatches.RoundPatches
 {
@@ -15,7 +15,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
             {
                 Server.Get.Events.Round.InvokeRoundRestartEvent();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: RoundRestartEvent failed!!\n{e}");
             }

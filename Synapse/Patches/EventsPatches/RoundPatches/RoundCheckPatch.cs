@@ -1,11 +1,11 @@
-﻿using System;
+﻿using HarmonyLib;
+using MEC;
+using Synapse.Api;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using HarmonyLib;
-using MEC;
-using Synapse.Api;
 using UnityEngine;
 using Logger = Synapse.Api.Logger;
 
@@ -16,15 +16,16 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
     {
         private static readonly MethodInfo
             CustomProcess = SymbolExtensions.GetMethodInfo(() => ProcessServerSide(null));
-        
+
         [HarmonyTranspiler]
         private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
         {
             var codes = new List<CodeInstruction>(instr);
 
-            foreach (var code in codes.Select((x,i) => new {Value =x, Index = i }))
+            foreach (var code in codes.Select((x, i) => new { Value = x, Index = i }))
             {
-                if (code.Value.opcode != OpCodes.Call) continue;
+                if (code.Value.opcode != OpCodes.Call)
+                    continue;
 
                 if (code.Value.operand != null && code.Value.operand is MethodBase methodBase &&
                     methodBase.Name == nameof(RoundSummary._ProcessServerSideCode))
@@ -38,7 +39,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 
         private static IEnumerator<float> ProcessServerSide(RoundSummary instance)
         {
-            while(instance != null)
+            while (instance != null)
             {
                 while (Map.Get.Round.RoundLock || !RoundSummary.RoundInProgress() || (instance._keepRoundOnOne && Server.Get.Players.Count < 2) || Map.Get.Round.RoundLength.TotalSeconds <= 3)
                     yield return Timing.WaitForOneFrame;
@@ -53,11 +54,11 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 
                 var leadingTeam = RoundSummary.LeadingTeam.Draw;
 
-                var result = default(RoundSummary.SumInfo_ClassList);
+                RoundSummary.SumInfo_ClassList result = default;
 
                 bool endround;
 
-                foreach(var player in Server.Get.Players)
+                foreach (var player in Server.Get.Players)
                 {
                     if (player.CustomRole != null)
                         customroles.Add(player.CustomRole);
@@ -92,11 +93,16 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                     }
                 }
 
-                if (teams.Contains(Team.MTF)) teamAmounts++;
-                if (teams.Contains(Team.RSC)) teamAmounts++;
-                if (teams.Contains(Team.CHI)) teamAmounts++;
-                if (teams.Contains(Team.CDP)) teamAmounts++;
-                if (teams.Contains(Team.SCP)) teamAmounts++;
+                if (teams.Contains(Team.MTF))
+                    teamAmounts++;
+                if (teams.Contains(Team.RSC))
+                    teamAmounts++;
+                if (teams.Contains(Team.CHI))
+                    teamAmounts++;
+                if (teams.Contains(Team.CDP))
+                    teamAmounts++;
+                if (teams.Contains(Team.SCP))
+                    teamAmounts++;
 
                 result.warhead_kills = Map.Get.Nuke.Detonated ? Map.Get.Nuke.NukeKills : -1;
 
@@ -115,16 +121,9 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                         endround = true;
                         break;
                     case 2:
-                        if (teams.Contains(Team.CHI) && teams.Contains(Team.SCP))
-                            endround = Server.Get.Configs.SynapseConfiguration.ChaosScpEnd;
-
-                        else if (teams.Contains(Team.CHI) && teams.Contains(Team.CDP))
-                            endround = true;
-
-                        else if (teams.Contains(Team.MTF) && teams.Contains(Team.RSC))
-                            endround = true;
-                        else
-                            endround = false;
+                        endround = teams.Contains(Team.CHI) && teams.Contains(Team.SCP)
+                            ? Server.Get.Configs.SynapseConfiguration.ChaosScpEnd
+                            : (teams.Contains(Team.CHI) && teams.Contains(Team.CDP)) || (teams.Contains(Team.MTF) && teams.Contains(Team.RSC));
                         break;
                     default:
                         endround = false;
@@ -132,12 +131,14 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                 }
 
                 foreach (var role in customroles)
+                {
                     if (role.GetEnemiesID().Any(x => teamids.Contains(x)))
                         endround = false;
+                }
 
                 if (RoundSummary.EscapedClassD + teams.Count(x => x == Team.CDP) > 0)
                 {
-                    if(teams.Contains(Team.SCP) || teams.Contains(Team.CHI) || teams.Contains(Team.CHI))
+                    if (teams.Contains(Team.SCP) || teams.Contains(Team.CHI) || teams.Contains(Team.CHI))
                         leadingTeam = RoundSummary.LeadingTeam.ChaosInsurgency;
                 }
                 else
@@ -148,7 +149,9 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                             leadingTeam = RoundSummary.LeadingTeam.FacilityForces;
                     }
                     else
+                    {
                         leadingTeam = RoundSummary.LeadingTeam.Anomalies;
+                    }
                 }
 
                 try
@@ -160,15 +163,14 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
                     Logger.Get.Error($"Synapse-Event: RoundCheckEvent failed!!\n{e}");
                 }
 
-
-                if (endround || Map.Get.Round.Forceend)
+                if (endround || Map.Get.Round.ForceEnd)
                 {
                     instance.RoundEnded = true;
-                    Map.Get.Round.Forceend = false;
+                    Map.Get.Round.ForceEnd = false;
                     FriendlyFireConfig.PauseDetector = true;
 
-                    var dpercentage = (float)instance.classlistStart.class_ds == 0 ? 0 : RoundSummary.EscapedClassD + result.class_ds / instance.classlistStart.class_ds;
-                    var spercentage = (float)instance.classlistStart.scientists == 0 ? 0 : RoundSummary.EscapedScientists + result.scientists / instance.classlistStart.scientists;
+                    var dpercentage = (float)instance.classlistStart.class_ds == 0 ? 0 : RoundSummary.EscapedClassD + (result.class_ds / instance.classlistStart.class_ds);
+                    var spercentage = (float)instance.classlistStart.scientists == 0 ? 0 : RoundSummary.EscapedScientists + (result.scientists / instance.classlistStart.scientists);
                     var text = $"Round finished! Anomalies: {teams.Where(x => x == Team.SCP).Count()} | Chaos: {teams.Where(x => x == Team.CHI || x == Team.CDP).Count()}" +
                         $" | Facility Forces: {teams.Where(x => x == Team.MTF || x == Team.RSC).Count()} | D escaped percentage: {dpercentage} | S escaped percentage : {spercentage}";
                     GameCore.Console.AddLog(text, Color.gray, false);
@@ -181,7 +183,7 @@ namespace Synapse.Patches.EventsPatches.RoundPatches
 
                     Map.Get.Round.ShowRoundSummary(result, leadingTeam);
 
-                    for (int j = 0; j < 50 * timeToRoundRestart; j++)
+                    for (var j = 0; j < 50 * timeToRoundRestart; j++)
                         yield return 0f;
 
                     Map.Get.Round.DimScreens();

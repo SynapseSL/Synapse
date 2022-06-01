@@ -1,7 +1,7 @@
+using LiteDB;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using LiteDB;
 
 namespace Synapse.Database
 {
@@ -12,8 +12,11 @@ namespace Synapse.Database
 
         public static void CheckEnabledOrThrow()
         {
-            if (!SynapseController.Server.Configs.SynapseConfiguration.DatabaseEnabled) throw new DataException("The Database has been disabled in the config. " +
+            if (!SynapseController.Server.Configs.SynapseConfiguration.DatabaseEnabled)
+            {
+                throw new DataException("The Database has been disabled in the config. " +
                                                                            "Please check SynapseController.EnableDatabase before accessing connected APIs");
+            }
         }
 
         public static PlayerRepository PlayerRepository = new PlayerRepository();
@@ -22,15 +25,9 @@ namespace Synapse.Database
 
     public class PlayerRepository : Repository<PlayerDbo>
     {
-        public PlayerDbo FindByGameId(string id)
-        {
-            return Get(LiteDB.Query.EQ("GameIdentifier", id));
-        }
+        public PlayerDbo FindByGameId(string id) => Get(LiteDB.Query.EQ("GameIdentifier", id));
 
-        public bool ExistGameId(string id)
-        {
-            return Exists(LiteDB.Query.EQ("GameIdentifier", id));
-        }
+        public bool ExistGameId(string id) => Exists(LiteDB.Query.EQ("GameIdentifier", id));
     }
 
     public class PlayerDbo : IDatabaseEntity
@@ -45,10 +42,6 @@ namespace Synapse.Database
 
         public Dictionary<string, string> Data { get; set; }
 
-        public int GetId()
-        {
-            return Id;
-        }
+        public int GetId() => Id;
     }
-
 }

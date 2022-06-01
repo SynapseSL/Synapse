@@ -11,7 +11,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     internal class PlayerDeathPatch
     {
         [HarmonyPrefix]
-        private static bool OnDeath(PlayerStats __instance, DamageHandlerBase handler,out bool __state)
+        private static bool OnDeath(PlayerStats __instance, DamageHandlerBase handler, out bool __state)
         {
             try
             {
@@ -25,8 +25,10 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 SynapseController.Server.Events.Player.InvokePlayerDeathEvent(victim, attacker, type, out var allow);
 
-                if (!allow) victim.Health = 1;
-                if (allow) victim.DeathPosition = victim.Position;
+                if (!allow)
+                    victim.Health = 1;
+                if (allow)
+                    victim.DeathPosition = victim.Position;
                 __state = allow;
                 return allow;
             }
@@ -39,20 +41,20 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         }
 
         [HarmonyPostfix]
-        private static void OnPostDeath(PlayerStats __instance,bool __state)
+        private static void OnPostDeath(PlayerStats __instance, bool __state)
         {
             if (__state)
             {
                 var victim = __instance.GetPlayer();
 
                 foreach (var larry in Server.Get.Players.Where(x => x.Scp106Controller.PocketPlayers.Contains(victim)))
-                    larry.Scp106Controller.PocketPlayers.Remove(victim);
+                    _ = larry.Scp106Controller.PocketPlayers.Remove(victim);
 
                 if (victim.IsDummy)
                     Map.Get.Dummies.FirstOrDefault(x => x.Player == victim)?.Destroy();
 
                 foreach (var larry in Server.Get.Players.Where(x => x.Scp106Controller.PocketPlayers.Contains(victim)))
-                    larry.Scp106Controller.PocketPlayers.Remove(victim);
+                    _ = larry.Scp106Controller.PocketPlayers.Remove(victim);
 
                 if (victim.IsDummy)
                     Map.Get.Dummies.FirstOrDefault(x => x.Player == victim)?.Destroy();

@@ -1,13 +1,13 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using InventorySystem.Items.MicroHID;
+using System;
 using UnityEngine;
 using ItemState = Synapse.Api.Events.SynapseEventArguments.ItemInteractState;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(MicroHIDItem),nameof(MicroHIDItem.ExecuteServerside))]
+    [HarmonyPatch(typeof(MicroHIDItem), nameof(MicroHIDItem.ExecuteServerside))]
     internal static class PlayerUseMicroPatch
     {
         [HarmonyPrefix]
@@ -32,7 +32,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     case HidState.Primed: itemstate = ItemState.Finalizing; break;
                 }
 
-                Server.Get.Events.Player.InvokePlayerItemUseEvent(owner,item, itemstate, ref allow);
+                Server.Get.Events.Player.InvokePlayerItemUseEvent(owner, item, itemstate, ref allow);
                 if (!allow)
                     state = HidState.Idle;
 
@@ -46,6 +46,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                             __instance.State = HidState.PoweringUp;
                             __instance._stopwatch.Restart();
                         }
+
                         break;
 
                     case HidState.PoweringUp:
@@ -56,7 +57,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                         }
                         else if (__instance._stopwatch.Elapsed.TotalSeconds >= 5.95)
                         {
-                            __instance.State = ((__instance.UserInput == HidUserInput.Fire) ? HidState.Firing : HidState.Primed);
+                            __instance.State = (__instance.UserInput == HidUserInput.Fire) ? HidState.Firing : HidState.Primed;
                             __instance._stopwatch.Restart();
                         }
 
@@ -70,18 +71,20 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                             __instance._stopwatch.Stop();
                             __instance._stopwatch.Reset();
                         }
+
                         break;
 
                     case HidState.Primed:
                         if ((__instance.UserInput != HidUserInput.Prime && __instance._stopwatch.Elapsed.TotalSeconds >= 0.34999999403953552) || __instance.RemainingEnergy <= 0f)
                         {
-                            __instance.State = ((__instance.UserInput == HidUserInput.Fire && __instance.RemainingEnergy > 0f) ? HidState.Firing : HidState.PoweringDown);
+                            __instance.State = (__instance.UserInput == HidUserInput.Fire && __instance.RemainingEnergy > 0f) ? HidState.Firing : HidState.PoweringDown;
                             __instance._stopwatch.Restart();
                         }
                         else
                         {
                             num = __instance._energyConsumtionCurve.Evaluate(1f);
                         }
+
                         break;
 
                     case HidState.Firing:
@@ -91,7 +94,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                             __instance.Fire();
                             if (__instance.RemainingEnergy == 0f || (__instance.UserInput != HidUserInput.Fire && __instance._stopwatch.Elapsed.TotalSeconds >= 2.05))
                             {
-                                __instance.State = ((__instance.RemainingEnergy > 0f && __instance.UserInput == HidUserInput.Prime) ? HidState.Primed : HidState.PoweringDown);
+                                __instance.State = (__instance.RemainingEnergy > 0f && __instance.UserInput == HidUserInput.Prime) ? HidState.Primed : HidState.PoweringDown;
                                 __instance._stopwatch.Restart();
                             }
                         }
@@ -99,6 +102,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                         {
                             num = __instance._energyConsumtionCurve.Evaluate(1f);
                         }
+
                         break;
                 }
 
@@ -109,7 +113,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 if (num > 0f)
                 {
-                    __instance.RemainingEnergy = Mathf.Clamp01(__instance.RemainingEnergy - num * Time.deltaTime);
+                    __instance.RemainingEnergy = Mathf.Clamp01(__instance.RemainingEnergy - (num * Time.deltaTime));
                     if (energyToByte != __instance.EnergyToByte)
                     {
                         __instance.ServerSendStatus(HidStatusMessageType.EnergySync, __instance.EnergyToByte);
@@ -118,7 +122,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: PlayerUseMicro failed!!\n{e}");
                 return true;

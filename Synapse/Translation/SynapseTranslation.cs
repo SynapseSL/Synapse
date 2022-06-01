@@ -1,6 +1,6 @@
-﻿using System.Linq;
+﻿using Synapse.Config;
 using System.Collections.Generic;
-using Synapse.Config;
+using System.Linq;
 
 namespace Synapse.Translation
 {
@@ -18,13 +18,11 @@ namespace Synapse.Translation
         {
             get
             {
-                if (translationSYML.Sections.Keys.Any(x => x == Server.Get.Configs.SynapseConfiguration.Language.ToUpper()))
-                    return translationSYML.Sections.First(x => x.Key.ToUpper() == Server.Get.Configs.SynapseConfiguration.Language.ToUpper()).Value.LoadAs<TPluginTranslation>();
-
-                if (translationSYML.Sections.Keys.Any(x => x == "ENGLISH"))
-                    return translationSYML.Sections.First(x => x.Key.ToUpper() == "ENGLISH").Value.LoadAs<TPluginTranslation>();
-
-                return translationSYML.Sections.FirstOrDefault().Value.LoadAs<TPluginTranslation>();
+                return translationSYML.Sections.Keys.Any(x => x == Server.Get.Configs.SynapseConfiguration.Language.ToUpper())
+                    ? translationSYML.Sections.First(x => x.Key.ToUpper() == Server.Get.Configs.SynapseConfiguration.Language.ToUpper()).Value.LoadAs<TPluginTranslation>()
+                    : translationSYML.Sections.Keys.Any(x => x == "ENGLISH")
+                    ? translationSYML.Sections.First(x => x.Key.ToUpper() == "ENGLISH").Value.LoadAs<TPluginTranslation>()
+                    : translationSYML.Sections.FirstOrDefault().Value.LoadAs<TPluginTranslation>();
             }
         }
 

@@ -4,15 +4,21 @@ namespace Synapse.Api
 {
     public class Nuke
     {
-        public static Nuke Get => Map.Get.Nuke;
+        public static Nuke Get
+            => Map.Get.Nuke;
 
-        internal Nuke() { }
+        internal Nuke()
+        {
+            InsidePanel = new NukeInsidePanel();
+            OutsidePanel = new NukeOutsidePanel();
+        }
 
-        private AlphaWarheadController WarheadController => AlphaWarheadController.Host;
+        private AlphaWarheadController WarheadController
+        => AlphaWarheadController.Host;
 
-        public NukeInsidePanel InsidePanel { get; } = new NukeInsidePanel();
+        public NukeInsidePanel InsidePanel { get; }
 
-        public NukeOutsidePanel OutsidePanel { get; } = new NukeOutsidePanel();
+        public NukeOutsidePanel OutsidePanel { get; }
 
         public float CountdownTime
         {
@@ -20,21 +26,29 @@ namespace Synapse.Api
             set => WarheadController.NetworktimeToDetonation = value;
         }
 
-        public int NukeKills => WarheadController.warheadKills;
+        public int NukeKills
+          => WarheadController.warheadKills;
 
-        public bool Active => WarheadController.NetworkinProgress;
+        public bool Active
+          => WarheadController.NetworkinProgress;
 
-        public bool Detonated => WarheadController.detonated;
+        public bool Detonated
+          => WarheadController.detonated;
 
-        public bool CanDetoante => WarheadController.CanDetonate;
+        public bool CanDetoante
+            => WarheadController.CanDetonate;
 
-        public void StartDetonation() => WarheadController.StartDetonation();
+        public void StartDetonation()
+            => WarheadController.StartDetonation();
 
-        public void CancelDetonation() => WarheadController.CancelDetonation();
+        public void CancelDetonation()
+            => WarheadController.CancelDetonation();
 
-        public void Detonate() => WarheadController.Detonate();
+        public void Detonate()
+            => WarheadController.Detonate();
 
-        public void InstantPrepare() => WarheadController.InstantPrepare();
+        public void InstantPrepare()
+            => WarheadController.InstantPrepare();
 
         public void Shake()
         {
@@ -44,11 +58,13 @@ namespace Synapse.Api
 
         public class NukeInsidePanel
         {
-            public static NukeInsidePanel Get => Nuke.Get.InsidePanel;
+            public static NukeInsidePanel Get
+                => Nuke.Get.InsidePanel;
 
             internal NukeInsidePanel() { }
 
-            private AlphaWarheadNukesitePanel Panel => AlphaWarheadOutsitePanel.nukeside;
+            private AlphaWarheadNukesitePanel Panel
+                => AlphaWarheadOutsitePanel.nukeside;
 
             public bool Enabled
             {
@@ -59,9 +75,11 @@ namespace Synapse.Api
             //Is used by a Harmony Patch
             public bool Locked { get; set; }
 
-            public Transform Lever => Panel.lever;
+            public Transform Lever
+                => Panel.lever;
 
-            public Vector3 Position => Panel.transform.position;
+            public Vector3 Position
+                => Panel.transform.position;
         }
 
         public class NukeOutsidePanel
@@ -79,7 +97,8 @@ namespace Synapse.Api
             }
         }
 
-        [System.Obsolete("Use Detonate()",true)]
-        public void Detoante() => WarheadController.Detonate();
+        [System.Obsolete("Use Detonate()", true)]
+        public void Detoante()
+            => WarheadController.Detonate();
     }
 }

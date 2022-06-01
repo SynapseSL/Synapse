@@ -1,6 +1,6 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Synapse.Api;
+using System;
 using EventHandler = Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
@@ -14,7 +14,8 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp106
             try
             {
                 var player = __instance.GetPlayer();
-                if (!SynapseExtensions.CanHarmScp(player) || !__instance.CanInteract) return false;
+                if (!SynapseExtensions.CanHarmScp(player) || !__instance.CanInteract)
+                    return false;
 
                 var allow = true;
                 EventHandler.Get.Scp.Scp106.InvokeScp106ContainmentEvent(player, ref allow);

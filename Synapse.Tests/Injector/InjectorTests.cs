@@ -36,7 +36,7 @@ namespace Synapse.Tests.Injector
                 // Fields
                 foreach (var field in type.Fields)
                 {
-                    var isEventBackingField = events.Any(_ => string.Equals(_, field.Name, StringComparison.InvariantCultureIgnoreCase));
+                    var isEventBackingField = events.Any(_ => String.Equals(_, field.Name, StringComparison.InvariantCultureIgnoreCase));
                     // wenn kein Event backing-field
                     if (!isEventBackingField)
                     {
@@ -87,14 +87,8 @@ namespace Synapse.Tests.Injector
             Assert.AreEqual((firstInstruction.Operand as dynamic).DeclaringType.FullName, "Synapse.Injector.Loader");
         }
         [Test]
-        public void LoaderType_IsInjected()
-        {
-            Assert.That(_injectedDataAssembly.Types.Any(_ => _.FullName == "Synapse.Injector.Loader"));
-        }
+        public void LoaderType_IsInjected() => Assert.That(_injectedDataAssembly.Types.Any(_ => _.FullName == "Synapse.Injector.Loader"));
         [Test]
-        public void TypesCount_AsExpected()
-        {
-            Assert.AreEqual(_cleanDataAssembly.Types.Count, _injectedDataAssembly.Types.Count - 1);
-        }
+        public void TypesCount_AsExpected() => Assert.AreEqual(_cleanDataAssembly.Types.Count, _injectedDataAssembly.Types.Count - 1);
     }
 }

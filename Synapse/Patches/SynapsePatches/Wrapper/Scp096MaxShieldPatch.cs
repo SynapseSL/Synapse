@@ -1,6 +1,6 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Synapse.Api;
+using System;
 
 namespace Synapse.Patches.SynapsePatches.Wrapper
 {
@@ -13,11 +13,12 @@ namespace Synapse.Patches.SynapsePatches.Wrapper
             try
             {
                 var ply = __instance?.GetPlayer();
-                if (ply == null) return;
+                if (ply is null)
+                    return;
 
                 __result = ply.Scp096Controller.MaxShield;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Wrapper: SCP-096 MaxShield failed!!\n{e}\nStackTrace:\n{e.StackTrace}");
             }

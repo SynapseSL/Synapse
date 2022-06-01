@@ -7,12 +7,69 @@ namespace Synapse.Api.CustomObjects
 {
     public class SynapseObject : DefaultSynapseObject
     {
+        public string Name { get; }
+        public int ID { get; }
+        public override Vector3 Position
+        {
+            get => base.Position;
+            set
+            {
+                base.Position = value;
+                UpdatePositionAndRotation();
+            }
+        }
+        public override Quaternion Rotation
+        {
+            get => base.Rotation;
+            set
+            {
+                base.Rotation = value;
+                UpdatePositionAndRotation();
+            }
+        }
+        public override Vector3 Scale
+        {
+            get => GameObject.transform.localScale;
+            set
+            {
+                GameObject.transform.localScale = value;
+                UpdateScale();
+            }
+        }
+        public override GameObject GameObject { get; }
+        public override ObjectType Type
+            => ObjectType.Shematic;
+        public List<ISynapseObject> Childrens { get; }
+        public List<SynapsePrimitiveObject> PrimitivesChildrens { get; }
+        public List<SynapseLightObject> LightChildrens { get; }
+        public List<SynapseTargetObject> TargetChildrens { get; }
+        public List<SynapseItemObject> ItemChildrens { get; }
+        public List<SynapseWorkStationObject> WorkStationChildrens { get; }
+        public List<SynapseDoorObject> DoorChildrens { get; }
+        public List<SynapseCustomObject> CustomChildrens { get; }
+        public List<SynapseRagdollObject> RagdollChildrens { get; }
+        public List<SynapseDummyObject> DummyChildrens { get; }
+        public List<SynapseGeneratorObject> GeneratorChildrens { get; }
+        public List<SynapseLockerObject> LockerChildrens { get; }
+
         public SynapseObject(SynapseSchematic schematic)
         {
             Name = schematic.Name;
             ID = schematic.ID;
             CustomAttributes = schematic.CustomAttributes;
             GameObject = new GameObject(Name);
+            Childrens = new List<ISynapseObject>();
+            PrimitivesChildrens = new List<SynapsePrimitiveObject>();
+            LightChildrens = new List<SynapseLightObject>();
+            TargetChildrens = new List<SynapseTargetObject>();
+            ItemChildrens = new List<SynapseItemObject>();
+            WorkStationChildrens = new List<SynapseWorkStationObject>();
+            DoorChildrens = new List<SynapseDoorObject>();
+            CustomChildrens = new List<SynapseCustomObject>();
+            RagdollChildrens = new List<SynapseRagdollObject>();
+            DummyChildrens = new List<SynapseDummyObject>();
+            GeneratorChildrens = new List<SynapseGeneratorObject>();
+            LockerChildrens = new List<SynapseLockerObject>();
 
             foreach (var primitive in schematic.PrimitiveObjects)
             {
@@ -23,7 +80,7 @@ namespace Synapse.Api.CustomObjects
                 obj.Parent = this;
             }
 
-            foreach(var light in schematic.LightObjects)
+            foreach (var light in schematic.LightObjects)
             {
                 var obj = new SynapseLightObject(light);
                 LightChildrens.Add(obj);
@@ -32,7 +89,7 @@ namespace Synapse.Api.CustomObjects
                 obj.Parent = this;
             }
 
-            foreach(var target in schematic.TargetObjects)
+            foreach (var target in schematic.TargetObjects)
             {
                 var obj = new SynapseTargetObject(target);
                 TargetChildrens.Add(obj);
@@ -41,7 +98,7 @@ namespace Synapse.Api.CustomObjects
                 obj.Parent = this;
             }
 
-            foreach(var item in schematic.ItemObjects)
+            foreach (var item in schematic.ItemObjects)
             {
                 var obj = new SynapseItemObject(item);
                 ItemChildrens.Add(obj);
@@ -50,7 +107,7 @@ namespace Synapse.Api.CustomObjects
                 obj.Parent = this;
             }
 
-            foreach(var station in schematic.WorkStationObjects)
+            foreach (var station in schematic.WorkStationObjects)
             {
                 var obj = new SynapseWorkStationObject(station);
                 WorkStationChildrens.Add(obj);
@@ -59,7 +116,7 @@ namespace Synapse.Api.CustomObjects
                 obj.Parent = this;
             }
 
-            foreach(var door in schematic.DoorObjects)
+            foreach (var door in schematic.DoorObjects)
             {
                 var obj = new SynapseDoorObject(door);
                 DoorChildrens.Add(obj);
@@ -68,7 +125,7 @@ namespace Synapse.Api.CustomObjects
                 obj.Parent = this;
             }
 
-            foreach(var custom in schematic.CustomObjects)
+            foreach (var custom in schematic.CustomObjects)
             {
                 var obj = new SynapseCustomObject(custom);
                 CustomChildrens.Add(obj);
@@ -119,85 +176,32 @@ namespace Synapse.Api.CustomObjects
             script.Object = this;
         }
 
-        public override Vector3 Position
-        {
-            get
-            {
-                return base.Position;
-            }
-            set
-            {
-                base.Position = value;
-                UpdatePositionAndRotation();
-            }
-        }
-
-        public override Quaternion Rotation
-        {
-            get => base.Rotation;
-            set
-            {
-                base.Rotation = value;
-                UpdatePositionAndRotation();
-            }
-        }
-
-        public override Vector3 Scale
-        {
-            get => GameObject.transform.localScale;
-            set
-            {
-                GameObject.transform.localScale = value;
-                UpdateScale();
-            }
-        }
-
-        public override GameObject GameObject { get; }
-
-        public override ObjectType Type => ObjectType.Shematic;
-
-        public List<ISynapseObject> Childrens { get; } = new List<ISynapseObject>();
-        public List<SynapsePrimitiveObject> PrimitivesChildrens { get; } = new List<SynapsePrimitiveObject>();
-        public List<SynapseLightObject> LightChildrens { get; } = new List<SynapseLightObject>();
-        public List<SynapseTargetObject> TargetChildrens { get; } = new List<SynapseTargetObject>();
-        public List<SynapseItemObject> ItemChildrens { get; } = new List<SynapseItemObject>();
-        public List<SynapseWorkStationObject> WorkStationChildrens { get; } = new List<SynapseWorkStationObject>();
-        public List<SynapseDoorObject> DoorChildrens { get; } = new List<SynapseDoorObject>();
-        public List<SynapseCustomObject> CustomChildrens { get; } = new List<SynapseCustomObject>();
-        public List<SynapseRagdollObject> RagdollChildrens { get; } = new List<SynapseRagdollObject>();
-        public List<SynapseDummyObject> DummyChildrens { get; } = new List<SynapseDummyObject>();
-        public List<SynapseGeneratorObject> GeneratorChildrens { get; } = new List<SynapseGeneratorObject>();
-        public List<SynapseLockerObject> LockerChildrens { get; } = new List<SynapseLockerObject>();
-
-        public string Name { get; }
-
-        public int ID { get; }
-
         public void DespawnForOnePlayer(Player player)
         {
-            foreach(var child in Childrens)
+            foreach (var child in Childrens)
+            {
                 if (child.GameObject.TryGetComponent<NetworkIdentity>(out var net))
                     net.DespawnForOnePlayer(player);
+            }
         }
-
         public override void Destroy()
         {
-            foreach(var child in Childrens)
+            foreach (var child in Childrens)
                 child.Destroy();
 
             Object.Destroy(GameObject);
         }
-
         private void UpdatePositionAndRotation()
         {
             foreach (var child in Childrens)
+            {
                 if (child is IRefreshable refresh)
                     refresh.Refresh();
+            }
         }
-
         private void UpdateScale()
         {
-            foreach(var ichild in Childrens)
+            foreach (var ichild in Childrens)
             {
                 var child = ichild as DefaultSynapseObject;
                 child.Scale = new Vector3(child.OriginalScale.x * Scale.x, child.OriginalScale.y * Scale.y, child.OriginalScale.z * Scale.z);

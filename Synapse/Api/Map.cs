@@ -60,7 +60,7 @@ namespace Synapse.Api
             set
             {
                 var component = Server.Get.Host.GetComponent<Intercom>();
-                if (string.IsNullOrEmpty(value))
+                if (String.IsNullOrEmpty(value))
                 {
                     component.CustomContent = null;
                     return;
@@ -93,6 +93,15 @@ namespace Synapse.Api
         public void PlayAmbientSound(AmbientSound id)
             => Server.Get.Host.GetComponent<AmbientSoundPlayer>().RpcPlaySound((int)id);
 
+        /// <returns>1 activated <see cref="Generator"/> gives 1000 volts</returns>
+        public int GetVoltage()
+        {
+            float totalvoltagefloat = 0;
+            foreach (var generator in Generators)
+                totalvoltagefloat += generator.generator._currentTime / generator.generator._totalActivationTime * 1000;
+            return (int)totalvoltagefloat;
+        }
+
         public Room GetRoom(RoomName roomType)
             => Rooms.FirstOrDefault(x => x.RoomType == roomType);
 
@@ -105,7 +114,7 @@ namespace Synapse.Api
         public void SendBroadcast(ushort time, string message, bool instant = false)
         {
             foreach (var ply in Server.Get.Players)
-                ply.SendBroadcast(time, message, instant);
+                _ = ply.SendBroadcast(time, message, instant);
         }
 
         public void AnnounceScpDeath(string scp) => AnnounceScpDeath(scp, ScpRecontainmentType.Unknown);
@@ -129,10 +138,10 @@ namespace Synapse.Api
 
         public void SubtitleCassie(string words, bool makehold = true, bool makenoise = true)
             => Respawning.RespawnEffectsController.PlayCassieAnnouncement(words, makehold, makenoise, true);
-        
+
         public void GlitchedCassie(string words)
         {
-            float num2 = (AlphaWarheadController.Host.timeToDetonation <= 0f) ? 3.5f : 1f;
+            var num2 = (AlphaWarheadController.Host.timeToDetonation <= 0f) ? 3.5f : 1f;
             Server.Get.GetObjectOf<NineTailedFoxAnnouncer>().ServerOnlyAddGlitchyPhrase(words, UnityEngine.Random.Range(0.1f, 0.14f) * num2, UnityEngine.Random.Range(0.07f, 0.08f) * num2);
         }
 
@@ -145,7 +154,7 @@ namespace Synapse.Api
             if (player != null)
                 grenadeitem.Throwable.ThrowableItem.PreviousOwner = new Footprinting.Footprint(player.Hub);
 
-            if(grenadeitem.Throwable.ThrowableItem.TryGetComponent<Rigidbody>(out var rgb))
+            if (grenadeitem.Throwable.ThrowableItem.TryGetComponent<Rigidbody>(out var rgb))
                 rgb.velocity = velocity;
 
             return grenadeitem;
@@ -166,7 +175,7 @@ namespace Synapse.Api
             NetworkServer.Spawn(gameObject.gameObject);
 
             if (destroy >= 0)
-                MEC.Timing.CallDelayed(destroy,() => NetworkServer.Destroy(gameObject));
+                _ = MEC.Timing.CallDelayed(destroy, () => NetworkServer.Destroy(gameObject));
 
             return gameObject;
         }
@@ -178,7 +187,7 @@ namespace Synapse.Api
             grenadeitem.Throwable.Fuse();
             if (player != null)
                 grenadeitem.Throwable.ThrowableItem.PreviousOwner = new Footprinting.Footprint(player.Hub);
-            MEC.Timing.CallDelayed(0.1f, () => grenadeitem.Destroy());
+            _ = MEC.Timing.CallDelayed(0.1f, () => grenadeitem.Destroy());
         }
 
         public void PlaceBlood(Vector3 pos, int type = 0, float size = 2)
@@ -226,7 +235,8 @@ namespace Synapse.Api
                     {
                         var room = Rooms.FirstOrDefault(x => x.ID == pair.Key);
                         var door = interactable.GetComponentInParent<DoorVariant>();
-                        if (room == null || door == null) continue;
+                        if (room is null || door is null)
+                            continue;
                         var sdoor = door.GetDoor();
                         sdoor.Rooms.Add(room);
                         room.Doors.Add(sdoor);
@@ -237,12 +247,12 @@ namespace Synapse.Api
 
             Scp914.Scp914Controller = UnityEngine.Object.FindObjectOfType<Scp914Controller>();
 
-            SynapseController.Server.Map.Elevators.RemoveAll(x => x.GameObject == null);
+            _ = SynapseController.Server.Map.Elevators.RemoveAll(x => x.GameObject is null);
         }
 
         internal void ClearObjects()
         {
-            Room.networkIdentities = null;
+            Room.NetworkIdentities = null;
             Teslas.Clear();
             Doors.Clear();
             Elevators.Clear();

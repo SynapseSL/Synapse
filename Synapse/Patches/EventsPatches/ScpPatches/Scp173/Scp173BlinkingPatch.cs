@@ -11,7 +11,8 @@ namespace Synapse.Patches.EventsPatches.ScpPatches.Scp173
         {
             try
             {
-                if (!__instance.BlinkReady) return false;
+                if (!__instance.BlinkReady)
+                    return false;
                 if ((__instance.Hub.PlayerCameraReference.transform.position - blinkPos).magnitude > __instance.EffectiveBlinkDistance() * 1.05)
                     return false;
 

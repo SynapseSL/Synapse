@@ -13,25 +13,34 @@
     {
         public CommandResult Execute(CommandContext context)
         {
-            if (context.Arguments.Count == 0) return new CommandResult
+            if (context.Arguments.Count == 0)
             {
-                Message = "Missing parameter! Usage: schematic id",
-                State = CommandResultState.Error
-            };
+                return new CommandResult
+                {
+                    Message = "Missing parameter! Usage: schematic id",
+                    State = CommandResultState.Error
+                };
+            }
 
-            if (!int.TryParse(context.Arguments.At(0), out var id)) return new CommandResult
+            if (!System.Int32.TryParse(context.Arguments.At(0), out var id))
             {
-                Message = "Invalid ID",
-                State = CommandResultState.Error
-            };
+                return new CommandResult
+                {
+                    Message = "Invalid ID",
+                    State = CommandResultState.Error
+                };
+            }
 
-            if (!Server.Get.Schematic.IsIDRegistered(id)) return new CommandResult
+            if (!Server.Get.Schematic.IsIDRegistered(id))
             {
-                Message = "No Schematic with this ID was found",
-                State = CommandResultState.Error
-            };
+                return new CommandResult
+                {
+                    Message = "No Schematic with this ID was found",
+                    State = CommandResultState.Error
+                };
+            }
 
-            Server.Get.Schematic.SpawnSchematic(id, context.Player.Position);
+            _ = Server.Get.Schematic.SpawnSchematic(id, context.Player.Position);
 
             return new CommandResult
             {

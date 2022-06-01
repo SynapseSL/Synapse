@@ -10,34 +10,14 @@ namespace Synapse.Api.CustomObjects
     {
         public static Dictionary<SpawnableDoorType, BreakableDoor> Prefab { get; internal set; } = new Dictionary<SpawnableDoorType, BreakableDoor>();
 
-        internal SynapseDoorObject(SynapseSchematic.DoorConfiguration configuration)
-        {
-            Door = CreateDoor(configuration.DoorType, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale, configuration.Open, configuration.Locked);
-            OriginalScale = configuration.Scale;
-            CustomAttributes = configuration.CustomAttributes;
-            UpdateEveryFrame = configuration.UpdateEveryFrame;
-            DoorType = configuration.DoorType;
-
-            var script = GameObject.AddComponent<SynapseObjectScript>();
-            script.Object = this;
-        }
-
-        public SynapseDoorObject(SpawnableDoorType type, Vector3 position, Quaternion rotation, Vector3 scale, bool open = false, bool locked = false)
-        {
-            Door = CreateDoor(type, position, rotation, scale, open, locked);
-            DoorType = type;
-
-            Map.Get.SynapseObjects.Add(this);
-            var script = GameObject.AddComponent<SynapseObjectScript>();
-            script.Object = this;
-        }
-
-        public override GameObject GameObject => Door.GameObject;
-        public override NetworkIdentity NetworkIdentity => Door.VDoor.netIdentity;
-        public override ObjectType Type => ObjectType.Door;
-
         public Door Door { get; }
         public SpawnableDoorType DoorType { get; }
+        public override GameObject GameObject
+            => Door.GameObject;
+        public override NetworkIdentity NetworkIdentity
+            => Door.VDoor.netIdentity;
+        public override ObjectType Type
+            => ObjectType.Door;
         public bool Open
         {
             get => Door.Open;
@@ -49,12 +29,35 @@ namespace Synapse.Api.CustomObjects
             set => Door.Locked = value;
         }
 
+        internal SynapseDoorObject(SynapseSchematic.DoorConfiguration configuration)
+        {
+            Door = CreateDoor(configuration.DoorType, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale, configuration.Open, configuration.Locked);
+            OriginalScale = configuration.Scale;
+            CustomAttributes = configuration.CustomAttributes;
+            UpdateEveryFrame = configuration.UpdateEveryFrame;
+            DoorType = configuration.DoorType;
+
+            var script = GameObject.AddComponent<SynapseObjectScript>();
+            script.Object = this;
+        }
+        public SynapseDoorObject(SpawnableDoorType type, Vector3 position, Quaternion rotation, Vector3 scale, bool open = false, bool locked = false)
+        {
+            Door = CreateDoor(type, position, rotation, scale, open, locked);
+            DoorType = type;
+
+            Map.Get.SynapseObjects.Add(this);
+            var script = GameObject.AddComponent<SynapseObjectScript>();
+            script.Object = this;
+        }
+
         private Door CreateDoor(SpawnableDoorType type, Vector3 position, Quaternion rotation, Vector3 scale, bool open, bool locked)
         {
             var ot = CreateNetworkObject(Prefab[type], position, rotation, scale);
-            var door = new Door(ot);
-            door.Open = open;
-            door.Locked = locked;
+            var door = new Door(ot)
+            {
+                Open = open,
+                Locked = locked
+            };
 
             Map.Get.Doors.Add(door);
             return door;

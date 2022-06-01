@@ -12,10 +12,7 @@ namespace Synapse.RCE
     {
         public int Port { get; }
 
-        public SynapseRceClient(int port)
-        {
-            Port = port;
-        }
+        public SynapseRceClient(int port) => Port = port;
 
         public RceResponse ExecuteFromFile(string path, string assemblyName = null, int? timeout = null)
         {
@@ -33,7 +30,7 @@ namespace Synapse.RCE
             assemblyName ??= Guid.NewGuid().ToString();
             try
             {
-                using TcpClient client = new TcpClient();
+                using var client = new TcpClient();
                 client.Connect(IPAddress.Loopback, Port);
                 if (timeout is { } timeoutVal)
                 {
@@ -64,6 +61,7 @@ namespace Synapse.RCE
                     Content = $"Failed to Connect with Server. {e}"
                 };
             }
+
             return retVal;
         }
         public async Task<RceResponse> ExecuteFromCodeAsync(string code, string assemblyName = null, int? timeout = null)
@@ -72,7 +70,7 @@ namespace Synapse.RCE
             assemblyName ??= Guid.NewGuid().ToString();
             try
             {
-                using TcpClient client = new TcpClient();
+                using var client = new TcpClient();
                 await client.ConnectAsync(IPAddress.Loopback, Port);
                 if (timeout is { } timeoutVal)
                 {
@@ -103,6 +101,7 @@ namespace Synapse.RCE
                     Content = $"Failed to Connect with Server. {e}"
                 };
             }
+
             return retVal;
         }
     }

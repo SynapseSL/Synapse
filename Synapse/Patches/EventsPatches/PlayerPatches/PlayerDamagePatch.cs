@@ -17,7 +17,9 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             {
                 if (!__instance._hub.characterClassManager.IsAlive
                     || __instance._hub.characterClassManager.GodMode)
+                {
                     return false;
+                }
 
                 var standardhandler = handler as StandardDamageHandler;
                 var type = handler.GetDamageType();
@@ -28,12 +30,13 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 if (type == DamageType.PocketDecay)
                 {
                     attacker = Server.Get.Players.FirstOrDefault(x => x.Scp106Controller.PocketPlayers.Contains(victim));
-                    if (attacker != null && !SynapseExtensions.GetHarmPermission(attacker, victim)) return false;
+                    if (attacker != null && !SynapseExtensions.GetHarmPermission(attacker, victim))
+                        return false;
                 }
 
                 SynapseController.Server.Events.Player.InvokePlayerDamageEvent(victim, attacker, ref damage, type, out var allow);
                 standardhandler.Damage = damage;
-                
+
                 return allow;
             }
             catch (Exception e)

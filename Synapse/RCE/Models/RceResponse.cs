@@ -58,9 +58,9 @@ namespace Synapse.RCE.Models
         }
         internal static RceResponse GetFailedBuildResponse(IEnumerable<Diagnostic> failures)
         {
-            StringBuilder builder = new StringBuilder();
-            foreach (Diagnostic diagnostic in failures)
-                builder.AppendLine(String.Format("{0}: {1}", diagnostic?.Id, diagnostic?.GetMessage()));
+            var builder = new StringBuilder();
+            foreach (var diagnostic in failures)
+                _ = builder.AppendLine(String.Format("{0}: {1}", diagnostic?.Id, diagnostic?.GetMessage()));
 
             return new RceResponse()
             {

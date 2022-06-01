@@ -1,11 +1,11 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
+using System;
 using UnityEngine;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(SinkholeEnvironmentalHazard),nameof(SinkholeEnvironmentalHazard.DistanceChanged))]
+    [HarmonyPatch(typeof(SinkholeEnvironmentalHazard), nameof(SinkholeEnvironmentalHazard.DistanceChanged))]
     internal static class PlayerWalkOnSinkholePatch
     {
         [HarmonyPrefix]
@@ -15,10 +15,10 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             {
                 var synapseplayer = player.GetPlayer();
 
-                if(Vector3.Distance(synapseplayer.Position ,__instance.transform.position) <= __instance.DistanceToBeAffected)
+                if (Vector3.Distance(synapseplayer.Position, __instance.transform.position) <= __instance.DistanceToBeAffected)
                 {
                     var allow = true;
-                    if (__instance.SCPImmune && !SynapseExtensions.CanHarmScp(synapseplayer, false) || synapseplayer.GodMode) 
+                    if ((__instance.SCPImmune && !SynapseExtensions.CanHarmScp(synapseplayer, false)) || synapseplayer.GodMode)
                         allow = false;
 
                     Synapse.Api.Events.EventHandler.Get.Player.InvokeSinkhole(synapseplayer, __instance, ref allow);

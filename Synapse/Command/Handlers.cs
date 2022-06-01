@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Synapse.Command.Commands;
+﻿using Synapse.Command.Commands;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Synapse.Command
@@ -15,7 +15,6 @@ namespace Synapse.Command
         public CommandHandler ClientCommandHandler { get; } = new CommandHandler();
 
         public CommandHandler ServerConsoleHandler { get; } = new CommandHandler();
-
 
         internal void RegisterSynapseCommands()
         {
@@ -53,25 +52,27 @@ namespace Synapse.Command
         internal static void RegisterGeneratedCommand(GeneratedCommand command)
         {
             foreach (var platform in command.Platforms)
+            {
                 switch (platform)
                 {
                     case Platform.ClientConsole:
 
-                        SynapseController.CommandHandlers.ClientCommandHandler.RegisterCommand(command);
+                        _ = SynapseController.CommandHandlers.ClientCommandHandler.RegisterCommand(command);
                         break;
                     case Platform.RemoteAdmin:
-                        SynapseController.CommandHandlers.RemoteAdminHandler.RegisterCommand(command);
+                        _ = SynapseController.CommandHandlers.RemoteAdminHandler.RegisterCommand(command);
                         break;
                     case Platform.ServerConsole:
-                        SynapseController.CommandHandlers.ServerConsoleHandler.RegisterCommand(command);
+                        _ = SynapseController.CommandHandlers.ServerConsoleHandler.RegisterCommand(command);
                         break;
                 }
+            }
         }
 
         internal void GenerateCommandCompletion()
         {
             var list = RemoteAdmin.QueryProcessor._commands.ToList();
-            foreach(var command in RemoteAdminHandler.Commands)
+            foreach (var command in RemoteAdminHandler.Commands)
             {
                 list.Add(new RemoteAdmin.QueryProcessor.CommandData
                 {
@@ -82,9 +83,11 @@ namespace Synapse.Command
                     Usage = command.Arguments
                 });
 
-                if (command.Aliases == null) continue;
-                
+                if (command.Aliases is null)
+                    continue;
+
                 foreach (var ali in command.Aliases)
+                {
                     list.Add(new RemoteAdmin.QueryProcessor.CommandData
                     {
                         Command = ali,
@@ -93,6 +96,7 @@ namespace Synapse.Command
                         Hidden = false,
                         Usage = command.Arguments
                     });
+                }
             }
 
             RemoteAdmin.QueryProcessor._commands = list.ToArray();
