@@ -157,5 +157,10 @@ namespace Synapse.Api.Enum
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Vitality,
+        /// <summary>
+        /// Increases movement speed and reload/draw speed for weapons and Stamina drain rate.
+        /// </summary>
+        /// <remarks>0 = Disabled, 1 = 1xScp1853, 2 = 2xScp1853...</remarks>
+        Scp1853,
     }
 }
