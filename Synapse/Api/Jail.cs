@@ -1,16 +1,14 @@
-﻿using Synapse.Api.Enum;
-using System.Collections.Generic;
-using Synapse.Config;
-using UnityEngine;
+﻿using Synapse.Config;
 
 namespace Synapse.Api
 {
     public class Jail
     {
-        internal Jail(Player player) => Player = player;
+        internal Jail(Player player)
+            => _player = player;
 
-        private readonly Player Player;
-        private bool isjailed = false;
+        private readonly Player _player;
+        private bool isjailed;
 
         public bool IsJailed
         {
@@ -24,31 +22,33 @@ namespace Synapse.Api
             }
         }
 
-        public Player Admin { get; set; }
+        public Player Admin { get; private set; }
 
-        public  SerializedPlayerState State { get; set; }
+        public SerializedPlayerState State { get; private set; }
 
         public void JailPlayer(Player admin)
         {
-            if (IsJailed) return;
+            if (IsJailed)
+                return;
 
             Admin = admin;
-            State = Player;
-            
+            State = _player;
+
             new SerializedPlayerState()
             {
                 Position = Admin.Position,
                 RoleType = RoleType.Tutorial,
-            }.Apply(Player);
+            }.Apply(_player);
 
             isjailed = true;
         }
 
         public void UnJailPlayer()
         {
-            if (!IsJailed) return;
+            if (!IsJailed)
+                return;
 
-            State.Apply(Player, true);
+            State.Apply(_player, true);
 
             isjailed = false;
         }

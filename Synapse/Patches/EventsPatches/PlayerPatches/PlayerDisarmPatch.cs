@@ -1,12 +1,12 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using InventorySystem.Disarming;
 using InventorySystem.Items;
 using Mirror;
+using System;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(DisarmingHandlers),nameof(DisarmingHandlers.ServerProcessDisarmMessage))]
+    [HarmonyPatch(typeof(DisarmingHandlers), nameof(DisarmingHandlers.ServerProcessDisarmMessage))]
     internal static class PlayerDisarmPatch
     {
         [HarmonyPrefix]
@@ -29,27 +29,30 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var flag = !msg.PlayerIsNull && msg.PlayerToDisarm.inventory.IsDisarmed();
                 var flag2 = !msg.PlayerIsNull && DisarmedPlayers.CanDisarm(cuffer.Hub, msg.PlayerToDisarm);
 
-                if(flag && !msg.Disarm)
+                if (flag && !msg.Disarm)
                 {
                     if (!cuffer.IsCuffed)
                     {
                         SynapseController.Server.Events.Player.InvokeUncuff(cuffer, target, out var allow);
-                        if (!allow) return false;
+                        if (!allow)
+                            return false;
                         msg.PlayerToDisarm.inventory.SetDisarmedStatus(null);
                     }
                 }
                 else
                 {
-                    if(flag || !flag2 || !msg.Disarm)
+                    if (flag || !flag2 || !msg.Disarm)
                     {
                         cuffer.NetworkIdentity.connectionToClient.Send(DisarmingHandlers.NewDisarmedList, 0);
                         return false;
                     }
-                    if(msg.PlayerToDisarm.inventory.CurInstance == null || msg.PlayerToDisarm.inventory.CurInstance.CanHolster())
+
+                    if (msg.PlayerToDisarm.inventory.CurInstance is null || msg.PlayerToDisarm.inventory.CurInstance.CanHolster())
                     {
                         SynapseController.Server.Events.Player.InvokePlayerCuffTargetEvent(target, cuffer, out var allow2);
 
-                        if (!allow2) return false;
+                        if (!allow2)
+                            return false;
 
                         msg.PlayerToDisarm.inventory.SetDisarmedStatus(cuffer.VanillaInventory);
                     }

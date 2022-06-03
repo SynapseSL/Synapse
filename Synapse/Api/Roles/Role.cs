@@ -1,25 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System;
 
 namespace Synapse.Api.Roles
 {
     public abstract class Role : IRole
     {
-        private Player player;
+        private Player _player;
 
         public Player Player
         {
-            get => player;
+            get => _player;
             set
             {
-                if (player == value)
+                if (_player == value)
                     return;
 
-                if (player != null)
-                    player.CustomRole = null;
+                if (_player != null)
+                    _player.CustomRole = null;
 
-                player = value;
+                _player = value;
             }
         }
 
@@ -27,11 +27,14 @@ namespace Synapse.Api.Roles
 
         public abstract int GetRoleID();
 
-        public virtual int GetTeamID() => (int)GetTeam();
+        public virtual int GetTeamID()
+            => (int)GetTeam();
 
-        public virtual List<int> GetFriendsID() => GetFriends().Select(x => (int)x).ToList();
+        public virtual List<int> GetFriendsID()
+            => GetFriends().Select(x => (int)x).ToList();
 
-        public virtual List<int> GetEnemiesID() => GetEnemys().Select(x => (int)x).ToList();
+        public virtual List<int> GetEnemiesID()
+            => GetEnemys().Select(x => (int)x).ToList();
 
         public abstract void Spawn();
 
@@ -42,7 +45,7 @@ namespace Synapse.Api.Roles
         #region Obsolete
         [Obsolete("CustomRoles will now be ignored when Escape and the Escape method is called so use it instead")]
         public virtual int GetEscapeRole() => -1;
-        [Obsolete("Use GetTeamID()",false)]
+        [Obsolete("Use GetTeamID()", false)]
         public virtual Team GetTeam() => Team.RIP;
         [Obsolete("Use GetFriendsID()", false)]
         public virtual List<Team> GetFriends() => new List<Team>();

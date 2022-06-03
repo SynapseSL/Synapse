@@ -21,42 +21,44 @@ namespace Synapse
 {
     public class Server
     {
+        public static Server Get
+            => SynapseController.Server;
+
         internal Server()
         {
+            Configs = new ConfigHandler();
+            Logger = new Logger();
+            Files = new FileLocations();
+            Map = new Map();
+            Events = new EventHandler();
+            RoleManager = new RoleManager();
+            TeamManager = new TeamManager();
+            ItemManager = new ItemManager();
+            PermissionHandler = new PermissionHandler();
+            Schematic = new SchematicHandler();
+            RceHandler = new RceHandler();
+            RoomHandler = new CustomRoomHandler();
         }
 
-        public static Server Get => SynapseController.Server;
-
         //Synapse Api
-        public Logger Logger { get; } = new Logger();
-
-        public Map Map { get; } = new Map();
-
-        public FileLocations Files { get; } = new FileLocations();
-
-        public EventHandler Events { get; } = new EventHandler();
-
-        public RoleManager RoleManager { get; } = new RoleManager();
-
-        public TeamManager TeamManager { get; } = new TeamManager();
-
-        public ItemManager ItemManager { get; } = new ItemManager();
-
-        public ConfigHandler Configs { get; } = new ConfigHandler();
-
-        public PermissionHandler PermissionHandler { get; } = new PermissionHandler();
-
-        public SchematicHandler Schematic { get; } = new SchematicHandler();
-
-        public CustomRoomHandler RoomHandler { get; } = new CustomRoomHandler();
-
-        internal RceHandler RceHandler { get; } = new RceHandler();
+        public Logger Logger { get; }
+        public Map Map { get; }
+        public FileLocations Files { get; }
+        public EventHandler Events { get; }
+        public RoleManager RoleManager { get; }
+        public TeamManager TeamManager { get; }
+        public ItemManager ItemManager { get; }
+        public ConfigHandler Configs { get; }
+        public PermissionHandler PermissionHandler { get; }
+        public SchematicHandler Schematic { get; }
+        internal RceHandler RceHandler { get; }
+        public CustomRoomHandler RoomHandler { get; }
 
         public Player Host
         {
             get
             {
-                if (PlayerManager.localPlayer.GetComponent<Player>() == null)
+                if (PlayerManager.localPlayer.GetComponent<Player>() is null)
                     PlayerManager.localPlayer.AddComponent<Player>();
 
                 return PlayerManager.localPlayer.GetComponent<Player>();
@@ -170,20 +172,11 @@ namespace Synapse
             }, BanHandler.BanType.IP);
         }
 
-        public List<TObject> GetObjectsOf<TObject>() where TObject : Object
-        {
-            return Object.FindObjectsOfType<TObject>().ToList();
-        }
+        public List<TObject> GetObjectsOf<TObject>() where TObject : Object => Object.FindObjectsOfType<TObject>().ToList();
 
-        public TObject GetObjectOf<TObject>() where TObject : Object
-        {
-            return Object.FindObjectOfType<TObject>();
-        }
+        public TObject GetObjectOf<TObject>() where TObject : Object => Object.FindObjectOfType<TObject>();
 
-        public List<Player> GetPlayers(Func<Player, bool> func)
-        {
-            return Players.Where(func).ToList();
-        }
+        public List<Player> GetPlayers(Func<Player, bool> func) => Players.Where(func).ToList();
 
         public bool TryGetPlayers(string arg, out List<Player> playerList, Player me = null)
         {
@@ -198,43 +191,65 @@ namespace Synapse
                 {
                     case "SELF":
                     case "ME":
-                        if (me == null) continue;
+                        {
+                            if (me is null)
+                                continue;
+                            if (!players.Contains(me))
+                                players.Add(me);
 
-                        if (!players.Contains(me))
-                            players.Add(me);
-                        continue;
-
+                            continue;
+                        }
                     case "REMOTEADMIN":
                     case "ADMIN":
                     case "STAFF":
-                        foreach (var player in Players)
-                            if (player.ServerRoles.RemoteAdmin)
-                                if (!players.Contains(player))
-                                    players.Add(player);
-                        continue;
+                        {
+                            foreach (var player in Players)
+                            {
+                                if (player.ServerRoles.RemoteAdmin)
+                                {
+                                    if (!players.Contains(player))
+                                        players.Add(player);
+                                }
+                            }
 
+                            continue;
+                        }
                     case "NW":
                     case "NORTHWOOD":
-                        foreach (var player in Players)
-                            if (player.ServerRoles.Staff)
-                                if (!players.Contains(player))
-                                    players.Add(player);
-                        break;
+                        {
+                            foreach (var player in Players)
+                            {
+                                if (player.ServerRoles.Staff)
+                                {
+                                    if (!players.Contains(player))
+                                        players.Add(player);
+                                }
+                            }
 
+                            break;
+                        }
                     case "*":
                     case "ALL":
                     case "EVERYONE":
-                        foreach (var player2 in Server.Get.Players)
-                            if (!players.Contains(player2))
-                                players.Add(player2);
-                        continue;
+                        {
+                            foreach (var player in Server.Get.Players)
+                            {
+                                if (!players.Contains(player))
+                                    players.Add(player);
+                            }
+
+                            continue;
+                        }
 
                     default:
-                        var player3 = GetPlayer(parameter);
-                        if (player3 == null) continue;
-                        if (!players.Contains(player3))
-                            players.Add(player3);
-                        continue;
+                        {
+                            var player = GetPlayer(parameter);
+                            if (player is null)
+                                continue;
+                            if (!players.Contains(player))
+                                players.Add(player);
+                            continue;
+                        }
                 }
             }
 
@@ -254,7 +269,7 @@ namespace Synapse
                     return player;
             }
 
-            if (int.TryParse(argument, out var playerid))
+            if (Int32.TryParse(argument, out var playerid))
             {
                 var player = GetPlayer(playerid);
                 if (player != null)
@@ -264,18 +279,11 @@ namespace Synapse
             return players.FirstOrDefault(x => x.NickName.Equals(argument, StringComparison.OrdinalIgnoreCase));
         }
 
-        public Player GetPlayer(int playerid)
-        {
-            return PlayerObjects.FirstOrDefault(x => x.PlayerId == playerid);
-        }
+        public Player GetPlayer(int playerid) => PlayerObjects.FirstOrDefault(x => x.PlayerId == playerid);
 
         public Player GetPlayer(uint netID) => PlayerObjects.FirstOrDefault(x => x.NetworkIdentity.netId == netID);
 
-        public Player GetPlayerByUID(string uid)
-        {
-            return Players.FirstOrDefault(x => x.UserId == uid || x.SecondUserID == uid);
-        }
-
+        public Player GetPlayerByUID(string uid) => Players.FirstOrDefault(x => x.UserId == uid || x.SecondUserID == uid);
 
         public class FileLocations
         {
@@ -306,7 +314,6 @@ namespace Synapse
             //synapse
             private string _synapseDirectory;
             private string _dependencyDirectory;
-
 
             internal FileLocations() => Refresh();
 
@@ -518,7 +525,6 @@ namespace Synapse
                 var configpath = Path.Combine(ConfigDirectory, "config.syml");
                 ConfigFile = File.Exists(configpath) ? configpath : Path.Combine(SharedConfigDirectory, "config.syml");
 
-
                 var permissionspath = Path.Combine(ConfigDirectory, "permission.syml");
                 PermissionFile = File.Exists(permissionspath)
                     ? permissionspath
@@ -535,10 +541,9 @@ namespace Synapse
 
             public string GetOldTranslationFile(PluginInformation infos)
             {
-                if (File.Exists(Path.Combine(SharedConfigDirectory, infos.Name + "-translation.txt")))
-                    return Path.Combine(SharedConfigDirectory, infos.Name + "-translation.txt");
-
-                return Path.Combine(ConfigDirectory, infos.Name + "-translation.txt");
+                return File.Exists(Path.Combine(SharedConfigDirectory, infos.Name + "-translation.txt"))
+                    ? Path.Combine(SharedConfigDirectory, infos.Name + "-translation.txt")
+                    : Path.Combine(ConfigDirectory, infos.Name + "-translation.txt");
             }
 
             public string GetTranslationPath(string name)
@@ -549,12 +554,7 @@ namespace Synapse
                     : Path.Combine(SharedConfigDirectory, name + "-translation.syml");
             }
 
-            public string GetPluginDirectory(PluginInformation infos)
-            {
-                if (infos.shared)
-                    return Path.Combine(SharedPluginDirectory, infos.Name);
-                return Path.Combine(PluginDirectory, infos.Name);
-            }
+            public string GetPluginDirectory(PluginInformation infos) => infos.Shared ? Path.Combine(SharedPluginDirectory, infos.Name) : Path.Combine(PluginDirectory, infos.Name);
         }
     }
 }

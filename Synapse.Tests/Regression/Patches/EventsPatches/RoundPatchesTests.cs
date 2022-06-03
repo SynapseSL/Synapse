@@ -10,10 +10,7 @@ namespace Synapse.Tests.Regression.Patches.EventsPatches
         private SynapseRceClient _client;
 
         [SetUp]
-        public void SetUp()
-        {
-            _client = new SynapseRceClient(9090);
-        }
+        public void SetUp() => _client = new SynapseRceClient(9090);
 
         [Test, Sequential]
         public async Task StartRound_Invoke_NoError()

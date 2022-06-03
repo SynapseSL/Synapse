@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using CommandSystem.Commands.RemoteAdmin;
 using CustomPlayerEffects;
-using Respawning;
 using Synapse.Api;
 using Synapse.Api.Enum;
 using Synapse.Api.Items;
@@ -72,9 +70,9 @@ namespace Synapse.Config
         public float YSize { get; set; } = 1f;
         public float ZSize { get; set; } = 1f;
 
-        public SynapseItem Parse() => new SynapseItem(ID) 
-        { 
-            Scale = new Vector3(XSize,YSize,ZSize),
+        public SynapseItem Parse() => new SynapseItem(ID)
+        {
+            Scale = new Vector3(XSize, YSize, ZSize),
             Durabillity = Durabillity,
             WeaponAttachments = WeaponAttachments
         };
@@ -98,10 +96,10 @@ namespace Synapse.Config
     {
         public SerializedPlayerItem() { }
 
-        public SerializedPlayerItem(SynapseItem item, short chance, bool preference) 
+        public SerializedPlayerItem(SynapseItem item, short chance, bool preference)
             : this(item.ID, item.Durabillity, item.WeaponAttachments, item.Scale, chance, preference) { }
 
-        public SerializedPlayerItem(int id, float durabillity, uint weaponattachement, Vector3 scale, short chance, bool preference) 
+        public SerializedPlayerItem(int id, float durabillity, uint weaponattachement, Vector3 scale, short chance, bool preference)
             : base(id, durabillity, weaponattachement, scale)
         {
             Chance = chance;
@@ -115,9 +113,10 @@ namespace Synapse.Config
         {
             var item = Parse();
 
-            if (UsePreferences && item.ItemCategory == ItemCategory.Firearm) item.WeaponAttachments = player.GetPreference(ItemManager.Get.GetBaseType(ID));
+            if (UsePreferences && item.ItemCategory == ItemCategory.Firearm)
+                item.WeaponAttachments = player.GetPreference(ItemManager.Get.GetBaseType(ID));
 
-            if(UnityEngine.Random.Range(1f,100f) <= Chance)
+            if (UnityEngine.Random.Range(1f, 100f) <= Chance)
                 item.PickUp(player);
 
             return item;
@@ -179,7 +178,7 @@ namespace Synapse.Config
     [Serializable]
     public class SerializedPlayerInventory
     {
-        public  SerializedPlayerInventory() { }
+        public SerializedPlayerInventory() { }
 
         public SerializedPlayerInventory(Player player)
         {
@@ -190,6 +189,7 @@ namespace Synapse.Config
             Ammo.Ammo44 = player.AmmoBox[AmmoType.Ammo44cal];
 
             foreach (var item in player.Inventory.Items)
+            {
                 Items.Add(new SerializedPlayerItem
                 {
                     Chance = 100,
@@ -201,8 +201,9 @@ namespace Synapse.Config
                     YSize = item.Scale.y,
                     ZSize = item.Scale.z,
                 });
+            }
         }
-        
+
         public List<SerializedPlayerItem> Items { get; set; } = new List<SerializedPlayerItem>();
 
         public SerializedAmmo Ammo { get; set; } = new SerializedAmmo();
@@ -243,12 +244,12 @@ namespace Synapse.Config
         public float Y { get; set; } = 0f;
         public float Z { get; set; } = 0f;
 
-        public static implicit operator Vector3(SerializedVector3 vector) => vector == null ? Vector3.zero : vector.Parse();
+        public static implicit operator Vector3(SerializedVector3 vector) => vector is null ? Vector3.zero : vector.Parse();
         public static implicit operator SerializedVector3(Vector3 vector) => new SerializedVector3(vector);
         public static implicit operator SerializedVector3(Quaternion rotation) => new SerializedVector3(rotation.eulerAngles);
         public static implicit operator Quaternion(SerializedVector3 vector) => Quaternion.Euler(vector);
     }
-    
+
     [Serializable]
     public class SerializedVector2
     {
@@ -319,17 +320,19 @@ namespace Synapse.Config
     [Serializable]
     public class SerializedEffect
     {
-        public  SerializedEffect() { }
-        
+        public SerializedEffect() { }
+
         public SerializedEffect(PlayerEffect effect)
         {
             Intensity = effect.Intensity;
             Duration = effect.Duration;
             if (Enum.TryParse(effect.ToString().Split(' ')[0], true, out Effect effectType))
+            {
                 Effect = effectType;
+            }
             else
             {
-                 Logger.Get.Warn("Missing Effect: " + effect?.ToString());
+                Logger.Get.Warn("Missing Effect: " + effect?.ToString());
             }
         }
 
@@ -339,7 +342,7 @@ namespace Synapse.Config
             Intensity = intensity;
             Duration = duration;
         }
-        
+
         public Effect Effect { get; set; } = Effect.Asphyxiated;
 
         public byte Intensity { get; set; } = 1;
@@ -350,11 +353,11 @@ namespace Synapse.Config
 
         public static implicit operator SerializedEffect(PlayerEffect effect) => new SerializedEffect(effect);
     }
-    
+
     [Serializable]
     public class SerializedPlayerState
     {
-        public  SerializedPlayerState() { }
+        public SerializedPlayerState() { }
 
         public SerializedPlayerState(Player player)
         {
@@ -375,12 +378,13 @@ namespace Synapse.Config
 
             foreach (var effect in player.PlayerEffectsController._allEffects)
             {
-                if(!effect.IsEnabled) continue;
-                
+                if (!effect.IsEnabled)
+                    continue;
+
                 Effects.Add(effect);
             }
         }
-        
+
         public SerializedVector3 Position { get; set; } = Vector3.zero;
 
         public SerializedVector2 Rotation { get; set; } = Vector2.zero;
@@ -428,13 +432,13 @@ namespace Synapse.Config
             player.ArtificialHealth = ArtificialHealth;
             player.Stamina = Stamina;
             player.Scale = Scale;
-            
+
             Inventory.Apply(player);
 
             foreach (var effect in Effects)
                 effect.Apply(player);
         }
-        
+
         public static implicit operator SerializedPlayerState(Player player) => new SerializedPlayerState(player);
     }
 }

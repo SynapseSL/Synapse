@@ -1,94 +1,103 @@
-﻿using System;
-using System.Linq;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Interactables.Interobjects.DoorUtils;
+using System;
+using System.Linq;
 using EventHandler = Synapse.Api.Events.EventHandler;
 using Logger = Synapse.Api.Logger;
 
 namespace Synapse.Patches.EventsPatches.MapPatches
 {
     [HarmonyPatch(typeof(DoorVariant), nameof(DoorVariant.ServerInteract))]
-	internal static class DoorInteractPatch
-	{
-		[HarmonyPrefix]
-		private static bool OnInteract(DoorVariant __instance, ReferenceHub ply, byte colliderId)
-		{
-			try
-			{
-				if (__instance.ActiveLocks > 0)
-				{
-					DoorLockMode mode = DoorLockUtils.GetMode((DoorLockReason)__instance.ActiveLocks);
-					if ((!mode.HasFlagFast(DoorLockMode.CanClose) || !mode.HasFlagFast(DoorLockMode.CanOpen)) && (!mode.HasFlagFast(DoorLockMode.ScpOverride) || ply.characterClassManager.CurRole.team != Team.SCP) && (mode == DoorLockMode.FullLock || (__instance.TargetState && !mode.HasFlagFast(DoorLockMode.CanClose)) || (!__instance.TargetState && !mode.HasFlagFast(DoorLockMode.CanOpen))))
-					{
-						__instance.LockBypassDenied(ply, colliderId);
-						return false;
-					}
-				}
-				if (__instance.AllowInteracting(ply, colliderId))
-				{
-					var player = ply.GetPlayer();
-					var flag = player.RoleType == RoleType.Scp079 || __instance.RequiredPermissions.CheckPermissions(player.VanillaInventory.CurInstance, ply);
-					var cardaccess = false;
-					var item = player.ItemInHand;
+    internal static class DoorInteractPatch
+    {
+        [HarmonyPrefix]
+        private static bool OnInteract(DoorVariant __instance, ReferenceHub ply, byte colliderId)
+        {
+            try
+            {
+                if (__instance.ActiveLocks > 0)
+                {
+                    var mode = DoorLockUtils.GetMode((DoorLockReason)__instance.ActiveLocks);
+                    if ((!mode.HasFlagFast(DoorLockMode.CanClose) || !mode.HasFlagFast(DoorLockMode.CanOpen)) && (!mode.HasFlagFast(DoorLockMode.ScpOverride) || ply.characterClassManager.CurRole.team != Team.SCP) && (mode == DoorLockMode.FullLock || (__instance.TargetState && !mode.HasFlagFast(DoorLockMode.CanClose)) || (!__instance.TargetState && !mode.HasFlagFast(DoorLockMode.CanOpen))))
+                    {
+                        __instance.LockBypassDenied(ply, colliderId);
+                        return false;
+                    }
+                }
 
-					if (item.ItemCategory == ItemCategory.Keycard)
+                if (__instance.AllowInteracting(ply, colliderId))
+                {
+                    var player = ply.GetPlayer();
+                    var flag = player.RoleType == RoleType.Scp079 || __instance.RequiredPermissions.CheckPermissions(player.VanillaInventory.CurInstance, ply);
+                    var cardaccess = false;
+                    var item = player.ItemInHand;
+
+                    if (item.ItemCategory == ItemCategory.Keycard)
+                    {
                         try
                         {
-							EventHandler.Get.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref flag);
-						}
-						catch (Exception ex)
+                            EventHandler.Get.Player.InvokePlayerItemUseEvent(player, item, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref flag);
+                        }
+                        catch (Exception ex)
                         {
-							Logger.Get.Error($"Synapse-Event: ItemUseDoor Event failed!!\n{ex}");
-						}
+                            Logger.Get.Error($"Synapse-Event: ItemUseDoor Event failed!!\n{ex}");
+                        }
+                    }
 
-					if (flag) cardaccess = true;
-					else if (Server.Get.Configs.SynapseConfiguration.RemoteKeyCard)
-						foreach (var item2 in player.Inventory.Items.Where(x => x != item && x.ItemCategory == ItemCategory.Keycard))
-						{
-							var allowcard = __instance.RequiredPermissions.CheckPermissions(item2.ItemBase, ply);
+                    if (flag)
+                    {
+                        cardaccess = true;
+                    }
+                    else if (Server.Get.Configs.SynapseConfiguration.RemoteKeyCard)
+                    {
+                        foreach (var item2 in player.Inventory.Items.Where(x => x != item && x.ItemCategory == ItemCategory.Keycard))
+                        {
+                            var allowcard = __instance.RequiredPermissions.CheckPermissions(item2.ItemBase, ply);
 
                             try
                             {
-								EventHandler.Get.Player.InvokePlayerItemUseEvent(player, item2, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allowcard);
-							}
-							catch (Exception ex)
+                                EventHandler.Get.Player.InvokePlayerItemUseEvent(player, item2, Api.Events.SynapseEventArguments.ItemInteractState.Finalizing, ref allowcard);
+                            }
+                            catch (Exception ex)
                             {
-								Logger.Get.Error($"Synapse-Event: ItemUseDoor Event failed!!\n{ex}");
-							}
+                                Logger.Get.Error($"Synapse-Event: ItemUseDoor Event failed!!\n{ex}");
+                            }
 
-							if (allowcard)
-							{
-								cardaccess = true;
-								break;
-							}
-						}
+                            if (allowcard)
+                            {
+                                cardaccess = true;
+                                break;
+                            }
+                        }
+                    }
 
-					try
-					{
-						EventHandler.Get.Map.InvokeDoorInteractEvent(player, __instance.GetDoor(), ref cardaccess);
-					}
-					catch(Exception ex)
+                    try
                     {
-						Logger.Get.Error($"Synapse-Event: DoorInteract failed!!\n{ex}");
-					}
+                        EventHandler.Get.Map.InvokeDoorInteractEvent(player, __instance.GetDoor(), ref cardaccess);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Get.Error($"Synapse-Event: DoorInteract failed!!\n{ex}");
+                    }
 
-					if (cardaccess)
-					{
-						__instance.NetworkTargetState = !__instance.TargetState;
-						__instance._triggerPlayer = ply;
-						return false;
-					}
-					__instance.PermissionsDenied(ply, colliderId);
-					DoorEvents.TriggerAction(__instance, DoorAction.AccessDenied, ply);
-				}
+                    if (cardaccess)
+                    {
+                        __instance.NetworkTargetState = !__instance.TargetState;
+                        __instance._triggerPlayer = ply;
+                        return false;
+                    }
 
-				return false;
-			}
-			catch (Exception e)
-			{
-				Logger.Get.Error($"Synapse-Event: DoorInteract Patch failed!!\n{e}");
-				return true;
-			}
-		}
-	}
+                    __instance.PermissionsDenied(ply, colliderId);
+                    DoorEvents.TriggerAction(__instance, DoorAction.AccessDenied, ply);
+                }
+
+                return false;
+            }
+            catch (Exception e)
+            {
+                Logger.Get.Error($"Synapse-Event: DoorInteract Patch failed!!\n{e}");
+                return true;
+            }
+        }
+    }
 }

@@ -1,9 +1,9 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using InventorySystem.Items.Usables;
 using Mirror;
 using Synapse.Api;
 using Synapse.Api.Events.SynapseEventArguments;
+using System;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
@@ -52,6 +52,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     handler.CurrentUsable = CurrentlyUsedItem.None;
                     NetworkServer.SendToAll(new StatusMessage(StatusMessage.StatusType.Cancel, item.Serial), 0, false);
                 }
+
                 return allow;
             }
             catch (Exception e)
@@ -83,6 +84,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     handler.CurrentUsable = CurrentlyUsedItem.None;
                     NetworkServer.SendToAll(new StatusMessage(StatusMessage.StatusType.Cancel, item.Serial), 0, false);
                 }
+
                 return allow;
             }
             catch (Exception e)

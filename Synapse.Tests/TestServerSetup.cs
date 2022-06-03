@@ -28,7 +28,7 @@ namespace Synapse.Tests
         private static string InjectorOutputDirectory;
         private static Process _localAdminProcess;
         private static ProcessStartInfo _localAdminStartInfo;
-        private static List<string> _logs;
+        private static readonly List<string> _logs;
 
         static TestServer()
         {
@@ -57,13 +57,12 @@ namespace Synapse.Tests
             await GenerateConfigs();
             ActivateRceConfig();
 
-            _localAdminProcess = new Process();
-            _localAdminProcess.StartInfo = _localAdminStartInfo;
-            _localAdminProcess.OutputDataReceived += (_, e) =>
+            _localAdminProcess = new Process
             {
-                _logs.Add(e.Data);
+                StartInfo = _localAdminStartInfo
             };
-            _localAdminProcess.Start();
+            _localAdminProcess.OutputDataReceived += (_, e) => _logs.Add(e.Data);
+            _ = _localAdminProcess.Start();
             _localAdminProcess.BeginOutputReadLine();
             LocalAdminInputStream = _localAdminProcess.StandardInput;
 
@@ -82,6 +81,7 @@ namespace Synapse.Tests
                 configContent = configContent.Replace("useLocalRceServer: false", "useLocalRceServer: true");
                 File.WriteAllText(configPath, configContent);
             }
+
             async Task GenerateConfigs()
             {
                 _localAdminProcess = Process.Start(_localAdminStartInfo);
@@ -90,16 +90,19 @@ namespace Synapse.Tests
                 await Task.Delay(5000);
 
                 _localAdminProcess.Kill();
-                while (!_localAdminProcess.HasExited) ;
+                while (!_localAdminProcess.HasExited)
+                    ;
             }
+
             void CreateLocalSynapseFolders()
             {
-                Directory.CreateDirectory(SynapseInstallationDirectory);
+                _ = Directory.CreateDirectory(SynapseInstallationDirectory);
                 CopyDirectory(SynapseBuildFolder, SynapseInstallationDirectory, true);
 
                 SynapsePluginDirectory = Path.Combine(SynapseInstallationDirectory, "plugins", "server-7777");
-                Directory.CreateDirectory(SynapsePluginDirectory);
+                _ = Directory.CreateDirectory(SynapsePluginDirectory);
             }
+
             void InjectSynapse()
             {
                 var injector = new SynapseInjector(true, InjectorOutputDirectory);
@@ -110,6 +113,7 @@ namespace Synapse.Tests
                 File.Delete(AssemblyCSharpPath);
                 File.Move(Path.Combine(InjectorOutputDirectory, "Assembly-CSharp.dll"), AssemblyCSharpPath);
             }
+
             void DownloadSlServer()
             {
                 Assert.DoesNotThrow(() =>
@@ -126,6 +130,7 @@ namespace Synapse.Tests
                     Assert.AreEqual(0, process.ExitCode);
                 });
             }
+
             void EnsurePaths()
             {
                 var testDirectoryInfo = new DirectoryInfo(TestContext.CurrentContext.TestDirectory);
@@ -155,9 +160,8 @@ namespace Synapse.Tests
                 if (Directory.Exists(InjectorOutputDirectory))
                     Directory.Delete(InjectorOutputDirectory, true);
 
-
-                Directory.CreateDirectory(ServerDirectory);
-                Directory.CreateDirectory(InjectorOutputDirectory);
+                _ = Directory.CreateDirectory(ServerDirectory);
+                _ = Directory.CreateDirectory(InjectorOutputDirectory);
             }
         }
 
@@ -181,10 +185,11 @@ namespace Synapse.Tests
             var scpsl = Process.GetProcessesByName("SCPSL")?.FirstOrDefault();
             scpsl?.Kill();
 
-
-            while ((!localAdmin?.HasExited ?? false) && (!scpsl?.HasExited ?? false)) ;
+            while ((!localAdmin?.HasExited ?? false) && (!scpsl?.HasExited ?? false))
+                ;
         }
-        static void CopyDirectory(string sourceDir, string destinationDir, bool recursive)
+
+        private static void CopyDirectory(string sourceDir, string destinationDir, bool recursive)
         {
             // Get information about the source directory
             var dir = new DirectoryInfo(sourceDir);
@@ -194,24 +199,24 @@ namespace Synapse.Tests
                 throw new DirectoryNotFoundException($"Source directory not found: {dir.FullName}");
 
             // Cache directories before we start copying
-            DirectoryInfo[] dirs = dir.GetDirectories();
+            var dirs = dir.GetDirectories();
 
             // Create the destination directory
-            Directory.CreateDirectory(destinationDir);
+            _ = Directory.CreateDirectory(destinationDir);
 
             // Get the files in the source directory and copy to the destination directory
-            foreach (FileInfo file in dir.GetFiles())
+            foreach (var file in dir.GetFiles())
             {
-                string targetFilePath = Path.Combine(destinationDir, file.Name);
-                file.CopyTo(targetFilePath);
+                var targetFilePath = Path.Combine(destinationDir, file.Name);
+                _ = file.CopyTo(targetFilePath);
             }
 
             // If recursive and copying subdirectories, recursively call this method
             if (recursive)
             {
-                foreach (DirectoryInfo subDir in dirs)
+                foreach (var subDir in dirs)
                 {
-                    string newDestinationDir = Path.Combine(destinationDir, subDir.Name);
+                    var newDestinationDir = Path.Combine(destinationDir, subDir.Name);
                     CopyDirectory(subDir.FullName, newDestinationDir, true);
                 }
             }

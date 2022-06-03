@@ -9,72 +9,72 @@ using UnityEngine;
 
 namespace Synapse.Api.Events.SynapseEventArguments
 {
-    public class PlayerJoinEventArgs: EventHandler.ISynapseEventArgs
+    public class PlayerJoinEventArgs : ISynapseEventArgs
     {
         public Player Player { internal set; get; }
-        
+
         public string Nickname { set; get; }
     }
 
-    public class PlayerLeaveEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerLeaveEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
     }
-    
-    public class PlayerBanEventArgs : EventHandler.ISynapseEventArgs
+
+    public class PlayerBanEventArgs : ISynapseEventArgs
     {
         public bool Allow { get; set; } = true;
-        
+
         public Player BannedPlayer { get; internal set; }
-        
+
         public Player Issuer { get; internal set; }
-        
+
         public long BanDuration { get; set; }
 
-        [Obsolete("Use BanDuration",true)]
+        [Obsolete("Use BanDuration", true)]
         public int Duration
         {
             get => (int)BanDuration;
             set => BanDuration = value;
         }
-        
+
         public string Reason { get; set; }
     }
 
-    public class PlayerSpeakEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerSpeakEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
-        
+
         public DissonanceUserSetup DissonanceUserSetup { get; internal set; }
 
         public bool Scp939Talk { get; set; }
-        
+
         public bool IntercomTalk { get; set; }
-        
+
         public bool RadioTalk { get; set; }
-        
+
         public bool ScpChat { get; set; }
-        
+
         public bool SpectatorChat { get; set; }
-        
+
         public bool Allow { get; set; }
     }
 
-    public class PlayerDeathEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerDeathEventArgs : ISynapseEventArgs
     {
         public Player Victim { get; internal set; }
-        
+
         public Player Killer { get; internal set; }
-        
+
         public DamageType DamageType { get; internal set; }
 
         public bool Allow { get; set; } = true;
     }
 
-    public class PlayerDamageEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerDamageEventArgs : ISynapseEventArgs
     {
         public Player Killer { get; internal set; }
-        
+
         public Player Victim { get; internal set; }
 
         public float Damage { get; set; }
@@ -84,23 +84,23 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; } = true;
     }
 
-    public class LoadComponentEventArgs : EventHandler.ISynapseEventArgs
+    public class LoadComponentEventArgs : ISynapseEventArgs
     {
         public GameObject Player { get; internal set; }
     }
-    
-    public class PlayerItemInteractEventArgs : EventHandler.ISynapseEventArgs
+
+    public class PlayerItemInteractEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
-        
+
         public ItemInteractState State { get; internal set; }
-        
+
         public Items.SynapseItem CurrentItem { get; internal set; }
-        
+
         public bool Allow { get; set; }
     }
 
-    public class PlayerThrowGrenadeEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerThrowGrenadeEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -108,13 +108,13 @@ namespace Synapse.Api.Events.SynapseEventArguments
 
         [Obsolete("Removed Since 11.0.0")]
         public float ForceMultiplier { get; set; }
-        
+
         [Obsolete("Removed since 11.0.0")]
         public float Delay { get; set; }
-        
+
         public bool Allow { get; set; }
     }
-    
+
     public enum ItemInteractState
     {
         Initiating,
@@ -122,16 +122,16 @@ namespace Synapse.Api.Events.SynapseEventArguments
         Stopping
     }
 
-    public class PlayerHealEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerHealEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
-        
+
         public float Amount { get; set; }
-        
+
         public bool Allow { get; set; }
     }
 
-    public class PlayerEscapeEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerEscapeEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -148,32 +148,32 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Player Cuffer => Player.Cuffer;
     }
 
-    public class PlayerSyncDataEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerSyncDataEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
         public bool Allow { get; set; } = true;
     }
 
-    public class PlayerReloadEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerReloadEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
         public bool Allow { get; set; } = true;
-        
+
         public Items.SynapseItem Item { get; internal set; }
     }
 
-    public class PlayerEnterFemurEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerEnterFemurEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
         public bool Allow { get; set; } = true;
-        
+
         public bool CloseFemur { get; set; }
     }
 
-    public class PlayerGeneratorInteractEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerGeneratorInteractEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -184,14 +184,14 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; }
     }
 
-    public class PlayerKeyPressEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerKeyPressEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
         public KeyCode KeyCode { get; internal set; }
     }
 
-    public class PlayerDropItemEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerDropItemEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -202,7 +202,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; }
     }
 
-    public class PlayerPickUpItemEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerPickUpItemEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -211,7 +211,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; }
     }
 
-    public class PlayerShootEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerShootEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -224,7 +224,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; }
     }
 
-    public class PlayerSetClassEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerSetClassEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -247,7 +247,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; }
     }
 
-    public class PlayerStartWorkstationEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerStartWorkstationEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -256,7 +256,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; } = true;
     }
 
-    public class PlayerConnectWorkstationEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerConnectWorkstationEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -268,7 +268,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; } = true;
     }
 
-    public class PlayerUnconnectWorkstationEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerUnconnectWorkstationEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -277,7 +277,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; } = true;
     }
 
-    public class PlayerDropAmmoEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerDropAmmoEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -291,7 +291,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public SynapseItem Tablet { get; internal set; }
     }
 
-    public class PlayerCuffTargetEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerCuffTargetEventArgs : ISynapseEventArgs
     {
         public Player Target { get; internal set; }
 
@@ -303,7 +303,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public SynapseItem Disarmer { get; internal set; }
     }
 
-    public class PlayerUseMicroEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerUseMicroEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -318,7 +318,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public HidState State { get; set; }
     }
 
-    public class PlayerWalkOnSinkholeEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerWalkOnSinkholeEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -330,7 +330,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool SlowDown { get; set; }
     }
 
-    public class PlayerWalkOnTantrumEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerWalkOnTantrumEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -339,7 +339,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool SlowDown { get; set; }
     }
 
-    public class PlayerReportEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerReportEventArgs : ISynapseEventArgs
     {
         public Player Reporter { get; internal set; }
 
@@ -352,7 +352,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool Allow { get; set; } = true;
     }
 
-    public class PlayerDamagePermissionEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerDamagePermissionEventArgs : ISynapseEventArgs
     {
         public Player Victim { get; internal set; }
 
@@ -361,7 +361,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool AllowDamage { get; set; }
     }
 
-    public class PlayerUnCuffTargetEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerUnCuffTargetEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -373,7 +373,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool FreeWithDisarmer { get; internal set; }
     }
 
-    public class PlayerChangeItemEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerChangeItemEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -384,7 +384,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public SynapseItem NewItem { get; internal set; }
     }
 
-    public class PlaceBulletHoleEventArgs : EventHandler.ISynapseEventArgs
+    public class PlaceBulletHoleEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -393,7 +393,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public Vector3 Position { get; internal set; }
     }
 
-    public class PlayerFlipCoinEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerFlipCoinEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 
@@ -402,7 +402,7 @@ namespace Synapse.Api.Events.SynapseEventArguments
         public bool IsTails { get; set; }
     }
 
-    public class PlayerRadioInteractEventArgs : EventHandler.ISynapseEventArgs
+    public class PlayerRadioInteractEventArgs : ISynapseEventArgs
     {
         public Player Player { get; internal set; }
 

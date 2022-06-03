@@ -6,7 +6,7 @@ using static Synapse.Api.Events.EventHandler;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(RadioItem),nameof(RadioItem.ServerProcessCmd))]
+    [HarmonyPatch(typeof(RadioItem), nameof(RadioItem.ServerProcessCmd))]
     internal static class PlayerRadioInteractPatch
     {
         [HarmonyPrefix]
@@ -20,7 +20,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 var nextstate = (int)state + 1 >= __instance.Ranges.Length ? 0 : state + 1;
 
                 Get.Player.InvokeRadio(player, item, ref command, state, ref nextstate, out var allow);
-                if (!allow) return false;
+                if (!allow)
+                    return false;
 
                 switch (command)
                 {
@@ -43,7 +44,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
 
                 return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Get.Error($"Synapse-Event: RadioInteractEvent failed!!\n{e}");
                 return true;

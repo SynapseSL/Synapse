@@ -1,6 +1,6 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Synapse.Api.Events.SynapseEventArguments;
+using System;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
@@ -26,10 +26,10 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                 __instance._dissonanceSetup.SpectatorChat = specChat;
                 __instance._dissonanceSetup.IntercomAsHuman = intercom;
 
-                if (scp939) __instance._dissonanceSetup.MimicAs939 = b;
-                else __instance._dissonanceSetup.MimicAs939 = false;
+                __instance._dissonanceSetup.MimicAs939 = scp939 && b;
 
-                if (radio) __instance._dissonanceSetup.RadioAsHuman = b;
+                if (radio)
+                    __instance._dissonanceSetup.RadioAsHuman = b;
 
                 try
                 {

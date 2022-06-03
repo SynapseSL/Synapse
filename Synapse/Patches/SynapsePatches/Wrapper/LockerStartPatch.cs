@@ -7,9 +7,6 @@ namespace Synapse.Patches.SynapsePatches
     internal static class LockerStartPatch
     {
         [HarmonyPostfix]
-        private static void Start(MapGeneration.Distributors.Locker __instance)
-        {
-            SynapseController.Server.Map.Lockers.Add(new Locker(__instance));
-        }
+        private static void Start(MapGeneration.Distributors.Locker __instance) => SynapseController.Server.Map.Lockers.Add(new Locker(__instance));
     }
 }

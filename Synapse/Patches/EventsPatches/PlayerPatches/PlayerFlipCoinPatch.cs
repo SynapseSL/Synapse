@@ -19,10 +19,11 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
                     var isTails = UnityEngine.Random.value >= 0.5f;
 
                     Server.Get.Events.Player.InvokeFlipCoinEvent(hub.GetPlayer(), ref isTails, out var allow);
-                    
+
                     if (allow)
                         new CoinNetworkHandler.CoinFlipMessage(hub.inventory.CurItem.SerialNumber, isTails).SendToAuthenticated();
                 }
+
                 return false;
             }
             catch (Exception ex)

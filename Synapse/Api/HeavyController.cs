@@ -4,13 +4,16 @@ namespace Synapse.Api
 {
     public class HeavyController
     {
-        public static HeavyController Get => Map.Get.HeavyController;
+        public static HeavyController Get
+            => Map.Get.HeavyController;
 
         internal HeavyController() { }
 
-        private Recontainer079 Container => Server.Get.GetObjectOf<Recontainer079>();
+        private Recontainer079 Container
+            => Server.Get.GetObjectOf<Recontainer079>();
 
-        public byte ActiveGenerators { get => (byte)Container._prevEngaged; }
+        public byte ActiveGenerators
+            => (byte)Container._prevEngaged;
 
         public bool Is079Recontained
         {
@@ -25,17 +28,20 @@ namespace Synapse.Api
         {
             var recontainer = Container;
 
-            recontainer.TryKill079();
+            _ = recontainer.TryKill079();
             recontainer.PlayAnnouncement(recontainer._announcementSuccess + " Unknown", 1f);
         }
 
-        public void Overcharge() => Container.Recontain();
+        public void Overcharge()
+            => Container.Recontain();
 
         public void LightsOut(float duration, bool onlyHeavy = true)
         {
             foreach (var room in Map.Get.Rooms)
+            {
                 if (!onlyHeavy || room.Zone == Enum.ZoneType.HCZ)
                     room.LightController?.ServerFlickerLights(duration);
+            }
         }
 
         [Obsolete("You don't need forced any more")]

@@ -16,10 +16,10 @@ namespace Synapse.RCE
         {
             failResponse = null;
 
-            string assemblyName = "RCE-" + request.AssemblyName;
+            var assemblyName = "RCE-" + request.AssemblyName;
             var syntaxTree = SyntaxFactory.ParseSyntaxTree(SourceText.From(request.Code));
 
-            List<MetadataReference> references = new List<MetadataReference>();
+            var references = new List<MetadataReference>();
 
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
@@ -35,7 +35,7 @@ namespace Synapse.RCE
             Assembly dynamicAssembly = null;
             try
             {
-                CSharpCompilation compilation = CSharpCompilation.Create(
+                var compilation = CSharpCompilation.Create(
                     assemblyName,
                     syntaxTrees: new[] { syntaxTree },
                     references: references,
@@ -46,7 +46,7 @@ namespace Synapse.RCE
                 var result = compilation.Emit(ms);
                 if (result.Success)
                 {
-                    ms.Seek(0, SeekOrigin.Begin);
+                    _ = ms.Seek(0, SeekOrigin.Begin);
                     dynamicAssembly = Assembly.Load(ms.ToArray());
                 }
                 else
@@ -71,8 +71,10 @@ namespace Synapse.RCE
                 ));
 
                 foreach (var assembly in assemblies.Where(_ => !_.IsDynamic))
+                {
                     if (!String.IsNullOrWhiteSpace(assembly.Location))
                         references.Add(MetadataReference.CreateFromFile(assembly.Location));
+                }
 
                 foreach (var depend in Directory.GetFiles(Server.Get.Files.DependencyDirectory, "*.dll"))
                     references.Add(MetadataReference.CreateFromFile(depend));

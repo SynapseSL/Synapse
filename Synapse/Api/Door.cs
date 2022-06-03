@@ -16,20 +16,61 @@ namespace Synapse.Api
             VDoor = vanilladoor;
             if (VDoor.TryGetComponent<DoorNametagExtension>(out var nametag))
                 Name = nametag.GetName;
+
+            DoorType = DetermineDoorType();
+
+            Rooms = new List<Room>();
+
+            DoorType DetermineDoorType()
+            {
+                foreach (var type in (DoorType[])System.Enum.GetValues(typeof(DoorType)))
+                {
+                    if (type.ToString().ToUpper().Contains(Name.ToUpper()))
+                    {
+                        return type;
+                    }
+                }
+
+                if (Name.Contains("EZ BreakableDoor"))
+                {
+                    return DoorType.EZ_Door;
+                }
+                else if (Name.Contains("LCZ BreakableDoor"))
+                {
+                    return DoorType.LCZ_Door;
+                }
+                else if (Name.Contains("HCZ BreakableDoor"))
+                {
+                    return DoorType.HCZ_Door;
+                }
+                else if (Name.Contains("Prison BreakableDoor"))
+                {
+                    return DoorType.PrisonDoor;
+                }
+                else if (Name.Contains("LCZ PortallessBreakableDoor"))
+                {
+                    return DoorType.Airlock;
+                }
+                else if (Name.Contains("Unsecured Pryable GateDoor"))
+                {
+                    return DoorType.HCZ_049_Gate;
+                }
+                else
+                {
+                    return DoorType.Other;
+                }
+            }
         }
 
         public vDoor VDoor { get; internal set; }
 
-        public GameObject GameObject => VDoor.gameObject;
+        public GameObject GameObject
+            => VDoor.gameObject;
 
         private string name;
         public string Name
         {
-            get
-            {
-                if (string.IsNullOrEmpty(name)) return GameObject.name;
-                return name;
-            }
+            get => name ?? GameObject.name;
             set => name = value;
         }
 
@@ -64,39 +105,22 @@ namespace Synapse.Api
             }
         }
 
-        public DoorPermissions DoorPermissions { get => VDoor.RequiredPermissions; set => VDoor.RequiredPermissions = value; }
-
-        private Enum.DoorType doorType;
-        public Enum.DoorType DoorType
+        public DoorPermissions DoorPermissions
         {
-            get
-            {
-                foreach (var type in (Enum.DoorType[])System.Enum.GetValues(typeof(Enum.DoorType)))
-                {
-                    if (type.ToString().ToUpper().Contains(Name.ToUpper()))
-                    {
-                        doorType = type;
-                        return doorType;
-                    }
-                }
-
-                if (Name.Contains("EZ BreakableDoor")) doorType = Enum.DoorType.EZ_Door;
-                else if (Name.Contains("LCZ BreakableDoor")) doorType = Enum.DoorType.LCZ_Door;
-                else if (Name.Contains("HCZ BreakableDoor")) doorType = Enum.DoorType.HCZ_Door;
-                else if (Name.Contains("Prison BreakableDoor")) doorType = Enum.DoorType.PrisonDoor;
-                else if (Name.Contains("LCZ PortallessBreakableDoor")) doorType = Enum.DoorType.Airlock;
-                else if (Name.Contains("Unsecured Pryable GateDoor")) doorType = Enum.DoorType.HCZ_049_Gate;
-                else doorType = Enum.DoorType.Other;
-
-                return doorType;
-            }
+            get => VDoor.RequiredPermissions;
+            set => VDoor.RequiredPermissions = value;
         }
 
-        public bool IsBreakable => VDoor is BreakableDoor;
+        public DoorType DoorType { get; }
 
-        public bool IsDestroyed => VDoor is BreakableDoor bd && bd.IsDestroyed;
+        public bool IsBreakable
+            => VDoor is BreakableDoor;
 
-        public bool IsPryable => VDoor is PryableDoor;
+        public bool IsDestroyed
+            => VDoor is BreakableDoor bd && bd.IsDestroyed;
+
+        public bool IsPryable
+            => VDoor is PryableDoor;
 
         public bool Open
         {
@@ -124,24 +148,21 @@ namespace Synapse.Api
         }
 
         public bool TryPry()
-        {
-            if (VDoor is PryableDoor pry)
-                return pry.TryPryGate();
-            else
-                return false;
-        }
+            => VDoor is PryableDoor pry && pry.TryPryGate();
 
-        public List<Room> Rooms { get; } = new List<Room>();
+        public List<Room> Rooms { get; }
 
         [Obsolete("Please create a Synapse.Api.CustomObjects.SynapseDoorObject")]
         public static Door SpawnDoorVariant(Vector3 position, Quaternion? rotation = null, DoorPermissions permissions = null)
         {
-            if(rotation == null) rotation = Quaternion.identity;
+            if (rotation is null)
+                rotation = Quaternion.identity;
             var obj = new SynapseDoorObject(SpawnableDoorType.HCZ, position, rotation.Value, Vector3.one);
             obj.Door.DoorPermissions = permissions;
             return obj.Door;
         }
 
-        public override string ToString() => Name;
+        public override string ToString()
+            => Name;
     }
 }

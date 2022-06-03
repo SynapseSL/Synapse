@@ -1,8 +1,8 @@
+using Synapse.Api;
+using Synapse.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Synapse.Api;
-using Synapse.Config;
 
 namespace Synapse.Permission
 {
@@ -13,11 +13,13 @@ namespace Synapse.Permission
         private SYML _permissionSYML;
 
         internal readonly Dictionary<string, SynapseGroup> groups = new Dictionary<string, SynapseGroup>();
-        internal ServerSection serverSection;
+        internal ServerSection ServerSection { get; private set; }
 
-        public static PermissionHandler Get => Server.Get.PermissionHandler;
+        public static PermissionHandler Get
+            => Server.Get.PermissionHandler;
 
-        public Dictionary<string, SynapseGroup> Groups { get => new Dictionary<string, SynapseGroup>(groups); }
+        public Dictionary<string, SynapseGroup> Groups
+            => new Dictionary<string, SynapseGroup>(groups);
 
         internal void Init()
         {
@@ -28,8 +30,8 @@ namespace Synapse.Permission
         public void Reload()
         {
             _permissionSYML.Load();
-            serverSection = new ServerSection();
-            serverSection = _permissionSYML.GetOrSetDefault("Server", serverSection);
+            ServerSection = new ServerSection();
+            ServerSection = _permissionSYML.GetOrSetDefault("Server", ServerSection);
             groups.Clear();
 
             foreach (var pair in _permissionSYML.Sections)
@@ -88,7 +90,7 @@ namespace Synapse.Permission
             if (!_permissionSYML.Sections.Any(x => x.Key.Equals(groupname, StringComparison.OrdinalIgnoreCase)))
                 return false;
 
-            _permissionSYML.Sections.Remove(_permissionSYML.Sections.First(x => x.Key.Equals(groupname, StringComparison.OrdinalIgnoreCase)).Key);
+            _ = _permissionSYML.Sections.Remove(_permissionSYML.Sections.First(x => x.Key.Equals(groupname, StringComparison.OrdinalIgnoreCase)).Key);
             _permissionSYML.Store();
             Reload();
 
@@ -103,7 +105,7 @@ namespace Synapse.Permission
             if (!_permissionSYML.Sections.Any(x => x.Key.Equals(groupname, StringComparison.OrdinalIgnoreCase)))
                 return false;
 
-            _permissionSYML.Sections.First(x => x.Key.Equals(groupname, StringComparison.OrdinalIgnoreCase)).Value.Import(group);
+            _ = _permissionSYML.Sections.First(x => x.Key.Equals(groupname, StringComparison.OrdinalIgnoreCase)).Value.Import(group);
             _permissionSYML.Store();
             Reload();
 
@@ -112,8 +114,9 @@ namespace Synapse.Permission
 
         public SynapseGroup GetServerGroup(string groupname)
         {
-            if (!Groups.Keys.Any(x => x.Equals(groupname, StringComparison.OrdinalIgnoreCase))) return null;
-            return groups.FirstOrDefault(x => x.Key.Equals(groupname, StringComparison.OrdinalIgnoreCase)).Value.Copy();
+            return !Groups.Keys.Any(x => x.Equals(groupname, StringComparison.OrdinalIgnoreCase))
+                ? null
+                : groups.FirstOrDefault(x => x.Key.Equals(groupname, StringComparison.OrdinalIgnoreCase)).Value.Copy();
         }
 
         public SynapseGroup GetPlayerGroup(Player player)
@@ -125,41 +128,34 @@ namespace Synapse.Permission
 
             var nwgroup = GetNorthwoodGroup();
 
-            if (player.ServerRoles.Staff && nwgroup != null)
-                return nwgroup;
-
-            return GetDefaultGroup();
+            return player.ServerRoles.Staff && nwgroup != null ? nwgroup : GetDefaultGroup();
         }
 
         public SynapseGroup GetPlayerGroup(string UserID)
         {
-            var group = groups.Values.FirstOrDefault(x => x.Members != null && x.Members.Contains(UserID));
+            var group = groups.Values.FirstOrDefault(x => x.Members?.Contains(UserID) ?? false);
 
             if (group != null)
                 return group.Copy();
 
             var nwgroup = GetNorthwoodGroup();
 
-            if (nwgroup != null && UserID.ToLower().Contains("@northwood"))
-                return nwgroup;
-
-            return GetDefaultGroup();
+            return nwgroup != null && UserID.ToLower().Contains("@northwood") ? nwgroup : GetDefaultGroup();
         }
 
         public SynapseGroup GetDefaultGroup()
         {
             var group = groups.Values.FirstOrDefault(x => x.Default);
 
-            if (group != null)
-                return group.Copy();
-
-            return new SynapseGroup
-            {
-                Default = true,
-                Permissions = new List<string> { "synapse.command.help", "synapse.command.plugins" },
-                Members = null,
-                Inheritance = null,
-            };
+            return group != null
+                ? group.Copy()
+                : new SynapseGroup
+                {
+                    Default = true,
+                    Permissions = new List<string> { "synapse.command.help", "synapse.command.plugins" },
+                    Members = null,
+                    Inheritance = null,
+                };
         }
 
         public SynapseGroup GetNorthwoodGroup() => groups.Values.FirstOrDefault(x => x.Northwood)?.Copy();
@@ -168,7 +164,7 @@ namespace Synapse.Permission
         {
             var group = GetServerGroup(groupname);
 
-            if (group == null)
+            if (group is null)
             {
                 Logger.Get.Warn($"Group {groupname} does not exist!");
                 return false;
@@ -177,14 +173,14 @@ namespace Synapse.Permission
             if (!userid.Contains("@"))
                 return false;
 
-            RemovePlayerGroup(userid);
+            _ = RemovePlayerGroup(userid);
 
-            if (group.Members == null)
+            if (group.Members is null)
                 group.Members = new List<string>();
 
             group.Members.Add(userid);
 
-            _permissionSYML.Sections.FirstOrDefault(x => x.Key.Equals(groupname, StringComparison.OrdinalIgnoreCase)).Value.Import(group);
+            _ = _permissionSYML.Sections.FirstOrDefault(x => x.Key.Equals(groupname, StringComparison.OrdinalIgnoreCase)).Value.Import(group);
             _permissionSYML.Store();
 
             Reload();
@@ -198,10 +194,10 @@ namespace Synapse.Permission
                 return false;
 
             var safe = false;
-            foreach (var group in groups.Where(x => x.Value.Members != null && x.Value.Members.Contains(userid)))
+            foreach (var group in groups.Where(x => x.Value.Members?.Contains(userid) ?? false))
             {
-                group.Value.Members.Remove(userid);
-                _permissionSYML.Sections[group.Key].Import(group.Value);
+                _ = group.Value.Members.Remove(userid);
+                _ = _permissionSYML.Sections[group.Key].Import(group.Value);
                 safe = true;
             }
 

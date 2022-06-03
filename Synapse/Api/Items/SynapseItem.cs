@@ -28,6 +28,7 @@ namespace Synapse.Api.Items
                 Logger.Get.Warn("If this message appears exists a Item that is not registered. Please report this bug in our Discord as detailed as possible");
                 return None;
             }
+
             return AllItems[serial];
         }
 
@@ -37,6 +38,9 @@ namespace Synapse.Api.Items
         private SynapseItem()
         {
             Throwable = new ThrowableAPI(this);
+            ItemData = new Dictionary<string, object>();
+            CanBePickedUp = true;
+            position = Vector3.zero;
         }
 
         /// <summary>
@@ -66,14 +70,16 @@ namespace Synapse.Api.Items
         /// </summary>
         /// <param name="type"></param>
         /// <param name="player"></param>
-        public SynapseItem(ItemType type, Player player) : this(type) => PickUp(player);
+        public SynapseItem(ItemType type, Player player) : this(type)
+            => PickUp(player);
 
         /// <summary>
         /// This constructor creates a completely new Item from a ItemType and Drops it
         /// </summary>
         /// <param name="type"></param>
         /// <param name="pos"></param>
-        public SynapseItem(ItemType type, Vector3 pos) : this(type) => Drop(pos);
+        public SynapseItem(ItemType type, Vector3 pos) : this(type)
+            => Drop(pos);
 
         /// <summary>
         /// This constructor creates a completely new Item from a ItemID but wont spawn it
@@ -81,7 +87,7 @@ namespace Synapse.Api.Items
         /// <param name="type"></param>
         public SynapseItem(int id) : this()
         {
-            if (id == -1 && None == null)
+            if (id == -1 && None is null)
             {
                 ID = -1;
                 ItemType = ItemType.None;
@@ -120,14 +126,16 @@ namespace Synapse.Api.Items
         /// </summary>
         /// <param name="type"></param>
         /// <param name="player"></param>
-        public SynapseItem(int id, Player player) : this(id) => PickUp(player);
+        public SynapseItem(int id, Player player) : this(id)
+            => PickUp(player);
 
         /// <summary>
         /// This constructor creates a completely new Item from a ItemID and Drops it
         /// </summary>
         /// <param name="type"></param>
         /// <param name="pos"></param>
-        public SynapseItem(int id, Vector3 pos) : this(id) => Drop(pos);
+        public SynapseItem(int id, Vector3 pos) : this(id)
+            => Drop(pos);
 
         /// <summary>
         /// This Constructor should be used to register a ItemBase that is not already registered
@@ -167,6 +175,7 @@ namespace Synapse.Api.Items
                 ItemCategory = examplebase.Category;
                 TierFlags = examplebase.TierFlags;
             }
+
             Weight = pickupBase.Info.Weight;
         }
         #endregion
@@ -198,13 +207,13 @@ namespace Synapse.Api.Items
         {
             get
             {
-                switch (State)
+                return State switch
                 {
-                    case ItemState.Map: return PickupBase.gameObject;
-                    case ItemState.Inventory: return ItemBase.gameObject;
-                    case ItemState.Thrown: return Throwable.ThrowableItem.gameObject;
-                    default: return null;
-                }
+                    ItemState.Map => PickupBase.gameObject,
+                    ItemState.Inventory => ItemBase.gameObject,
+                    ItemState.Thrown => Throwable.ThrowableItem.gameObject,
+                    _ => null,
+                };
             }
         }
         public ItemBase ItemBase { get; internal set; }
@@ -212,19 +221,23 @@ namespace Synapse.Api.Items
         #endregion
 
         #region DynamicValues
-        public Enum.ItemState State
+        public ItemState State
         {
             get
             {
-                if (deactivated) return Enum.ItemState.Destroyed;
+                if (deactivated)
+                    return ItemState.Destroyed;
 
-                if (Throwable.ThrowableItem != null) return Enum.ItemState.Thrown;
+                if (Throwable.ThrowableItem != null)
+                    return ItemState.Thrown;
 
-                if (ItemBase != null) return Enum.ItemState.Inventory;
+                if (ItemBase != null)
+                    return ItemState.Inventory;
 
-                if (PickupBase != null) return Enum.ItemState.Map;
+                if (PickupBase != null)
+                    return ItemState.Map;
 
-                return Enum.ItemState.Despawned;
+                return ItemState.Despawned;
             }
         }
 
@@ -232,34 +245,32 @@ namespace Synapse.Api.Items
         {
             get
             {
-                switch (State)
+                return State switch
                 {
                     //case ItemState.Map: return PickupBase.PreviousOwner.Hub.GetPlayer();
-                    case ItemState.Inventory: return ItemBase.Owner.GetPlayer();
-                    default: return null;
-                }
+                    ItemState.Inventory => ItemBase.Owner.GetPlayer(),
+                    _ => null,
+                };
             }
         }
         #endregion
 
         #region ChangableAPIValues
-        public Dictionary<string, object> ItemData { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, object> ItemData { get; set; }
 
-        public bool CanBePickedUp { get; set; } = true;
+        public bool CanBePickedUp { get; set; }
         public SynapseSchematic Schematic { get; set; }
         public SynapseObject SynapseObject { get; set; }
 
-        private Vector3 position = Vector3.zero;
+        private Vector3 position;
         public Vector3 Position
         {
             get
             {
                 if (Throwable.ThrowableItem != null)
                     return Throwable.ThrowableItem.transform.position;
-
                 if (ItemBase != null)
                     return ItemHolder.Position;
-
                 if (PickupBase != null)
                     return PickupBase.Info.Position;
 
@@ -280,16 +291,7 @@ namespace Synapse.Api.Items
         private Quaternion rotation = default;
         public Quaternion Rotation
         {
-            get
-            {
-                if (ItemBase != null)
-                    return ItemHolder.transform.rotation;
-
-                if (PickupBase != null)
-                    return PickupBase.transform.rotation;
-
-                return rotation;
-            }
+            get => ItemBase != null ? ItemHolder.transform.rotation : PickupBase != null ? PickupBase.transform.rotation : rotation;
             set
             {
                 if (PickupBase != null)
@@ -312,7 +314,7 @@ namespace Synapse.Api.Items
                 {
                     PickupBase.transform.localScale = value;
 
-                    if (SynapseObject == null)
+                    if (SynapseObject is null)
                         PickupBase.netIdentity.UpdatePositionRotationScale();
                     else
                         SynapseObject.Scale = SynapseObject.GameObject.transform.lossyScale;
@@ -361,7 +363,7 @@ namespace Synapse.Api.Items
             }
             set
             {
-                if(State == ItemState.Despawned)
+                if (State == ItemState.Despawned)
                 {
                     durabillity = value;
                     return;
@@ -394,6 +396,7 @@ namespace Synapse.Api.Items
                             var armpickup = PickupBase as FirearmPickup;
                             armpickup.Status = new FirearmStatus((byte)value, armpickup.Status.Flags, armpickup.Status.Attachments);
                         }
+
                         break;
 
                     case ItemCategory.Ammo:
@@ -409,7 +412,7 @@ namespace Synapse.Api.Items
         {
             get
             {
-                if(ItemBase is Firearm arm)
+                if (ItemBase is Firearm arm)
                 {
                     return arm.Status.Attachments;
                 }
@@ -417,6 +420,7 @@ namespace Synapse.Api.Items
                 {
                     return armpickup.Status.Attachments;
                 }
+
                 return attachments;
             }
             set
@@ -431,7 +435,7 @@ namespace Synapse.Api.Items
                     arm.ApplyAttachmentsCode(value, true);
                 else if (PickupBase is FirearmPickup armpickup)
                     armpickup.NetworkStatus = new FirearmStatus(armpickup.Status.Ammo, armpickup.Status.Flags, value);
-                
+
             }
         }
         #endregion
@@ -448,19 +452,19 @@ namespace Synapse.Api.Items
             switch (State)
             {
                 case ItemState.Map:
-                    player.VanillaInventory.ServerAddItem(ItemType, Serial, PickupBase);
+                    _ = player.VanillaInventory.ServerAddItem(ItemType, Serial, PickupBase);
                     PickupBase.DestroySelf();
                     break;
 
                 case ItemState.Despawned:
-                    player.VanillaInventory.ServerAddItem(ItemType, Serial);
+                    _ = player.VanillaInventory.ServerAddItem(ItemType, Serial);
                     Durabillity = durabillity;
                     WeaponAttachments = attachments;
                     break;
 
                 case ItemState.Inventory:
                     DespawnItemBase();
-                    player.VanillaInventory.ServerAddItem(ItemType, Serial);
+                    _ = player.VanillaInventory.ServerAddItem(ItemType, Serial);
                     break;
             }
         }
@@ -472,7 +476,7 @@ namespace Synapse.Api.Items
                 case ItemState.Map: Position = position; break;
 
                 case ItemState.Inventory:
-                    ItemHolder.VanillaInventory.ServerDropItem(Serial);
+                    _ = ItemHolder.VanillaInventory.ServerDropItem(Serial);
                     break;
 
                 case ItemState.Despawned:
@@ -499,6 +503,7 @@ namespace Synapse.Api.Items
 
                         CheckForSchematic();
                     }
+
                     break;
             }
         }
@@ -526,14 +531,14 @@ namespace Synapse.Api.Items
         {
             if (ItemBase != null)
             {
-                if(ItemHolder != null)
+                if (ItemHolder != null)
                 {
                     ItemBase.OnRemoved(null);
 
                     if (ItemHolder.ItemInHand == this)
                         ItemHolder.ItemInHand = None;
 
-                    ItemHolder.VanillaInventory.UserInventory.Items.Remove(Serial);
+                    _ = ItemHolder.VanillaInventory.UserInventory.Items.Remove(Serial);
                     ItemHolder.VanillaInventory.SendItemsNextFrame = true;
                 }
 
@@ -544,14 +549,15 @@ namespace Synapse.Api.Items
 
         public void DespawnPickup()
         {
-            if (PickupBase != null) NetworkServer.Destroy(PickupBase.gameObject);
+            if (PickupBase != null)
+                NetworkServer.Destroy(PickupBase.gameObject);
             PickupBase = null;
         }
 
         public void Destroy()
         {
             Despawn();
-            AllItems.Remove(Serial);
+            _ = AllItems.Remove(Serial);
             deactivated = true;
         }
 
@@ -559,12 +565,16 @@ namespace Synapse.Api.Items
         {
             try
             {
-                if (Schematic == null) return;
-                if (PickupBase == null) return;
+                if (Schematic is null)
+                    return;
+                if (PickupBase is null)
+                    return;
 
-                SynapseObject = new SynapseObject(Schematic);
-                SynapseObject.Position = Position;
-                SynapseObject.ItemParent = this;
+                SynapseObject = new SynapseObject(Schematic)
+                {
+                    Position = Position,
+                    ItemParent = this
+                };
 
                 var scale = Scale;
                 Scale = Vector3.one;
@@ -574,7 +584,7 @@ namespace Synapse.Api.Items
 
                 PickupBase?.netIdentity.DespawnForAllPlayers();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.Get.Error($"Synapse-Item: Creating the Schematic {Schematic?.ID} for a Item failed\n" + ex);
             }

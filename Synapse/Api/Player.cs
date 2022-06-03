@@ -15,13 +15,13 @@ using Synapse.Api.Enum;
 using Synapse.Api.Events.SynapseEventArguments;
 using Synapse.Api.Items;
 using Synapse.Api.Roles;
+using Synapse.Config;
 using Synapse.Database;
 using Synapse.Patches.EventsPatches.PlayerPatches;
 using Synapse.Permission;
 using System;
 using System.Linq;
 using System.Reflection;
-using Synapse.Config;
 using UnityEngine;
 
 namespace Synapse.Api
@@ -67,10 +67,9 @@ namespace Synapse.Api
 
         public uint GetPreference(ItemType item)
         {
-            if (AttachmentsServerHandler.PlayerPreferences.TryGetValue(Hub, out var dict) && dict.TryGetValue(item, out var result))
-                return result;
-
-            return 0;
+            return AttachmentsServerHandler.PlayerPreferences.TryGetValue(Hub, out var dict) && dict.TryGetValue(item, out var result)
+                ? result
+                : 0;
         }
 
         public void Kick(string message) => ServerConsole.Disconnect(gameObject, message);
@@ -139,13 +138,14 @@ namespace Synapse.Api
         public bool Hurt(DamageHandlerBase handlerbase) => PlayerStats.DealDamage(handlerbase);
 
         public void Kill() => Kill("Unknown Reason");
-        
+
         public bool Kill(string reason) => PlayerStats.DealDamage(new CustomReasonDamageHandler(reason));
-        
+
         public bool Kill(string reason, string cassie)
         {
-            bool result = Kill(reason);
-            if (result) Server.Get.Map.Cassie(cassie);
+            var result = Kill(reason);
+            if (result)
+                Server.Get.Map.Cassie(cassie);
             return result;
         }
 
@@ -157,8 +157,10 @@ namespace Synapse.Api
 
         public void ExecuteCommand(string command, bool RA = true)
         {
-            if (RA) RemoteAdmin.CommandProcessor.ProcessQuery(command, CommandSender);
-            else QueryProcessor.ProcessGameConsoleQuery(command);
+            if (RA)
+                RemoteAdmin.CommandProcessor.ProcessQuery(command, CommandSender);
+            else
+                QueryProcessor.ProcessGameConsoleQuery(command);
         }
 
         public void SendToServer(ushort port)
@@ -172,7 +174,7 @@ namespace Synapse.Api
             {
                 netId = component.netId,
                 componentIndex = component.ComponentIndex,
-                functionHash = typeof(RoundSummary).FullName.GetStableHashCode() * 503 + "RpcDimScreen".GetStableHashCode(),
+                functionHash = (typeof(RoundSummary).FullName.GetStableHashCode() * 503) + "RpcDimScreen".GetStableHashCode(),
                 payload = writer.ToArraySegment()
             };
             Connection.Send(msg);
@@ -193,7 +195,7 @@ namespace Synapse.Api
             {
                 netId = component.netId,
                 componentIndex = component.ComponentIndex,
-                functionHash = typeof(CharacterClassManager).FullName.GetStableHashCode() * 503 + "RpcPlaceBlood".GetStableHashCode(),
+                functionHash = (typeof(CharacterClassManager).FullName.GetStableHashCode() * 503) + "RpcPlaceBlood".GetStableHashCode(),
                 payload = writer.ToArraySegment()
             };
             Connection.Send(msg);
@@ -237,9 +239,11 @@ namespace Synapse.Api
             if (Hub.isDedicatedServer)
                 Server.Get.Events.Server.InvokeUpdateEvent();
 
-            if (this == Server.Get.Host || HideRank || SynapseGroup.Color.ToUpper() != "RAINBOW") return;
+            if (this == Server.Get.Host || HideRank || SynapseGroup.Color.ToUpper() != "RAINBOW")
+                return;
 
-            if (!string.IsNullOrEmpty(ServerRoles.NetworkGlobalBadge)) return;
+            if (!String.IsNullOrEmpty(ServerRoles.NetworkGlobalBadge))
+                return;
 
             if (Time.time >= delay)
             {
@@ -291,7 +295,8 @@ namespace Synapse.Api
                 if (oldRole != null)
                     oldRole.DeSpawn();
 
-                if (_role == null) return;
+                if (_role is null)
+                    return;
 
                 _role.Player = this;
                 _role.Spawn();
@@ -300,11 +305,7 @@ namespace Synapse.Api
 
         public int RoleID
         {
-            get
-            {
-                if (CustomRole == null) return (int)RoleType;
-                else return CustomRole.GetRoleID();
-            }
+            get => CustomRole is null ? (int)RoleType : CustomRole.GetRoleID();
             set
             {
                 if (value >= 0 && value <= RoleManager.HighestRole)
@@ -321,7 +322,7 @@ namespace Synapse.Api
             }
         }
 
-        public string RoleName => CustomRole == null ? RoleType.ToString() : CustomRole.GetRoleName();
+        public string RoleName => CustomRole is null ? RoleType.ToString() : CustomRole.GetRoleName();
 
         /// <summary>
         /// This field is just for storing some setclass information between multiple Harmony Patches
@@ -333,16 +334,10 @@ namespace Synapse.Api
 
         public SynapseGroup SynapseGroup
         {
-            get
-            {
-                if (synapseGroup == null)
-                    return Server.Get.PermissionHandler.GetPlayerGroup(this);
-
-                return synapseGroup;
-            }
+            get => synapseGroup is null ? Server.Get.PermissionHandler.GetPlayerGroup(this) : synapseGroup;
             set
             {
-                if (value == null)
+                if (value is null)
                     return;
 
                 synapseGroup = value;
@@ -370,11 +365,12 @@ namespace Synapse.Api
             var globalAccesAllowed = true;
             switch (ServerRoles.GlobalBadgeType)
             {
-                case 1: globalAccesAllowed = Server.Get.PermissionHandler.serverSection.StaffAccess; break;
-                case 2: globalAccesAllowed = Server.Get.PermissionHandler.serverSection.ManagerAccess; break;
-                case 3: globalAccesAllowed = Server.Get.PermissionHandler.serverSection.GlobalBanTeamAccess; break;
-                case 4: globalAccesAllowed = Server.Get.PermissionHandler.serverSection.GlobalBanTeamAccess; break;
+                case 1: globalAccesAllowed = Server.Get.PermissionHandler.ServerSection.StaffAccess; break;
+                case 2: globalAccesAllowed = Server.Get.PermissionHandler.ServerSection.ManagerAccess; break;
+                case 3: globalAccesAllowed = Server.Get.PermissionHandler.ServerSection.GlobalBanTeamAccess; break;
+                case 4: globalAccesAllowed = Server.Get.PermissionHandler.ServerSection.GlobalBanTeamAccess; break;
             }
+
             if (GlobalPerms != 0 && globalAccesAllowed)
                 group.Permissions |= GlobalPerms;
 
@@ -391,11 +387,11 @@ namespace Synapse.Api
 
             ServerRoles.SendRealIds();
 
-            if (string.IsNullOrEmpty(group.BadgeText))
+            if (String.IsNullOrEmpty(group.BadgeText))
             {
                 ServerRoles.SetColor(null);
                 ServerRoles.SetText(null);
-                if (!string.IsNullOrEmpty(ServerRoles.PrevBadge))
+                if (!String.IsNullOrEmpty(ServerRoles.PrevBadge))
                 {
                     ServerRoles.HiddenBadge = ServerRoles.PrevBadge;
                     ServerRoles.GlobalHidden = true;
@@ -425,11 +421,13 @@ namespace Synapse.Api
             var flag2 = ServerRoles.Staff || PermissionsHandler.IsPermitted(group.Permissions, PlayerPermissions.ViewHiddenGlobalBadges);
 
             if (flag || flag2)
+            {
                 foreach (var player in Server.Get.Players)
                 {
-                    if (!string.IsNullOrEmpty(player.ServerRoles.HiddenBadge) && (!player.ServerRoles.GlobalHidden || flag2) && (player.ServerRoles.GlobalHidden || flag))
+                    if (!String.IsNullOrEmpty(player.ServerRoles.HiddenBadge) && (!player.ServerRoles.GlobalHidden || flag2) && (player.ServerRoles.GlobalHidden || flag))
                         player.ServerRoles.TargetSetHiddenRole(Connection, player.ServerRoles.HiddenBadge);
                 }
+            }
         }
 
         public ulong GlobalPerms => ServerRoles._globalPerms;
@@ -568,7 +566,7 @@ namespace Synapse.Api
                     var method = typeof(NetworkServer).GetMethod("SendSpawnMessage", BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public);
 
                     foreach (var ply in Server.Get.Players)
-                        method.Invoke(null, new object[] { NetworkIdentity, ply.Connection });
+                        _ = method.Invoke(null, new object[] { NetworkIdentity, ply.Connection });
                 }
                 catch (Exception e)
                 {
@@ -588,7 +586,7 @@ namespace Synapse.Api
         public float ArtificialHealth
         {
             get => GetStatBase<AhpStat>().CurValue;
-            set => GetStatBase<AhpStat>().ServerAddProcess(value,value, 1.2f, 0f, 0f, false);
+            set => GetStatBase<AhpStat>().ServerAddProcess(value, value, 1.2f, 0f, 0f, false);
         }
 
         private int maxahp = 75;
@@ -607,13 +605,13 @@ namespace Synapse.Api
         public float Stamina
         {
             get => Hub.fpc.staminaController.RemainingStamina * 100;
-            set => Hub.fpc.staminaController.RemainingStamina = (value / 100f);
+            set => Hub.fpc.staminaController.RemainingStamina = value / 100f;
         }
 
         public float StaminaUsage
         {
             get => Hub.fpc.staminaController.StaminaUse * 100;
-            set => Hub.fpc.staminaController.StaminaUse = (value / 100f);
+            set => Hub.fpc.staminaController.StaminaUse = value / 100f;
         }
 
         public RoleType RoleType
@@ -644,12 +642,11 @@ namespace Synapse.Api
         {
             get
             {
-                if (DisarmedPlayers.Entries.All(x => x.DisarmedPlayer != NetworkIdentity.netId)) return null;
+                if (DisarmedPlayers.Entries.All(x => x.DisarmedPlayer != NetworkIdentity.netId))
+                    return null;
 
                 var id = DisarmedPlayers.Entries.FirstOrDefault(x => x.DisarmedPlayer == NetworkIdentity.netId).Disarmer;
-                if (id == 0)
-                    return ReferenceHub.LocalHub.GetPlayer();
-                return Server.Get.Players.FirstOrDefault(x => x.NetworkIdentity.netId == id);
+                return id == 0 ? ReferenceHub.LocalHub.GetPlayer() : Server.Get.Players.FirstOrDefault(x => x.NetworkIdentity.netId == id);
             }
             set => VanillaInventory.SetDisarmedStatus(value.VanillaInventory);
         }
@@ -658,10 +655,9 @@ namespace Synapse.Api
         {
             get
             {
-                if (!Physics.Raycast(CameraReference.transform.position, CameraReference.transform.forward, out RaycastHit raycastthit, 100f))
-                    return null;
-
-                return raycastthit.transform.gameObject;
+                return !Physics.Raycast(CameraReference.transform.position, CameraReference.transform.forward, out var raycastthit, 100f)
+                    ? null
+                    : raycastthit.transform.gameObject;
             }
         }
 
@@ -695,13 +691,7 @@ namespace Synapse.Api
 
             public ushort this[AmmoType ammo]
             {
-                get
-                {
-                    if (player.VanillaInventory.UserInventory.ReserveAmmo.TryGetValue((ItemType)ammo, out var amount))
-                        return amount;
-
-                    return 0;
-                }
+                get => player.VanillaInventory.UserInventory.ReserveAmmo.TryGetValue((ItemType)ammo, out var amount) ? amount : (ushort)0;
                 set
                 {
                     player.VanillaInventory.UserInventory.ReserveAmmo[(ItemType)ammo] = value;
@@ -730,7 +720,7 @@ namespace Synapse.Api
 
         public bool HideRank
         {
-            get => !string.IsNullOrEmpty(ServerRoles.HiddenBadge);
+            get => !String.IsNullOrEmpty(ServerRoles.HiddenBadge);
             set
             {
                 if (value)
@@ -764,14 +754,7 @@ namespace Synapse.Api
             set => ClassManager.NetworkCurUnitName = value;
         }
 
-        public CommandSender CommandSender
-        {
-            get
-            {
-                if (this == SynapseController.Server.Host) return ServerConsole._scs;
-                return QueryProcessor._sender;
-            }
-        }
+        public CommandSender CommandSender => this == SynapseController.Server.Host ? ServerConsole._scs : (CommandSender)QueryProcessor._sender;
 
         public ZoneType Zone => Room.Zone;
 
@@ -791,7 +774,7 @@ namespace Synapse.Api
 
         public Team Team => ClassManager.CurRole.team;
 
-        public int TeamID => CustomRole == null ? (int)Team : CustomRole.GetTeamID();
+        public int TeamID => CustomRole is null ? (int)Team : CustomRole.GetTeamID();
 
         public Team RealTeam => Server.Get.TeamManager.IsDefaultID(TeamID) ? (Team)TeamID : Team.RIP;
 
@@ -803,19 +786,20 @@ namespace Synapse.Api
         {
             get
             {
-                if (VanillaInventory.CurItem == ItemIdentifier.None || VanillaInventory.CurInstance == null) return SynapseItem.None;
-
-                return SynapseItem.GetSynapseItem(VanillaInventory.CurItem.SerialNumber);
+                return VanillaInventory.CurItem == ItemIdentifier.None || VanillaInventory.CurInstance is null
+                    ? SynapseItem.None
+                    : SynapseItem.GetSynapseItem(VanillaInventory.CurItem.SerialNumber);
             }
             set
             {
-                if (value == null || value == SynapseItem.None || !Inventory.Items.Contains(value))
+                if (value is null || value == SynapseItem.None || !Inventory.Items.Contains(value))
                 {
                     VanillaInventory.NetworkCurItem = ItemIdentifier.None;
                     VanillaInventory.CurInstance = null;
                 }
 
-                if (!ItemInHand.ItemBase.CanHolster() || !value.ItemBase.CanEquip()) return;
+                if (!ItemInHand.ItemBase.CanHolster() || !value.ItemBase.CanEquip())
+                    return;
 
                 VanillaInventory.NetworkCurItem = new ItemIdentifier(value.ItemType, value.Serial);
                 VanillaInventory.CurInstance = value.ItemBase;
@@ -835,7 +819,6 @@ namespace Synapse.Api
         public Assets._Scripts.Dissonance.DissonanceUserSetup DissonanceUserSetup { get; }
 
         public Radio Radio { get; }
-
 
         public GameConsoleTransmission GameConsoleTransmission { get; }
 
@@ -889,8 +872,9 @@ namespace Synapse.Api
             DatabaseManager.CheckEnabledOrThrow();
             var dbo = DatabaseManager.PlayerRepository.FindByGameId(UserId);
             dbo.Data[key] = value;
-            if (value == null) dbo.Data.Remove(key);
-            DatabaseManager.PlayerRepository.Save(dbo);
+            if (value is null)
+                _ = dbo.Data.Remove(key);
+            _ = DatabaseManager.PlayerRepository.Save(dbo);
         }
 
         #endregion
@@ -899,14 +883,14 @@ namespace Synapse.Api
 
         public void TriggerEscape()
         {
-            if (CustomRole == null)
+            if (CustomRole is null)
             {
                 var newRole = -1;
                 var allow = true;
                 var changeTeam = false;
 
-
                 foreach (var entry in DisarmedPlayers.Entries)
+                {
                     if (entry.DisarmedPlayer == NetworkIdentity.netId)
                     {
                         if (entry.Disarmer == 0)
@@ -922,8 +906,7 @@ namespace Synapse.Api
                         else if (RoleType == RoleType.ClassD && cuffer.Faction == Faction.FoundationStaff)
                             changeTeam = true;
                     }
-
-
+                }
 
                 switch (RoleType)
                 {
@@ -941,13 +924,15 @@ namespace Synapse.Api
                         break;
                 }
 
-                if (newRole < 0) allow = false;
+                if (newRole < 0)
+                    allow = false;
 
                 var isClassD = RoleID == (int)RoleType.ClassD;
 
                 Server.Get.Events.Player.InvokePlayerEscapeEvent(this, ref newRole, ref isClassD, ref changeTeam, ref allow);
 
-                if (newRole < 0 || !allow) return;
+                if (newRole < 0 || !allow)
+                    return;
 
                 if (newRole >= -1 && newRole <= RoleManager.HighestRole)
                     ClassManager.SetPlayersClass((RoleType)newRole, gameObject, CharacterClassManager.SpawnReason.Escaped, false);
@@ -961,25 +946,25 @@ namespace Synapse.Api
                 {
                     case Team.MTF when changeTeam:
                         RoundSummary.EscapedScientists++;
-                        tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
+                        _ = tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
                             GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_mtf_classd_cuffed_count", 1), false);
                         break;
 
                     case Team.MTF when !changeTeam:
                         RoundSummary.EscapedScientists++;
-                        tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
+                        _ = tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
                             GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_mtf_scientist_count", 1), false);
                         break;
 
                     case Team.CHI when changeTeam:
                         RoundSummary.EscapedClassD++;
-                        tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
+                        _ = tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
                             GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_ci_scientist_cuffed_count", 1), false);
                         break;
 
                     case Team.CHI when !changeTeam:
                         RoundSummary.EscapedClassD++;
-                        tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
+                        _ = tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
                             GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_ci_classd_count", 1), false);
                         break;
                 }

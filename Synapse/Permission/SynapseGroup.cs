@@ -45,41 +45,54 @@ namespace Synapse.Permission
 
         public bool HasPermission(string permission) => HasPermission(permission, 0);
 
-        public bool HasPermission(string permission,int count)
+        public bool HasPermission(string permission, int count)
         {
-            if(count > 50) return false;
+            if (count > 50)
+                return false;
 
             if (permission != null && Permissions != null)
+            {
                 foreach (var perm in Permissions)
                 {
-                    if (perm == "*" || perm == "*.*" || perm == ".*") return true;
+                    if (perm == "*" || perm == "*.*" || perm == ".*")
+                        return true;
 
-                    if (permission.ToUpper() == perm.ToUpper()) return true;
+                    if (permission.Equals(perm, StringComparison.InvariantCultureIgnoreCase))
+                        return true;
 
                     var args = permission.Split('.');
                     var args2 = perm.Split('.');
 
-                    if (args.Length == 1 || args2.Length == 1) continue;
+                    if (args.Length == 1 || args2.Length == 1)
+                        continue;
 
-                    if (args2[0].ToUpper() == args[0].ToUpper())
-                        for (int i = 1; i < args.Length; i++)
+                    if (args2[0].Equals(args[0], StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        for (var i = 1; i < args.Length; i++)
                         {
-                            if (args.Length < i + 1 || args2.Length < i + 1) break;
+                            if (args.Length < i + 1 || args2.Length < i + 1)
+                                break;
 
-                            if (args2[i] == "*") return true;
+                            if (args2[i] == "*")
+                                return true;
 
-                            if (args[i].ToUpper() != args2[i].ToUpper()) break;
+                            if (args[i].ToUpper() != args2[i].ToUpper())
+                                break;
                         }
+                    }
                 }
+            }
 
-            if (Inheritance == null) return false;
+            if (Inheritance is null)
+                return false;
 
             foreach (var groupname in Inheritance)
             {
-                if (groupname == null) continue;
+                if (groupname is null)
+                    continue;
 
                 var group = PermissionHandler.Get.GetServerGroup(groupname);
-                if (group == null)
+                if (group is null)
                     continue;
 
                 if (group.HasPermission(permission, count + 1))
@@ -93,10 +106,11 @@ namespace Synapse.Permission
 
         public ulong GetVanillaPermissionValue()
         {
-            if (Permissions == null) return 0;
+            if (Permissions is null)
+                return 0;
 
             var value = 0ul;
-            foreach(var perm in (PlayerPermissions[])Enum.GetValues(typeof(PlayerPermissions)))
+            foreach (var perm in (PlayerPermissions[])Enum.GetValues(typeof(PlayerPermissions)))
             {
                 if (HasPermission($"{VanillaPrefix}.{perm}"))
                     value += (ulong)perm;

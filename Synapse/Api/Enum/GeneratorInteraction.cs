@@ -10,9 +10,9 @@ namespace Synapse.Api.Enum
         OpenDoor,
         CloseDoor,
 
-        [Obsolete("Use Activated",true)]
+        [Obsolete("Use Activated", true)]
         TabletInjected = 0,
-        [Obsolete("Use Disabled",true)]
+        [Obsolete("Use Disabled", true)]
         TabledEjected = 1,
     }
 }

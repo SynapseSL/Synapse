@@ -1,5 +1,4 @@
-﻿using System;
-using Achievements;
+﻿using Achievements;
 using HarmonyLib;
 using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Firearms.Attachments;
@@ -16,19 +15,22 @@ namespace Synapse.Patches.SynapsePatches.Dummy
         [HarmonyPrefix]
         private static bool HitInidcatorFix(uint netId, float damage, Vector3 origin)
         {
-            if (!ReferenceHub.TryGetHubNetID(netId, out ReferenceHub referenceHub))
+            if (!ReferenceHub.TryGetHubNetID(netId, out var referenceHub))
             {
                 return false;
             }
+
             var player = referenceHub.GetPlayer();
-            if (player == null || player.IsDummy)
+            if (player is null || player.IsDummy)
             {
                 return false;
             }
-            foreach (ReferenceHub referenceHub2 in referenceHub.spectatorManager.ServerCurrentSpectatingPlayers)
+
+            foreach (var referenceHub2 in referenceHub.spectatorManager.ServerCurrentSpectatingPlayers)
             {
                 referenceHub2.networkIdentity.connectionToClient.Send(new GunHitMessage(false, damage, origin));
             }
+
             return false;
         }
     }
@@ -39,26 +41,27 @@ namespace Synapse.Patches.SynapsePatches.Dummy
         [HarmonyPrefix]
         private static bool FirearmPlaySound(this Firearm firearm, byte clipId)
         {
-            FirearmAudioClip firearmAudioClip = firearm.AudioClips[clipId];
-            ReferenceHub owner = firearm.Owner;
+            var firearmAudioClip = firearm.AudioClips[clipId];
+            var owner = firearm.Owner;
 
-            float num = firearmAudioClip.HasFlag(FirearmAudioFlags.ScaleDistance) ? (firearmAudioClip.MaxDistance * firearm.AttachmentsValue(AttachmentParam.GunshotLoudnessMultiplier)) : firearmAudioClip.MaxDistance;
+            var num = firearmAudioClip.HasFlag(FirearmAudioFlags.ScaleDistance) ? (firearmAudioClip.MaxDistance * firearm.AttachmentsValue(AttachmentParam.GunshotLoudnessMultiplier)) : firearmAudioClip.MaxDistance;
             if (firearmAudioClip.HasFlag(FirearmAudioFlags.IsGunshot) && owner.transform.position.y > 900f)
             {
                 num *= 2.3f;
             }
 
-            float soundReach = num * num;
-            foreach (ReferenceHub referenceHub in ReferenceHub.GetAllHubs().Values)
+            var soundReach = num * num;
+            foreach (var referenceHub in ReferenceHub.GetAllHubs().Values)
             {
                 var player = referenceHub.GetPlayer();
-                if (player == null || player.IsDummy)
+                if (player is null || player.IsDummy)
                 {
                     return false;
                 }
+
                 if (referenceHub != firearm.Owner)
                 {
-                    RoleType curClass = referenceHub.characterClassManager.CurClass;
+                    var curClass = referenceHub.characterClassManager.CurClass;
                     if (curClass == RoleType.Spectator || curClass == RoleType.Scp079 || (referenceHub.transform.position - owner.transform.position).sqrMagnitude <= soundReach)
                     {
                         referenceHub.networkIdentity.connectionToClient.Send(new GunAudioMessage(owner, clipId, (byte)Mathf.RoundToInt(Mathf.Clamp(num, 0f, 255f)), referenceHub), 0);
@@ -66,8 +69,8 @@ namespace Synapse.Patches.SynapsePatches.Dummy
                 }
             }
 
-            Action<Firearm, byte, float> serverSoundPlayed = FirearmExtensions.ServerSoundPlayed;
-            if (serverSoundPlayed == null)
+            var serverSoundPlayed = FirearmExtensions.ServerSoundPlayed;
+            if (serverSoundPlayed is null)
             {
                 return false;
             }
@@ -77,7 +80,7 @@ namespace Synapse.Patches.SynapsePatches.Dummy
         }
     }
 
-    [HarmonyPatch(typeof(AchievementHandlerBase),nameof(AchievementHandlerBase.ServerAchieve))]
+    [HarmonyPatch(typeof(AchievementHandlerBase), nameof(AchievementHandlerBase.ServerAchieve))]
     internal static class AchievePatch
     {
         [HarmonyPrefix]
