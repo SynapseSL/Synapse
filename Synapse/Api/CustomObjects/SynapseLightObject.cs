@@ -37,10 +37,11 @@ namespace Synapse.Api.CustomObjects
             get => ToyBase.LightColor;
             set => ToyBase.NetworkLightColor = value;
         }
+        
         public float LightIntensity
         {
             get => ToyBase.LightIntensity;
-            set => ToyBase.NetworkLightIntensity = value;
+            set => ToyBase.LightIntensity = value;
         }
         public float LightRange
         {
@@ -51,6 +52,21 @@ namespace Synapse.Api.CustomObjects
         {
             get => ToyBase.LightShadows;
             set => ToyBase.NetworkLightShadows = value;
+        }
+
+        private bool enabled = true;
+        public bool Enabled
+        {
+            get => enabled;
+            set
+            {
+                enabled = value;
+                
+                if(value)
+                    ToyBase.netIdentity.UpdatePositionRotationScale();
+                else
+                    ToyBase.netIdentity.DespawnForAllPlayers();
+            }
         }
 
         private LightSourceToy CreateLightSource(Color color, float lightIntensity, float range,bool shadows, Vector3 position, Quaternion rotation, Vector3 scale)

@@ -1,9 +1,8 @@
 using Synapse.Api.CustomObjects;
+using Synapse.Api.CustomObjects.CustomRooms;
 using Synapse.Config;
-using System.Collections.Generic;
-using Synapse.Api.Events.SynapseEventArguments;
+using Synapse.Api.Enum;
 using UnityEngine;
-using YamlDotNet.Core.Tokens;
 
 namespace Synapse.Api.Events
 {
@@ -28,19 +27,7 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    state = ev.Player;
-                    break;
-                
-                case  KeyCode.Alpha2:
-                    ev.Player.PlayerState = state;
-                    break;
-                
-                case  KeyCode.Alpha3:
-                    ev.Player.Jail.JailPlayer(ev.Player);
-                    break;
-                    
-                case KeyCode.Alpha4:
-                    ev.Player.Jail.UnJailPlayer();
+                    CustomRoomHandler.Get.SpawnCustomRoom(0, ev.Player.Position);
                     break;
             }
         }

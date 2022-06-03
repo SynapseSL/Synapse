@@ -8,5 +8,6 @@
         Entrance,
         Surface,
         Pocket,
+        Custom,
     }
 }

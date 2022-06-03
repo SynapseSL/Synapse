@@ -9,6 +9,8 @@ namespace Synapse.Api
 {
     public class Room
     {
+        internal Room(){}
+        
         internal Room(RoomIdentifier identifier)
         {
             Identifier = identifier;
@@ -26,17 +28,17 @@ namespace Synapse.Api
             NetworkIdentity = GetNetworkIdentity(RoomType);
         }
 
-        public void LightsOut(float duration)
+        public virtual void LightsOut(float duration)
             => LightController.ServerFlickerLights(duration);
 
-        public void SetLightIntensity(float intensity)
+        public virtual void SetLightIntensity(float intensity)
             => LightController.UpdateLightsIntensity(LightController.LightIntensityMultiplier, intensity);
 
-        public GameObject GameObject { get; }
+        public virtual GameObject GameObject { get; }
 
         public RoomIdentifier Identifier { get; }
 
-        public Vector3 Position
+        public virtual Vector3 Position
         {
             get => GameObject.transform.position;
             set
@@ -47,7 +49,7 @@ namespace Synapse.Api
             }
         }
 
-        public Quaternion Rotation
+        public virtual Quaternion Rotation
         {
             get => GameObject.transform.rotation;
             set
@@ -58,7 +60,7 @@ namespace Synapse.Api
             }
         }
 
-        public Vector3 Scale
+        public virtual Vector3 Scale
         {
             get => GameObject.transform.localScale;
             set
@@ -69,19 +71,19 @@ namespace Synapse.Api
             }
         }
 
-        public string RoomName => GameObject.name;
+        public virtual string RoomName => GameObject.name;
 
         public NetworkIdentity NetworkIdentity { get; }
 
         public FlickerableLightController LightController { get; }
 
-        public List<Door> Doors { get; } = new List<Door>();
+        public virtual List<Door> Doors { get; } = new List<Door>();
 
         public List<Camera> Cameras { get; } = new List<Camera>();
 
         public int ID { get; }
 
-        public ZoneType Zone
+        public virtual ZoneType Zone
         {
             get
             {
@@ -112,7 +114,7 @@ namespace Synapse.Api
 
         public RoomShape RoomShape { get; }
 
-        public Color WarheadColor { get => LightController.Network_warheadLightColor; set => LightController.Network_warheadLightColor = value; }
+        public virtual Color WarheadColor { get => LightController.Network_warheadLightColor; set => LightController.Network_warheadLightColor = value; }
 
         internal static List<NetworkIdentity> networkIdentities;
 

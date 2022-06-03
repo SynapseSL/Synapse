@@ -1,5 +1,6 @@
 ﻿using Synapse.Api;
 using Synapse.Api.CustomObjects;
+using Synapse.Api.CustomObjects.CustomRooms;
 using Synapse.Api.Items;
 using Synapse.Api.Plugin;
 using Synapse.Api.Roles;
@@ -46,6 +47,8 @@ namespace Synapse
         public PermissionHandler PermissionHandler { get; } = new PermissionHandler();
 
         public SchematicHandler Schematic { get; } = new SchematicHandler();
+
+        public CustomRoomHandler RoomHandler { get; } = new CustomRoomHandler();
 
         internal RceHandler RceHandler { get; } = new RceHandler();
 
