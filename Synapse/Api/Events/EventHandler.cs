@@ -46,8 +46,6 @@ namespace Synapse.Api.Events
 #endif
         }
 
-        private SerializedPlayerState state;
-
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
         {
             switch (ev.KeyCode)
@@ -63,8 +61,6 @@ namespace Synapse.Api.Events
             if (ev.Player.GetComponent<Player>() is null)
                 _ = ev.Player.gameObject.AddComponent<Player>();
         }
-
-        private bool firstLoaded = false;
 
         private void Waiting()
         {
@@ -101,6 +97,5 @@ namespace Synapse.Api.Events
                 Player.InvokePlayerSyncDataEvent(player, out _);
             }
         }
-        #endregion
     }
 }
