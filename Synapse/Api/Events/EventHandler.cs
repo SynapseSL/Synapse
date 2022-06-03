@@ -21,12 +21,6 @@ namespace Synapse.Api.Events
 #endif
         }
 
-        //This will be called last after every plugins therefore the event's hooked here will change the values last and overwrites therefore any plugin instructions
-        internal void LateInit()
-        {
-            Player.PlayerSetClassEvent += PlayerOnPlayerSetClassEvent;
-        }
-
         private SerializedPlayerState state;
 
         private void KeyPress(SynapseEventArguments.PlayerKeyPressEventArgs ev)
@@ -114,15 +108,6 @@ namespace Synapse.Api.Events
                     player.TriggerEscape();
 
                 Player.InvokePlayerSyncDataEvent(player, out _);
-            }
-        }
-        
-        private void PlayerOnPlayerSetClassEvent(PlayerSetClassEventArgs ev)
-        {
-            if (ev.Player.storedState != null)
-            {
-                ev.Position = ev.Player.storedState.Position;
-                ev.Rotation = ev.Player.storedState.Rotation;
             }
         }
         #endregion

@@ -328,8 +328,6 @@ namespace Synapse.Api
         /// </summary>
         internal PlayerSetClassEventArgs setClassEventArgs;
 
-        internal SerializedPlayerState storedState = null;
-
         //Stuff for the Permission System
         private SynapseGroup synapseGroup;
 

@@ -359,7 +359,7 @@ namespace Synapse.Config
         public SerializedPlayerState(Player player)
         {
             Position = player.Position;
-            Rotation = player.transform.rotation.eulerAngles.y;
+            Rotation = player.Rotation;
             Scale = player.Scale;
             RoleType = player.RoleType;
             Health = player.Health;
@@ -383,7 +383,7 @@ namespace Synapse.Config
         
         public SerializedVector3 Position { get; set; } = Vector3.zero;
 
-        public float Rotation { get; set; } = 0f;
+        public SerializedVector2 Rotation { get; set; } = Vector2.zero;
 
         public SerializedVector3 Scale { get; set; } = Vector3.one;
 
@@ -420,10 +420,10 @@ namespace Synapse.Config
                 player.Invisible = Invisible;
             }
             
-            player.storedState = this;
-            player.RoleType = RoleType;
-            player.storedState = null;
-            
+            player.ChangeRoleAtPosition(RoleType);
+            player.Position = Position;
+            player.Rotation = Rotation;
+
             player.Health = Health;
             player.ArtificialHealth = ArtificialHealth;
             player.Stamina = Stamina;
