@@ -38,7 +38,6 @@ public class SynapseController
         TryInit(Server.RceHandler.Init, "Initialising RCE failed");
         TryInit(CommandHandlers.RegisterSynapseCommands, "Initialising SynapseCommands failed");
         TryInit(PluginLoader.ActivatePlugins, "Initialising Plugins failed");
-        TryInit(Server.Logger.Refresh, "Initialising Logger File failed");
         TryInit(Server.RceHandler.Reload, "Reloading RCE failed. Try updating your dependencies");
 
         Server.Logger.Info("Synapse is now ready!");
