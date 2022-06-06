@@ -55,7 +55,7 @@ public static class SynapseExtensions
 
     public static Team GetTeam(this RoleType role) => Server.Get.Host.ClassManager.Classes.SafeGet(role).team;
 
-    public static Room GetSynapseRoom(this RoomIdentifier identifier) => Map.Get.Rooms.FirstOrDefault(x => x?.Identifier == identifier);
+    public static Room GetSynapseRoom(this RoomIdentifier identifier) => Map.Get.Rooms.FirstOrDefault(x => x.Identifier == identifier);
 
     public static Generator GetGenerator(this Scp079Generator generator079) => Map.Get.Generators.FirstOrDefault(x => x?.GameObject == generator079.gameObject);
 
