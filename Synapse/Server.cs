@@ -1,5 +1,6 @@
 ﻿using Synapse.Api;
 using Synapse.Api.CustomObjects;
+using Synapse.Api.CustomObjects.CustomRooms;
 using Synapse.Api.Items;
 using Synapse.Api.Plugin;
 using Synapse.Api.Roles;
@@ -36,6 +37,7 @@ namespace Synapse
             PermissionHandler = new PermissionHandler();
             Schematic = new SchematicHandler();
             RceHandler = new RceHandler();
+            RoomHandler = new CustomRoomHandler();
         }
 
         //Synapse Api
@@ -50,13 +52,14 @@ namespace Synapse
         public PermissionHandler PermissionHandler { get; }
         public SchematicHandler Schematic { get; }
         internal RceHandler RceHandler { get; }
+        public CustomRoomHandler RoomHandler { get; }
 
         public Player Host
         {
             get
             {
                 if (PlayerManager.localPlayer.GetComponent<Player>() is null)
-                    _ = PlayerManager.localPlayer.AddComponent<Player>();
+                    PlayerManager.localPlayer.AddComponent<Player>();
 
                 return PlayerManager.localPlayer.GetComponent<Player>();
             }
@@ -75,7 +78,7 @@ namespace Synapse
             set
             {
                 ServerConsole._serverName = value;
-                _ = ServerConsole.RefreshServerName();
+                ServerConsole.RefreshServerName();
             }
         }
 
@@ -138,7 +141,7 @@ namespace Synapse
         /// <param name="duration">The duration for the ban  in seconds</param>
         public void OfflineBanID(string reason, string issuer, string id, int duration)
         {
-            _ = BanHandler.IssueBan(new BanDetails
+            BanHandler.IssueBan(new BanDetails
             {
                 Reason = reason,
                 Issuer = issuer,
@@ -158,7 +161,7 @@ namespace Synapse
         /// <param name="duration">The duration for the ban in seconds</param>
         public void OfflineBanIP(string reason, string issuer, string ip, int duration)
         {
-            _ = BanHandler.IssueBan(new BanDetails
+            BanHandler.IssueBan(new BanDetails
             {
                 Reason = reason,
                 Issuer = issuer,
@@ -182,8 +185,7 @@ namespace Synapse
 
             foreach (var parameter in args)
             {
-                if (String.IsNullOrWhiteSpace(parameter))
-                    continue;
+                if (string.IsNullOrWhiteSpace(parameter)) continue;
 
                 switch (parameter.ToUpper())
                 {
@@ -321,7 +323,7 @@ namespace Synapse
                 get
                 {
                     if (!Directory.Exists(_synapseDirectory))
-                        _ = Directory.CreateDirectory(_synapseDirectory);
+                        Directory.CreateDirectory(_synapseDirectory);
 
                     return _synapseDirectory;
                 }
@@ -333,15 +335,14 @@ namespace Synapse
                 get
                 {
                     if (!Directory.Exists(_databaseDirectory))
-                        _ = Directory.CreateDirectory(_databaseDirectory);
+                        Directory.CreateDirectory(_databaseDirectory);
 
                     return _databaseDirectory;
                 }
                 private set => _databaseDirectory = value;
             }
 
-            public string DatabaseFile
-                => Path.Combine(DatabaseDirectory, "database.db");
+            public string DatabaseFile => Path.Combine(DatabaseDirectory, "database.db");
 
             //Plugin
             public string MainPluginDirectory
@@ -349,7 +350,7 @@ namespace Synapse
                 get
                 {
                     if (!Directory.Exists(_mainPluginDirectory))
-                        _ = Directory.CreateDirectory(_mainPluginDirectory);
+                        Directory.CreateDirectory(_mainPluginDirectory);
 
                     return _mainPluginDirectory;
                 }
@@ -361,7 +362,7 @@ namespace Synapse
                 get
                 {
                     if (!Directory.Exists(_pluginDirectory))
-                        _ = Directory.CreateDirectory(_pluginDirectory);
+                        Directory.CreateDirectory(_pluginDirectory);
 
                     return _pluginDirectory;
                 }
@@ -373,7 +374,7 @@ namespace Synapse
                 get
                 {
                     if (!Directory.Exists(_sharedPluginDirectory))
-                        _ = Directory.CreateDirectory(_sharedPluginDirectory);
+                        Directory.CreateDirectory(_sharedPluginDirectory);
 
                     return _sharedPluginDirectory;
                 }
@@ -386,7 +387,7 @@ namespace Synapse
                 get
                 {
                     if (!Directory.Exists(_mainConfigDirectory))
-                        _ = Directory.CreateDirectory(_mainConfigDirectory);
+                        Directory.CreateDirectory(_mainConfigDirectory);
 
                     return _mainConfigDirectory;
                 }
@@ -398,7 +399,7 @@ namespace Synapse
                 get
                 {
                     if (!Directory.Exists(_configDirectory))
-                        _ = Directory.CreateDirectory(_configDirectory);
+                        Directory.CreateDirectory(_configDirectory);
 
                     return _configDirectory;
                 }
@@ -410,7 +411,7 @@ namespace Synapse
                 get
                 {
                     if (!Directory.Exists(_dependencyDirectory))
-                        _ = Directory.CreateDirectory(_dependencyDirectory);
+                        Directory.CreateDirectory(_dependencyDirectory);
 
                     return _dependencyDirectory;
                 }
@@ -422,7 +423,7 @@ namespace Synapse
                 get
                 {
                     if (!Directory.Exists(_sharedConfigDirectory))
-                        _ = Directory.CreateDirectory(_sharedConfigDirectory);
+                        Directory.CreateDirectory(_sharedConfigDirectory);
 
                     return _sharedConfigDirectory;
                 }
@@ -434,7 +435,7 @@ namespace Synapse
                 get
                 {
                     if (!Directory.Exists(_schematicDirectory))
-                        _ = Directory.CreateDirectory(_schematicDirectory);
+                        Directory.CreateDirectory(_schematicDirectory);
 
                     return _schematicDirectory;
                 }
@@ -446,7 +447,7 @@ namespace Synapse
                 get
                 {
                     if (!Directory.Exists(_logDirectory))
-                        _ = Directory.CreateDirectory(_logDirectory);
+                        Directory.CreateDirectory(_logDirectory);
 
                     return _logDirectory;
                 }
@@ -458,7 +459,7 @@ namespace Synapse
                 get
                 {
                     if (!Directory.Exists(_logPortDirectory))
-                        _ = Directory.CreateDirectory(_logPortDirectory);
+                        Directory.CreateDirectory(_logPortDirectory);
 
                     return _logPortDirectory;
                 }

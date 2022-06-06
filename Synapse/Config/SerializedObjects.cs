@@ -1,9 +1,9 @@
-﻿using CustomPlayerEffects;
+﻿using System;
+using System.Collections.Generic;
+using CustomPlayerEffects;
 using Synapse.Api;
 using Synapse.Api.Enum;
 using Synapse.Api.Items;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using Logger = Synapse.Api.Logger;
 
@@ -213,7 +213,7 @@ namespace Synapse.Config
             player.Inventory.Clear();
 
             foreach (var item in Items)
-                _ = item.Apply(player);
+                item.Apply(player);
 
             Ammo.Apply(player);
         }
@@ -362,7 +362,7 @@ namespace Synapse.Config
         public SerializedPlayerState(Player player)
         {
             Position = player.Position;
-            Rotation = player.transform.rotation.eulerAngles.y;
+            Rotation = player.Rotation;
             Scale = player.Scale;
             RoleType = player.RoleType;
             Health = player.Health;
@@ -387,7 +387,7 @@ namespace Synapse.Config
 
         public SerializedVector3 Position { get; set; } = Vector3.zero;
 
-        public float Rotation { get; set; } = 0f;
+        public SerializedVector2 Rotation { get; set; } = Vector2.zero;
 
         public SerializedVector3 Scale { get; set; } = Vector3.one;
 
@@ -423,10 +423,10 @@ namespace Synapse.Config
                 player.OverWatch = OverWatch;
                 player.Invisible = Invisible;
             }
-
-            player.storedState = this;
-            player.RoleType = RoleType;
-            player.storedState = null;
+            
+            player.ChangeRoleAtPosition(RoleType);
+            player.Position = Position;
+            player.Rotation = Rotation;
 
             player.Health = Health;
             player.ArtificialHealth = ArtificialHealth;

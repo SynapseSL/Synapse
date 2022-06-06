@@ -32,6 +32,21 @@ namespace Synapse.Api.CustomObjects
             get => ToyBase.LightShadows;
             set => ToyBase.NetworkLightShadows = value;
         }
+        
+        private bool enabled = true;
+        public bool Enabled
+        {
+            get => enabled;
+            set
+            {
+                enabled = value;
+                
+                if(value)
+                    ToyBase.netIdentity.UpdatePositionRotationScale();
+                else
+                    ToyBase.netIdentity.DespawnForAllPlayers();
+            }
+        }
 
         public SynapseLightObject(Color color, float lightIntensity, float range, bool shadows, Vector3 position, Quaternion rotation, Vector3 scale)
         {
@@ -42,6 +57,7 @@ namespace Synapse.Api.CustomObjects
             var script = GameObject.AddComponent<SynapseObjectScript>();
             script.Object = this;
         }
+        
         internal SynapseLightObject(SynapseSchematic.LightSourceConfiguration configuration)
         {
             ToyBase = CreateLightSource(configuration.Color, configuration.LightIntensity, configuration.LightRange, configuration.LightShadows, configuration.Position, Quaternion.Euler(configuration.Rotation), configuration.Scale);
