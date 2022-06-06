@@ -162,5 +162,9 @@ namespace Synapse.Api.Enum
         /// </summary>
         /// <remarks>0 = Disabled, 1 = 1xScp1853, 2 = 2xScp1853...</remarks>
         Scp1853,
+        /// <summary>
+        /// Do a blink
+        /// </summary>
+        Visuals173Blink,
     }
 }

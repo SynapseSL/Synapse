@@ -129,6 +129,7 @@ namespace Synapse.Api
             ScpRecontainmentType.Chaos => $". SCP {scp} SUCCESSFULLY TERMINATED . BY CHAOSINSURGENCY",
             ScpRecontainmentType.Scientist => $". SCP {scp} SUCCESSFULLY TERMINATED . BY SCIENCE PERSONNEL",
             ScpRecontainmentType.ClassD => $". SCP {scp} SUCCESSFULLY TERMINATED . BY CLASSD PERSONNEL",
+            ScpRecontainmentType.Scp => $"TERMINATED BY SCP {Unit}",
             ScpRecontainmentType.Unknown => $". SCP {scp} SUCCESSFULLY TERMINATED . CONTAINMENTUNIT UNKNOWN",
             _ => $". SCP {scp} SUCCESSFULLY TERMINATED . TERMINATION CAUSE UNSPECIFIED",
         });

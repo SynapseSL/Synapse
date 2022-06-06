@@ -54,20 +54,12 @@ namespace Synapse.Api.Events
             switch (ev.KeyCode)
             {
                 case KeyCode.Alpha1:
-                    state = ev.Player;
+                    ev.Player.DecayArtificialHealth = 0;
                     break;
-
                 case KeyCode.Alpha2:
-                    ev.Player.PlayerState = state;
+                    ev.Player.DecayArtificialHealth = 1.2f;
                     break;
 
-                case KeyCode.Alpha3:
-                    ev.Player.Jail.JailPlayer(ev.Player);
-                    break;
-
-                case KeyCode.Alpha4:
-                    ev.Player.Jail.UnJailPlayer();
-                    break;
             }
         }
 
