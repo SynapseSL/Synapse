@@ -37,6 +37,8 @@ namespace Synapse.Api.CustomObjects.CustomRooms
         public abstract int SchematicID { get; }
 
         public virtual void OnGenerate() { }
+        
+        public virtual void OnDespawn() { }
 
         public void Generate(Vector3 position)
         {
@@ -46,6 +48,13 @@ namespace Synapse.Api.CustomObjects.CustomRooms
                 CustomRoom = this
             };
             OnGenerate();
+        }
+
+        public void Despawn()
+        {
+            Room?.Destroy();
+            if (Converter != null) Map.Get.Rooms.Remove(Converter);
+            OnDespawn();
         }
 
         public void SetLights(bool turnOn = false)
