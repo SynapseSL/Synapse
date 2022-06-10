@@ -35,6 +35,11 @@ namespace Synapse.Api.CustomObjects
         public override GameObject GameObject => Door.GameObject;
         public override NetworkIdentity NetworkIdentity => Door.VDoor.netIdentity;
         public override ObjectType Type => ObjectType.Door;
+        public override void Destroy()
+        {
+            Map.Get.Doors.Remove(Door);
+            base.Destroy();
+        }
 
         public Door Door { get; }
         public SpawnableDoorType DoorType { get; }

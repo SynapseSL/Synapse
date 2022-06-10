@@ -42,6 +42,11 @@ namespace Synapse.Api.CustomObjects
         public override NetworkIdentity NetworkIdentity => Locker.locker.netIdentity;
         public override GameObject GameObject => Locker.GameObject;
         public override ObjectType Type => ObjectType.Locker;
+        public override void Destroy()
+        {
+            Map.Get.Lockers.Remove(Locker);
+            base.Destroy();
+        }
 
         public LockerType LockerType { get; }
 

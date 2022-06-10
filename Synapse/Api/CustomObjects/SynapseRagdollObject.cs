@@ -42,6 +42,11 @@ namespace Synapse.Api.CustomObjects
             foreach (var rigid in Ragdoll.ragdoll.AllRigidbodies)
                 rigid.useGravity = true;
         }
+        public override void Destroy()
+        {
+            Map.Get.Ragdolls.Remove(Ragdoll);
+            base.Destroy();
+        }
 
         public RoleType RoleType => Ragdoll.RoleType;
         public DamageType DamageType => Ragdoll.ragdoll.Info.Handler.GetDamageType();
