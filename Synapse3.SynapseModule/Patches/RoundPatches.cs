@@ -12,13 +12,14 @@ using UnityEngine;
 namespace Synapse3.SynapseModule.Patches;
 
 [Patches]
-public class RoundPatches
+public static class RoundPatches
 {
+    
     [HarmonyPatch(typeof(SpawnpointManager), nameof(SpawnpointManager.FillSpawnPoints))]
     [HarmonyPrefix]
     public static void RoundWaitingPatch()
     {
-        NeuronLogger.For<RoundPatches>().Info("Waiting for players event!");
+        NeuronLogger.For<Synapse>().Info("Waiting for players event!");
     }
 
 
@@ -28,7 +29,7 @@ public class RoundPatches
     {
         if (msg.StartsWith("Round finished! Anomalies: ") && type == ServerLogs.ServerLogType.GameEvent)
         {
-            NeuronLogger.For<RoundPatches>().Error("Round end neuron event");
+            NeuronLogger.For<Synapse>().Error("Round end neuron event");
         }
     }
 
@@ -36,10 +37,10 @@ public class RoundPatches
     [HarmonyPrefix]
     public static void RoundStartPatch()
     {
-        NeuronLogger.For<RoundPatches>().Error("Round start neuron event");
+        NeuronLogger.For<Synapse>().Error("Round start neuron event");
     }
 
-    [HarmonyPatch(typeof(RoundSummary), "Start", MethodType.Normal), HarmonyPrefix]
+    [HarmonyPatch(typeof(RoundSummary), nameof(RoundSummary._ProcessServerSideCode)), HarmonyPrefix]
     public static bool RoundSummaryOverride(RoundSummary __instance, out IEnumerator<float> __result)
     {
         __result = DecoratedRoundMethods.ProcessServerSideCode(__instance);
@@ -58,11 +59,11 @@ internal static class RoundStartPatch
     {
         try
         {
-            NeuronLogger.For<RoundPatches>().Info("Round start event!");
+            NeuronLogger.For<Synapse>().Info("Round start event!");
         }
         catch (Exception e)
         {
-            NeuronLogger.For<RoundPatches>().Error($"Synapse-Event: RoundStartEvent failed!!\n{e}");
+            NeuronLogger.For<Synapse>().Error($"Synapse-Event: RoundStartEvent failed!!\n{e}");
         }
     }
 }
@@ -177,7 +178,7 @@ public class DecoratedRoundMethods
                     : RoundSummary.LeadingTeam.Draw;
             
             //
-            NeuronLogger.For<RoundPatches>().Error($"Synapse Round End Check {shouldRoundEnd}, Leading {leadingTeam}");
+            NeuronLogger.For<Synapse>().Error($"Synapse Round End Check {shouldRoundEnd}, Leading {leadingTeam}");
             roundSummary.RoundEnded = shouldRoundEnd;
             
             if (!roundSummary.RoundEnded) continue; // Perform Round End

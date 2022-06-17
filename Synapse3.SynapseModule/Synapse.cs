@@ -2,7 +2,7 @@
 
 namespace Synapse3.SynapseModule;
 
-public static class Synapse
+public class Synapse
 {
     /// <summary>
     /// Returns an instance of the specified object by either resolving it using
