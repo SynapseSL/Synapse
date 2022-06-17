@@ -39,6 +39,13 @@ public class RoundPatches
         NeuronLogger.For<RoundPatches>().Error("Round start neuron event");
     }
 
+    [HarmonyPatch(typeof(RoundSummary), "Start", MethodType.Normal), HarmonyPrefix]
+    public static bool RoundSummaryOverride(RoundSummary __instance, out IEnumerator<float> __result)
+    {
+        __result = DecoratedRoundMethods.ProcessServerSideCode(__instance);
+        return false;
+    }
+
 }
 
 [Patches]
@@ -63,13 +70,6 @@ internal static class RoundStartPatch
 
 public class DecoratedRoundMethods
 {
-    [HarmonyPatch(typeof(RoundSummary), "Start", MethodType.Normal), HarmonyPrefix]
-    public static bool RoundSummaryOverride(RoundSummary __instance, out IEnumerator<float> __result)
-    {
-        __result = DecoratedRoundMethods.ProcessServerSideCode(__instance);
-        return false;
-    }
-    
     // Decorated and refactored coroutine RoundSummary._ProcessServerSideCode()
     public static IEnumerator<float> ProcessServerSideCode(RoundSummary roundSummary)
     {

@@ -33,10 +33,7 @@ public class SynapseModule : Module
     public override void Enable()
     {
         Logger.Info("Synapse3 enabled!");
-        var result = Patcher.GetPatcherInstance()
-            .CreateProcessor(typeof(RoundSummary).GetMethod(nameof(RoundSummary.Start)))
-            .AddPrefix(typeof(DecoratedRoundMethods).GetMethod(nameof(DecoratedRoundMethods.ProcessServerSideCode)))
-            .Patch();
+
     }
 
     public override void Disable()
