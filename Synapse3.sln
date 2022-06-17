@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synapse3.Platform", "Synapse3.Platform\Synapse3.Platform.csproj", "{AECE678B-12A9-47DA-B74A-6A2A6D85CBE7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synapse3.Injector", "Synapse3.Injector\Synapse3.Injector.csproj", "{9F7DC781-0B15-4BD9-9CE7-C3D9084F21EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synapse3.SynapseModule", "Synapse3.SynapseModule\Synapse3.SynapseModule.csproj", "{F880C8DE-7742-42FF-AD28-840EB81238F4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AECE678B-12A9-47DA-B74A-6A2A6D85CBE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AECE678B-12A9-47DA-B74A-6A2A6D85CBE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AECE678B-12A9-47DA-B74A-6A2A6D85CBE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AECE678B-12A9-47DA-B74A-6A2A6D85CBE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F7DC781-0B15-4BD9-9CE7-C3D9084F21EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F7DC781-0B15-4BD9-9CE7-C3D9084F21EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F7DC781-0B15-4BD9-9CE7-C3D9084F21EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F7DC781-0B15-4BD9-9CE7-C3D9084F21EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F880C8DE-7742-42FF-AD28-840EB81238F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F880C8DE-7742-42FF-AD28-840EB81238F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F880C8DE-7742-42FF-AD28-840EB81238F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F880C8DE-7742-42FF-AD28-840EB81238F4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
