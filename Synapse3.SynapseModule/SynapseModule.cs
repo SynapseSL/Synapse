@@ -1,8 +1,10 @@
 ﻿using System;
+using HarmonyLib;
 using Neuron.Core.Modules;
 using Neuron.Modules.Patcher;
 using Neuron.Modules.Commands;
 using Ninject;
+using Synapse3.SynapseModule.Patches;
 
 namespace Synapse3.SynapseModule;
 
@@ -23,7 +25,7 @@ public class SynapseModule : Module
     [Inject]
     public CommandService Commands { get; set; }
 
-    public override void Load()
+    public override void Load(IKernel kernel)
     {
         Logger.Info("Synapse3 is loading");
     }
@@ -31,7 +33,10 @@ public class SynapseModule : Module
     public override void Enable()
     {
         Logger.Info("Synapse3 enabled!");
-        throw new Exception("Tests!");
+        var result = Patcher.GetPatcherInstance()
+            .CreateProcessor(typeof(RoundSummary).GetMethod(nameof(RoundSummary.Start)))
+            .AddPrefix(typeof(DecoratedRoundMethods).GetMethod(nameof(DecoratedRoundMethods.ProcessServerSideCode)))
+            .Patch();
     }
 
     public override void Disable()

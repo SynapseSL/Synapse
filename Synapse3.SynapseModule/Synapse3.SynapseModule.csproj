@@ -33,6 +33,9 @@
         <Reference Include="Assembly-CSharp-firstpass">
             <HintPath>..\Refs\Assembly-CSharp-firstpass.dll</HintPath>
         </Reference>
+        <Reference Include="Mirror">
+          <HintPath>..\Refs\Mirror_publicized.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine">
             <HintPath>..\Refs\UnityEngine.dll</HintPath>
         </Reference>
