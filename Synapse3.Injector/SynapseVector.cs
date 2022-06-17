@@ -23,9 +23,9 @@ public class SynapseVector
             {
                 var fileUri = new Uri(file);
                 var targetUri = currentUri.MakeRelativeUri(fileUri);
-                ServerConsole.AddLog($"Loading assembly at {Uri.UnescapeDataString(targetUri.ToString())}", ConsoleColor.DarkGray);
+                ServerConsole.AddLog($"[Bootstrapp] Loading assembly at {Uri.UnescapeDataString(targetUri.ToString())}", ConsoleColor.DarkGray);
                 var assembly = domain.Load(File.ReadAllBytes(file));
-                ServerConsole.AddLog($"Loaded assembly {assembly.FullName}");
+                ServerConsole.AddLog($"[Bootstrapp] Loaded assembly {assembly.FullName}");
                 assemblies.Add(assembly);
             }
 

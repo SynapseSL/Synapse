@@ -1,0 +1,21 @@
+﻿using Neuron.Modules.Commands;
+using Neuron.Modules.Commands.Command;
+
+namespace Synapse3.SynapseModule.CommandService;
+
+public abstract class SynapseCommand : Command<SynapseContext>
+{
+    public override CommandResult PreExecute(SynapseContext context)
+    {
+        if (Meta is not SynapseCommandAttribute attribute)
+            return new CommandResult()
+            {
+                Response = "Invalid Command, cant check for Permissions",
+                StatusCode = CommandStatusCode.Error
+            };
+        
+        //TODO: Check Player permissions and implement Translation for Error above
+        
+        return null;
+    }
+}

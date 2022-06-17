@@ -25,6 +25,6 @@ public class LabLogRenderer : ILogRender
         {
             buffer.Append(token.Message);
         }
-        ServerConsole.AddLog(buffer.ToString(), color);
+        ServerConsole.AddLog($"[{output.Level}] " + buffer, color);
     }
 }
