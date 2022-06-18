@@ -55,5 +55,11 @@ namespace Synapse.Api.CustomObjects
             Map.Get.WorkStations.Add(station);
             return station;
         }
+        
+        public override void Destroy()
+        {
+            Map.Get.WorkStations.Remove(WorkStation);
+            base.Destroy();
+        }
     }
 }

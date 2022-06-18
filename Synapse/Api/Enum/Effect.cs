@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Synapse.Api.Enum
 {
@@ -135,7 +136,7 @@ namespace Synapse.Api.Enum
         /// <summary>
         /// Increases movement speed
         /// </summary>
-        /// <remarks>0 = Disabled, each intensity point adds 1% of movement speed (max 355)</remarks>
+        /// <remarks>0 = Disabled, each intensity point adds 1% of movement speed (max 255)</remarks>
         MovementBoost,
         /// <summary>
         /// Reduces severity of Amnesia, Bleeding, Burned, Concussed, Hemorrhage, Poisoned and SCP-207.
@@ -163,8 +164,9 @@ namespace Synapse.Api.Enum
         /// <remarks>0 = Disabled, 1 = 1xScp1853, 2 = 2xScp1853...</remarks>
         Scp1853,
         /// <summary>
-        /// Do a blink
+        /// Turns the screen black.
         /// </summary>
+        /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Visuals173Blink,
     }
 }

@@ -1,4 +1,4 @@
-﻿using Synapse.Api.Enum;
+using Synapse.Api.Enum;
 using Synapse.Api.Events.SynapseEventArguments;
 using UnityEngine;
 

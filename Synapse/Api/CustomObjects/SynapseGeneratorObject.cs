@@ -34,7 +34,14 @@ namespace Synapse.Api.CustomObjects
             var script = GameObject.AddComponent<SynapseObjectScript>();
             script.Object = this;
         }
-
+        
+        public override void Destroy()
+        {
+            //The Generator will add itself on first Start to Map.Generators
+            Map.Get.Generators.Remove(Generator);
+            base.Destroy();
+        }
+        
         public Generator Generator { get; }
     }
 }

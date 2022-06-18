@@ -2,6 +2,7 @@
 using InventorySystem;
 using InventorySystem.Items.Usables;
 using MEC;
+using Mirror;
 using PlayerStatsSystem;
 using Synapse.Api;
 using Synapse.Api.Enum;
@@ -114,8 +115,10 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             {
                 var player = __instance.GetPlayer();
                 var args = player.setClassEventArgs;
-                if (args is null)
+                if (player.LiteRoleSet)
                     return false;
+                if (args == null)
+                    return true;
                 var rot = new PlayerMovementSync.PlayerRotation?(new PlayerMovementSync.PlayerRotation(new float?(0f), new float?(args.Rotation)));
                 _ = Timing.RunCoroutine(__instance.SafelySpawnPlayer(args.Position, rot), Segment.FixedUpdate);
                 return false;
@@ -194,7 +197,7 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
             try
             {
                 var player = __instance.GetPlayer();
-                if (player.setClassEventArgs is null)
+                if (player.LiteRoleSet)
                     return false;
 
                 player.MaxHealth = player.ClassManager.CurRole.maxHP;
@@ -216,7 +219,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                return !(ply?.GetPlayer()?.setClassEventArgs is null);
+                if (ply?.GetPlayer().LiteRoleSet == true) return false;
+                return true;
             }
             catch (Exception ex)
             {
@@ -234,7 +238,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         {
             try
             {
-                return !(targetHub?.GetPlayer()?.setClassEventArgs is null);
+                if (targetHub?.GetPlayer()?.LiteRoleSet == true) return false;
+                return true;
             }
             catch (Exception ex)
             {

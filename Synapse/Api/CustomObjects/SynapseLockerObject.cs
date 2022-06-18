@@ -20,6 +20,12 @@ namespace Synapse.Api.CustomObjects
             => ObjectType.Locker;
         public LockerType LockerType { get; }
         public Locker Locker { get; }
+        
+        public override void Destroy()
+        {
+            Map.Get.Lockers.Remove(Locker);
+            base.Destroy();
+        }
 
         public SynapseLockerObject(LockerType lockerType, Vector3 pos, Quaternion rotation, Vector3 scale, bool removeDefaultItems = false)
         {

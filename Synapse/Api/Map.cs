@@ -152,8 +152,9 @@ namespace Synapse.Api
             var grenadeitem = new SynapseItem(itemtype, position);
             grenadeitem.Throwable.Fuse();
             grenadeitem.Throwable.FuseTime = fusetime;
-            if (player != null)
-                grenadeitem.Throwable.ThrowableItem.PreviousOwner = new Footprinting.Footprint(player.Hub);
+
+            if (player == null) player = Server.Get.Host;
+            grenadeitem.Throwable.ThrowableItem.PreviousOwner = new Footprinting.Footprint(player.Hub);
 
             if (grenadeitem.Throwable.ThrowableItem.TryGetComponent<Rigidbody>(out var rgb))
                 rgb.velocity = velocity;
