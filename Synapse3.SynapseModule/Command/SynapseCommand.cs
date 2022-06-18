@@ -1,7 +1,7 @@
 ﻿using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Command;
 
-namespace Synapse3.SynapseModule.CommandService;
+namespace Synapse3.SynapseModule.Command;
 
 public abstract class SynapseCommand : Command<SynapseContext>
 {

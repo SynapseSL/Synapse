@@ -3,7 +3,7 @@ using System.Linq;
 using Neuron.Modules.Commands;
 using Synapse3.SynapseModule.Player;
 
-namespace Synapse3.SynapseModule.CommandService;
+namespace Synapse3.SynapseModule.Command;
 
 public class SynapseContext : ICommandContext
 {

@@ -2,6 +2,7 @@
 using Neuron.Modules.Patcher;
 using Neuron.Modules.Commands;
 using Ninject;
+using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule;
 
@@ -30,7 +31,6 @@ public class SynapseModule : Module
     public override void Enable()
     {
         Logger.Info("Synapse3 enabled!");
-
     }
 
     public override void Disable()

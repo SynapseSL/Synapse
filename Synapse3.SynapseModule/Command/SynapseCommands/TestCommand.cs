@@ -1,6 +1,6 @@
 ﻿using Neuron.Modules.Commands;
 
-namespace Synapse3.SynapseModule.CommandService.SynapseCommands;
+namespace Synapse3.SynapseModule.Command.SynapseCommands;
 
 [SynapseCommand(
     CommandName = "Test",

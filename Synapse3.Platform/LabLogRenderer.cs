@@ -14,7 +14,7 @@ public class LabLogRenderer : ILogRender
         {
             LogLevel.Verbose => ConsoleColor.DarkGray,
             LogLevel.Debug => ConsoleColor.Gray,
-            LogLevel.Information => ConsoleColor.White,
+            LogLevel.Information => ConsoleColor.Cyan,
             LogLevel.Warning => ConsoleColor.Yellow,
             LogLevel.Error => ConsoleColor.Red,
             LogLevel.Fatal => ConsoleColor.DarkRed,

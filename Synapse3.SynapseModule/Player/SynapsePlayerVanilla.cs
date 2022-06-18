@@ -4,6 +4,7 @@ using InventorySystem.Searching;
 using Mirror;
 using PlayerStatsSystem;
 using RemoteAdmin;
+using Synapse3.SynapseModule.Enums;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
@@ -65,7 +66,7 @@ public partial class SynapsePlayer
     {
         get
         {
-            if (this == IsServer) return ServerConsole._scs;
+            if (PlayerType == PlayerType.Server) return ServerConsole._scs;
             return QueryProcessor._sender;
         }
     }

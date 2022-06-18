@@ -1,6 +1,6 @@
 ﻿using Neuron.Modules.Commands.Command;
 
-namespace Synapse3.SynapseModule.CommandService;
+namespace Synapse3.SynapseModule.Command;
 
 public class SynapseCommandAttribute : CommandAttribute
 {
