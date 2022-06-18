@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using PlayableScps;
+using UnityEngine;
 
 namespace Synapse.Api.Events.SynapseEventArguments
 {
