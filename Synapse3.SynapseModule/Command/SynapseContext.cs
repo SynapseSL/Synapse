@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Neuron.Modules.Commands;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Command;
@@ -13,7 +14,7 @@ public class SynapseContext : ICommandContext
 
     public bool IsAdmin
     {
-        get => Platform == CommandPlatform.ServerConsole;
+        get => Platform == CommandPlatform.ServerConsole || Player.PlayerType == PlayerType.Server;
         set {}
     }
     

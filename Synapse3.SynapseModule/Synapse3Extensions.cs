@@ -4,6 +4,7 @@ using PlayerStatsSystem;
 using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Player;
+using UnityEngine;
 
 public static class Synapse3Extensions
 {
@@ -78,4 +79,18 @@ public static class Synapse3Extensions
         var msg = new ObjectDestroyMessage { netId = identity.netId };
         NetworkServer.SendToAll(msg);
     }
+    
+    public static SynapsePlayer GetPlayer(this NetworkConnection connection) => connection.identity.GetPlayer();
+
+    public static SynapsePlayer GetPlayer(this MonoBehaviour mono) => mono?.gameObject?.GetComponent<SynapsePlayer>();
+
+    public static SynapsePlayer GetPlayer(this GameObject gameObject) => gameObject?.GetComponent<SynapsePlayer>();
+
+    public static SynapsePlayer GetPlayer(this PlayableScps.PlayableScp scp) => scp?.Hub?.GetPlayer();
+
+    public static SynapsePlayer GetPlayer(this CommandSender sender) => Synapse.Get<PlayerService>().GetPlayer(x => x.CommandSender == sender);
+
+    public static SynapsePlayer GetPlayer(this StatBase stat) => stat.Hub.GetPlayer();
+
+    public static SynapsePlayer GetPlayer(this Footprinting.Footprint footprint) => footprint.Hub?.GetPlayer();
 }

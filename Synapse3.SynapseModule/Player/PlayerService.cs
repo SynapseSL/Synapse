@@ -27,6 +27,13 @@ public class PlayerService : Service
     /// </summary>
     public int PlayersAmount => ServerConsole.PlayersAmount;
 
+    public List<SynapsePlayer> GetAbsoluteAllPlayers()
+    {
+        var list = Players.ToList();
+        list.Add(Host);
+        return list;
+    }
+
 
 
     /// <summary>
@@ -72,13 +79,13 @@ public class PlayerService : Service
         => GetPlayer(x => x.NetworkIdentity.netId == netId);
     
     public SynapsePlayer GetPlayer(Func<SynapsePlayer, bool> func)
-        => Players.FirstOrDefault(func);
+        => GetAbsoluteAllPlayers().FirstOrDefault(func);
 
     /// <summary>
     /// Returns the player with that UserID
     /// </summary>
     public SynapsePlayer GetPlayerByUserId(string userid)
-        => Players.FirstOrDefault(x => x.UserId == userid || x.SecondUserID == userid);
+        => GetPlayer(x => x.UserId == userid || x.SecondUserID == userid);
 
     /// <summary>
     /// Returns the player with that Name
@@ -89,7 +96,7 @@ public class PlayerService : Service
             string.Equals(x.NickName, name, StringComparison.OrdinalIgnoreCase));
     
     public List<SynapsePlayer> GetPlayers(Func<SynapsePlayer, bool> func)
-        => Players.Where(func).ToList();
+        => GetAbsoluteAllPlayers().Where(func).ToList();
 
     /// <summary>
     /// Returns multiple Player that are parsed from a string.
@@ -99,7 +106,7 @@ public class PlayerService : Service
     public bool TryGetPlayers(string arg, out List<SynapsePlayer> players, SynapsePlayer me = null)
     {
         players = new List<SynapsePlayer>();
-        var all = Players;
+        var all = GetAbsoluteAllPlayers();
         var args = arg.Split('.');
 
         foreach (var parameter in args)
