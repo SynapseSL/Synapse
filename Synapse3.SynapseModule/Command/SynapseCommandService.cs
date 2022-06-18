@@ -17,14 +17,16 @@ public class SynapseCommandService : Service
     };
 
     private readonly CommandService _command;
+    private SynapseModule _synapseModule;
 
     public CommandReactor ServerConsole { get; private set; }
     public CommandReactor RemoteAdmin { get; private set; }
     public CommandReactor PlayerConsole { get; private set; }
-    
-    public SynapseCommandService(CommandService command)
+
+    public SynapseCommandService(CommandService command, SynapseModule synapseModule)
     {
         _command = command;
+        _synapseModule = synapseModule;
     }
 
     public override void Enable()
@@ -39,11 +41,19 @@ public class SynapseCommandService : Service
         PlayerConsole = _command.CreateCommandReactor();
         PlayerConsole.NotFoundFallbackHandler = NotFound;
 
+        while (_synapseModule.moduleCommandBindingQueue.Count != 0)
+        {
+            var binding = _synapseModule.moduleCommandBindingQueue.Dequeue();
+            LoadBinding(binding);
+        }
+        
         foreach (var command in _synapseCommands)
         {
             RegisterSynapseCommand(command);
         }
     }
+    
+    public void LoadBinding(SynapseCommandBinding binding) => RegisterSynapseCommand(binding.Type);
 
     public void RegisterSynapseCommand(Type command)
     {
@@ -75,7 +85,7 @@ public class SynapseCommandService : Service
         return new CommandResult()
         {
             StatusCode = 0,
-            Response = "You shouldn't be able to see this since the default Game response should come"
+            Response = "You shouldn't be able to see this since the default game response should come"
         };
     }
 }
