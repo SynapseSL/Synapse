@@ -1,0 +1,39 @@
+﻿using Neuron.Core.Dev;
+using Neuron.Core.Plugins;
+using Ninject;
+using Synapse3.SynapseModule;
+
+namespace Synapse3.ExamplePlugin
+{
+    [Plugin(
+        Name = "Example Plugin",
+        Description = "Example Description",
+        Version = "1.0.0"
+    )]
+    public class ExamplePlugin : Plugin
+    {
+        public ExampleConfig Config { get; set; }
+        public ExampleTranslations Translations { get; set; }
+
+        public override void Load()
+        {
+            Logger.Info($"Before {Config}");
+            Logger.Info($"Before {Translations}");
+        }
+
+        public override void Enable()
+        {
+            Translations = Synapse.Get<ExampleTranslations>();
+            Config = Synapse.Get<ExampleConfig>();
+            Logger.Info(Config.StringEntry);
+            Logger.Info(Config.IntEntry);
+            Logger.Info(Config.ListEntry);
+            Logger.Info(Translations.CommandMessage.Format("Example Command", "Helight"));
+        }
+
+        public override void Disable()
+        {
+            
+        }
+    }
+}

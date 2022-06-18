@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synapse3.Injector", "Synaps
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synapse3.SynapseModule", "Synapse3.SynapseModule\Synapse3.SynapseModule.csproj", "{F880C8DE-7742-42FF-AD28-840EB81238F4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synapse3.ExamplePlugin", "Synapse3.ExamplePlugin\Synapse3.ExamplePlugin.csproj", "{A15E8A0D-C71D-4615-97BE-53225FC36FAB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{F880C8DE-7742-42FF-AD28-840EB81238F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F880C8DE-7742-42FF-AD28-840EB81238F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F880C8DE-7742-42FF-AD28-840EB81238F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A15E8A0D-C71D-4615-97BE-53225FC36FAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A15E8A0D-C71D-4615-97BE-53225FC36FAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A15E8A0D-C71D-4615-97BE-53225FC36FAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A15E8A0D-C71D-4615-97BE-53225FC36FAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
