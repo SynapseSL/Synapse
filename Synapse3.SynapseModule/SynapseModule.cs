@@ -48,8 +48,8 @@ public class SynapseModule : Module
         var moduleManager = kernel.Get<ModuleManager>();
         var pluginManager = kernel.Get<PluginManager>();
         metaManager.MetaGenerateBindings.Subscribe(OnGenerateCommandBinding);
-        moduleManager.ModuleLoad.Subscribe(OnModuleLoadCommands);
-        pluginManager.PluginLoad.Subscribe(OnPluginLoadCommands);
+        moduleManager.ModuleLoadLate.Subscribe(OnModuleLoadCommands);
+        pluginManager.PluginLoadLate.Subscribe(OnPluginLoadCommands);
         
         CustomNetworkManager.Modded = true;
         BuildInfoCommand.ModDescription = $"Plugin Framework: Synapse\n" +
