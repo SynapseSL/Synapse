@@ -1,10 +1,7 @@
-﻿using System;
-using HarmonyLib;
-using Neuron.Core.Modules;
+﻿using Neuron.Core.Modules;
 using Neuron.Modules.Patcher;
 using Neuron.Modules.Commands;
 using Ninject;
-using Synapse3.SynapseModule.Patches;
 
 namespace Synapse3.SynapseModule;
 
@@ -23,7 +20,7 @@ public class SynapseModule : Module
     public PatcherService Patcher { get; set; }
     
     [Inject]
-    public CommandService Commands { get; set; }
+    public Neuron.Modules.Commands.CommandService Commands { get; set; }
 
     public override void Load(IKernel kernel)
     {

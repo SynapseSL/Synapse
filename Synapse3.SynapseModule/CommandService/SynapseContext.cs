@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Synapse3.SynapseModule.PlayerService;
 using Neuron.Modules.Commands;
+using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.CommandService;
 
