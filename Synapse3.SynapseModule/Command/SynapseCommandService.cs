@@ -30,8 +30,13 @@ public class SynapseCommandService : Service
     public override void Enable()
     {
         ServerConsole = _command.CreateCommandReactor();
+        ServerConsole.NotFoundFallbackHandler = NotFound;
+        
         RemoteAdmin = _command.CreateCommandReactor();
+        RemoteAdmin.NotFoundFallbackHandler = NotFound;
+        
         PlayerConsole = _command.CreateCommandReactor();
+        PlayerConsole.NotFoundFallbackHandler = NotFound;
 
         foreach (var command in _synapseCommands)
         {
@@ -62,5 +67,14 @@ public class SynapseCommandService : Service
                     break;
             }
         }
+    }
+
+    private static CommandResult NotFound(CommandEvent args)
+    {
+        return new CommandResult()
+        {
+            StatusCode = 0,
+            Response = "You shouldn't be able to see this since the default Game response should come"
+        };
     }
 }

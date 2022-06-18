@@ -7,6 +7,8 @@ public abstract class SynapseCommand : Command<SynapseContext>
 {
     public override CommandResult PreExecute(SynapseContext context)
     {
+        if (context.IsAdmin) return null;
+        
         if (Meta is not SynapseCommandAttribute attribute)
             return new CommandResult()
             {

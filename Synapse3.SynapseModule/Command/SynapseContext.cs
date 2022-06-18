@@ -13,18 +13,18 @@ public class SynapseContext : ICommandContext
 
     public bool IsAdmin
     {
-        get => false;
+        get => Platform == CommandPlatform.ServerConsole;
         set {}
     }
     
     public Type ContextType => typeof(SynapseContext);
     
     public SynapsePlayer Player { get; set; }
+    
+    public CommandPlatform Platform { get; set; }
 
-    public SynapseContext Of(string message, SynapsePlayer player)
+    public static SynapseContext Of(string message, SynapsePlayer player, CommandPlatform platform)
     {
-        Player = player;
-        
         var context = new SynapseContext()
         {
             FullCommand = message,
@@ -34,6 +34,10 @@ public class SynapseContext : ICommandContext
         context.Command = args[0];
         args.RemoveAt(0);
         context.Arguments = args.ToArray();
+        
+        context.Player = player;
+        context.Platform = platform;
+        
         return context;
     }
 }
