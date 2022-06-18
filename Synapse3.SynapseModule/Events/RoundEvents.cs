@@ -26,9 +26,6 @@ public class RoundEvents : Service
 
 public class RoundStartEvent : IEvent { }
 
-public class RoundEndEvent : IEvent
-{
-    
-}
+public class RoundEndEvent : IEvent { }
 
 public class RoundWaitingEvent : IEvent { }

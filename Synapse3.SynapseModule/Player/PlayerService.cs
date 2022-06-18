@@ -27,6 +27,9 @@ public class PlayerService : Service
     /// </summary>
     public int PlayersAmount => ServerConsole.PlayersAmount;
 
+    /// <summary>
+    /// Returns all Player objects even the Host and all Dummies
+    /// </summary>
     public List<SynapsePlayer> GetAbsoluteAllPlayers()
     {
         var list = Players.ToList();

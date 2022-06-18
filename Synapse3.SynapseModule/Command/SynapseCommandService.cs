@@ -29,6 +29,7 @@ public class SynapseCommandService : Service
 
     public override void Enable()
     {
+        NeuronLogger.For<Synapse>().Error("Enable SynapseCommand");
         ServerConsole = _command.CreateCommandReactor();
         ServerConsole.NotFoundFallbackHandler = NotFound;
         

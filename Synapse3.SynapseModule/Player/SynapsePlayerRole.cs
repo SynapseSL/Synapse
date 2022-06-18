@@ -1,4 +1,7 @@
-﻿namespace Synapse3.SynapseModule.Player;
+﻿using Synapse3.SynapseModule.CustomRole;
+using Synapse3.SynapseModule.Enums;
+
+namespace Synapse3.SynapseModule.Player;
 
 public partial class SynapsePlayer
 {
@@ -15,5 +18,12 @@ public partial class SynapsePlayer
         LiteRoleSet = true;
         Hub.characterClassManager.SetClassIDAdv(role, true, CharacterClassManager.SpawnReason.ForceClass);
         LiteRoleSet = false;
+    }
+    
+    public SynapseRole CustomRole { get; set; }
+
+    public void RemoveCustomRole(DespawnReason reason)
+    {
+        
     }
 }

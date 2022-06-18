@@ -9,7 +9,7 @@ public class SynapseCommandAttribute : CommandAttribute
     public CommandPlatform[] Platforms { get; set; } = { CommandPlatform.ServerConsole };
 }
 
-public class SynapseRACommandAttribute : SynapseCommandAttribute
+public class SynapseRaCommandAttribute : SynapseCommandAttribute
 {
     public string[] Parameters { get; set; } = { };
 }

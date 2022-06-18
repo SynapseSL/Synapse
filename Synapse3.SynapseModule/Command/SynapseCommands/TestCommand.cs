@@ -2,12 +2,13 @@
 
 namespace Synapse3.SynapseModule.Command.SynapseCommands;
 
-[SynapseCommand(
+[SynapseRaCommand(
     CommandName = "Test",
     Aliases = new []{ "te" },
     Description = "Command for testing purposes",
     Permission = "synapse.test",
-    Platforms = new[] { CommandPlatform.PlayerConsole, CommandPlatform.RemoteAdmin , CommandPlatform.ServerConsole }
+    Platforms = new[] { CommandPlatform.PlayerConsole, CommandPlatform.RemoteAdmin , CommandPlatform.ServerConsole },
+    Parameters = new []{ "Test" }
     )]
 public class TestCommand : SynapseCommand
 {

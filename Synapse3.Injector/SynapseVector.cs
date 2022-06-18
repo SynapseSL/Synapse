@@ -15,6 +15,12 @@ public class SynapseVector
     {
         try
         {
+            if (StartupArgs.Args.Any(x => x.Equals("-nosynapse", StringComparison.OrdinalIgnoreCase)))
+            {
+                ServerConsole.AddLog("Server started with -nosynapse argument! Synapse will not be loaded");
+                return;
+            }
+            
             ServerConsole.AddLog("Bootstrapping Synapse3 via reflections", ConsoleColor.Cyan);
             var assemblies = new List<Assembly>();
             var domain = AppDomain.CurrentDomain;
