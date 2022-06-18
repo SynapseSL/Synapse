@@ -1,6 +1,7 @@
 ﻿using Neuron.Core.Modules;
 using Neuron.Modules.Patcher;
 using Neuron.Modules.Commands;
+using Neuron.Modules.Configs;
 using Ninject;
 using Synapse3.SynapseModule.Player;
 
@@ -12,7 +13,8 @@ namespace Synapse3.SynapseModule;
     Dependencies = new []
     {
         typeof(PatcherModule),
-        typeof(CommandsModule)
+        typeof(CommandsModule),
+        typeof(ConfigsModule)
     }
 )]
 public class SynapseModule : Module
@@ -21,7 +23,7 @@ public class SynapseModule : Module
     public PatcherService Patcher { get; set; }
     
     [Inject]
-    public Neuron.Modules.Commands.CommandService Commands { get; set; }
+    public CommandService Commands { get; set; }
 
     public override void Load(IKernel kernel)
     {

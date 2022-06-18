@@ -23,6 +23,7 @@
         <ProjectReference Include="..\..\Neuron\Neuron.Core\Neuron.Core.csproj" />
         <ProjectReference Include="..\..\Neuron\Neuron.Modules.Patcher\Neuron.Modules.Patcher.csproj" />
         <ProjectReference Include="..\..\Neuron\Neuron.Modules.Commands\Neuron.Modules.Commands.csproj" />
+        <ProjectReference Include="..\..\Neuron\Neuron.Modules.Configs\Neuron.Modules.Configs.csproj" />
     </ItemGroup>
 
 
