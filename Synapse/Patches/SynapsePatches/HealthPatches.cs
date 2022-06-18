@@ -20,7 +20,8 @@ namespace Synapse.Patches.SynapsePatches
         [HarmonyPrefix]
         private static bool ServerAddProcess(AhpStat __instance, float amount, out AhpStat.AhpProcess __result)
         {
-            __result = __instance.ServerAddProcess(amount, __instance.GetPlayer().MaxArtificialHealth, 1.2f, 0.7f, 0f, false);
+            var player = __instance.GetPlayer();
+            __result = __instance.ServerAddProcess(amount, player.MaxArtificialHealth, player.DecayArtificialHealth, AhpStat.DefaultEfficacy, 0f, false);
             return false;
         }
     }

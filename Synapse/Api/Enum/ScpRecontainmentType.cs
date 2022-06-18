@@ -10,6 +10,7 @@
         Tesla = 5,
         Nuke = 6,
         Decontamination = 7,
-        Unknown = 8
+        Unknown = 8,
+        Scp = 9,
     }
 }

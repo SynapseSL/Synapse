@@ -106,7 +106,7 @@ namespace Synapse.Api
             => Rooms.FirstOrDefault(x => x.RoomType == roomType);
 
         public Door GetDoor(Enum.DoorType doorType)
-            => Doors.FirstOrDefault(x => x.DoorType == doorType);
+            => Doors.FirstOrDefault(x => x?.DoorType == doorType);
 
         public Elevator GetElevator(Enum.ElevatorType elevatorType)
             => Elevators.FirstOrDefault(x => x.ElevatorType == elevatorType);
@@ -129,6 +129,7 @@ namespace Synapse.Api
             ScpRecontainmentType.Chaos => $". SCP {scp} SUCCESSFULLY TERMINATED . BY CHAOSINSURGENCY",
             ScpRecontainmentType.Scientist => $". SCP {scp} SUCCESSFULLY TERMINATED . BY SCIENCE PERSONNEL",
             ScpRecontainmentType.ClassD => $". SCP {scp} SUCCESSFULLY TERMINATED . BY CLASSD PERSONNEL",
+            ScpRecontainmentType.Scp => $"TERMINATED BY SCP {Unit}",
             ScpRecontainmentType.Unknown => $". SCP {scp} SUCCESSFULLY TERMINATED . CONTAINMENTUNIT UNKNOWN",
             _ => $". SCP {scp} SUCCESSFULLY TERMINATED . TERMINATION CAUSE UNSPECIFIED",
         });

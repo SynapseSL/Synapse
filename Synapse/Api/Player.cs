@@ -589,7 +589,7 @@ namespace Synapse.Api
             set => GetStatBase<AhpStat>().ServerAddProcess(value, value, 1.2f, 0f, 0f, false);
         }
 
-        private int maxahp = 75;
+        private int maxahp = (int)AhpStat.DefaultMax;
 
         public int MaxArtificialHealth
         {
@@ -599,6 +599,19 @@ namespace Synapse.Api
                 maxahp = value;
                 foreach (var process in GetStatBase<AhpStat>()._activeProcesses)
                     process.Limit = value;
+            }
+        }
+
+        private float decayahp = AhpStat.DefaultDecay;
+
+        public float DecayArtificialHealth
+        {
+            get => decayahp;
+            set
+            {
+                decayahp = value;
+                foreach (var process in GetStatBase<AhpStat>()._activeProcesses)
+                    process.DecayRate = value;
             }
         }
 
