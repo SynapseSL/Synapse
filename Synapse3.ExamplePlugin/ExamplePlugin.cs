@@ -12,7 +12,10 @@ namespace Synapse3.ExamplePlugin
     )]
     public class ExamplePlugin : Plugin
     {
+        [Inject]
         public ExampleConfig Config { get; set; }
+        
+        [Inject]
         public ExampleTranslations Translations { get; set; }
 
         public override void Load()
@@ -23,8 +26,6 @@ namespace Synapse3.ExamplePlugin
 
         public override void Enable()
         {
-            Translations = Synapse.Get<ExampleTranslations>();
-            Config = Synapse.Get<ExampleConfig>();
             Logger.Info(Config.StringEntry);
             Logger.Info(Config.IntEntry);
             Logger.Info(Config.ListEntry);
