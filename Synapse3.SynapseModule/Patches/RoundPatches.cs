@@ -19,6 +19,7 @@ public static class RoundPatches
     [HarmonyPrefix]
     public static void RoundWaitingPatch()
     {
+        Synapse.Get<RoundEvents>().RoundWaiting.Raise(new RoundWaitingEvent());
         NeuronLogger.For<Synapse>().Info("Waiting for players event!");
     }
 

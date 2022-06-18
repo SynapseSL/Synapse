@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Event;
+using RemoteAdmin;
 using Synapse3.SynapseModule.Command.SynapseCommands;
+using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Command;
 
@@ -15,23 +19,24 @@ public class SynapseCommandService : Service
     {
         typeof(TestCommand)
     };
-
+    
     private readonly CommandService _command;
-    private SynapseModule _synapseModule;
+    private readonly RoundEvents _round;
+    private readonly SynapseModule _synapseModule;
 
     public CommandReactor ServerConsole { get; private set; }
     public CommandReactor RemoteAdmin { get; private set; }
     public CommandReactor PlayerConsole { get; private set; }
 
-    public SynapseCommandService(CommandService command, SynapseModule synapseModule)
+    public SynapseCommandService(CommandService command,RoundEvents round, SynapseModule synapseModule)
     {
         _command = command;
+        _round = round;
         _synapseModule = synapseModule;
     }
 
     public override void Enable()
     {
-        NeuronLogger.For<Synapse>().Error("Enable SynapseCommand");
         ServerConsole = _command.CreateCommandReactor();
         ServerConsole.NotFoundFallbackHandler = NotFound;
         
@@ -51,6 +56,8 @@ public class SynapseCommandService : Service
         {
             RegisterSynapseCommand(command);
         }
+        
+        _round.RoundWaiting.Subscribe(GenerateCommandCompletion);
     }
     
     public void LoadBinding(SynapseCommandBinding binding) => RegisterSynapseCommand(binding.Type);
@@ -87,5 +94,41 @@ public class SynapseCommandService : Service
             StatusCode = 0,
             Response = "You shouldn't be able to see this since the default game response should come"
         };
+    }
+
+    private void GenerateCommandCompletion(RoundWaitingEvent ev)
+    {
+        var list = QueryProcessor.ParseCommandsToStruct(CommandProcessor.GetAllCommands()).ToList();
+
+        foreach (var command in RemoteAdmin.Handler.Commands)
+        {
+            var meta = (SynapseRaCommandAttribute)command.Meta;
+            list.Add(new QueryProcessor.CommandData
+            {
+                Command = meta.CommandName,
+                AliasOf = null,
+                Description = meta.Description,
+                Hidden = false,
+                Usage = meta.Parameters
+            });
+            
+            if(meta.Aliases == null) continue;
+
+            foreach (var alias in meta.Aliases)
+            {
+                list.Add(new QueryProcessor.CommandData
+                {
+                    Command = alias,
+                    AliasOf = meta.CommandName,
+                    Description = meta.Description,
+                    Hidden = false,
+                    Usage = meta.Parameters
+                });
+            }
+        }
+
+        QueryProcessor._commands = list.ToArray();
+
+        NeuronLogger.For<Synapse>().Error("LOADED RA PARAMS");
     }
 }

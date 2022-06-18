@@ -21,8 +21,7 @@ public class CustomRoleService : Service
 
     public override void Enable()
     {
-        NeuronLogger.For<Synapse>().Error("Enable SynapseCustomRole");
-        _command.RemoteAdmin?.Subscribe(OnRemoteAdmin);
+        _command.RemoteAdmin.Subscribe(OnRemoteAdmin);
     }
 
     /// <summary>
