@@ -22,13 +22,13 @@ public class SynapseCommandService : Service
     
     private readonly CommandService _command;
     private readonly RoundEvents _round;
-    private readonly SynapseModule _synapseModule;
+    private readonly Synapse _synapseModule;
 
     public CommandReactor ServerConsole { get; private set; }
     public CommandReactor RemoteAdmin { get; private set; }
     public CommandReactor PlayerConsole { get; private set; }
 
-    public SynapseCommandService(CommandService command,RoundEvents round, SynapseModule synapseModule)
+    public SynapseCommandService(CommandService command,RoundEvents round, Synapse synapseModule)
     {
         _command = command;
         _round = round;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CommandSystem.Commands.Shared;
 using Neuron.Core;
@@ -11,7 +12,7 @@ using Neuron.Modules.Patcher;
 using Ninject;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Enums;
-using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule;
 
@@ -146,4 +147,12 @@ public class Synapse : Module
         
     }
     
+}
+
+public class SynapseCommandBinding : IMetaBinding
+{
+    
+    public Type Type { get; set; }
+
+    public IEnumerable<Type> PromisedServices => new Type[] { };
 }
