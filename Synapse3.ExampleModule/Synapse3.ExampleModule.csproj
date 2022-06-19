@@ -8,8 +8,8 @@
         <OutputType>Library</OutputType>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
-        <RootNamespace>Synapse3.SynapseModule</RootNamespace>
-        <PackageId>Synapse3.SynapseModule</PackageId>
+        <RootNamespace>Synapse3.ExampleModule</RootNamespace>
+        <PackageId>Synapse3.ExampleModule</PackageId>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
@@ -20,44 +20,26 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Synapse3.SynapseModule\Synapse3.SynapseModule.csproj" />
+    </ItemGroup>
+
+
+    <ItemGroup>
         <Reference Include="Assembly-CSharp">
             <HintPath>..\Refs\Assembly-CSharp-Publicized.dll</HintPath>
         </Reference>
         <Reference Include="Assembly-CSharp-firstpass">
             <HintPath>..\Refs\Assembly-CSharp-firstpass.dll</HintPath>
         </Reference>
-        <Reference Include="CommandSystem.Core">
-          <HintPath>..\Refs\CommandSystem.Core.dll</HintPath>
-        </Reference>
         <Reference Include="Mirror">
-          <HintPath>..\Refs\Mirror_publicized.dll</HintPath>
-        </Reference>
-        <Reference Include="Neuron.Modules.Configs">
-          <HintPath>..\..\Neuron\Neuron.Modules.Configs\bin\Debug\netstandard2.0\Neuron.Modules.Configs.dll</HintPath>
-        </Reference>
-        <Reference Include="NorthwoodLib">
-          <HintPath>..\Refs\NorthwoodLib.dll</HintPath>
+            <HintPath>..\Refs\Mirror_publicized.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine">
             <HintPath>..\Refs\UnityEngine.dll</HintPath>
         </Reference>
-        <Reference Include="UnityEngine.AnimationModule">
-          <HintPath>..\Refs\UnityEngine.AnimationModule.dll</HintPath>
-        </Reference>
         <Reference Include="UnityEngine.CoreModule">
             <HintPath>..\Refs\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
-        <Reference Include="UnityEngine.PhysicsModule">
-          <HintPath>..\Refs\UnityEngine.PhysicsModule.dll</HintPath>
-        </Reference>
-    </ItemGroup>
-
-
-    <ItemGroup>
-      <PackageReference Include="NeuronModding.Core" Version="1.0.0.1" />
-      <PackageReference Include="NeuronModding.Modules.Commands" Version="1.0.0.1" />
-      <PackageReference Include="NeuronModding.Modules.Configs" Version="1.0.0.1" />
-      <PackageReference Include="NeuronModding.Modules.Patcher" Version="1.0.0.1" />
     </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
