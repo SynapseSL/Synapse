@@ -19,11 +19,79 @@ public partial class SynapsePlayer
         Hub.characterClassManager.SetClassIDAdv(role, true, CharacterClassManager.SpawnReason.ForceClass);
         LiteRoleSet = false;
     }
-    
-    public SynapseRole CustomRole { get; set; }
 
+    private ISynapseRole _customRole;
+
+    /// <summary>
+    /// The Current CustomRole of the Player. Is null when he is just a Vanilla Role
+    /// </summary>
+    public ISynapseRole CustomRole
+    {
+        get => _customRole;
+        set
+        {
+            RemoveCustomRole(DespawnReason.API);
+            
+            if(value is null)
+                return;
+            
+            _customRole = value;
+            _customRole.Player = this;
+            _customRole.SpawnPlayer(false);
+        }
+    }
+    
+    /// <summary>
+    /// Removes the CustomRole Of the Player if he has one
+    /// </summary>
     public void RemoveCustomRole(DespawnReason reason)
     {
+        _customRole?.DeSpawn(reason);
+        _customRole = null;
+    }
+
+    /// <inheritdoc cref="SpawnCustomRole(ISynapseRole,bool)"/>
+    public void SpawnCustomRole(int id, bool liteSpawn = false)
+        => SpawnCustomRole(Synapse.Get<CustomRoleService>().GetCustomRole(id), liteSpawn);
+    
+    /// <summary>
+    /// Spawns the Player with that CustomRole
+    /// </summary>
+    public void SpawnCustomRole(ISynapseRole role, bool liteSpawn = false)
+    {
+        if(role is null)
+            return;
         
+        RemoveCustomRole(DespawnReason.API);
+
+        _customRole = role;
+        _customRole.Player = this;
+        _customRole.SpawnPlayer(liteSpawn);
+    }
+
+    /// <summary>
+    /// The Current RoleID of the Player. Combines RoleType and CustomRole
+    /// </summary>
+    public int RoleID
+    {
+        get
+        {
+            if (CustomRole == null) return (int)RoleType;
+            return CustomRole.GetRoleID();
+        }
+        set
+        {
+            if (value is >= -1 and <= (int)CustomRoleService.HighestRole)
+            {
+                RemoveCustomRole(DespawnReason.API);
+                RoleType = (RoleType)value;
+                return;
+            }
+
+            var service = Synapse.Get<CustomRoleService>();
+            if(!service.IsIdRegistered(value)) return;
+
+            CustomRole = service.GetCustomRole(value);
+        }
     }
 }

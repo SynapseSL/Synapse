@@ -128,7 +128,5 @@ public class SynapseCommandService : Service
         }
 
         QueryProcessor._commands = list.ToArray();
-
-        NeuronLogger.For<Synapse>().Error("LOADED RA PARAMS");
     }
 }

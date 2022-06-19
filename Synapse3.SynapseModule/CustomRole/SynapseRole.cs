@@ -6,7 +6,21 @@ namespace Synapse3.SynapseModule.CustomRole;
 
 public abstract class SynapseRole : ISynapseRole
 {
-    public SynapsePlayer Player { get; set; }
+    private SynapsePlayer _player;
+
+    public SynapsePlayer Player
+    {
+        get => _player;
+        set
+        {
+            if(_player == value)
+                return;
+
+            _player?.RemoveCustomRole(DespawnReason.API);
+
+            _player = value;
+        }
+    }
     
     public abstract string GetRoleName();
     public abstract int GetRoleID();

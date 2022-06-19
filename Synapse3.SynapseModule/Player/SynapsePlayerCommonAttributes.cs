@@ -172,4 +172,13 @@ public partial class SynapsePlayer
     /// Freezes the Player in his current location
     /// </summary>
     public bool StopInput { get => Hub.fpc.NetworkforceStopInputs; set => Hub.fpc.NetworkforceStopInputs = value; }
+    
+    /// <summary>
+    /// The Current RoleType of the Player. Use RoleID instead if you want to set the Role of the Player and remove potentially active custom roles
+    /// </summary>
+    public RoleType RoleType
+    {
+        get => ClassManager.CurClass;
+        set => ClassManager.SetPlayersClass(value, gameObject, CharacterClassManager.SpawnReason.None);
+    }
 }
