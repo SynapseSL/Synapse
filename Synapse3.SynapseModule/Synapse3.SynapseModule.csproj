@@ -42,11 +42,20 @@
         <Reference Include="Neuron.Modules.Configs">
           <HintPath>..\..\Neuron\Neuron.Modules.Configs\bin\Debug\netstandard2.0\Neuron.Modules.Configs.dll</HintPath>
         </Reference>
+        <Reference Include="NorthwoodLib">
+          <HintPath>..\Refs\NorthwoodLib.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine">
             <HintPath>..\Refs\UnityEngine.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.AnimationModule">
+          <HintPath>..\Refs\UnityEngine.AnimationModule.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine.CoreModule">
             <HintPath>..\Refs\UnityEngine.CoreModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.PhysicsModule">
+          <HintPath>..\Refs\UnityEngine.PhysicsModule.dll</HintPath>
         </Reference>
     </ItemGroup>
 

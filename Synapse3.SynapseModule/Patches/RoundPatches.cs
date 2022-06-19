@@ -14,63 +14,70 @@ namespace Synapse3.SynapseModule.Patches;
 [Patches]
 public static class RoundPatches
 {
-    
+    [HarmonyPrefix]
     [HarmonyPatch(typeof(SpawnpointManager), nameof(SpawnpointManager.FillSpawnPoints))]
-    [HarmonyPrefix]
     public static void RoundWaitingPatch()
-    {
-        Synapse.Get<RoundEvents>().RoundWaiting.Raise(new RoundWaitingEvent());
-        NeuronLogger.For<Synapse>().Info("Waiting for players event!");
-    }
-
-
-    [HarmonyPatch(typeof(ServerLogs), nameof(ServerLogs.AddLog))]
-    [HarmonyPrefix]
-    public static void RoundEndPatch(ref ServerLogs.Modules module, ref string msg, ref ServerLogs.ServerLogType type, ref bool init)
-    {
-        if (msg.StartsWith("Round finished! Anomalies: ") && type == ServerLogs.ServerLogType.GameEvent)
-        {
-            NeuronLogger.For<Synapse>().Error("Round end neuron event");
-        }
-    }
-
-    [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.RpcRoundStarted))]
-    [HarmonyPrefix]
-    public static void RoundStartPatch()
-    {
-        NeuronLogger.For<Synapse>().Error("Round start neuron event");
-    }
-
-    [HarmonyPatch(typeof(RoundSummary), nameof(RoundSummary._ProcessServerSideCode)), HarmonyPrefix]
-    public static bool RoundSummaryOverride(RoundSummary __instance, out IEnumerator<float> __result)
-    {
-        __result = DecoratedRoundMethods.ProcessServerSideCode(__instance);
-        return false;
-    }
-
-}
-
-[Patches]
-[HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.RpcRoundStarted))]
-internal static class RoundStartPatch
-{
-    
-    [HarmonyPrefix]
-    private static void RoundStart()
     {
         try
         {
-            NeuronLogger.For<Synapse>().Info("Round start event!");
+            Synapse.Get<RoundEvents>().RoundWaiting.Raise(new RoundWaitingEvent());
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error($"Synapse-Event: RoundStartEvent failed!!\n{e}");
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Round Waiting Event Failed");
+        }
+    }
+
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ServerLogs), nameof(ServerLogs.AddLog))]
+    public static void RoundEndPatch(ref ServerLogs.Modules module, ref string msg, ref ServerLogs.ServerLogType type, ref bool init)
+    {
+        try
+        {
+            if (msg.StartsWith("Round finished! Anomalies: ") && type == ServerLogs.ServerLogType.GameEvent)
+            {
+                Synapse.Get<RoundEvents>().RoundEnd.Raise(new RoundEndEvent());
+            }
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Round End Event Failed");
+        }
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.RpcRoundStarted))]
+    public static void RoundStartPatch()
+    {
+        try
+        {
+            Synapse.Get<RoundEvents>().RoundStart.Raise(new RoundStartEvent());
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Round Start Event Failed");
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(RoundSummary), nameof(RoundSummary._ProcessServerSideCode))]
+    public static bool RoundSummaryOverride(RoundSummary __instance, ref IEnumerator<float> __result)
+    {
+        try
+        {
+            __result = DecoratedRoundMethods.ProcessServerSideCode(__instance);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Round EndCheck Event Failed");
+            return true;
         }
     }
 }
 
-
-public class DecoratedRoundMethods
+public static class DecoratedRoundMethods
 {
     // Decorated and refactored coroutine RoundSummary._ProcessServerSideCode()
     public static IEnumerator<float> ProcessServerSideCode(RoundSummary roundSummary)
