@@ -1,6 +1,7 @@
 ﻿using Neuron.Core.Dev;
 using Neuron.Core.Modules;
 using Ninject;
+using Synapse3.SynapseModule;
 
 namespace Synapse3.ExampleModule;
 
@@ -9,7 +10,7 @@ namespace Synapse3.ExampleModule;
     Description = "Example Description",
     Dependencies = new []
     {
-        typeof(SynapseModule.SynapseModule)
+        typeof(Synapse)
     }
 )]
 public class ExampleModule : Module
