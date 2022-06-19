@@ -39,6 +39,11 @@
         <HintPath>..\Refs\UnityEngine.CoreModule.dll</HintPath>
       </Reference>
     </ItemGroup>
+
+
+    <ItemGroup>
+      <PackageReference Include="NeuronModding.Core" Version="1.0.0.1" />
+    </ItemGroup>
     
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
 

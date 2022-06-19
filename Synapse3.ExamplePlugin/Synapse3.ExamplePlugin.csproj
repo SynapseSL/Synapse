@@ -20,10 +20,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Neuron\Neuron.Core\Neuron.Core.csproj" />
-        <ProjectReference Include="..\..\Neuron\Neuron.Modules.Patcher\Neuron.Modules.Patcher.csproj" />
-        <ProjectReference Include="..\..\Neuron\Neuron.Modules.Commands\Neuron.Modules.Commands.csproj" />
-        <ProjectReference Include="..\..\Neuron\Neuron.Modules.Configs\Neuron.Modules.Configs.csproj" />
         <ProjectReference Include="..\Synapse3.SynapseModule\Synapse3.SynapseModule.csproj" />
     </ItemGroup>
 
