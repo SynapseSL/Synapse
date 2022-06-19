@@ -1,7 +1,6 @@
 ﻿using Neuron.Core.Dev;
 using Neuron.Core.Modules;
 using Ninject;
-using Synapse3.ExamplePlugin;
 
 namespace Synapse3.ExampleModule;
 

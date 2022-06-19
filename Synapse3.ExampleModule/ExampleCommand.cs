@@ -2,10 +2,9 @@
 using Neuron.Core.Meta;
 using Neuron.Modules.Commands;
 using Ninject;
-using Synapse3.ExampleModule;
 using Synapse3.SynapseModule.Command;
 
-namespace Synapse3.ExamplePlugin;
+namespace Synapse3.ExampleModule;
 
 [Automatic]
 [SynapseCommand(
