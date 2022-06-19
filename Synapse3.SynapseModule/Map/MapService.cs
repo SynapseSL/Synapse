@@ -13,4 +13,7 @@ public class MapService : Service
 
     internal readonly List<SynapseDoor> _synapseDoors = new();
     public ReadOnlyCollection<SynapseDoor> SynapseDoors => _synapseDoors.AsReadOnly();
+    
+    internal readonly List<SynapseGenerator> _synapseGenerators = new();
+    public ReadOnlyCollection<SynapseGenerator> SynapseGenerators => _synapseGenerators.AsReadOnly();
 }

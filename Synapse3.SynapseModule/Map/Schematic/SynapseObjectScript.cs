@@ -1,5 +1,4 @@
-﻿using Synapse3.SynapseModule.Map.Objects;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Schematic;
 
