@@ -17,7 +17,8 @@ public class SynapseCommandService : Service
 {
     private readonly List<Type> _synapseCommands = new List<Type>
     {
-        typeof(TestCommand)
+        typeof(TestCommand),
+        typeof(PermissionCommand)
     };
     
     private readonly CommandService _command;

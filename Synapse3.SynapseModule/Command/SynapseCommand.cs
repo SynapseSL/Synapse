@@ -15,9 +15,18 @@ public abstract class SynapseCommand : Command<SynapseContext>
                 Response = "Invalid Command, cant check for Permissions",
                 StatusCode = CommandStatusCode.Error
             };
-        
-        //TODO: Check Player permissions and implement Translation for Error above
-        
+
+        if (attribute.Permission != "")
+        {
+            if (!context.Player.HasPermission(attribute.Permission))
+            {
+                return new CommandResult()
+                {
+                    Response = "Forbidden",
+                    StatusCode = CommandStatusCode.Forbidden
+                };
+            }
+        }
         return null;
     }
 }
