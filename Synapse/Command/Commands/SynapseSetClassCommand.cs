@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using Synapse.Api.Roles;
+using System.Linq;
 
 namespace Synapse.Command.Commands
 {
@@ -48,7 +49,7 @@ namespace Synapse.Command.Commands
 
             player.CustomRole = null;
 
-            if (id >= 0 && id <= 17)
+            if (id >= 0 && id <= RoleManager.HighestRole)
                 player.RoleType = (RoleType)id;
             else
                 player.CustomRole = Server.Get.RoleManager.GetCustomRole(id);
