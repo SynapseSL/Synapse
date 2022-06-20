@@ -60,7 +60,6 @@ public static class SynapseExtensions
     public static Generator GetGenerator(this Scp079Generator generator079) => Map.Get.Generators.FirstOrDefault(x => x?.GameObject == generator079.gameObject);
 
     public static Door GetDoor(this Interactables.Interobjects.DoorUtils.DoorVariant door) => Map.Get.Doors.FirstOrDefault(x => x.VDoor != null && x.GameObject == door.gameObject);
-    
 
     public static Tesla GetTesla(this TeslaGate teslaGate) => Map.Get.Teslas.FirstOrDefault(x => x.GameObject == teslaGate.gameObject);
 

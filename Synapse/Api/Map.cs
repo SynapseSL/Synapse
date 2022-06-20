@@ -140,6 +140,39 @@ namespace Synapse.Api
         public void SubtitleCassie(string words, bool makehold = true, bool makenoise = true)
             => Respawning.RespawnEffectsController.PlayCassieAnnouncement(words, makehold, makenoise, true);
 
+        public void GlitchedCassie(string words, bool makehold = true, bool makenoise = true, bool subtitle = true)
+        {
+            var num2 = (AlphaWarheadController.Host.timeToDetonation <= 0f) ? 3.5f : 1f;
+            var glitchChance = UnityEngine.Random.Range(0.1f, 0.14f) * num2;
+            var jamChance = UnityEngine.Random.Range(0.07f, 0.08f) * num2;
+            var newWords = Server.Get.GetObjectOf<NineTailedFoxAnnouncer>().newWords;
+            var array = words.Split(' ');
+            newWords.Clear();
+            CollectionExtensions.EnsureCapacity(newWords, array.Length);
+            for (var i = 0; i < array.Length; i++)
+            {
+                newWords.Add(array[i]);
+                if (i < array.Length - 1)
+                {
+                    if (UnityEngine.Random.value < glitchChance)
+                    {
+                        newWords.Add(".G" + UnityEngine.Random.Range(1, 7));
+                    }
+
+                    if (UnityEngine.Random.value < jamChance)
+                    {
+                        newWords.Add("JAM_" + UnityEngine.Random.Range(0, 70).ToString("000") + "_" + UnityEngine.Random.Range(2, 6));
+                    }
+                }
+            }
+
+            words = "";
+            foreach (var newWord in newWords)
+                words = words + newWord + " ";
+
+            Respawning.RespawnEffectsController.PlayCassieAnnouncement(words, makehold, makenoise, subtitle);
+        }
+
         public void GlitchedCassie(string words)
         {
             var num2 = (AlphaWarheadController.Host.timeToDetonation <= 0f) ? 3.5f : 1f;
