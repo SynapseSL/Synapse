@@ -28,6 +28,11 @@ namespace Synapse.Api.CustomObjects
             get => Door.Locked;
             set => Door.Locked = value;
         }
+        public override void Destroy()
+        {
+            Map.Get.Doors.Remove(Door);
+            base.Destroy();
+        }
 
         internal SynapseDoorObject(SynapseSchematic.DoorConfiguration configuration)
         {

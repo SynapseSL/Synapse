@@ -6,12 +6,11 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
     [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.SetClassIDHook))]
     internal static class RoleChangeClassIdPatch
     {
-        internal static bool ForceLite = false;
-
         [HarmonyPrefix]
         private static bool SetClass(CharacterClassManager __instance, RoleType id)
         {
-            __instance.SetClassIDAdv(id, ForceLite, CharacterClassManager.SpawnReason.None, true);
+            var player = __instance.GetPlayer();
+            __instance.SetClassIDAdv(id, player.LiteRoleSet, CharacterClassManager.SpawnReason.None, true);
             return false;
         }
     }
@@ -22,7 +21,8 @@ namespace Synapse.Patches.EventsPatches.PlayerPatches
         [HarmonyPrefix]
         private static bool SetClass(CharacterClassManager __instance, RoleType id, CharacterClassManager.SpawnReason spawnReason)
         {
-            __instance.SetClassIDAdv(id, RoleChangeClassIdPatch.ForceLite, spawnReason, false);
+            var player = __instance.GetPlayer();
+            __instance.SetClassIDAdv(id, player.LiteRoleSet, spawnReason, false);
             return false;
         }
     }

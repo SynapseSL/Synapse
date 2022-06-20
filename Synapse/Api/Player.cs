@@ -78,10 +78,12 @@ namespace Synapse.Api
 
         public void ChangeRoleAtPosition(RoleType role)
         {
-            RoleChangeClassIdPatch.ForceLite = true;
+            LiteRoleSet = true;
             Hub.characterClassManager.SetClassIDAdv(role, true, CharacterClassManager.SpawnReason.ForceClass);
-            RoleChangeClassIdPatch.ForceLite = false;
+            LiteRoleSet = false;
         }
+
+        internal bool LiteRoleSet { get; set; } = false;
 
         public void GiveTextHint(string message, float duration = 5f)
         {
