@@ -5,6 +5,9 @@ namespace Synapse3.SynapseModule.Player;
 
 public partial class SynapsePlayer
 {
+    /// <summary>
+    /// True if the Rank is not visible for normal players
+    /// </summary>
     public bool HideRank
     {
         get => !string.IsNullOrEmpty(ServerRoles.HiddenBadge);
@@ -18,7 +21,9 @@ public partial class SynapsePlayer
     }
 
     private SynapseGroup _synapseGroup;
-
+    /// <summary>
+    /// The Current SynapseRole and therefore all Permissions of the Player
+    /// </summary>
     public SynapseGroup SynapseGroup
     {
         get
@@ -39,6 +44,9 @@ public partial class SynapsePlayer
         }
     }
     
+    /// <summary>
+    /// True if the Player can Open the RemoteAdmin
+    /// </summary>
     public bool RemoteAdminAccess
     {
         get => ServerRoles.RemoteAdmin;
@@ -51,6 +59,9 @@ public partial class SynapsePlayer
         }
     }
     
+    /// <summary>
+    /// Gives the Player access to the RemoteAdmin (doesn't automatically give any Permissions)
+    /// </summary>
     public void RaLogin()
     {
         ServerRoles.RemoteAdmin = true;
@@ -61,6 +72,9 @@ public partial class SynapsePlayer
         ServerRoles.TargetOpenRemoteAdmin(false);
     }
 
+    /// <summary>
+    /// Removes the Player access to the RemoteAdmin
+    /// </summary>
     public void RaLogout()
     {
         Hub.serverRoles.RemoteAdmin = false;
@@ -68,9 +82,18 @@ public partial class SynapsePlayer
         Hub.serverRoles.TargetCloseRemoteAdmin();
     }
 
+    /// <summary>
+    /// Returns true if the Player has the Permission
+    /// </summary>
+    /// <param name="permission"></param>
+    /// <returns></returns>
     public bool HasPermission(string permission) =>
         PlayerType == PlayerType.Server || SynapseGroup.HasPermission(permission);
 
+    /// <summary>
+    /// Reloads the Permissions of the Player
+    /// </summary>
+    /// <param name="disp"></param>
     public void RefreshPermission(bool disp)
     {
         var group = new UserGroup
@@ -165,4 +188,14 @@ public partial class SynapsePlayer
                     player.ServerRoles.TargetSetHiddenRole(Connection, player.ServerRoles.HiddenBadge);
             }
     }
+    
+    /// <summary>
+    /// If the Player has Globally Permissions for RemoteAdmin
+    /// </summary>
+    public bool GlobalRemoteAdmin => ServerRoles.RemoteAdminMode == ServerRoles.AccessMode.GlobalAccess;
+    
+    /// <summary>
+    /// The Global Permissions of the Player
+    /// </summary>
+    public ulong GlobalPerms => ServerRoles._globalPerms;
 }

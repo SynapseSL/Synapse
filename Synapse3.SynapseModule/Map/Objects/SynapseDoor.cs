@@ -2,6 +2,7 @@
 using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
 using Mirror;
+using Neuron.Core.Logging;
 using Synapse3.SynapseModule.Map.Schematic;
 using UnityEngine;
 
@@ -106,9 +107,8 @@ public class SynapseDoor : NetworkSynapseObject
     private void SetUp()
     {
         Map._synapseDoors.Add(this);
-        var comp = GameObject.AddComponent<SynapseObjectScript<SynapseDoor>>();
+        var comp = GameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
-
         if (Variant.TryGetComponent<DoorNametagExtension>(out var nametag))
             _name = nametag.GetName;
     }

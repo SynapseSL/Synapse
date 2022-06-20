@@ -21,11 +21,6 @@
 
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Neuron\Neuron.Core\Neuron.Core.csproj" />
-    </ItemGroup>
-
-
-    <ItemGroup>
       <Reference Include="Assembly-CSharp">
         <HintPath>..\Refs\Assembly-CSharp-Publicized.dll</HintPath>
       </Reference>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Neuron.Core.Meta;
+using Synapse3.SynapseModule.Permissions;
 using Console = GameCore.Console;
 
 namespace Synapse3.SynapseModule;
@@ -86,7 +87,7 @@ public class ServerService : Service
     }
 
     /// <summary>
-    ///     Bans a IP
+    /// Bans a IP
     /// </summary>
     /// <param name="reason">The reason for the ban</param>
     /// <param name="issuer">The person/SCP that banned the player</param>
@@ -103,5 +104,13 @@ public class ServerService : Service
             IssuanceTime = DateTime.UtcNow.Ticks,
             Expires = DateTime.UtcNow.AddSeconds(duration).Ticks
         }, BanHandler.BanType.IP);
+    }
+
+    /// <summary>
+    /// Reloads all Services of Synapse
+    /// </summary>
+    public void Reload()
+    {
+        Synapse.Get<PermissionService>().Reload();
     }
 }

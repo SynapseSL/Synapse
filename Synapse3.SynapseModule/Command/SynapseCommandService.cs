@@ -18,7 +18,8 @@ public class SynapseCommandService : Service
     private readonly List<Type> _synapseCommands = new List<Type>
     {
         typeof(TestCommand),
-        typeof(PermissionCommand)
+        typeof(PermissionCommand),
+        typeof(ReloadCommand)
     };
     
     private readonly CommandService _command;
@@ -103,7 +104,8 @@ public class SynapseCommandService : Service
 
         foreach (var command in RemoteAdmin.Handler.Commands)
         {
-            var meta = (SynapseRaCommandAttribute)command.Meta;
+            if(command.Meta is not SynapseRaCommandAttribute meta) continue;
+            
             list.Add(new QueryProcessor.CommandData
             {
                 Command = meta.CommandName,

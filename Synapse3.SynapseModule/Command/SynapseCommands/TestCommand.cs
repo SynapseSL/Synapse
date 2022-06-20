@@ -1,6 +1,5 @@
 ﻿using Neuron.Modules.Commands;
 using Synapse3.SynapseModule.CustomRole;
-using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Objects;
 using UnityEngine;
 

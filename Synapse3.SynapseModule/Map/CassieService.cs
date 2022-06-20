@@ -4,5 +4,8 @@ namespace Synapse3.SynapseModule.Map;
 
 public class CassieService : Service
 {
-    
+    public void Announce(string message)
+    {
+        
+    }
 }

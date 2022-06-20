@@ -14,17 +14,24 @@ namespace Synapse3.SynapseModule.Patches;
 [Patches]
 public static class RoundPatches
 {
+    private static bool _firstTime = true;
+    
     [HarmonyPrefix]
     [HarmonyPatch(typeof(SpawnpointManager), nameof(SpawnpointManager.FillSpawnPoints))]
     public static void RoundWaitingPatch()
     {
         try
         {
-            Synapse.Get<RoundEvents>().RoundWaiting.Raise(new RoundWaitingEvent());
+            var ev = new RoundWaitingEvent
+            {
+                FirstTime = _firstTime
+            };
+            Synapse.Get<RoundEvents>().RoundWaiting.Raise(ev);
+            _firstTime = false;
         }
         catch (Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Round Waiting Event Failed");
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Round Waiting Event Failed\n" + ex);
         }
     }
 
@@ -42,7 +49,7 @@ public static class RoundPatches
         }
         catch (Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Round End Event Failed");
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Round End Event Failed\n" + ex);
         }
     }
     
@@ -56,7 +63,7 @@ public static class RoundPatches
         }
         catch (Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Round Start Event Failed");
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Round Start Event Failed\n" + ex);
         }
     }
 
@@ -71,7 +78,7 @@ public static class RoundPatches
         }
         catch (Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Round EndCheck Event Failed");
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Round EndCheck Event Failed\n" + ex);
             return true;
         }
     }

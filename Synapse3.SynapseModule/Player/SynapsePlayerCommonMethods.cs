@@ -4,6 +4,7 @@ using Mirror;
 using PlayerStatsSystem;
 using RoundRestarting;
 using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Map;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
@@ -61,28 +62,6 @@ public partial class SynapsePlayer
     /// </summary>
     public void GiveEffect(Effect effect, byte intensity = 1, float duration = -1f) => PlayerEffectsController.ChangeByString(effect.ToString().ToLower(), intensity, duration);
 
-    //TODO:
-    /*
-    public void RaLogin()
-    {
-        ServerRoles.RemoteAdmin = true;
-        ServerRoles.Permissions = SynapseGroup.GetVanillaPermissionValue() | ServerRoles._globalPerms;
-        ServerRoles.RemoteAdminMode = GlobalRemoteAdmin ? ServerRoles.AccessMode.GlobalAccess : ServerRoles.AccessMode.PasswordOverride;
-        if (!ServerRoles.AdminChatPerms)
-            ServerRoles.AdminChatPerms = SynapseGroup.HasVanillaPermission(PlayerPermissions.AdminChat);
-        ServerRoles.TargetOpenRemoteAdmin(false);
-
-        QueryProcessor.SyncCommandsToClient();
-    }
-
-    public void RaLogout()
-    {
-        Hub.serverRoles.RemoteAdmin = false;
-        Hub.serverRoles.RemoteAdminMode = ServerRoles.AccessMode.LocalAccess;
-        Hub.serverRoles.TargetCloseRemoteAdmin();
-    }
-    */
-    
     /// <summary>
     /// Heals the Player the specific amount without over healing him
     /// </summary>
@@ -118,10 +97,9 @@ public partial class SynapsePlayer
     /// </summary>
     public bool Kill(string reason, string cassie)
     {
-        //TODO:
         var result = Kill(reason);
-        //if (result)
-        //    Server.Get.Map.Cassie(cassie);
+        if (result)
+            Synapse.Get<CassieService>().Announce(cassie);
         return result;
     }
     

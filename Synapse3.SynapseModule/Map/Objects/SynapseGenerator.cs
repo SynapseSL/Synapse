@@ -76,7 +76,7 @@ public class SynapseGenerator : StructureSyncSynapseObject
     private void SetUp()
     {
         Map._synapseGenerators.Add(this);
-        var comp = GameObject.AddComponent<SynapseObjectScript<SynapseGenerator>>();
+        var comp = GameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
     }
 }

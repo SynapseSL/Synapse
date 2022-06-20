@@ -1,4 +1,5 @@
-﻿using Synapse3.SynapseModule.Enums;
+﻿using Neuron.Core.Logging;
+using Synapse3.SynapseModule.Enums;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
@@ -6,7 +7,7 @@ namespace Synapse3.SynapseModule.Player;
 public partial class SynapsePlayer : MonoBehaviour
 {
     /// <summary>
-    /// Returns true if this SynapsePlayer object is the Dedicated Server
+    /// The Type of Player this is. It can be a normal Player the Server itself or a Dummy
     /// </summary>
     public virtual PlayerType PlayerType => PlayerType.Player;
 

@@ -11,6 +11,4 @@ public class SynapseServerPlayer : SynapsePlayer
     {
         Synapse.Get<PlayerService>().Host = this;
     }
-
-    public override void OnDestroy() { }
 }

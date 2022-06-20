@@ -2,9 +2,9 @@
 
 namespace Synapse3.SynapseModule.Map.Schematic;
 
-public class SynapseObjectScript<TSynapseObject> : MonoBehaviour where TSynapseObject : ISynapseObject
+public class SynapseObjectScript : MonoBehaviour
 {
-    public TSynapseObject Object { get; internal set; }
+    public ISynapseObject Object { get; internal set; }
 
     //public SynapseObject Parent { get; private set; }
 

@@ -2,7 +2,7 @@
 using HarmonyLib;
 using Neuron.Core.Logging;
 
-namespace Synapse3.SynapseModule.Patches.PlayerPatches;
+namespace Synapse3.SynapseModule.Patches;
 
 [Patches]
 public static class PermissionPatches
@@ -18,12 +18,11 @@ public static class PermissionPatches
         }
         catch(Exception e)
         {
-            NeuronLogger.For<Synapse>().Error($"Synapse-Permission: RefreshPermissionPatch failed!!\n{e}");
+            NeuronLogger.For<Synapse>().Error($"Sy3 Permission: RefreshPermissionPatch failed!!\n{e}");
         }
         return false;
     }
 
     [HarmonyPatch(typeof(ServerRoles), nameof(ServerRoles.SetGroup)), HarmonyPrefix]
     public static bool SetGroup() => false;
-
 }

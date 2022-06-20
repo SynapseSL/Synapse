@@ -28,4 +28,7 @@ public class RoundStartEvent : IEvent { }
 
 public class RoundEndEvent : IEvent { }
 
-public class RoundWaitingEvent : IEvent { }
+public class RoundWaitingEvent : IEvent
+{
+    public bool FirstTime { get; set; }
+}

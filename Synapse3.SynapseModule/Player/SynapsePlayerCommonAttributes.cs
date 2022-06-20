@@ -157,17 +157,7 @@ public partial class SynapsePlayer
         get => AnimationController.MoveState;
         set => AnimationController.UserCode_CmdChangeSpeedState((byte)value);
     }
-    
-    /// <summary>
-    /// If the Player has Globally Permissions for RemoteAdmin
-    /// </summary>
-    public bool GlobalRemoteAdmin => ServerRoles.RemoteAdminMode == ServerRoles.AccessMode.GlobalAccess;
-    
-    /// <summary>
-    /// The Global Permissions of the Player
-    /// </summary>
-    public ulong GlobalPerms => ServerRoles._globalPerms;
-    
+
     /// <summary>
     /// Freezes the Player in his current location
     /// </summary>

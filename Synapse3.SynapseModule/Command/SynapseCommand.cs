@@ -22,7 +22,7 @@ public abstract class SynapseCommand : Command<SynapseContext>
             {
                 return new CommandResult()
                 {
-                    Response = "Forbidden",
+                    Response = "You don't have access to this Command",
                     StatusCode = CommandStatusCode.Forbidden
                 };
             }

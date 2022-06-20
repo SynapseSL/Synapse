@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Neuron.Modules.Configs;
 using Synapse3.SynapseModule.Player;
@@ -11,7 +12,7 @@ public class PermissionService : Service
 {
     private ConfigService _configService;
     public ConfigContainer Container { get; set; }
-    public Dictionary<string, SynapseGroup> Groups { get; set; }
+    public Dictionary<string, SynapseGroup> Groups { get; set; } = new ();
 
     private SynapseGroup _fallbackDefault = new SynapseGroup
     {
@@ -28,8 +29,15 @@ public class PermissionService : Service
 
     public override void Enable()
     {
-        Container = _configService.GetContainer("permissions.syml");
-        LoadGroups();
+        try
+        {
+            Container = _configService.GetContainer("permissions.syml");
+            LoadGroups();
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Permission: Failed to load permission.syml\n" + ex);
+        }
     }
 
     public void Reload()
@@ -93,7 +101,7 @@ public class PermissionService : Service
     }
 
     public SynapseGroup GetDefaultGroup() => Groups.Values.FirstOrDefault(x => x.Default) ?? _fallbackDefault;
-    public SynapseGroup GetNorthwoodGroup() => Groups.Values.FirstOrDefault(x => x.Northwood).Copy();
+    public SynapseGroup GetNorthwoodGroup() => Groups.Values.FirstOrDefault(x => x.Northwood)?.Copy();
 
     public bool AddServerGroup(SynapseGroup group, string groupName)
     {
