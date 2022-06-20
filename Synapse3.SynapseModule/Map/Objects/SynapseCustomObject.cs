@@ -9,6 +9,11 @@ public class SynapseCustomObject : DefaultSynapseObject
     public override ObjectType Type => ObjectType.Custom;
     public override void Destroy()
         => Object.Destroy(GameObject);
+    public override void OnDestroy()
+    {
+        Map._synapseCustomObjects.Remove(this);
+        base.OnDestroy();
+    }
     
     public int ID { get; private set; }
 

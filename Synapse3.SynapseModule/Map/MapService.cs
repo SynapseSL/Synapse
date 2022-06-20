@@ -19,4 +19,10 @@ public class MapService : Service
 
     internal readonly List<SynapseCustomObject> _synapseCustomObjects = new();
     public ReadOnlyCollection<SynapseCustomObject> SynapseCustomObjects => _synapseCustomObjects.AsReadOnly();
+
+    internal readonly List<SynapseLight> _synapseLights = new();
+    public ReadOnlyCollection<SynapseLight> SynapseLights => _synapseLights.AsReadOnly();
+
+    internal readonly List<SynapseLocker> _synapseLockers = new();
+    public ReadOnlyCollection<SynapseLocker> SynapseLockers => _synapseLockers.AsReadOnly();
 }

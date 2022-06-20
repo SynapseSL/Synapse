@@ -11,4 +11,7 @@ public class SynapseServerPlayer : SynapsePlayer
     {
         Synapse.Get<PlayerService>().Host = this;
     }
+
+    //Don't Remove this it's a little bit more optimised this way
+    public override void OnDestroy() { }
 }

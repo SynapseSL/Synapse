@@ -2,7 +2,6 @@
 using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
 using Mirror;
-using Neuron.Core.Logging;
 using Synapse3.SynapseModule.Map.Schematic;
 using UnityEngine;
 
@@ -10,7 +9,7 @@ namespace Synapse3.SynapseModule.Map.Objects;
 
 public class SynapseDoor : NetworkSynapseObject
 {
-    public static Dictionary<SpawnableDoorType, BreakableDoor> Prefab { get; internal set; } = new Dictionary<SpawnableDoorType, BreakableDoor>();
+    public static Dictionary<SpawnableDoorType, BreakableDoor> Prefab { get; } = new Dictionary<SpawnableDoorType, BreakableDoor>();
 
     public DoorVariant Variant { get; }
     
@@ -19,6 +18,12 @@ public class SynapseDoor : NetworkSynapseObject
     public override NetworkIdentity NetworkIdentity => Variant.netIdentity;
     
     public override ObjectType Type => ObjectType.Door;
+
+    public override void OnDestroy()
+    {
+        Map._synapseDoors.Remove(this);
+        base.OnDestroy();
+    }
 
     private string _name;
 

@@ -14,6 +14,11 @@ public class SynapseGenerator : StructureSyncSynapseObject
     public override GameObject GameObject => Generator.gameObject;
     public override NetworkIdentity NetworkIdentity => Generator.netIdentity;
     public override ObjectType Type => ObjectType.Generator;
+    public override void OnDestroy()
+    {
+        Map._synapseGenerators.Remove(this);
+        base.OnDestroy();
+    }
     public string Name => GameObject.name;
 
     public bool Open
