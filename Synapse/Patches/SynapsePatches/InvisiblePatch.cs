@@ -185,6 +185,7 @@ namespace Synapse.Patches.SynapsePatches
         private static void Postfix(Scp173 __instance, int __state)
         {
             var peanut = __instance.GetPlayer();
+            
             foreach (var ply in __instance._observingPlayers)
             {
                 var player = ply.GetPlayer();
@@ -198,7 +199,7 @@ namespace Synapse.Patches.SynapsePatches
 
                 if (flag)
                 {
-                    _ = __instance._observingPlayers.Remove(player.Hub);
+                    __instance._observingPlayers.Remove(player.Hub);
                     __instance._isObserved = __instance._observingPlayers.Count > 0;
                     if (__state != __instance._observingPlayers.Count && __instance._blinkCooldownRemaining > 0f)
                     {

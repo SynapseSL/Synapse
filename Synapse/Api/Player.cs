@@ -34,7 +34,7 @@ namespace Synapse.Api
             Scp106Controller = new Scp106Controller(this);
             Scp079Controller = new Scp079Controller(this);
             Scp096Controller = new Scp096Controller(this);
-            Scp173Controller = new Scp173Controller();
+            Scp173Controller = new Scp173Controller(this);
             Jail = new Jail(this);
             ActiveBroadcasts = new BroadcastList(this);
             Inventory = new PlayerInventory(this);
