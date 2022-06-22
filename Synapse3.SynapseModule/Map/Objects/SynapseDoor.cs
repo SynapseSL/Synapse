@@ -93,21 +93,6 @@ public class SynapseDoor : NetworkSynapseObject
         Variant = variant;
         SetUp();
     }
-    
-    /*internal SynapseDoor(SynapseSchematic.DoorConfiguration configuration)
-    {
-        OriginalScale = configuration.Scale;
-            CustomAttributes = configuration.CustomAttributes;
-            UpdateEveryFrame = configuration.UpdateEveryFrame;
-            DoorType = configuration.DoorType;
-            
-        OriginalScale = configuration.Scale;
-        CustomAttributes = configuration.CustomAttributes;
-        UpdateEveryFrame = configuration.UpdateEveryFrame;
-        DoorType = configuration.DoorType;
-        
-        SetUp();
-    }*/
 
     private void SetUp()
     {

@@ -25,4 +25,16 @@ public class MapService : Service
 
     internal readonly List<SynapseLocker> _synapseLockers = new();
     public ReadOnlyCollection<SynapseLocker> SynapseLockers => _synapseLockers.AsReadOnly();
+
+    internal readonly List<SynapsePrimitive> _synapsePrimitives = new();
+    public ReadOnlyCollection<SynapsePrimitive> SynapsePrimitives => _synapsePrimitives.AsReadOnly();
+
+    internal readonly List<SynapseTarget> _synapseTargets = new();
+    public ReadOnlyCollection<SynapseTarget> SynapseTargets => _synapseTargets.AsReadOnly();
+
+    internal readonly List<SynapseWorkStation> _synapseWorkStations = new();
+    public ReadOnlyCollection<SynapseWorkStation> SynapseWorkStations => _synapseWorkStations.AsReadOnly();
+
+    internal readonly List<SynapseRagdoll> _synapseRagdolls = new();
+    public ReadOnlyCollection<SynapseRagdoll> SynapseRagdolls => _synapseRagdolls.AsReadOnly();
 }

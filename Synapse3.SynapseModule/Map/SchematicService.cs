@@ -1,4 +1,5 @@
-﻿using Interactables.Interobjects;
+﻿using AdminToys;
+using Interactables.Interobjects;
 using MapGeneration.Distributors;
 using Mirror;
 using Neuron.Core.Meta;
@@ -34,6 +35,26 @@ public class SchematicService : Service
 
                 case "LCZ BreakableDoor" when prefab.TryGetComponent<BreakableDoor>(out var door):
                     SynapseDoor.Prefab[SynapseDoor.SpawnableDoorType.LCZ] = door;
+                    break;
+                
+                case "PrimitiveObjectToy" when prefab.TryGetComponent<PrimitiveObjectToy>(out var pref):
+                    SynapsePrimitive.Prefab = pref;
+                    break;
+
+                case "LightSourceToy" when prefab.TryGetComponent<LightSourceToy>(out var lightpref):
+                    SynapseLight.Prefab = lightpref;
+                    break;
+
+                case "sportTargetPrefab" when prefab.TryGetComponent<ShootingTarget>(out var target):
+                    SynapseTarget.Prefabs[SynapseTarget.TargetType.Sport] = target;
+                    break;
+
+                case "dboyTargetPrefab" when prefab.TryGetComponent<ShootingTarget>(out var target):
+                    SynapseTarget.Prefabs[SynapseTarget.TargetType.DBoy] = target;
+                    break;
+
+                case "binaryTargetPrefab" when prefab.TryGetComponent<ShootingTarget>(out var target):
+                    SynapseTarget.Prefabs[SynapseTarget.TargetType.Binary] = target;
                     break;
             }
         }

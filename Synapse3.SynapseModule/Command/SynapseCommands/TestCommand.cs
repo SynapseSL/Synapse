@@ -20,7 +20,7 @@ public class TestCommand : SynapseCommand
     {
         result.Response = "Test message";
 
-        var door = new SynapseDoor(SynapseDoor.SpawnableDoorType.LCZ, context.Player.Position, context.Player.Rotation,
+        new SynapseLocker(SynapseLocker.LockerType.ScpPedestal, context.Player.Position, context.Player.Rotation,
             Vector3.one);
     }
 }

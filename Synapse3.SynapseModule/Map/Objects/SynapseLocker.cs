@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using InventorySystem.Items.Pickups;
 using MapGeneration.Distributors;
 using Mirror;
 using Synapse3.SynapseModule.Map.Schematic;
@@ -8,6 +9,7 @@ using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Objects;
 
+//TODO: Fix Floating Bug
 public class SynapseLocker : StructureSyncSynapseObject
 {
     public static Dictionary<LockerType, Locker> Prefabs { get; } = new ();
@@ -26,20 +28,29 @@ public class SynapseLocker : StructureSyncSynapseObject
         base.OnDestroy();
     }
 
+    public void SpawnItem(ItemType type, int chamber, int amount = 1)
+    {
+        if(chamber >= 0 && Chambers.Count > chamber)
+            Chambers[chamber].SpawnItem(type,amount);
+        UnfreezeAll();
+    }
+
+    public string Name => GameObject.name;
+    
+    public LockerType SynapseLockerType { get; private set; }
+
     public SynapseLocker(LockerType lockerType, Vector3 position, Quaternion rotation, Vector3 scale,
         bool removeDefaultItems = false)
     {
         Locker = CreateLocker(lockerType, position, rotation, scale, removeDefaultItems);
-        SetUp();
+        SetUp(lockerType);
     }
-
     internal SynapseLocker(Locker locker)
     {
         Locker = locker;
-        SetUp();
+        SetUp(GetLockerType());
     }
-
-    private void SetUp()
+    private void SetUp(LockerType type)
     {
         Map._synapseLockers.Add(this);
         var comp = GameObject.AddComponent<SynapseObjectScript>();
@@ -51,17 +62,50 @@ public class SynapseLocker : StructureSyncSynapseObject
             list.Add(new SynapseLockerChamber(Locker.Chambers[i], this, i));
 
         Chambers = list.AsReadOnly();
+        SynapseLockerType = type;
     }
     private Locker CreateLocker(LockerType lockerType, Vector3 position, Quaternion rotation, Vector3 scale,
         bool removeDefaultItems = false)
     {
         var locker = CreateNetworkObject(Prefabs[lockerType], position, rotation, scale);
+
+        foreach (var lockerChamber in locker.Chambers)
+            lockerChamber._spawnpoint.SetParent(locker.transform);
         
-        //TODO: Chambers
+        foreach (var pickupBase in locker.GetComponentsInChildren<ItemPickupBase>())
+        {
+            if (removeDefaultItems)
+            {
+                NetworkServer.Destroy(pickupBase.gameObject);
+            }
+            else
+            {
+                pickupBase.Rb.isKinematic = false;
+                pickupBase.Rb.useGravity = true;
+            }
+        }
 
         return locker;
     }
-    
+    private LockerType GetLockerType()
+    {
+        if (Name.Contains("AdrenalineMedkit")) return LockerType.MedkitWallCabinet;
+        if (Name.Contains("RegularMedkit")) return LockerType.AdrenalineWallCabinet;
+        if (Name.Contains("Pedestal")) return LockerType.ScpPedestal;
+        if (Name.Contains("MiscLocker")) return LockerType.StandardLocker;
+        if (Name.Contains("RifleRack")) return LockerType.RifleRackLocker;
+        if (Name.Contains("LargeGunLocker")) return LockerType.LargeGunLocker;
+        return default;
+    }
+    private void UnfreezeAll()
+    {
+        foreach (Rigidbody rigidbody in SpawnablesDistributorBase.BodiesToUnfreeze)
+            if (rigidbody != null)
+            {
+                rigidbody.isKinematic = false;
+                rigidbody.useGravity = true;
+            }
+    }
     public enum LockerType
     {
         StandardLocker,
@@ -85,7 +129,7 @@ public class SynapseLocker : StructureSyncSynapseObject
         
         public SynapseLocker Locker { get; }
         public LockerChamber LockerChamber { get; }
-        public ushort ByteID { get; },
+        public ushort ByteID { get; }
         public ushort ColliderID { get; }
 
         public GameObject GameObject => LockerChamber.gameObject;
