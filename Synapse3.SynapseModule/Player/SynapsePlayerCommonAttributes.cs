@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Linq;
+using InventorySystem.Disarming;
+using PlayerStatsSystem;
+using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
 
@@ -96,42 +100,6 @@ public partial class SynapsePlayer
     public bool Invisible { get; set; }
 
     /// <summary>
-    /// The current Position of the Player
-    /// </summary>
-    public Vector3 Position
-    {
-        get => PlayerMovementSync.GetRealPosition();
-        set => PlayerMovementSync.OverridePosition(value, PlayerRotation);
-    }
-
-    /// <summary>
-    /// The Rotation of the Player as Quaternion
-    /// </summary>
-    public Quaternion Rotation => transform.rotation;
-
-    /// <summary>
-    /// The Rotation of the Player as vector2
-    /// </summary>
-    public Vector2 RotationVector2
-    {
-        get => PlayerMovementSync.RotationSync;
-        set => PlayerMovementSync.NetworkRotationSync = value;
-    }
-    
-    /// <summary>
-    /// The Rotation of the Player as PlayerRotation
-    /// </summary>
-    public PlayerMovementSync.PlayerRotation PlayerRotation
-    {
-        get
-        {
-            var vec2 = RotationVector2;
-            return new PlayerMovementSync.PlayerRotation(vec2.x, vec2.y);
-        }
-        set => RotationVector2 = new Vector2(value.x.Value, value.y.Value);
-    }
-
-    /// <summary>
     /// The last position the player died. Used to revive him as SCP-049-2
     /// </summary>
     public Vector3 DeathPosition
@@ -171,4 +139,108 @@ public partial class SynapsePlayer
         get => ClassManager.CurClass;
         set => ClassManager.SetPlayersClass(value, gameObject, CharacterClassManager.SpawnReason.None);
     }
+
+    /// <summary>
+    /// The current health of the player
+    /// </summary>
+    public float Health
+    {
+        get => GetStatBase<HealthStat>().CurValue;
+        set => GetStatBase<HealthStat>().CurValue = value;
+    }
+
+    /// <summary>
+    /// The maximum health a player can have
+    /// </summary>
+    [Obsolete("Currently not working")]
+    public float MaxHealth { get; set; } = 100f;
+
+    /// <summary>
+    /// The current artificial health of the player
+    /// </summary>
+    public float ArtificialHealth
+    {
+        get => GetStatBase<AhpStat>().CurValue;
+        set => GetStatBase<AhpStat>().ServerAddProcess(value, value, 1.2f, 0f, 0f, false);
+    }
+
+    private int maxahp = 75;
+    
+    /// <summary>
+    /// The maximum artificial health a player can have
+    /// </summary>
+    public int MaxArtificialHealth
+    {
+        get => maxahp;
+        set
+        {
+            maxahp = value;
+            foreach (var process in GetStatBase<AhpStat>()._activeProcesses)
+            {
+                process.Limit = value;
+            }
+        }
+    }
+
+    /// <summary>
+    /// The current stamina of the player
+    /// </summary>
+    public float Stamina
+    {
+        get => Hub.fpc.staminaController.RemainingStamina * 100;
+        set => Hub.fpc.staminaController.RemainingStamina = (value / 100);
+    }
+
+    /// <summary>
+    /// The stamina usage of the player
+    /// </summary>
+    public float StaminaUsage
+    {
+        get => Hub.fpc.staminaController.StaminaUse * 100;
+        set => Hub.fpc.staminaController.StaminaUse = (value / 100);
+    }
+
+    /// <summary>
+    /// The player who is spectated by the player
+    /// </summary>
+    public SynapsePlayer CurrentlySpectating
+    {
+        get => SpectatorManager.CurrentSpectatedPlayer != null ? SpectatorManager.CurrentSpectatedPlayer.GetPlayer() : null;
+        set => SpectatorManager.CurrentSpectatedPlayer = value;
+    }
+
+    /// <summary>
+    /// The player who cuffed the player
+    /// </summary>
+    public SynapsePlayer Cuffer
+    {
+        get
+        {
+            if (DisarmedPlayers.Entries.All(x => x.DisarmedPlayer != NetworkIdentity.netId)) return null;
+
+            var id = DisarmedPlayers.Entries.FirstOrDefault(x => x.DisarmedPlayer == NetworkIdentity.netId).Disarmer;
+            if (id == 0) return ReferenceHub.LocalHub.GetPlayer();
+            
+            // TODO: Dimenzio nach ServerService fragen
+            // return Server.Get.Players.FirstOrDefault(x => x.NetworkIdentity.netId == id);
+            return null;
+        }
+        set => VanillaInventory.SetDisarmedStatus(value.VanillaInventory);
+    }
+
+    /// <summary>
+    /// The gameobject the player is looking at
+    /// </summary>
+    public GameObject LookingAt
+    {
+        get
+        {
+            if (!Physics.Raycast(CameraReference.transform.position, CameraReference.transform.forward,
+                    out RaycastHit raycastHit, 100f)) return null;
+            return raycastHit.transform.gameObject;
+        }
+    }
+    
+    
+    // TODO: https://github.com/SynapseSL/Synapse/blob/65bd755bfee3781c6279c368b87348ee944fbfe8/Synapse/Api/Player.cs#L663 hier fortsetzen
 }
