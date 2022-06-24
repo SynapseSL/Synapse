@@ -4,44 +4,6 @@ using UnityEngine;
 namespace Synapse3.SynapseModule.Config;
 //TODO:
 /*
-[Serializable]
-    public class SerializedMapPoint
-    {
-        public SerializedMapPoint(string room, float x, float y, float z)
-        {
-            Room = room;
-            X = x;
-            Y = y;
-            Z = z;
-        }
-
-        public SerializedMapPoint(MapPoint point)
-        {
-            Room = point.Room.RoomName;
-            X = point.RelativePosition.x;
-            Y = point.RelativePosition.y;
-            Z = point.RelativePosition.z;
-        }
-
-        public SerializedMapPoint()
-        {
-        }
-
-        public string Room { get; set; }
-        public float X { get; set; } = 0f;
-        public float Y { get; set; } = 0f;
-        public float Z { get; set; } = 0f;
-
-        public MapPoint Parse() => MapPoint.Parse(ToString());
-
-        public override string ToString() => $"{Room}:{X}:{Y}:{Z}";
-
-        public static explicit operator MapPoint(SerializedMapPoint point) => point.Parse();
-        public static implicit operator SerializedMapPoint(MapPoint point) => new SerializedMapPoint(point);
-    }
-    */
-
-/*
     [Serializable]
     public class SerializedItem
     {

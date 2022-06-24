@@ -78,6 +78,18 @@ public class SynapseGenerator : StructureSyncSynapseObject
         Generator = generator;
         SetUp();
     }
+    internal SynapseGenerator(SchematicConfiguration.SimpleUpdateConfig configuration,
+        SynapseSchematic schematic) :
+        this(configuration.Position,configuration.Rotation,configuration.Scale)
+    {
+        Parent = schematic;
+        schematic._generators.Add(this);
+        GameObject.transform.parent = schematic.GameObject.transform;
+        
+        OriginalScale = configuration.Scale;
+        CustomAttributes = configuration.CustomAttributes;
+        UpdateEveryFrame = configuration.UpdateEveryFrame;
+    }
     private void SetUp()
     {
         Map._synapseGenerators.Add(this);

@@ -13,5 +13,6 @@ public enum ObjectType
     Dummy,
     Custom,
     Locker,
-    Generator
+    Generator,
+    Room,
 }

@@ -45,6 +45,18 @@ public class SynapseLight : SynapseToyObject<LightSourceToy>
         SetUp();
     }
 
+    internal SynapseLight(SchematicConfiguration.LightSourceConfiguration configuration, SynapseSchematic schematic) :
+        this(configuration.Color, configuration.LightIntensity, configuration.LightRange,
+            configuration.LightShadows, configuration.Position, configuration.Rotation, configuration.Scale)
+    {
+        Parent = schematic;
+        schematic._lights.Add(this);
+        GameObject.transform.parent = schematic.GameObject.transform;
+        
+        OriginalScale = configuration.Scale;
+        CustomAttributes = configuration.CustomAttributes;
+    }
+    
     private void SetUp()
     {
         Map._synapseLights.Add(this);

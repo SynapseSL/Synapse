@@ -1,5 +1,6 @@
 ﻿using AdminToys;
 using Interactables.Interobjects;
+using InventorySystem.Items.Firearms.Attachments;
 using MapGeneration.Distributors;
 using Mirror;
 using Neuron.Core.Meta;
@@ -56,6 +57,10 @@ public class SchematicService : Service
                 case "binaryTargetPrefab" when prefab.TryGetComponent<ShootingTarget>(out var target):
                     SynapseTarget.Prefabs[SynapseTarget.TargetType.Binary] = target;
                     break;
+                
+                case "Work Station" when prefab.TryGetComponent<WorkstationController>(out var station):
+                    SynapseWorkStation.Prefab = station;
+                    break;
             }
         }
     }
@@ -98,5 +103,9 @@ public class SchematicService : Service
                     break;
             }
         }
+        
+        foreach (var role in CharacterClassManager._staticClasses)
+            if (role != null)
+                SynapseRagdoll.Prefabs[role.roleId] = role.model_ragdoll?.GetComponent<Ragdoll>();
     }
 }

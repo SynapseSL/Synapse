@@ -46,6 +46,18 @@ public class SynapseRagdoll : NetworkSynapseObject
         _player = Synapse.Get<PlayerService>();
     }
 
+    internal SynapseRagdoll(SchematicConfiguration.RagdollConfiguration configuration,
+        SynapseSchematic schematic) :
+        this(configuration.RoleType, configuration.DamageType, configuration.Position, configuration.Rotation,
+            configuration.Scale, configuration.Nick)
+    {
+        Parent = schematic;
+        schematic._ragdolls.Add(this);
+        GameObject.transform.parent = schematic.GameObject.transform;
+        
+        OriginalScale = configuration.Scale;
+        CustomAttributes = configuration.CustomAttributes;
+    }
     private void SetUp(RoleType role, DamageType damage, string nick)
     {
         Map._synapseRagdolls.Add(this);

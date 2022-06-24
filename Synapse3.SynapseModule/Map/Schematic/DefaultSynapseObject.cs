@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Mirror;
+using Synapse3.SynapseModule.Map.Objects;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Schematic;
@@ -21,8 +22,7 @@ public abstract class DefaultSynapseObject : ISynapseObject
     public List<string> CustomAttributes { get; set; }
 
     public Vector3 OriginalScale { get; internal set; }
-    //public SynapseObject Parent { get; internal set; }
-    //TODO: public SynapseItem ItemParent { get; internal set; }
+    public ISynapseObject Parent { get; internal set; }
 
     public virtual Vector3 Position
     {

@@ -50,6 +50,26 @@ public class SynapseLocker : StructureSyncSynapseObject
         Locker = locker;
         SetUp(GetLockerType());
     }
+
+    internal SynapseLocker(SchematicConfiguration.LockerConfiguration configuration,
+        SynapseSchematic schematic) :
+        this(configuration.LockerType, configuration.Position, configuration.Rotation, configuration.Scale,
+            configuration.DeleteDefaultItems)
+    {
+        Parent = schematic;
+        schematic._lockers.Add(this);
+        GameObject.transform.parent = schematic.GameObject.transform;
+        
+        OriginalScale = configuration.Scale;
+        CustomAttributes = configuration.CustomAttributes;
+        UpdateEveryFrame = configuration.UpdateEveryFrame;
+        
+        for (int i = 0; i < configuration.Chambers.Count; i++)
+        {
+            foreach (var item in configuration.Chambers[i].Items)
+                SpawnItem(item, i);
+        }
+    }
     private void SetUp(LockerType type)
     {
         Map._synapseLockers.Add(this);

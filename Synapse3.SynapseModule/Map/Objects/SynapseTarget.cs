@@ -24,6 +24,17 @@ public class SynapseTarget : SynapseToyObject<ShootingTarget>
         ToyBase = CreateTarget(type, position, rotation, scale);
         SetUp(type);
     }
+    internal SynapseTarget(SchematicConfiguration.TargetConfiguration configuration, SynapseSchematic schematic) : 
+        this(configuration.TargetType, configuration.Position, configuration.Rotation,
+            configuration.Scale)
+    {
+        Parent = schematic;
+        schematic._targets.Add(this);
+        GameObject.transform.parent = schematic.GameObject.transform;
+        
+        OriginalScale = configuration.Scale;
+        CustomAttributes = configuration.CustomAttributes;
+    }
 
     private void SetUp(TargetType type)
     {

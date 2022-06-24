@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Objects;
 
+//TODO: Add DoorType
 public class SynapseDoor : NetworkSynapseObject
 {
     public static Dictionary<SpawnableDoorType, BreakableDoor> Prefab { get; } = new Dictionary<SpawnableDoorType, BreakableDoor>();
@@ -94,6 +95,18 @@ public class SynapseDoor : NetworkSynapseObject
         SetUp();
     }
 
+    internal SynapseDoor(SchematicConfiguration.DoorConfiguration configuration,
+        SynapseSchematic schematic) :
+        this(configuration.DoorType, configuration.Position, configuration.Rotation, configuration.Scale)
+    {
+        Parent = schematic;
+        schematic._doors.Add(this);
+        GameObject.transform.parent = schematic.GameObject.transform;
+        
+        OriginalScale = configuration.Scale;
+        CustomAttributes = configuration.CustomAttributes;
+        UpdateEveryFrame = configuration.UpdateEveryFrame;
+    }
     private void SetUp()
     {
         Map._synapseDoors.Add(this);

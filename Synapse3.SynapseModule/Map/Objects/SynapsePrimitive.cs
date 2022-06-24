@@ -1,6 +1,8 @@
 ﻿using AdminToys;
 using Mirror;
+using Neuron.Core.Logging;
 using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Objects;
@@ -15,8 +17,10 @@ public class SynapsePrimitive : SynapseToyObject<PrimitiveObjectToy>
     {
         Map._synapsePrimitives.Remove(this);
         base.OnDestroy();
+
+        if (Parent is SynapseSchematic schematic) schematic._primitives.Remove(this);
     }
-    
+
     public Color Color
         => ToyBase.MaterialColor;
 
@@ -33,10 +37,24 @@ public class SynapsePrimitive : SynapseToyObject<PrimitiveObjectToy>
     public SynapsePrimitive(PrimitiveType primitiveType, Color color, Vector3 position, Quaternion rotation,
         Vector3 scale)
     {
-        ToyBase = CreatePrimitive(primitiveType, color, Vector3.positiveInfinity, rotation, scale);
+        ToyBase = CreatePrimitive(primitiveType, color, position, rotation, scale);
         SetUp();
     }
-    
+
+    internal SynapsePrimitive(SchematicConfiguration.PrimitiveConfiguration configuration, SynapseSchematic schematic) :
+        this(configuration.PrimitiveType, configuration.Color, configuration.Position, configuration.Rotation,
+            configuration.Scale)
+    {
+        Parent = schematic;
+        schematic._primitives.Add(this);
+        GameObject.transform.parent = schematic.GameObject.transform;
+        
+        OriginalScale = configuration.Scale;
+        CustomAttributes = configuration.CustomAttributes;
+        
+        if(configuration.Physics)
+            ApplyPhysics();
+    }
     private void SetUp()
     {
         Map._synapsePrimitives.Add(this);

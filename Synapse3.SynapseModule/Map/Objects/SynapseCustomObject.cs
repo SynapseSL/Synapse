@@ -23,6 +23,17 @@ public class SynapseCustomObject : DefaultSynapseObject
         SetUp(id);
     }
 
+    internal SynapseCustomObject(SchematicConfiguration.CustomObjectConfiguration configuration,
+        SynapseSchematic schematic) :
+        this(configuration.Position, configuration.Rotation, configuration.Scale, configuration.ID)
+    {
+        Parent = schematic;
+        schematic._custom.Add(this);
+        GameObject.transform.parent = schematic.GameObject.transform;
+        
+        OriginalScale = configuration.Scale;
+        CustomAttributes = configuration.CustomAttributes;
+    }
     private void SetUp(int id)
     {
         ID = id;

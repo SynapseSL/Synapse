@@ -45,6 +45,19 @@ public class SynapseWorkStation : NetworkSynapseObject
         WorkstationController = station;
         SetUp();
     }
+
+    internal SynapseWorkStation(SchematicConfiguration.SimpleUpdateConfig configuration,
+        SynapseSchematic schematic) :
+        this(configuration.Position, configuration.Rotation, configuration.Scale)
+    {
+        Parent = schematic;
+        schematic._workStations.Add(this);
+        GameObject.transform.parent = schematic.GameObject.transform;
+        
+        OriginalScale = configuration.Scale;
+        CustomAttributes = configuration.CustomAttributes;
+        UpdateEveryFrame = configuration.UpdateEveryFrame;
+    }
     private void SetUp()
     {
         Map._synapseWorkStations.Add(this);
