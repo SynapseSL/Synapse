@@ -1,17 +1,23 @@
-﻿using MapGeneration;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using MapGeneration;
+using Synapse3.SynapseModule.Map.Objects;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Rooms;
 
-public class SynapseRoom : IRoom
+public class SynapseRoom : IVanillaRoom
 {
     internal SynapseRoom(RoomIdentifier identifier, RoomType type)
     {
         Identifier = identifier;
         RoomType = type;
         LightController = Identifier.GetComponentInChildren<FlickerableLightController>();
-        
-        //TODO: Add SCP-079 Cams
+
+        foreach (var camera079 in identifier.GetComponentsInChildren<Camera079>())
+        {
+            _cameras.Add(new SynapseCamera(camera079, this));
+        }
     }
     
     public RoomIdentifier Identifier { get; }
@@ -58,4 +64,7 @@ public class SynapseRoom : IRoom
     {
         LightController.ServerFlickerLights(duration);
     }
+
+    private List<SynapseCamera> _cameras = new();
+    public ReadOnlyCollection<SynapseCamera> Cameras => _cameras.AsReadOnly();
 }

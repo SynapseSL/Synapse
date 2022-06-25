@@ -10,7 +10,8 @@ public class RoundEvents : Service
     public readonly EventReactor<RoundStartEvent> RoundStart = new();
     public readonly EventReactor<RoundEndEvent> RoundEnd = new();
     public readonly EventReactor<RoundWaitingEvent> RoundWaiting = new();
-    
+    public readonly EventReactor<RoundRestartEvent> RoundRestart = new();
+
     public RoundEvents(EventManager eventManager)
     {
         _eventManager = eventManager;
@@ -32,3 +33,5 @@ public class RoundWaitingEvent : IEvent
 {
     public bool FirstTime { get; set; }
 }
+
+public class RoundRestartEvent : IEvent { }

@@ -1,5 +1,7 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using Mirror;
+using Neuron.Core.Logging;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Enums;
@@ -31,6 +33,27 @@ public static class Synapse3Extensions
         if((int)type < 0 || (int)type > 23) return new UniversalDamageHandler(0f,DeathTranslations.Unknown);
 
         return new UniversalDamageHandler(0f, DeathTranslations.TranslationsById[(byte)type]);
+    }
+    
+    public static DamageType GetDamageType(this DamageHandlerBase handler)
+    {
+        if (handler == null) return DamageType.Unknown;
+                
+        if(Enum.TryParse<DamageType>(handler.GetType().Name.Replace("DamageHandler",""),out var type))
+        {
+            if(type == DamageType.Universal)
+            {
+                var id = ((UniversalDamageHandler)handler).TranslationId;
+
+                if (id > 23) return DamageType.Universal;
+
+                return (DamageType)id;
+            }
+
+            return type;
+        }
+
+        return DamageType.Unknown;
     }
     
     /// <summary>

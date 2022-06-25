@@ -1,13 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using MapGeneration;
 using Mirror;
+using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Rooms;
 
-public class SynapseNetworkRoom : NetworkSynapseObject, IRoom
+public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
 {
     internal SynapseNetworkRoom(RoomIdentifier identifier, RoomType type)
     {
@@ -18,6 +20,11 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IRoom
         
         var comp = identifier.gameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
+        
+        foreach (var camera079 in identifier.GetComponentsInChildren<Camera079>())
+        {
+            _cameras.Add(new SynapseCamera(camera079, this));
+        }
     }
 
     public RoomIdentifier Identifier { get; }
@@ -68,10 +75,10 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IRoom
         base.OnDestroy();
     }
 
-    private static List<NetworkIdentity> _networkIdentities;
-    private static NetworkIdentity GetNetworkIdentity(RoomType room)
+    internal static List<NetworkIdentity> _networkIdentities;
+    private NetworkIdentity GetNetworkIdentity(RoomType room)
     {
-        if (_networkIdentities == null || _networkIdentities.All(x => x == null))
+        if (_networkIdentities == null)
             _networkIdentities = Synapse.GetObjectsOf<NetworkIdentity>().Where(x => x.name.Contains("All"))
                 .ToList();
         switch (room)
@@ -88,4 +95,7 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IRoom
             default: return null;
         }
     }
+
+    private List<SynapseCamera> _cameras = new();
+    public ReadOnlyCollection<SynapseCamera> Cameras => _cameras.AsReadOnly();
 }

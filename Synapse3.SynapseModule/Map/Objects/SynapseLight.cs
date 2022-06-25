@@ -15,6 +15,8 @@ public class SynapseLight : SynapseToyObject<LightSourceToy>
     {
         Map._synapseLights.Remove(this);
         base.OnDestroy();
+        
+        if (Parent is SynapseSchematic schematic) schematic._lights.Remove(this);
     }
     
     public Color LightColor

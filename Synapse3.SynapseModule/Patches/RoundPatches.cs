@@ -12,7 +12,7 @@ using UnityEngine;
 namespace Synapse3.SynapseModule.Patches;
 
 [Patches]
-public static class RoundPatches
+internal static class RoundPatches
 {
     private static bool _firstTime = true;
     
@@ -80,6 +80,20 @@ public static class RoundPatches
         {
             NeuronLogger.For<Synapse>().Error("Sy3 Event: Round EndCheck Event Failed\n" + ex);
             return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(RoundRestart), nameof(RoundRestart.InitiateRoundRestart))]
+    public static void RoundRestartPatch()
+    {
+        try
+        {
+            Synapse.Get<RoundEvents>().RoundRestart.Raise(new RoundRestartEvent());
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Events: Round Restart Event failed:\n" + ex);
         }
     }
 }

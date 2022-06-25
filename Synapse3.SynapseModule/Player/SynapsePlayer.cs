@@ -17,5 +17,6 @@ public partial class SynapsePlayer : MonoBehaviour
         DissonanceUserSetup = GetComponent<Assets._Scripts.Dissonance.DissonanceUserSetup>();
         Radio = GetComponent<Radio>();
         Escape = GetComponent<Escape>();
+        AmmoBox = new AmmoBox(this);
     }
 }

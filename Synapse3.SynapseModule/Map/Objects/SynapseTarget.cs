@@ -16,6 +16,8 @@ public class SynapseTarget : SynapseToyObject<ShootingTarget>
     {
         Map._synapseTargets.Remove(this);
         base.OnDestroy();
+        
+        if (Parent is SynapseSchematic schematic) schematic._targets.Remove(this);
     }
     public TargetType SynapseTargetType { get; private set; }
 

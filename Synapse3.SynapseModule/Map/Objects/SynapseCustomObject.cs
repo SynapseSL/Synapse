@@ -13,6 +13,8 @@ public class SynapseCustomObject : DefaultSynapseObject
     {
         Map._synapseCustomObjects.Remove(this);
         base.OnDestroy();
+        
+        if (Parent is SynapseSchematic schematic) schematic._custom.Remove(this);
     }
     
     public int ID { get; private set; }

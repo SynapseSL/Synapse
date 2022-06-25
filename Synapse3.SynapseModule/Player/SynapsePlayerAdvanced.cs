@@ -5,6 +5,8 @@ namespace Synapse3.SynapseModule.Player;
 
 public partial class SynapsePlayer
 {
+    public AmmoBox AmmoBox { get; }
+    
     public void AttachSynapseObject(ISynapseObject so, Vector3 offset)
     {
         so.Rotation = transform.rotation;

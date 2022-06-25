@@ -38,7 +38,7 @@ public class RoomPoint
         var room = roomService.GetRoom(roomName);
         if (room != null) return room.GameObject.transform.TransformPoint(position);
         
-        NeuronLogger.For<Synapse>().Debug("Couldn't find a Room with Name " + roomName + " for the MapPoint");
+        NeuronLogger.For<Synapse>().Debug("Couldn't find a Room with Name " + roomName + " for the Room Point");
         return Vector3.zero;
     }
 
@@ -49,7 +49,7 @@ public class RoomPoint
 
         if (room != null) return room.Rotation * (Quaternion)rotation;
 
-        NeuronLogger.For<Synapse>().Debug("Couldn't find a Room with Name " + roomName + " for the MapPoint");
+        NeuronLogger.For<Synapse>().Debug("Couldn't find a Room with Name " + roomName + " for the Room Point");
         return Quaternion.identity;
     }
 }

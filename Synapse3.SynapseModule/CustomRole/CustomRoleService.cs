@@ -39,7 +39,6 @@ public class CustomRoleService : Service
     public override void Enable()
     {
         _command.RemoteAdmin.Subscribe(OnRemoteAdmin);
-        RegisterCustomRole<TestClass>();
     }
 
     /// <summary>
@@ -162,29 +161,6 @@ public class CustomRoleService : Service
             if (player == null) continue;
 
             player.RemoveCustomRole(kill? DespawnReason.Death : DespawnReason.Forceclass);
-        }
-    }
-    
-    public class TestClass : SynapseRole
-    {
-        public override string GetRoleName() => "Test";
-
-        public override int GetRoleID() => 99;
-
-        public override int GetTeamID() => 99;
-
-        public override List<int> GetFriendsID() => new();
-
-        public override List<int> GetEnemiesID() => new();
-
-        public override void SpawnPlayer(bool spawnLite)
-        {
-            
-        }
-
-        public override void DeSpawn(DespawnReason reason)
-        {
-            NeuronLogger.For<Synapse>().Error(reason);
         }
     }
 }

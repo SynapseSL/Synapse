@@ -26,6 +26,8 @@ public class SynapseLocker : StructureSyncSynapseObject
         Map._synapseLockers.Remove(this);
         Chambers = null;
         base.OnDestroy();
+        
+        if (Parent is SynapseSchematic schematic) schematic._lockers.Remove(this);
     }
 
     public void SpawnItem(ItemType type, int chamber, int amount = 1)

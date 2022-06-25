@@ -12,11 +12,15 @@ namespace Synapse3.SynapseModule.Map;
 public class RoomService : Service
 {
     private readonly RoundEvents _round;
+    private readonly MapService _map;
 
-    public RoomService(RoundEvents round)
+    public RoomService(RoundEvents round, MapService map)
     {
         _round = round;
+        _map = map;
+        
         round.RoundWaiting.Subscribe(LoadRooms);
+        round.RoundRestart.Subscribe(ClearRooms);
     }
 
     public IRoom GetRoom(int id)
@@ -40,7 +44,7 @@ public class RoomService : Service
         {
             var type = GetRoomTypeFromName(room.gameObject.name);
 
-            IRoom iRoom;
+            IVanillaRoom iRoom;
             switch (type)
             {
                 case RoomType.Scp939:
@@ -56,10 +60,15 @@ public class RoomService : Service
             }
 
             _rooms.Add(iRoom);
+            _map._synapseCameras.AddRange(iRoom.Cameras);
         }
     }
-    
-    //TODO: private void ClearRooms()
+
+    private void ClearRooms(RoundRestartEvent ev)
+    {
+        _rooms.Clear();
+        SynapseNetworkRoom._networkIdentities.Clear();
+    }
 
     public RoomType GetRoomTypeFromName(string roomName)
     {

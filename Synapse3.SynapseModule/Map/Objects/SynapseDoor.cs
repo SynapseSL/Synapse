@@ -24,6 +24,8 @@ public class SynapseDoor : NetworkSynapseObject
     {
         Map._synapseDoors.Remove(this);
         base.OnDestroy();
+        
+        if (Parent is SynapseSchematic schematic) schematic._doors.Remove(this);
     }
 
     private string _name;
@@ -60,6 +62,8 @@ public class SynapseDoor : NetworkSynapseObject
     public bool IsDestroyed => Variant is BreakableDoor { IsDestroyed: true };
 
     public bool IsPryable => Variant is PryableDoor;
+    
+    public SpawnableDoorType SpawnableType { get; private set; }
 
     public bool TryBreakDoor()
     {
@@ -86,13 +90,13 @@ public class SynapseDoor : NetworkSynapseObject
     public SynapseDoor(SpawnableDoorType type, Vector3 position, Quaternion rotation, Vector3 scale)
     {
         Variant = CreateDoor(type, position, rotation, scale);
-        SetUp();
+        SetUp(type);
     }
     
     internal SynapseDoor(DoorVariant variant)
     {
         Variant = variant;
-        SetUp();
+        SetUp(SpawnableDoorType.None);
     }
 
     internal SynapseDoor(SchematicConfiguration.DoorConfiguration configuration,
@@ -107,8 +111,10 @@ public class SynapseDoor : NetworkSynapseObject
         CustomAttributes = configuration.CustomAttributes;
         UpdateEveryFrame = configuration.UpdateEveryFrame;
     }
-    private void SetUp()
+    private void SetUp(SpawnableDoorType type)
     {
+        SpawnableType = type;
+        
         Map._synapseDoors.Add(this);
         var comp = GameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
@@ -123,8 +129,9 @@ public class SynapseDoor : NetworkSynapseObject
     
     public enum SpawnableDoorType
     {
-        LCZ,
-        HCZ,
-        EZ
+        None,
+        Lcz,
+        Hcz,
+        Ez
     }
 }

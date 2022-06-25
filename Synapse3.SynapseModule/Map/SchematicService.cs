@@ -6,6 +6,7 @@ using Mirror;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Objects;
+using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map;
 
@@ -27,15 +28,15 @@ public class SchematicService : Service
             switch (prefab.name)
             {
                 case "EZ BreakableDoor" when prefab.TryGetComponent<BreakableDoor>(out var door):
-                    SynapseDoor.Prefab[SynapseDoor.SpawnableDoorType.EZ] = door;
+                    SynapseDoor.Prefab[SynapseDoor.SpawnableDoorType.Ez] = door;
                     break;
 
                 case "HCZ BreakableDoor" when prefab.TryGetComponent<BreakableDoor>(out var door):
-                    SynapseDoor.Prefab[SynapseDoor.SpawnableDoorType.HCZ] = door;
+                    SynapseDoor.Prefab[SynapseDoor.SpawnableDoorType.Hcz] = door;
                     break;
 
                 case "LCZ BreakableDoor" when prefab.TryGetComponent<BreakableDoor>(out var door):
-                    SynapseDoor.Prefab[SynapseDoor.SpawnableDoorType.LCZ] = door;
+                    SynapseDoor.Prefab[SynapseDoor.SpawnableDoorType.Lcz] = door;
                     break;
                 
                 case "PrimitiveObjectToy" when prefab.TryGetComponent<PrimitiveObjectToy>(out var pref):
@@ -107,5 +108,15 @@ public class SchematicService : Service
         foreach (var role in CharacterClassManager._staticClasses)
             if (role != null)
                 SynapseRagdoll.Prefabs[role.roleId] = role.model_ragdoll?.GetComponent<Ragdoll>();
+    }
+
+    public SynapseSchematic SpawnSchematic(int id, Vector3 position)
+    {
+        return null;
+    }
+    
+    public bool IsIDRegistered(int id)
+    {
+        return true;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using MapGeneration;
 using PlayerStatsSystem;
+using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Rooms;
 using UnityEngine;
 
@@ -44,11 +45,26 @@ public partial class SynapsePlayer
         set => RotationVector2 = new Vector2(value.x.Value, value.y.Value);
     }
 
-    // TODO: Dimenzio nach Room service fragen
-    // public SynapseRoom Room
-    // {
-    //     get => 
-    // }
-    
-    // public MapPoint MapPoint
+    /// <summary>
+    /// The Room the Player is currently inside
+    /// </summary>
+    public IRoom Room
+    {
+        get => Synapse.Get<RoomService>().GetNearestRoom(Position);
+        set => Position = value.Position;
+    }
+
+    /// <summary>
+    /// The Current Position and Rotation of the Player as RoomPoint
+    /// </summary>
+    public RoomPoint RoomPoint
+    {
+        get => new RoomPoint(Position, Rotation);
+        set
+        {
+            Position = value.GetMapPosition();
+            var rot = value.GetMapRotation();
+            RotationVector2 = new Vector2(rot.x, rot.y);
+        }
+    }
 }

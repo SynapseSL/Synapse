@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Neuron.Core.Meta;
+using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Permissions;
 using Console = GameCore.Console;
 
@@ -112,5 +113,6 @@ public class ServerService : Service
     public void Reload()
     {
         Synapse.Get<PermissionService>().Reload();
+        Synapse.Get<SynapseConfigService>().Reload();
     }
 }

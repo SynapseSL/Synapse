@@ -26,6 +26,8 @@ public class SynapseRagdoll : NetworkSynapseObject
     {
         Map._synapseRagdolls.Remove(this);
         base.OnDestroy();
+        
+        if (Parent is SynapseSchematic schematic) schematic._ragdolls.Remove(this);
     }
     
     public DamageType DamageType { get; private set; }
@@ -39,6 +41,12 @@ public class SynapseRagdoll : NetworkSynapseObject
     {
         Ragdoll = CreateRagdoll(role, damage, pos, rot, scale, nick);
         SetUp(role, damage, nick);
+    }
+
+    internal SynapseRagdoll(Ragdoll ragdoll)
+    {
+        Ragdoll = ragdoll;
+        SetUp(ragdoll.NetworkInfo.RoleType, ragdoll.NetworkInfo.Handler.GetDamageType(), ragdoll.NetworkInfo.Nickname);
     }
 
     private SynapseRagdoll()

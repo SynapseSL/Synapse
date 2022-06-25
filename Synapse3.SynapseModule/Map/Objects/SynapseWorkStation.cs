@@ -19,6 +19,8 @@ public class SynapseWorkStation : NetworkSynapseObject
     {
         Map._synapseWorkStations.Remove(this);
         base.OnDestroy();
+        
+        if (Parent is SynapseSchematic schematic) schematic._workStations.Remove(this);
     }
     
     public string Name => GameObject.name;

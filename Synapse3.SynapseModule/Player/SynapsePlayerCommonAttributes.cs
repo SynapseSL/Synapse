@@ -152,7 +152,6 @@ public partial class SynapsePlayer
     /// <summary>
     /// The maximum health a player can have
     /// </summary>
-    [Obsolete("Currently not working")]
     public float MaxHealth { get; set; } = 100f;
 
     /// <summary>
@@ -165,7 +164,6 @@ public partial class SynapsePlayer
     }
 
     private int maxahp = 75;
-    
     /// <summary>
     /// The maximum artificial health a player can have
     /// </summary>
@@ -220,9 +218,8 @@ public partial class SynapsePlayer
 
             var id = DisarmedPlayers.Entries.FirstOrDefault(x => x.DisarmedPlayer == NetworkIdentity.netId).Disarmer;
             if (id == 0) return ReferenceHub.LocalHub.GetPlayer();
-            
-            // TODO: Dimenzio nach ServerService fragen
-            // return Server.Get.Players.FirstOrDefault(x => x.NetworkIdentity.netId == id);
+
+            Synapse.Get<PlayerService>().GetPlayer(id);
             return null;
         }
         set => VanillaInventory.SetDisarmedStatus(value.VanillaInventory);

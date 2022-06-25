@@ -18,6 +18,8 @@ public class SynapseGenerator : StructureSyncSynapseObject
     {
         Map._synapseGenerators.Remove(this);
         base.OnDestroy();
+        
+        if (Parent is SynapseSchematic schematic) schematic._generators.Remove(this);
     }
     public string Name => GameObject.name;
 
@@ -73,7 +75,7 @@ public class SynapseGenerator : StructureSyncSynapseObject
         SetUp();
     }
 
-    private SynapseGenerator(Scp079Generator generator)
+    internal SynapseGenerator(Scp079Generator generator)
     {
         Generator = generator;
         SetUp();
