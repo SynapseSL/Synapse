@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Linq;
 using InventorySystem.Disarming;
+using Mirror;
+using Mirror.LiteNetLib4Mirror;
 using PlayerStatsSystem;
+using Synapse3.SynapseModule.Map.Rooms;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
@@ -237,7 +240,44 @@ public partial class SynapsePlayer
             return raycastHit.transform.gameObject;
         }
     }
-    
-    
-    // TODO: https://github.com/SynapseSL/Synapse/blob/65bd755bfee3781c6279c368b87348ee944fbfe8/Synapse/Api/Player.cs#L663 hier fortsetzen
+
+    /// <summary>
+    /// True if the player has DoNotTrack enabled (https://scpslgame.com/Verified_server_rules.pdf [8.11])
+    /// </summary>
+    public bool DoNotTrack => ServerRoles.DoNotTrack;
+
+    /// <summary>
+    /// True if the player is cuffed
+    /// </summary>
+    public bool IsCuffed => DisarmedPlayers.IsDisarmed(VanillaInventory);
+
+    /// <summary>
+    /// The time a player is alive
+    /// </summary>
+    public float AliveTime => ClassManager.AliveTime;
+
+    /// <summary>
+    /// I don't need to explain this, right?
+    /// </summary>
+    public int Ping => LiteNetLib4MirrorServer.Peers[Connection.connectionId].Ping;
+
+    /// <summary>
+    /// The current Team of the player
+    /// </summary>
+    public Team Team => ClassManager.CurRole.team;
+
+    /// <summary>
+    /// The current team id of the player
+    /// </summary>
+    public int TeamID => CustomRole?.GetTeamID() ?? (int)Team;
+
+    /// <summary>
+    /// The current faction of the player
+    /// </summary>
+    public Faction Faction => ClassManager.Faction;
+
+    /// <summary>
+    /// The ip address of the player
+    /// </summary>
+    public string IpAddress => QueryProcessor._ipAddress;
 }

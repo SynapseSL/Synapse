@@ -198,4 +198,59 @@ public partial class SynapsePlayer
     /// The Global Permissions of the Player
     /// </summary>
     public ulong GlobalPerms => ServerRoles._globalPerms;
+
+    /// <summary>
+    /// The vanilla group of the player
+    /// </summary>
+    public UserGroup Rank
+    {
+        get => ServerRoles.Group;
+        set => ServerRoles.SetGroup(value, value != null && value.Permissions > 0UL, true);
+    }
+
+    /// <summary>
+    /// The visible color of the player's rank
+    /// </summary>
+    public string RankColor
+    {
+        get => Rank.BadgeColor;
+        set => ServerRoles.SetColor(value);
+    }
+
+    /// <summary>
+    /// The visible name of the player's rank
+    /// </summary>
+    public string RankName
+    {
+        get => Rank.BadgeText;
+        set => ServerRoles.SetText(value);
+    }
+
+    /// <summary>
+    /// A code which represents the vanilla permissions of the player
+    /// </summary>
+    public ulong Permission
+    {
+        get => ServerRoles.Permissions;
+        set => ServerRoles.Permissions = value;
+    }
+
+    /// <summary>
+    /// True if the player is not allowed to use voice chat
+    /// </summary>
+    public bool IsMuted
+    {
+        get => DissonanceUserSetup.Muted;
+        set => DissonanceUserSetup.NetworkmuteStatus =
+            value ? Assets._Scripts.Dissonance.VoicechatMuteStatus.AdministrativelyMuted : 0;
+    }
+
+    /// <summary>
+    /// True if the player is not allowed to use the intercom
+    /// </summary>
+    public bool IsIntercomMuted
+    {
+        get => ClassManager.NetworkIntercomMuted;
+        set => ClassManager.NetworkIntercomMuted = value;
+    }
 }

@@ -209,4 +209,9 @@ public partial class SynapsePlayer
             customHandling = false
         });
     }
+
+    public void TriggerEscape()
+    {
+        // TODO: Do this shit
+    }
 }
