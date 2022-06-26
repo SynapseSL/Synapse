@@ -186,10 +186,13 @@ namespace Synapse.Patches.SynapsePatches
         {
             var peanut = __instance.GetPlayer();
             
+            peanut.Scp173Controller.ConfrontingPlayers.Clear();
             foreach (var ply in __instance._observingPlayers)
             {
                 var player = ply.GetPlayer();
                 var flag = false;
+
+                peanut.Scp173Controller.ConfrontingPlayers.Add(player);
 
                 if (player.Invisible || (player.RealTeam == Team.SCP && !Server.Get.Configs.SynapseConfiguration.ScpTrigger173) || Server.Get.Configs.SynapseConfiguration.CantLookAt173.Contains(player.RoleID))
                     flag = true;

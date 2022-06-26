@@ -20,8 +20,8 @@ namespace Synapse.Api
         public bool IsObserved => Scp173._isObserved;
 
         public float TimeBlinck { get => Scp173._blinkCooldownRemaining; set => Scp173._blinkCooldownRemaining = value; }
-        
-        public HashSet<Player> ConfrontingPlayers => Scp173._observingPlayers.Select(p => p.GetPlayer()).ToHashSet();
+
+        public HashSet<Player> ConfrontingPlayers = new HashSet<Player>();
 
         public HashSet<Player> IgnoredPlayers { get; internal set; } = new HashSet<Player>();
 
