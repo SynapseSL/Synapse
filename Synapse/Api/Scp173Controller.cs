@@ -21,7 +21,7 @@ namespace Synapse.Api
 
         public float TimeBlinck { get => Scp173._blinkCooldownRemaining; set => Scp173._blinkCooldownRemaining = value; }
 
-        public HashSet<Player> ConfrontingPlayers = new HashSet<Player>();
+        public HashSet<Player> ConfrontingPlayers { get; internal set; } = new HashSet<Player>();
 
         public HashSet<Player> IgnoredPlayers { get; internal set; } = new HashSet<Player>();
 
