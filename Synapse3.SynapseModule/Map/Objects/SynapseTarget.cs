@@ -32,8 +32,7 @@ public class SynapseTarget : SynapseToyObject<ShootingTarget>
     {
         Parent = schematic;
         schematic._targets.Add(this);
-        GameObject.transform.parent = schematic.GameObject.transform;
-        
+
         OriginalScale = configuration.Scale;
         CustomAttributes = configuration.CustomAttributes;
     }

@@ -61,8 +61,7 @@ public class SynapseRagdoll : NetworkSynapseObject
     {
         Parent = schematic;
         schematic._ragdolls.Add(this);
-        GameObject.transform.parent = schematic.GameObject.transform;
-        
+
         OriginalScale = configuration.Scale;
         CustomAttributes = configuration.CustomAttributes;
     }

@@ -31,8 +31,7 @@ public class SynapseCustomObject : DefaultSynapseObject
     {
         Parent = schematic;
         schematic._custom.Add(this);
-        GameObject.transform.parent = schematic.GameObject.transform;
-        
+
         OriginalScale = configuration.Scale;
         CustomAttributes = configuration.CustomAttributes;
     }

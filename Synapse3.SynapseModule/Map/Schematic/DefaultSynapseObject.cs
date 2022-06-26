@@ -12,17 +12,27 @@ public abstract class DefaultSynapseObject : ISynapseObject
         Map = Synapse.Get<MapService>();
         Map._synapseObjects.Add(this);
     }
-    
-    public MapService Map { get; }
+
+    protected MapService Map { get; }
     
     public abstract GameObject GameObject { get; }
     public abstract ObjectType Type { get; }
 
-    public Dictionary<string, object> ObjectData { get; set; } = new Dictionary<string, object>();
+    public Dictionary<string, object> ObjectData { get; set; } = new ();
     public List<string> CustomAttributes { get; set; }
 
     public Vector3 OriginalScale { get; internal set; }
-    public ISynapseObject Parent { get; internal set; }
+
+    private ISynapseObject _parent;
+    public ISynapseObject Parent
+    {
+        get => _parent;
+        set
+        {
+            _parent = value;
+            GameObject.transform.parent = value.GameObject.transform;
+        }
+    }
 
     public virtual Vector3 Position
     {

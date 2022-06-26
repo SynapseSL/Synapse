@@ -35,7 +35,7 @@ public class Synapse : Module
     
     public const VersionType Type = VersionType.None;
     public const string SubVersion = "1.0";
-    public const string BasedGameVersion = "11.2.0";
+    public const string BasedGameVersion = "11.2.1";
     
     /// <summary>
     /// Returns an instance of the specified object by either resolving it using

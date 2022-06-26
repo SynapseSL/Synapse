@@ -1,49 +1,27 @@
-﻿using System.Collections.Generic;
-using InventorySystem;
+﻿using InventorySystem;
 using InventorySystem.Items;
-using Neuron.Core.Logging;
+using Synapse3.SynapseModule.Item.SubAPI;
+using Synapse3.SynapseModule.Map.Schematic;
+
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace Synapse3.SynapseModule.Item;
 
-public class SynapseItem
+public partial class SynapseItem : DefaultSynapseObject
 {
     public static SynapseItem None { get; } = new SynapseItem(-1);
-    
-    public static Dictionary<ushort, SynapseItem> AllItems { get; } = new Dictionary<ushort, SynapseItem>();
 
-    public static SynapseItem GetSynapseItem(ushort serial)
-    {
-        if (!AllItems.ContainsKey(serial))
-        {
-            NeuronLogger.For<Synapse>().Warn("If this message appears exists a Item that is not registered. Please report this bug in our Discord as detailed as possible");
-            return None;
-        }
-        return AllItems[serial];
-    }
-
-    public readonly int ID;
-
-    public readonly string Name;
-
-    public readonly bool IsCustomItem;
-
-    public readonly ItemType ItemType;
-
-    public readonly ItemCategory ItemCategory;
-
-    public ItemTierFlags TierFlags { get; }
-
-    public ushort Serial { get; }
-
-    public float Weight { get; }
+    private ItemService _item;
     
     private SynapseItem()
     {
-        //Throwable = new ThrowableAPI(this);
+        _item = Synapse.Get<ItemService>();
+        Throwable = new Throwable();
+        FireArm = new FireArm();
     }
+    
     public SynapseItem(int id) : this()
     {
-        /*
         if (id == -1 && None == null)
         {
             ID = -1;
@@ -53,12 +31,12 @@ public class SynapseItem
         }
 
         Serial = ItemSerialGenerator.GenerateNext();
-        AllItems[Serial] = this;
+        _item.AllItems[Serial] = this;
         ID = id;
-        var item = Synapse.Get<ItemService>();
-        Schematic = item.GetSchematicConfiguration(ID);
 
-        if (id >= 0 && id <= ItemManager.HighestItem)
+        SchematicConfiguration = _item.GetSchematicConfiguration(ID);
+
+        if (id is >= 0 and <= ItemService.HighestItem)
         {
             IsCustomItem = false;
             ItemType = (ItemType)id;
@@ -67,16 +45,15 @@ public class SynapseItem
         else
         {
             IsCustomItem = true;
-            ItemType = Server.Get.ItemManager.GetBaseType(id);
-            Name = Server.Get.ItemManager.GetName(id);
+            ItemType = _item.GetBaseType(id);
+            Name = _item.GetName(id);
         }
 
-        if (InventoryItemLoader.AvailableItems.TryGetValue(ItemType, out var examplebase))
+        if (InventoryItemLoader.AvailableItems.TryGetValue(ItemType, out var exampleBase))
         {
-            ItemCategory = examplebase.Category;
-            TierFlags = examplebase.TierFlags;
-            Weight = examplebase.Weight;
+            ItemCategory = exampleBase.Category;
+            TierFlags = exampleBase.TierFlags;
+            Weight = exampleBase.Weight;
         }
-        */
     }
 }

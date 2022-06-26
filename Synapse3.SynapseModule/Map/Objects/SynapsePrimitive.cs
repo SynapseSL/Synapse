@@ -47,8 +47,7 @@ public class SynapsePrimitive : SynapseToyObject<PrimitiveObjectToy>
     {
         Parent = schematic;
         schematic._primitives.Add(this);
-        GameObject.transform.parent = schematic.GameObject.transform;
-        
+
         OriginalScale = configuration.Scale;
         CustomAttributes = configuration.CustomAttributes;
         

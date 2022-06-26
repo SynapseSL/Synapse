@@ -105,8 +105,7 @@ public class SynapseDoor : NetworkSynapseObject
     {
         Parent = schematic;
         schematic._doors.Add(this);
-        GameObject.transform.parent = schematic.GameObject.transform;
-        
+
         OriginalScale = configuration.Scale;
         CustomAttributes = configuration.CustomAttributes;
         UpdateEveryFrame = configuration.UpdateEveryFrame;

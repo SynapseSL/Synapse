@@ -54,8 +54,7 @@ public class SynapseWorkStation : NetworkSynapseObject
     {
         Parent = schematic;
         schematic._workStations.Add(this);
-        GameObject.transform.parent = schematic.GameObject.transform;
-        
+
         OriginalScale = configuration.Scale;
         CustomAttributes = configuration.CustomAttributes;
         UpdateEveryFrame = configuration.UpdateEveryFrame;

@@ -86,8 +86,7 @@ public class SynapseGenerator : StructureSyncSynapseObject
     {
         Parent = schematic;
         schematic._generators.Add(this);
-        GameObject.transform.parent = schematic.GameObject.transform;
-        
+
         OriginalScale = configuration.Scale;
         CustomAttributes = configuration.CustomAttributes;
         UpdateEveryFrame = configuration.UpdateEveryFrame;

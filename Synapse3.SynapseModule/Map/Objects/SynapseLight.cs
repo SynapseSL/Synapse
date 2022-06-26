@@ -53,8 +53,7 @@ public class SynapseLight : SynapseToyObject<LightSourceToy>
     {
         Parent = schematic;
         schematic._lights.Add(this);
-        GameObject.transform.parent = schematic.GameObject.transform;
-        
+
         OriginalScale = configuration.Scale;
         CustomAttributes = configuration.CustomAttributes;
     }
