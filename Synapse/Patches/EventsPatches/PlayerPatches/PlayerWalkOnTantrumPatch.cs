@@ -1,43 +1,28 @@
 ﻿using HarmonyLib;
 using System;
+using Synapse.Api;
 using UnityEngine;
 
 namespace Synapse.Patches.EventsPatches.PlayerPatches
 {
-    [HarmonyPatch(typeof(TantrumEnvironmentalHazard), nameof(TantrumEnvironmentalHazard.DistanceChanged))]
+    [HarmonyPatch(typeof(TantrumEnvironmentalHazard), nameof(TantrumEnvironmentalHazard.OnEnter))]
     internal static class PlayerWalkOnTantrumPatch
     {
         [HarmonyPrefix]
-        private static bool DistanceChanged(TantrumEnvironmentalHazard __instance, ReferenceHub player)
+        private static bool OnEnter(TantrumEnvironmentalHazard __instance, ReferenceHub player)
         {
             try
             {
-                if (player == null || __instance.DisableEffect || __instance._correctPosition == null)
-                    return false;
-
-                var synapseplayer = player.GetPlayer();
+                var sPlayer = (Player)player;
+                bool allow = !(!SynapseExtensions.CanHarmScp(sPlayer, false) || sPlayer.GodMode);
                 
-                if (Vector3.Distance(player.transform.position, __instance._correctPosition.position) > __instance.DistanceToBeAffected)
-                    return false;
-                
-                var allow = true;
+                Synapse.Api.Events.EventHandler.Get.Player.InvokeTantrum(sPlayer, __instance, ref allow);
 
-                if ((__instance.SCPImmune && synapseplayer.Team == (int)Team.SCP) || !SynapseExtensions.CanHarmScp(synapseplayer, false) || synapseplayer.GodMode)
-                    allow = false;
-               
-                Synapse.Api.Events.EventHandler.Get.Player.InvokeTantrum(synapseplayer, __instance, ref allow);
-
-                if (allow)
-                {
-                    Synapse.Api.Logger.Get.Debug("ALLOW TANTRUM");
-                    synapseplayer.PlayerEffectsController.EnableEffect<CustomPlayerEffects.Stained>(2f, false);
-                }
-                
-                return false;
+                return allow;
             }
             catch (Exception ex)
             {
-                Synapse.Api.Logger.Get.Error("Synapse-Event: PlayerWalkOnSinkholeEvent failed!!\n" + ex);
+                Api.Logger.Get.Error("Synapse-Event: PlayerWalkOnSinkholeEvent failed!!\n" + ex);
                 return true;
             }
         }
