@@ -4,10 +4,10 @@ using Synapse3.SynapseModule.Permissions;
 
 namespace Synapse3.SynapseModule.Command.SynapseCommands;
 
-[SynapseCommand(
+[SynapseRaCommand(
     CommandName = "Permission",
-    Description = "A command to manage the permission system",
     Aliases = new[] {"pm", "perm", "perms", "permissions"},
+    Description = "A command to manage the permission system",
     Permission = "",
     Platforms = new[] {CommandPlatform.ServerConsole, CommandPlatform.RemoteAdmin}
 )]

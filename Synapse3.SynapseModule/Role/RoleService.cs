@@ -23,7 +23,7 @@ public class RoleService : Service
     public ReadOnlyCollection<RoleInformation> CustomRoles => _customRoles.AsReadOnly();
 
     /// <summary>
-    /// Creates a new CustomRoleService
+    /// Creates a new RoleService
     /// </summary>
     public RoleService(SynapseCommandService command, PlayerService player)
     {
@@ -32,7 +32,7 @@ public class RoleService : Service
     }
 
     /// <summary>
-    /// This method Enables the CustomRoleService don't call it manually
+    /// This method Enables the RoleService don't call it manually
     /// </summary>
     public override void Enable()
     {

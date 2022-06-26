@@ -28,10 +28,19 @@ public class RoomPoint
 
     public string roomName = "";
 
+    /// <summary>
+    /// Position relative to the room
+    /// </summary>
     public SerializedVector3 position = Vector3.zero;
 
+    /// <summary>
+    /// Rotation relative to the room
+    /// </summary>
     public SerializedVector3 rotation = Vector3.zero;
 
+    /// <summary>
+    /// Absolute position of the room
+    /// </summary>
     public Vector3 GetMapPosition()
     {
         var roomService = Synapse.Get<RoomService>();
@@ -42,6 +51,9 @@ public class RoomPoint
         return Vector3.zero;
     }
 
+    /// <summary>
+    /// Absolute rotation of the room
+    /// </summary>
     public Quaternion GetMapRotation()
     {
         var roomService = Synapse.Get<RoomService>();

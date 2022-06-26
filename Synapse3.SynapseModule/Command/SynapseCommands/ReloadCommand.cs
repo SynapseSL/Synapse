@@ -1,4 +1,6 @@
-﻿using Neuron.Modules.Commands;
+﻿using System;
+using Neuron.Core.Logging;
+using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Command;
 
 namespace Synapse3.SynapseModule.Command.SynapseCommands;
@@ -8,7 +10,7 @@ namespace Synapse3.SynapseModule.Command.SynapseCommands;
     Aliases = new[] { "rl" },
     Parameters = new string[] { },
     Description = "Reloads Synapse",
-    Permission = "synapse.reload",
+    Permission = "synapse.command.reload",
     Platforms = new [] { CommandPlatform.RemoteAdmin, CommandPlatform.ServerConsole }
 )]
 public class ReloadCommand : SynapseCommand
@@ -21,10 +23,11 @@ public class ReloadCommand : SynapseCommand
             result.StatusCode = CommandStatusCode.Ok;
             result.Response = "Synapse Reloaded";
         }
-        catch
+        catch (Exception ex)
         {
             result.StatusCode = CommandStatusCode.Error;
             result.Response = "Couldn't reload Synapse.See Server console for more Information";
+            NeuronLogger.For<Synapse>().Error($"Sy3 Command: reload command failed\n{ex}");
         }
     }
 }

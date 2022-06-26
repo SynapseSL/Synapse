@@ -11,6 +11,8 @@ public class PlayerEvents : Service
 
     public readonly EventReactor<LoadComponentEvent> LoadComponent = new();
 
+    public readonly EventReactor<KeyPressEvent> KeyPress = new();
+
     public PlayerEvents(EventManager eventManager)
     {
         _eventManager = eventManager;
@@ -19,6 +21,7 @@ public class PlayerEvents : Service
     public override void Enable()
     {
         _eventManager.RegisterEvent(LoadComponent);
+        _eventManager.RegisterEvent(KeyPress);
     }
 }
 
@@ -41,5 +44,17 @@ public class LoadComponentEvent : IEvent
             return PlayerGameobject.AddComponent<TComponent>();
 
         return comp;
+    }
+}
+
+public class KeyPressEvent : IEvent
+{
+    public SynapsePlayer Player { get; }
+    public KeyCode KeyCode { get; }
+
+    public KeyPressEvent(SynapsePlayer player, KeyCode keyCode)
+    {
+        Player = player;
+        KeyCode = keyCode;
     }
 }
