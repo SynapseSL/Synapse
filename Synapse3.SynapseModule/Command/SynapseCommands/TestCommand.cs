@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Neuron.Modules.Commands;
 using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic;
@@ -18,28 +19,24 @@ namespace Synapse3.SynapseModule.Command.SynapseCommands;
     )]
 public class TestCommand : SynapseCommand
 {
-    private RoomPoint point = null;
     public override void Execute(SynapseContext context, ref CommandResult result)
     {
-        result.Response = "Spawn Schematic!";
+        result.Response = "Save";
 
-        var pos = Vector3.zero;
-        var rot = Quaternion.identity;
-        if (point == null)
+        var config = new SchematicConfiguration()
         {
-            pos = context.Player.Position;
-            rot = context.Player.Rotation;
+            ID = 100,
+            Name = "Test",
+            Primitives = new List<SchematicConfiguration.PrimitiveConfiguration>()
+            {
+                new SchematicConfiguration.PrimitiveConfiguration()
+                {
+                    Color = Color.black,
+                    Position = Vector3.up * 10
+                }
+            }
+        };
 
-            point = new RoomPoint(pos, rot);
-        }
-        else
-        {
-            pos = point.GetMapPosition();
-            rot = point.GetMapRotation();
-        }
-
-        var door = new SynapseDoor(SynapseDoor.SpawnableDoorType.Ez, pos, rot, Vector3.one);
-
-        context.Player.Position = pos;
+        Synapse.Get<SchematicService>().SaveConfiguration(config);
     }
 }

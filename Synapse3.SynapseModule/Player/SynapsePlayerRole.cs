@@ -1,5 +1,5 @@
-﻿using Synapse3.SynapseModule.CustomRole;
-using Synapse3.SynapseModule.Enums;
+﻿using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Role;
 
 namespace Synapse3.SynapseModule.Player;
 
@@ -52,7 +52,7 @@ public partial class SynapsePlayer
 
     /// <inheritdoc cref="SpawnCustomRole(ISynapseRole,bool)"/>
     public void SpawnCustomRole(int id, bool liteSpawn = false)
-        => SpawnCustomRole(Synapse.Get<CustomRoleService>().GetCustomRole(id), liteSpawn);
+        => SpawnCustomRole(Synapse.Get<RoleService>().GetRole(id), liteSpawn);
     
     /// <summary>
     /// Spawns the Player with that CustomRole
@@ -81,17 +81,17 @@ public partial class SynapsePlayer
         }
         set
         {
-            if (value is >= -1 and <= (int)CustomRoleService.HighestRole)
+            if (value is >= -1 and <= (int)RoleService.HighestRole)
             {
                 RemoveCustomRole(DespawnReason.API);
                 RoleType = (RoleType)value;
                 return;
             }
 
-            var service = Synapse.Get<CustomRoleService>();
+            var service = Synapse.Get<RoleService>();
             if(!service.IsIdRegistered(value)) return;
 
-            CustomRole = service.GetCustomRole(value);
+            CustomRole = service.GetRole(value);
         }
     }
 }

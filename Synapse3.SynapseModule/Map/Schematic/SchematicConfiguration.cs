@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Syml;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Objects;
@@ -8,8 +9,13 @@ using UnityEngine;
 namespace Synapse3.SynapseModule.Map.Schematic;
 
 [Serializable]
-public class SchematicConfiguration
+public class SchematicConfiguration : IDocumentSection
 {
+    /// <summary>
+    /// This is to determine if the Schematic should be removed on Reload
+    /// </summary>
+    [NonSerialized] internal bool Reload = true;
+    
     public string Name { get; set; }
     public int ID { get; set; }
     public List<string> CustomAttributes { get; set; }

@@ -2,22 +2,20 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Neuron.Modules.Commands.Event;
 using Synapse3.SynapseModule.Command;
-using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Player;
 
-namespace Synapse3.SynapseModule.CustomRole;
+namespace Synapse3.SynapseModule.Role;
 
-public class CustomRoleService : Service
+public class RoleService : Service
 {
     private readonly SynapseCommandService _command;
     private readonly PlayerService _player;
     private List<RoleInformation> _customRoles = new();
 
-    public const RoleType HighestRole = RoleType.ChaosMarauder;
+    public const int HighestRole = (int)RoleType.ChaosMarauder;
     
     /// <summary>
     /// A list of all Registered CustomRoles that can spawn
@@ -27,7 +25,7 @@ public class CustomRoleService : Service
     /// <summary>
     /// Creates a new CustomRoleService
     /// </summary>
-    public CustomRoleService(SynapseCommandService command, PlayerService player)
+    public RoleService(SynapseCommandService command, PlayerService player)
     {
         _command = command;
         _player = player;
@@ -46,7 +44,7 @@ public class CustomRoleService : Service
     /// </summary>
     public bool IsIdRegistered(int id)
     {
-        if (id is >= -1 and <= (int)HighestRole) return true;
+        if (id is >= -1 and <= HighestRole) return true;
 
         if (_customRoles.Any(x => x.ID == id)) return true;
 
@@ -58,7 +56,7 @@ public class CustomRoleService : Service
     /// </summary>
     public string GetRoleName(int id)
     {
-        if (id is >= -1 and <= (int)HighestRole)
+        if (id is >= -1 and <= HighestRole)
             return ((RoleType)id).ToString();
 
         if (!IsIdRegistered(id)) return string.Empty;
@@ -69,20 +67,20 @@ public class CustomRoleService : Service
     /// <summary>
     /// Creates a new Instance of the Object to get the Role Name & id and register it. The Role must have a empty constructor for this
     /// </summary>
-    public bool RegisterCustomRole<TRole>() where TRole : ISynapseRole
+    public bool RegisterRole<TRole>() where TRole : ISynapseRole
     {
         var role = (ISynapseRole)Activator.CreateInstance(typeof(TRole));
         var info = new RoleInformation(role.GetRoleName(), role.GetRoleID(), typeof(TRole));
 
-        return RegisterCustomRole(info);
+        return RegisterRole(info);
     }
 
     /// <summary>
     /// Register a CustomRole that can be spawned later
     /// </summary>
-    public bool RegisterCustomRole(RoleInformation info)
+    public bool RegisterRole(RoleInformation info)
     {
-        if (info.ID is >= -1 and <= (int)HighestRole) return false;
+        if (info.ID is >= -1 and <= HighestRole) return false;
         if (IsIdRegistered(info.ID)) return false;
 
         _customRoles.Add(info);
@@ -94,7 +92,7 @@ public class CustomRoleService : Service
     /// </summary>
     /// <param name="id">The Id of the Custom Role</param>
     /// <returns>true, when a role was found and could be removed</returns>
-    public bool UnRegisterCustomRole(int id)
+    public bool UnRegisterRole(int id)
     {
         var role = _customRoles.FirstOrDefault(x => x.ID == id);
         if (role != null)
@@ -103,32 +101,32 @@ public class CustomRoleService : Service
         return false;
     }
     
-    /// <inheritdoc cref="GetCustomRole(RoleInformation)"/>
-    public ISynapseRole GetCustomRole(string name)
+    /// <inheritdoc cref="GetRole(Synapse3.SynapseModule.Role.RoleInformation)"/>
+    public ISynapseRole GetRole(string name)
     {
         var info = CustomRoles.FirstOrDefault(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
 
         if (info == null)
             return null;
 
-        return GetCustomRole(info);
+        return GetRole(info);
     }
 
-    /// <inheritdoc cref="GetCustomRole(RoleInformation)"/>
-    public ISynapseRole GetCustomRole(int id)
+    /// <inheritdoc cref="GetRole(Synapse3.SynapseModule.Role.RoleInformation)"/>
+    public ISynapseRole GetRole(int id)
     {
         var info = CustomRoles.FirstOrDefault(x => x.ID == id);
 
         if (info == null) 
             return null;
 
-        return GetCustomRole(info);
+        return GetRole(info);
     }
 
     /// <summary>
     /// Creates a new Instance of a CustomRole
     /// </summary>
-    private ISynapseRole GetCustomRole(RoleInformation info)
+    private ISynapseRole GetRole(RoleInformation info)
     {
         if (info.RoleScript.GetConstructors().Any(x => x.GetParameters().Count() == 1 && x.GetParameters().First().ParameterType == typeof(int)))
             return (ISynapseRole)Activator.CreateInstance(info.RoleScript, new object[] { info.ID });

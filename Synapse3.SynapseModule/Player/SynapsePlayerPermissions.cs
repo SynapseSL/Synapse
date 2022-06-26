@@ -70,6 +70,7 @@ public partial class SynapsePlayer
         if (!ServerRoles.AdminChatPerms)
             ServerRoles.AdminChatPerms = SynapseGroup.HasVanillaPermission(PlayerPermissions.AdminChat);
         ServerRoles.TargetOpenRemoteAdmin(false);
+        QueryProcessor.SyncCommandsToClient();
     }
 
     /// <summary>

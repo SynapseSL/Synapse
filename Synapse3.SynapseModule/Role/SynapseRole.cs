@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Player;
 
-namespace Synapse3.SynapseModule.CustomRole;
+namespace Synapse3.SynapseModule.Role;
 
 public abstract class SynapseRole : ISynapseRole
 {

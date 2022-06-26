@@ -9,6 +9,8 @@ public class SynapseConfigService : Service
     public ConfigContainer Container { get; set; }
 
     public HostingConfiguration HostingConfiguration { get; private set; }
+    
+    public PermissionConfiguration PermissionConfiguration { get; private set; }
 
     public SynapseConfigService(ConfigService configService)
     {
@@ -24,5 +26,6 @@ public class SynapseConfigService : Service
     public void Reload()
     {
         HostingConfiguration = Container.Get<HostingConfiguration>();
+        PermissionConfiguration = Container.Get<PermissionConfiguration>();
     }
 }
