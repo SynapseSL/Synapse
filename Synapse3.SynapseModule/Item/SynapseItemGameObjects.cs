@@ -17,11 +17,10 @@ public partial class SynapseItem
             {
                 case ItemState.Map: return Pickup.gameObject;
                 case ItemState.Inventory: return Item.gameObject;
-                case ItemState.Thrown: return null; //TODO: Implement Grenade
+                case ItemState.Thrown: return Throwable.Projectile.gameObject;
                 
                 case ItemState.BeforeSpawn:
                 case ItemState.Despawned:
-                case ItemState.Destroyed:
                 default: return null;
             }
         }

@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
+using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
@@ -12,10 +13,17 @@ namespace Synapse3.SynapseModule.Item;
 public class ItemService : Service
 {
     public const int HighestItem = (int)ItemType.ParticleDisruptor;
-    
+
+    private RoundEvents _round;
     private readonly List<ItemInformation> _items = new();
     private readonly Dictionary<ItemType, SchematicConfiguration> overridenVanillaItems = new();
 
+    public ItemService(RoundEvents round)
+    {
+        _round = round;
+        round.RoundRestart.Subscribe(Clear);
+    }
+    
     public ReadOnlyCollection<ItemInformation> Items => _items.AsReadOnly();
     public Dictionary<ushort, SynapseItem> AllItems { get; } = new ();
 
@@ -82,4 +90,9 @@ public class ItemService : Service
     }
     
     private ItemInformation GetInfo(int id) => _items.FirstOrDefault(x => x.ID == id);
+
+    private void Clear(RoundRestartEvent ev)
+    {
+        AllItems.Clear();
+    }
 }

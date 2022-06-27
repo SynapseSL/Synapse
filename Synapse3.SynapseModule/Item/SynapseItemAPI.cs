@@ -1,4 +1,6 @@
 ﻿using System;
+using InventorySystem;
+using InventorySystem.Items.Pickups;
 using Mirror;
 using Neuron.Core.Logging;
 using Synapse3.SynapseModule.Map.Objects;
@@ -10,39 +12,63 @@ namespace Synapse3.SynapseModule.Item;
 
 public partial class SynapseItem
 {
-    public void PickUp(SynapsePlayer player)
+    public void EquipItem(SynapsePlayer player)
     {
+        if (player.Inventory.Items.Count >= 8)
+        {
+            Drop(player.Position);
+            return;
+        }
         
-    }
-
-    public void Drop(Vector3 position)
-    {
-        
+        Destroy();
+        player.VanillaInventory.ServerAddItem(ItemType, Serial, Pickup);
+        State = ItemState.Inventory;
+        player.Inventory._items.Add(this);
     }
 
     public void Drop()
-    {
-        
-    }
+        => Drop(Position);
 
-    public void Despawn()
+    public void Drop(Vector3 position)
     {
+        if (State == ItemState.Map)
+        {
+            Position = position;
+            return;
+        }
         
+        Destroy();
+        
+        if(!InventoryItemLoader.AvailableItems.TryGetValue(ItemType, out var exampleBase)) return;
+
+        Pickup = UnityEngine.Object.Instantiate(exampleBase.PickupDropModel, position, _rotation);
+        var info = new PickupSyncInfo
+        {
+            Position = position,
+            Rotation = new LowPrecisionQuaternion(_rotation),
+            ItemId = ItemType,
+            Serial = Serial,
+            Weight = Weight
+        };
+        Pickup.Info = info;
+        Pickup.transform.localScale = Scale;
+        NetworkServer.Spawn(Pickup.gameObject);
+        Pickup.InfoReceived(default, info);
+        UpdateSchematic();
+        State = ItemState.Map;
     }
 
     public override void Destroy()
     {
-        Despawn();
+        DestroyItem();
+        DestroyPickup();
+        Throwable.DestroyProjectile();
         
-        base.Destroy();
+        State = ItemState.Despawned;
+        OnDestroy();
     }
 
-    public override void OnDestroy()
-    {
-        base.OnDestroy();
-    }
-    
-    private void DespawnItemBase()
+    internal void DestroyItem()
     {
         if(Item is null) return;
 
@@ -51,16 +77,18 @@ public partial class SynapseItem
         {
             Item.OnRemoved(null);
 
-            //TODO: Set Current ItemInHand to None
+            if (holder.Inventory.ItemInHand == this)
+                holder.Inventory.ItemInHand = None;
             
             holder.VanillaInventory.UserInventory.Items.Remove(Serial);
             holder.VanillaInventory.SendItemsNextFrame = true;
+            holder.Inventory._items.Remove(this);
         }
         
         Object.Destroy(Item.gameObject);
     }
 
-    private void DespawnPickup()
+    internal void DestroyPickup()
     {
         if(Pickup == null) return;
 
@@ -71,7 +99,7 @@ public partial class SynapseItem
     {
         try
         {
-            if(Schematic is null || Pickup is null) return;
+            if(Schematic is null || Pickup is null || SchematicConfiguration is null) return;
 
             Schematic = new SynapseSchematic(SchematicConfiguration);
             Schematic.Position = Position;

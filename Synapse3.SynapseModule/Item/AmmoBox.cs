@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Linq;
+using InventorySystem;
 using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Player;
 
-namespace Synapse3.SynapseModule.Player;
+namespace Synapse3.SynapseModule.Item;
 
 public class AmmoBox
 {
@@ -34,5 +37,22 @@ public class AmmoBox
         {
             this[ammoType] = amount;
         }
+    }
+
+    public void DropAmount(AmmoType type, ushort amount)
+        => _player.VanillaInventory.ServerDropAmmo((ItemType)type, amount);
+
+    public void DropAllAmmo()
+    {
+        foreach (var pair in _player.VanillaInventory.UserInventory.ReserveAmmo.ToList())
+        {
+            _player.VanillaInventory.ServerDropAmmo(pair.Key, pair.Value);
+        }
+    }
+
+    public void Clear()
+    {
+        _player.VanillaInventory.UserInventory.ReserveAmmo.Clear();
+        _player.VanillaInventory.SendAmmoNextFrame = true;
     }
 }

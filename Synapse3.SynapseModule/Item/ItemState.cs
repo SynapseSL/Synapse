@@ -7,5 +7,4 @@ public enum ItemState
     Inventory,
     Thrown,
     Despawned,
-    Destroyed
 }

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Reflection;
+using InventorySystem.Items;
+using InventorySystem.Items.Pickups;
 using Mirror;
 using Neuron.Core.Logging;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
@@ -116,4 +119,10 @@ public static class Synapse3Extensions
     public static SynapsePlayer GetPlayer(this StatBase stat) => stat.Hub.GetPlayer();
 
     public static SynapsePlayer GetPlayer(this Footprinting.Footprint footprint) => footprint.Hub?.GetPlayer();
+
+    public static SynapseItem GetSynapseItem(this ItemPickupBase pickupBase) =>
+        Synapse.Get<ItemService>().GetSynapseItem(pickupBase.Info.Serial);
+    
+    public static SynapseItem GetSynapseItem(this ItemBase itemBase) =>
+        Synapse.Get<ItemService>().GetSynapseItem(itemBase.ItemSerial);
 }

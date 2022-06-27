@@ -1,12 +1,11 @@
-﻿using Synapse3.SynapseModule.Map.Schematic;
+﻿using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.Map.Schematic;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
 
 public partial class SynapsePlayer
 {
-    public AmmoBox AmmoBox { get; }
-    
     public void AttachSynapseObject(ISynapseObject so, Vector3 offset)
     {
         so.Rotation = transform.rotation;
@@ -14,4 +13,6 @@ public partial class SynapsePlayer
         so.Position = (transform1 = transform).TransformPoint(offset);
         so.GameObject.transform.parent = transform1;
     }
+    
+    public ItemInventory Inventory { get; }
 }

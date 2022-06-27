@@ -20,7 +20,7 @@ public partial class SynapseItem
     
     
     public override ObjectType Type => ObjectType.Item;
-    public ItemState State { get; private set; } = ItemState.BeforeSpawn;
+    public ItemState State { get; internal set; } = ItemState.BeforeSpawn;
 
     public bool CanBePickedUp { get; set; } = false;
     public SchematicConfiguration SchematicConfiguration { get; set; }
