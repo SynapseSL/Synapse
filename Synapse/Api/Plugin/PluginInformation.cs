@@ -13,6 +13,13 @@ namespace Synapse.Api.Plugin
         public string Version = "Unknown";
         public int LoadPriority = 0;
 
+        public PluginInformation() { }
+
+        public PluginInformation(string pluginName)
+        {
+            Name = pluginName;
+        }
+
         internal bool Shared { get; set; } = false;
     }
 }

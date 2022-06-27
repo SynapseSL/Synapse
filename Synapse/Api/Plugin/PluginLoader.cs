@@ -48,7 +48,7 @@ namespace Synapse.Api.Plugin
                         if (infos is null)
                         {
                             SynapseController.Server.Logger.Info($"The File {assembly.GetName().Name} has a class which inherits from IPlugin but has no PluginInformation ... Default Values will be added");
-                            infos = new PluginInformation();
+                            infos = new PluginInformation(assembly.GetName().Name);
                         }
 
                         if (pluginpath.Contains("server-shared"))
@@ -56,7 +56,10 @@ namespace Synapse.Api.Plugin
 
                         var allTypes = assembly.GetTypes().ToList();
                         _ = allTypes.Remove(type);
-                        dictionary.Add(infos, new KeyValuePair<Type, List<Type>>(type, allTypes));
+                        if (dictionary.ContainsKey(infos))
+                            Logger.Get.Error($"Plugin {infos.Name} ({infos.Version}) is already loaded, the plugin is skip");
+                        else
+                            dictionary.Add(infos, new KeyValuePair<Type, List<Type>>(type, allTypes));
                         break;
                     }
                 }
