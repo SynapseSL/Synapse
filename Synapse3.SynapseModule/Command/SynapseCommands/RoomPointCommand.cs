@@ -6,14 +6,14 @@ using UnityEngine;
 namespace Synapse3.SynapseModule.Command.SynapseCommands;
 
 [SynapseRaCommand(
-    CommandName = "MapPoint",
-    Aliases = new[] { "GetMapPoint", "MP" },
-    Parameters = new string[] { "(view)" },
+    CommandName = "RoomPoint",
+    Aliases = new[] { "GetRoomPoint", "RP" },
+    Parameters = new[] { "(view)" },
     Description = "A command to get the current location as MapPoint",
     Permission = "synapse.command.mappoint",
     Platforms = new [] { CommandPlatform.RemoteAdmin }
 )]
-public class MapPointCommand : SynapseCommand
+public class RoomPointCommand : SynapseCommand
 {
     public override void Execute(SynapseContext context, ref CommandResult result)
     {
@@ -35,6 +35,5 @@ public class MapPointCommand : SynapseCommand
                          $"\n  y: {point.position.Y}" +
                          $"\n  z: {point.position.Z}";
         result.StatusCode = CommandStatusCode.Ok;
-        return;
     }
 }

@@ -86,6 +86,7 @@ public partial class SynapseItem
         }
         set
         {
+            _scale = value;
             if (Schematic is not null)
             {
                 Schematic.Scale = value;

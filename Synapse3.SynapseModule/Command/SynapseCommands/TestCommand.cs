@@ -1,10 +1,5 @@
-﻿using System.Collections.Generic;
-using Neuron.Modules.Commands;
-using Synapse3.SynapseModule.Enums;
-using Synapse3.SynapseModule.Map;
-using Synapse3.SynapseModule.Map.Objects;
-using Synapse3.SynapseModule.Map.Rooms;
-using Synapse3.SynapseModule.Map.Schematic;
+﻿using Neuron.Modules.Commands;
+using Synapse3.SynapseModule.Item;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Command.SynapseCommands;
@@ -23,20 +18,9 @@ public class TestCommand : SynapseCommand
     {
         result.Response = "Save";
 
-        var config = new SchematicConfiguration()
+        foreach (var item in Synapse.Get<ItemService>().AllItems)
         {
-            ID = 100,
-            Name = "Test",
-            Primitives = new List<SchematicConfiguration.PrimitiveConfiguration>()
-            {
-                new SchematicConfiguration.PrimitiveConfiguration()
-                {
-                    Color = Color.black,
-                    Position = Vector3.up * 10
-                }
-            }
-        };
-
-        Synapse.Get<SchematicService>().SaveConfiguration(config);
+            item.Scale = Vector3.one * 2;
+        }
     }
 }

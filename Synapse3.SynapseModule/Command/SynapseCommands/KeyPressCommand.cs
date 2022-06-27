@@ -20,7 +20,7 @@ public class KeyPressCommand : SynapseCommand
 {
     public override void Execute(SynapseContext context, ref CommandResult result)
     {
-        if(context.Player == Synapse.Get<PlayerService>().Host)
+        if(context.IsAdmin)
         {
             result.Response = "The ServerConsole cant use this command";
             result.StatusCode = CommandStatusCode.Error;
@@ -38,7 +38,8 @@ public class KeyPressCommand : SynapseCommand
         {
             case "SYNC":
                 foreach (var key in (KeyCode[])Enum.GetValues(typeof(KeyCode)))
-                    context.Player.ClassManager.TargetChangeCmdBinding(context.Player.Connection, key, $".keypress send {(int)key}");
+                    context.Player.ClassManager.TargetChangeCmdBinding(context.Player.Connection, key,
+                        $".keypress send {(int)key}");
                 result.Response = "All Keys was synced";
                 result.StatusCode = CommandStatusCode.Ok;
                 return;

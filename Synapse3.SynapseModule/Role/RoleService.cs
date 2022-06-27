@@ -158,7 +158,7 @@ public class RoleService : Service
             var player = _player.GetPlayer(result);
             if (player == null) continue;
 
-            player.RemoveCustomRole(kill? DespawnReason.Death : DespawnReason.Forceclass);
+            player.RemoveCustomRole(kill? DespawnReason.Death : DespawnReason.ForceClass);
         }
     }
 }

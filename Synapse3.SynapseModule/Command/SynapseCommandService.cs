@@ -19,7 +19,8 @@ public class SynapseCommandService : Service
     {
         typeof(TestCommand),
         typeof(PermissionCommand),
-        typeof(ReloadCommand)
+        typeof(ReloadCommand),
+        typeof(KeyPressCommand),
     };
     
     private readonly CommandService _command;

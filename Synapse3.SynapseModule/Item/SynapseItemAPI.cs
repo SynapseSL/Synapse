@@ -1,5 +1,7 @@
 ﻿using System;
+using Achievements.Handlers;
 using InventorySystem;
+using InventorySystem.Items;
 using InventorySystem.Items.Pickups;
 using Mirror;
 using Neuron.Core.Logging;
@@ -20,10 +22,30 @@ public partial class SynapseItem
             return;
         }
         
-        Destroy();
-        player.VanillaInventory.ServerAddItem(ItemType, Serial, Pickup);
-        State = ItemState.Inventory;
+        DestroyItem();
+        Throwable.DestroyProjectile();
+
+
+        Item = player.VanillaInventory.CreateItemInstance(ItemType, player.VanillaInventory.isLocalPlayer);
+        if(Item == null) return;
+        
+        player.VanillaInventory.UserInventory.Items[Serial] = Item;
+        player.VanillaInventory.SendItemsNextFrame = true;
         player.Inventory._items.Add(this);
+        
+        Item.ItemSerial = Serial;
+        Item.OnAdded(Pickup);
+        //Normally it will call a event but we can't call it from here
+        ItemPickupHandler.OnItemAdded(player.VanillaInventory, Item, Pickup);
+
+        if (player.VanillaInventory.isLocalPlayer && Item is IAcquisitionConfirmationTrigger trigger)
+        {
+            trigger.ServerConfirmAcqusition();
+            trigger.AcquisitionAlreadyReceived = true;
+        }
+        
+        DestroyPickup();
+        State = ItemState.Inventory;
     }
 
     public void Drop()
@@ -36,21 +58,30 @@ public partial class SynapseItem
             Position = position;
             return;
         }
-        
+
+        var owner = ItemOwner;
+        var rot = _rotation;
+
         Destroy();
         
         if(!InventoryItemLoader.AvailableItems.TryGetValue(ItemType, out var exampleBase)) return;
 
-        Pickup = UnityEngine.Object.Instantiate(exampleBase.PickupDropModel, position, _rotation);
+        if (owner is not null)
+        {
+            rot = owner.CameraReference.rotation * exampleBase.PickupDropModel.transform.rotation;
+        }
+        
+        Pickup = UnityEngine.Object.Instantiate(exampleBase.PickupDropModel, position, rot);
         var info = new PickupSyncInfo
         {
             Position = position,
-            Rotation = new LowPrecisionQuaternion(_rotation),
+            Rotation = new LowPrecisionQuaternion(rot),
             ItemId = ItemType,
             Serial = Serial,
             Weight = Weight
         };
         Pickup.Info = info;
+        Pickup.NetworkInfo = info;
         Pickup.transform.localScale = Scale;
         NetworkServer.Spawn(Pickup.gameObject);
         Pickup.InfoReceived(default, info);
@@ -65,13 +96,13 @@ public partial class SynapseItem
         Throwable.DestroyProjectile();
         
         State = ItemState.Despawned;
-        OnDestroy();
     }
+    
+    public override void OnDestroy() { }
 
     internal void DestroyItem()
     {
         if(Item is null) return;
-
         var holder = ItemOwner;
         if (holder != null)
         {
@@ -84,8 +115,9 @@ public partial class SynapseItem
             holder.VanillaInventory.SendItemsNextFrame = true;
             holder.Inventory._items.Remove(this);
         }
-        
+
         Object.Destroy(Item.gameObject);
+        Item = null;
     }
 
     internal void DestroyPickup()
@@ -93,6 +125,7 @@ public partial class SynapseItem
         if(Pickup == null) return;
 
         NetworkServer.Destroy(Pickup.gameObject);
+        Pickup = null;
     }
 
     internal void UpdateSchematic()
