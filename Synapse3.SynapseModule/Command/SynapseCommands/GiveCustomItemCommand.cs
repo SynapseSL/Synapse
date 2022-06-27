@@ -9,7 +9,7 @@ namespace Synapse3.SynapseModule.Command.SynapseCommands;
 [SynapseRaCommand(
     CommandName = "GiveItem",
     Aliases = new[] { "gi" },
-    Parameters = new[] { "Player", "ItemID", "(Durability)", "(Attachments)", "(X Size)", "(Y Size)", "(Z Size)" },
+    Parameters = new[] { "Player", "ItemID", "(Attachments)", "(X Size)", "(Y Size)", "(Z Size)" },
     Description = "A Command to give a Player an Item",
     Permission = "synapse.command.give",
     Platforms = new [] { CommandPlatform.RemoteAdmin, CommandPlatform.ServerConsole }
@@ -40,21 +40,12 @@ public class GiveCustomItemCommand : SynapseCommand
             return;
         }
 
-        float durability = 0;
         uint attachments = 0;
         float xsize = 1;
         float ysize = 1;
         float zsize = 1;
 
-        if(context.Arguments.Length > 2)
-            if(!float.TryParse(context.Arguments.ElementAt(2),out durability))
-            {
-                result.Response = "Invalid Parameter for Durability";
-                result.StatusCode = CommandStatusCode.Error;
-                return;
-            }
-
-        if (context.Arguments.Length > 3)
+        if (context.Arguments.Length > 2)
             if (!uint.TryParse(context.Arguments.ElementAt(3), out attachments))
             {
                 result.Response = "Invalid Parameter for Attachments";
@@ -62,7 +53,7 @@ public class GiveCustomItemCommand : SynapseCommand
                 return;
             }
 
-        if (context.Arguments.Length > 4)
+        if (context.Arguments.Length > 3)
             if (!float.TryParse(context.Arguments.ElementAt(4), out xsize))
             {
                 result.Response = "Invalid Parameter for XSize";
@@ -70,7 +61,7 @@ public class GiveCustomItemCommand : SynapseCommand
                 return;
             }
 
-        if (context.Arguments.Length > 5)
+        if (context.Arguments.Length > 4)
             if (!float.TryParse(context.Arguments.ElementAt(5), out ysize))
             {
                 result.Response = "Invalid Parameter for YSize";
@@ -78,7 +69,7 @@ public class GiveCustomItemCommand : SynapseCommand
                 return;
             }
 
-        if (context.Arguments.Length > 6)
+        if (context.Arguments.Length > 5)
             if (!float.TryParse(context.Arguments.ElementAt(6), out zsize))
             {
                 result.Response = "Invalid Parameter for ZSize";
@@ -92,17 +83,14 @@ public class GiveCustomItemCommand : SynapseCommand
             result.StatusCode = CommandStatusCode.Error;
             return;
         }
-        
-        // TODO: Help Dimenzio
-        // Synapse.Get<ItemService>().GetSynapseItem()
-        // var item = new Api.Items.SynapseItem(id)
-        // {
-        //     Scale = new UnityEngine.Vector3(xsize, ysize, zsize),
-        // };
-        // player.Inventory.AddItem(item);
-        // item.Durabillity = durability;
-        // item.WeaponAttachments = attachments;
 
+        var item = new SynapseItem(id)
+        {
+            Scale = new UnityEngine.Vector3(xsize, ysize, zsize),
+        };
+        // TODO: coming soon item.FireArm.Attachments
+        
+        player.Inventory.GiveItem(item);
 
         result.Response = "Added Item to Players Inventory!";
         result.StatusCode = CommandStatusCode.Ok;
