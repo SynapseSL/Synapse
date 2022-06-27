@@ -42,7 +42,7 @@ public partial class SynapseItem : DefaultSynapseObject
         }
 
         Serial = ItemSerialGenerator.GenerateNext();
-        _item.AllItems[Serial] = this;
+        _item._allItems[Serial] = this;
         ID = id;
 
         SchematicConfiguration = _item.GetSchematicConfiguration(ID);
@@ -103,7 +103,7 @@ public partial class SynapseItem : DefaultSynapseObject
     {
         Item = itemBase;
         Serial = itemBase.ItemSerial;
-        _item.AllItems[Serial] = this;
+        _item._allItems[Serial] = this;
         ID = (int)itemBase.ItemTypeId;
         SchematicConfiguration = _item.GetSchematicConfiguration(ID);
         Name = itemBase.ItemTypeId.ToString();
@@ -121,7 +121,7 @@ public partial class SynapseItem : DefaultSynapseObject
     {
         Serial = pickupBase.Info.Serial;
         Pickup = pickupBase;
-        _item.AllItems[Serial] = this;
+        _item._allItems[Serial] = this;
         ID = (int)pickupBase.Info.ItemId;
         SchematicConfiguration = _item.GetSchematicConfiguration(ID);
         Name = pickupBase.Info.ItemId.ToString();

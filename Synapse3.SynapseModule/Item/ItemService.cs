@@ -24,17 +24,20 @@ public class ItemService : Service
         round.RoundRestart.Subscribe(Clear);
     }
     
-    public ReadOnlyCollection<ItemInformation> Items => _items.AsReadOnly();
-    public Dictionary<ushort, SynapseItem> AllItems { get; } = new ();
+    public ReadOnlyCollection<ItemInformation> CustomItemInformation => _items.AsReadOnly();
+    internal Dictionary<ushort, SynapseItem> _allItems { get; } = new ();
+
+    public ReadOnlyCollection<SynapseItem> AllItems =>
+        _allItems.Select(x => x.Value).Where(x => x is not null).ToList().AsReadOnly();
 
     public SynapseItem GetSynapseItem(ushort serial)
     {
-        if (!AllItems.ContainsKey(serial))
+        if (!_allItems.ContainsKey(serial))
         {
             NeuronLogger.For<Synapse>().Warn("If this message appears exists a Item that is not registered. Please report this bug in our Discord as detailed as possible");
             return SynapseItem.None;
         }
-        return AllItems[serial];
+        return _allItems[serial];
     }
     
     public bool RegisterItem(ItemInformation info)
@@ -93,6 +96,6 @@ public class ItemService : Service
 
     private void Clear(RoundRestartEvent ev)
     {
-        AllItems.Clear();
+        _allItems.Clear();
     }
 }

@@ -34,6 +34,9 @@
         <Reference Include="Mirror">
             <HintPath>..\Refs\Mirror_publicized.dll</HintPath>
         </Reference>
+        <Reference Include="Neuron.Modules.Configs">
+          <HintPath>..\..\Neuron\Neuron.Modules.Configs\bin\Debug\netstandard2.0\Neuron.Modules.Configs.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine">
             <HintPath>..\Refs\UnityEngine.dll</HintPath>
         </Reference>

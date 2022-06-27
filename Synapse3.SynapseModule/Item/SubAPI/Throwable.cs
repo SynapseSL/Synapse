@@ -70,5 +70,6 @@ public class Throwable
     {
         if (Projectile is not null)
             NetworkServer.Destroy(Projectile.gameObject);
+        Projectile = null;
     }
 }

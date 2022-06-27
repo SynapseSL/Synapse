@@ -3,6 +3,6 @@
 public enum DespawnReason
 {
     Death,
-    Forceclass,
+    ForceClass,
     API,
 }
