@@ -1,6 +1,9 @@
-﻿using Hints;
+﻿using System;
+using Hints;
 using InventorySystem.Items.Firearms.Attachments;
 using Mirror;
+using Neuron.Core;
+using Neuron.Core.Logging;
 using PlayerStatsSystem;
 using RoundRestarting;
 using Synapse3.SynapseModule.Enums;
@@ -44,8 +47,43 @@ public partial class SynapsePlayer
             new StringHintParameter("")
         }, HintEffectPresets.FadeInAndOut(duration), duration));
     }
+
+    /// <summary>
+    /// Displays a Broadcast on the Player's screen
+    /// </summary>
+    public Broadcast SendBroadcast(ushort time, string message, bool instant = false)
+    {
+        if (PlayerType == PlayerType.Server)
+            NeuronLogger.For<Synapse>().Info($"Broadcast: {message}", ConsoleColor.White);
+
+        Broadcast bc = new(message, time, this);
+        ActiveBroadcasts.Add(bc, instant);
+        return bc;
+    }
     
-    //TODO: Broadcast Stuff
+    /// <summary>
+    /// Creates the broadcast
+    /// </summary>
+    /// <param name="time"></param>
+    /// <param name="message"></param>
+    internal void Broadcast(ushort time, string message) => GetComponent<global::Broadcast>()
+        .TargetAddElement(Connection, message, time, new global::Broadcast.BroadcastFlags());
+
+    /// <summary>
+    /// Removes the currently displayed broadcast
+    /// </summary>
+    internal void ClearBroadcasts() => GetComponent<global::Broadcast>().TargetClearElements(Connection);
+
+    /// <summary>
+    /// Shows instantly the new broadcast
+    /// </summary>
+    /// <param name="time"></param>
+    /// <param name="message"></param>
+    internal void InstantBroadcast(ushort time, string message)
+    {
+        ClearBroadcasts();
+        Broadcast(time, message);
+    }
     
     /// <summary>
     /// Sends a Message to the Player in his Console

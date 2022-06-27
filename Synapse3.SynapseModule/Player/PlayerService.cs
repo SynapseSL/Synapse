@@ -37,8 +37,6 @@ public class PlayerService : Service
         return list;
     }
 
-
-
     /// <summary>
     /// Returns a Player based upon the given argument
     /// </summary>

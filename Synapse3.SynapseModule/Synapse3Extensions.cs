@@ -3,7 +3,6 @@ using System.Reflection;
 using InventorySystem.Items;
 using InventorySystem.Items.Pickups;
 using Mirror;
-using Neuron.Core.Logging;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Enums;

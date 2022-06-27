@@ -1,4 +1,5 @@
-﻿using Synapse3.SynapseModule.Item;
+﻿using System.Collections.Generic;
+using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Schematic;
 using UnityEngine;
 
@@ -15,4 +16,6 @@ public partial class SynapsePlayer
     }
     
     public ItemInventory Inventory { get; }
+
+    public BroadcastList ActiveBroadcasts { get; }
 }

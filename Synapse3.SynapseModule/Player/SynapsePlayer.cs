@@ -18,5 +18,6 @@ public partial class SynapsePlayer : MonoBehaviour
         Radio = GetComponent<Radio>();
         Escape = GetComponent<Escape>();
         Inventory = new(this);
+        ActiveBroadcasts = new(this);
     }
 }
