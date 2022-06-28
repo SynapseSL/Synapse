@@ -112,6 +112,8 @@ public partial class SynapseItem : DefaultSynapseObject
         ItemCategory = itemBase.Category;
         TierFlags = itemBase.TierFlags;
         Weight = itemBase.Weight;
+
+        State = ItemState.Inventory;
     }
 
     /// <summary>
@@ -133,5 +135,7 @@ public partial class SynapseItem : DefaultSynapseObject
             TierFlags = exampleBase.TierFlags;
         }
         Weight = pickupBase.Info.Weight;
+
+        State = ItemState.Map;
     }
 }

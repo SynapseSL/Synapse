@@ -36,7 +36,11 @@ public partial class SynapseItem
         Item.ItemSerial = Serial;
         Item.OnAdded(Pickup);
         //Normally it will call a event but we can't call it from here
-        ItemPickupHandler.OnItemAdded(player.VanillaInventory, Item, Pickup);
+        try
+        {
+            ItemPickupHandler.OnItemAdded(player.VanillaInventory, Item, Pickup);
+        }
+        catch { }
 
         if (player.VanillaInventory.isLocalPlayer && Item is IAcquisitionConfirmationTrigger trigger)
         {
@@ -78,7 +82,8 @@ public partial class SynapseItem
             Rotation = new LowPrecisionQuaternion(rot),
             ItemId = ItemType,
             Serial = Serial,
-            Weight = Weight
+            Weight = Weight,
+            Locked = !CanBePickedUp,
         };
         Pickup.Info = info;
         Pickup.NetworkInfo = info;
@@ -97,8 +102,6 @@ public partial class SynapseItem
         
         State = ItemState.Despawned;
     }
-    
-    public override void OnDestroy() { }
 
     internal void DestroyItem()
     {
@@ -106,7 +109,7 @@ public partial class SynapseItem
         var holder = ItemOwner;
         if (holder != null)
         {
-            Item.OnRemoved(null);
+            Item.OnRemoved(Pickup);
 
             if (holder.Inventory.ItemInHand == this)
                 holder.Inventory.ItemInHand = None;

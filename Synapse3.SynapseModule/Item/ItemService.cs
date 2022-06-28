@@ -96,6 +96,11 @@ public class ItemService : Service
 
     private void Clear(RoundRestartEvent ev)
     {
+        foreach (var item in _allItems)
+        {
+            if(item.Value == null) continue;
+            item.Value.OnDestroy();
+        }
         _allItems.Clear();
     }
 }

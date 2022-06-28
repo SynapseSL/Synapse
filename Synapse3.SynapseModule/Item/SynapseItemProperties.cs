@@ -1,4 +1,5 @@
-﻿using Synapse3.SynapseModule.Map.Objects;
+﻿using InventorySystem.Items.Pickups;
+using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 
 // ReSharper disable MemberCanBePrivate.Global
@@ -22,7 +23,23 @@ public partial class SynapseItem
     public override ObjectType Type => ObjectType.Item;
     public ItemState State { get; internal set; } = ItemState.BeforeSpawn;
 
-    public bool CanBePickedUp { get; set; } = false;
+    private bool _canBePickedUp = true;
+
+    public bool CanBePickedUp
+    {
+        get => _canBePickedUp;
+        set
+        {
+            _canBePickedUp = value;
+
+            if (Pickup != null)
+            {
+                Pickup.Info.Locked = !value;
+                Pickup.NetworkInfo = Pickup.Info;
+                Pickup.InfoReceived(default,Pickup.Info);
+            }
+        }
+    }
     public SchematicConfiguration SchematicConfiguration { get; set; }
     public SynapseSchematic Schematic { get; private set; }
 }

@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Linq;
 using HarmonyLib;
 using InventorySystem;
 using InventorySystem.Items;
 using InventorySystem.Items.Pickups;
+using InventorySystem.Items.ThrowableProjectiles;
+using MapGeneration.Distributors;
+using Mirror;
 using Neuron.Core.Logging;
 using Synapse3.SynapseModule.Item;
+using UnityEngine;
 
 namespace Synapse3.SynapseModule.Patches;
 
@@ -18,7 +23,7 @@ internal static class ItemPatches
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ItemPickupBase), nameof(ItemPickupBase.DestroySelf))]
-    public static bool DestroyPickupPatch(ItemPickupBase __instance)
+    public static bool DestroyPickup(ItemPickupBase __instance)
     {
         try
         {
@@ -42,13 +47,13 @@ internal static class ItemPatches
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(InventoryExtensions), nameof(InventoryExtensions.ServerAddItem))]
-    private static bool ServerAddItem(ref ItemBase __result, Inventory inv, ItemType type, ushort itemSerial,
+    public static bool ServerAddItem(ref ItemBase __result, Inventory inv, ItemType type, ushort itemSerial,
         ItemPickupBase pickup)
     {
         try
         {
             var player = inv.GetPlayer();
-            if (itemSerial == 0 || !Synapse.Get<ItemService>()._allItems.TryGetValue(itemSerial, out var item))
+            if (itemSerial == 0 || !Synapse.Get<ItemService>()._allItems.TryGetValue(itemSerial, out var item) || item == null)
             {
                 item = new SynapseItem(type);
             }
@@ -71,7 +76,7 @@ internal static class ItemPatches
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(InventoryExtensions), nameof(InventoryExtensions.ServerCreatePickup))]
-    private static bool ServerCreatePickupPatch(ref ItemPickupBase __result, Inventory inv, ItemBase item,
+    public static bool ServerCreatePickup(ref ItemPickupBase __result, Inventory inv, ItemBase item,
         PickupSyncInfo psi, bool spawn)
     {
         try
@@ -84,7 +89,7 @@ internal static class ItemPatches
                 psi.Serial = ItemSerialGenerator.GenerateNext();
             }
 
-            if (synapseItem is null)
+            if (synapseItem == null)
             {
                 synapseItem = new SynapseItem(item.ItemTypeId);
             }
@@ -95,6 +100,113 @@ internal static class ItemPatches
         catch (Exception ex)
         {
             NeuronLogger.For<Synapse>().Error("Sy3 Items: Create Pickup failed\n" + ex);
+        }
+
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(InventoryExtensions), nameof(InventoryExtensions.ServerRemoveItem))]
+    public static bool ServerRemoveItem(Inventory inv, ushort itemSerial, ItemPickupBase ipb)
+    {
+        try
+        {
+            if (!inv.UserInventory.Items.ContainsKey(itemSerial))
+                return false;
+
+            if (!Synapse.Get<ItemService>()._allItems.TryGetValue(itemSerial, out var item))
+            {
+                NeuronLogger.For<Synapse>().Warn("Found unregistered ItemSerial in Server Remove Item Patch");
+                return false;
+            }
+
+            //When ipb is null then this Method is used to destroy the entire object if not it is used to switch to a pickup
+            if (ipb == null)
+            {
+                item.Destroy();
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Items: Remove Item failed\n" + ex);
+        }
+
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ItemDistributor), nameof(ItemDistributor.SpawnPickup))]
+    public static bool SpawnPickup(ItemPickupBase ipb)
+    {
+        try
+        {
+            if (ipb == null) return false;
+            NetworkServer.Spawn(ipb.gameObject);
+
+            var serial = ItemSerialGenerator.GenerateNext();
+
+            var info = new PickupSyncInfo
+            {
+                ItemId = ipb.Info.ItemId,
+                Position = ipb.transform.position,
+                Rotation = new LowPrecisionQuaternion(ipb.transform.rotation),
+                Serial = serial,
+                Weight = ipb.Info.Weight,
+                Locked = ipb.Info.Locked
+            };
+
+            ipb.NetworkInfo = info;
+            ipb.Info = info;
+            ipb.InfoReceived(default, info);
+            _ = new SynapseItem(ipb);
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Items: Map Spawn Pickup failed\n" + ex);
+        }
+
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ThrowableItem), nameof(ThrowableItem.ServerThrow),
+        new[] { typeof(float), typeof(float), typeof(Vector3), typeof(Vector3) })]
+    private static bool ServerThrow(ThrowableItem __instance, float forceAmount, float upwardFactor, Vector3 torque,
+        Vector3 startVel)
+    {
+        try
+        {
+            var item = __instance.GetSynapseItem();
+
+            item.Throwable.Throw(forceAmount, upwardFactor, torque, startVel);
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Items: Throw Grenade failed\n" + ex);
+        }
+
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(TimedGrenadePickup), nameof(TimedGrenadePickup.Update))]
+    private static bool UpdateGrenadePickup(TimedGrenadePickup __instance)
+    {
+        try
+        {
+            if (!__instance._replaceNextFrame)
+                return false;
+
+            var item = __instance.GetSynapseItem();
+
+            item.Throwable.Fuse(__instance._attacker);
+            
+            __instance._replaceNextFrame = false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Items: Update Grenade failed\n" + ex);
         }
 
         return false;

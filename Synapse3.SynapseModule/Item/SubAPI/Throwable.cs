@@ -1,7 +1,12 @@
-﻿using InventorySystem;
+﻿using System;
+using InventorySystem;
+using InventorySystem.Items.Pickups;
 using InventorySystem.Items.ThrowableProjectiles;
 using Mirror;
+using Respawning;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule.Item.SubAPI;
 
@@ -38,7 +43,7 @@ public class Throwable
     /// <summary>
     /// Activates the Grenade when it's already on the Map
     /// </summary>
-    public void Fuse()
+    public void Fuse(SynapsePlayer owner = null)
     {
         if(_item.State != ItemState.Map) return;
         if(!InventoryItemLoader.AvailableItems.TryGetValue(_item.ItemType, out var itemBase)) return;
@@ -55,10 +60,60 @@ public class Throwable
 
         _item.Pickup.Info.Locked = true;
         Projectile.NetworkInfo = _item.Pickup.Info;
+        if (owner != null)
+            Projectile.PreviousOwner = owner;
         NetworkServer.Spawn(Projectile.gameObject);
         Projectile.InfoReceived(default, _item.Pickup.Info);
         
         Projectile.ServerActivate();
+        _item.DestroyItem();
+        _item.DestroyPickup();
+        _item.State = ItemState.Thrown;
+    }
+
+    public void Throw(Vector3 startVelocity = default, bool fullForce = false)
+    {
+        if(_item.State != ItemState.Inventory || _item.Item is not ThrowableItem throwableItem) return;
+        
+        var settings = fullForce ? throwableItem.FullThrowSettings : throwableItem.WeakThrowSettings;
+
+        Throw(settings.StartVelocity, settings.UpwardsFactor, settings.StartTorque, startVelocity);
+    }
+
+    public void Throw(float forceAmount, float upwardFactor, Vector3 torque, Vector3 startVel)
+    {
+        if(_item.State != ItemState.Inventory || _item.Item is not ThrowableItem throwableItem) return;
+        
+        if(throwableItem._alreadyFired) return;
+
+        throwableItem._destroyTime = Time.timeSinceLevelLoad + throwableItem._postThrownAnimationTime;
+        throwableItem._alreadyFired = true;
+        GameplayTickets.Singleton.HandleItemTickets(throwableItem);
+
+        Projectile = Object.Instantiate(throwableItem.Projectile, throwableItem.Owner.PlayerCameraReference.position,
+            throwableItem.Owner.PlayerCameraReference.rotation);
+        var transform = Projectile.transform;
+        var info = new PickupSyncInfo
+        {
+            ItemId = _item.ItemType,
+            Locked = !throwableItem._repickupable,
+            Serial = _item.Serial,
+            Weight = _item.Weight,
+            Position = transform.position,
+            Rotation = new LowPrecisionQuaternion(transform.rotation)
+        };
+        Projectile.NetworkInfo = info;
+        Projectile.PreviousOwner = _item.ItemOwner;
+        NetworkServer.Spawn(Projectile.gameObject);
+        Projectile.InfoReceived(default, info);
+
+        if (Projectile.TryGetComponent<Rigidbody>(out var rb))
+        {
+            throwableItem.PropelBody(rb, torque, startVel, forceAmount, upwardFactor);
+        }
+        Projectile.ServerActivate();
+
+        _item.DestroyItem();
         _item.DestroyPickup();
         _item.State = ItemState.Thrown;
     }
