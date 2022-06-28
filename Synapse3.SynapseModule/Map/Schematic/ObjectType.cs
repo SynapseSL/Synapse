@@ -15,4 +15,5 @@ public enum ObjectType
     Locker,
     Generator,
     Room,
+    OldGrenade,
 }

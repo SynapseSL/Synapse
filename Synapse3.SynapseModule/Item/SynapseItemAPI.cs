@@ -129,6 +129,9 @@ public partial class SynapseItem
 
         NetworkServer.Destroy(Pickup.gameObject);
         Pickup = null;
+        
+        if (Parent is SynapseSchematic schematic) schematic._items.Remove(this);
+        Parent = null;
     }
 
     internal void UpdateSchematic()

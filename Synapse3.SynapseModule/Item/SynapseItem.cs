@@ -1,7 +1,9 @@
-﻿using InventorySystem;
+﻿using System.Net.NetworkInformation;
+using InventorySystem;
 using InventorySystem.Items;
 using InventorySystem.Items.Pickups;
 using Synapse3.SynapseModule.Item.SubAPI;
+using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -137,5 +139,25 @@ public partial class SynapseItem : DefaultSynapseObject
         Weight = pickupBase.Info.Weight;
 
         State = ItemState.Map;
+    }
+
+    internal SynapseItem(SchematicConfiguration.ItemConfiguration configuration, SynapseSchematic schematic) : this(configuration.ItemType)
+    {
+        Parent = schematic;
+        schematic._items.Add(this);
+        
+        OriginalScale = configuration.Scale;
+        CustomAttributes = configuration.CustomAttributes;
+        
+        Drop(configuration.Position);
+        Rotation = configuration.Rotation;
+        Scale = configuration.Scale;
+        CanBePickedUp = configuration.CanBePickedUp;
+        if (!configuration.Physics)
+        {
+            Pickup.Rb.useGravity = false;
+            Pickup.Rb.isKinematic = true;
+        }
+        //TODO: Durability
     }
 }
