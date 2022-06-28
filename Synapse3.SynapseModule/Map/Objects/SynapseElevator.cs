@@ -46,7 +46,9 @@ public class SynapseElevator
     /// </summary>
     public bool Operative => Lift.operative;
 
-    //TODO: WTF?!?
+    /// <summary>
+    /// The maximum distance a player can be in to be teleported
+    /// </summary>
     public float MaxDistance
     {
         get => Lift.maxDistance;
