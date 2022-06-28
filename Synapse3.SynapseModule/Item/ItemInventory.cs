@@ -29,7 +29,7 @@ public class ItemInventory
         }
         set
         {
-            if (value == null || value == SynapseItem.None) //TODO:|| !Inventory.Items.Contains(value))
+            if (value == null || value == SynapseItem.None|| !_items.Contains(value))
             {
                 _player.VanillaInventory.NetworkCurItem = ItemIdentifier.None;
                 _player.VanillaInventory.CurInstance = null;

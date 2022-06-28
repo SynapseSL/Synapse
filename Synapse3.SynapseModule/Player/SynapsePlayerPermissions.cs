@@ -1,4 +1,5 @@
-﻿using Synapse3.SynapseModule.Enums;
+﻿using Synapse3.SynapseModule.Config;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Permissions;
 
 namespace Synapse3.SynapseModule.Player;
@@ -109,27 +110,24 @@ public partial class SynapsePlayer
             Shared = false
         };
 
-        var globalAccesAllowed = true;
-        /*
+        var globalAccessAllowed = true;
         switch (ServerRoles.GlobalBadgeType)
         {
             case 1:
-                globalAccesAllowed = Server.Get.PermissionHandler.serverSection.StaffAccess;
+                globalAccessAllowed = Synapse.Get<SynapseConfigService>().PermissionConfiguration.StaffAccess;
                 break;
             case 2:
-                globalAccesAllowed = Server.Get.PermissionHandler.serverSection.ManagerAccess;
+                globalAccessAllowed = Synapse.Get<SynapseConfigService>().PermissionConfiguration.ManagerAccess;
                 break;
             case 3:
-                globalAccesAllowed = Server.Get.PermissionHandler.serverSection.GlobalBanTeamAccess;
+                globalAccessAllowed = Synapse.Get<SynapseConfigService>().PermissionConfiguration.GlobalBanTeamAccess;
                 break;
             case 4:
-                globalAccesAllowed = Server.Get.PermissionHandler.serverSection.GlobalBanTeamAccess;
+                globalAccessAllowed = Synapse.Get<SynapseConfigService>().PermissionConfiguration.GlobalBanTeamAccess;
                 break;
         }
-        TODO: Implement
-        */
 
-        if (GlobalPerms != 0 && globalAccesAllowed)
+        if (GlobalPerms != 0 && globalAccessAllowed)
             group.Permissions |= GlobalPerms;
 
         ServerRoles.Group = group;

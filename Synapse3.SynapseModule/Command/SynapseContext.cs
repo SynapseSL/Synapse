@@ -20,9 +20,9 @@ public class SynapseContext : ICommandContext
     
     public Type ContextType => typeof(SynapseContext);
     
-    public SynapsePlayer Player { get; set; }
+    public SynapsePlayer Player { get; private set; }
     
-    public CommandPlatform Platform { get; set; }
+    public CommandPlatform Platform { get; private set; }
 
     public static SynapseContext Of(string message, SynapsePlayer player, CommandPlatform platform)
     {

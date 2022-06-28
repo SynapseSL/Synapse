@@ -1,4 +1,6 @@
 ﻿using System;
+using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Config;
@@ -92,21 +94,12 @@ namespace Synapse3.SynapseModule.Config;
             UsePreferences = preference;
         }
     }
+    */
 
     [Serializable]
     public class SerializedAmmo
     {
         public SerializedAmmo() { }
-
-        [Obsolete("Ammo is stored in ushort since 11.0")]
-        public SerializedAmmo(uint ammo5, uint ammo7, uint ammo9)
-        {
-            Ammo5 = (ushort)ammo5;
-            Ammo7 = (ushort)ammo7;
-            Ammo9 = (ushort)ammo9;
-            Ammo12 = 0;
-            Ammo44 = 0;
-        }
 
         public SerializedAmmo(ushort ammo5, ushort ammo7, ushort ammo9, ushort ammo12, ushort ammo44)
         {
@@ -117,22 +110,23 @@ namespace Synapse3.SynapseModule.Config;
             Ammo44 = ammo44;
         }
 
-        public ushort Ammo5 { get; set; } = 0;
-        public ushort Ammo7 { get; set; } = 0;
-        public ushort Ammo9 { get; set; } = 0;
-        public ushort Ammo12 { get; set; } = 0;
-        public ushort Ammo44 { get; set; } = 0;
+        public ushort Ammo5 { get; set; }
+        public ushort Ammo7 { get; set; }
+        public ushort Ammo9 { get; set; }
+        public ushort Ammo12 { get; set; }
+        public ushort Ammo44 { get; set; }
 
-        public void Apply(Player player)
+        public void Apply(SynapsePlayer player)
         {
-            player.AmmoBox[AmmoType.Ammo556x45] = Ammo5;
-            player.AmmoBox[AmmoType.Ammo762x39] = Ammo7;
-            player.AmmoBox[AmmoType.Ammo9x19] = Ammo9;
-            player.AmmoBox[AmmoType.Ammo12gauge] = Ammo12;
-            player.AmmoBox[AmmoType.Ammo44cal] = Ammo44;
+            player.Inventory.AmmoBox[AmmoType.Ammo556X45] = Ammo5;
+            player.Inventory.AmmoBox[AmmoType.Ammo762X39] = Ammo7;
+            player.Inventory.AmmoBox[AmmoType.Ammo9X19] = Ammo9;
+            player.Inventory.AmmoBox[AmmoType.Ammo12Gauge] = Ammo12;
+            player.Inventory.AmmoBox[AmmoType.Ammo44Cal] = Ammo44;
         }
     }
 
+/*
     [Serializable]
     public class SerializedPlayerInventory
     {

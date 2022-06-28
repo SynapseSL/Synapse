@@ -1,5 +1,6 @@
 ﻿using Neuron.Core.Logging;
 using Neuron.Core.Meta;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map;
@@ -56,6 +57,11 @@ public class DebugService : Service
             
             case KeyCode.Alpha5:
                 NeuronLogger.For<Synapse>().Warn(ev.Player.Room.Name);
+                break;
+            
+            case KeyCode.Alpha6:
+                Synapse.Get<CassieService>().Announce("This is a test message",
+                    CassieSettings.Glitched, CassieSettings.Noise, CassieSettings.DisplayText);
                 break;
         }
     }
