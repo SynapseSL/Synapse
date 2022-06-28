@@ -57,9 +57,13 @@ public abstract class SynapseCustomRoom : DefaultSynapseObject ,IRoom
         OnGenerate();
     }
 
+    public override void Destroy()
+    {
+        Object.Destroy(GameObject);
+    }
+
     public void Despawn()
     {
-        Synapse.Get<RoomService>()._rooms.Remove(this);
         Object.Destroy(GameObject);
     }
 

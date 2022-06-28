@@ -33,10 +33,12 @@ public class MapService : Service
     internal readonly List<SynapseWorkStation> _synapseWorkStations = new();
     internal readonly List<SynapseRagdoll> _synapseRagdolls = new();
     internal readonly List<SynapseSchematic> _synapseSchematics = new();
-    
+    internal readonly List<SynapseOldGrenade> _synapseOldGrenades = new();
+
     //Other Objects
     private readonly List<SynapseTesla> _synapseTeslas = new();
     internal readonly List<SynapseCamera> _synapseCameras = new();
+    private readonly List<SynapseElevator> _synapseElevators = new();
 
     public ReadOnlyCollection<ISynapseObject> SynapseObjects => _synapseObjects.AsReadOnly();
     public ReadOnlyCollection<SynapseDoor> SynapseDoors => _synapseDoors.AsReadOnly();
@@ -49,9 +51,11 @@ public class MapService : Service
     public ReadOnlyCollection<SynapseWorkStation> SynapseWorkStations => _synapseWorkStations.AsReadOnly();
     public ReadOnlyCollection<SynapseRagdoll> SynapseRagdolls => _synapseRagdolls.AsReadOnly();
     public ReadOnlyCollection<SynapseSchematic> SynapseSchematics => _synapseSchematics.AsReadOnly();
+    public ReadOnlyCollection<SynapseOldGrenade> SynapseOldGrenades => _synapseOldGrenades.AsReadOnly();
 
     public ReadOnlyCollection<SynapseTesla> SynapseTeslas => _synapseTeslas.AsReadOnly();
     public ReadOnlyCollection<SynapseCamera> SynapseCameras => _synapseCameras.AsReadOnly();
+    public ReadOnlyCollection<SynapseElevator> SynapseElevators => _synapseElevators.AsReadOnly();
 
 
     private void LoadObjects(RoundWaitingEvent ev)
@@ -80,10 +84,17 @@ public class MapService : Service
         {
             _synapseTeslas.Add(new SynapseTesla(tesla));
         }
+
+        foreach (var lift in Synapse.GetObjectsOf<Lift>())
+        {
+            _synapseElevators.Add(new SynapseElevator(lift));
+        }
     }
 
     private void ClearObjects(RoundRestartEvent ev)
     {
         _synapseTeslas.Clear();
+        _synapseElevators.Clear();
+        _synapseCameras.Clear();
     }
 }

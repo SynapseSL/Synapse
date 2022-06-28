@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Mirror;
+using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -57,6 +58,8 @@ public class SynapseSchematic : DefaultSynapseObject
     internal readonly List<SynapseRagdoll> _ragdolls = new ();
     internal readonly List<SynapseGenerator> _generators = new();
     internal readonly List<SynapseLocker> _lockers = new();
+    internal readonly List<SynapseItem> _items = new();
+    internal readonly List<SynapseOldGrenade> _oldGrenades = new();
 
     public ReadOnlyCollection<ISynapseObject> Children => _children.AsReadOnly();
     public ReadOnlyCollection<SynapsePrimitive> Primitives => _primitives.AsReadOnly();
@@ -68,6 +71,8 @@ public class SynapseSchematic : DefaultSynapseObject
     public ReadOnlyCollection<SynapseRagdoll> Ragdolls => _ragdolls.AsReadOnly();
     public ReadOnlyCollection<SynapseGenerator> Generators => _generators.AsReadOnly();
     public ReadOnlyCollection<SynapseLocker> Lockers => _lockers.AsReadOnly();
+    public ReadOnlyCollection<SynapseItem> Items => _items.AsReadOnly();
+    public ReadOnlyCollection<SynapseOldGrenade> OldGrenades => _oldGrenades.AsReadOnly();
 
     public string Name { get; }
 
@@ -133,6 +138,21 @@ public class SynapseSchematic : DefaultSynapseObject
         foreach (var gen in configuration.Generators)
         {
             _children.Add(new SynapseGenerator(gen, this));
+        }
+
+        foreach (var customObject in configuration.CustomObjects)
+        {
+            _children.Add(new SynapseCustomObject(customObject,this));
+        }
+
+        foreach (var item in configuration.Items)
+        {
+            _children.Add(new SynapseItem(item, this));
+        }
+
+        foreach (var grenade in configuration.OldGrenades)
+        {
+            _children.Add(new SynapseOldGrenade(grenade, this));
         }
 
         Map._synapseSchematics.Add(this);
