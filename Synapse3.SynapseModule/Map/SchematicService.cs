@@ -75,7 +75,7 @@ public class SchematicService : Service
             Rotation = rotation,
             Scale = scale,
         };
-        return null;
+        return so;
     }
 
     public SynapseSchematic SpawnSchematic(SchematicConfiguration configuration, Vector3 position, Quaternion rotation)
@@ -95,7 +95,7 @@ public class SchematicService : Service
     public SynapseSchematic SpawnSchematic(int id, Vector3 position)
         => SpawnSchematic(GetConfiguration(id), position, Quaternion.identity, Vector3.one);
 
-    public SchematicConfiguration GetConfiguration(int id) => SchematicConfigurations.FirstOrDefault(x => x.ID == id);
+    public SchematicConfiguration GetConfiguration(int id) => _schematicConfigurations.FirstOrDefault(x => x.ID == id);
 
     public SchematicConfiguration GetConfiguration(string name) =>
         SchematicConfigurations.FirstOrDefault(x => x.Name == name);
@@ -111,7 +111,7 @@ public class SchematicService : Service
     public bool SaveConfiguration(SchematicConfiguration configuration)
     {
         if (IsIDRegistered(configuration.ID) || string.IsNullOrWhiteSpace(configuration.Name)) return false;
-        RegisterSchematic(configuration);
+        RegisterSchematic(configuration, true);
         
         var file = Path.Combine(_base.PrepareRelativeDirectory("Schematics"), configuration.Name);
 

@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using MapGeneration;
+using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Rooms;
@@ -11,6 +13,8 @@ namespace Synapse3.SynapseModule.Map;
 
 public class RoomService : Service
 {
+    public const int HighestRoom = (int)RoomType.GateB;
+    
     private readonly RoundEvents _round;
     private readonly MapService _map;
 
@@ -22,6 +26,12 @@ public class RoomService : Service
         round.RoundWaiting.Subscribe(LoadRooms);
         round.RoundRestart.Subscribe(ClearRooms);
     }
+
+    internal readonly List<IRoom> _rooms = new();
+    private readonly List<CustomRoomInformation> _customRoomInformation = new ();
+    
+    public ReadOnlyCollection<IRoom> Rooms => _rooms.AsReadOnly();
+    public ReadOnlyCollection<CustomRoomInformation> CustomRoomInformation => _customRoomInformation.AsReadOnly();
 
     public IRoom GetRoom(int id)
         => Rooms.FirstOrDefault(x => x.ID == id);
@@ -35,9 +45,55 @@ public class RoomService : Service
         return Rooms.OrderBy(x => Vector3.Distance(x.Position, position))?.FirstOrDefault();
     }
 
-    internal readonly List<IRoom> _rooms = new();
-    public ReadOnlyCollection<IRoom> Rooms => _rooms.AsReadOnly();
+    public void RegisterCustomRoom<TRoom>() where TRoom : SynapseCustomRoom
+    {
+        var room = (SynapseCustomRoom)Activator.CreateInstance(typeof(TRoom));
+        var info = new CustomRoomInformation
+        {
+            Name = room.Name,
+            ID = room.ID,
+            RoomType = typeof(TRoom)
+        };
+        
+        RegisterCustomRoom(info);
+    }
+    
+    public void RegisterCustomRoom(CustomRoomInformation info)
+    {
+        if(IsIdRegistered(info.ID)) return;
+        _customRoomInformation.Add(info);
+    }
 
+    public void RemoveCustomRoom(int id)
+    {
+        if(!IsIdRegistered(id)) return;
+        var info = _customRoomInformation.First(x => x.ID == id);
+        _customRoomInformation.Remove(info);
+    }
+
+    public SynapseCustomRoom CreateRoom(int id)
+    {
+        if (!IsIdRegistered(id)) return null;
+        var info = _customRoomInformation.FirstOrDefault(x => x.ID == id);
+
+        if (info.RoomType.GetConstructors().Any(x =>
+                x.GetParameters().Length == 1 && x.GetParameters().First().ParameterType == typeof(int)))
+            return (SynapseCustomRoom)Activator.CreateInstance(info.RoomType, new object[] { id });
+
+        return (SynapseCustomRoom)Activator.CreateInstance(info.RoomType);
+    }
+
+    public SynapseCustomRoom SpawnCustomRoom(int id, Vector3 position)
+    {
+        if (!IsIdRegistered(id) || id is >= 0 and <= HighestRoom) return null;
+        var room = CreateRoom(id);
+        room.Generate(position);
+        return room;
+    }
+
+    public bool IsIdRegistered(int id)
+        => id is >= 0 and <= HighestRoom || _customRoomInformation.Any(x => x.ID == id);
+    
     private void LoadRooms(RoundWaitingEvent ev)
     {
         foreach (var room in RoomIdentifier.AllRoomIdentifiers)
@@ -138,4 +194,12 @@ public class RoomService : Service
             { "EZ_GateA", RoomType.GateA },
             { "EZ_GateB", RoomType.GateB }
         });
+    
+    public class TestRoom : SynapseCustomRoom
+    {
+        public override string Name => "Test";
+        public override int ID => 100;
+        public override int Zone => 99;
+        public override int SchematicID => 1;
+    }
 }

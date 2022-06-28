@@ -2,6 +2,7 @@
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.Map;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule;
@@ -47,6 +48,14 @@ public class DebugService : Service
                 {
                     item.EquipItem(ev.Player);
                 }
+                break;
+            
+            case KeyCode.Alpha4:
+                Synapse.Get<RoomService>().SpawnCustomRoom(100, ev.Player.Position);
+                break;
+            
+            case KeyCode.Alpha5:
+                NeuronLogger.For<Synapse>().Warn(ev.Player.Room.Name);
                 break;
         }
     }
