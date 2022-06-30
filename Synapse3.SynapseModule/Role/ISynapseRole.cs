@@ -6,10 +6,8 @@ namespace Synapse3.SynapseModule.Role;
 public interface ISynapseRole
 {
     SynapsePlayer Player { get; set; }
-
-    string GetRoleName();
-
-    int GetRoleID();
+    
+    RoleInformation Information { get; set; }
 
     int GetTeamID();
 

@@ -20,12 +20,12 @@ public abstract class SynapseRole : ISynapseRole
             _player = value;
         }
     }
+
+    public RoleInformation Information { get; set; }
     
-    public abstract string GetRoleName();
-    public abstract int GetRoleID();
     public abstract int GetTeamID();
-    public abstract List<int> GetFriendsID();
-    public abstract List<int> GetEnemiesID();
+    public virtual List<int> GetFriendsID() => new ();
+    public virtual List<int> GetEnemiesID() => new ();
 
     public virtual void TryEscape() { }
     public abstract void SpawnPlayer(bool spawnLite);

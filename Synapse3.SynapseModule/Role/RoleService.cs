@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using Neuron.Core.Meta;
 using Neuron.Modules.Commands.Event;
 using Synapse3.SynapseModule.Command;
@@ -15,6 +16,9 @@ public class RoleService : Service
     private readonly PlayerService _player;
     private List<RoleInformation> _customRoles = new();
 
+    /// <summary>
+    /// The Hightest vanilla number for Roles
+    /// </summary>
     public const int HighestRole = (int)RoleType.ChaosMarauder;
     
     /// <summary>
@@ -38,6 +42,19 @@ public class RoleService : Service
     {
         _command.RemoteAdmin.Subscribe(OnRemoteAdmin);
     }
+
+    /// <summary>
+    /// This method Disables the RoleService don't call it manually
+    /// </summary>
+    public override void Disable()
+    {
+        _command.RemoteAdmin.Unsubscribe(OnRemoteAdmin);
+    }
+
+    /// <summary>
+    /// Loads the SynapseRoleBindings
+    /// </summary>
+    internal void LoadBinding(SynapseRoleBinding binding) => RegisterRole(binding.Info);
 
     /// <summary>
     /// Returns true if the Id is registered or is an Vanilla Role
@@ -65,12 +82,13 @@ public class RoleService : Service
     }
 
     /// <summary>
-    /// Creates a new Instance of the Object to get the Role Name & id and register it. The Role must have a empty constructor for this
+    /// Creates a new Instance of the Object to get the Role Name & id and register it. The RoleType must have an RoleInformation attribute
     /// </summary>
     public bool RegisterRole<TRole>() where TRole : ISynapseRole
     {
-        var role = (ISynapseRole)Activator.CreateInstance(typeof(TRole));
-        var info = new RoleInformation(role.GetRoleName(), role.GetRoleID(), typeof(TRole));
+        var info = typeof(TRole).GetCustomAttribute<RoleInformation>();
+        if (info == null) return false;
+        info.RoleScript = typeof(TRole);
 
         return RegisterRole(info);
     }
@@ -128,10 +146,18 @@ public class RoleService : Service
     /// </summary>
     private ISynapseRole GetRole(RoleInformation info)
     {
-        if (info.RoleScript.GetConstructors().Any(x => x.GetParameters().Count() == 1 && x.GetParameters().First().ParameterType == typeof(int)))
-            return (ISynapseRole)Activator.CreateInstance(info.RoleScript, new object[] { info.ID });
+        ISynapseRole role;
 
-        return (ISynapseRole)Activator.CreateInstance(info.RoleScript);
+        if (info.RoleScript.GetConstructors().Any(x =>
+                x.GetParameters().Count() == 1 && x.GetParameters().First().ParameterType == typeof(RoleInformation)))
+        {
+            role = (ISynapseRole)Activator.CreateInstance(info.RoleScript, new object[] { info });
+        }
+        {
+            role = (ISynapseRole)Activator.CreateInstance(info.RoleScript);
+        }
+        role.Information = info;
+        return role;
     }
 
     /// <summary>

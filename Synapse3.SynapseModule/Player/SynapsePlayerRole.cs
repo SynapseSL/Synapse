@@ -77,7 +77,7 @@ public partial class SynapsePlayer
         get
         {
             if (CustomRole == null) return (int)RoleType;
-            return CustomRole.GetRoleID();
+            return CustomRole.Information.ID;
         }
         set
         {
@@ -92,6 +92,18 @@ public partial class SynapsePlayer
             if(!service.IsIdRegistered(value)) return;
 
             CustomRole = service.GetRole(value);
+        }
+    }
+
+    /// <summary>
+    /// The Name of the Role the player currently has
+    /// </summary>
+    public string RoleName
+    {
+        get
+        {
+            if (CustomRole == null) return RoleType.ToString();
+            return CustomRole.Information.Name;
         }
     }
 }

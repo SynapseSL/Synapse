@@ -12,6 +12,7 @@ using Neuron.Modules.Patcher;
 using Ninject;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Role;
 using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule;
@@ -87,7 +88,9 @@ public class Synapse : Module
     
     internal Queue<SynapseCommandBinding> moduleCommandBindingQueue = new();
     
-    public SynapseCommandService SynapseCommandService { get; set; }
+    public SynapseCommandService SynapseCommandService { get; private set; }
+    
+    public RoleService RoleService { get; private set; }
 
     public override void Load(IKernel kernel)
     {
@@ -98,8 +101,9 @@ public class Synapse : Module
         var moduleManager = kernel.Get<ModuleManager>();
         var pluginManager = kernel.Get<PluginManager>();
         metaManager.MetaGenerateBindings.Subscribe(OnGenerateCommandBinding);
-        moduleManager.ModuleLoadLate.Subscribe(OnModuleLoadCommands);
-        pluginManager.PluginLoadLate.Subscribe(OnPluginLoadCommands);
+        metaManager.MetaGenerateBindings.Subscribe(OnGenerateRoleBinding);
+        moduleManager.ModuleLoadLate.Subscribe(LoadModuleLate);
+        pluginManager.PluginLoadLate.Subscribe(OnPluginLoadLate);
         
         CustomNetworkManager.Modded = true;
         BuildInfoCommand.ModDescription = $"Plugin Framework: Synapse\n" +
@@ -109,11 +113,24 @@ public class Synapse : Module
         if(Synapse.BasedGameVersion != GameCore.Version.VersionString)
             Logger.Warn($"Sy3 Version: This Version of Synapse3 is build for SCPSL Version {Synapse.BasedGameVersion} Currently installed: {GameCore.Version.VersionString}\nBugs may occurs");
     }
+
+    private void OnGenerateRoleBinding(MetaGenerateBindingsEvent args)
+    {
+        if(!args.MetaType.TryGetAttribute<AutomaticAttribute>(out var _)) return;
+        if(!args.MetaType.TryGetAttribute<RoleInformation>(out var roleInformation)) return;
+        if(!args.MetaType.Is<SynapseRole>()) return;
+
+        roleInformation.RoleScript = args.MetaType.Type;
+        args.Outputs.Add(new SynapseRoleBinding()
+        {
+            Info = roleInformation
+        });
+    }
     
     private void OnGenerateCommandBinding(MetaGenerateBindingsEvent args)
     {
-        if (!args.MetaType.TryGetAttribute<AutomaticAttribute>(out var automaticAttribute)) return;
-        if (!args.MetaType.TryGetAttribute<SynapseCommandAttribute>(out var commandAttribute)) return;
+        if (!args.MetaType.TryGetAttribute<AutomaticAttribute>(out var _)) return;
+        if (!args.MetaType.TryGetAttribute<SynapseCommandAttribute>(out var _)) return;
         if (!args.MetaType.Is<SynapseCommand>()) return;
             
         Logger.Debug($"* {args.MetaType.Type} [SynapseCommandBinding]");
@@ -123,21 +140,36 @@ public class Synapse : Module
         });
     }
 
-    private void OnPluginLoadCommands(PluginLoadEvent args) => args.Context.MetaBindings
-        .OfType<SynapseCommandBinding>()
-        .ToList().ForEach(x=> SynapseCommandService.LoadBinding(x));
+    private void OnPluginLoadLate(PluginLoadEvent args)
+    {
+        args.Context.MetaBindings
+            .OfType<SynapseCommandBinding>()
+            .ToList().ForEach(x=> SynapseCommandService.LoadBinding(x));
 
-    private void OnModuleLoadCommands(ModuleLoadEvent args) => args.Context.MetaBindings
-        .OfType<SynapseCommandBinding>()
-        .ToList().ForEach(binding =>
-        {
-            Logger.Debug("Enqueue module binding [SynapseCommand]");
-            moduleCommandBindingQueue.Enqueue(binding);
-        });
+        args.Context.MetaBindings
+            .OfType<SynapseRoleBinding>()
+            .ToList().ForEach(x => RoleService.LoadBinding(x));
+    }
+
+    private void LoadModuleLate(ModuleLoadEvent args)
+    {
+        args.Context.MetaBindings
+            .OfType<SynapseCommandBinding>()
+            .ToList().ForEach(binding =>
+            {
+                Logger.Debug("Enqueue module binding [SynapseCommand]");
+                moduleCommandBindingQueue.Enqueue(binding);
+            });
+        
+        args.Context.MetaBindings
+            .OfType<SynapseRoleBinding>()
+            .ToList().ForEach(x => RoleService.LoadBinding(x));
+    }
 
     public override void Enable()
     {
         SynapseCommandService = _kernel.GetSafe<SynapseCommandService>();
+        RoleService = _kernel.GetSafe<RoleService>();
         
         Logger.Info("Synapse3 enabled!");
     }
@@ -151,8 +183,14 @@ public class Synapse : Module
 
 public class SynapseCommandBinding : IMetaBinding
 {
-    
     public Type Type { get; set; }
+
+    public IEnumerable<Type> PromisedServices => new Type[] { };
+}
+
+public class SynapseRoleBinding : IMetaBinding
+{
+    public RoleInformation Info { get; set; }
 
     public IEnumerable<Type> PromisedServices => new Type[] { };
 }

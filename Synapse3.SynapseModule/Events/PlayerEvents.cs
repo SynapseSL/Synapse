@@ -10,8 +10,8 @@ public class PlayerEvents : Service
     private readonly EventManager _eventManager;
 
     public readonly EventReactor<LoadComponentEvent> LoadComponent = new();
-
     public readonly EventReactor<KeyPressEvent> KeyPress = new();
+    public readonly EventReactor<HarmPermissionEvent> HarmPermission = new();
 
     public PlayerEvents(EventManager eventManager)
     {
@@ -22,39 +22,65 @@ public class PlayerEvents : Service
     {
         _eventManager.RegisterEvent(LoadComponent);
         _eventManager.RegisterEvent(KeyPress);
+        _eventManager.RegisterEvent(HarmPermission);
     }
 }
 
-public class LoadComponentEvent : IEvent
+public abstract class PlayerEvent : IEvent
 {
-    public LoadComponentEvent(SynapsePlayer player)
+    public SynapsePlayer Player { get; }
+
+    protected PlayerEvent(SynapsePlayer player)
     {
         Player = player;
-        PlayerGameobject = player.gameObject;
     }
-    
-    public SynapsePlayer Player { get; }
-    
-    public GameObject PlayerGameobject { get; }
+}
+
+public abstract class PlayerInteractEvent : PlayerEvent
+{
+    public bool Allow { get; set; }
+
+    protected PlayerInteractEvent(SynapsePlayer player, bool allow) : base(player)
+    {
+        Allow = allow;
+    }
+} 
+
+public class LoadComponentEvent : PlayerEvent
+{
+    public LoadComponentEvent(SynapsePlayer player) : base(player)
+    {
+        PlayerGameObject = player.gameObject;
+    }
+
+    public GameObject PlayerGameObject { get; }
 
     public TComponent AddComponent<TComponent>() where TComponent : Component
     {
-        var comp = (TComponent)PlayerGameobject.GetComponent(typeof(TComponent));
+        var comp = (TComponent)PlayerGameObject.GetComponent(typeof(TComponent));
         if (comp == null)
-            return PlayerGameobject.AddComponent<TComponent>();
+            return PlayerGameObject.AddComponent<TComponent>();
 
         return comp;
     }
 }
 
-public class KeyPressEvent : IEvent
+public class KeyPressEvent : PlayerEvent
 {
-    public SynapsePlayer Player { get; }
     public KeyCode KeyCode { get; }
 
-    public KeyPressEvent(SynapsePlayer player, KeyCode keyCode)
+    public KeyPressEvent(SynapsePlayer player, KeyCode keyCode) : base(player)
     {
-        Player = player;
         KeyCode = keyCode;
     }
+}
+
+public class HarmPermissionEvent : PlayerInteractEvent
+{
+    public HarmPermissionEvent(SynapsePlayer attacker, SynapsePlayer victim, bool allow) : base(attacker, allow)
+    {
+        Victim = victim;
+    }
+    
+    public SynapsePlayer Victim { get; }
 }

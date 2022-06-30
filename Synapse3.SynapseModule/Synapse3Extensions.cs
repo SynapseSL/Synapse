@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using InventorySystem.Items;
 using InventorySystem.Items.Pickups;
 using Mirror;
+using Neuron.Core.Logging;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule;
+using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -127,7 +131,62 @@ public static class Synapse3Extensions
 
     public static bool GetHarmPermission(SynapsePlayer attacker, SynapsePlayer victim, bool ignoreFFConfig = false)
     {
-        //TODO:
-        return false;
+        try
+        {
+            bool allow;
+
+            if (Synapse.Get<RoundService>().RoundEnded &&
+                Synapse.Get<SynapseConfigService>().GamePlayConfiguration.AutoFriendlyFire)
+            {
+                allow = true;
+            }
+            else if (attacker == victim)
+            {
+                allow = true;
+            }
+            else if (attacker.Team == Team.RIP && victim.Team == Team.RIP)
+            {
+                allow = false;
+            }
+            else if (attacker.CustomRole == null && victim.CustomRole == null)
+            {
+                if (attacker.Team == Team.SCP && victim.Team == Team.SCP) allow = false;
+
+                var ff = ignoreFFConfig || Synapse.Get<ServerService>().FF;
+
+                if (ff)
+                {
+                    allow = true;
+                }
+                else
+                {
+                    allow = attacker.Faction != victim.Faction;
+                }
+            }
+            else
+            {
+                allow = true;
+                if (attacker.CustomRole != null && attacker.CustomRole.GetFriendsID().Any(x => x == victim.TeamID))
+                {
+                    allow = false;
+                    //TODO: Same Team Message
+                }
+
+                if (victim.CustomRole != null && victim.CustomRole.GetFriendsID().Any(x => x == attacker.TeamID))
+                {
+                    allow = false;
+                    //Same Team Message
+                }
+            }
+
+            var ev = new HarmPermissionEvent(attacker, victim, allow);
+            Synapse.Get<PlayerEvents>().HarmPermission.Raise(ev);
+            return ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 FF: Harm Permission Event failed\n" + ex);
+            return true;
+        }
     }
 }

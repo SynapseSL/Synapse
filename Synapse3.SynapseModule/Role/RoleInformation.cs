@@ -2,8 +2,10 @@
 
 namespace Synapse3.SynapseModule.Role;
 
-public class RoleInformation
+public class RoleInformation : Attribute
 {
+    public RoleInformation() { }
+    
     public RoleInformation(string name, int id, Type script)
     {
         Name = name;
@@ -11,7 +13,7 @@ public class RoleInformation
         RoleScript = script;
     }
 
-    public string Name { get; }
-    public int ID { get; }
-    public Type RoleScript { get; }
+    public string Name { get; set; }
+    public int ID { get; set; }
+    public Type RoleScript { get; internal set; }
 }

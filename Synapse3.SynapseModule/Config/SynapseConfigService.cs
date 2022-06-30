@@ -11,6 +11,8 @@ public class SynapseConfigService : Service
     public HostingConfiguration HostingConfiguration { get; private set; }
     
     public PermissionConfiguration PermissionConfiguration { get; private set; }
+    
+    public GamePlayConfiguration GamePlayConfiguration { get; internal set; }
 
     public SynapseConfigService(ConfigService configService)
     {
@@ -27,5 +29,6 @@ public class SynapseConfigService : Service
     {
         HostingConfiguration = Container.Get<HostingConfiguration>();
         PermissionConfiguration = Container.Get<PermissionConfiguration>();
+        GamePlayConfiguration = Container.Get<GamePlayConfiguration>();
     }
 }
