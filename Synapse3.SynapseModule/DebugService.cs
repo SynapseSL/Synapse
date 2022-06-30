@@ -60,8 +60,8 @@ public class DebugService : Service
                 break;
             
             case KeyCode.Alpha6:
-                Synapse.Get<CassieService>().Announce("This is a test message",
-                    CassieSettings.Glitched, CassieSettings.Noise, CassieSettings.DisplayText);
+                Synapse.Get<CassieService>().AnnounceScpDeath("056", ScpContainmentType.ClassD, "Unknown", 0.3f, 0.2f,
+                    CassieSettings.Glitched, CassieSettings.DisplayText, CassieSettings.Noise);
                 break;
         }
     }

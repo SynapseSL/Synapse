@@ -7,6 +7,7 @@ using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
+using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map;
 
@@ -57,6 +58,29 @@ public class MapService : Service
     public ReadOnlyCollection<SynapseCamera> SynapseCameras => _synapseCameras.AsReadOnly();
     public ReadOnlyCollection<SynapseElevator> SynapseElevators => _synapseElevators.AsReadOnly();
 
+
+
+    public Vector3 GlobalRespawnPoint
+    {
+        get => NonFacilityCompatibility.currentSceneSettings.constantRespawnPoint;
+        set => NonFacilityCompatibility.currentSceneSettings.constantRespawnPoint = value;
+    }
+
+    public float HumanWalkSpeed
+    {
+        get => ServerConfigSynchronizer.Singleton.NetworkHumanWalkSpeedMultiplier;
+        set => ServerConfigSynchronizer.Singleton.NetworkHumanWalkSpeedMultiplier = value;
+    }
+
+    public float HumanSprintSpeed
+    {
+        get => ServerConfigSynchronizer.Singleton.NetworkHumanSprintSpeedMultiplier;
+        set => ServerConfigSynchronizer.Singleton.NetworkHumanSprintSpeedMultiplier = value;
+    }
+    
+    public int Seed => MapGeneration.SeedSynchronizer.Seed;
+    
+    
 
     private void LoadObjects(RoundWaitingEvent ev)
     {

@@ -124,4 +124,10 @@ public static class Synapse3Extensions
     
     public static SynapseItem GetSynapseItem(this ItemBase itemBase) =>
         Synapse.Get<ItemService>().GetSynapseItem(itemBase.ItemSerial);
+
+    public static bool GetHarmPermission(SynapsePlayer attacker, SynapsePlayer victim, bool ignoreFFConfig = false)
+    {
+        //TODO:
+        return false;
+    }
 }
