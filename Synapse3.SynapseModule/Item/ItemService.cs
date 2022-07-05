@@ -21,9 +21,18 @@ public class ItemService : Service
     public ItemService(RoundEvents round)
     {
         _round = round;
-        round.RoundRestart.Subscribe(Clear);
     }
-    
+
+    public override void Enable()
+    {
+        _round.Restart.Subscribe(Clear);
+    }
+
+    public override void Disable()
+    {
+        _round.Restart.Unsubscribe(Clear);
+    }
+
     public ReadOnlyCollection<ItemInformation> CustomItemInformation => _items.AsReadOnly();
     internal Dictionary<ushort, SynapseItem> _allItems { get; } = new ();
 

@@ -27,6 +27,7 @@ public class SynapseConfigService : Service
 
     public void Reload()
     {
+        Container.Load();
         HostingConfiguration = Container.Get<HostingConfiguration>();
         PermissionConfiguration = Container.Get<PermissionConfiguration>();
         GamePlayConfiguration = Container.Get<GamePlayConfiguration>();

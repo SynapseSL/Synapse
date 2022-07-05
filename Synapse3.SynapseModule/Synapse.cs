@@ -12,7 +12,9 @@ using Neuron.Modules.Patcher;
 using Ninject;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Map.Schematic.CustomAttributes;
 using Synapse3.SynapseModule.Role;
+using Synapse3.SynapseModule.Teams;
 using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule;
@@ -70,7 +72,7 @@ public class Synapse : Module
     public static string GetVersion()
     {
         var version = $"{Major}.{Minor}.{Patch}";
-
+        
         if (Type != VersionType.None)
             version += $"{Type}-{SubVersion}";
 
@@ -91,6 +93,10 @@ public class Synapse : Module
     public SynapseCommandService SynapseCommandService { get; private set; }
     
     public RoleService RoleService { get; private set; }
+    
+    public TeamService TeamService { get; private set; }
+    
+    public CustomAttributeService CustomAttributeService { get; private set; }
 
     public override void Load(IKernel kernel)
     {
@@ -100,8 +106,7 @@ public class Synapse : Module
         var metaManager = kernel.Get<MetaManager>();
         var moduleManager = kernel.Get<ModuleManager>();
         var pluginManager = kernel.Get<PluginManager>();
-        metaManager.MetaGenerateBindings.Subscribe(OnGenerateCommandBinding);
-        metaManager.MetaGenerateBindings.Subscribe(OnGenerateRoleBinding);
+        metaManager.MetaGenerateBindings.Subscribe(MetaGenerateBindings);
         moduleManager.ModuleLoadLate.Subscribe(LoadModuleLate);
         pluginManager.PluginLoadLate.Subscribe(OnPluginLoadLate);
         
@@ -114,11 +119,19 @@ public class Synapse : Module
             Logger.Warn($"Sy3 Version: This Version of Synapse3 is build for SCPSL Version {Synapse.BasedGameVersion} Currently installed: {GameCore.Version.VersionString}\nBugs may occurs");
     }
 
+    private void MetaGenerateBindings(MetaGenerateBindingsEvent args)
+    {
+        OnGenerateRoleBinding(args);
+        OnGenerateCommandBinding(args);
+        OnGenerateTeamBinding(args);
+        OnGenerateAttributeBinding(args);
+    }
+
     private void OnGenerateRoleBinding(MetaGenerateBindingsEvent args)
     {
         if(!args.MetaType.TryGetAttribute<AutomaticAttribute>(out var _)) return;
         if(!args.MetaType.TryGetAttribute<RoleInformation>(out var roleInformation)) return;
-        if(!args.MetaType.Is<SynapseRole>()) return;
+        if(!args.MetaType.Is<ISynapseRole>()) return;
 
         roleInformation.RoleScript = args.MetaType.Type;
         args.Outputs.Add(new SynapseRoleBinding()
@@ -140,6 +153,30 @@ public class Synapse : Module
         });
     }
 
+    private void OnGenerateTeamBinding(MetaGenerateBindingsEvent args)
+    {
+        if (!args.MetaType.TryGetAttribute<AutomaticAttribute>(out var _)) return;
+        if (!args.MetaType.TryGetAttribute<TeamInformation>(out var info)) return;
+        if(!args.MetaType.Is<ISynapseTeam>()) return;
+        
+        args.Outputs.Add(new SynapseTeamBinding()
+        {
+            Info = info,
+            Type = args.MetaType.Type
+        });
+    }
+
+    private void OnGenerateAttributeBinding(MetaGenerateBindingsEvent args)
+    {
+        if (!args.MetaType.TryGetAttribute<AutomaticAttribute>(out var _)) return;
+        if(!args.MetaType.Is<AttributeHandler>()) return;
+
+        args.Outputs.Add(new SynapseCustomObjectAttributeBinding()
+        {
+            Type = args.MetaType.Type
+        });
+    }
+
     private void OnPluginLoadLate(PluginLoadEvent args)
     {
         args.Context.MetaBindings
@@ -149,6 +186,14 @@ public class Synapse : Module
         args.Context.MetaBindings
             .OfType<SynapseRoleBinding>()
             .ToList().ForEach(x => RoleService.LoadBinding(x));
+        
+        args.Context.MetaBindings
+            .OfType<SynapseTeamBinding>()
+            .ToList().ForEach(x => TeamService.LoadBinding(x));
+        
+        args.Context.MetaBindings
+            .OfType<SynapseCustomObjectAttributeBinding>()
+            .ToList().ForEach(x => CustomAttributeService.LoadBinding(x));
     }
 
     private void LoadModuleLate(ModuleLoadEvent args)
@@ -164,12 +209,22 @@ public class Synapse : Module
         args.Context.MetaBindings
             .OfType<SynapseRoleBinding>()
             .ToList().ForEach(x => RoleService.LoadBinding(x));
+        
+        args.Context.MetaBindings
+            .OfType<SynapseTeamBinding>()
+            .ToList().ForEach(x => TeamService.LoadBinding(x));
+        
+        args.Context.MetaBindings
+            .OfType<SynapseCustomObjectAttributeBinding>()
+            .ToList().ForEach(x => CustomAttributeService.LoadBinding(x));
     }
 
     public override void Enable()
     {
         SynapseCommandService = _kernel.GetSafe<SynapseCommandService>();
         RoleService = _kernel.GetSafe<RoleService>();
+        TeamService = _kernel.GetSafe<TeamService>();
+        CustomAttributeService = _kernel.GetSafe<CustomAttributeService>();
         
         Logger.Info("Synapse3 enabled!");
     }
@@ -192,5 +247,21 @@ public class SynapseRoleBinding : IMetaBinding
 {
     public RoleInformation Info { get; set; }
 
+    public IEnumerable<Type> PromisedServices => new Type[] { };
+}
+
+public class SynapseTeamBinding : IMetaBinding
+{
+    public TeamInformation Info { get; set; }
+    
+    public Type Type { get; set; }
+    
+    public IEnumerable<Type> PromisedServices => new Type[] { };
+}
+
+public class SynapseCustomObjectAttributeBinding : IMetaBinding
+{
+    public Type Type { get; set; }
+    
     public IEnumerable<Type> PromisedServices => new Type[] { };
 }

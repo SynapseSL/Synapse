@@ -1,4 +1,5 @@
-﻿using Neuron.Core.Events;
+﻿using System.Collections.ObjectModel;
+using Neuron.Core.Events;
 using Neuron.Core.Meta;
 
 namespace Synapse3.SynapseModule.Events;
@@ -7,10 +8,11 @@ public class RoundEvents : Service
 {
     private readonly EventManager _eventManager;
 
-    public readonly EventReactor<RoundStartEvent> RoundStart = new();
-    public readonly EventReactor<RoundEndEvent> RoundEnd = new();
-    public readonly EventReactor<RoundWaitingEvent> RoundWaiting = new();
-    public readonly EventReactor<RoundRestartEvent> RoundRestart = new();
+    public readonly EventReactor<RoundStartEvent> Start = new();
+    public readonly EventReactor<RoundEndEvent> End = new();
+    public readonly EventReactor<RoundWaitingEvent> Waiting = new();
+    public readonly EventReactor<RoundRestartEvent> Restart = new();
+    public readonly EventReactor<RoundCheckEndEvent> CheckEnd = new();
 
     public RoundEvents(EventManager eventManager)
     {
@@ -19,9 +21,11 @@ public class RoundEvents : Service
     
     public override void Enable()
     {
-        _eventManager.RegisterEvent(RoundStart);
-        _eventManager.RegisterEvent(RoundEnd);
-        _eventManager.RegisterEvent(RoundWaiting);
+        _eventManager.RegisterEvent(Start);
+        _eventManager.RegisterEvent(End);
+        _eventManager.RegisterEvent(Waiting);
+        _eventManager.RegisterEvent(Restart);
+        _eventManager.RegisterEvent(CheckEnd);
     }
 }
 
@@ -35,3 +39,10 @@ public class RoundWaitingEvent : IEvent
 }
 
 public class RoundRestartEvent : IEvent { }
+
+public class RoundCheckEndEvent : IEvent
+{
+    public bool EndRound { get; set; }
+    
+    public RoundSummary.LeadingTeam WinningTeam { get; set; }
+}

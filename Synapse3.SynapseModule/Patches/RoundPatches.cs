@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using CustomPlayerEffects;
 using GameCore;
 using HarmonyLib;
 using MEC;
 using Neuron.Core.Logging;
 using RoundRestarting;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Player;
+using Synapse3.SynapseModule.Role;
 using UnityEngine;
 // ReSharper disable InconsistentNaming
 
@@ -26,7 +30,7 @@ internal static class RoundPatches
             {
                 FirstTime = _firstTime
             };
-            Synapse.Get<RoundEvents>().RoundWaiting.Raise(ev);
+            Synapse.Get<RoundEvents>().Waiting.Raise(ev);
             _firstTime = false;
         }
         catch (Exception ex)
@@ -44,7 +48,7 @@ internal static class RoundPatches
         {
             if (msg.StartsWith("Round finished! Anomalies: ") && type == ServerLogs.ServerLogType.GameEvent)
             {
-                Synapse.Get<RoundEvents>().RoundEnd.Raise(new RoundEndEvent());
+                Synapse.Get<RoundEvents>().End.Raise(new RoundEndEvent());
             }
         }
         catch (Exception ex)
@@ -59,7 +63,7 @@ internal static class RoundPatches
     {
         try
         {
-            Synapse.Get<RoundEvents>().RoundStart.Raise(new RoundStartEvent());
+            Synapse.Get<RoundEvents>().Start.Raise(new RoundStartEvent());
         }
         catch (Exception ex)
         {
@@ -89,7 +93,7 @@ internal static class RoundPatches
     {
         try
         {
-            Synapse.Get<RoundEvents>().RoundRestart.Raise(new RoundRestartEvent());
+            Synapse.Get<RoundEvents>().Restart.Raise(new RoundRestartEvent());
         }
         catch (Exception ex)
         {
@@ -105,58 +109,67 @@ public static class DecoratedRoundMethods
     {
         // Neuron Event Hook
         var roundEvents = Synapse.Get<RoundEvents>();
+        var playerService = Synapse.Get<PlayerService>();
 
         float time = Time.unscaledTime;
         while (roundSummary != null)
         {
             yield return Timing.WaitForSeconds(2.5f);
-            if (RoundSummary.RoundLock || (roundSummary._keepRoundOnOne && PlayerManager.players.Count < 2) ||
-                !RoundSummary.RoundInProgress() || !((double) Time.unscaledTime - (double) time >= 15.0)) continue;
             
-            RoundSummary.SumInfo_ClassList classList = new RoundSummary.SumInfo_ClassList();
-            foreach (KeyValuePair<GameObject, ReferenceHub> allHub in ReferenceHub.GetAllHubs())
-            {
-                if (!(allHub.Value == null))
-                {
-                    CharacterClassManager characterClassManager = allHub.Value.characterClassManager;
-                    if (characterClassManager.Classes.CheckBounds(characterClassManager.CurClass))
-                    {
-                        switch (characterClassManager.CurRole.team)
-                        {
-                            case Team.SCP:
-                                if (characterClassManager.CurClass == RoleType.Scp0492)
-                                {
-                                    ++classList.zombies;
-                                    continue;
-                                }
+            if (RoundSummary.RoundLock || (roundSummary._keepRoundOnOne && PlayerManager.players.Count < 2) ||
+                !RoundSummary.RoundInProgress() || Time.unscaledTime - time < 15f) continue;
+            
+            var classList = new RoundSummary.SumInfo_ClassList();
+            var customroles = new List<ISynapseRole>();
+            var livinTeamsById = new List<int>();
 
-                                ++classList.scps_except_zombies;
-                                continue;
-                            case Team.MTF:
-                                ++classList.mtf_and_guards;
-                                continue;
-                            case Team.CHI:
-                                ++classList.chaos_insurgents;
-                                continue;
-                            case Team.RSC:
-                                ++classList.scientists;
-                                continue;
-                            case Team.CDP:
-                                ++classList.class_ds;
-                                continue;
-                            default:
-                                continue;
-                        }
-                    }
+            foreach (var player in playerService.Players)
+            {
+                if(!player.ClassManager.Classes.CheckBounds(player.ClassManager.CurClass)) continue;
+
+                livinTeamsById.Add(player.TeamID);
+                if(player.CustomRole != null)
+                    customroles.Add(player.CustomRole);
+                
+                switch (player.TeamID)
+                {
+                    case (int)Team.SCP when player.RoleType == RoleType.Scp0492:
+                        classList.zombies++;
+                        break;
+                    
+                    case (int)Team.SCP when player.RoleType != RoleType.Scp0492:
+                        classList.scps_except_zombies++;
+                        break;
+                    
+                    case (int)Team.MTF:
+                        classList.mtf_and_guards++;
+                        break;
+                    
+                    case (int)Team.CHI:
+                        classList.chaos_insurgents++;
+                        break;
+                    
+                    case (int)Team.RSC:
+                        classList.scientists++;
+                        break;
+                        
+                    case (int)Team.CDP:
+                        classList.class_ds++;
+                        break;
                 }
             }
 
-            yield return float.NegativeInfinity;
+            yield return Timing.WaitForOneFrame;
+            
             classList.warhead_kills =
                 AlphaWarheadController.Host.detonated ? AlphaWarheadController.Host.warheadKills : -1;
-            yield return float.NegativeInfinity;
+            
+            yield return Timing.WaitForOneFrame;
+            
             classList.time = (int) Time.realtimeSinceStartup;
-            yield return float.NegativeInfinity;
+            
+            yield return Timing.WaitForOneFrame;
+            
             RoundSummary.roundTime = classList.time - roundSummary.classlistStart.time;
             int totalMtfs = classList.mtf_and_guards + classList.scientists;
             int totalChaos = classList.chaos_insurgents + classList.class_ds;
@@ -164,6 +177,7 @@ public static class DecoratedRoundMethods
             int totalClassD = classList.class_ds + RoundSummary.EscapedClassD;
             int totalScientists = classList.scientists + RoundSummary.EscapedScientists;
             RoundSummary.SurvivingSCPs = classList.scps_except_zombies;
+            
             var shouldRoundEnd = false; // Change temporary variable instead of real field
             float percentageDClass = roundSummary.classlistStart.class_ds == 0
                 ? 0.0f
@@ -171,6 +185,7 @@ public static class DecoratedRoundMethods
             float percentageScientists = roundSummary.classlistStart.scientists == 0
                 ? 1f
                 : (float) (totalScientists / roundSummary.classlistStart.scientists);
+            
             if (classList.class_ds <= 0 && totalMtfs <= 0)
             {
                 shouldRoundEnd = true;
@@ -178,54 +193,96 @@ public static class DecoratedRoundMethods
             else
             {
                 int livingTeams = 0;
+                
                 if (totalMtfs > 0)
-                    ++livingTeams;
+                    livingTeams++;
+                
                 if (totalChaos > 0)
-                    ++livingTeams;
+                    livingTeams++;
+                
                 if (totalScps > 0)
-                    ++livingTeams;
+                    livingTeams++;
+                
                 shouldRoundEnd = livingTeams <= 1;
             }
+
+            var normalizedMtfs = totalMtfs > 0;
+            var anyChaos = totalChaos > 0;
+            var anyScps = totalScps > 0;
             
-            int normalizedMtfs = totalMtfs > 0 ? 1 : 0;
-            bool anyChaos = totalChaos > 0;
-            bool anyScps = totalScps > 0;
-            RoundSummary.LeadingTeam leadingTeam = RoundSummary.LeadingTeam.Draw;
-            if (normalizedMtfs != 0)
+            var leadingTeam = RoundSummary.LeadingTeam.Draw;
+            
+            if (normalizedMtfs)
                 leadingTeam = RoundSummary.EscapedScientists >= RoundSummary.EscapedClassD
                     ? RoundSummary.LeadingTeam.FacilityForces
                     : RoundSummary.LeadingTeam.Draw;
+            
             else if (anyScps || anyScps & anyChaos)
                 leadingTeam = RoundSummary.EscapedClassD > RoundSummary.SurvivingSCPs
                     ? RoundSummary.LeadingTeam.ChaosInsurgency
                     : (RoundSummary.SurvivingSCPs > RoundSummary.EscapedScientists
                         ? RoundSummary.LeadingTeam.Anomalies
                         : RoundSummary.LeadingTeam.Draw);
+            
             else if (anyChaos)
                 leadingTeam = RoundSummary.EscapedClassD >= RoundSummary.EscapedScientists
                     ? RoundSummary.LeadingTeam.ChaosInsurgency
                     : RoundSummary.LeadingTeam.Draw;
+
+            if (shouldRoundEnd)
+            {
+                foreach (var role in customroles)
+                {
+                    if (role.GetEnemiesID().Any(x => livinTeamsById.Contains(x)))
+                    {
+                        shouldRoundEnd = false;
+                        break;
+                    }
+                }
+            }
             
-            //
-            NeuronLogger.For<Synapse>().Error($"Synapse Round End Check {shouldRoundEnd}, Leading {leadingTeam}");
-            roundSummary.RoundEnded = shouldRoundEnd;
+            var ev = new RoundCheckEndEvent()
+            {
+                EndRound = shouldRoundEnd,
+                WinningTeam = leadingTeam
+            };
+
+            try
+            {
+                roundEvents.CheckEnd.Raise(ev);
+            }
+            catch (Exception ex)
+            {
+                NeuronLogger.For<Synapse>().Error("Sy3 Events: Round Restart Event IEnumerator failed:\n" + ex);
+            }
+
+            leadingTeam = ev.WinningTeam;
+            roundSummary.RoundEnded = ev.EndRound;
             
             if (!roundSummary.RoundEnded) continue; // Perform Round End
+            
             FriendlyFireConfig.PauseDetector = true;
             string str = "Round finished! Anomalies: " + totalScps + " | Chaos: " + totalChaos +
                          " | Facility Forces: " + totalMtfs + " | D escaped percentage: " + percentageDClass +
                          " | S escaped percentage: : " + percentageScientists;
             GameCore.Console.AddLog(str, Color.gray);
             ServerLogs.AddLog(ServerLogs.Modules.Logger, str, ServerLogs.ServerLogType.GameEvent);
+            
             yield return Timing.WaitForSeconds(1.5f);
+            
             int roundCd = Mathf.Clamp(ConfigFile.ServerConfig.GetInt("auto_round_restart_time", 10), 5, 1000);
+            
             if (roundSummary != null)
                 roundSummary.RpcShowRoundSummary(roundSummary.classlistStart, classList, leadingTeam,
                     RoundSummary.EscapedClassD, RoundSummary.EscapedScientists, RoundSummary.KilledBySCPs,
                     roundCd);
+            
             yield return Timing.WaitForSeconds((float) (roundCd - 1));
+            
             roundSummary.RpcDimScreen();
+            
             yield return Timing.WaitForSeconds(1f);
+            
             RoundRestart.InitiateRoundRestart();
         }
     }

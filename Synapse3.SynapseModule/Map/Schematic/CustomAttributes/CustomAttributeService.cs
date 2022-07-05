@@ -3,17 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
+using Ninject;
 using Synapse3.SynapseModule.Events;
 
 namespace Synapse3.SynapseModule.Map.Schematic.CustomAttributes;
 
 public class CustomAttributeService : Service
 {
+    private IKernel _kernel;
     private SynapseObjectEvents _events;
 
-    public CustomAttributeService(SynapseObjectEvents events)
+    public CustomAttributeService(SynapseObjectEvents events, IKernel kernel)
     {
         _events = events;
+        _kernel = kernel;
     }
     
     public List<AttributeHandler> Handlers { get; } = new List<AttributeHandler>();
@@ -24,12 +27,23 @@ public class CustomAttributeService : Service
         typeof(MapTeleporter),
     };
 
+    internal void LoadBinding(SynapseCustomObjectAttributeBinding binding) => LoadHandlerFromType(binding.Type);
+    
     public override void Enable()
     {
         foreach(var type in DefaultAttributes)
             LoadHandlerFromType(type);
+        
+        _events.Load.Subscribe(OnLoad);
+        _events.Update.Subscribe(OnUpdate);
+        _events.Destroy.Subscribe(OnDestroy);
+    }
 
-        RegisterEvents();
+    public override void Disable()
+    {
+        _events.Load.Unsubscribe(OnLoad);
+        _events.Update.Unsubscribe(OnUpdate);
+        _events.Destroy.Unsubscribe(OnDestroy);
     }
 
     public void LoadHandlerFromType(Type type)
@@ -39,11 +53,10 @@ public class CustomAttributeService : Service
             if (!typeof(AttributeHandler).IsAssignableFrom(type)) return;
             if (type.IsAbstract) return;
 
-            var handlerobject = Activator.CreateInstance(type);
-
-            if (!(handlerobject is AttributeHandler handler)) return;
+            var handler = (AttributeHandler)_kernel.Get(type);
+            
             if (string.IsNullOrWhiteSpace(handler.Name)) return;
-            if (Handlers.Any(x => x.Name.ToLower() == handler.Name.ToLower())) return;
+            if (Handlers.Any(x => string.Equals(x.Name, handler.Name, StringComparison.CurrentCultureIgnoreCase))) return;
 
             Handlers.Add(handler);
             handler.Init();
@@ -54,13 +67,6 @@ public class CustomAttributeService : Service
         }
     }
 
-    private void RegisterEvents()
-    {
-        _events.LoadObject.Subscribe(OnLoad);
-        _events.UpdateObject.Subscribe(OnUpdate);
-        _events.DestroyObject.Subscribe(OnDestroy);
-    }
-    
     private void OnLoad(LoadObjectEvent ev)
     {
         foreach (var handler in Handlers)

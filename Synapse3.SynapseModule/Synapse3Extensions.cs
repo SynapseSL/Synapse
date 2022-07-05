@@ -129,6 +129,17 @@ public static class Synapse3Extensions
     public static SynapseItem GetSynapseItem(this ItemBase itemBase) =>
         Synapse.Get<ItemService>().GetSynapseItem(itemBase.ItemSerial);
 
+    public static bool CanHarmScp(SynapsePlayer player, bool message)
+    {
+        if (player.TeamID == (int)Team.SCP || player.CustomRole?.GetFriendsID().Any(x => x == (int)Team.SCP) == true)
+        {
+            //TODO: Message
+            return false;
+        }
+
+        return true;
+    }
+    
     public static bool GetHarmPermission(SynapsePlayer attacker, SynapsePlayer victim, bool ignoreFFConfig = false)
     {
         try

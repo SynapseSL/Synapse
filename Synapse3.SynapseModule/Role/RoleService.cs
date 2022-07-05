@@ -82,7 +82,7 @@ public class RoleService : Service
     }
 
     /// <summary>
-    /// Creates a new Instance of the Object to get the Role Name & id and register it. The RoleType must have an RoleInformation attribute
+    /// Creates a new Instance of the Object to get the Role Name and id and register it. The RoleType must have an RoleInformation attribute
     /// </summary>
     public bool RegisterRole<TRole>() where TRole : ISynapseRole
     {
@@ -149,10 +149,11 @@ public class RoleService : Service
         ISynapseRole role;
 
         if (info.RoleScript.GetConstructors().Any(x =>
-                x.GetParameters().Count() == 1 && x.GetParameters().First().ParameterType == typeof(RoleInformation)))
+                x.GetParameters().Count() == 1 && x.GetParameters().First().ParameterType == typeof(RoleInformation))) 
         {
-            role = (ISynapseRole)Activator.CreateInstance(info.RoleScript, new object[] { info });
+            role = (ISynapseRole)Activator.CreateInstance(info.RoleScript, info);
         }
+        else
         {
             role = (ISynapseRole)Activator.CreateInstance(info.RoleScript);
         }

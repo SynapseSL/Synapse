@@ -3,6 +3,7 @@ using GameCore;
 using Neuron.Core.Meta;
 using Respawning;
 using RoundRestarting;
+using Synapse3.SynapseModule.Events;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule;
@@ -11,11 +12,33 @@ public class RoundService : Service
 {
     private RoundSummary Rs => RoundSummary.singleton;
     private RespawnManager Rm => RespawnManager.Singleton;
+    private RoundEvents _round;
+
+    public RoundService(RoundEvents round)
+    {
+        _round = round;
+    }
+
+    public override void Enable()
+    {
+       _round.Waiting.Subscribe(AddRound);
+    }
+
+    public override void Disable()
+    {
+        _round.Waiting.Unsubscribe(AddRound);
+    }
+
+    private void AddRound(RoundWaitingEvent ev)
+    {
+        CurrentRound++;
+    }
+
 
     /// <summary>
     /// The number of the round sciece the last server restart
     /// </summary>
-    public int CurrentRound { get; internal set; } = 0;
+    public int CurrentRound { get; private set; } = 0;
 
     /// <summary>
     /// The time until the next wave spawns

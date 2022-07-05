@@ -75,12 +75,18 @@ public class KeyPressEvent : PlayerEvent
     }
 }
 
-public class HarmPermissionEvent : PlayerInteractEvent
+public class HarmPermissionEvent : IEvent
 {
-    public HarmPermissionEvent(SynapsePlayer attacker, SynapsePlayer victim, bool allow) : base(attacker, allow)
+    public HarmPermissionEvent(SynapsePlayer attacker, SynapsePlayer victim, bool allow)
     {
         Victim = victim;
+        Attacker = attacker;
+        Allow = allow;
     }
+    
+    public bool Allow { get; set; }
+    
+    public SynapsePlayer Attacker { get; }
     
     public SynapsePlayer Victim { get; }
 }

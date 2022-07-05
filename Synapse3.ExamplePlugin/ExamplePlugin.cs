@@ -33,7 +33,6 @@ namespace Synapse3.ExamplePlugin
             Logger.Info(Config.IntEntry);
             Logger.Info(Config.ListEntry);
             Logger.Info(Translations.CommandMessage.Format("Example Command", "Helight"));
-
         }
 
         public override void Disable()

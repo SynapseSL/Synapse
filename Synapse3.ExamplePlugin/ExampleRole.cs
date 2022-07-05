@@ -10,7 +10,7 @@ namespace Synapse3.ExamplePlugin;
 )]
 public class ExampleRole : SynapseRole
 {
-    public override int GetTeamID() => 5;
+    public override int GetTeamID() => 15;
 
     public override void SpawnPlayer(bool spawnLite)
     {

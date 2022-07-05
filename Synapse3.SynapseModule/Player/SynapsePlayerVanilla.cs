@@ -1,4 +1,5 @@
-﻿using Hints;
+﻿using CustomPlayerEffects;
+using Hints;
 using InventorySystem;
 using InventorySystem.Searching;
 using Mirror;
@@ -53,6 +54,8 @@ public partial class SynapsePlayer
     public Inventory VanillaInventory => Hub.inventory;
 
     public CharacterClassManager ClassManager => Hub.characterClassManager;
+
+    public PlayableScpsController ScpsController => Hub.scpsController;
     
     public Assets._Scripts.Dissonance.DissonanceUserSetup DissonanceUserSetup { get; }
 
@@ -61,6 +64,8 @@ public partial class SynapsePlayer
     public GameConsoleTransmission GameConsoleTransmission { get; }
 
     public Escape Escape { get; }
+    
+    public Scp939_VisionController Scp939VisionController { get; }
     
     public CommandSender CommandSender
     {
@@ -75,4 +80,6 @@ public partial class SynapsePlayer
     /// Returns the PlayerStatBase of the specific Type
     /// </summary>
     public TStat GetStatBase<TStat>() where TStat : StatBase => PlayerStats.GetModule<TStat>();
+
+    public TEffect GetEffect<TEffect>() where TEffect : PlayerEffect => PlayerEffectsController.GetEffect<TEffect>();
 }

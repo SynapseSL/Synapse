@@ -126,7 +126,7 @@ public class SchematicService : Service
 
     public override void Enable()
     {
-        _round.RoundWaiting.Subscribe(LateInit);
+        _round.Waiting.Subscribe(LateInit);
         
         foreach (var prefab in NetworkManager.singleton.spawnPrefabs)
         {

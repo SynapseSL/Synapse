@@ -23,6 +23,11 @@ public class DebugService : Service
         _player.KeyPress.Subscribe(OnKeyPress);
     }
 
+    public override void Disable()
+    {
+        _player.KeyPress.Unsubscribe(OnKeyPress);
+    }
+
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)

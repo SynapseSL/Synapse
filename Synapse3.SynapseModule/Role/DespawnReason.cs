@@ -5,4 +5,5 @@ public enum DespawnReason
     Death,
     ForceClass,
     API,
+    Other
 }

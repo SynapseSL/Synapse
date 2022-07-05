@@ -16,7 +16,7 @@ public class SynapseObjectScript : MonoBehaviour
     public void Start()
     {
         _events = Synapse.Get<SynapseObjectEvents>();
-        _events.LoadObject.Raise(new LoadObjectEvent(Object));
+        _events.Load.Raise(new LoadObjectEvent(Object));
         
         Parent = (Object as DefaultSynapseObject)?.Parent;
         IsChild = Parent != null;
@@ -24,7 +24,7 @@ public class SynapseObjectScript : MonoBehaviour
 
     public void Update()
     {
-        _events.UpdateObject.Raise(new UpdateObjectEvent(Object));
+        _events.Update.Raise(new UpdateObjectEvent(Object));
 
         if(Object is IRefreshable { UpdateEveryFrame: true } refresh)
             refresh.Refresh();
@@ -32,7 +32,7 @@ public class SynapseObjectScript : MonoBehaviour
 
     public void OnDestroy()
     {
-        _events.DestroyObject.Raise(new DestroyObjectEvent(Object));
+        _events.Destroy.Raise(new DestroyObjectEvent(Object));
         Object.OnDestroy();
     }
 }

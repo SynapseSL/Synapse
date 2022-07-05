@@ -8,9 +8,9 @@ public class SynapseObjectEvents : Service
 {
     private readonly EventManager _eventManager;
     
-    public readonly EventReactor<LoadObjectEvent> LoadObject = new();
-    public readonly EventReactor<UpdateObjectEvent> UpdateObject = new();
-    public readonly EventReactor<DestroyObjectEvent> DestroyObject = new();
+    public readonly EventReactor<LoadObjectEvent> Load = new();
+    public readonly EventReactor<UpdateObjectEvent> Update = new();
+    public readonly EventReactor<DestroyObjectEvent> Destroy = new();
 
     public SynapseObjectEvents(EventManager eventManager)
     {
@@ -19,9 +19,9 @@ public class SynapseObjectEvents : Service
 
     public override void Enable()
     {
-        _eventManager.RegisterEvent(LoadObject);
-        _eventManager.RegisterEvent(UpdateObject);
-        _eventManager.RegisterEvent(DestroyObject);
+        _eventManager.RegisterEvent(Load);
+        _eventManager.RegisterEvent(Update);
+        _eventManager.RegisterEvent(Destroy);
     }
 }
 

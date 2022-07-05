@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Event;
 using RemoteAdmin;
 using Synapse3.SynapseModule.Command.SynapseCommands;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Command;
 
@@ -22,6 +20,7 @@ public class SynapseCommandService : Service
         typeof(ReloadCommand),
         typeof(KeyPressCommand),
         typeof(SetClassCommand),
+        typeof(RespawnCommand),
     };
     
     private readonly CommandService _command;
@@ -61,15 +60,20 @@ public class SynapseCommandService : Service
             RegisterSynapseCommand(command);
         }
         
-        _round.RoundWaiting.Subscribe(GenerateCommandCompletion);
+        _round.Waiting.Subscribe(GenerateCommandCompletion);
     }
-    
+
+    public override void Disable()
+    {
+        _round.Waiting.Unsubscribe(GenerateCommandCompletion);
+    }
+
     public void LoadBinding(SynapseCommandBinding binding) => RegisterSynapseCommand(binding.Type);
 
     public void RegisterSynapseCommand(Type command)
     {
         var rawMeta = command.GetCustomAttribute(typeof(SynapseCommandAttribute));
-        if(rawMeta is null) return;
+        if(rawMeta == null) return;
         var meta = (SynapseCommandAttribute)rawMeta;
 
         foreach (var platform in meta.Platforms)

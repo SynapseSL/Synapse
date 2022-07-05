@@ -1,9 +1,10 @@
-﻿using Synapse3.SynapseModule.Events;
+﻿using Neuron.Core.Meta;
+using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Map;
 
-public class IntercomService
+public class IntercomService : Service
 {
     private RoundEvents _round;
     private PlayerService _player;
@@ -13,7 +14,16 @@ public class IntercomService
     {
         _round = round;
         _player = player;
-        round.RoundWaiting.Subscribe(GetIntercom);
+    }
+
+    public override void Enable()
+    {
+        _round.Waiting.Subscribe(GetIntercom);
+    }
+
+    public override void Disable()
+    {
+        _round.Waiting.Unsubscribe(GetIntercom);
     }
 
     public SynapsePlayer Speaker

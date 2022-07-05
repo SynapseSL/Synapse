@@ -17,6 +17,7 @@ public partial class SynapsePlayer : MonoBehaviour
         DissonanceUserSetup = GetComponent<Assets._Scripts.Dissonance.DissonanceUserSetup>();
         Radio = GetComponent<Radio>();
         Escape = GetComponent<Escape>();
+        Scp939VisionController = GetComponent<Scp939_VisionController>();
         Inventory = new(this);
         ActiveBroadcasts = new(this);
     }

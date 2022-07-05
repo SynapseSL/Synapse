@@ -3,6 +3,7 @@ using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Command;
 using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
+using Synapse3.SynapseModule.Teams;
 
 namespace Synapse3.SynapseModule.Command.SynapseCommands;
 
@@ -46,8 +47,7 @@ public class RespawnCommand : SynapseCommand
             return;
         }
 
-        // TODO: Add TeamManager
-        // Server.Get.TeamManager.SpawnTeam(id,players);
+        Synapse.Get<TeamService>().SpawnTeam(id, players);
         result.Response = "Team was spawned";
         result.StatusCode = CommandStatusCode.Error;
     }

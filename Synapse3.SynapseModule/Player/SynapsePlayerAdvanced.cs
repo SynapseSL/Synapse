@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Mirror;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Schematic;
 using UnityEngine;
@@ -18,4 +19,8 @@ public partial class SynapsePlayer
     public ItemInventory Inventory { get; }
 
     public BroadcastList ActiveBroadcasts { get; }
+
+    public void SendNetworkMessage<TNetworkMessage>(TNetworkMessage msg, int channel = 0)
+        where TNetworkMessage : struct, NetworkMessage =>
+        Connection?.Send(msg, channel);
 }

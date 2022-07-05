@@ -22,9 +22,18 @@ public class RoomService : Service
     {
         _round = round;
         _map = map;
-        
-        round.RoundWaiting.Subscribe(LoadRooms);
-        round.RoundRestart.Subscribe(ClearRooms);
+    }
+
+    public override void Enable()
+    {
+        _round.Waiting.Subscribe(LoadRooms);
+        _round.Restart.Subscribe(ClearRooms);
+    }
+
+    public override void Disable()
+    {
+        _round.Waiting.Unsubscribe(LoadRooms);
+        _round.Restart.Unsubscribe(ClearRooms);
     }
 
     internal readonly List<IRoom> _rooms = new();

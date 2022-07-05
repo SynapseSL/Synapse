@@ -18,10 +18,20 @@ public class MapService : Service
     public MapService(RoundEvents round)
     {
         _round = round;
-        round.RoundWaiting.Subscribe(LoadObjects);
-        round.RoundRestart.Subscribe(ClearObjects);
     }
-    
+
+    public override void Enable()
+    {
+        _round.Waiting.Subscribe(LoadObjects);
+        _round.Restart.Subscribe(ClearObjects);
+    }
+
+    public override void Disable()
+    {
+        _round.Waiting.Subscribe(LoadObjects);
+        _round.Restart.Subscribe(ClearObjects);
+    }
+
     //Schematic Objects
     internal readonly List<ISynapseObject> _synapseObjects = new();
     internal readonly List<SynapseDoor> _synapseDoors = new();
