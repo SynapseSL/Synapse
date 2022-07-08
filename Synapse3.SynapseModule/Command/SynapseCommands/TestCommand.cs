@@ -2,6 +2,7 @@
 using Neuron.Core.Logging;
 using Neuron.Modules.Commands;
 using Synapse3.SynapseModule.Config;
+using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Objects;
@@ -24,6 +25,11 @@ public class TestCommand : SynapseCommand
     {
         result.Response = "Save";
 
+        var dummy = new SynapseDummy(context.Player.Position, context.Player.RotationVector2, context.Player.RoleType,
+            context.Player.NickName, "", "");
+
+        NeuronLogger.For<Synapse>().Warn(dummy.Player.GetComponent<HitboxIdentity>().TargetHub == null);
+        /*
         var config = new SchematicConfiguration()
         {
             Name = "ExampleRoom",
@@ -111,5 +117,6 @@ public class TestCommand : SynapseCommand
         var room = Synapse.Get<RoomService>().SpawnCustomRoom(100,context.Player.Position);
 
         room.Position = new Vector3(0f, 1020f, 0f);
+        */
     }
 }

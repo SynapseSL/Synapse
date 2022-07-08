@@ -139,7 +139,7 @@ public partial class SynapsePlayer
     /// <summary>
     /// The Current RoleType of the Player. Use RoleID instead if you want to set the Role of the Player and remove potentially active custom roles
     /// </summary>
-    public RoleType RoleType
+    public virtual RoleType RoleType
     {
         get => ClassManager.CurClass;
         set => ClassManager.SetPlayersClass(value, gameObject, CharacterClassManager.SpawnReason.None);

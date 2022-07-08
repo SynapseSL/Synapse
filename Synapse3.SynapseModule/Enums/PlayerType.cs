@@ -5,5 +5,4 @@ public enum PlayerType
     Player,
     Server,
     Dummy,
-    Other
 }

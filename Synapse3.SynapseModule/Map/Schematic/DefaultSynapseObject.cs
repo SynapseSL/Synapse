@@ -30,7 +30,8 @@ public abstract class DefaultSynapseObject : ISynapseObject
         set
         {
             _parent = value;
-            GameObject.transform.parent = value?.GameObject?.transform;
+            if (GameObject != null)
+                GameObject.transform.parent = value?.GameObject?.transform;
         }
     }
 

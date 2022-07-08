@@ -191,7 +191,7 @@ public static class Synapse3Extensions
             }
 
             var ev = new HarmPermissionEvent(attacker, victim, allow);
-            Synapse.Get<PlayerEvents>().HarmPermission.Raise(ev);
+            ev.Raise();
             return ev.Allow;
         }
         catch (Exception ex)

@@ -1,5 +1,4 @@
-﻿using System;
-using InventorySystem;
+﻿using InventorySystem;
 using InventorySystem.Items.Pickups;
 using InventorySystem.Items.ThrowableProjectiles;
 using Mirror;
@@ -10,9 +9,9 @@ using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule.Item.SubAPI;
 
-public class Throwable
+public class Throwable : ISubSynapseItem
 {
-    private SynapseItem _item;
+    private readonly SynapseItem _item;
     
     public Throwable(SynapseItem item)
     {
@@ -126,5 +125,11 @@ public class Throwable
         if (Projectile is not null)
             NetworkServer.Destroy(Projectile.gameObject);
         Projectile = null;
+    }
+
+    public float Durability
+    {
+        get => FuseTime;
+        set => FuseTime = value;
     }
 }

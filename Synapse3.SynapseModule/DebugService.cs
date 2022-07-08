@@ -33,40 +33,8 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                NeuronLogger.For<Synapse>().Warn($"All Items: {ev.Player.Inventory.Items.Count}");
-                break;
-            
-            case KeyCode.Alpha2:
-                foreach (var item in Synapse.Get<ItemService>()._allItems)
-                {
-                    if (item.Value == null)
-                    {
-                        NeuronLogger.For<Synapse>().Warn($"{item.Key} is null");
-                        continue;
-                    }
-                    
-                    NeuronLogger.For<Synapse>().Warn($"{item.Key} exist ID: {item.Value.ID} State: {item.Value.State}");
-                }
-                break;
-            
-            case KeyCode.Alpha3:
-                foreach (var item in Synapse.Get<ItemService>().AllItems)
-                {
-                    item.EquipItem(ev.Player);
-                }
-                break;
-            
-            case KeyCode.Alpha4:
-                Synapse.Get<RoomService>().SpawnCustomRoom(100, ev.Player.Position);
-                break;
-            
-            case KeyCode.Alpha5:
-                NeuronLogger.For<Synapse>().Warn(ev.Player.Room.Name);
-                break;
-            
-            case KeyCode.Alpha6:
-                Synapse.Get<CassieService>().AnnounceScpDeath("056", ScpContainmentType.ClassD, "Unknown", 0.3f, 0.2f,
-                    CassieSettings.Glitched, CassieSettings.DisplayText, CassieSettings.Noise);
+                var comp = ev.Player.GetComponentInChildren<HitboxIdentity>();
+                NeuronLogger.For<Synapse>().Warn(comp == null);
                 break;
         }
     }

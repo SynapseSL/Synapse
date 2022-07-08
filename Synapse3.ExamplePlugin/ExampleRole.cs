@@ -1,4 +1,5 @@
-﻿using Neuron.Core.Meta;
+﻿using System.Collections.Generic;
+using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Role;
 
 namespace Synapse3.ExamplePlugin;
@@ -14,6 +15,8 @@ public class ExampleRole : SynapseRole
 
     public override void SpawnPlayer(bool spawnLite)
     {
-        Player.RoleType = RoleType.Tutorial;
+        Player.RoleType = RoleType.ClassD;
     }
+
+    public override List<int> GetEnemiesID() => new (){ (int)Team.CDP };
 }

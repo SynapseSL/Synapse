@@ -1,219 +1,364 @@
 ﻿using System;
+using System.Collections.Generic;
+using CustomPlayerEffects;
 using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Config;
-//TODO:
-/*
-    [Serializable]
-    public class SerializedItem
+
+[Serializable]
+public class SerializedItem
+{
+    public SerializedItem() { }
+
+    public SerializedItem(SynapseItem item)
+        : this(item.ID, item.Durability, item.FireArm.Attachments, item.Scale) { }
+
+    public SerializedItem(int id, float durability, uint weaponAttachment, Vector3 scale)
     {
-        public SerializedItem() { }
+        ID = id;
+        Durability = durability;
+        WeaponAttachments = weaponAttachment;
+        XSize = scale.x;
+        YSize = scale.y;
+        ZSize = scale.z;
+    }
 
-        public SerializedItem(SynapseItem item)
-            : this(item.ID, item.Durabillity, item.WeaponAttachments, item.Scale) { }
+    public int ID { get; set; }
+        
+    public float Durability { get; set; }
+    public uint WeaponAttachments { get; set; }
+    public float XSize { get; set; } = 1f;
+    public float YSize { get; set; } = 1f;
+    public float ZSize { get; set; } = 1f;
 
-        public SerializedItem(int id, float durabillity, uint weaponattachement, Vector3 scale)
+    public SynapseItem Parse() => new SynapseItem(ID)
+    {
+        Durability = Durability,
+        FireArm =
         {
-            ID = id;
-            Durabillity = durabillity;
-            WeaponAttachments = weaponattachement;
-            XSize = scale.x;
-            YSize = scale.y;
-            ZSize = scale.z;
+            Attachments = WeaponAttachments
         }
+    };
 
-        public int ID { get; set; }
-        public float Durabillity { get; set; } = 0f;
-        public uint WeaponAttachments { get; set; } = 0;
-        public float XSize { get; set; } = 1f;
-        public float YSize { get; set; } = 1f;
-        public float ZSize { get; set; } = 1f;
+    public static explicit operator SynapseItem(SerializedItem item) => item.Parse();
+    public static implicit operator SerializedItem(SynapseItem item) => new (item);
+}
 
-        public SynapseItem Parse() => new SynapseItem(ID) 
-        { 
-            Scale = new Vector3(XSize,YSize,ZSize),
-            Durabillity = Durabillity,
-            WeaponAttachments = WeaponAttachments
-        };
+[Serializable]
+public class SerializedPlayerItem : SerializedItem
+{
+    public SerializedPlayerItem() { }
 
-        public static explicit operator SynapseItem(SerializedItem item) => item.Parse();
-        public static implicit operator SerializedItem(SynapseItem item) => new SerializedItem(item);
+    public SerializedPlayerItem(SynapseItem item, short chance, bool preference) 
+        : this(item.ID, item.Durability, item.FireArm.Attachments, item.Scale, chance, preference) { }
 
-        [Obsolete("Please use the Attachments code now")]
-        public SerializedItem(int id, float durabillity, int barrel, int sight, int other, Vector3 scale)
+    public SerializedPlayerItem(int id, float durability, uint weaponAttachment, Vector3 scale, short chance, bool preference) 
+        : base(id, durability, weaponAttachment, scale)
+    {
+        Chance = chance;
+        UsePreferences = preference;
+    }
+
+    public short Chance { get; set; } = 100;
+    public bool UsePreferences { get; set; }
+
+    public SynapseItem Apply(SynapsePlayer player)
+    {
+        var item = Parse();
+
+        if (UsePreferences && item.ItemCategory == ItemCategory.Firearm)
+            item.FireArm.Attachments = player.GetPreference(Synapse.Get<ItemService>().GetBaseType(ID));
+
+        if (UnityEngine.Random.Range(1f, 100f) <= Chance)
+            item.EquipItem(player);
+
+        return item;
+    }
+}
+
+[Serializable]
+public class SerializedAmmo
+{
+    public SerializedAmmo() { }
+
+    public SerializedAmmo(ushort ammo5, ushort ammo7, ushort ammo9, ushort ammo12, ushort ammo44)
+    {
+        Ammo5 = ammo5;
+        Ammo7 = ammo7;
+        Ammo9 = ammo9;
+        Ammo12 = ammo12;
+        Ammo44 = ammo44;
+    }
+
+    public ushort Ammo5 { get; set; }
+    public ushort Ammo7 { get; set; }
+    public ushort Ammo9 { get; set; }
+    public ushort Ammo12 { get; set; }
+    public ushort Ammo44 { get; set; }
+
+    public void Apply(SynapsePlayer player)
+    {
+        player.Inventory.AmmoBox[AmmoType.Ammo556X45] = Ammo5;
+        player.Inventory.AmmoBox[AmmoType.Ammo762X39] = Ammo7;
+        player.Inventory.AmmoBox[AmmoType.Ammo9X19] = Ammo9;
+        player.Inventory.AmmoBox[AmmoType.Ammo12Gauge] = Ammo12;
+        player.Inventory.AmmoBox[AmmoType.Ammo44Cal] = Ammo44;
+    }
+}
+
+[Serializable]
+public class SerializedPlayerInventory
+{
+    public SerializedPlayerInventory() { }
+    
+    public SerializedPlayerInventory(SynapsePlayer player)
+    {
+        Ammo.Ammo5 = player.Inventory.AmmoBox[AmmoType.Ammo556X45];
+        Ammo.Ammo7 = player.Inventory.AmmoBox[AmmoType.Ammo762X39];
+        Ammo.Ammo9 = player.Inventory.AmmoBox[AmmoType.Ammo9X19];
+        Ammo.Ammo12 = player.Inventory.AmmoBox[AmmoType.Ammo12Gauge];
+        Ammo.Ammo44 = player.Inventory.AmmoBox[AmmoType.Ammo44Cal];
+
+        foreach (var item in player.Inventory.Items)
         {
-            ID = id;
-            Durabillity = durabillity;
-            XSize = scale.x;
-            YSize = scale.y;
-            ZSize = scale.z;
+            Items.Add(new SerializedPlayerItem(item, 100, false));
         }
     }
 
-    [Serializable]
-    public class SerializedPlayerItem : SerializedItem
+    public List<SerializedPlayerItem> Items { get; set; } = new();
+
+    public SerializedAmmo Ammo { get; set; } = new();
+
+    public void Apply(SynapsePlayer player)
     {
-        public SerializedPlayerItem() { }
+        player.Inventory.ClearAllItems();
+        player.Inventory.AmmoBox.Clear();
 
-        public SerializedPlayerItem(SynapseItem item, short chance, bool preference) 
-            : this(item.ID, item.Durabillity, item.WeaponAttachments, item.Scale, chance, preference) { }
+        foreach (var item in Items)
+            item.Apply(player);
 
-        public SerializedPlayerItem(int id, float durabillity, uint weaponattachement, Vector3 scale, short chance, bool preference) 
-            : base(id, durabillity, weaponattachement, scale)
-        {
-            Chance = chance;
-            UsePreferences = preference;
-        }
-
-        public short Chance { get; set; } = 100;
-        public bool UsePreferences { get; set; }
-
-        public SynapseItem Apply(Player player)
-        {
-            var item = Parse();
-
-            if (UsePreferences && item.ItemCategory == ItemCategory.Firearm) item.WeaponAttachments = player.GetPreference(ItemManager.Get.GetBaseType(ID));
-
-            if(UnityEngine.Random.Range(1f,100f) <= Chance)
-                item.PickUp(player);
-
-            return item;
-        }
-
-        [Obsolete("Use the Attachements Code now")]
-        public SerializedPlayerItem(int id, float durabillity, int barrel, int sight, int other, Vector3 scale, short chance, bool preference)
-        {
-            ID = id;
-            Durabillity = durabillity;
-            XSize = scale.x;
-            YSize = scale.y;
-            ZSize = scale.z;
-            Chance = chance;
-            UsePreferences = preference;
-        }
+        Ammo.Apply(player);
     }
-    */
-
-    [Serializable]
-    public class SerializedAmmo
+}
+    
+[Serializable]
+public class SerializedVector3
+{
+    public SerializedVector3(Vector3 vector)
     {
-        public SerializedAmmo() { }
-
-        public SerializedAmmo(ushort ammo5, ushort ammo7, ushort ammo9, ushort ammo12, ushort ammo44)
-        {
-            Ammo5 = ammo5;
-            Ammo7 = ammo7;
-            Ammo9 = ammo9;
-            Ammo12 = ammo12;
-            Ammo44 = ammo44;
-        }
-
-        public ushort Ammo5 { get; set; }
-        public ushort Ammo7 { get; set; }
-        public ushort Ammo9 { get; set; }
-        public ushort Ammo12 { get; set; }
-        public ushort Ammo44 { get; set; }
-
-        public void Apply(SynapsePlayer player)
-        {
-            player.Inventory.AmmoBox[AmmoType.Ammo556X45] = Ammo5;
-            player.Inventory.AmmoBox[AmmoType.Ammo762X39] = Ammo7;
-            player.Inventory.AmmoBox[AmmoType.Ammo9X19] = Ammo9;
-            player.Inventory.AmmoBox[AmmoType.Ammo12Gauge] = Ammo12;
-            player.Inventory.AmmoBox[AmmoType.Ammo44Cal] = Ammo44;
-        }
+        X = vector.x;
+        Y = vector.y;
+        Z = vector.z;
     }
 
-/*
-    [Serializable]
-    public class SerializedPlayerInventory
+    public SerializedVector3(float x, float y, float z)
     {
-        public List<SerializedPlayerItem> Items { get; set; }
-
-        public SerializedAmmo Ammo { get; set; }
-
-        public void Apply(Player player)
-        {
-            player.Inventory.Clear();
-
-            foreach (var item in Items)
-                item.Apply(player);
-
-            Ammo.Apply(player);
-        }
-    }
-    */
-
-    [Serializable]
-    public class SerializedVector3
-    {
-        public SerializedVector3(Vector3 vector)
-        {
-            X = vector.x;
-            Y = vector.y;
-            Z = vector.z;
-        }
-
-        public SerializedVector3(float x, float y, float z)
-        {
-            X = x;
-            Y = y;
-            Z = z;
-        }
-
-        public SerializedVector3() { }
-
-        public Vector3 Parse() => new Vector3(X, Y, Z);
-
-        public float X { get; set; }
-        public float Y { get; set; }
-        public float Z { get; set; }
-
-        public static implicit operator Vector3(SerializedVector3 vector) => vector?.Parse() ?? Vector3.zero;
-        public static implicit operator SerializedVector3(Vector3 vector) => new SerializedVector3(vector);
-        public static implicit operator SerializedVector3(Quaternion rotation) => new SerializedVector3(rotation.eulerAngles);
-        public static implicit operator Quaternion(SerializedVector3 vector) => Quaternion.Euler(vector);
+        X = x;
+        Y = y;
+        Z = z;
     }
 
-    [Serializable]
-    public class SerializedColor
+    public SerializedVector3() { }
+
+    public Vector3 Parse() => new Vector3(X, Y, Z);
+
+    public float X { get; set; }
+    public float Y { get; set; }
+    public float Z { get; set; }
+
+    public static implicit operator Vector3(SerializedVector3 vector) => vector?.Parse() ?? Vector3.zero;
+    public static implicit operator SerializedVector3(Vector3 vector) => new SerializedVector3(vector);
+    public static implicit operator SerializedVector3(Quaternion rotation) => new SerializedVector3(rotation.eulerAngles);
+    public static implicit operator Quaternion(SerializedVector3 vector) => Quaternion.Euler(vector);
+}   
+
+[Serializable]
+public class SerializedVector2
+{
+    public SerializedVector2(Vector2 vector)
     {
-        public SerializedColor() { }
+        X = vector.x;
+        Y = vector.y;
+    }
 
-        public SerializedColor(Color32 color)
+    public SerializedVector2(float x, float y)
+    {
+        X = x;
+        Y = y;
+    }
+
+    public SerializedVector2() { }
+
+    public Vector2 Parse() => new(X, Y);
+
+    public float X { get; set; }
+    public float Y { get; set; }
+
+    public static implicit operator Vector2(SerializedVector2 vector) => vector?.Parse() ?? Vector2.zero;
+    public static implicit operator SerializedVector2(Vector2 vector) => new (vector);
+}
+
+[Serializable]
+public class SerializedColor
+{
+    public SerializedColor() { }
+
+    public SerializedColor(Color32 color)
+    {
+        R = color.r / 255f;
+        G = color.g / 255f;
+        B = color.b / 255f;
+        A = color.a / 255f;
+    }
+    public SerializedColor(Color color)
+    {
+        R = color.r;
+        G = color.g;
+        B = color.b;
+        A = color.a;
+    }
+    public SerializedColor(float r, float g, float b, float a)
+    {
+        R = r;
+        G = g;
+        B = b;
+        A = a;
+    }
+
+    public float R { get; set; }
+    public float G { get; set; }
+    public float B { get; set; }
+    public float A { get; set; } = 1f;
+
+    public Color Parse() => new Color(R, G, B, A);
+
+    public static implicit operator Color(SerializedColor color) => color.Parse();
+    public static implicit operator SerializedColor(Color color) => new SerializedColor(color);
+    public static implicit operator Color32(SerializedColor color) => color.Parse();
+    public static implicit operator SerializedColor(Color32 color) => new SerializedColor(color);
+
+}
+
+[Serializable]
+public class SerializedEffect
+{
+    public SerializedEffect() { }
+
+    public SerializedEffect(PlayerEffect effect)
+    {
+        Intensity = effect.Intensity;
+        Duration = effect.Duration;
+        if (Enum.TryParse(effect.ToString().Split(' ')[0], true, out Effect effectType))
         {
-            R = color.r / 255f;
-            G = color.g / 255f;
-            B = color.b / 255f;
-            A = color.a / 255f;
+            Effect = effectType;
         }
-        public SerializedColor(Color color)
+    }
+
+    public SerializedEffect(Effect effect, byte intensity, float duration)
+    {
+        Effect = effect;
+        Intensity = intensity;
+        Duration = duration;
+    }
+
+    public Effect Effect { get; set; } = Effect.Asphyxiated;
+
+    public byte Intensity { get; set; } = 1;
+
+    public float Duration { get; set; } = -1;
+
+    public void Apply(SynapsePlayer player) => player.GiveEffect(Effect, Intensity, Duration);
+
+    public static implicit operator SerializedEffect(PlayerEffect effect) => new SerializedEffect(effect);
+}
+
+[Serializable]
+    public class SerializedPlayerState
+    {
+        public SerializedPlayerState() { }
+
+        public SerializedPlayerState(SynapsePlayer player)
         {
-            R = color.r;
-            G = color.g;
-            B = color.b;
-            A = color.a;
+            Position = player.Position;
+            Rotation = player.RotationVector2;
+            Scale = player.Scale;
+            RoleType = player.RoleType;
+            Health = player.Health;
+            ArtificialHealth = player.ArtificialHealth;
+            Stamina = player.Stamina;
+            GodMode = player.GodMode;
+            NoClip = player.NoClip;
+            Bypass = player.Bypass;
+            OverWatch = player.OverWatch;
+            Invisible = player.Invisible;
+
+            Inventory = new SerializedPlayerInventory(player);
+
+            foreach (var effect in player.PlayerEffectsController._allEffects)
+            {
+                if (!effect.IsEnabled)
+                    continue;
+
+                Effects.Add(effect);
+            }
         }
-        public SerializedColor(float r, float g, float b, float a)
+
+        public SerializedVector3 Position { get; set; } = Vector3.zero;
+
+        public SerializedVector2 Rotation { get; set; } = Vector2.zero;
+
+        public SerializedVector3 Scale { get; set; } = Vector3.one;
+
+        public SerializedPlayerInventory Inventory { get; set; } = new SerializedPlayerInventory();
+
+        public List<SerializedEffect> Effects { get; set; } = new List<SerializedEffect>();
+
+        public RoleType RoleType { get; set; } = RoleType.None;
+
+        public float Health { get; set; } = 100;
+
+        public float ArtificialHealth { get; set; } = 0;
+
+        public float Stamina { get; set; } = 100f;
+
+        public bool GodMode { get; set; } = false;
+
+        public bool NoClip { get; set; } = false;
+
+        public bool Bypass { get; set; } = false;
+
+        public bool OverWatch { get; set; } = false;
+
+        public bool Invisible { get; set; } = false;
+
+        public void Apply(SynapsePlayer player, bool applyModes = false)
         {
-            R = r;
-            G = g;
-            B = b;
-            A = a;
+            if (applyModes)
+            {
+                player.GodMode = GodMode;
+                player.NoClip = NoClip;
+                player.Bypass = Bypass;
+                player.OverWatch = OverWatch;
+                player.Invisible = Invisible;
+            }
+            
+            player.ChangeRoleAtPosition(RoleType);
+            player.Position = Position;
+            player.RotationVector2 = Rotation;
+
+            player.Health = Health;
+            player.ArtificialHealth = ArtificialHealth;
+            player.Stamina = Stamina;
+            player.Scale = Scale;
+
+            Inventory.Apply(player);
+
+            foreach (var effect in Effects)
+                effect.Apply(player);
         }
 
-        public float R { get; set; }
-        public float G { get; set; }
-        public float B { get; set; }
-        public float A { get; set; } = 1f;
-
-        public Color Parse() => new Color(R, G, B, A);
-
-        public static implicit operator Color(SerializedColor color) => color.Parse();
-        public static implicit operator SerializedColor(Color color) => new SerializedColor(color);
-        public static implicit operator Color32(SerializedColor color) => color.Parse();
-        public static implicit operator SerializedColor(Color32 color) => new SerializedColor(color);
-
+        public static implicit operator SerializedPlayerState(SynapsePlayer player) => new (player);
     }

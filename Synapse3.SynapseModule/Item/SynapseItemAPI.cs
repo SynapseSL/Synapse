@@ -62,7 +62,7 @@ public partial class SynapseItem
             Position = position;
             return;
         }
-
+        
         var owner = ItemOwner;
         var rot = _rotation;
 
@@ -125,13 +125,15 @@ public partial class SynapseItem
 
     internal void DestroyPickup()
     {
+        if (Parent is SynapseSchematic schematic)
+        {
+            schematic._items.Remove(this);
+            Parent = null;
+        }
         if(Pickup == null) return;
 
         NetworkServer.Destroy(Pickup.gameObject);
         Pickup = null;
-        
-        if (Parent is SynapseSchematic schematic) schematic._items.Remove(this);
-        Parent = null;
     }
 
     internal void UpdateSchematic()

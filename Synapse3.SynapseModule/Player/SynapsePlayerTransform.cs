@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Reflection;
 using MapGeneration;
+using Mirror;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Rooms;
@@ -43,6 +45,20 @@ public partial class SynapsePlayer
             return new PlayerMovementSync.PlayerRotation(vec2.x, vec2.y);
         }
         set => RotationVector2 = new Vector2(value.x.Value, value.y.Value);
+    }
+
+    public Vector3 Scale
+    {
+        get => transform.localScale;
+        set
+        {
+            transform.localScale = value;
+
+            var method = typeof(NetworkServer).GetMethod("SendSpawnMessage", BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public);
+
+            foreach (var ply in Synapse.Get<PlayerService>().Players)
+                _ = method.Invoke(null, new object[] { NetworkIdentity, ply.Connection });
+        }
     }
 
     /// <summary>

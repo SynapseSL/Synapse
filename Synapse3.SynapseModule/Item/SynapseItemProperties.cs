@@ -1,4 +1,5 @@
-﻿using InventorySystem.Items.Pickups;
+﻿using System.Collections.Generic;
+using Synapse3.SynapseModule.Item.SubAPI;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 
@@ -8,6 +9,8 @@ namespace Synapse3.SynapseModule.Item;
 
 public partial class SynapseItem
 {
+    private Dictionary<ItemCategory, ISubSynapseItem> _subApi = new();
+
     public readonly int ID;
     public readonly string Name;
     public readonly bool IsCustomItem;
@@ -42,4 +45,10 @@ public partial class SynapseItem
     }
     public SchematicConfiguration SchematicConfiguration { get; set; }
     public SynapseSchematic Schematic { get; private set; }
+
+    public float Durability
+    {
+        get => _subApi[ItemCategory].Durability;
+        set => _subApi[ItemCategory].Durability = value;
+    }
 }

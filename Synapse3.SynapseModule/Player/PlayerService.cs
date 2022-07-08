@@ -2,12 +2,21 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Neuron.Core.Logging;
 using Neuron.Core.Meta;
+using Synapse3.SynapseModule.Dummy;
 
 namespace Synapse3.SynapseModule.Player;
 
 public class PlayerService : Service
 {
+    private DummyService _dummy;
+
+    public PlayerService(DummyService dummy)
+    {
+        _dummy = dummy;
+    }
+    
     /// <summary>
     /// Returns the Host Player
     /// </summary>
@@ -34,6 +43,10 @@ public class PlayerService : Service
     {
         var list = Players.ToList();
         list.Add(Host);
+        foreach (var dummy in _dummy._dummies)
+        {
+            list.Add(dummy.Player);
+        }
         return list;
     }
 

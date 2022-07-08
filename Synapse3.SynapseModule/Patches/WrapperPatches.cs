@@ -3,6 +3,7 @@ using HarmonyLib;
 using Mirror;
 using Neuron.Core.Logging;
 using PlayerStatsSystem;
+using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
@@ -18,13 +19,18 @@ internal static class WrapperPatches
     {
         try
         {
+            var dummy = Synapse.Get<DummyService>();
             var player = __instance.GetComponent<SynapsePlayer>();
             if (player == null)
             {
-                //At this point nothing is initiated inside the Gameobjecte therefore is this the only solution I found
+                //At this point nothing is initiated inside the GameObject therefore is this the only solution I found
                 if (ReferenceHub.Hubs.Count == 0)
                 {
                     player = __instance.gameObject.AddComponent<SynapseServerPlayer>();
+                }
+                else if (__instance.transform.parent == dummy._dummyParent)
+                {
+                    player = __instance.gameObject.AddComponent<DummyPlayer>();
                 }
                 else
                 {
@@ -32,7 +38,7 @@ internal static class WrapperPatches
                 }
             }
 
-            Synapse.Get<PlayerEvents>().LoadComponent.Raise(new LoadComponentEvent(player));
+            new LoadComponentEvent(player).Raise();
         }
         catch (Exception ex)
         {

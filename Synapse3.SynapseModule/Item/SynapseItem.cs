@@ -27,7 +27,10 @@ public partial class SynapseItem : DefaultSynapseObject
     {
         _item = Synapse.Get<ItemService>();
         Throwable = new Throwable(this);
-        FireArm = new FireArm();
+        FireArm = new FireArm(this);
+
+        _subApi[ItemCategory.Grenade] = Throwable;
+        _subApi[ItemCategory.Firearm] = FireArm;
     }
     
     /// <summary>
