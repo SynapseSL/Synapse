@@ -4,6 +4,7 @@ using System.Linq;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Neuron.Modules.Configs;
+using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Permissions;
@@ -11,10 +12,11 @@ namespace Synapse3.SynapseModule.Permissions;
 public class PermissionService : Service
 {
     private ConfigService _configService;
+    private ServerEvents _server;
     public ConfigContainer Container { get; set; }
     public Dictionary<string, SynapseGroup> Groups { get; set; } = new ();
 
-    private SynapseGroup _fallbackDefault = new SynapseGroup
+    private SynapseGroup _fallbackDefault = new()
     {
         Default = true,
         Permissions = new List<string> {"synapse.command.help", "synapse.command.plugins"},
@@ -22,13 +24,15 @@ public class PermissionService : Service
         Inheritance = null,
     };
 
-    public PermissionService(ConfigService configService)
+    public PermissionService(ConfigService configService,ServerEvents server)
     {
+        _server = server;
         _configService = configService;
     }
 
     public override void Enable()
     {
+        _server.Reload.Subscribe(Reload);
         try
         {
             Container = _configService.GetContainer("permissions.syml");
@@ -40,7 +44,12 @@ public class PermissionService : Service
         }
     }
 
-    public void Reload()
+    public override void Disable()
+    {
+        _server.Reload.Unsubscribe(Reload);
+    }
+
+    public void Reload(ReloadEvent _)
     {
         Container.Load();
         LoadGroups();
@@ -54,7 +63,7 @@ public class PermissionService : Service
         }
         
         Container.Store();
-        Reload();
+        Reload(null);
     }
 
     public SynapseGroup GetGroupInsensitive(string key) => Groups

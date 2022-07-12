@@ -27,7 +27,7 @@ internal static class ItemPatches
     {
         try
         {
-            var item = __instance.GetSynapseItem();
+            var item = __instance.GetItem();
         
             //Whenever the Item should be transformed to a Inventory Item a ItemBase will be created before
             //so that when ItemBase null is the game wants to destroy it
@@ -52,7 +52,7 @@ internal static class ItemPatches
     {
         try
         {
-            var player = inv.GetPlayer();
+            var player = inv.GetSynapsePlayer();
             if (itemSerial == 0 || !Synapse.Get<ItemService>()._allItems.TryGetValue(itemSerial, out var item) || item == null)
             {
                 item = new SynapseItem(type);
@@ -177,7 +177,7 @@ internal static class ItemPatches
     {
         try
         {
-            var item = __instance.GetSynapseItem();
+            var item = __instance.GetItem();
 
             item.Throwable.Throw(forceAmount, upwardFactor, torque, startVel);
         }
@@ -198,7 +198,7 @@ internal static class ItemPatches
             if (!__instance._replaceNextFrame)
                 return false;
 
-            var item = __instance.GetSynapseItem();
+            var item = __instance.GetItem();
 
             item.Throwable.Fuse(__instance._attacker);
             

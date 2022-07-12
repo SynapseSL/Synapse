@@ -21,6 +21,7 @@ namespace Synapse3.SynapseModule.Map;
 
 public class SchematicService : Service
 {
+    private ServerEvents _server;
     private NeuronBase _base;
     private NeuronLogger _logger;
     private RoundEvents _round;
@@ -28,14 +29,15 @@ public class SchematicService : Service
 
     public ReadOnlyCollection<SchematicConfiguration> SchematicConfigurations => _schematicConfigurations.AsReadOnly();
 
-    public SchematicService(NeuronBase neuronBase, NeuronLogger neuronLogger, RoundEvents round)
+    public SchematicService(NeuronBase neuronBase, NeuronLogger neuronLogger, RoundEvents round, ServerEvents server)
     {
         _base = neuronBase;
         _logger = neuronLogger;
         _round = round;
+        _server = server;
     }
 
-    public void Reload()
+    public void Reload(ReloadEvent _)
     {
         foreach (var configuration in _schematicConfigurations)
         {
@@ -127,6 +129,7 @@ public class SchematicService : Service
     public override void Enable()
     {
         _round.Waiting.Subscribe(LateInit);
+        _server.Reload.Subscribe(Reload);
         
         foreach (var prefab in NetworkManager.singleton.spawnPrefabs)
         {
@@ -170,7 +173,13 @@ public class SchematicService : Service
             }
         }
         
-        Reload();
+        Reload(null);
+    }
+
+    public override void Disable()
+    {
+        _round.Waiting.Unsubscribe(LateInit);
+        _server.Reload.Unsubscribe(Reload);
     }
 
     private void LateInit(RoundWaitingEvent ev)

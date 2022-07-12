@@ -63,8 +63,8 @@ internal static class FriendlyFirePatches
         {
             if (handler is not AttackerDamageHandler aHandler) return true;
 
-            var player = __instance.TargetHub.GetPlayer();
-            var attacker = aHandler.Attacker.GetPlayer();
+            var player = __instance.TargetHub.GetSynapsePlayer();
+            var attacker = aHandler.Attacker.GetSynapsePlayer();
             return Synapse3Extensions.GetHarmPermission(attacker, player);
         }
         catch (Exception ex)

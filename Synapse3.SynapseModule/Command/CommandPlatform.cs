@@ -1,5 +1,8 @@
 ﻿namespace Synapse3.SynapseModule.Command;
 
+/// <summary>
+/// A Enum that represents the Current Command Platform
+/// </summary>
 public enum CommandPlatform
 {
     /// <summary>

@@ -22,7 +22,7 @@ internal static class MiscPatches
     [HarmonyPatch(typeof(HealthStat), "get_MaxValue")]
     private static bool GetMaxHealth(HealthStat __instance, out float __result)
     {
-        __result = __instance.GetPlayer().MaxHealth;
+        __result = __instance.GetSynapsePlayer().MaxHealth;
         return false;
     }
 
@@ -30,8 +30,9 @@ internal static class MiscPatches
     [HarmonyPatch(typeof(AhpStat), nameof(AhpStat.ServerAddProcess), typeof(float))]
     private static bool ServerAddProcess(AhpStat __instance, float amount, out AhpStat.AhpProcess __result)
     {
-        var player = __instance.GetPlayer();
-        __result = __instance.ServerAddProcess(amount, player.MaxArtificialHealth, 1.2f, 0.7f, 0f, false);
+        var player = __instance.GetSynapsePlayer();
+        __result = __instance.ServerAddProcess(amount, player.MaxArtificialHealth, player.DecayArtificialHealth, 0.7f,
+            0f, false);
         return false;
     }
 

@@ -11,6 +11,9 @@ using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.Map;
+using Synapse3.SynapseModule.Map.Objects;
+using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
@@ -109,25 +112,31 @@ public static class Synapse3Extensions
         NetworkServer.SendToAll(msg);
     }
     
-    public static SynapsePlayer GetPlayer(this NetworkConnection connection) => connection.identity.GetPlayer();
+    public static SynapsePlayer GetSynapsePlayer(this NetworkConnection connection) => connection.identity.GetSynapsePlayer();
 
-    public static SynapsePlayer GetPlayer(this MonoBehaviour mono) => mono?.gameObject?.GetComponent<SynapsePlayer>();
+    public static SynapsePlayer GetSynapsePlayer(this MonoBehaviour mono) => mono?.gameObject?.GetComponent<SynapsePlayer>();
 
-    public static SynapsePlayer GetPlayer(this GameObject gameObject) => gameObject?.GetComponent<SynapsePlayer>();
+    public static SynapsePlayer GetSynapsePlayer(this GameObject gameObject) => gameObject?.GetComponent<SynapsePlayer>();
 
-    public static SynapsePlayer GetPlayer(this PlayableScps.PlayableScp scp) => scp?.Hub?.GetPlayer();
+    public static SynapsePlayer GetSynapsePlayer(this PlayableScps.PlayableScp scp) => scp?.Hub?.GetSynapsePlayer();
 
-    public static SynapsePlayer GetPlayer(this CommandSender sender) => Synapse.Get<PlayerService>().GetPlayer(x => x.CommandSender == sender);
+    public static SynapsePlayer GetSynapsePlayer(this CommandSender sender) => Synapse.Get<PlayerService>().GetPlayer(x => x.CommandSender == sender);
 
-    public static SynapsePlayer GetPlayer(this StatBase stat) => stat.Hub.GetPlayer();
+    public static SynapsePlayer GetSynapsePlayer(this StatBase stat) => stat.Hub.GetSynapsePlayer();
 
-    public static SynapsePlayer GetPlayer(this Footprinting.Footprint footprint) => footprint.Hub?.GetPlayer();
+    public static SynapsePlayer GetSynapsePlayer(this Footprinting.Footprint footprint) => footprint.Hub?.GetSynapsePlayer();
 
-    public static SynapseItem GetSynapseItem(this ItemPickupBase pickupBase) =>
+    public static SynapseItem GetItem(this ItemPickupBase pickupBase) =>
         Synapse.Get<ItemService>().GetSynapseItem(pickupBase.Info.Serial);
     
-    public static SynapseItem GetSynapseItem(this ItemBase itemBase) =>
+    public static SynapseItem GetItem(this ItemBase itemBase) =>
         Synapse.Get<ItemService>().GetSynapseItem(itemBase.ItemSerial);
+
+    public static IRoom GetRoom(this RoomType type) =>
+        Synapse.Get<RoomService>()._rooms.FirstOrDefault(x => x.ID == (int)type);
+
+    public static SynapseElevator GetElevator(this ElevatorType type) => Synapse.Get<MapService>()._synapseElevators
+        .FirstOrDefault(x => x.ElevatorType == type);
 
     public static bool CanHarmScp(SynapsePlayer player, bool message)
     {
@@ -191,7 +200,7 @@ public static class Synapse3Extensions
             }
 
             var ev = new HarmPermissionEvent(attacker, victim, allow);
-            ev.Raise();
+            Synapse.Get<PlayerEvents>().HarmPermission.Raise(ev);
             return ev.Allow;
         }
         catch (Exception ex)

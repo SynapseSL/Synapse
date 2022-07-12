@@ -22,7 +22,7 @@ public class PlayerService : Service
     /// </summary>
     public SynapseServerPlayer Host { get; internal set; }
     
-    private List<SynapsePlayer> _players = new List<SynapsePlayer>();
+    private List<SynapsePlayer> _players = new();
     /// <summary>
     /// Returns a ReadOnly List of all actual Players on the Server
     /// </summary>

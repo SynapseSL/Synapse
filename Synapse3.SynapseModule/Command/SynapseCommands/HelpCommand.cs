@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Command;
 using System.Linq;
@@ -39,18 +40,21 @@ public class HelpCommand : SynapseCommand
                     return;
             }
 
-            commandlist = commandlist.Where(x => context.Player.HasPermission((x.Meta as SynapseCommandAttribute)?.Permission) || string.IsNullOrWhiteSpace((x.Meta as SynapseCommandAttribute)?.Permission) || (x.Meta as SynapseCommandAttribute)?.Permission.ToUpper() == "NONE").ToList();
+            commandlist = commandlist.Where(x =>
+                context.Player.HasPermission((x.Meta as SynapseCommandAttribute)?.Permission) ||
+                string.IsNullOrWhiteSpace((x.Meta as SynapseCommandAttribute)?.Permission)).ToList();
 
             if (context.Arguments.Length > 0 && !string.IsNullOrWhiteSpace(context.Arguments.First()))
             {
-                var command = commandlist.FirstOrDefault(x => (x.Meta as SynapseCommandAttribute)?.CommandName.ToLower() == context.Arguments.First());
+                var command = commandlist.FirstOrDefault(x =>
+                    string.Equals((x.Meta as SynapseCommandAttribute)?.CommandName, context.Arguments.First(),
+                        StringComparison.OrdinalIgnoreCase));
 
                 if (command == null)
                 {
-                    foreach (ICommand c in commandlist.Where(c => (c.Meta as SynapseCommandAttribute)?.Aliases.FirstOrDefault(i => i.ToLower() == context.Arguments.First()) != null))
-                    {
-                        command = c;
-                    }
+                    command = commandlist.FirstOrDefault(x =>
+                        (x.Meta as SynapseCommandAttribute)?.Aliases.Any(y => string.Equals(y, context.Arguments[0])) ==
+                        true);
 
                     if (command == null)
                     {

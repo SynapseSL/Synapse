@@ -16,7 +16,7 @@ public partial class SynapseItem : DefaultSynapseObject
     /// <summary>
     /// The Default SynapseItem that will be returned instead of null
     /// </summary>
-    public static SynapseItem None { get; } = new SynapseItem(-1);
+    public static SynapseItem None { get; } = new(-1);
 
     private ItemService _item;
     

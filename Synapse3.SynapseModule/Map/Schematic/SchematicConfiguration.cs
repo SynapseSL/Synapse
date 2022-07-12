@@ -133,13 +133,13 @@ public class SchematicConfiguration : IDocumentSection
     {
         public SynapseLocker.LockerType LockerType { get; set; }
 
-        public List<LockerChamber> Chambers { get; set; } = new List<LockerChamber>();
+        public List<LockerChamber> Chambers { get; set; } = new();
 
         public bool DeleteDefaultItems { get; set; }
 
         public class LockerChamber
         {
-            public List<ItemType> Items { get; set; } = new List<ItemType>();
+            public List<ItemType> Items { get; set; } = new();
         }
     }
 }

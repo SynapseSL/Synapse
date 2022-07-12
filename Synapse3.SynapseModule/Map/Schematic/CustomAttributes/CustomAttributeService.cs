@@ -19,8 +19,8 @@ public class CustomAttributeService : Service
         _kernel = kernel;
     }
     
-    public List<AttributeHandler> Handlers { get; } = new List<AttributeHandler>();
-    public List<Type> DefaultAttributes { get; } = new List<Type>
+    public List<AttributeHandler> Handlers { get; } = new();
+    public List<Type> DefaultAttributes { get; } = new()
     {
         typeof(SchematicDoor),
         typeof(StaticTeleporter),

@@ -8,7 +8,7 @@ namespace Synapse3.SynapseModule.Map.Objects;
 
 public class SynapseTarget : SynapseToyObject<ShootingTarget>
 {
-    public static Dictionary<TargetType, ShootingTarget> Prefabs { get; } = new Dictionary<TargetType, ShootingTarget>();
+    public static Dictionary<TargetType, ShootingTarget> Prefabs { get; } = new();
     
     public override ObjectType Type => ObjectType.Target;
     public override ShootingTarget ToyBase { get; }

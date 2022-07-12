@@ -10,7 +10,7 @@ namespace Synapse3.SynapseModule.Map.Objects;
 //TODO: Add DoorType
 public class SynapseDoor : NetworkSynapseObject
 {
-    public static Dictionary<SpawnableDoorType, BreakableDoor> Prefab { get; } = new Dictionary<SpawnableDoorType, BreakableDoor>();
+    public static Dictionary<SpawnableDoorType, BreakableDoor> Prefab { get; } = new();
 
     public DoorVariant Variant { get; }
     

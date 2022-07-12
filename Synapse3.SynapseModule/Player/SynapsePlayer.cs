@@ -1,4 +1,5 @@
 ﻿using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Item;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
@@ -18,7 +19,7 @@ public partial class SynapsePlayer : MonoBehaviour
         Radio = GetComponent<Radio>();
         Escape = GetComponent<Escape>();
         Scp939VisionController = GetComponent<Scp939_VisionController>();
-        Inventory = new(this);
-        ActiveBroadcasts = new(this);
+        Inventory = new ItemInventory(this);
+        ActiveBroadcasts = new BroadcastList(this);
     }
 }

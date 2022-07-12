@@ -168,19 +168,33 @@ public partial class SynapsePlayer
         set => GetStatBase<AhpStat>().ServerAddProcess(value, value, 1.2f, 0f, 0f, false);
     }
 
-    private int maxahp = 75;
+    private float _maxAhp = AhpStat.DefaultMax;
     /// <summary>
     /// The maximum artificial health a player can have
     /// </summary>
-    public int MaxArtificialHealth
+    public float MaxArtificialHealth
     {
-        get => maxahp;
+        get => _maxAhp;
         set
         {
-            maxahp = value;
+            _maxAhp = value;
             foreach (var process in GetStatBase<AhpStat>()._activeProcesses)
             {
                 process.Limit = value;
+            }
+        }
+    }
+
+    private float _decayArtificialHealth = AhpStat.DefaultDecay;
+    public float DecayArtificialHealth
+    {
+        get => _decayArtificialHealth;
+        set
+        {
+            _decayArtificialHealth = value;
+            foreach (var process in GetStatBase<AhpStat>()._activeProcesses)
+            {
+                process.DecayRate = value;
             }
         }
     }
@@ -208,7 +222,7 @@ public partial class SynapsePlayer
     /// </summary>
     public SynapsePlayer CurrentlySpectating
     {
-        get => SpectatorManager.CurrentSpectatedPlayer != null ? SpectatorManager.CurrentSpectatedPlayer.GetPlayer() : null;
+        get => SpectatorManager.CurrentSpectatedPlayer != null ? SpectatorManager.CurrentSpectatedPlayer.GetSynapsePlayer() : null;
         set => SpectatorManager.CurrentSpectatedPlayer = value;
     }
 
@@ -222,7 +236,7 @@ public partial class SynapsePlayer
             if (DisarmedPlayers.Entries.All(x => x.DisarmedPlayer != NetworkIdentity.netId)) return null;
 
             var id = DisarmedPlayers.Entries.FirstOrDefault(x => x.DisarmedPlayer == NetworkIdentity.netId).Disarmer;
-            if (id == 0) return ReferenceHub.LocalHub.GetPlayer();
+            if (id == 0) return ReferenceHub.LocalHub.GetSynapsePlayer();
 
             Synapse.Get<PlayerService>().GetPlayer(id);
             return null;

@@ -66,7 +66,7 @@ internal static class CommandPatches
     {
         try
         {
-            var player = __instance._sender.GetPlayer();
+            var player = __instance._sender.GetSynapsePlayer();
             if (player == null) return true;
 
             var result = Synapse.Get<SynapseCommandService>().PlayerConsole
@@ -115,7 +115,7 @@ internal static class CommandPatches
     {
         try
         {
-            var player = sender.GetPlayer();
+            var player = sender.GetSynapsePlayer();
             
             if (q.StartsWith("@"))
                 return true;

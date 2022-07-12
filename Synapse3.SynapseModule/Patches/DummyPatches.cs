@@ -34,7 +34,7 @@ internal static class DummyPatches
     [HarmonyPatch(typeof(NetworkBehaviour), nameof(NetworkBehaviour.SendTargetRPCInternal))]
     private static bool OnTargetRpc(NetworkBehaviour __instance)
     {
-        var player = __instance.GetPlayer();
+        var player = __instance.GetSynapsePlayer();
         if (player.PlayerType == PlayerType.Dummy) return false;
         return true;
     }

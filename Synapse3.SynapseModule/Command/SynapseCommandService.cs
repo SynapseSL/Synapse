@@ -13,7 +13,7 @@ namespace Synapse3.SynapseModule.Command;
 
 public class SynapseCommandService : Service
 {
-    private readonly List<Type> _synapseCommands = new List<Type>
+    private readonly List<Type> _synapseCommands = new()
     {
         typeof(TestCommand),
         typeof(PermissionCommand),
@@ -21,16 +21,32 @@ public class SynapseCommandService : Service
         typeof(KeyPressCommand),
         typeof(SetClassCommand),
         typeof(RespawnCommand),
+        typeof(GiveCustomItemCommand),
+        typeof(HelpCommand),
+        typeof(RoomPointCommand),
+        typeof(SchematicCommand),
     };
     
     private readonly CommandService _command;
     private readonly RoundEvents _round;
     private readonly Synapse _synapseModule;
 
+    /// <summary>
+    /// The <see cref="CommandReactor"/> for all Server Console Commands
+    /// </summary>
     public CommandReactor ServerConsole { get; private set; }
+    /// <summary>
+    /// The <see cref="CommandReactor"/> for all Remote Admin Commands
+    /// </summary>
     public CommandReactor RemoteAdmin { get; private set; }
+    /// <summary>
+    /// The <see cref="CommandReactor"/> for all Player Console Commands
+    /// </summary>
     public CommandReactor PlayerConsole { get; private set; }
 
+    /// <summary>
+    /// Creates a new Instance of the SynapseCommandService
+    /// </summary>
     public SynapseCommandService(CommandService command,RoundEvents round, Synapse synapseModule)
     {
         _command = command;
@@ -38,6 +54,9 @@ public class SynapseCommandService : Service
         _synapseModule = synapseModule;
     }
 
+    /// <summary>
+    /// Set's up everything for the SynapseCommandService. Don't call it manually
+    /// </summary>
     public override void Enable()
     {
         ServerConsole = _command.CreateCommandReactor();
@@ -63,13 +82,19 @@ public class SynapseCommandService : Service
         _round.Waiting.Subscribe(GenerateCommandCompletion);
     }
 
+    /// <summary>
+    /// Disables the SynapseCommandService. Don't call it manually
+    /// </summary>
     public override void Disable()
     {
         _round.Waiting.Unsubscribe(GenerateCommandCompletion);
     }
 
-    public void LoadBinding(SynapseCommandBinding binding) => RegisterSynapseCommand(binding.Type);
+    internal void LoadBinding(SynapseCommandBinding binding) => RegisterSynapseCommand(binding.Type);
 
+    /// <summary>
+    /// Registers a new SynapseCommand with just it type
+    /// </summary>
     public void RegisterSynapseCommand(Type command)
     {
         var rawMeta = command.GetCustomAttribute(typeof(SynapseCommandAttribute));

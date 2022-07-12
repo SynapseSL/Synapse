@@ -16,8 +16,8 @@ internal static class ShootPatch
     {
         try
         {
-            var ev = new ShootEvent(conn.GetPlayer(), msg.TargetNetId, msg.ShooterWeaponSerial, true);
-            ev.Raise();
+            var ev = new ShootEvent(conn.GetSynapsePlayer(), msg.TargetNetId, msg.ShooterWeaponSerial, true);
+            Synapse.Get<PlayerEvents>().Shoot.Raise(ev);
             return ev.Allow;
         }
         catch (Exception ex)

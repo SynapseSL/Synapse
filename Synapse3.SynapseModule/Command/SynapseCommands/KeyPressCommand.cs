@@ -54,7 +54,8 @@ public class KeyPressCommand : SynapseCommand
 
                 try
                 {
-                    new KeyPressEvent(context.Player, key2).Raise();
+                    var ev = new KeyPressEvent(context.Player, key2);
+                    Synapse.Get<PlayerEvents>().KeyPress.Raise(ev);
                 }
                 catch (Exception ex)
                 {

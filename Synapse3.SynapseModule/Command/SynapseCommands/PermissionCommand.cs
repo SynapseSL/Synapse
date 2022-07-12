@@ -9,13 +9,13 @@ namespace Synapse3.SynapseModule.Command.SynapseCommands;
     Aliases = new[] {"pm", "perm", "perms", "permissions"},
     Description = "A command to manage the permission system",
     Permission = "",
-    Platforms = new[] {CommandPlatform.ServerConsole, CommandPlatform.RemoteAdmin}
+    Platforms = new[] { CommandPlatform.ServerConsole, CommandPlatform.RemoteAdmin }
 )]
 public class PermissionCommand : SynapseCommand
 {
     public override void Execute(SynapseContext context, ref CommandResult result)
     {
-        if (context.Arguments.Length < 1) context.Arguments = new[] {""};
+        if (context.Arguments.Length < 1) context.Arguments = new[] { "" };
         var permissionService = Synapse.Get<PermissionService>();
 
         switch (context.Arguments[0].ToUpper())

@@ -6,7 +6,7 @@ public abstract class AttributeHandler
 {
     public abstract string Name { get; }
 
-    public List<ISynapseObject> SynapseObjects { get; } = new List<ISynapseObject>();
+    public List<ISynapseObject> SynapseObjects { get; } = new();
 
     public virtual void Init() { }
 

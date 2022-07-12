@@ -33,7 +33,7 @@ public class IntercomService : Service
         {
             if (Intercom.Networkspeaker == null) return null;
 
-            return Intercom.Networkspeaker.GetPlayer();
+            return Intercom.Networkspeaker.GetSynapsePlayer();
         }
         set => Intercom.RequestTransmission(value.gameObject);
     }

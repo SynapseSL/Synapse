@@ -9,7 +9,7 @@ namespace Synapse3.SynapseModule.Command.SynapseCommands;
     CommandName = "RoomPoint",
     Aliases = new[] { "GetRoomPoint", "RP" },
     Parameters = new[] { "(view)" },
-    Description = "A command to get the current location as MapPoint",
+    Description = "A command to get the current location as RoomPoint",
     Permission = "synapse.command.mappoint",
     Platforms = new [] { CommandPlatform.RemoteAdmin }
 )]
@@ -18,7 +18,7 @@ public class RoomPointCommand : SynapseCommand
     public override void Execute(SynapseContext context, ref CommandResult result)
     {
         RoomPoint point;
-        if (context.Arguments.Length == 0)
+        if (context.Arguments.Length != 0)
         {
             point = new RoomPoint(context.Player.Position, context.Player.Rotation);
         }
@@ -26,7 +26,7 @@ public class RoomPointCommand : SynapseCommand
         {
             var cameraTransform = context.Player.CameraReference.transform;
             Physics.Raycast(cameraTransform.position, cameraTransform.forward, out RaycastHit raycastHit, 100f);
-            point = new RoomPoint(raycastHit.point + (Vector3.up * 0.1f), Quaternion.identity);
+            point = new RoomPoint(raycastHit.point + Vector3.up * 0.1f, Quaternion.identity);
         }
 
         result.Response = "\nThe position you are looking at as RoomPoint (change , to . in the syml config):" +

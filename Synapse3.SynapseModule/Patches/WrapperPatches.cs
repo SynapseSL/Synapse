@@ -37,8 +37,9 @@ internal static class WrapperPatches
                     player = __instance.gameObject.AddComponent<SynapsePlayer>();
                 }
             }
-
-            new LoadComponentEvent(player).Raise();
+            
+            var ev = new LoadComponentEvent(__instance.gameObject, player);
+            Synapse.Get<PlayerEvents>().LoadComponent.Raise(ev);
         }
         catch (Exception ex)
         {

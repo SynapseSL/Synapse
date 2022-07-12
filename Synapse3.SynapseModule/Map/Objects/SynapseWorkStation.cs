@@ -27,7 +27,7 @@ public class SynapseWorkStation : NetworkSynapseObject
     
     public SynapsePlayer KnownUser
     {
-        get => WorkstationController._knownUser.GetPlayer();
+        get => WorkstationController._knownUser.GetSynapsePlayer();
         set => WorkstationController._knownUser = value.Hub;
     }
 

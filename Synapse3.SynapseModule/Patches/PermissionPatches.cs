@@ -13,7 +13,7 @@ public static class PermissionPatches
     {
         try
         {
-            var player = __instance.GetPlayer();
+            var player = __instance.GetSynapsePlayer();
             player.RefreshPermission(disp);
         }
         catch(Exception e)

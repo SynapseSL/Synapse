@@ -5,6 +5,7 @@ using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Synapse3.SynapseModule.Config;
 
@@ -34,7 +35,7 @@ public class SerializedItem
     public float YSize { get; set; } = 1f;
     public float ZSize { get; set; } = 1f;
 
-    public SynapseItem Parse() => new SynapseItem(ID)
+    public SynapseItem Parse() => new(ID)
     {
         Durability = Durability,
         FireArm =
@@ -72,7 +73,7 @@ public class SerializedPlayerItem : SerializedItem
         if (UsePreferences && item.ItemCategory == ItemCategory.Firearm)
             item.FireArm.Attachments = player.GetPreference(Synapse.Get<ItemService>().GetBaseType(ID));
 
-        if (UnityEngine.Random.Range(1f, 100f) <= Chance)
+        if (Random.Range(1f, 100f) <= Chance)
             item.EquipItem(player);
 
         return item;
@@ -163,15 +164,15 @@ public class SerializedVector3
 
     public SerializedVector3() { }
 
-    public Vector3 Parse() => new Vector3(X, Y, Z);
+    public Vector3 Parse() => new(X, Y, Z);
 
     public float X { get; set; }
     public float Y { get; set; }
     public float Z { get; set; }
 
     public static implicit operator Vector3(SerializedVector3 vector) => vector?.Parse() ?? Vector3.zero;
-    public static implicit operator SerializedVector3(Vector3 vector) => new SerializedVector3(vector);
-    public static implicit operator SerializedVector3(Quaternion rotation) => new SerializedVector3(rotation.eulerAngles);
+    public static implicit operator SerializedVector3(Vector3 vector) => new(vector);
+    public static implicit operator SerializedVector3(Quaternion rotation) => new(rotation.eulerAngles);
     public static implicit operator Quaternion(SerializedVector3 vector) => Quaternion.Euler(vector);
 }   
 
@@ -233,12 +234,12 @@ public class SerializedColor
     public float B { get; set; }
     public float A { get; set; } = 1f;
 
-    public Color Parse() => new Color(R, G, B, A);
+    public Color Parse() => new(R, G, B, A);
 
     public static implicit operator Color(SerializedColor color) => color.Parse();
-    public static implicit operator SerializedColor(Color color) => new SerializedColor(color);
+    public static implicit operator SerializedColor(Color color) => new(color);
     public static implicit operator Color32(SerializedColor color) => color.Parse();
-    public static implicit operator SerializedColor(Color32 color) => new SerializedColor(color);
+    public static implicit operator SerializedColor(Color32 color) => new(color);
 
 }
 
@@ -272,12 +273,12 @@ public class SerializedEffect
 
     public void Apply(SynapsePlayer player) => player.GiveEffect(Effect, Intensity, Duration);
 
-    public static implicit operator SerializedEffect(PlayerEffect effect) => new SerializedEffect(effect);
+    public static implicit operator SerializedEffect(PlayerEffect effect) => new(effect);
 }
 
 [Serializable]
-    public class SerializedPlayerState
-    {
+public class SerializedPlayerState
+ {
         public SerializedPlayerState() { }
 
         public SerializedPlayerState(SynapsePlayer player)
@@ -285,9 +286,11 @@ public class SerializedEffect
             Position = player.Position;
             Rotation = player.RotationVector2;
             Scale = player.Scale;
-            RoleType = player.RoleType;
+            RoleID = player.RoleID;
             Health = player.Health;
+            MaxHealth = player.MaxHealth;
             ArtificialHealth = player.ArtificialHealth;
+            MaxArtificialHealth = player.MaxArtificialHealth;
             Stamina = player.Stamina;
             GodMode = player.GodMode;
             NoClip = player.NoClip;
@@ -312,27 +315,31 @@ public class SerializedEffect
 
         public SerializedVector3 Scale { get; set; } = Vector3.one;
 
-        public SerializedPlayerInventory Inventory { get; set; } = new SerializedPlayerInventory();
+        public SerializedPlayerInventory Inventory { get; set; } = new();
 
-        public List<SerializedEffect> Effects { get; set; } = new List<SerializedEffect>();
+        public List<SerializedEffect> Effects { get; set; } = new();
 
-        public RoleType RoleType { get; set; } = RoleType.None;
+        public int RoleID { get; set; }
 
-        public float Health { get; set; } = 100;
+        public float Health { get; set; } = 100f;
 
-        public float ArtificialHealth { get; set; } = 0;
+        public float MaxHealth { get; set; } = 100f;
+
+        public float ArtificialHealth { get; set; }
+        
+        public float MaxArtificialHealth { get; set; }
 
         public float Stamina { get; set; } = 100f;
 
-        public bool GodMode { get; set; } = false;
+        public bool GodMode { get; set; }
 
-        public bool NoClip { get; set; } = false;
+        public bool NoClip { get; set; }
 
-        public bool Bypass { get; set; } = false;
+        public bool Bypass { get; set; }
 
-        public bool OverWatch { get; set; } = false;
+        public bool OverWatch { get; set; }
 
-        public bool Invisible { get; set; } = false;
+        public bool Invisible { get; set; }
 
         public void Apply(SynapsePlayer player, bool applyModes = false)
         {
@@ -344,13 +351,15 @@ public class SerializedEffect
                 player.OverWatch = OverWatch;
                 player.Invisible = Invisible;
             }
-            
-            player.ChangeRoleAtPosition(RoleType);
+
+            player.SpawnCustomRole(RoleID, true);
             player.Position = Position;
             player.RotationVector2 = Rotation;
 
             player.Health = Health;
+            player.MaxHealth = MaxHealth;
             player.ArtificialHealth = ArtificialHealth;
+            player.MaxArtificialHealth = MaxArtificialHealth;
             player.Stamina = Stamina;
             player.Scale = Scale;
 
@@ -361,4 +370,4 @@ public class SerializedEffect
         }
 
         public static implicit operator SerializedPlayerState(SynapsePlayer player) => new (player);
-    }
+ }

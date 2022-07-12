@@ -1,4 +1,5 @@
 ﻿using Neuron.Core.Events;
+using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Player;
@@ -29,33 +30,31 @@ public class PlayerEvents : Service
     }
 }
 
-public abstract class PlayerEvent<TEvent> : SynapseEvent<TEvent> where TEvent : SynapseEvent<TEvent>
+public abstract class PlayerEvent : IEvent
 {
     public SynapsePlayer Player { get; }
 
-    protected PlayerEvent(SynapsePlayer player, EventReactor<TEvent> reactor) : base(reactor)
+    protected PlayerEvent(SynapsePlayer player)
     {
         Player = player;
     }
 }
 
-public abstract class PlayerInteractEvent<TEvent> : PlayerEvent<TEvent> where TEvent : SynapseEvent<TEvent>
+public abstract class PlayerInteractEvent : PlayerEvent
 {
     public bool Allow { get; set; }
 
-    protected PlayerInteractEvent(SynapsePlayer player, bool allow, EventReactor<TEvent> reactor) : base(player,
-        reactor)
-
+    protected PlayerInteractEvent(SynapsePlayer player, bool allow) : base(player)
     {
         Allow = allow;
     }
 } 
 
-public class LoadComponentEvent : PlayerEvent<LoadComponentEvent>
+public class LoadComponentEvent : PlayerEvent
 {
-    public LoadComponentEvent(SynapsePlayer player) : base(player,Synapse.Get<PlayerEvents>().LoadComponent)
+    public LoadComponentEvent(GameObject game,SynapsePlayer player) : base(player)
     {
-        PlayerGameObject = player.gameObject;
+        PlayerGameObject = game;
     }
 
     public GameObject PlayerGameObject { get; }
@@ -70,20 +69,19 @@ public class LoadComponentEvent : PlayerEvent<LoadComponentEvent>
     }
 }
 
-public class KeyPressEvent : PlayerEvent<KeyPressEvent>
+public class KeyPressEvent : PlayerEvent
 {
     public KeyCode KeyCode { get; }
 
-    public KeyPressEvent(SynapsePlayer player, KeyCode keyCode) : base(player, Synapse.Get<PlayerEvents>().KeyPress)
+    public KeyPressEvent(SynapsePlayer player, KeyCode keyCode) : base(player)
     {
         KeyCode = keyCode;
     }
 }
 
-public class HarmPermissionEvent : SynapseEvent<HarmPermissionEvent>
+public class HarmPermissionEvent : IEvent
 {
-    public HarmPermissionEvent(SynapsePlayer attacker, SynapsePlayer victim, bool allow) : base(
-        Synapse.Get<PlayerEvents>().HarmPermission)
+    public HarmPermissionEvent(SynapsePlayer attacker, SynapsePlayer victim, bool allow)
     {
         Victim = victim;
         Attacker = attacker;
@@ -97,10 +95,9 @@ public class HarmPermissionEvent : SynapseEvent<HarmPermissionEvent>
     public SynapsePlayer Victim { get; }
 }
 
-public class ShootEvent : PlayerInteractEvent<ShootEvent>
+public class ShootEvent : PlayerInteractEvent
 {
-    public ShootEvent(SynapsePlayer player, uint targetNetID, ushort itemSerial, bool allow) :
-        base(player, allow, Synapse.Get<PlayerEvents>().Shoot)
+    public ShootEvent(SynapsePlayer player, uint targetNetID, ushort itemSerial, bool allow) : base(player, allow)
     {
         if (targetNetID > 0)
             Target = Synapse.Get<PlayerService>().GetPlayer(targetNetID);

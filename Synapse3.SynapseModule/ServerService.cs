@@ -2,6 +2,7 @@
 using System.Linq;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Config;
+using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Permissions;
 using Console = GameCore.Console;
@@ -10,6 +11,12 @@ namespace Synapse3.SynapseModule;
 
 public class ServerService : Service
 {
+    private readonly ServerEvents _server;
+    public ServerService(ServerEvents server)
+    {
+        _server = server;
+    }
+    
     /// <summary>
     /// Configures the ServerName that will be displayed on the Server List
     /// </summary>
@@ -113,8 +120,6 @@ public class ServerService : Service
     /// </summary>
     public void Reload()
     {
-        Synapse.Get<PermissionService>().Reload();
-        Synapse.Get<SynapseConfigService>().Reload();
-        Synapse.Get<SchematicService>().Reload();
+        _server.Reload.Raise(new ReloadEvent());
     }
 }

@@ -1,12 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items.Firearms.Attachments;
 using MapGeneration.Distributors;
+using MEC;
+using Mirror;
 using Neuron.Core.Meta;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map;
@@ -47,9 +54,9 @@ public class MapService : Service
     internal readonly List<SynapseOldGrenade> _synapseOldGrenades = new();
 
     //Other Objects
-    private readonly List<SynapseTesla> _synapseTeslas = new();
+    internal readonly List<SynapseTesla> _synapseTeslas = new();
     internal readonly List<SynapseCamera> _synapseCameras = new();
-    private readonly List<SynapseElevator> _synapseElevators = new();
+    internal readonly List<SynapseElevator> _synapseElevators = new();
 
     public ReadOnlyCollection<ISynapseObject> SynapseObjects => _synapseObjects.AsReadOnly();
     public ReadOnlyCollection<SynapseDoor> SynapseDoors => _synapseDoors.AsReadOnly();
@@ -89,8 +96,28 @@ public class MapService : Service
     }
     
     public int Seed => MapGeneration.SeedSynchronizer.Seed;
+
+    public void Explode(Vector3 position, GrenadeType type)
+    {
+        var item = new SynapseItem((int)type, position);
+        item.Throwable.Fuse();
+        Timing.CallDelayed(Timing.WaitForOneFrame, item.Destroy);
+    }
+
+    public GameObject SpawnTantrum(Vector3 position, float destroy = -1)
+    {
+        var prefab = NetworkClient.prefabs[Guid.Parse("a0e7ee93-b802-e5a4-38bd-95e27cc133ea")];
+        var gameObject = UnityEngine.Object.Instantiate(prefab, position, Quaternion.identity);
+        NetworkServer.Spawn(gameObject.gameObject);
+
+        if (destroy >= 0)
+            Timing.CallDelayed(destroy,() => NetworkServer.Destroy(gameObject));
+
+        return gameObject;
+    }
     
-    
+    public void PlaceBlood(Vector3 pos, int type = 0, float size = 2)
+        => Synapse.Get<PlayerService>().Host.ClassManager.RpcPlaceBlood(pos, type, size);
 
     private void LoadObjects(RoundWaitingEvent ev)
     {

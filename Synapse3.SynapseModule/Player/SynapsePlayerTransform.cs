@@ -75,7 +75,7 @@ public partial class SynapsePlayer
     /// </summary>
     public RoomPoint RoomPoint
     {
-        get => new RoomPoint(Position, Rotation);
+        get => new(Position, Rotation);
         set
         {
             Position = value.GetMapPosition();
@@ -83,4 +83,6 @@ public partial class SynapsePlayer
             RotationVector2 = new Vector2(rot.x, rot.y);
         }
     }
+
+    public int ZoneId => Room.Zone;
 }

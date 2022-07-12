@@ -47,12 +47,12 @@ public class SetClassCommand : SynapseCommand
             return;
         }
 
-        player.CustomRole = null;
+        player.RemoveCustomRole(DespawnReason.ForceClass);
 
-        if (id >= 0 && id <= 17)
+        if (id is >= 0 and <= 17)
             player.RoleType = (RoleType)id;
         else
-            player.CustomRole = Synapse.Get<RoleService>().GetRole(id);
+            player.RoleID = id;
         
 
         result.Response = "Player Role was set";
