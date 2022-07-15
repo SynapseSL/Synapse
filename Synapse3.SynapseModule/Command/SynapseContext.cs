@@ -32,6 +32,7 @@ public class SynapseContext : ICommandContext
     public bool IsAdmin
     {
         get => Platform == CommandPlatform.ServerConsole || Player.PlayerType == PlayerType.Server;
+        //TODO: Remove this once the New Nuget is released
         set {}
     }
     

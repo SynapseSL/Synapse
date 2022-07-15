@@ -1,6 +1,7 @@
 ﻿using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Command;
 using Synapse3.SynapseModule.Map;
+using Synapse3.SynapseModule.Map.Schematic;
 
 namespace Synapse3.SynapseModule.Command.SynapseCommands;
 

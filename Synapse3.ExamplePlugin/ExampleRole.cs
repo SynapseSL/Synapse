@@ -5,7 +5,7 @@ using Synapse3.SynapseModule.Role;
 namespace Synapse3.ExamplePlugin;
 
 [Automatic]
-[RoleInformation(
+[Role(
     Name = "ExampleRole",
     ID = 60
 )]

@@ -1,12 +1,16 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using MEC;
 using Neuron.Core.Logging;
 using Neuron.Modules.Commands;
+using Scp914;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Map.Scp914;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Command.SynapseCommands;
@@ -23,12 +27,14 @@ public class TestCommand : SynapseCommand
 {
     public override void Execute(SynapseContext context, ref CommandResult result)
     {
-        result.Response = "Save";
+        result.Response = "Test";
 
-        var dummy = new SynapseDummy(context.Player.Position, context.Player.RotationVector2, context.Player.RoleType,
-            context.Player.NickName, "", "");
+        var service = Synapse.Get<Scp914Service>();
 
-        NeuronLogger.For<Synapse>().Warn(dummy.Player.GetComponent<HitboxIdentity>().TargetHub == null);
+        foreach (var door in service.Scp914._doors)
+        {
+            door.NetworkTargetState = !door.NetworkTargetState;
+        }
         /*
         var config = new SchematicConfiguration()
         {

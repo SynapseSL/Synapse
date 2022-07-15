@@ -13,6 +13,9 @@ namespace Synapse3.SynapseModule.Command;
 
 public class SynapseCommandService : Service
 {
+    /// <summary>
+    /// A List of all Default Commands that will be added manually
+    /// </summary>
     private readonly List<Type> _synapseCommands = new()
     {
         typeof(TestCommand),
@@ -120,6 +123,9 @@ public class SynapseCommandService : Service
         }
     }
 
+    /// <summary>
+    /// Returns the default Command NotFound Message
+    /// </summary>
     private static CommandResult NotFound(CommandEvent args)
     {
         return new CommandResult()
@@ -129,7 +135,10 @@ public class SynapseCommandService : Service
         };
     }
 
-    private void GenerateCommandCompletion(RoundWaitingEvent ev)
+    /// <summary>
+    /// This is for generating the Command Completion a player can see when entering a Command in the Remote Admin
+    /// </summary>
+    private void GenerateCommandCompletion(RoundWaitingEvent _)
     {
         var list = QueryProcessor.ParseCommandsToStruct(CommandProcessor.GetAllCommands()).ToList();
 

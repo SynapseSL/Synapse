@@ -2,9 +2,12 @@
 using InventorySystem;
 using InventorySystem.Items;
 using InventorySystem.Items.Pickups;
+using Scp914;
 using Synapse3.SynapseModule.Item.SubAPI;
+using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Map.Scp914;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
@@ -71,6 +74,15 @@ public partial class SynapseItem : DefaultSynapseObject
             TierFlags = exampleBase.TierFlags;
             Weight = exampleBase.Weight;
         }
+
+        var processor = Synapse.Get<Scp914Service>().GetProcessor(ID);
+        if (processor == Default914Processor.DefaultProcessor)
+        {
+            if (Scp914Upgrader.TryGetProcessor(ItemType, out var vanillaProcessor))
+                processor = new Default914Processor(vanillaProcessor);
+        }
+
+        UpgradeProcessor = processor;
     }
 
     /// <summary>
@@ -119,6 +131,15 @@ public partial class SynapseItem : DefaultSynapseObject
         Weight = itemBase.Weight;
 
         State = ItemState.Inventory;
+        
+        var processor = Synapse.Get<Scp914Service>().GetProcessor(ID);
+        if (processor == Default914Processor.DefaultProcessor)
+        {
+            if (Scp914Upgrader.TryGetProcessor(ItemType, out var vanillaProcessor))
+                processor = new Default914Processor(vanillaProcessor);
+        }
+
+        UpgradeProcessor = processor;
     }
 
     /// <summary>
@@ -142,6 +163,15 @@ public partial class SynapseItem : DefaultSynapseObject
         Weight = pickupBase.Info.Weight;
 
         State = ItemState.Map;
+
+        var processor = Synapse.Get<Scp914Service>().GetProcessor(ID);
+        if (processor == Default914Processor.DefaultProcessor)
+        {
+            if (Scp914Upgrader.TryGetProcessor(ItemType, out var vanillaProcessor))
+                processor = new Default914Processor(vanillaProcessor);
+        }
+
+        UpgradeProcessor = processor;
     }
 
     internal SynapseItem(SchematicConfiguration.ItemConfiguration configuration, SynapseSchematic schematic) : this(configuration.ItemType)
@@ -161,6 +191,7 @@ public partial class SynapseItem : DefaultSynapseObject
             Pickup.Rb.useGravity = false;
             Pickup.Rb.isKinematic = true;
         }
-        //TODO: Durability
+
+        Durability = configuration.Durabillity;
     }
 }

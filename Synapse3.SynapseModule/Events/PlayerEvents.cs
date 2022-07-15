@@ -1,6 +1,7 @@
-﻿using Neuron.Core.Events;
-using Neuron.Core.Logging;
+﻿using System.Collections.Generic;
+using Neuron.Core.Events;
 using Neuron.Core.Meta;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -15,6 +16,7 @@ public class PlayerEvents : Service
     public readonly EventReactor<KeyPressEvent> KeyPress = new();
     public readonly EventReactor<HarmPermissionEvent> HarmPermission = new();
     public readonly EventReactor<ShootEvent> Shoot = new();
+    public readonly EventReactor<SetClassEvent> SetClassEvent = new();
 
     public PlayerEvents(EventManager eventManager)
     {
@@ -27,6 +29,7 @@ public class PlayerEvents : Service
         _eventManager.RegisterEvent(KeyPress);
         _eventManager.RegisterEvent(HarmPermission);
         _eventManager.RegisterEvent(Shoot);
+        _eventManager.RegisterEvent(SetClassEvent);
     }
 }
 
@@ -108,4 +111,28 @@ public class ShootEvent : PlayerInteractEvent
     public SynapsePlayer Target { get; }
     
     public SynapseItem Item { get; }
+}
+
+public class SetClassEvent : PlayerInteractEvent
+{
+    public SetClassEvent(SynapsePlayer player, RoleType role, CharacterClassManager.SpawnReason reason) : base(player,
+        true)
+    {
+        Role = role;
+        SpawnReason = reason;
+    }
+    
+    public RoleType Role { get; set; }
+    
+    public CharacterClassManager.SpawnReason SpawnReason { get; }
+
+    public List<int> Items { get; set; } = new();
+
+    public List<SynapseItem> EscapeItems { get; set; } = new();
+    
+    public Vector3 Position { get; set; } = Vector3.zero;
+
+    public PlayerMovementSync.PlayerRotation Rotation { get; set; }
+
+    public Dictionary<AmmoType, ushort> Ammo { get; set; } = new();
 }

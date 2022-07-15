@@ -15,7 +15,7 @@ public class ItemService : Service
     public const int HighestItem = (int)ItemType.ParticleDisruptor;
 
     private RoundEvents _round;
-    private readonly List<ItemInformation> _items = new();
+    private readonly List<ItemAttribute> _items = new();
     private readonly Dictionary<ItemType, SchematicConfiguration> overridenVanillaItems = new();
 
     public ItemService(RoundEvents round)
@@ -33,7 +33,7 @@ public class ItemService : Service
         _round.Restart.Unsubscribe(Clear);
     }
 
-    public ReadOnlyCollection<ItemInformation> CustomItemInformation => _items.AsReadOnly();
+    public ReadOnlyCollection<ItemAttribute> CustomItemInformation => _items.AsReadOnly();
     internal Dictionary<ushort, SynapseItem> _allItems { get; } = new ();
 
     public ReadOnlyCollection<SynapseItem> AllItems =>
@@ -49,7 +49,7 @@ public class ItemService : Service
         return _allItems[serial];
     }
     
-    public bool RegisterItem(ItemInformation info)
+    public bool RegisterItem(ItemAttribute info)
     {
         if (IsIdRegistered(info.ID)) return false;
         
@@ -101,7 +101,7 @@ public class ItemService : Service
         return GetInfo(id)?.Name ?? "";
     }
     
-    private ItemInformation GetInfo(int id) => _items.FirstOrDefault(x => x.ID == id);
+    private ItemAttribute GetInfo(int id) => _items.FirstOrDefault(x => x.ID == id);
 
     private void Clear(RoundRestartEvent ev)
     {

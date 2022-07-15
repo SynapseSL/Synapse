@@ -9,20 +9,30 @@ namespace Synapse3.SynapseModule;
 public class DebugService : Service
 {
     private PlayerEvents _player;
+    private MapEvents _map;
 
-    public DebugService(PlayerEvents player)
+    public DebugService(PlayerEvents player, MapEvents map)
     {
         _player = player;
+        _map = map;
     }
 
     public override void Enable()
     {
+        _map.Scp914Upgrade.Subscribe(Upgrade);
         _player.KeyPress.Subscribe(OnKeyPress);
     }
 
     public override void Disable()
     {
+        _map.Scp914Upgrade.Unsubscribe(Upgrade);
         _player.KeyPress.Unsubscribe(OnKeyPress);
+    }
+
+    private void Upgrade(Scp914UpgradeEvent ev)
+    {
+        ev.MoveItems = false;
+        ev.MovePlayers = false;
     }
 
     private void OnKeyPress(KeyPressEvent ev)

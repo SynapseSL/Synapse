@@ -2,6 +2,7 @@
 using Synapse3.SynapseModule.Item.SubAPI;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Map.Scp914;
 
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -51,4 +52,6 @@ public partial class SynapseItem
         get => _subApi[ItemCategory].Durability;
         set => _subApi[ItemCategory].Durability = value;
     }
+    
+    public ISynapse914Processor UpgradeProcessor { get; set; }
 }

@@ -9,5 +9,5 @@ public abstract class SynapseTeam : ISynapseTeam
 
     public abstract int MaxWaveSize { get; }
     public virtual float RespawnTime => 0f;
-    public TeamInformation Info { get; set; }
+    public TeamAttribute Info { get; set; }
 }

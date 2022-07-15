@@ -21,7 +21,7 @@ public abstract class SynapseRole : ISynapseRole
         }
     }
 
-    public RoleInformation Information { get; set; }
+    public RoleAttribute Attribute { get; set; }
     
     public abstract int GetTeamID();
     public virtual List<int> GetFriendsID() => new ();

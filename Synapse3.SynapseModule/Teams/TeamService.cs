@@ -27,12 +27,12 @@ public class TeamService : Service
     public void RegisterTeam<TTeam>() where TTeam : ISynapseTeam
     {
         var type = typeof(TTeam);
-        var info = type.GetCustomAttribute<TeamInformation>();
+        var info = type.GetCustomAttribute<TeamAttribute>();
         if (info == null) return;
         RegisterTeam(type, info);
     }
 
-    public void RegisterTeam(Type teamType, TeamInformation info)
+    public void RegisterTeam(Type teamType, TeamAttribute info)
     {
         if(IsIdRegistered(info.Id)) return;
         if(!typeof(ISynapseTeam).IsAssignableFrom(teamType)) return;

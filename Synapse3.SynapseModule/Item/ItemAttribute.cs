@@ -1,6 +1,8 @@
-﻿namespace Synapse3.SynapseModule.Item;
+﻿using System;
 
-public class ItemInformation
+namespace Synapse3.SynapseModule.Item;
+
+public class ItemAttribute : Attribute
 {
     public int ID { get; set; }
     

@@ -7,7 +7,7 @@ using Synapse3.SynapseModule.Teams;
 namespace Synapse3.ExamplePlugin;
 
 [Automatic]
-[TeamInformation(
+[Team(
     Name = "Example",
     Id = 15
 )]

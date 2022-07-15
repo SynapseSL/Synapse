@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using MapGeneration;
-using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Map.Rooms;
 using UnityEngine;
 
-namespace Synapse3.SynapseModule.Map;
+namespace Synapse3.SynapseModule.Map.Rooms;
 
 public class RoomService : Service
 {

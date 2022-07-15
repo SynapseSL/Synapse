@@ -14,10 +14,9 @@ using Neuron.Core.Meta;
 using Neuron.Modules.Configs;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Objects;
-using Synapse3.SynapseModule.Map.Schematic;
 using UnityEngine;
 
-namespace Synapse3.SynapseModule.Map;
+namespace Synapse3.SynapseModule.Map.Schematic;
 
 public class SchematicService : Service
 {
@@ -37,7 +36,7 @@ public class SchematicService : Service
         _server = server;
     }
 
-    public void Reload(ReloadEvent _)
+    public void Reload(ReloadEvent _ = null)
     {
         foreach (var configuration in _schematicConfigurations)
         {
@@ -173,7 +172,7 @@ public class SchematicService : Service
             }
         }
         
-        Reload(null);
+        Reload();
     }
 
     public override void Disable()

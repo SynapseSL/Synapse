@@ -12,7 +12,7 @@ public class HeavyZoneService : Service
         _room = room;
     }
 
-    private  Recontainer079 Recontainer => Synapse.GetObjectOf<Recontainer079>();
+    private  Recontainer079 Recontainer => Synapse.GetObject<Recontainer079>();
 
     public byte ActiveGenerators => (byte)Recontainer._prevEngaged;
 

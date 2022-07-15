@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CommandSystem.Commands.Shared;
 using Neuron.Core;
@@ -13,6 +12,7 @@ using Ninject;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Schematic.CustomAttributes;
+using Synapse3.SynapseModule.Map.Scp914;
 using Synapse3.SynapseModule.Role;
 using Synapse3.SynapseModule.Teams;
 using Object = UnityEngine.Object;
@@ -53,7 +53,7 @@ public class Synapse : Module
     /// </summary>
     /// <typeparam name="TObject"></typeparam>
     /// <returns></returns>
-    public static List<TObject> GetObjectsOf<TObject>() where TObject : Object
+    public static List<TObject> GetObjects<TObject>() where TObject : Object
     {
         return Object.FindObjectsOfType<TObject>().ToList();
     }
@@ -61,7 +61,7 @@ public class Synapse : Module
     /// <summary>
     /// Returns an instance of the specified object from Unity
     /// </summary>
-    public static TObject GetObjectOf<TObject>() where TObject : Object
+    public static TObject GetObject<TObject>() where TObject : Object
     {
         return Object.FindObjectOfType<TObject>();
     }
@@ -97,6 +97,8 @@ public class Synapse : Module
     public TeamService TeamService { get; private set; }
     
     public CustomAttributeService CustomAttributeService { get; private set; }
+    
+    public Scp914Service Scp914Service { get; private set; }
 
     public override void Load(IKernel kernel)
     {
@@ -125,13 +127,14 @@ public class Synapse : Module
         OnGenerateCommandBinding(args);
         OnGenerateTeamBinding(args);
         OnGenerateAttributeBinding(args);
+        OnGenerate914ProcessorBinding(args);
     }
 
     private void OnGenerateRoleBinding(MetaGenerateBindingsEvent args)
     {
-        if(!args.MetaType.TryGetAttribute<AutomaticAttribute>(out var _)) return;
-        if(!args.MetaType.TryGetAttribute<RoleInformation>(out var roleInformation)) return;
-        if(!args.MetaType.Is<ISynapseRole>()) return;
+        if (!args.MetaType.TryGetAttribute<AutomaticAttribute>(out _)) return;
+        if (!args.MetaType.TryGetAttribute<RoleAttribute>(out var roleInformation)) return;
+        if (!args.MetaType.Is<ISynapseRole>()) return;
 
         roleInformation.RoleScript = args.MetaType.Type;
         args.Outputs.Add(new SynapseRoleBinding()
@@ -142,11 +145,10 @@ public class Synapse : Module
     
     private void OnGenerateCommandBinding(MetaGenerateBindingsEvent args)
     {
-        if (!args.MetaType.TryGetAttribute<AutomaticAttribute>(out var _)) return;
+        if (!args.MetaType.TryGetAttribute<AutomaticAttribute>(out _)) return;
         if (!args.MetaType.TryGetAttribute<SynapseCommandAttribute>(out var _)) return;
         if (!args.MetaType.Is<SynapseCommand>()) return;
-            
-        Logger.Debug($"* {args.MetaType.Type} [SynapseCommandBinding]");
+        
         args.Outputs.Add(new SynapseCommandBinding()
         {
             Type = args.MetaType.Type,
@@ -155,9 +157,9 @@ public class Synapse : Module
 
     private void OnGenerateTeamBinding(MetaGenerateBindingsEvent args)
     {
-        if (!args.MetaType.TryGetAttribute<AutomaticAttribute>(out var _)) return;
-        if (!args.MetaType.TryGetAttribute<TeamInformation>(out var info)) return;
-        if(!args.MetaType.Is<ISynapseTeam>()) return;
+        if (!args.MetaType.TryGetAttribute<AutomaticAttribute>(out _)) return;
+        if (!args.MetaType.TryGetAttribute<TeamAttribute>(out var info)) return;
+        if (!args.MetaType.Is<ISynapseTeam>()) return;
         
         args.Outputs.Add(new SynapseTeamBinding()
         {
@@ -174,6 +176,19 @@ public class Synapse : Module
         args.Outputs.Add(new SynapseCustomObjectAttributeBinding()
         {
             Type = args.MetaType.Type
+        });
+    }
+    
+    private void OnGenerate914ProcessorBinding(MetaGenerateBindingsEvent args)
+    {
+        if (!args.MetaType.TryGetAttribute<AutomaticAttribute>(out _)) return;
+        if (!args.MetaType.TryGetAttribute<Scp914ProcessorAttribute>(out var info)) return;
+        if(!args.MetaType.Is<ISynapse914Processor>()) return;
+
+        args.Outputs.Add(new SynapseScp914ProcessorBinding()
+        {
+            Processor = args.MetaType.Type,
+            ReplaceHandlers = info.ReplaceHandlers
         });
     }
 
@@ -194,6 +209,10 @@ public class Synapse : Module
         args.Context.MetaBindings
             .OfType<SynapseCustomObjectAttributeBinding>()
             .ToList().ForEach(x => CustomAttributeService.LoadBinding(x));
+        
+        args.Context.MetaBindings
+            .OfType<SynapseScp914ProcessorBinding>()
+            .ToList().ForEach(x => Scp914Service.LoadBinding(x));
     }
 
     private void LoadModuleLate(ModuleLoadEvent args)
@@ -217,6 +236,10 @@ public class Synapse : Module
         args.Context.MetaBindings
             .OfType<SynapseCustomObjectAttributeBinding>()
             .ToList().ForEach(x => CustomAttributeService.LoadBinding(x));
+        
+        args.Context.MetaBindings
+            .OfType<SynapseScp914ProcessorBinding>()
+            .ToList().ForEach(x => Scp914Service.LoadBinding(x));
     }
 
     public override void Enable()
@@ -225,6 +248,7 @@ public class Synapse : Module
         RoleService = _kernel.GetSafe<RoleService>();
         TeamService = _kernel.GetSafe<TeamService>();
         CustomAttributeService = _kernel.GetSafe<CustomAttributeService>();
+        Scp914Service = _kernel.GetSafe<Scp914Service>();
         
         Logger.Info("Synapse3 enabled!");
     }
@@ -233,35 +257,4 @@ public class Synapse : Module
     {
         
     }
-    
-}
-
-public class SynapseCommandBinding : IMetaBinding
-{
-    public Type Type { get; set; }
-
-    public IEnumerable<Type> PromisedServices => new Type[] { };
-}
-
-public class SynapseRoleBinding : IMetaBinding
-{
-    public RoleInformation Info { get; set; }
-
-    public IEnumerable<Type> PromisedServices => new Type[] { };
-}
-
-public class SynapseTeamBinding : IMetaBinding
-{
-    public TeamInformation Info { get; set; }
-    
-    public Type Type { get; set; }
-    
-    public IEnumerable<Type> PromisedServices => new Type[] { };
-}
-
-public class SynapseCustomObjectAttributeBinding : IMetaBinding
-{
-    public Type Type { get; set; }
-    
-    public IEnumerable<Type> PromisedServices => new Type[] { };
 }

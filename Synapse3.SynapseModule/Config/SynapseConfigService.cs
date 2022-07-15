@@ -4,6 +4,9 @@ using Synapse3.SynapseModule.Events;
 
 namespace Synapse3.SynapseModule.Config;
 
+/// <summary>
+/// The Synapse Service that manages the Synapse configuration file
+/// </summary>
 public class SynapseConfigService : Service
 {
     private ConfigService _configService;
@@ -27,7 +30,7 @@ public class SynapseConfigService : Service
     {
         _server.Reload.Subscribe(Reload);
         Container = _configService.GetContainer("synapse.syml");
-        Reload(null);
+        Reload();
     }
 
     public override void Disable()
@@ -35,7 +38,7 @@ public class SynapseConfigService : Service
         _server.Reload.Unsubscribe(Reload);
     }
 
-    public void Reload(ReloadEvent _)
+    public void Reload(ReloadEvent _ = null)
     {
         Container.Load();
         HostingConfiguration = Container.Get<HostingConfiguration>();

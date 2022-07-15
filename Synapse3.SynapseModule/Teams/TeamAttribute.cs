@@ -2,7 +2,7 @@
 
 namespace Synapse3.SynapseModule.Teams;
 
-public class TeamInformation : Attribute
+public class TeamAttribute : Attribute
 {
     public int Id { get; set; }
     

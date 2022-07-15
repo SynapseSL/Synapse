@@ -121,7 +121,7 @@ public class MapService : Service
 
     private void LoadObjects(RoundWaitingEvent ev)
     {
-        foreach (var doorVariant in Synapse.GetObjectsOf<DoorVariant>())
+        foreach (var doorVariant in Synapse.GetObjects<DoorVariant>())
         {
             _ = new SynapseDoor(doorVariant);
         }
@@ -131,7 +131,7 @@ public class MapService : Service
             _ = new SynapseGenerator(generator);
         }
 
-        foreach (var locker in Synapse.GetObjectsOf<Locker>())
+        foreach (var locker in Synapse.GetObjects<Locker>())
         {
             _ = new SynapseLocker(locker);
         }
@@ -141,12 +141,12 @@ public class MapService : Service
             _ = new SynapseWorkStation(workstation);
         }
 
-        foreach (var tesla in Synapse.GetObjectsOf<TeslaGate>())
+        foreach (var tesla in Synapse.GetObjects<TeslaGate>())
         {
             _synapseTeslas.Add(new SynapseTesla(tesla));
         }
 
-        foreach (var lift in Synapse.GetObjectsOf<Lift>())
+        foreach (var lift in Synapse.GetObjects<Lift>())
         {
             _synapseElevators.Add(new SynapseElevator(lift));
         }

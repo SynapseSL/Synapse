@@ -3,6 +3,9 @@ using Syml;
 
 namespace Synapse3.SynapseModule.Config;
 
+/// <summary>
+/// The Synapse Configuration Section for all Permission related stuff
+/// </summary>
 [DocumentSection("Permission")]
 public class PermissionConfiguration : IDocumentSection
 {

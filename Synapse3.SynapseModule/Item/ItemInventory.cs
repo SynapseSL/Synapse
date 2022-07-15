@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using InventorySystem.Items;
 using Synapse3.SynapseModule.Player;
 
@@ -16,7 +17,7 @@ public class ItemInventory
     }
     
     internal List<SynapseItem> _items = new();
-    public ReadOnlyCollection<SynapseItem> Items => _items.AsReadOnly();
+    public ReadOnlyCollection<SynapseItem> Items => _items.ToList().AsReadOnly();
     
     public SynapseItem ItemInHand
     {
@@ -46,8 +47,8 @@ public class ItemInventory
     public AmmoBox AmmoBox { get; }
 
     public void GiveItem(SynapseItem item) => item.EquipItem(_player);
-    public void GiveItem(int id) => new SynapseItem(id, _player);
-    public void GiveItem(ItemType itemType) => new SynapseItem(itemType, _player);
+    public SynapseItem GiveItem(int id) => new(id, _player);
+    public SynapseItem GiveItem(ItemType itemType) => new(itemType, _player);
 
     public void RemoveItem(SynapseItem item) => item.Destroy();
 

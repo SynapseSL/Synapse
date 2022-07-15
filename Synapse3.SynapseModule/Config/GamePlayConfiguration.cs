@@ -3,6 +3,9 @@ using Syml;
 
 namespace Synapse3.SynapseModule.Config;
 
+/// <summary>
+/// The Synapse Configuration Section for all GamePlay related stuff
+/// </summary>
 [DocumentSection("GamePlay")]
 public class GamePlayConfiguration : IDocumentSection
 {

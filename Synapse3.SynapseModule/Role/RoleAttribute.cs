@@ -2,11 +2,11 @@
 
 namespace Synapse3.SynapseModule.Role;
 
-public class RoleInformation : Attribute
+public class RoleAttribute : Attribute
 {
-    public RoleInformation() { }
+    public RoleAttribute() { }
     
-    public RoleInformation(string name, int id, Type script)
+    public RoleAttribute(string name, int id, Type script)
     {
         Name = name;
         ID = id;

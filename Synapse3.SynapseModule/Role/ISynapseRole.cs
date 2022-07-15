@@ -7,7 +7,7 @@ public interface ISynapseRole
 {
     SynapsePlayer Player { get; set; }
     
-    RoleInformation Information { get; set; }
+    RoleAttribute Attribute { get; set; }
 
     int GetTeamID();
 

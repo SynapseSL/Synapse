@@ -4,11 +4,15 @@ using CustomPlayerEffects;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Player;
+using Synapse3.SynapseModule.Role;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Synapse3.SynapseModule.Config;
 
+/// <summary>
+/// A Serialized SynapseItem that can be used for configuration files
+/// </summary>
 [Serializable]
 public class SerializedItem
 {
@@ -352,7 +356,11 @@ public class SerializedPlayerState
                 player.Invisible = Invisible;
             }
 
-            player.SpawnCustomRole(RoleID, true);
+            if (RoleID is >= 0 and <= RoleService.HighestRole)
+                player.ChangeRoleAtPosition((RoleType)RoleID);
+            else
+                player.SpawnCustomRole(RoleID, true);
+            
             player.Position = Position;
             player.RotationVector2 = Rotation;
 

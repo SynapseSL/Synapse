@@ -49,7 +49,7 @@ public class PermissionService : Service
         _server.Reload.Unsubscribe(Reload);
     }
 
-    public void Reload(ReloadEvent _)
+    public void Reload(ReloadEvent _ = null)
     {
         Container.Load();
         LoadGroups();

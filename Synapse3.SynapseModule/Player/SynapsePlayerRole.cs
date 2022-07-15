@@ -77,7 +77,7 @@ public partial class SynapsePlayer
         get
         {
             if (CustomRole == null) return (int)RoleType;
-            return CustomRole.Information.ID;
+            return CustomRole.Attribute.ID;
         }
         set
         {
@@ -103,7 +103,7 @@ public partial class SynapsePlayer
         get
         {
             if (CustomRole == null) return RoleType.ToString();
-            return CustomRole.Information.Name;
+            return CustomRole.Attribute.Name;
         }
     }
 }

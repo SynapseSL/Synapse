@@ -14,7 +14,7 @@ public class RoleService : Service
 {
     private readonly SynapseCommandService _command;
     private readonly PlayerService _player;
-    private List<RoleInformation> _customRoles = new();
+    private List<RoleAttribute> _customRoles = new();
 
     /// <summary>
     /// The Hightest vanilla number for Roles
@@ -24,7 +24,7 @@ public class RoleService : Service
     /// <summary>
     /// A list of all Registered CustomRoles that can spawn
     /// </summary>
-    public ReadOnlyCollection<RoleInformation> CustomRoles => _customRoles.AsReadOnly();
+    public ReadOnlyCollection<RoleAttribute> CustomRoles => _customRoles.AsReadOnly();
 
     /// <summary>
     /// Creates a new RoleService
@@ -86,7 +86,7 @@ public class RoleService : Service
     /// </summary>
     public bool RegisterRole<TRole>() where TRole : ISynapseRole
     {
-        var info = typeof(TRole).GetCustomAttribute<RoleInformation>();
+        var info = typeof(TRole).GetCustomAttribute<RoleAttribute>();
         if (info == null) return false;
         info.RoleScript = typeof(TRole);
 
@@ -96,7 +96,7 @@ public class RoleService : Service
     /// <summary>
     /// Register a CustomRole that can be spawned later
     /// </summary>
-    public bool RegisterRole(RoleInformation info)
+    public bool RegisterRole(RoleAttribute info)
     {
         if (info.ID is >= -1 and <= HighestRole) return false;
         if (IsIdRegistered(info.ID)) return false;
@@ -119,7 +119,7 @@ public class RoleService : Service
         return false;
     }
     
-    /// <inheritdoc cref="GetRole(Synapse3.SynapseModule.Role.RoleInformation)"/>
+    /// <inheritdoc cref="GetRole(RoleAttribute)"/>
     public ISynapseRole GetRole(string name)
     {
         var info = CustomRoles.FirstOrDefault(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
@@ -130,7 +130,7 @@ public class RoleService : Service
         return GetRole(info);
     }
 
-    /// <inheritdoc cref="GetRole(Synapse3.SynapseModule.Role.RoleInformation)"/>
+    /// <inheritdoc cref="GetRole(RoleAttribute)"/>
     public ISynapseRole GetRole(int id)
     {
         var info = CustomRoles.FirstOrDefault(x => x.ID == id);
@@ -144,12 +144,12 @@ public class RoleService : Service
     /// <summary>
     /// Creates a new Instance of a CustomRole
     /// </summary>
-    private ISynapseRole GetRole(RoleInformation info)
+    private ISynapseRole GetRole(RoleAttribute info)
     {
         ISynapseRole role;
 
         if (info.RoleScript.GetConstructors().Any(x =>
-                x.GetParameters().Count() == 1 && x.GetParameters().First().ParameterType == typeof(RoleInformation))) 
+                x.GetParameters().Count() == 1 && x.GetParameters().First().ParameterType == typeof(RoleAttribute))) 
         {
             role = (ISynapseRole)Activator.CreateInstance(info.RoleScript, info);
         }
@@ -157,7 +157,7 @@ public class RoleService : Service
         {
             role = (ISynapseRole)Activator.CreateInstance(info.RoleScript);
         }
-        role.Information = info;
+        role.Attribute = info;
         return role;
     }
 

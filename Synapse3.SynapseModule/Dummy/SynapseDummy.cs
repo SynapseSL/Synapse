@@ -157,7 +157,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
             try
             {
                 if (GameObject == null) yield break;
-                if (Direction == MovementDirection.Stop)
+                if (Direction == MovementDirection.None)
                 {
                     continue;
                 }
@@ -219,7 +219,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
 
                 if (wall)
                 {
-                    Direction = MovementDirection.Stop;
+                    Direction = MovementDirection.None;
                 }
             }
             catch (Exception e)

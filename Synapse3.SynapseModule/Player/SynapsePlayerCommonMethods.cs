@@ -22,7 +22,7 @@ public partial class SynapsePlayer
     /// <summary>
     /// Bans the Player
     /// </summary>
-    public void Ban(int duration, string reason, string issuer = "Plugin") => Synapse.GetObjectOf<BanPlayer>().BanUser(gameObject, duration, reason, issuer);
+    public void Ban(int duration, string reason, string issuer = "Plugin") => Synapse.GetObject<BanPlayer>().BanUser(gameObject, duration, reason, issuer);
     
     /// <summary>
     /// Returns a uint Value that corresponds to the players favorite Attachments for a specific Weapon
