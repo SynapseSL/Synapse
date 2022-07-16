@@ -1,9 +1,5 @@
-﻿using System;
-using System.Reflection;
-using MapGeneration;
+﻿using System.Reflection;
 using Mirror;
-using PlayerStatsSystem;
-using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Rooms;
 using UnityEngine;
 

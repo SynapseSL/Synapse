@@ -12,4 +12,6 @@ public interface ISynapseTeam
     public int MaxWaveSize { get; }
     
     public float RespawnTime { get; }
+
+    public void RespawnAnnouncement();
 }

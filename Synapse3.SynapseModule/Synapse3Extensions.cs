@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items;
+using InventorySystem.Items.Firearms.Attachments;
 using InventorySystem.Items.Pickups;
+using MapGeneration.Distributors;
 using Mirror;
 using Neuron.Core.Logging;
 using PlayerStatsSystem;
@@ -14,6 +17,7 @@ using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Rooms;
+using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
@@ -33,44 +37,14 @@ public static class Synapse3Extensions
 
         sender.RaReply($"{Assembly.GetCallingAssembly().GetName().Name}#" + message, success, true, category);
     }
-    
-    /// <summary>
-    /// Returns a UniversalDamageHandler based upon the given DamageType
-    /// </summary>
-    public static UniversalDamageHandler GetUniversalDamageHandler(this DamageType type)
-    {
-        if((int)type < 0 || (int)type > 23) return new UniversalDamageHandler(0f,DeathTranslations.Unknown);
 
-        return new UniversalDamageHandler(0f, DeathTranslations.TranslationsById[(byte)type]);
-    }
-    
-    public static DamageType GetDamageType(this DamageHandlerBase handler)
-    {
-        if (handler == null) return DamageType.Unknown;
-                
-        if(Enum.TryParse<DamageType>(handler.GetType().Name.Replace("DamageHandler",""),out var type))
-        {
-            if(type == DamageType.Universal)
-            {
-                var id = ((UniversalDamageHandler)handler).TranslationId;
-
-                if (id > 23) return DamageType.Universal;
-
-                return (DamageType)id;
-            }
-
-            return type;
-        }
-
-        return DamageType.Unknown;
-    }
     
     /// <summary>
     /// Updates Position Rotation and Scale of an NetworkObject for all players
     /// </summary>
     public static void UpdatePositionRotationScale(this NetworkIdentity identity)
         => NetworkServer.SendToAll(GetSpawnMessage(identity));
-
+    
     /// <summary>
     /// Returns a Spawnmessage for an NetworkObject that can be modified
     /// </summary>
@@ -97,7 +71,7 @@ public static class Synapse3Extensions
     /// <summary>
     /// Hides an NetworkObject for a single players
     /// </summary>
-    public static void DespawnForOnePlayer(this NetworkIdentity identity, SynapsePlayer player)
+    public static void UnSpawnForOnePlayer(this NetworkIdentity identity, SynapsePlayer player)
     {
         var msg = new ObjectDestroyMessage { netId = identity.netId };
         player.Connection.Send(msg);
@@ -106,38 +80,142 @@ public static class Synapse3Extensions
     /// <summary>
     /// Hides an NetworkObject for all Players on the Server that are currently connected
     /// </summary>
-    public static void DespawnForAllPlayers(this NetworkIdentity identity)
+    public static void UnSpawnForAllPlayers(this NetworkIdentity identity)
     {
         var msg = new ObjectDestroyMessage { netId = identity.netId };
         NetworkServer.SendToAll(msg);
     }
     
+    
+    
     public static SynapsePlayer GetSynapsePlayer(this NetworkConnection connection) => connection.identity.GetSynapsePlayer();
-
     public static SynapsePlayer GetSynapsePlayer(this MonoBehaviour mono) => mono?.gameObject?.GetComponent<SynapsePlayer>();
-
     public static SynapsePlayer GetSynapsePlayer(this GameObject gameObject) => gameObject?.GetComponent<SynapsePlayer>();
-
     public static SynapsePlayer GetSynapsePlayer(this PlayableScps.PlayableScp scp) => scp?.Hub?.GetSynapsePlayer();
-
     public static SynapsePlayer GetSynapsePlayer(this CommandSender sender) => Synapse.Get<PlayerService>().GetPlayer(x => x.CommandSender == sender);
-
     public static SynapsePlayer GetSynapsePlayer(this StatBase stat) => stat.Hub.GetSynapsePlayer();
-
     public static SynapsePlayer GetSynapsePlayer(this Footprinting.Footprint footprint) => footprint.Hub?.GetSynapsePlayer();
 
+    
     public static SynapseItem GetItem(this ItemPickupBase pickupBase) =>
         Synapse.Get<ItemService>().GetSynapseItem(pickupBase.Info.Serial);
-    
     public static SynapseItem GetItem(this ItemBase itemBase) =>
         Synapse.Get<ItemService>().GetSynapseItem(itemBase.ItemSerial);
 
+    
+    /// <summary>
+    /// Returns a UniversalDamageHandler based upon the given DamageType
+    /// </summary>
+    public static UniversalDamageHandler GetUniversalDamageHandler(this DamageType type)
+    {
+        if((int)type < 0 || (int)type > 23) return new UniversalDamageHandler(0f,DeathTranslations.Unknown);
+
+        return new UniversalDamageHandler(0f, DeathTranslations.TranslationsById[(byte)type]);
+    }
+    public static DamageType GetDamageType(this DamageHandlerBase handler)
+    {
+        if (handler == null) return DamageType.Unknown;
+                
+        if(Enum.TryParse<DamageType>(handler.GetType().Name.Replace("DamageHandler",""),out var type))
+        {
+            if(type == DamageType.Universal)
+            {
+                var id = ((UniversalDamageHandler)handler).TranslationId;
+
+                if (id > 23) return DamageType.Universal;
+
+                return (DamageType)id;
+            }
+
+            return type;
+        }
+
+        return DamageType.Unknown;
+    }
     public static IRoom GetRoom(this RoomType type) =>
         Synapse.Get<RoomService>()._rooms.FirstOrDefault(x => x.ID == (int)type);
-
-    public static SynapseElevator GetElevator(this ElevatorType type) => Synapse.Get<MapService>()._synapseElevators
+    public static SynapseElevator GetSynapseElevator(this ElevatorType type) => Synapse.Get<MapService>()._synapseElevators
         .FirstOrDefault(x => x.ElevatorType == type);
+    
 
+    public static SynapseDoor GetSynapseDoor(this DoorVariant variant)
+    {
+        var script = variant.GetComponent<SynapseObjectScript>();
+
+        if (script != null && script.Object is SynapseDoor door)
+        {
+            return door;
+        }
+
+        NeuronLogger.For<Synapse>().Debug("Found DoorVariant without SynapseObjectScript ... creating new SynapseDoor");
+        return new SynapseDoor(variant);
+    }
+
+    public static SynapseGenerator GetSynapseGenerator(this Scp079Generator generator)
+    {
+        var script = generator.GetComponent<SynapseObjectScript>();
+
+        if (script != null && script.Object is SynapseGenerator gen)
+        {
+            return gen;
+        }
+
+        NeuronLogger.For<Synapse>()
+            .Debug("Found Scp079Generator without SynapseObjectScript ... creating new SynapseGenerator");
+        return new SynapseGenerator(generator);
+    }
+
+    public static SynapseWorkStation GetSynapseWorkStation(this WorkstationController workstationController)
+    {
+        var script = workstationController.GetComponent<SynapseObjectScript>();
+
+        if (script != null && script.Object is SynapseWorkStation workStation)
+        {
+            return workStation;
+        }
+
+        NeuronLogger.For<Synapse>()
+            .Debug("Found WorkStationController without SynapseObjectScript ... creating new SynapseWorkStation");
+        return new SynapseWorkStation(workstationController);
+    }
+
+    public static SynapseLocker GetSynapseLocker(this Locker locker)
+    {
+        var script = locker.GetComponent<SynapseObjectScript>();
+
+        if (script != null && script.Object is SynapseLocker synapseLocker)
+        {
+            return synapseLocker;
+        }
+
+        NeuronLogger.For<Synapse>()
+            .Debug("Found Locker without SynapseObjectScript ... creating new SynapseLocker");
+        return new SynapseLocker(locker);
+    }
+
+    public static SynapseRagdoll GetSynapseRagdoll(this Ragdoll rag)
+    {
+        var script = rag.GetComponent<SynapseObjectScript>();
+
+        if (script != null && script.Object is SynapseRagdoll ragdoll)
+        {
+            return ragdoll;
+        }
+
+        NeuronLogger.For<Synapse>()
+            .Debug("Found Ragdoll without SynapseObjectScript ... creating new SynapseRagdoll");
+        return new SynapseRagdoll(rag);
+    }
+
+    
+    public static SynapseTesla GetSynapseTesla(this TeslaGate gate) =>
+        Synapse.Get<MapService>()._synapseTeslas.FirstOrDefault(x => x.Gate == gate);
+    public static SynapseElevator GetSynapseElevator(this Lift lift) =>
+        Synapse.Get<MapService>()._synapseElevators.FirstOrDefault(x => x.Lift == lift);
+    public static SynapseCamera GetSynapseCamera(this Camera079 cam) =>
+        Synapse.Get<MapService>()._synapseCameras.FirstOrDefault(x => x.Camera == cam);
+
+    
     public static bool CanHarmScp(SynapsePlayer player, bool message)
     {
         if (player.TeamID == (int)Team.SCP || player.CustomRole?.GetFriendsID().Any(x => x == (int)Team.SCP) == true)
@@ -148,7 +226,6 @@ public static class Synapse3Extensions
 
         return true;
     }
-    
     public static bool GetHarmPermission(SynapsePlayer attacker, SynapsePlayer victim, bool ignoreFFConfig = false)
     {
         try

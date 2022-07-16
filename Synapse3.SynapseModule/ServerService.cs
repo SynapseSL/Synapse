@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Neuron.Core.Meta;
-using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Map;
-using Synapse3.SynapseModule.Permissions;
 using Console = GameCore.Console;
 
 namespace Synapse3.SynapseModule;

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CustomPlayerEffects;
 using GameCore;
 using HarmonyLib;
 using MEC;
@@ -120,16 +119,16 @@ public static class DecoratedRoundMethods
                 !RoundSummary.RoundInProgress() || Time.unscaledTime - time < 15f) continue;
             
             var classList = new RoundSummary.SumInfo_ClassList();
-            var customroles = new List<ISynapseRole>();
-            var livinTeamsById = new List<int>();
+            var customRoles = new List<ISynapseRole>();
+            var livingTeamsById = new List<int>();
 
             foreach (var player in playerService.Players)
             {
                 if(!player.ClassManager.Classes.CheckBounds(player.ClassManager.CurClass)) continue;
 
-                livinTeamsById.Add(player.TeamID);
+                livingTeamsById.Add(player.TeamID);
                 if(player.CustomRole != null)
-                    customroles.Add(player.CustomRole);
+                    customRoles.Add(player.CustomRole);
                 
                 switch (player.TeamID)
                 {
@@ -231,9 +230,9 @@ public static class DecoratedRoundMethods
 
             if (shouldRoundEnd)
             {
-                foreach (var role in customroles)
+                foreach (var role in customRoles)
                 {
-                    if (role.GetEnemiesID().Any(x => livinTeamsById.Contains(x)))
+                    if (role.GetEnemiesID().Any(x => livingTeamsById.Contains(x)))
                     {
                         shouldRoundEnd = false;
                         break;

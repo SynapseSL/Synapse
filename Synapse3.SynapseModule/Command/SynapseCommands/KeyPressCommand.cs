@@ -4,7 +4,6 @@ using Neuron.Core.Logging;
 using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Command;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Command.SynapseCommands;

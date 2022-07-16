@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using HarmonyLib;
 using InventorySystem.Items.Armor;
 using InventorySystem.Items.Pickups;
 using Neuron.Core.Logging;
+using Respawning;
 using Scp914;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
-using Synapse3.SynapseModule.Map.Scp914;
 using Synapse3.SynapseModule.Player;
+using Synapse3.SynapseModule.Teams;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Patches;
@@ -47,7 +47,10 @@ internal static class MapPatches
                 }
             }
 
-            var ev = new Scp914UpgradeEvent(players, items);
+            var ev = new Scp914UpgradeEvent(players, items)
+            {
+                MoveVector = moveVector
+            };
             Synapse.Get<MapEvents>().Scp914Upgrade.Raise(ev);
 
             if (!ev.Allow)
@@ -56,7 +59,7 @@ internal static class MapPatches
             foreach (var player in players)
             {
                 if (ev.MovePlayers)
-                    player.Position = player.transform.position + moveVector;
+                    player.Position = player.transform.position + ev.MoveVector;
 
                 if (heldOnly)
                 {
@@ -82,7 +85,7 @@ internal static class MapPatches
             foreach (var item in items)
             {
                 item?.UpgradeProcessor.CreateUpgradedItem(item, setting,
-                    ev.MoveItems ? item.Position + moveVector : item.Position);
+                    ev.MoveItems ? item.Position + ev.MoveVector : item.Position);
             }
             
             return false;

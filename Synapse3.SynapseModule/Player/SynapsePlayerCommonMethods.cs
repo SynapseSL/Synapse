@@ -2,7 +2,6 @@
 using Hints;
 using InventorySystem.Items.Firearms.Attachments;
 using Mirror;
-using Neuron.Core;
 using Neuron.Core.Logging;
 using PlayerStatsSystem;
 using RoundRestarting;

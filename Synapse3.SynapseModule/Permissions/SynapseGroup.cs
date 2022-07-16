@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using Syml;
-using Synapse3.SynapseModule.Config;
 
 namespace Synapse3.SynapseModule.Permissions;
 

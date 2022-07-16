@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using InventorySystem.Items;
-using InventorySystem.Items.Firearms;
 using Mirror;
 using Neuron.Core.Logging;
 using RemoteAdmin;

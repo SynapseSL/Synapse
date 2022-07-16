@@ -1,10 +1,8 @@
-﻿using System.Net.NetworkInformation;
-using InventorySystem;
+﻿using InventorySystem;
 using InventorySystem.Items;
 using InventorySystem.Items.Pickups;
 using Scp914;
 using Synapse3.SynapseModule.Item.SubAPI;
-using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Map.Scp914;
@@ -34,6 +32,14 @@ public partial class SynapseItem : DefaultSynapseObject
 
         _subApi[ItemCategory.Grenade] = Throwable;
         _subApi[ItemCategory.Firearm] = FireArm;
+        _subApi[ItemCategory.Ammo] = null;
+        _subApi[ItemCategory.Armor] = null;
+        _subApi[ItemCategory.Keycard] = null;
+        _subApi[ItemCategory.Medical] = null;
+        _subApi[ItemCategory.None] = null;
+        _subApi[ItemCategory.Radio] = null;
+        _subApi[ItemCategory.MicroHID] = null;
+        _subApi[ItemCategory.SCPItem] = null;
     }
     
     /// <summary>

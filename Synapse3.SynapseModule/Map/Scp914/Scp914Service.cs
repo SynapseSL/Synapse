@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Neuron.Core.Meta;
 using Ninject;
 using Scp914;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Map.Objects;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Scp914;
@@ -25,17 +27,18 @@ public class Scp914Service : Service
 
     public override void Enable()
     {
-        _round.Waiting.Subscribe(Set914);
+        _round.Waiting.Subscribe(RoundInit);
     }
 
     public override void Disable()
     {
-        _round.Waiting.Unsubscribe(Set914);
+        _round.Waiting.Unsubscribe(RoundInit);
     }
 
-    private void Set914(RoundWaitingEvent ev)
+    private void RoundInit(RoundWaitingEvent ev)
     {
         Scp914 = Synapse.GetObject<Scp914Controller>();
+        _doors = Scp914._doors.Select(x => x.GetSynapseDoor()).ToArray();
     }
     
     
@@ -43,7 +46,7 @@ public class Scp914Service : Service
 
     public Vector3 Position => Scp914.gameObject.transform.position;
 
-    public Scp914KnobSetting KnowState
+    public Scp914KnobSetting KnobState
     {
         get => Scp914._knobSetting;
         set => Scp914.Network_knobSetting = value;
@@ -69,6 +72,17 @@ public class Scp914Service : Service
         set => Scp914._chamberSize = value;
     }
 
+    private SynapseDoor[] _doors;
+    public SynapseDoor[] Doors
+    {
+        get => _doors;
+        set
+        {
+            _doors = value;
+            Scp914._doors = value.Select(x => x.Variant).ToArray();
+        }
+    }
+
     public void Activate() => Scp914.ServerInteract(null, 0);
 
     public Dictionary<int, ISynapse914Processor> Synapse914Processors { get; set; } = new();
@@ -80,6 +94,7 @@ public class Scp914Service : Service
     internal void LoadBinding(SynapseScp914ProcessorBinding binding)
     {
         var processor = (ISynapse914Processor)_kernel.Get(binding.Processor);
+        _kernel.Bind(binding.Processor).ToConstant(processor).InSingletonScope();
         foreach (var id in binding.ReplaceHandlers)
         {
             Synapse914Processors[id] = processor;

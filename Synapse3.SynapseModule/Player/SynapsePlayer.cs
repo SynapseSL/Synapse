@@ -21,5 +21,6 @@ public partial class SynapsePlayer : MonoBehaviour
         Scp939VisionController = GetComponent<Scp939_VisionController>();
         Inventory = new ItemInventory(this);
         ActiveBroadcasts = new BroadcastList(this);
+        ScpController = new ScpController(this);
     }
 }

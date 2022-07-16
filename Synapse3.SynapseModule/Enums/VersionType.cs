@@ -3,6 +3,7 @@
 public enum VersionType
 {
     None,
+    Beta,
     Pre,
     Dev
 }

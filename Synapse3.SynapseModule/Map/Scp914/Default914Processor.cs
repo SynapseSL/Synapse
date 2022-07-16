@@ -1,5 +1,4 @@
-﻿using Neuron.Core.Logging;
-using Scp914;
+﻿using Scp914;
 using Scp914.Processors;
 using Synapse3.SynapseModule.Item;
 using UnityEngine;

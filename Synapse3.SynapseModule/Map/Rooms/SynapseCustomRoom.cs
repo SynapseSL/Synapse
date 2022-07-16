@@ -1,5 +1,4 @@
-﻿using Neuron.Core.Logging;
-using Synapse3.SynapseModule.Map.Objects;
+﻿using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using UnityEngine;
 
@@ -78,7 +77,7 @@ public abstract class SynapseCustomRoom : DefaultSynapseObject ,IRoom
     {
         foreach (var light in RoomSchematic.Lights)
         {
-            light.ToyBase.netIdentity.DespawnForAllPlayers();
+            light.ToyBase.netIdentity.UnSpawnForAllPlayers();
         }
 
         MEC.Timing.CallDelayed(duration, () =>

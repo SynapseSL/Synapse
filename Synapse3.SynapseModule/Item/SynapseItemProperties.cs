@@ -49,8 +49,17 @@ public partial class SynapseItem
 
     public float Durability
     {
-        get => _subApi[ItemCategory].Durability;
-        set => _subApi[ItemCategory].Durability = value;
+        get
+        {
+            if (_subApi[ItemCategory] != null)
+                return _subApi[ItemCategory].Durability;
+            return 0;
+        }
+        set
+        {
+            if (_subApi[ItemCategory] != null)
+                _subApi[ItemCategory].Durability = value;
+        }
     }
     
     public ISynapse914Processor UpgradeProcessor { get; set; }

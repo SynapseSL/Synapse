@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Mirror;
+﻿using Mirror;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
@@ -29,6 +28,8 @@ public partial class SynapsePlayer
     public ItemInventory Inventory { get; }
 
     public BroadcastList ActiveBroadcasts { get; }
+    
+    public ScpController ScpController { get; }
 
     public void SendNetworkMessage<TNetworkMessage>(TNetworkMessage msg, int channel = 0)
         where TNetworkMessage : struct, NetworkMessage =>

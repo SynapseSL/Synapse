@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO.Compression;
-using Neuron.Core.Dev;
-using Neuron.Core.Meta;
+﻿using Neuron.Core.Meta;
 using Neuron.Modules.Commands;
 using Ninject;
 using Synapse3.SynapseModule.Command;

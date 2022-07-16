@@ -54,6 +54,7 @@ public class CustomAttributeService : Service
             if (type.IsAbstract) return;
 
             var handler = (AttributeHandler)_kernel.Get(type);
+            _kernel.Bind(type).ToConstant(handler).InSingletonScope();
             
             if (string.IsNullOrWhiteSpace(handler.Name)) return;
             if (Handlers.Any(x => string.Equals(x.Name, handler.Name, StringComparison.CurrentCultureIgnoreCase))) return;

@@ -9,7 +9,6 @@ using PlayerStatsSystem;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map;
-using Synapse3.SynapseModule.Role;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Patches.PlayerPatches;

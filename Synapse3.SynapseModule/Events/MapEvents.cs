@@ -4,6 +4,7 @@ using Neuron.Core.Events;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Player;
+using UnityEngine;
 
 namespace Synapse3.SynapseModule.Events;
 
@@ -35,6 +36,8 @@ public class Scp914UpgradeEvent : IEvent
     public bool MovePlayers { get; set; } = true;
 
     public bool MoveItems { get; set; } = true;
+    
+    public Vector3 MoveVector { get; set; }
 
     public Scp914UpgradeEvent(List<SynapsePlayer> players, List<SynapseItem> items)
     {

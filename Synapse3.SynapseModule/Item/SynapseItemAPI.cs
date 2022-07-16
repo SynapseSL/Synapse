@@ -148,7 +148,7 @@ public partial class SynapseItem
             Schematic.Scale = Scale;
             Schematic.Parent = this;
             
-            Pickup.netIdentity.DespawnForAllPlayers();
+            Pickup.netIdentity.UnSpawnForAllPlayers();
         }
         catch (Exception ex)
         {

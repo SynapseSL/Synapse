@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Neuron.Core.Meta;
+using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Role;
 using Synapse3.SynapseModule.Teams;
 
@@ -42,5 +43,14 @@ public class SynapseScp914ProcessorBinding : IMetaBinding
     
     public int[] ReplaceHandlers { get; set; }
 
+    public IEnumerable<Type> PromisedServices => new Type[] { };
+}
+
+public class SynapseItemBinding : IMetaBinding
+{
+    public ItemAttribute Info { get; set; }
+    
+    public Type HandlerType { get; set; }
+    
     public IEnumerable<Type> PromisedServices => new Type[] { };
 }

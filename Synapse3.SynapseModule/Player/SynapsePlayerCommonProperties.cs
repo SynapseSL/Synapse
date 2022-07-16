@@ -1,12 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using InventorySystem.Disarming;
-using InventorySystem.Items;
-using Mirror;
 using Mirror.LiteNetLib4Mirror;
 using PlayerStatsSystem;
-using Synapse3.SynapseModule.Item;
-using Synapse3.SynapseModule.Map.Rooms;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;

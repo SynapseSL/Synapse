@@ -1,15 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using MEC;
-using Neuron.Core.Logging;
+﻿using System.Linq;
 using Neuron.Modules.Commands;
-using Scp914;
-using Synapse3.SynapseModule.Config;
-using Synapse3.SynapseModule.Dummy;
-using Synapse3.SynapseModule.Item;
-using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Objects;
-using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Map.Scp914;
 using UnityEngine;
 
@@ -31,10 +22,17 @@ public class TestCommand : SynapseCommand
 
         var service = Synapse.Get<Scp914Service>();
 
-        foreach (var door in service.Scp914._doors)
+        var doors = service.Doors.ToList();
+        var door = new SynapseDoor(SynapseDoor.SpawnableDoorType.Hcz, context.Player.Position, context.Player.Rotation,
+            Vector3.one)
         {
-            door.NetworkTargetState = !door.NetworkTargetState;
-        }
+            Locked = true,
+            Open = true
+        };
+        doors.Add(door);
+        service.Doors = doors.ToArray();
+        
+        
         /*
         var config = new SchematicConfiguration()
         {

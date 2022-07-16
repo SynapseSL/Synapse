@@ -87,11 +87,11 @@ public class SynapseSchematic : DefaultSynapseObject
         {
             if (child is NetworkSynapseObject network)
             {
-                network.NetworkIdentity.DespawnForOnePlayer(player);
+                network.NetworkIdentity.UnSpawnForOnePlayer(player);
             }
             else if(child.GameObject.TryGetComponent<NetworkIdentity>(out var net))
             {
-                net.DespawnForOnePlayer(player);
+                net.UnSpawnForOnePlayer(player);
             }
         }
     }

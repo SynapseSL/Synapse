@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Neuron.Core;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
+using Ninject;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Map;
-using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 
 namespace Synapse3.SynapseModule.Item;
@@ -14,12 +15,14 @@ public class ItemService : Service
 {
     public const int HighestItem = (int)ItemType.ParticleDisruptor;
 
+    private IKernel _kernel;
     private RoundEvents _round;
     private readonly List<ItemAttribute> _items = new();
     private readonly Dictionary<ItemType, SchematicConfiguration> overridenVanillaItems = new();
 
-    public ItemService(RoundEvents round)
+    public ItemService(RoundEvents round, IKernel kernel)
     {
+        _kernel = kernel;
         _round = round;
     }
 
@@ -47,6 +50,14 @@ public class ItemService : Service
             return SynapseItem.None;
         }
         return _allItems[serial];
+    }
+
+    public bool CreateAndRegisterItemHandler(ItemAttribute info, Type handlerType)
+    {
+        var handler = (CustomItemHandler)_kernel.GetSafe(handlerType);
+        _kernel.Bind(handlerType).ToConstant(handler).InSingletonScope();
+        handler.Attribute = info;
+        return RegisterItem(info);
     }
     
     public bool RegisterItem(ItemAttribute info)
@@ -111,5 +122,10 @@ public class ItemService : Service
             item.Value.OnDestroy();
         }
         _allItems.Clear();
+    }
+
+    internal void LoadBinding(SynapseItemBinding binding)
+    {
+        CreateAndRegisterItemHandler(binding.Info, binding.HandlerType);
     }
 }

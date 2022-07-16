@@ -11,6 +11,7 @@ using Neuron.Modules.Patcher;
 using Ninject;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Schematic.CustomAttributes;
 using Synapse3.SynapseModule.Map.Scp914;
 using Synapse3.SynapseModule.Role;
@@ -36,7 +37,7 @@ public class Synapse : Module
     public const int Minor = 0;
     public const int Patch = 0;
     
-    public const VersionType Type = VersionType.None;
+    public const VersionType Type = VersionType.Beta;
     public const string SubVersion = "1.0";
     public const string BasedGameVersion = "11.2.1";
     
@@ -74,7 +75,7 @@ public class Synapse : Module
         var version = $"{Major}.{Minor}.{Patch}";
         
         if (Type != VersionType.None)
-            version += $"{Type}-{SubVersion}";
+            version += $"-{Type}-{SubVersion}";
 
         return version;
     }
@@ -90,15 +91,14 @@ public class Synapse : Module
     
     internal Queue<SynapseCommandBinding> moduleCommandBindingQueue = new();
     
+    
+    
     public SynapseCommandService SynapseCommandService { get; private set; }
-    
     public RoleService RoleService { get; private set; }
-    
     public TeamService TeamService { get; private set; }
-    
     public CustomAttributeService CustomAttributeService { get; private set; }
-    
     public Scp914Service Scp914Service { get; private set; }
+    public ItemService ItemService { get; private set; }
 
     public override void Load(IKernel kernel)
     {
@@ -128,6 +128,7 @@ public class Synapse : Module
         OnGenerateTeamBinding(args);
         OnGenerateAttributeBinding(args);
         OnGenerate914ProcessorBinding(args);
+        OnGenerateItemBinding(args);
     }
 
     private void OnGenerateRoleBinding(MetaGenerateBindingsEvent args)
@@ -183,12 +184,25 @@ public class Synapse : Module
     {
         if (!args.MetaType.TryGetAttribute<AutomaticAttribute>(out _)) return;
         if (!args.MetaType.TryGetAttribute<Scp914ProcessorAttribute>(out var info)) return;
-        if(!args.MetaType.Is<ISynapse914Processor>()) return;
+        if (!args.MetaType.Is<ISynapse914Processor>()) return;
 
         args.Outputs.Add(new SynapseScp914ProcessorBinding()
         {
             Processor = args.MetaType.Type,
             ReplaceHandlers = info.ReplaceHandlers
+        });
+    }
+
+    private void OnGenerateItemBinding(MetaGenerateBindingsEvent args)
+    {
+        if (!args.MetaType.TryGetAttribute<AutomaticAttribute>(out _)) return;
+        if (!args.MetaType.TryGetAttribute<ItemAttribute>(out var info)) return;
+        if (!args.MetaType.Is<CustomItemHandler>()) return;
+
+        args.Outputs.Add(new SynapseItemBinding()
+        {
+            Info = info,
+            HandlerType = args.MetaType.Type
         });
     }
 
@@ -213,6 +227,10 @@ public class Synapse : Module
         args.Context.MetaBindings
             .OfType<SynapseScp914ProcessorBinding>()
             .ToList().ForEach(x => Scp914Service.LoadBinding(x));
+        
+        args.Context.MetaBindings
+            .OfType<SynapseItemBinding>()
+            .ToList().ForEach(x => ItemService.LoadBinding(x));
     }
 
     private void LoadModuleLate(ModuleLoadEvent args)
@@ -240,6 +258,10 @@ public class Synapse : Module
         args.Context.MetaBindings
             .OfType<SynapseScp914ProcessorBinding>()
             .ToList().ForEach(x => Scp914Service.LoadBinding(x));
+        
+        args.Context.MetaBindings
+            .OfType<SynapseItemBinding>()
+            .ToList().ForEach(x => ItemService.LoadBinding(x));
     }
 
     public override void Enable()
@@ -249,6 +271,7 @@ public class Synapse : Module
         TeamService = _kernel.GetSafe<TeamService>();
         CustomAttributeService = _kernel.GetSafe<CustomAttributeService>();
         Scp914Service = _kernel.GetSafe<Scp914Service>();
+        ItemService = _kernel.GetSafe<ItemService>();
         
         Logger.Info("Synapse3 enabled!");
     }

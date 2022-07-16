@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using HarmonyLib;
 using InventorySystem;
 using InventorySystem.Items;

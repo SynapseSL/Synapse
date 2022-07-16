@@ -54,7 +54,8 @@ internal static class DummyPatches
     [HarmonyPatch(typeof(FirearmBasicMessagesHandler), nameof(FirearmBasicMessagesHandler.ServerShotReceived))]
     private static Exception OnShoot(Exception __exception)
     {
-        NeuronLogger.For<Synapse>().Error(__exception);
+        if (__exception != null)
+            NeuronLogger.For<Synapse>().Error(__exception);
         return null;
     }
 }
