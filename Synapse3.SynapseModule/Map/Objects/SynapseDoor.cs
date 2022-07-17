@@ -48,7 +48,13 @@ public class SynapseDoor : NetworkSynapseObject
     public bool Locked
     {
         get => Variant.ActiveLocks > 0;
-        set => Variant.ServerChangeLock(DoorLockReason.SpecialDoorFeature, value);
+        set
+        {
+            if (value)
+                Variant.ServerChangeLock(DoorLockReason.SpecialDoorFeature, true);
+            else
+                Variant.NetworkActiveLocks = 0;
+        }
     }
 
     public DoorPermissions DoorPermissions
@@ -78,11 +84,13 @@ public class SynapseDoor : NetworkSynapseObject
 
     public bool TryPry()
     {
-        if (Variant is PryableDoor pryableDoor)
-            return pryableDoor.TryPryGate();
+        if (Variant is PryableDoor door)
+            return door.TryPryGate();
 
         return false;
     }
+
+    public void LockWithReason(DoorLockReason reason) => Variant.ServerChangeLock(reason, true);
 
     public override string ToString() => Name;
 

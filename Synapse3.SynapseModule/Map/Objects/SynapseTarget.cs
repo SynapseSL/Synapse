@@ -47,7 +47,7 @@ public class SynapseTarget : SynapseToyObject<ShootingTarget>
     }
     private ShootingTarget CreateTarget(TargetType type, Vector3 position, Quaternion rotation, Vector3 scale)
     {
-        var ot = UnityEngine.Object.Instantiate(Prefabs[type], position, rotation);
+        var ot = Object.Instantiate(Prefabs[type], position, rotation);
 
         var transform = ot.transform;
         transform.position = position;

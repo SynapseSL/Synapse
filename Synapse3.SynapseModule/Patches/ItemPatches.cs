@@ -16,8 +16,8 @@ namespace Synapse3.SynapseModule.Patches;
 internal static class ItemPatches
 {
     [HarmonyPostfix]
-    [HarmonyPatch(typeof(InventorySystem.Items.ItemSerialGenerator),
-        nameof(InventorySystem.Items.ItemSerialGenerator.GenerateNext))]
+    [HarmonyPatch(typeof(ItemSerialGenerator),
+        nameof(ItemSerialGenerator.GenerateNext))]
     public static void GenerateSerial(ushort __result) => Synapse.Get<ItemService>()._allItems[__result] = null;
 
     [HarmonyPrefix]

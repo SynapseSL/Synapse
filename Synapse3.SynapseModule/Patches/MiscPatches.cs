@@ -56,4 +56,18 @@ internal static class MiscPatches
         catch{ }
         return false;
     }
+    
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(PlayableScps.Scp096), "CurMaxShield", MethodType.Getter)]
+    private static void GetMaxShield(PlayableScps.Scp096 __instance, ref float __result)
+    {
+        try
+        {
+            var player = __instance.GetSynapsePlayer();
+            if(player == null) return;
+
+            __result = player.ScpController.Scp096.MaxShield;
+        }
+        catch{ }
+    }
 }

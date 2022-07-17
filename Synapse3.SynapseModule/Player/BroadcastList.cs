@@ -1,65 +1,75 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Synapse3.SynapseModule.Player;
 
-public class BroadcastList
+public class BroadcastList : 
+    ICollection<Broadcast>
 {
     private readonly SynapsePlayer _player;
-    private List<Broadcast> bcs = new();
-
+    private readonly List<Broadcast> _broadcasts = new();
+    
+    
     public BroadcastList(SynapsePlayer player) => _player = player;
 
-    public void Add(Broadcast bc, bool instant = false)
+    
+    public void Add(Broadcast item) => Add(item, false);
+    public void Add(Broadcast bc, bool instant)
     {
         if (bc == null)
             return;
 
         if (instant)
         {
-            var currentbc = bcs.FirstOrDefault();
+            var activeBroadcast = _broadcasts.FirstOrDefault();
             
-            bcs.Insert(0, bc);
-
-            if (currentbc != null)
-                currentbc.EndBc();
-            else
-                bcs.First().StartBc(_player);
+            _broadcasts.Insert(0, bc);
+            activeBroadcast?.EndBc();
+            bc.StartBc(_player);
         }
         else
         {
-            bcs.Add(bc);
+            _broadcasts.Add(bc);
             
-            if(!bcs.First().Active)
-                bcs.First().StartBc(_player);
+            if(!_broadcasts.First().Active)
+                _broadcasts.First().StartBc(_player);
         }
     }
-
-    public void Remove(Broadcast bc)
+    public bool Remove(Broadcast bc)
     {
-        if (bcs.Any(x => x == bc))
+        if (bc != null && _broadcasts.Any(x => x == bc))
         {
-            bcs.Remove(bc);
+            _broadcasts.Remove(bc);
 
             if (bc.Active)
                 bc.EndBc();
-        }
-    }
 
+            return true;
+        }
+
+        return false;
+    }
     public void Clear()
     {
-        if (bcs.Count < 1)
+        if (_broadcasts.Count < 1)
             return;
 
-        var activebc = bcs.FirstOrDefault();
-        bcs.Clear();
-        activebc.EndBc();
+        var activeBc = _broadcasts.FirstOrDefault();
+        _broadcasts.Clear();
+        activeBc?.EndBc();
     }
 
-    public IEnumerator<Broadcast> GetEnumerator() => bcs.GetEnumerator();
-    public bool Contains(Broadcast bc) => bcs.Contains(bc);
-    public bool Any(Func<Broadcast, bool> func) => bcs.Any(func);
-    public Broadcast FirstOrDefault() => bcs.FirstOrDefault();
-    public Broadcast FirstOrDefault(Func<Broadcast, bool> func) => bcs.FirstOrDefault(func);
+    
+    public void CopyTo(Broadcast[] array, int arrayIndex) => _broadcasts.CopyTo(array, arrayIndex);
+    public bool Contains(Broadcast bc) => _broadcasts.Contains(bc);
+
+    
+    public int Count => _broadcasts.Count;
+    public bool IsReadOnly => false;
+
+    
+    public IEnumerator<Broadcast> GetEnumerator() => _broadcasts.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

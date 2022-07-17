@@ -114,11 +114,11 @@ public class Synapse : Module
         
         CustomNetworkManager.Modded = true;
         BuildInfoCommand.ModDescription = $"Plugin Framework: Synapse\n" +
-                                          $"Synapse Version: {Synapse.GetVersion()}\n" +
+                                          $"Synapse Version: {GetVersion()}\n" +
                                           $"Description: Synapse is a heavily modded server software using extensive runtime patching to make development faster and the usage more accessible to end-users";
         
-        if(Synapse.BasedGameVersion != GameCore.Version.VersionString)
-            Logger.Warn($"Sy3 Version: This Version of Synapse3 is build for SCPSL Version {Synapse.BasedGameVersion} Currently installed: {GameCore.Version.VersionString}\nBugs may occurs");
+        if(BasedGameVersion != GameCore.Version.VersionString)
+            Logger.Warn($"Sy3 Version: This Version of Synapse3 is build for SCPSL Version {BasedGameVersion} Currently installed: {GameCore.Version.VersionString}\nBugs may occurs");
     }
 
     private void MetaGenerateBindings(MetaGenerateBindingsEvent args)

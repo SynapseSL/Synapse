@@ -75,7 +75,7 @@ public partial class SynapseItem
             rot = owner.CameraReference.rotation * exampleBase.PickupDropModel.transform.rotation;
         }
         
-        Pickup = UnityEngine.Object.Instantiate(exampleBase.PickupDropModel, position, rot);
+        Pickup = Object.Instantiate(exampleBase.PickupDropModel, position, rot);
         var info = new PickupSyncInfo
         {
             Position = position,
