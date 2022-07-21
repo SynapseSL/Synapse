@@ -23,6 +23,8 @@ public abstract class SynapseRole : ISynapseRole
 
     public RoleAttribute Attribute { get; set; }
     
+    public virtual void Load() { }
+    
     public abstract int GetTeamID();
     public virtual List<int> GetFriendsID() => new ();
     public virtual List<int> GetEnemiesID() => new ();

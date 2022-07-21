@@ -46,7 +46,7 @@ public class RespawnCommand : SynapseCommand
             return;
         }
 
-        Synapse.Get<TeamService>().SpawnTeam(id, players);
+        Synapse.Get<TeamService>().SpawnCustomTeam(id, players);
         result.Response = "Team was spawned";
         result.StatusCode = CommandStatusCode.Error;
     }

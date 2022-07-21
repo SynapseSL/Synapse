@@ -9,6 +9,8 @@ public interface ISynapseRole
     
     RoleAttribute Attribute { get; set; }
 
+    void Load();
+
     int GetTeamID();
 
     List<int> GetFriendsID();

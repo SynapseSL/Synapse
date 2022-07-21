@@ -2,6 +2,7 @@
 using Neuron.Modules.Commands;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Scp914;
+using Synapse3.SynapseModule.Teams;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Command.SynapseCommands;
@@ -20,19 +21,12 @@ public class TestCommand : SynapseCommand
     {
         result.Response = "Test";
 
-        var service = Synapse.Get<Scp914Service>();
+        var service = Synapse.Get<TeamService>();
 
-        var doors = service.Doors.ToList();
-        var door = new SynapseDoor(SynapseDoor.SpawnableDoorType.Hcz, context.Player.Position, context.Player.Rotation,
-            Vector3.one)
-        {
-            Locked = true,
-            Open = true
-        };
-        doors.Add(door);
-        service.Doors = doors.ToArray();
-        
-        
+        service.NextTeam = 15;
+        service.Spawn();
+
+
         /*
         var config = new SchematicConfiguration()
         {

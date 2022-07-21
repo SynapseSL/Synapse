@@ -1,5 +1,7 @@
-﻿using Neuron.Core.Events;
+﻿using System.Collections.Generic;
+using Neuron.Core.Events;
 using Neuron.Core.Meta;
+using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Events;
 
@@ -13,6 +15,8 @@ public class RoundEvents : Service
     public readonly EventReactor<RoundRestartEvent> Restart = new();
     public readonly EventReactor<RoundCheckEndEvent> CheckEnd = new();
     public readonly EventReactor<SelectTeamEvent> SelectTeam = new();
+    public readonly EventReactor<SpawnTeamEvent> SpawnTeam = new();
+    public readonly EventReactor<FirstSpawnEvent> FirstSpawn = new();
 
     public RoundEvents(EventManager eventManager)
     {
@@ -27,6 +31,8 @@ public class RoundEvents : Service
         _eventManager.RegisterEvent(Restart);
         _eventManager.RegisterEvent(CheckEnd);
         _eventManager.RegisterEvent(SelectTeam);
+        _eventManager.RegisterEvent(SpawnTeam);
+        _eventManager.RegisterEvent(FirstSpawn);
     }
 }
 
@@ -50,7 +56,26 @@ public class RoundCheckEndEvent : IEvent
 
 public class SelectTeamEvent : IEvent
 {
-    public int ID { get; set; }
+    public int TeamId { get; set; }
 
     public bool Reset { get; set; } = false;
+}
+
+public class SpawnTeamEvent : IEvent
+{
+    public SpawnTeamEvent(int teamId)
+    {
+        TeamId = teamId;
+    }
+    
+    public int TeamId { get; }
+    
+    public List<SynapsePlayer> Players { get; set; }
+
+    public bool Allow { get; set; } = true;
+}
+
+public class FirstSpawnEvent : IEvent
+{
+    public Dictionary<SynapsePlayer,int> PlayerAndRoles { get; set; }
 }

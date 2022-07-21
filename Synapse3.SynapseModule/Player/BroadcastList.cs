@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,7 +12,7 @@ public class BroadcastList :
     
     
     public BroadcastList(SynapsePlayer player) => _player = player;
-
+    
     
     public void Add(Broadcast item) => Add(item, false);
     public void Add(Broadcast bc, bool instant)
@@ -60,15 +59,15 @@ public class BroadcastList :
         _broadcasts.Clear();
         activeBc?.EndBc();
     }
-
+    
     
     public void CopyTo(Broadcast[] array, int arrayIndex) => _broadcasts.CopyTo(array, arrayIndex);
     public bool Contains(Broadcast bc) => _broadcasts.Contains(bc);
-
+    
     
     public int Count => _broadcasts.Count;
     public bool IsReadOnly => false;
-
+    
     
     public IEnumerator<Broadcast> GetEnumerator() => _broadcasts.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

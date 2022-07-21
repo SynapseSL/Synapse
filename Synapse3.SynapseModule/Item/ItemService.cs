@@ -42,6 +42,9 @@ public class ItemService : Service
     public ReadOnlyCollection<SynapseItem> AllItems =>
         _allItems.Select(x => x.Value).Where(x => x is not null).ToList().AsReadOnly();
 
+    /// <summary>
+    /// Returns the SynapseItem with that Serial or SynapseIte.None
+    /// </summary>
     public SynapseItem GetSynapseItem(ushort serial)
     {
         if (!_allItems.ContainsKey(serial))
@@ -52,6 +55,9 @@ public class ItemService : Service
         return _allItems[serial];
     }
 
+    /// <summary>
+    /// Creates and registers the CustomItemHandler and binds it to the kernel
+    /// </summary>
     public bool CreateAndRegisterItemHandler(ItemAttribute info, Type handlerType)
     {
         var handler = (CustomItemHandler)_kernel.GetSafe(handlerType);
@@ -60,6 +66,11 @@ public class ItemService : Service
         return RegisterItem(info);
     }
     
+    /// <summary>
+    /// Registers the CustomItem
+    /// </summary>
+    /// <param name="info"></param>
+    /// <returns></returns>
     public bool RegisterItem(ItemAttribute info)
     {
         if (IsIdRegistered(info.ID)) return false;
@@ -68,6 +79,9 @@ public class ItemService : Service
         return true;
     }
 
+    /// <summary>
+    /// Removes the CustomItem so that it can no longer be spawned
+    /// </summary>
     public bool UnRegisterItem(int id)
     {
         var info = GetInfo(id);
@@ -76,9 +90,15 @@ public class ItemService : Service
         return _items.Remove(info);
     }
 
+    /// <summary>
+    /// Sets the Schematic Look for an Vanilla Item
+    /// </summary>
     public void SetVanillaItemSchematic(ItemType type, SchematicConfiguration configuration)
         => overridenVanillaItems[type] = configuration;
 
+    /// <summary>
+    /// Returns the Schematic Configuration registered with this ID
+    /// </summary>
     public SchematicConfiguration GetSchematicConfiguration(int id)
     {
         if (id is >= 0 and <= HighestItem)

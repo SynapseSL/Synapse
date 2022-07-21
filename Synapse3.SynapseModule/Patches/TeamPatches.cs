@@ -32,9 +32,10 @@ internal static class TeamPatches
 
                     var ev = new SelectTeamEvent()
                     {
-                        ID = nextTeam
+                        TeamId = nextTeam
                     };
                     Synapse.Get<RoundEvents>().SelectTeam.Raise(ev);
+                    nextTeam = ev.TeamId;
 
                     if (ev.Reset || nextTeam == 0)
                     {
@@ -64,13 +65,14 @@ internal static class TeamPatches
     }
 
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(RespawnManager), nameof(RespawnManager.Update))]
+    [HarmonyPatch(typeof(RespawnManager), nameof(RespawnManager.ForceSpawnTeam))]
     public static bool ForceRespawn(RespawnManager __instance, SpawnableTeamType teamToSpawn)
     {
         try
         {
             var service = Synapse.Get<TeamService>();
             service.NextTeam = (int)teamToSpawn;
+            service.Spawn();
             __instance.RestartSequence();
             return false;
         }

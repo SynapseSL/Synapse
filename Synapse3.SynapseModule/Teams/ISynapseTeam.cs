@@ -5,7 +5,7 @@ namespace Synapse3.SynapseModule.Teams;
 
 public interface ISynapseTeam
 {
-    public TeamAttribute Info { get; set; }
+    public TeamAttribute Attribute { get; set; }
 
     public void SpawnPlayers(List<SynapsePlayer> players);
     

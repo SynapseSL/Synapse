@@ -17,6 +17,7 @@ using Synapse3.SynapseModule.Map.Scp914;
 using Synapse3.SynapseModule.Role;
 using Synapse3.SynapseModule.Teams;
 using Object = UnityEngine.Object;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace Synapse3.SynapseModule;
 
@@ -54,18 +55,12 @@ public class Synapse : Module
     /// </summary>
     /// <typeparam name="TObject"></typeparam>
     /// <returns></returns>
-    public static List<TObject> GetObjects<TObject>() where TObject : Object
-    {
-        return Object.FindObjectsOfType<TObject>().ToList();
-    }
+    public static List<TObject> GetObjects<TObject>() where TObject : Object => Object.FindObjectsOfType<TObject>().ToList();
 
     /// <summary>
     /// Returns an instance of the specified object from Unity
     /// </summary>
-    public static TObject GetObject<TObject>() where TObject : Object
-    {
-        return Object.FindObjectOfType<TObject>();
-    }
+    public static TObject GetObject<TObject>() where TObject : Object => Object.FindObjectOfType<TObject>();
 
     /// <summary>
     /// Creates a string with the full combined version of Synapse

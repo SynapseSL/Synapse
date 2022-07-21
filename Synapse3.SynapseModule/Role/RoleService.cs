@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using Neuron.Core;
 using Neuron.Core.Meta;
 using Neuron.Modules.Commands.Event;
+using Ninject;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Player;
 
@@ -12,6 +14,7 @@ namespace Synapse3.SynapseModule.Role;
 
 public class RoleService : Service
 {
+    private readonly IKernel _kernel;
     private readonly SynapseCommandService _command;
     private readonly PlayerService _player;
     private List<RoleAttribute> _customRoles = new();
@@ -29,8 +32,9 @@ public class RoleService : Service
     /// <summary>
     /// Creates a new RoleService
     /// </summary>
-    public RoleService(SynapseCommandService command, PlayerService player)
+    public RoleService(IKernel kernel, SynapseCommandService command, PlayerService player)
     {
+        _kernel = kernel;
         _command = command;
         _player = player;
     }
@@ -98,6 +102,7 @@ public class RoleService : Service
     /// </summary>
     public bool RegisterRole(RoleAttribute info)
     {
+        if (info.RoleScript == null) return false;
         if (info.ID is >= -1 and <= HighestRole) return false;
         if (IsIdRegistered(info.ID)) return false;
 
@@ -146,18 +151,10 @@ public class RoleService : Service
     /// </summary>
     private ISynapseRole GetRole(RoleAttribute info)
     {
-        ISynapseRole role;
-
-        if (info.RoleScript.GetConstructors().Any(x =>
-                x.GetParameters().Count() == 1 && x.GetParameters().First().ParameterType == typeof(RoleAttribute))) 
-        {
-            role = (ISynapseRole)Activator.CreateInstance(info.RoleScript, info);
-        }
-        else
-        {
-            role = (ISynapseRole)Activator.CreateInstance(info.RoleScript);
-        }
+        if (info.RoleScript == null) return null;
+        var role = (ISynapseRole)_kernel.Get(info.RoleScript);
         role.Attribute = info;
+        role.Load();
         return role;
     }
 

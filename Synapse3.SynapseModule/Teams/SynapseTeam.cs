@@ -11,5 +11,5 @@ public abstract class SynapseTeam : ISynapseTeam
     public virtual float RespawnTime => 0f;
     
     public virtual void RespawnAnnouncement() { }
-    public TeamAttribute Info { get; set; }
+    public TeamAttribute Attribute { get; set; }
 }

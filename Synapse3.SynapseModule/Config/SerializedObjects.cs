@@ -357,7 +357,7 @@ public class SerializedPlayerState
             }
 
             if (RoleID is >= 0 and <= RoleService.HighestRole)
-                player.ChangeRoleAtPosition((RoleType)RoleID);
+                player.ChangeRoleLite((RoleType)RoleID);
             else
                 player.SpawnCustomRole(RoleID, true);
             

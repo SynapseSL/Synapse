@@ -17,21 +17,23 @@ public class SynapseVector
         {
             if (StartupArgs.Args.Any(x => x.Equals("-nosynapse", StringComparison.OrdinalIgnoreCase)))
             {
-                ServerConsole.AddLog("Server started with -nosynapse argument! Synapse will not be loaded");
+                Log("Server started with -nosynapse argument! SynapsePlatform will not be loaded");
                 return;
             }
             
-            ServerConsole.AddLog("Bootstrapping Synapse3 via reflections", ConsoleColor.Cyan);
+            Log("Bootstrapping SynapsePlatform via reflections", ConsoleColor.Cyan);
+            
             var assemblies = new List<Assembly>();
             var domain = AppDomain.CurrentDomain;
             var currentUri = new Uri(Directory.GetCurrentDirectory());
+            
             foreach (var file in Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), "Synapse", "Managed"), "*.dll"))
             {
                 var fileUri = new Uri(file);
                 var targetUri = currentUri.MakeRelativeUri(fileUri);
-                ServerConsole.AddLog($"[Bootstrapp] Loading assembly at {Uri.UnescapeDataString(targetUri.ToString())}", ConsoleColor.DarkGray);
+                Log($"Loading assembly at {Uri.UnescapeDataString(targetUri.ToString())}", ConsoleColor.DarkGray);
                 var assembly = domain.Load(File.ReadAllBytes(file));
-                ServerConsole.AddLog($"[Bootstrapp] Loaded assembly {assembly.FullName}");
+                Log($"Loaded assembly {assembly.FullName}");
                 assemblies.Add(assembly);
             }
 
@@ -49,7 +51,12 @@ public class SynapseVector
         }
         catch (Exception e)
         {
-            ServerConsole.AddLog($"Failed to load Synapse3: {e}", ConsoleColor.DarkRed);
+            Log($"Failed to load SynapsePlatform: {e}", ConsoleColor.DarkRed);
         }
+    }
+
+    private static void Log(string msg, ConsoleColor color = ConsoleColor.Gray)
+    {
+        ServerConsole.AddLog("[Bootstrap]" + msg, color);
     }
 }

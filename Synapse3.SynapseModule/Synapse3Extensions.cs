@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items;
 using InventorySystem.Items.Firearms.Attachments;
+using InventorySystem.Items.Keycards;
 using InventorySystem.Items.Pickups;
 using MapGeneration.Distributors;
 using Mirror;
@@ -84,6 +86,37 @@ public static class Synapse3Extensions
     {
         var msg = new ObjectDestroyMessage { netId = identity.netId };
         NetworkServer.SendToAll(msg);
+    }
+    
+    public static bool CheckPermission(this DoorPermissions door, SynapsePlayer player) =>
+        CheckPermission(door.RequiredPermissions, player, door.RequireAll);
+    
+    public static bool CheckPermission(this KeycardPermissions permissions, SynapsePlayer player,
+        bool needIdentical = false)
+    {
+        if (player.Bypass || (ushort)permissions == 0) return true;
+        if (player.ClassManager.IsAnyScp() && permissions.HasFlagFast(KeycardPermissions.ScpOverride)) return true;
+        
+        var items = Synapse.Get<SynapseConfigService>().GamePlayConfiguration.RemoteKeyCard
+            ? player.Inventory.Items.ToList()
+            : new List<SynapseItem> { player.Inventory.ItemInHand };
+
+        foreach (var item in items)
+        {
+            if(item.ItemCategory != ItemCategory.Keycard || item.Item == null) continue;
+
+            var overlappingPerms = ((KeycardItem)item.Item).Permissions & permissions;
+            var ev = new KeyCardInteractEvent(item, ItemInteractState.Finalize)
+            {
+                Allow = needIdentical ? overlappingPerms == permissions : overlappingPerms >= 0,
+            };
+            
+            Synapse.Get<ItemEvents>().KeyCardInteract.Raise(ev);
+            if (ev.Allow)
+                return true;
+        }
+
+        return false;
     }
     
     

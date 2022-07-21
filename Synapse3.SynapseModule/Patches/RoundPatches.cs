@@ -7,9 +7,12 @@ using MEC;
 using Neuron.Core.Logging;
 using RoundRestarting;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
 using UnityEngine;
+using Console = System.Console;
+
 // ReSharper disable InconsistentNaming
 
 namespace Synapse3.SynapseModule.Patches;
@@ -99,9 +102,25 @@ internal static class RoundPatches
             NeuronLogger.For<Synapse>().Error("Sy3 Events: Round Restart Event failed:\n" + ex);
         }
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.SetRandomRoles))]
+    private static bool SetRandomRoles(CharacterClassManager __instance, bool first)
+    {
+        try
+        {
+            DecoratedRoundMethods.OnSetRandomRoles(__instance, first);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Events: First Spawn Event failed:\n" + ex);
+            return true;
+        }
+    }
 }
 
-public static class DecoratedRoundMethods
+internal static class DecoratedRoundMethods
 {
     // Decorated and refactored coroutine RoundSummary._ProcessServerSideCode()
     public static IEnumerator<float> ProcessServerSideCode(RoundSummary roundSummary)
@@ -283,6 +302,48 @@ public static class DecoratedRoundMethods
             yield return Timing.WaitForSeconds(1f);
             
             RoundRestart.InitiateRoundRestart();
+        }
+    }
+
+    public static void OnSetRandomRoles(CharacterClassManager manager, bool first)
+    {
+        if(!manager.isLocalPlayer || !manager.isServer) return;
+        manager.RunDefaultClassPicker(first, out var roles, out var playersRoleList);
+        if (first && ConfigFile.ServerConfig.GetBool("smart_class_picker", true) && GameCore.Console.EnableSCP)
+        {
+            manager.RunSmartClassPicker(roles, out playersRoleList);
+        }
+
+        var players = new Dictionary<SynapsePlayer, int>();
+        foreach (var pair in playersRoleList)
+        {
+            var player = pair.Key.GetSynapsePlayer();
+            if (player == null || player.OverWatch) continue;
+            players[player] = (int)pair.Value;
+        }
+
+        var ev = new FirstSpawnEvent()
+        {
+            PlayerAndRoles = players
+        };
+        Synapse.Get<RoundEvents>().FirstSpawn.Raise(ev);
+        
+        players = ev.PlayerAndRoles;
+        
+        foreach (var pair in players)
+        {
+            //That way we can also apply the RoundStart SpawnReason otherwise we could just use the else part
+            if (pair.Value is >= 0 and <= RoleService.HighestRole)
+            {
+                var chaos = manager.IsCIOnStart && pair.Value == (int)RoleType.FacilityGuard;
+
+                manager.SetPlayersClass(chaos ? RoleType.ChaosRifleman : (RoleType)pair.Value, pair.Key.gameObject,
+                    CharacterClassManager.SpawnReason.RoundStart);
+            }
+            else
+            {
+                pair.Key.RoleID = pair.Value;
+            }
         }
     }
 }

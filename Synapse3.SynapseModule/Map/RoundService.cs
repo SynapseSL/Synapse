@@ -38,7 +38,7 @@ public class RoundService : Service
     /// <summary>
     /// The number of the round sciece the last server restart
     /// </summary>
-    public int CurrentRound { get; private set; } = 0;
+    public int CurrentRound { get; private set; }
 
     /// <summary>
     /// The time until the next wave spawns
@@ -153,7 +153,7 @@ public class RoundService : Service
     public bool RoundEnded => Rs.RoundEnded;
 
     //TODO: @Dimenzio wird das noch von dir eingebaut oder ist das nur so?
-    internal bool Forceend { get; set; } = false;
+    internal bool Forceend { get; set; }
 
     /// <summary>
     /// Manual ForceRoundStart

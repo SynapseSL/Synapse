@@ -8,13 +8,13 @@ namespace Synapse3.SynapseModule.Permissions;
 public class SynapseGroup : IDocumentSection
 {
     [Description("If Enabled this Group will be assigned to all players, which are in no other Group")]
-    public bool Default = false;
+    public bool Default;
 
     [Description("If Enabled this Group will be assigned to Northwood staff players, which are in no other Group")]
-    public bool Northwood = false;
+    public bool Northwood;
 
     [Description("If Enabled this Group has Acces to RemoteAdmin")]
-    public bool RemoteAdmin = false;
+    public bool RemoteAdmin;
 
     [Description("The Badge which will be displayed in game")]
     public string Badge = "NONE";
@@ -23,13 +23,13 @@ public class SynapseGroup : IDocumentSection
     public string Color = "NONE";
 
     [Description("If Enabled The Badge of this Group will be displayed instead of the global Badge")]
-    public bool Cover = false;
+    public bool Cover;
 
     [Description("If Enabled the Badge is Hidden by default")]
-    public bool Hidden = false;
+    public bool Hidden;
 
     [Description("The KickPower the group has")]
-    public byte KickPower = 0;
+    public byte KickPower;
 
     [Description("The KickPower which is required to kick the group")]
     public byte RequiredKickPower = 1;
