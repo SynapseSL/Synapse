@@ -4,18 +4,38 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Dummy;
+using Synapse3.SynapseModule.Events;
+using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
 
 public class PlayerService : Service
 {
     private DummyService _dummy;
+    private PlayerEvents _player;
 
-    public PlayerService(DummyService dummy)
+    public PlayerService(DummyService dummy, PlayerEvents player)
     {
         _dummy = dummy;
+        _player = player;
     }
-    
+
+    public override void Enable()
+    {
+        _player.Update.Subscribe(PlayerUpdate);
+    }
+
+    public override void Disable()
+    {
+        _player.Update.Unsubscribe(PlayerUpdate);
+    }
+
+    private void PlayerUpdate(UpdateEvent ev)
+    {
+        if (Vector3.Distance(ev.Player.Position, ev.Player.Escape.worldPosition) < Escape.radius)
+            ev.Player.TriggerEscape();
+    }
+
     /// <summary>
     /// Returns the Host Player
     /// </summary>

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Mirror;
+using Neuron.Core.Logging;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
@@ -43,7 +44,7 @@ public class SynapseRagdoll : NetworkSynapseObject
         SetUp(role, damage, nick);
     }
 
-    internal SynapseRagdoll(Ragdoll ragdoll)
+    internal SynapseRagdoll(Ragdoll ragdoll) : this()
     {
         Ragdoll = ragdoll;
         SetUp(ragdoll.NetworkInfo.RoleType, ragdoll.NetworkInfo.Handler.GetDamageType(), ragdoll.NetworkInfo.Nickname);
@@ -74,6 +75,7 @@ public class SynapseRagdoll : NetworkSynapseObject
         DamageType = damage;
         RoleType = role;
         Nick = nick;
+        MoveInElevator = true;
     }
 
     private Ragdoll CreateRagdoll(RoleType role, DamageType damage, Vector3 pos, Quaternion rot, Vector3 scale,

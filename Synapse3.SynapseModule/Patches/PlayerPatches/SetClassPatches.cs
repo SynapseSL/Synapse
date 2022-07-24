@@ -65,7 +65,7 @@ internal static class SetClassPatches
                 }
             }
 
-            Synapse.Get<PlayerEvents>().SetClassEvent.Raise(ev);
+            Synapse.Get<PlayerEvents>().SetClass.Raise(ev);
 
             classid = ev.Role;
 

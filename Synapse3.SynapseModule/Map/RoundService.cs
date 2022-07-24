@@ -32,6 +32,7 @@ public class RoundService : Service
     private void AddRound(RoundWaitingEvent ev)
     {
         CurrentRound++;
+        ForceEnd = false;
     }
 
 
@@ -49,7 +50,9 @@ public class RoundService : Service
         set => Rm._timeForNextSequence = value + (Rm._stopwatch.Elapsed.Hours * 3600 + Rm._stopwatch.Elapsed.Minutes * 60 + Rm._stopwatch.Elapsed.Seconds);
     }
 
-    //TODO: No fucking clue what this does
+    /// <summary>
+    /// If enabled the players that are the longest time dead will be prioritised when selecting the players to respawn
+    /// </summary>
     public bool PrioritySpawn
     {
         get => Rm._prioritySpawn;
@@ -151,9 +154,8 @@ public class RoundService : Service
     /// True when the round has ended
     /// </summary>
     public bool RoundEnded => Rs.RoundEnded;
-
-    //TODO: @Dimenzio wird das noch von dir eingebaut oder ist das nur so?
-    internal bool Forceend { get; set; }
+    
+    internal bool ForceEnd { get; set; }
 
     /// <summary>
     /// Manual ForceRoundStart
@@ -163,7 +165,7 @@ public class RoundService : Service
     /// <summary>
     /// Manual ForceRoundEnd
     /// </summary>
-    public void EndRound() => Forceend = true;
+    public void EndRound() => ForceEnd = true;
 
     /// <summary>
     /// Manual ForceRoundRestart

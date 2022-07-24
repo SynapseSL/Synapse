@@ -114,6 +114,8 @@ public class SynapseDoor : NetworkSynapseObject
         Parent = schematic;
         schematic._doors.Add(this);
 
+        Locked = configuration.Locked;
+        Open = configuration.Open;
         OriginalScale = configuration.Scale;
         CustomAttributes = configuration.CustomAttributes;
         UpdateEveryFrame = configuration.UpdateEveryFrame;

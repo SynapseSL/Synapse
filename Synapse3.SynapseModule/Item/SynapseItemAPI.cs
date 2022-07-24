@@ -6,6 +6,7 @@ using InventorySystem.Items.Pickups;
 using Mirror;
 using Neuron.Core.Logging;
 using Synapse3.SynapseModule.Map.Objects;
+using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -92,6 +93,9 @@ public partial class SynapseItem
         Pickup.InfoReceived(default, info);
         UpdateSchematic();
         State = ItemState.Map;
+        
+        var comp = Pickup.gameObject.AddComponent<SynapseObjectScript>();
+        comp.Object = this;
     }
 
     public override void Destroy()

@@ -3,8 +3,10 @@ using System.Linq;
 using CustomPlayerEffects;
 using HarmonyLib;
 using Neuron.Core.Logging;
+using Ninject.Infrastructure.Language;
 using PlayableScps;
 using Synapse3.SynapseModule.Config;
+using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Player;
@@ -27,7 +29,7 @@ internal static class InvisiblePatches
 
             var service = Synapse.Get<PlayerService>();
             var players = service.Players.ToList();
-            //TODO: Add Dummies here
+            players.AddRange(Synapse.Get<DummyService>().Dummies.Select(x => x.Player));
             __instance._usedData = players.Count;
 
             if (__instance.ReceivedData == null || __instance.ReceivedData.Length < __instance._usedData)

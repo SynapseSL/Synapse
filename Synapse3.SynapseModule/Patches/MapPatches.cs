@@ -4,13 +4,12 @@ using HarmonyLib;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items.Armor;
 using InventorySystem.Items.Pickups;
+using MapGeneration.Distributors;
 using Neuron.Core.Logging;
-using Respawning;
 using Scp914;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Player;
-using Synapse3.SynapseModule.Teams;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Patches;
@@ -48,10 +47,85 @@ internal static class MapPatches
             return true;
         }
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp079Generator), nameof(Scp079Generator.ServerUpdate))]
+    public static bool OnGeneratorUpdateForEngage(Scp079Generator __instance)
+    {
+        try
+        {
+            DecoratedMapPatches.GeneratorUpdate(__instance);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Generator Engage Event failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Lift), nameof(Lift.UseLift))]
+    public static bool OnUseLift(Lift __instance, out bool __result)
+    {
+        __result = false;
+        try
+        {
+            if (!__instance.operative || AlphaWarheadController.Host.timeToDetonation == 0f ||
+                __instance._locked) return false;
+
+            __instance.GetSynapseElevator().MoveToNext();
+            __instance.operative = false;
+            __result = true;
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Generator Engage Event failed\n" + ex);
+            return true;
+        }
+    }
 }
 
 internal static class DecoratedMapPatches
 {
+    public static void GeneratorUpdate(Scp079Generator generator)
+    {
+        var engageReady = generator._currentTime >= generator._totalActivationTime;
+        if (engageReady)
+        {
+            var time = Mathf.FloorToInt(generator._totalActivationTime - generator._currentTime);
+            if (time != generator._syncTime)
+                generator.Network_syncTime = (short)time;
+        }
+
+        if (generator.ActivationReady)
+        {
+            if (engageReady && !generator.Engaged)
+            {
+                var ev = new GeneratorEngageEvent(generator.GetSynapseGenerator());
+                
+                if(!ev.Allow || ev.ForcedUnAllow)
+                    return;
+                
+                generator.Engaged = true;
+                generator.Activating = false;
+                return;
+            }
+
+            generator._currentTime += Time.deltaTime;
+        }
+        else
+        {
+            if(generator._currentTime == 0f || engageReady)
+                return;
+            
+            generator._currentTime -= generator.DropdownSpeed * Time.deltaTime;
+        }
+
+        generator._currentTime = Mathf.Clamp(generator._currentTime, 0f, generator._totalActivationTime);
+    }
+    
     public static bool OnUpgrade(Collider[] intake, Vector3 moveVector, Scp914Mode mode, Scp914KnobSetting setting)
     {
         var inventory = (mode & Scp914Mode.Inventory) == Scp914Mode.Inventory;

@@ -249,6 +249,10 @@ public partial class SynapsePlayer
 
     public void TriggerEscape()
     {
-        // TODO: Do this shit
+        if (CustomRole != null)
+        {
+            CustomRole.TryEscape();
+            return;
+        }
     }
 }

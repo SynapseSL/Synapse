@@ -1,8 +1,12 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using MEC;
 using Neuron.Modules.Commands;
+using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Map.Objects;
-using Synapse3.SynapseModule.Map.Scp914;
-using Synapse3.SynapseModule.Teams;
+using Synapse3.SynapseModule.Map.Schematic;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Command.SynapseCommands;
@@ -17,14 +21,64 @@ namespace Synapse3.SynapseModule.Command.SynapseCommands;
     )]
 public class TestCommand : SynapseCommand
 {
+    public class ExampleElevator : CustomElevator
+    {
+        private readonly List<IElevatorDestination> _destinations = new ();
+        public override ReadOnlyCollection<IElevatorDestination> Destinations => _destinations.AsReadOnly();
+
+        public ExampleElevator()
+        {
+            var service = Synapse.Get<SchematicService>();
+            _destinations.Add(
+                new SchematicDestination(service.SpawnSchematic(8, new Vector3(0f, 1002f, 0f)), 0, "First", this)
+                {
+                    RangeScale = Vector3.one * 2
+                });
+        
+            _destinations.Add(
+                new SchematicDestination(service.SpawnSchematic(8, new Vector3(0f, 1002f, -50f)), 1, "Second", this)
+                {
+                    RangeScale = Vector3.one * 2
+                });
+
+            _destinations.Add(((SynapseElevator)ElevatorType.GateB.GetSynapseElevator()).Destinations[0]);
+            
+            _destinations.Add(
+                new SchematicDestination(service.SpawnSchematic(8, new Vector3(170f, 995f, -60f)), 2, "Third", this)
+                {
+                    RangeScale = Vector3.one * 2
+                });
+
+            CurrentDestination = _destinations[0];
+        }
+    }
+    
     public override void Execute(SynapseContext context, ref CommandResult result)
     {
         result.Response = "Test";
 
-        var service = Synapse.Get<TeamService>();
+        var elevator = new ExampleElevator();
+        context.Player.Position = elevator.Destinations[0].DestinationPosition;
 
-        service.NextTeam = 15;
-        service.Spawn();
+        Timing.CallDelayed(3f, () =>
+        {
+            elevator.MoveToNext();
+        });
+        
+        Timing.CallDelayed(20f, () =>
+        {
+            elevator.MoveToNext();
+        });
+        
+        Timing.CallDelayed(35f, () =>
+        {
+            elevator.MoveToNext();
+        });
+        
+        Timing.CallDelayed(50f, () =>
+        {
+            elevator.MoveToNext();
+        });
 
 
         /*

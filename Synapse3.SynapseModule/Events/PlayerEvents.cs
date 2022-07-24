@@ -16,7 +16,8 @@ public class PlayerEvents : Service
     public readonly EventReactor<KeyPressEvent> KeyPress = new();
     public readonly EventReactor<HarmPermissionEvent> HarmPermission = new();
     public readonly EventReactor<ShootEvent> Shoot = new();
-    public readonly EventReactor<SetClassEvent> SetClassEvent = new();
+    public readonly EventReactor<SetClassEvent> SetClass = new();
+    public readonly EventReactor<UpdateEvent> Update = new();
 
     public PlayerEvents(EventManager eventManager)
     {
@@ -29,7 +30,7 @@ public class PlayerEvents : Service
         _eventManager.RegisterEvent(KeyPress);
         _eventManager.RegisterEvent(HarmPermission);
         _eventManager.RegisterEvent(Shoot);
-        _eventManager.RegisterEvent(SetClassEvent);
+        _eventManager.RegisterEvent(SetClass);
     }
 }
 
@@ -135,4 +136,9 @@ public class SetClassEvent : PlayerInteractEvent
     public PlayerMovementSync.PlayerRotation Rotation { get; set; }
 
     public Dictionary<AmmoType, ushort> Ammo { get; set; } = new();
+}
+
+public class UpdateEvent : PlayerEvent
+{
+    public UpdateEvent(SynapsePlayer player) : base(player) { }
 }

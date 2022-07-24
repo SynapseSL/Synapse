@@ -12,7 +12,7 @@ namespace Synapse3.SynapseModule.Map.Objects;
 public class SynapseSchematic : DefaultSynapseObject
 {
     public override GameObject GameObject { get; }
-    public override ObjectType Type => ObjectType.Shematic;
+    public override ObjectType Type => ObjectType.Schematic;
     public override Vector3 Position
     {
         set

@@ -1,4 +1,7 @@
-﻿namespace Synapse3.SynapseModule.Player;
+﻿using System;
+using Synapse3.SynapseModule.Events;
+
+namespace Synapse3.SynapseModule.Player;
 
 public partial class SynapsePlayer
 {
@@ -16,5 +19,10 @@ public partial class SynapsePlayer
         if(!service.Players.Contains(this)) return;
 
         service.RemovePlayer(this);
+    }
+
+    public void Update()
+    {
+        Synapse.Get<PlayerEvents>().Update.Raise(new UpdateEvent(this));
     }
 }

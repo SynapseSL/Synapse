@@ -112,6 +112,8 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         _ = MEC.Timing.RunCoroutine(Update());
 
         NetworkServer.Spawn(GameObject);
+
+        MoveInElevator = true;
     }
 
     internal SynapseDummy(SchematicConfiguration.DummyConfiguration configuration, SynapseSchematic schematic) :

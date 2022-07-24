@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GameCore;
 using HarmonyLib;
+using LightContainmentZoneDecontamination;
 using MEC;
 using Neuron.Core.Logging;
 using RoundRestarting;
@@ -118,6 +119,23 @@ internal static class RoundPatches
             return true;
         }
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(DecontaminationController), nameof(DecontaminationController.FinishDecontamination))]
+    public static bool OnDecontamination()
+    {
+        try
+        {
+            var ev = new DecontaminationEvent();
+            Synapse.Get<RoundEvents>().Decontamination.Raise(ev);
+            return ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Events: Decontamination Event failed:\n" + ex);
+            return true;
+        }
+    }
 }
 
 internal static class DecoratedRoundMethods
@@ -128,14 +146,19 @@ internal static class DecoratedRoundMethods
         // Neuron Event Hook
         var roundEvents = Synapse.Get<RoundEvents>();
         var playerService = Synapse.Get<PlayerService>();
+        var roundService = Synapse.Get<RoundService>();
 
         float time = Time.unscaledTime;
         while (roundSummary != null)
         {
             yield return Timing.WaitForSeconds(2.5f);
+
+            if (!RoundSummary.RoundInProgress()) continue;
             
-            if (RoundSummary.RoundLock || (roundSummary._keepRoundOnOne && PlayerManager.players.Count < 2) ||
-                !RoundSummary.RoundInProgress() || Time.unscaledTime - time < 15f) continue;
+            if(!roundService.ForceEnd)
+                if (RoundSummary.RoundLock || (roundSummary._keepRoundOnOne && PlayerManager.players.Count < 2) ||
+                    Time.unscaledTime - time < 15f)
+                    continue;
             
             var classList = new RoundSummary.SumInfo_ClassList();
             var customRoles = new List<ISynapseRole>();

@@ -2,7 +2,7 @@
 
 public enum ObjectType
 {
-    Shematic,
+    Schematic,
     Primitive,
     LightSource,
     Target,
@@ -16,4 +16,5 @@ public enum ObjectType
     Generator,
     Room,
     OldGrenade,
+    ElevatorDestination
 }

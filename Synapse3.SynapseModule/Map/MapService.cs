@@ -55,7 +55,6 @@ public class MapService : Service
     //Other Objects
     internal readonly List<SynapseTesla> _synapseTeslas = new();
     internal readonly List<SynapseCamera> _synapseCameras = new();
-    internal readonly List<SynapseElevator> _synapseElevators = new();
 
     public ReadOnlyCollection<ISynapseObject> SynapseObjects => _synapseObjects.AsReadOnly();
     public ReadOnlyCollection<SynapseDoor> SynapseDoors => _synapseDoors.AsReadOnly();
@@ -72,7 +71,6 @@ public class MapService : Service
 
     public ReadOnlyCollection<SynapseTesla> SynapseTeslas => _synapseTeslas.AsReadOnly();
     public ReadOnlyCollection<SynapseCamera> SynapseCameras => _synapseCameras.AsReadOnly();
-    public ReadOnlyCollection<SynapseElevator> SynapseElevators => _synapseElevators.AsReadOnly();
 
 
 
@@ -144,17 +142,11 @@ public class MapService : Service
         {
             _synapseTeslas.Add(new SynapseTesla(tesla));
         }
-
-        foreach (var lift in Synapse.GetObjects<Lift>())
-        {
-            _synapseElevators.Add(new SynapseElevator(lift));
-        }
     }
 
     private void ClearObjects(RoundRestartEvent ev)
     {
         _synapseTeslas.Clear();
-        _synapseElevators.Clear();
         _synapseCameras.Clear();
     }
 }

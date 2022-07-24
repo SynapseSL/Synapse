@@ -17,6 +17,7 @@ using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map;
+using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic;
@@ -167,8 +168,9 @@ public static class Synapse3Extensions
     }
     public static IRoom GetRoom(this RoomType type) =>
         Synapse.Get<RoomService>()._rooms.FirstOrDefault(x => x.ID == (int)type);
-    public static SynapseElevator GetSynapseElevator(this ElevatorType type) => Synapse.Get<MapService>()._synapseElevators
-        .FirstOrDefault(x => x.ElevatorType == type);
+
+    public static IElevator GetSynapseElevator(this ElevatorType type) => Synapse.Get<ElevatorService>().Elevators
+        .FirstOrDefault(x => x is SynapseElevator elevator && elevator.ElevatorType == type);
     
 
     public static SynapseDoor GetSynapseDoor(this DoorVariant variant)
@@ -243,8 +245,10 @@ public static class Synapse3Extensions
     
     public static SynapseTesla GetSynapseTesla(this TeslaGate gate) =>
         Synapse.Get<MapService>()._synapseTeslas.FirstOrDefault(x => x.Gate == gate);
-    public static SynapseElevator GetSynapseElevator(this Lift lift) =>
-        Synapse.Get<MapService>()._synapseElevators.FirstOrDefault(x => x.Lift == lift);
+
+    public static IElevator GetSynapseElevator(this Lift lift) =>
+        Synapse.Get<ElevatorService>().Elevators
+            .FirstOrDefault(x => x is SynapseElevator elevator && elevator.Lift == lift);
     public static SynapseCamera GetSynapseCamera(this Camera079 cam) =>
         Synapse.Get<MapService>()._synapseCameras.FirstOrDefault(x => x.Camera == cam);
 

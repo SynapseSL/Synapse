@@ -1,6 +1,9 @@
 ﻿using Neuron.Core.Logging;
 using Neuron.Core.Meta;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Map.Elevators;
+using Synapse3.SynapseModule.Map.Schematic;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule;
@@ -21,6 +24,8 @@ public class DebugService : Service
         _item = item;
     }
 
+    private SchematicDestination _destination;
+
     public override void Enable()
     {
         _map.Scp914Upgrade.Subscribe(Upgrade);
@@ -31,6 +36,21 @@ public class DebugService : Service
         
         _item.KeyCardInteract.Subscribe(KeyCardItem);
         _item.BasicInteract.Subscribe(BasicItem);
+
+        /*_round.Start.Subscribe(_ =>
+            _destination =
+                new SchematicDestination(Synapse.Get<SchematicService>().SpawnSchematic(8, new Vector3(0f, 1002f, 0f)),
+                    99, "test", null));
+        
+        _map.ElevatorMoveContent.Subscribe(Elevator);
+        */
+    }
+
+    private void Elevator(ElevatorMoveContentEvent ev)
+    {
+        if(ev.Elevator.Id != (int)ElevatorType.GateB || ev.Destination.ElevatorId != 0) return;
+        ev.Destination = _destination;
+        ev.OpenDoorManually = true;
     }
 
     public override void Disable()

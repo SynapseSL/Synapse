@@ -3,6 +3,7 @@ using InventorySystem.Items.Pickups;
 using InventorySystem.Items.ThrowableProjectiles;
 using Mirror;
 using Respawning;
+using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -64,6 +65,9 @@ public class Throwable : ISubSynapseItem
         NetworkServer.Spawn(Projectile.gameObject);
         Projectile.InfoReceived(default, _item.Pickup.Info);
         
+        var comp = Projectile.gameObject.AddComponent<SynapseObjectScript>();
+        comp.Object = _item;
+        
         Projectile.ServerActivate();
         _item.DestroyItem();
         _item.DestroyPickup();
@@ -105,6 +109,9 @@ public class Throwable : ISubSynapseItem
         Projectile.PreviousOwner = _item.ItemOwner;
         NetworkServer.Spawn(Projectile.gameObject);
         Projectile.InfoReceived(default, info);
+        
+        var comp = Projectile.gameObject.AddComponent<SynapseObjectScript>();
+        comp.Object = _item;
 
         if (Projectile.TryGetComponent<Rigidbody>(out var rb))
         {

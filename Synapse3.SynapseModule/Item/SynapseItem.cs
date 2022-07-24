@@ -40,6 +40,8 @@ public partial class SynapseItem : DefaultSynapseObject
         _subApi[ItemCategory.Radio] = null;
         _subApi[ItemCategory.MicroHID] = null;
         _subApi[ItemCategory.SCPItem] = null;
+
+        MoveInElevator = true;
     }
     
     /// <summary>

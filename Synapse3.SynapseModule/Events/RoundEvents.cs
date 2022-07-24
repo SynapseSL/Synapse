@@ -17,6 +17,7 @@ public class RoundEvents : Service
     public readonly EventReactor<SelectTeamEvent> SelectTeam = new();
     public readonly EventReactor<SpawnTeamEvent> SpawnTeam = new();
     public readonly EventReactor<FirstSpawnEvent> FirstSpawn = new();
+    public readonly EventReactor<DecontaminationEvent> Decontamination = new();
 
     public RoundEvents(EventManager eventManager)
     {
@@ -33,6 +34,7 @@ public class RoundEvents : Service
         _eventManager.RegisterEvent(SelectTeam);
         _eventManager.RegisterEvent(SpawnTeam);
         _eventManager.RegisterEvent(FirstSpawn);
+        _eventManager.RegisterEvent(Decontamination);
     }
 }
 
@@ -78,4 +80,9 @@ public class SpawnTeamEvent : IEvent
 public class FirstSpawnEvent : IEvent
 {
     public Dictionary<SynapsePlayer,int> PlayerAndRoles { get; set; }
+}
+
+public class DecontaminationEvent : IEvent
+{
+    public bool Allow { get; set; } = true;
 }
