@@ -15,8 +15,9 @@ public class MapEvents : Service
     private readonly EventManager _eventManager;
 
     public readonly EventReactor<Scp914UpgradeEvent> Scp914Upgrade = new();
-    public readonly EventReactor<DoorInteractEvent> DoorInteract = new();
     public readonly EventReactor<ElevatorMoveContentEvent> ElevatorMoveContent = new();
+    public readonly EventReactor<TriggerTeslaEvent> TriggerTesla = new();
+    public readonly EventReactor<DetonateWarheadEvent> DetonateWarhead = new();
 
     public MapEvents(EventManager eventManager)
     {
@@ -26,8 +27,9 @@ public class MapEvents : Service
     public override void Enable()
     {
         _eventManager.RegisterEvent(Scp914Upgrade);
-        _eventManager.RegisterEvent(DoorInteract);
         _eventManager.RegisterEvent(ElevatorMoveContent);
+        _eventManager.RegisterEvent(TriggerTesla);
+        _eventManager.RegisterEvent(DetonateWarhead);
     }
 }
 
@@ -49,22 +51,6 @@ public class Scp914UpgradeEvent : IEvent
     {
         Players = new ReadOnlyCollection<SynapsePlayer>(players);
         Items = new ReadOnlyCollection<SynapseItem>(items);
-    }
-}
-
-public class DoorInteractEvent : PlayerInteractEvent
-{
-    public SynapseDoor Door { get; }
-    
-    /// <summary>
-    /// This is true when a player tries to open/close a locked door and he is not in Bypass or something else causes to overrides the lock like the Nuke
-    /// </summary>
-    public bool LockBypassRejected { get; }
-
-    public DoorInteractEvent(SynapsePlayer player, bool allow, SynapseDoor door, bool lockBypass) : base(player, allow)
-    {
-        Door = door;
-        LockBypassRejected = lockBypass;
     }
 }
 
@@ -112,3 +98,15 @@ public class ElevatorMoveContentEvent : IEvent
         Elevator = elevator;
     }
 }
+
+public class TriggerTeslaEvent : PlayerInteractEvent
+{
+    public TriggerTeslaEvent(SynapsePlayer player, bool allow, SynapseTesla tesla) : base(player, allow)
+    {
+        Tesla = tesla;
+    }
+    
+    public SynapseTesla Tesla { get; }
+}
+
+public class DetonateWarheadEvent : IEvent { }

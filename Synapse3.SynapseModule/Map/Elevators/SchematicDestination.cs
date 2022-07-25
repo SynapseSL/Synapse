@@ -7,7 +7,7 @@ namespace Synapse3.SynapseModule.Map.Elevators;
 
 public class SchematicDestination : DefaultSynapseObject, IElevatorDestination
 {
-    public SchematicDestination(SynapseSchematic destination, int id, string name, IElevator elevator)
+    public SchematicDestination(SynapseSchematic destination, int id, string name, IElevator elevator, Vector3 range)
     {
         Elevator = elevator;
         DestinationName = name;
@@ -15,6 +15,7 @@ public class SchematicDestination : DefaultSynapseObject, IElevatorDestination
         Transform = destination._custom.FirstOrDefault(x => x.ID == 1)?.GameObject.transform;
         Schematic = destination;
         destination.Parent = this;
+        RangeScale = range;
     }
     
     public SynapseSchematic Schematic { get; }

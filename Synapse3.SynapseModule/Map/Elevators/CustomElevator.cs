@@ -15,10 +15,8 @@ public abstract class CustomElevator : DefaultElevator
 
     public override void MoveToDestination(int destinationId)
     {
-        NeuronLogger.For<Synapse>().Warn("Move Custom Object");
-        if (Destinations.Any(x => x.ElevatorId == destinationId))
+        if (Destinations.Any(x => x.ElevatorId == destinationId) && !_moving)
         {
-            NeuronLogger.For<Synapse>().Warn("Check");
             _moving = true;
             Timing.RunCoroutine(MoveTo(destinationId));
         }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using HarmonyLib;
-using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items.Armor;
 using InventorySystem.Items.Pickups;
 using MapGeneration.Distributors;
@@ -9,6 +8,7 @@ using Neuron.Core.Logging;
 using Scp914;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
@@ -33,22 +33,6 @@ internal static class MapPatches
     }
 
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(DoorVariant), nameof(DoorVariant.ServerInteract))]
-    public static bool OnDoorInteract(DoorVariant __instance,ReferenceHub ply, byte colliderId)
-    {
-        try
-        {
-            DecoratedMapPatches.OnDoorInteract(__instance, ply, colliderId);
-            return false;
-        }
-        catch (Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Door Interact Event failed\n" + ex);
-            return true;
-        }
-    }
-
-    [HarmonyPrefix]
     [HarmonyPatch(typeof(Scp079Generator), nameof(Scp079Generator.ServerUpdate))]
     public static bool OnGeneratorUpdateForEngage(Scp079Generator __instance)
     {
@@ -65,23 +49,67 @@ internal static class MapPatches
     }
 
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(Lift), nameof(Lift.UseLift))]
-    public static bool OnUseLift(Lift __instance, out bool __result)
+    [HarmonyPatch(typeof(TeslaGate), nameof(TeslaGate.PlayerInRange))]
+    public static bool OnTeslaRange(TeslaGate __instance, out bool __result, ReferenceHub player)
     {
         __result = false;
         try
         {
-            if (!__instance.operative || AlphaWarheadController.Host.timeToDetonation == 0f ||
-                __instance._locked) return false;
+            var sPlayer = player.GetSynapsePlayer();
 
-            __instance.GetSynapseElevator().MoveToNext();
-            __instance.operative = false;
-            __result = true;
+            if (__instance.InRange(sPlayer.Position))
+            {
+                __result = !sPlayer.Invisible;
+                
+                var ev = new TriggerTeslaEvent(sPlayer, __result, __instance.GetSynapseTesla());
+                Synapse.Get<MapEvents>().TriggerTesla.Raise(ev);
+
+                __result = ev.Allow;
+            }
+
             return false;
         }
         catch (Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Generator Engage Event failed\n" + ex);
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Trigger Tesla Event failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(AlphaWarheadController), nameof(AlphaWarheadController.Detonate))]
+    public static void OnDetonate()
+    {
+        try
+        {
+            Synapse.Get<MapEvents>().DetonateWarhead.Raise(new DetonateWarheadEvent());
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Detonate Warhead Event failed\n" + ex);
+        }
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(PlayerInteract),nameof(PlayerInteract.UserCode_CmdUsePanel))]
+    public static bool OnPanelInteract(PlayerInteract __instance ,ref PlayerInteract.AlphaPanelOperations n)
+    {
+        try
+        {
+            if (!__instance.ChckDis(AlphaWarheadOutsitePanel.nukeside.transform.position) ||
+                !__instance.CanInteract) return false;
+
+            var ev = new WarheadPanelInteractEvent(__instance.GetSynapsePlayer(),
+                !Synapse.Get<NukeService>().InsidePanel.Locked, n);
+            
+            Synapse.Get<PlayerEvents>().WarheadPanelInteract.Raise(ev);
+            n = ev.Operation;
+            
+            return ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Warhead Panel Interact Event failed\n" + ex);
             return true;
         }
     }
@@ -194,64 +222,5 @@ internal static class DecoratedMapPatches
         }
 
         return false;
-    }
-
-    public static void OnDoorInteract(DoorVariant door, ReferenceHub hub, byte colliderId)
-    {
-        var player = hub.GetSynapsePlayer();
-        var allow = false;
-        var bypassDenied = false;
-        if (door.ActiveLocks > 0)
-        {
-            var mode = DoorLockUtils.GetMode((DoorLockReason)door.ActiveLocks);
-            
-            var canInteractGeneral = mode.HasFlagFast(DoorLockMode.CanClose) || mode.HasFlagFast(DoorLockMode.CanOpen);
-            var scpOverride = mode.HasFlagFast(DoorLockMode.ScpOverride) &&
-                              hub.characterClassManager.CurRole.team == Team.SCP;
-            var canChangeCurrently = mode != DoorLockMode.FullLock &&
-                                     ((door.TargetState && mode.HasFlagFast(DoorLockMode.CanClose)) ||
-                                      (!door.TargetState && mode.HasFlagFast(DoorLockMode.CanOpen)));
-
-            if (!canInteractGeneral && !scpOverride && !canChangeCurrently)
-            {
-                bypassDenied = true;
-            }
-        }
-
-        //This is most often false when the Animation is still playing
-        if(!door.AllowInteracting(hub,colliderId)) return;
-        
-        if (!bypassDenied)
-        {
-            if (hub.characterClassManager.CurClass == RoleType.Scp079 ||
-                door.RequiredPermissions.CheckPermission(player))
-            {
-                allow = true;
-            }  
-        }
-
-        var ev = new DoorInteractEvent(player, allow, door.GetSynapseDoor(), bypassDenied);
-        Synapse.Get<MapEvents>().DoorInteract.Raise(ev);
-        
-        if (ev.Allow)
-        {
-            door.NetworkTargetState = !door.TargetState;
-            door._triggerPlayer = hub;
-            return;
-        }
-
-        if (ev.LockBypassRejected)
-        {
-            door.LockBypassDenied(hub, colliderId);
-            return;
-        }
-        
-        door.PermissionsDenied(hub, colliderId);
-        DoorEvents.TriggerAction(door, DoorAction.AccessDenied, hub); 
-    }
-
-    public static bool CheckKeyCardPerm(SynapsePlayer player)
-    {
-        return true;
     }
 }

@@ -10,7 +10,7 @@ using Synapse3.SynapseModule.Events;
 
 namespace Synapse3.SynapseModule.Patches;
 
-[Patches]
+//[Patches]
 internal static class ServerPatches
 {
     //TODO: Fix the Transpiler

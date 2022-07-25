@@ -3,6 +3,7 @@ using Neuron.Core.Events;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
@@ -18,6 +19,11 @@ public class PlayerEvents : Service
     public readonly EventReactor<ShootEvent> Shoot = new();
     public readonly EventReactor<SetClassEvent> SetClass = new();
     public readonly EventReactor<UpdateEvent> Update = new();
+    public readonly EventReactor<DoorInteractEvent> DoorInteract = new();
+    public readonly EventReactor<LockerUseEvent> LockerUse = new();
+    public readonly EventReactor<StartWarheadEvent> StartWarhead = new();
+    public readonly EventReactor<CancelWarheadEvent> CancelWarhead = new();
+    public readonly EventReactor<WarheadPanelInteractEvent> WarheadPanelInteract = new();
 
     public PlayerEvents(EventManager eventManager)
     {
@@ -31,6 +37,11 @@ public class PlayerEvents : Service
         _eventManager.RegisterEvent(HarmPermission);
         _eventManager.RegisterEvent(Shoot);
         _eventManager.RegisterEvent(SetClass);
+        _eventManager.RegisterEvent(StartWarhead);
+        _eventManager.RegisterEvent(CancelWarhead);
+        _eventManager.RegisterEvent(DoorInteract);
+        _eventManager.RegisterEvent(LockerUse);
+        _eventManager.RegisterEvent(WarheadPanelInteract);
     }
 }
 
@@ -141,4 +152,54 @@ public class SetClassEvent : PlayerInteractEvent
 public class UpdateEvent : PlayerEvent
 {
     public UpdateEvent(SynapsePlayer player) : base(player) { }
+}
+
+public class DoorInteractEvent : PlayerInteractEvent
+{
+    public SynapseDoor Door { get; }
+    
+    /// <summary>
+    /// This is true when a player tries to open/close a locked door and he is not in Bypass or something else causes to overrides the lock like the Nuke
+    /// </summary>
+    public bool LockBypassRejected { get; }
+
+    public DoorInteractEvent(SynapsePlayer player, bool allow, SynapseDoor door, bool lockBypass) : base(player, allow)
+    {
+        Door = door;
+        LockBypassRejected = lockBypass;
+    }
+}
+
+public class LockerUseEvent : PlayerInteractEvent
+{
+    public LockerUseEvent(SynapsePlayer player, bool allow, SynapseLocker locker, SynapseLocker.SynapseLockerChamber chamber) : base(player, allow)
+    {
+        Locker = locker;
+        Chamber = chamber;
+    }
+
+    public SynapseLocker Locker { get; }
+    
+    public SynapseLocker.SynapseLockerChamber Chamber { get; }
+}
+
+public class StartWarheadEvent : PlayerInteractEvent
+{
+    public StartWarheadEvent(SynapsePlayer player, bool allow) : base(player, allow) { }
+}
+
+public class CancelWarheadEvent : PlayerInteractEvent
+{
+    public CancelWarheadEvent(SynapsePlayer player, bool allow) : base(player, allow) { }
+}
+
+public class WarheadPanelInteractEvent : PlayerInteractEvent
+{
+    public PlayerInteract.AlphaPanelOperations Operation { get; set; }
+
+    public WarheadPanelInteractEvent(SynapsePlayer player, bool allow, PlayerInteract.AlphaPanelOperations operation) :
+        base(player, allow)
+    {
+        Operation = operation;
+    }
 }

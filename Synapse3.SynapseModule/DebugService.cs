@@ -29,7 +29,8 @@ public class DebugService : Service
     public override void Enable()
     {
         _map.Scp914Upgrade.Subscribe(Upgrade);
-        _map.DoorInteract.Subscribe(OnDoor);
+        _player.DoorInteract.Subscribe(OnDoor);
+        _map.TriggerTesla.Subscribe(Tesla);
         _player.KeyPress.Subscribe(OnKeyPress);
         _round.SelectTeam.Subscribe(SelectTeam);
         _round.SpawnTeam.Subscribe(SpawnTeam);
@@ -44,6 +45,11 @@ public class DebugService : Service
         
         _map.ElevatorMoveContent.Subscribe(Elevator);
         */
+    }
+
+    private void Tesla(TriggerTeslaEvent ev)
+    {
+        if (ev.Player.RoleType == RoleType.ClassD) ev.Allow = false;
     }
 
     private void Elevator(ElevatorMoveContentEvent ev)

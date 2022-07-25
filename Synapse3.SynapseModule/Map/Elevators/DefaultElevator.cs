@@ -26,7 +26,7 @@ public abstract class DefaultElevator : IElevator
 
     public void MoveToNext()
     {
-        if(CurrentDestination == null) return;
+        if(CurrentDestination == null || IsMoving) return;
         
         for (int i = 0; i < Destinations.Count; i++)
         {
@@ -51,86 +51,88 @@ public abstract class DefaultElevator : IElevator
         {
             var destination = GetDestination(destinationId);
 
-        var ev = new ElevatorMoveContentEvent(this)
-        {
-            Destination = destination
-        };
-        try
-        {
-            Synapse.Get<MapEvents>().ElevatorMoveContent.Raise(ev);
-        }
-        catch (Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Elevator Move Content Event failed\n" + ex);
-        }
-        destination = ev.Destination;
-
-        foreach (var player in Synapse.Get<PlayerService>().Players)
-        {
-            //Move Players
-            if (InsideAnyDestination(player.Position, destinationId, out var localPosition, out var transform))
+            var ev = new ElevatorMoveContentEvent(this)
             {
-                var rotation = player.Rotation.eulerAngles.y - (transform.rotation.eulerAngles.y - destination.Transform.eulerAngles.y);
-                player.PlayerMovementSync.AddSafeTime(0.5f);
-                player.PlayerMovementSync.OverridePosition(destination.GetWorldPosition(localPosition),
-                    new PlayerMovementSync.PlayerRotation(null, rotation));
+                Destination = destination
+            };
+            try
+        
+            {
+                Synapse.Get<MapEvents>().ElevatorMoveContent.Raise(ev);
+            }
+            catch (Exception ex)
+            {
+                NeuronLogger.For<Synapse>().Error("Sy3 Event: Elevator Move Content Event failed\n" + ex);
+            }
 
-                if (DecontaminationController.Singleton.IsDecontaminating)
+            destination = ev.Destination;
+            
+            foreach (var player in Synapse.Get<PlayerService>().Players)
+            {
+                //Move Players
+                if (InsideAnyDestination(player.Position, destinationId, out var localPosition, out var transform))
                 {
-                    var y = player.transform.position.y;
+                    var rotation = player.Rotation.eulerAngles.y - (transform.rotation.eulerAngles.y - destination.Transform.eulerAngles.y);
+                    player.PlayerMovementSync.AddSafeTime(0.5f);
+                    player.PlayerMovementSync.OverridePosition(destination.GetWorldPosition(localPosition),
+                        new PlayerMovementSync.PlayerRotation(null, rotation));
 
-                    if (y <= 200f || y >= -200f)
-                        player.PlayerEffectsController.EnableEffect<Decontaminating>();
+                    if (DecontaminationController.Singleton.IsDecontaminating)
+                    {
+                        var y = player.transform.position.y;
+
+                        if (y <= 200f || y >= -200f)
+                            player.PlayerEffectsController.EnableEffect<Decontaminating>();
+                    }
+                }
+            
+                //Move 106 Portal
+                var script = player.Hub.scp106PlayerScript;
+                if (script != null &&
+                    InsideAnyDestination(script.portalPosition, destinationId, out localPosition, out _))
+                {
+                    script.SetPortalPosition(Vector3.zero, destination.GetWorldPosition(localPosition));
                 }
             }
             
-            //Move 106 Portal
-            var script = player.Hub.scp106PlayerScript;
-            if (script != null &&
-                InsideAnyDestination(script.portalPosition, destinationId, out localPosition, out _))
+            //Move Tantrum
+            foreach (var tantrum in TantrumEnvironmentalHazard.AllTantrums)
             {
-                script.SetPortalPosition(Vector3.zero, destination.GetWorldPosition(localPosition));
+                if (InsideAnyDestination(tantrum.transform.position, destinationId, out var localPosition, out _))
+                {
+                    tantrum.SetTantrumPosition(Vector3.zero, destination.GetWorldPosition(localPosition));
+                }
             }
-        }
-        
-        //Move Tantrum
-        foreach (var tantrum in TantrumEnvironmentalHazard.AllTantrums)
-        {
-            if (InsideAnyDestination(tantrum.transform.position, destinationId, out var localPosition, out _))
-            {
-                tantrum.SetTantrumPosition(Vector3.zero, destination.GetWorldPosition(localPosition));
-            }
-        }
-
-        //Move SynapseObjects like Items/Ragdolls
-        foreach (var otherDestination in Destinations)
-        {
-            if(destination == otherDestination) continue;
-            var synapseObjects = new HashSet<ISynapseObject>();
-            var box = otherDestination.RangeScale;
-            box.y *= 1.5f;
-            box.x *= 1.1f;
-            box.z *= 1.1f;
             
-            foreach (var collider in Physics.OverlapBox(otherDestination.DestinationPosition,box))
+            //Move SynapseObjects like Items/Ragdolls
+            foreach (var otherDestination in Destinations)
             {
-                var synapse = collider.GetComponentInParent<SynapseObjectScript>();
-                if(synapse == null) continue;
-                if (synapse.Object is not DefaultSynapseObject { MoveInElevator: true }) continue;
-                if (!synapseObjects.Add(synapse.Object)) continue;
-                if (!InsideAnyDestination(synapse.Object.Position, destinationId, out var local, out var transform,
-                        true))
-                    continue;
-                synapse.Object.Position = destination.GetWorldPosition(local);
-                synapse.Object.Rotation =
-                    Quaternion.Euler(
-                        destination.Transform.TransformVector(
-                            transform.InverseTransformVector(synapse.Object.Rotation.eulerAngles)));
+                if(destination == otherDestination) continue;
+                var synapseObjects = new HashSet<ISynapseObject>();
+                var box = otherDestination.RangeScale;
+                box.y *= 1.5f;
+                box.x *= 1.1f;
+                box.z *= 1.1f;
+            
+                foreach (var collider in Physics.OverlapBox(otherDestination.DestinationPosition,box))
+                {
+                    var synapse = collider.GetComponentInParent<SynapseObjectScript>();
+                    if(synapse == null) continue;
+                    if (synapse.Object is not DefaultSynapseObject { MoveInElevator: true }) continue;
+                    if (!synapseObjects.Add(synapse.Object)) continue;
+                    if (!InsideAnyDestination(synapse.Object.Position, destinationId, out var local, out var transform,
+                            true))
+                        continue;
+                    synapse.Object.Position = destination.GetWorldPosition(local);
+                    synapse.Object.Rotation =
+                        Quaternion.Euler(
+                            destination.Transform.TransformVector(
+                                transform.InverseTransformVector(synapse.Object.Rotation.eulerAngles)));
+                }
             }
-        }
 
-        if (ev.OpenDoorManually)
-            Timing.CallDelayed(ev.OpenManuallyDelay, () => destination.Open = true);
+            if (ev.OpenDoorManually)
+                Timing.CallDelayed(ev.OpenManuallyDelay, () => destination.Open = true);
         }
         catch (Exception ex)
         {

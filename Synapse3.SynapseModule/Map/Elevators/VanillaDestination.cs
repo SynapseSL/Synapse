@@ -57,11 +57,7 @@ public class VanillaDestination : IElevatorDestination
         }
     }
 
-    public bool Locked
-    {
-        get => ((SynapseElevator)Elevator).Locked;
-        set => ((SynapseElevator)Elevator).Locked = value;
-    }
+    public bool Locked { get; set; }
     
     public int ElevatorId { get; }
     public Vector3 RangeScale { get; set; }

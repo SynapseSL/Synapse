@@ -74,4 +74,26 @@ internal static class WrapperPatches
             return true;
         }
     }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Lift), nameof(Lift.UseLift))]
+    public static bool OnUseLift(Lift __instance, out bool __result)
+    {
+        __result = false;
+        try
+        {
+            if (!__instance.operative || AlphaWarheadController.Host.timeToDetonation == 0f ||
+                __instance._locked) return false;
+
+            __instance.GetSynapseElevator().MoveToNext();
+            __instance.operative = false;
+            __result = true;
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Generator Engage Event failed\n" + ex);
+            return true;
+        }
+    }
 }

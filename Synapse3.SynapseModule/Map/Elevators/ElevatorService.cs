@@ -29,6 +29,11 @@ public class ElevatorService : Service
     private List<IElevator> _elevators = new ();
     public ReadOnlyCollection<IElevator> Elevators => _elevators.AsReadOnly();
 
+    public void AddElevator(IElevator elevator)
+    {
+        _elevators.Add(elevator);
+    }
+
     private void GetVanillaElevators(RoundWaitingEvent _)
     {
         foreach (var lift in Synapse.GetObjects<Lift>())
