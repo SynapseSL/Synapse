@@ -387,7 +387,7 @@ namespace Synapse.Api
             QueryProcessor.GameplayData = PermissionsHandler.IsPermitted(group.Permissions, PlayerPermissions.GameplayData);
 
             //Since OverwatchPermitted is a seperate vanilla Central Server Permission it is only activated and never deactivated
-            if (!ServerRoles.OverwatchPermitted && PermissionsHandler.IsPermitted(group.Permissions, PlayerPermissions.AdminChat))
+            if (!ServerRoles.OverwatchPermitted && PermissionsHandler.IsPermitted(group.Permissions, PlayerPermissions.Overwatch))
                 ServerRoles.OverwatchPermitted = true;
 
             ServerRoles.SendRealIds();
