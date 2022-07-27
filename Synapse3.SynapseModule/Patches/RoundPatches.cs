@@ -106,7 +106,7 @@ internal static class RoundPatches
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.SetRandomRoles))]
-    private static bool SetRandomRoles(CharacterClassManager __instance, bool first)
+    public static bool SetRandomRoles(CharacterClassManager __instance, bool first)
     {
         try
         {

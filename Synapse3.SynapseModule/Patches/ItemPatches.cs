@@ -171,7 +171,7 @@ internal static class ItemPatches
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ThrowableItem), nameof(ThrowableItem.ServerThrow),
         new[] { typeof(float), typeof(float), typeof(Vector3), typeof(Vector3) })]
-    private static bool ServerThrow(ThrowableItem __instance, float forceAmount, float upwardFactor, Vector3 torque,
+    public static bool ServerThrow(ThrowableItem __instance, float forceAmount, float upwardFactor, Vector3 torque,
         Vector3 startVel)
     {
         try
@@ -190,7 +190,7 @@ internal static class ItemPatches
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(TimedGrenadePickup), nameof(TimedGrenadePickup.Update))]
-    private static bool UpdateGrenadePickup(TimedGrenadePickup __instance)
+    public static bool UpdateGrenadePickup(TimedGrenadePickup __instance)
     {
         try
         {
@@ -207,7 +207,6 @@ internal static class ItemPatches
         {
             NeuronLogger.For<Synapse>().Error("Sy3 Items: Update Grenade failed\n" + ex);
         }
-
         return false;
     }
 }

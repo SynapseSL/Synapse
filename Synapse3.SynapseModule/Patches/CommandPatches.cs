@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Linq;
 using HarmonyLib;
 using Neuron.Core.Logging;
 using Neuron.Modules.Commands.Command;
 using RemoteAdmin;
 using Synapse3.SynapseModule.Command;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Patches;
@@ -13,7 +15,7 @@ internal static class CommandPatches
 {
     [HarmonyPrefix]
     [HarmonyPatch(typeof(GameCore.Console), nameof(GameCore.Console.TypeCommand))]
-    private static bool OnServerConsoleCommand(string cmd)
+    public static bool OnServerConsoleCommand(string cmd)
     {
         try
         {
@@ -62,7 +64,7 @@ internal static class CommandPatches
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(QueryProcessor), nameof(QueryProcessor.ProcessGameConsoleQuery))]
-    private static bool OnPlayerConsoleCommand(QueryProcessor __instance, string query)
+    public static bool OnPlayerConsoleCommand(QueryProcessor __instance, string query)
     {
         try
         {
@@ -111,21 +113,19 @@ internal static class CommandPatches
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(CommandProcessor), nameof(CommandProcessor.ProcessQuery))]
-    private static bool OnRemoteAdminCommand(string q, CommandSender sender)
+    public static bool OnRemoteAdminCommand(string q, CommandSender sender)
     {
         try
         {
             var player = sender.GetSynapsePlayer();
             
-            if (q.StartsWith("@"))
-                return true;
-
-            if (q.StartsWith("REQUEST_DATA PLAYER_LIST SILENT"))
+            //@ is used for AdminChat and $ for Communication like getting the playerList
+            if (q.StartsWith("@") || q.StartsWith("$"))
                 return true;
 
             var result = Synapse.Get<SynapseCommandService>().RemoteAdmin
                 .Invoke(SynapseContext.Of(q, player, CommandPlatform.RemoteAdmin));
-            
+
             if (result.StatusCodeInt == 0) return true;
 
             player.SendRaConsoleMessage(result.Response, result.StatusCodeInt == (int)CommandStatusCode.Ok);

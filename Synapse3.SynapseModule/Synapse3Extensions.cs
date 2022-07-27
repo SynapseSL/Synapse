@@ -107,7 +107,7 @@ public static class Synapse3Extensions
             if(item.ItemCategory != ItemCategory.Keycard || item.Item == null) continue;
 
             var overlappingPerms = ((KeycardItem)item.Item).Permissions & permissions;
-            var ev = new KeyCardInteractEvent(item, ItemInteractState.Finalize)
+            var ev = new KeyCardInteractEvent(item, ItemInteractState.Finalize, player)
             {
                 Allow = needIdentical ? overlappingPerms == permissions : overlappingPerms >= 0,
             };
@@ -122,7 +122,7 @@ public static class Synapse3Extensions
     
     
     
-    public static SynapsePlayer GetSynapsePlayer(this NetworkConnection connection) => connection.identity.GetSynapsePlayer();
+    public static SynapsePlayer GetSynapsePlayer(this NetworkConnection connection) => connection?.identity.GetSynapsePlayer();
     public static SynapsePlayer GetSynapsePlayer(this MonoBehaviour mono) => mono?.gameObject?.GetComponent<SynapsePlayer>();
     public static SynapsePlayer GetSynapsePlayer(this GameObject gameObject) => gameObject?.GetComponent<SynapsePlayer>();
     public static SynapsePlayer GetSynapsePlayer(this PlayableScps.PlayableScp scp) => scp?.Hub?.GetSynapsePlayer();

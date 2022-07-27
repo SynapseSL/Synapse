@@ -1,5 +1,7 @@
 ﻿using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Command;
+using RemoteAdmin.Communication;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Rooms;
 using UnityEngine;
 
@@ -30,10 +32,13 @@ public class RoomPointCommand : SynapseCommand
         }
 
         result.Response = "\nThe position you are looking at as RoomPoint (change , to . in the syml config):" +
-                         $"\n  room: {point.roomName}" +
-                         $"\n  x: {point.position.X}" +
-                         $"\n  y: {point.position.Y}" +
-                         $"\n  z: {point.position.Z}";
-        result.StatusCode = CommandStatusCode.Ok;
+                          $"\n  room: {point.roomName}" +
+                          $"\n  x: {point.position.X}" +
+                          $"\n  y: {point.position.Y}" +
+                          $"\n  z: {point.position.Z}";
+                          result.StatusCode = CommandStatusCode.Ok;
+
+        RaClipboard.Send(context.Player.CommandSender, RaClipboard.RaClipBoardType.PlayerId,
+            $"{point.roomName} {point.position.X} {point.position.Y} {point.position.Z}");
     }
 }

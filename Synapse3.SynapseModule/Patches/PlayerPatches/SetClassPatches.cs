@@ -84,7 +84,7 @@ internal static class SetClassPatches
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.SetPlayersClass))]
-    private static void AfterSetClass(GameObject ply)
+    public static void AfterSetClass(GameObject ply)
     {
         var player = ply.GetSynapsePlayer();
         if (player != null)
@@ -211,6 +211,4 @@ internal static class SetClassPatches
             return true;
         }
     }
-    
-    
 }

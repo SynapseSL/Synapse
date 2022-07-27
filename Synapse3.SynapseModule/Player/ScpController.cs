@@ -11,7 +11,10 @@ public class ScpController
         _player = player;
         Scp079 = new(player);
         Scp096 = new Scp096Controller(player);
+        Scp106 = new Scp106Controller(player);
     }
+
+    public readonly Scp106Controller Scp106;
 
     public readonly Scp079Controller Scp079;
 

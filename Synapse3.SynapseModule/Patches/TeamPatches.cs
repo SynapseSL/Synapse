@@ -10,7 +10,6 @@ namespace Synapse3.SynapseModule.Patches;
 [Patches]
 internal static class TeamPatches
 {
-    
     [HarmonyPrefix]
     [HarmonyPatch(typeof(RespawnManager),nameof(RespawnManager.Update))]
     public static bool OnTeamUpdate(RespawnManager __instance)

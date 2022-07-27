@@ -5,6 +5,7 @@ using System.Linq;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Permissions;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
@@ -127,7 +128,10 @@ public class PlayerService : Service
         => GetPlayer(x =>
             string.Equals(x.DisplayName, name, StringComparison.OrdinalIgnoreCase) ||
             string.Equals(x.NickName, name, StringComparison.OrdinalIgnoreCase));
-    
+
+    public List<SynapsePlayer> GetPlayers(int synapseGroupId)
+        => GetPlayers(x => x.SynapseGroup.GroupId == synapseGroupId);
+
     public List<SynapsePlayer> GetPlayers(Func<SynapsePlayer, bool> func)
         => GetAbsoluteAllPlayers().Where(func).ToList();
 
@@ -136,9 +140,9 @@ public class PlayerService : Service
     /// Use . between each player
     /// </summary>
     /// <param name="me">The Player which should be returned for Me and Self</param>
-    public bool TryGetPlayers(string arg, out List<SynapsePlayer> players, SynapsePlayer me = null)
+    public bool TryGetPlayers(string arg, out HashSet<SynapsePlayer> players, SynapsePlayer me = null)
     {
-        players = new List<SynapsePlayer>();
+        players = new HashSet<SynapsePlayer>();
         var all = GetAbsoluteAllPlayers();
         var args = arg.Split('.');
 
@@ -151,9 +155,7 @@ public class PlayerService : Service
                 case "SELF":
                 case "ME":
                     if (me == null) continue;
-
-                    if (!players.Contains(me))
-                        players.Add(me);
+                    players.Add(me);
                     continue;
 
                 case "REMOTEADMIN":
@@ -161,31 +163,44 @@ public class PlayerService : Service
                 case "STAFF":
                     foreach (var player in all)
                         if (player.ServerRoles.RemoteAdmin)
-                            if (!players.Contains(player))
-                                players.Add(player);
+                            players.Add(player);
                     continue;
 
                 case "NW":
                 case "NORTHWOOD":
                     foreach (var player in all)
                         if (player.ServerRoles.Staff)
-                            if (!players.Contains(player))
-                                players.Add(player);
+                            players.Add(player);
                     break;
 
                 case "*":
                 case "ALL":
                 case "EVERYONE":
                     foreach (var player2 in all)
-                        if (!players.Contains(player2))
-                            players.Add(player2);
+                        players.Add(player2);
+                    continue;
+                
+                //10000 is reserved for Overwatch Players since the Overwatch category needs an Id and this number will most likely never be reached on a normal Server
+                case "10000":
+                    foreach (var player in GetPlayers(x => x.OverWatch))
+                        players.Add(player);
                     continue;
 
                 default:
                     var player3 = GetPlayer(parameter);
-                    if (player3 == null) continue;
-                    if (!players.Contains(player3))
-                        players.Add(player3);
+                    
+                    if (player3 == null)
+                    {
+                        //Check For SynapseGroupID
+                        if (int.TryParse(parameter, out var id))
+                        {
+                            foreach (var player in GetPlayers(id))
+                                players.Add(player);
+                        }
+                        continue;
+                    }
+
+                    players.Add(player3);
                     continue;
             }
         }

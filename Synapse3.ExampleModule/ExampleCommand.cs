@@ -14,7 +14,6 @@ namespace Synapse3.ExampleModule;
 )]
 public class ExampleCommand : SynapseCommand
 {
-
     [Inject] public ExampleConfig Config { get; set; }
 
     [Inject] public ExampleTranslations Translations { get; set; }

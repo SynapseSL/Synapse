@@ -11,6 +11,7 @@ namespace Synapse3.SynapseModule.Permissions;
 
 public class PermissionService : Service
 {
+    private int _currentGroupId = 500;
     private ConfigService _configService;
     private ServerEvents _server;
     public ConfigContainer Container { get; set; }
@@ -102,11 +103,17 @@ public class PermissionService : Service
 
             Store();
         }
+
+
+        _currentGroupId = 500;
+        foreach (var group in Groups)
+        {
+            group.Value.GroupId = _currentGroupId++;
+        }
         
         
         foreach (var player in Synapse.Get<PlayerService>().Players)
             player.RefreshPermission(player.HideRank);
-        
     }
 
     public SynapseGroup GetDefaultGroup() => Groups.Values.FirstOrDefault(x => x.Default) ?? _fallbackDefault;

@@ -23,9 +23,8 @@ public class SetClassCommand : SynapseCommand
             result.StatusCode = CommandStatusCode.Error;
             return;
         }
-
-        var player = Synapse.Get<PlayerService>().GetPlayer(context.Arguments[0]);
-        if(player == null)
+        
+        if (!Synapse.Get<PlayerService>().TryGetPlayers(context.Arguments[0], out var players, context.Player))
         {
             result.Response = "No Player was found!";
             result.StatusCode = CommandStatusCode.Error;
@@ -47,13 +46,15 @@ public class SetClassCommand : SynapseCommand
             return;
         }
 
-        player.RemoveCustomRole(DespawnReason.ForceClass);
+        foreach (var player in players)
+        {
+            player.RemoveCustomRole(DespawnReason.ForceClass);
 
-        if (id is >= 0 and <= 17)
-            player.RoleType = (RoleType)id;
-        else
-            player.RoleID = id;
-        
+            if (id is >= 0 and <= 17)
+                player.RoleType = (RoleType)id;
+            else
+                player.RoleID = id;   
+        }
 
         result.Response = "Player Role was set";
         result.StatusCode = CommandStatusCode.Ok;

@@ -24,9 +24,8 @@ public class GiveCustomItemCommand : SynapseCommand
             result.StatusCode = CommandStatusCode.Error;
             return;
         }
-
-        var player = Synapse.Get<PlayerService>().GetPlayer(context.Arguments[0]);
-        if (player == null)
+        
+        if (!Synapse.Get<PlayerService>().TryGetPlayers(context.Arguments[0],out var players,context.Player))
         {
             result.Response = "No Player was found";
             result.StatusCode = CommandStatusCode.Error;
@@ -93,15 +92,18 @@ public class GiveCustomItemCommand : SynapseCommand
             return;
         }
 
-        _ = new SynapseItem(id, player)
+        foreach (var player in players)
         {
-            Scale = new UnityEngine.Vector3(xsize, ysize, zsize),
-            Durability = durabillity,
-            FireArm =
+            _ = new SynapseItem(id, player)
             {
-                Attachments = attachments
-            }
-        };
+                Scale = new UnityEngine.Vector3(xsize, ysize, zsize),
+                Durability = durabillity,
+                FireArm =
+                {
+                    Attachments = attachments
+                }
+            };   
+        }
 
         result.Response = "Added Item to Players Inventory!";
         result.StatusCode = CommandStatusCode.Ok;

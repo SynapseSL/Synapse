@@ -17,7 +17,7 @@ internal static class DummyPatches
 {
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ReferenceHub), nameof(ReferenceHub.GetAllHubs))]
-    private static bool OnGetAllHubs(out Dictionary<GameObject, ReferenceHub> __result)
+    public static bool OnGetAllHubs(out Dictionary<GameObject, ReferenceHub> __result)
     {
         __result = new Dictionary<GameObject, ReferenceHub>();
         var service = Synapse.Get<PlayerService>();
@@ -32,7 +32,7 @@ internal static class DummyPatches
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(NetworkBehaviour), nameof(NetworkBehaviour.SendTargetRPCInternal))]
-    private static bool OnTargetRpc(NetworkBehaviour __instance)
+    public static bool OnTargetRpc(NetworkBehaviour __instance)
     {
         var player = __instance.GetSynapsePlayer();
         if (player.PlayerType == PlayerType.Dummy) return false;
@@ -41,18 +41,18 @@ internal static class DummyPatches
     
     [HarmonyPrefix]
     [HarmonyPatch(typeof(AchievementHandlerBase), nameof(AchievementHandlerBase.ServerAchieve))]
-    private static bool OnAchieve(NetworkConnection conn) => conn != null;
+    public static bool OnAchieve(NetworkConnection conn) => conn != null;
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(StandardHitregBase), nameof(StandardHitregBase.ShowHitIndicator))]
-    private static bool OnIndicator(uint netId)
+    public static bool OnIndicator(uint netId)
     {
         return Synapse.Get<PlayerService>().GetPlayer(netId).Connection != null;
     }
 
     [HarmonyFinalizer]
     [HarmonyPatch(typeof(FirearmBasicMessagesHandler), nameof(FirearmBasicMessagesHandler.ServerShotReceived))]
-    private static Exception OnShoot(Exception __exception)
+    public static Exception OnShoot(Exception __exception)
     {
         if (__exception != null)
             NeuronLogger.For<Synapse>().Error(__exception);

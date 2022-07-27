@@ -1,9 +1,9 @@
 ﻿using Neuron.Core.Logging;
 using Neuron.Core.Meta;
+using RemoteAdmin.Communication;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Elevators;
-using Synapse3.SynapseModule.Map.Schematic;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule;
@@ -38,13 +38,12 @@ public class DebugService : Service
         _item.KeyCardInteract.Subscribe(KeyCardItem);
         _item.BasicInteract.Subscribe(BasicItem);
 
-        /*_round.Start.Subscribe(_ =>
-            _destination =
-                new SchematicDestination(Synapse.Get<SchematicService>().SpawnSchematic(8, new Vector3(0f, 1002f, 0f)),
-                    99, "test", null));
-        
-        _map.ElevatorMoveContent.Subscribe(Elevator);
-        */
+        _player.Death.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"{ev.Player.NickName} {ev.DamageType} {ev.LastTakenDamage}");
+        });
+        _player.Damage.Subscribe(ev =>
+            NeuronLogger.For<Synapse>().Warn($"Damage: {ev.Player.NickName} {ev.Damage} {ev.DamageType}"));
     }
 
     private void Tesla(TriggerTeslaEvent ev)
@@ -101,8 +100,9 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                var comp = ev.Player.GetComponentInChildren<HitboxIdentity>();
-                NeuronLogger.For<Synapse>().Warn(comp == null);
+                RaClipboard.Send(ev.Player.CommandSender, RaClipboard.RaClipBoardType.PlayerId,
+                    "Hallo dies ist eine Test Message");
+                ev.Player.SendRaConsoleMessage("<color=white>Klick mich an! <link=CP_ID></link></color>", true, RaCategory.PlayerInfo);
                 break;
         }
     }

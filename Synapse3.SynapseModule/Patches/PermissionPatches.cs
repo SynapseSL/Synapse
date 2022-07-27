@@ -7,7 +7,6 @@ namespace Synapse3.SynapseModule.Patches;
 [Patches]
 public static class PermissionPatches
 {
-
     [HarmonyPatch(typeof(ServerRoles), nameof(ServerRoles.RefreshPermissions)), HarmonyPrefix]
     public static bool RefreshPermission(ServerRoles __instance, bool disp = false)
     {

@@ -17,4 +17,10 @@ public class PermissionConfiguration : IDocumentSection
 
     [Description("If Enabled the Staff gets their global Permissions")]
     public bool StaffAccess = true;
+
+    [Description("If Enabled the RemoteAdmin Player List will be sorted by the Players SynapseGroup")]
+    public bool BetterRemoteAdminList = true;
+
+    [Description("If Enabled all Player in Overwatch will be displayed at the bottom of the Remote Admin List")]
+    public bool OverWatchListDown = true;
 }

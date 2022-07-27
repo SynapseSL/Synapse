@@ -1,11 +1,18 @@
 ﻿using System;
+using GameCore;
 using HarmonyLib;
 using Interactables.Interobjects.DoorUtils;
+using InventorySystem;
+using InventorySystem.Items;
 using InventorySystem.Items.Firearms.BasicMessages;
 using MapGeneration.Distributors;
 using Mirror;
 using Neuron.Core.Logging;
+using PlayerStatsSystem;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Patches.PlayerPatches;
@@ -15,7 +22,7 @@ internal static class PlayerPatches
 {
     [HarmonyPrefix]
     [HarmonyPatch(typeof(FirearmBasicMessagesHandler), nameof(FirearmBasicMessagesHandler.ServerShotReceived))]
-    private static bool OnShootMsg(NetworkConnection conn, ShotMessage msg)
+    public static bool OnShootMsg(NetworkConnection conn, ShotMessage msg)
     {
         try
         {
@@ -92,10 +99,137 @@ internal static class PlayerPatches
             return true;
         }
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(BanPlayer), nameof(BanPlayer.BanUser), typeof(GameObject), typeof(long), typeof(string),
+        typeof(string), typeof(bool))]
+    public static bool OnBan(GameObject user, long duration, string reason, string issuer, bool isGlobalBan)
+    {
+        try
+        {
+            var player = user.GetSynapsePlayer();
+            var banIssuer = issuer.Contains("(")
+                ? Synapse.Get<PlayerService>().GetPlayer(issuer.Substring(issuer.LastIndexOf('(') + 1,
+                    issuer.Length - 2 - issuer.LastIndexOf('(')))
+                : Synapse.Get<PlayerService>().GetPlayer(issuer);
+
+            var ev = new BanEvent(player, true, banIssuer, reason, duration, isGlobalBan);
+            Synapse.Get<PlayerEvents>().Ban.Raise(ev);
+
+            return isGlobalBan && ConfigFile.ServerConfig.GetBool("gban_ban_ip") || ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Player Ban Event failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Inventory), nameof(Inventory.ServerSelectItem))]
+    public static bool OnSelectItem(Inventory __instance, ushort itemSerial)
+
+    {
+        try
+        {
+            DecoratedPlayerPatches.OnChangeItem(__instance, itemSerial);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Change Item Event failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.DealDamage))]
+    public static bool OnDamage(PlayerStats __instance, DamageHandlerBase handler)
+    {
+        try
+        {
+            return DecoratedPlayerPatches.OnDealDamage(__instance, handler);
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Player Damage Event failed\n" + ex);
+            return true;
+        }
+    }
 }
 
 internal static class DecoratedPlayerPatches
 {
+    public static bool OnDealDamage(PlayerStats stats, DamageHandlerBase handler)
+    {
+        if (!stats._hub.characterClassManager.IsAlive || stats._hub.characterClassManager.GodMode) return false;
+        var player = stats.GetSynapsePlayer();
+        SynapsePlayer attacker = null;
+        if (handler is AttackerDamageHandler aHandler)
+            attacker = aHandler.Attacker;
+        var damageType = handler.GetDamageType();
+
+        if (damageType == DamageType.PocketDecay)
+        {
+            //TODO: PocketPlayers
+            if (attacker != null && !Synapse3Extensions.GetHarmPermission(attacker, player)) return false;
+        }
+
+        var ev = new DamageEvent(player, true, attacker, damageType, ((StandardDamageHandler)handler).Damage);
+        Synapse.Get<PlayerEvents>().Damage.Raise(ev);
+        ((StandardDamageHandler)handler).Damage = ev.Damage;
+        return ev.Allow;
+    }
+    
+    public static void OnChangeItem(Inventory inventory, ushort serial)
+    {
+        if(serial == inventory.CurItem.SerialNumber) return;
+        ItemBase oldItem = null;
+        ItemBase newItem = null;
+        var flag = inventory.CurItem.SerialNumber == 0 ||
+                   (inventory.UserInventory.Items.TryGetValue(inventory.CurItem.SerialNumber, out oldItem) &&
+                    inventory.CurInstance != null);
+
+        if (serial == 0 || inventory.UserInventory.Items.TryGetValue(serial, out newItem))
+        {
+            if (inventory.CurItem.SerialNumber > 0 && flag && !oldItem.CanHolster()) return;
+            if (serial != 0 && !newItem.CanEquip()) return;
+            if (serial == 0)
+            {
+                var ev = new ChangeItemEvent(inventory.GetSynapsePlayer(), true, SynapseItem.None);
+                Synapse.Get<PlayerEvents>().ChangeItem.Raise(ev);
+                if (ev.Allow)
+                {
+                    inventory.NetworkCurItem = ItemIdentifier.None;
+                    if (!inventory.isLocalPlayer)
+                        inventory.CurInstance = null;
+                }
+            }
+            else
+            {
+                var ev = new ChangeItemEvent(inventory.GetSynapsePlayer(), true, newItem.GetItem());
+                Synapse.Get<PlayerEvents>().ChangeItem.Raise(ev);
+                if (ev.Allow)
+                {
+                    inventory.NetworkCurItem = new ItemIdentifier(newItem.ItemTypeId, serial);
+                    if (!inventory.isLocalPlayer)
+                        inventory.CurInstance = newItem;
+                }
+            }
+        }
+        else if (!flag)
+        {
+            var ev = new ChangeItemEvent(inventory.GetSynapsePlayer(), true, SynapseItem.None);
+            Synapse.Get<PlayerEvents>().ChangeItem.Raise(ev);
+            if (ev.Allow)
+            {
+                inventory.NetworkCurItem = ItemIdentifier.None;
+                if (!inventory.isLocalPlayer)
+                    inventory.CurInstance = null;
+            }
+        }
+    }
+    
     public static void OnDoorInteract(DoorVariant door, ReferenceHub hub, byte colliderId)
     {
         var player = hub.GetSynapsePlayer();

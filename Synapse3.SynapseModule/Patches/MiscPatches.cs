@@ -20,7 +20,7 @@ internal static class MiscPatches
     
     [HarmonyPrefix]
     [HarmonyPatch(typeof(HealthStat), "get_MaxValue")]
-    private static bool GetMaxHealth(HealthStat __instance, out float __result)
+    public static bool GetMaxHealth(HealthStat __instance, out float __result)
     {
         __result = __instance.GetSynapsePlayer().MaxHealth;
         return false;
@@ -28,7 +28,7 @@ internal static class MiscPatches
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(AhpStat), nameof(AhpStat.ServerAddProcess), typeof(float))]
-    private static bool ServerAddProcess(AhpStat __instance, float amount, out AhpStat.AhpProcess __result)
+    public static bool ServerAddProcess(AhpStat __instance, float amount, out AhpStat.AhpProcess __result)
     {
         var player = __instance.GetSynapsePlayer();
         __result = __instance.ServerAddProcess(amount, player.MaxArtificialHealth, player.DecayArtificialHealth, 0.7f,
@@ -38,7 +38,7 @@ internal static class MiscPatches
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(PlayerMovementSync), nameof(PlayerMovementSync.OverridePosition))]
-    private static bool OnSetPosition(PlayerMovementSync __instance, Vector3 pos,
+    public static bool OnSetPosition(PlayerMovementSync __instance, Vector3 pos,
         PlayerMovementSync.PlayerRotation? rot, bool forceGround)
     {
         try
@@ -59,7 +59,7 @@ internal static class MiscPatches
     
     [HarmonyPostfix]
     [HarmonyPatch(typeof(PlayableScps.Scp096), "CurMaxShield", MethodType.Getter)]
-    private static void GetMaxShield(PlayableScps.Scp096 __instance, ref float __result)
+    public static void GetMaxShield(PlayableScps.Scp096 __instance, ref float __result)
     {
         try
         {

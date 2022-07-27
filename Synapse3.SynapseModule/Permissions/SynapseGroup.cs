@@ -7,6 +7,8 @@ namespace Synapse3.SynapseModule.Permissions;
 
 public class SynapseGroup : IDocumentSection
 {
+    public int GroupId { get; internal set; }
+    
     [Description("If Enabled this Group will be assigned to all players, which are in no other Group")]
     public bool Default;
 
@@ -106,6 +108,7 @@ public class SynapseGroup : IDocumentSection
 
     public SynapseGroup Copy() => new()
     {
+        GroupId = GroupId,
         Badge = Badge,
         Color = Color,
         Cover = Cover,

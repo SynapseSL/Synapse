@@ -24,6 +24,10 @@ public class PlayerEvents : Service
     public readonly EventReactor<StartWarheadEvent> StartWarhead = new();
     public readonly EventReactor<CancelWarheadEvent> CancelWarhead = new();
     public readonly EventReactor<WarheadPanelInteractEvent> WarheadPanelInteract = new();
+    public readonly EventReactor<BanEvent> Ban = new();
+    public readonly EventReactor<ChangeItemEvent> ChangeItem = new();
+    public readonly EventReactor<DamageEvent> Damage = new();
+    public readonly EventReactor<DeathEvent> Death = new();
 
     public PlayerEvents(EventManager eventManager)
     {
@@ -42,6 +46,9 @@ public class PlayerEvents : Service
         _eventManager.RegisterEvent(DoorInteract);
         _eventManager.RegisterEvent(LockerUse);
         _eventManager.RegisterEvent(WarheadPanelInteract);
+        _eventManager.RegisterEvent(Ban);
+        _eventManager.RegisterEvent(ChangeItem);
+        _eventManager.RegisterEvent(Death);
     }
 }
 
@@ -202,4 +209,68 @@ public class WarheadPanelInteractEvent : PlayerInteractEvent
     {
         Operation = operation;
     }
+}
+
+public class BanEvent : PlayerInteractEvent
+{
+    public BanEvent(SynapsePlayer player, bool allow, SynapsePlayer banIssuer, string reason, long duration,
+        bool global) : base(player, allow)
+    {
+        BanIssuer = banIssuer;
+        Reason = reason;
+        Duration = duration;
+        GlobalBan = global;
+    }
+
+    public SynapsePlayer BanIssuer { get; }
+    
+    public string Reason { get; set; }
+    
+    public long Duration { get; set; }
+    
+    public bool GlobalBan { get; }
+}
+
+public class ChangeItemEvent : PlayerInteractEvent
+{
+    public ChangeItemEvent(SynapsePlayer player, bool allow, SynapseItem newItem) : base(player, allow)
+    {
+        NewItem = newItem;
+    }
+
+    public SynapseItem PreviousItem => Player.Inventory.ItemInHand;
+    
+    public SynapseItem NewItem { get; }
+}
+
+public class DamageEvent : PlayerInteractEvent
+{
+    public DamageEvent(SynapsePlayer player, bool allow, SynapsePlayer attacker, DamageType damageType, float damage) : base(player, allow)
+    {
+        Attacker = attacker;
+        DamageType = damageType;
+        Damage = damage;
+    }
+
+    public SynapsePlayer Attacker { get; }
+    
+    public DamageType DamageType { get; }
+    
+    public float Damage { get; set; }
+}
+
+public class DeathEvent : PlayerInteractEvent
+{
+    public DeathEvent(SynapsePlayer player, bool allow, SynapsePlayer attacker, DamageType damageType, float lastTakenDamage) : base(player, allow)
+    {
+        Attacker = attacker;
+        DamageType = damageType;
+        LastTakenDamage = lastTakenDamage;
+    }
+
+    public SynapsePlayer Attacker { get; }
+    
+    public DamageType DamageType { get; }
+    
+    public float LastTakenDamage { get; }
 }
