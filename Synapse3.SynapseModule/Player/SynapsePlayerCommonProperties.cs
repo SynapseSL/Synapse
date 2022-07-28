@@ -222,9 +222,9 @@ public partial class SynapsePlayer
     }
 
     /// <summary>
-    /// The player who cuffed the player
+    /// The player who disarmed the player
     /// </summary>
-    public SynapsePlayer Cuffer
+    public SynapsePlayer Disarmer
     {
         get
         {
@@ -258,9 +258,9 @@ public partial class SynapsePlayer
     public bool DoNotTrack => ServerRoles.DoNotTrack;
 
     /// <summary>
-    /// True if the player is cuffed
+    /// True if the player is disarmed
     /// </summary>
-    public bool IsCuffed => DisarmedPlayers.IsDisarmed(VanillaInventory);
+    public bool IsDisarmed => VanillaInventory.IsDisarmed();
 
     /// <summary>
     /// The time a player is alive

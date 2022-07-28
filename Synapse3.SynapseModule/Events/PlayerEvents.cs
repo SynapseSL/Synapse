@@ -28,6 +28,15 @@ public class PlayerEvents : Service
     public readonly EventReactor<ChangeItemEvent> ChangeItem = new();
     public readonly EventReactor<DamageEvent> Damage = new();
     public readonly EventReactor<DeathEvent> Death = new();
+    public readonly EventReactor<FreePlayerEvent> FreePlayer = new();
+    public readonly EventReactor<DropAmmoEvent> DropAmmo = new();
+    public readonly EventReactor<EscapeEvent> Escape = new();
+    public readonly EventReactor<DropItemEvent> DropItem = new();
+    public readonly EventReactor<EnterFemurEvent> EnterFemur = new();
+    public readonly EventReactor<GeneratorInteractEvent> GeneratorInteract = new();
+    public readonly EventReactor<HealEvent> Heal = new();
+    public readonly EventReactor<JoinEvent> Join = new();
+    public readonly EventReactor<LeaveEvent> Leave = new();
 
     public PlayerEvents(EventManager eventManager)
     {
@@ -49,6 +58,15 @@ public class PlayerEvents : Service
         _eventManager.RegisterEvent(Ban);
         _eventManager.RegisterEvent(ChangeItem);
         _eventManager.RegisterEvent(Death);
+        _eventManager.RegisterEvent(FreePlayer);
+        _eventManager.RegisterEvent(DropAmmo);
+        _eventManager.RegisterEvent(Escape);
+        _eventManager.RegisterEvent(DropItem);
+        _eventManager.RegisterEvent(EnterFemur);
+        _eventManager.RegisterEvent(GeneratorInteract);
+        _eventManager.RegisterEvent(Heal);
+        _eventManager.RegisterEvent(Join);
+        _eventManager.RegisterEvent(Leave);
     }
 }
 
@@ -273,4 +291,104 @@ public class DeathEvent : PlayerInteractEvent
     public DamageType DamageType { get; }
     
     public float LastTakenDamage { get; }
+}
+
+public class FreePlayerEvent : PlayerInteractEvent
+{
+    public FreePlayerEvent(SynapsePlayer player, bool allow, SynapsePlayer disarmedPlayer) : base(player, allow)
+    {
+        DisarmedPlayer = disarmedPlayer;
+    }
+
+    public SynapsePlayer DisarmedPlayer { get; }
+}
+
+public class DropAmmoEvent : PlayerInteractEvent
+{
+    public DropAmmoEvent(SynapsePlayer player, bool allow, AmmoType ammoType, ushort amount) : base(player, allow)
+    {
+        AmmoType = ammoType;
+        Amount = amount;
+    }
+
+    public AmmoType AmmoType { get; set; }
+    
+    public ushort Amount { get; set; }
+}
+
+public class EscapeEvent : PlayerInteractEvent
+{
+    public EscapeEvent(SynapsePlayer player, bool allow, int newRole, bool isClassD, bool changeTeam) : base(player, allow)
+    {
+        NewRole = newRole;
+        IsClassD = isClassD;
+        ChangeTeam = changeTeam;
+    }
+
+    public int NewRole { get; set; }
+    
+    public bool IsClassD { get; }
+    
+    public bool ChangeTeam { get; }
+}
+
+public class DropItemEvent : PlayerInteractEvent
+{
+    public DropItemEvent(SynapsePlayer player, bool allow, SynapseItem itemToDrop, bool @throw) : base(player, allow)
+    {
+        ItemToDrop = itemToDrop;
+        Throw = @throw;
+    }
+
+    public SynapseItem ItemToDrop { get; }
+    
+    public bool Throw { get; set; }
+}
+
+public class EnterFemurEvent : PlayerInteractEvent
+{
+    public EnterFemurEvent(SynapsePlayer player, bool allow, bool closeFemur) : base(player, allow)
+    {
+        CloseFemur = closeFemur;
+    }
+
+    public bool CloseFemur { get; set; }
+}
+
+public class GeneratorInteractEvent : PlayerInteractEvent
+{
+    public GeneratorInteractEvent(SynapsePlayer player, bool allow, SynapseGenerator generator, GeneratorInteract interactionType) : base(player, allow)
+    {
+        Generator = generator;
+        InteractionType = interactionType;
+    }
+
+    public SynapseGenerator Generator { get; }
+    
+    public GeneratorInteract InteractionType { get; }
+}
+
+public class HealEvent : PlayerInteractEvent
+{
+    public HealEvent(SynapsePlayer player, bool allow, float amount) : base(player, allow)
+    {
+        Amount = amount;
+    }
+
+    public float Amount { get; set; }
+}
+
+public class JoinEvent : PlayerEvent
+{
+    public JoinEvent(SynapsePlayer player, string nickName) : base(player)
+    {
+        NickName = nickName;
+    }
+
+    public string NickName { get; set; }
+}
+
+public class LeaveEvent : PlayerEvent
+{
+    public LeaveEvent(SynapsePlayer player) : base(player) { }
 }

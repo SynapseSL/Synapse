@@ -20,6 +20,8 @@ internal static class DeathPatches
     {
         try
         {
+            var damage =  (handler as StandardDamageHandler)?.Damage ?? 0;
+            
             var player = __instance.GetSynapsePlayer();
             var attacker = (handler as AttackerDamageHandler)?.Attacker.GetSynapsePlayer();
             var damageType = handler.GetDamageType();
@@ -28,7 +30,7 @@ internal static class DeathPatches
                 attacker = Synapse.Get<PlayerService>().Players
                     .FirstOrDefault(x => x.ScpController.Scp106.PlayersInPocket.Contains(player));
 
-            var ev = new DeathEvent(player, true, attacker, damageType, (handler as StandardDamageHandler)?.Damage ?? 0);
+            var ev = new DeathEvent(player, true, attacker, damageType, damage);
             Synapse.Get<PlayerEvents>().Death.Raise(ev);
 
             if (!ev.Allow)

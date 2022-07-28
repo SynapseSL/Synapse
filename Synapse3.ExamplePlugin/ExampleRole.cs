@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Role;
 
@@ -19,4 +20,9 @@ public class ExampleRole : SynapseRole
     }
 
     public override List<int> GetEnemiesID() => new (){ (int)Team.CDP };
+
+    public override void DeSpawn(DespawnReason reason)
+    {
+        NeuronLogger.For<ExamplePlugin>().Warn(reason);
+    }
 }

@@ -14,6 +14,7 @@ public class ItemEvents: Service
     public readonly EventReactor<BasicItemInteractEvent> BasicInteract = new();
     public readonly EventReactor<KeyCardInteractEvent> KeyCardInteract = new ();
     public readonly EventReactor<ConsumeItemEvent> ConsumeItem = new();
+    public readonly EventReactor<DisarmEvent> Disarm = new();
 
     public ItemEvents(EventManager eventManager)
     {
@@ -25,28 +26,26 @@ public class ItemEvents: Service
         _eventManager.RegisterEvent(BasicInteract);
         _eventManager.RegisterEvent(KeyCardInteract);
         _eventManager.RegisterEvent(ConsumeItem);
+        _eventManager.RegisterEvent(Disarm);
 
         KeyCardInteract.Subscribe(ev => BasicInteract.Raise(ev));
         ConsumeItem.Subscribe(ev => BasicInteract.Raise(ev));
+        Disarm.Subscribe(ev => BasicInteract.Raise(ev));
     }
 }
 
-public abstract class BasicItemInteractEvent : IEvent
+public abstract class BasicItemInteractEvent : PlayerInteractEvent
 {
-    public BasicItemInteractEvent(SynapseItem item, ItemInteractState state,SynapsePlayer player)
+    public BasicItemInteractEvent(SynapseItem item, ItemInteractState state, SynapsePlayer player) :
+        base(player, true)
     {
         Item = item;
         State = state;
-        Player = player;
     }
     
     public SynapseItem Item { get; }
     
     public ItemInteractState State { get; }
-    
-    public SynapsePlayer Player { get; }
-
-    public bool Allow { get; set; } = true;
 }
 
 public class KeyCardInteractEvent : BasicItemInteractEvent
@@ -67,4 +66,24 @@ public class ConsumeItemEvent : BasicItemInteractEvent
     public PlayerHandler Handler { get; }
 
     public int CandyID { get; set; } = -1;
+}
+
+public class DisarmEvent : BasicItemInteractEvent
+{
+    public DisarmEvent(SynapseItem item, ItemInteractState state, SynapsePlayer player, SynapsePlayer target) : base(item, state, player)
+    {
+        Target = target;
+    }
+
+    public SynapsePlayer Target { get; }
+}
+
+public class FlipCoinEvent : BasicItemInteractEvent
+{
+    public FlipCoinEvent(SynapseItem item, SynapsePlayer player, bool tails) : base(item, ItemInteractState.Finalize, player)
+    {
+        Tails = tails;
+    }
+
+    public bool Tails { get; set; }
 }

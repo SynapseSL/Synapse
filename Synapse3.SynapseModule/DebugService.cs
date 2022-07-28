@@ -28,6 +28,10 @@ public class DebugService : Service
 
     public override void Enable()
     {
+        _player.Ban.Subscribe(BasicInteract);
+        _player.Damage.Subscribe(BasicInteract);
+        _player.Shoot.Subscribe(BasicInteract);
+        
         _map.Scp914Upgrade.Subscribe(Upgrade);
         _player.DoorInteract.Subscribe(OnDoor);
         _map.TriggerTesla.Subscribe(Tesla);
@@ -44,6 +48,11 @@ public class DebugService : Service
         });
         _player.Damage.Subscribe(ev =>
             NeuronLogger.For<Synapse>().Warn($"Damage: {ev.Player.NickName} {ev.Damage} {ev.DamageType}"));
+    }
+
+    private void BasicInteract(PlayerInteractEvent ev)
+    {
+        
     }
 
     private void Tesla(TriggerTeslaEvent ev)

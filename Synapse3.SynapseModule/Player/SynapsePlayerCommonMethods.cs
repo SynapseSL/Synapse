@@ -1,12 +1,15 @@
 ﻿using System;
 using Hints;
+using InventorySystem.Disarming;
 using InventorySystem.Items.Firearms.Attachments;
 using Mirror;
 using Neuron.Core.Logging;
 using PlayerStatsSystem;
 using RoundRestarting;
 using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map;
+using Synapse3.SynapseModule.Role;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
@@ -253,6 +256,97 @@ public partial class SynapsePlayer
         {
             CustomRole.TryEscape();
             return;
+        }
+
+        var allow = true;
+        var escapeRole = -1;
+        var changeTeam = false;
+
+        foreach (var disarmedEntry in DisarmedPlayers.Entries)
+        {
+            if (disarmedEntry.DisarmedPlayer == NetworkIdentity.netId)
+            {
+                if (disarmedEntry.DisarmedPlayer == 0 && CharacterClassManager.ForceCuffedChangeTeam)
+                {
+                    changeTeam = true;
+                }
+
+                var disarmer = Disarmer;
+
+                switch (RoleType)
+                {
+                    case RoleType.Scientist when disarmer.Faction == Faction.FoundationEnemy:
+                        changeTeam = true;
+                        break;
+                    
+                    case RoleType.ClassD when disarmer.Faction == Faction.FoundationStaff:
+                        changeTeam = true;
+                        break;
+                }
+            }
+        }
+
+        switch (RoleType)
+        {
+            case RoleType.ClassD when changeTeam:
+                escapeRole = (int)RoleType.NtfPrivate;
+                break;
+
+            case RoleType.ClassD:
+            case RoleType.Scientist when changeTeam:
+                escapeRole = (int)RoleType.ChaosConscript;
+                break;
+
+            case RoleType.Scientist:
+                escapeRole = (int)RoleType.NtfSpecialist;
+                break;
+        }
+
+        if (escapeRole < 0) allow = false;
+
+        var ev = new EscapeEvent(this, allow, escapeRole, RoleID == (int)RoleType.ClassD, changeTeam);
+        Synapse.Get<PlayerEvents>().Escape.Raise(ev);
+        
+        if(ev.NewRole < 0 || !ev.Allow) return;
+
+        if (ev.NewRole is >= -1 and <= RoleService.HighestRole)
+        {
+            ClassManager.SetPlayersClass((RoleType)ev.NewRole, gameObject, CharacterClassManager.SpawnReason.Escaped);
+        }
+        else
+        {
+            RoleID = ev.NewRole;
+        }
+
+        Escape.TargetShowEscapeMessage(Connection, ev.IsClassD, changeTeam);
+        
+        var tickets = Respawning.RespawnTickets.Singleton;
+        //At this Point the Player already changed his role and therefore his Team as well
+        switch (TeamID)
+        {
+            case (int)Team.MTF when changeTeam:
+                RoundSummary.EscapedScientists++;
+                tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
+                    GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_mtf_classd_cuffed_count", 1), false);
+                break;
+
+            case (int)Team.MTF when !changeTeam:
+                RoundSummary.EscapedScientists++;
+                tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
+                    GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_mtf_scientist_count", 1), false);
+                break;
+
+            case (int)Team.CHI when changeTeam:
+                RoundSummary.EscapedClassD++;
+                tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
+                    GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_ci_scientist_cuffed_count", 1), false);
+                break;
+
+            case (int)Team.CHI when !changeTeam:
+                RoundSummary.EscapedClassD++;
+                tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
+                    GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_ci_classd_count", 1), false);
+                break;
         }
     }
 }

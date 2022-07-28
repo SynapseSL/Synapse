@@ -120,14 +120,15 @@ public abstract class DefaultElevator : IElevator
                     if(synapse == null) continue;
                     if (synapse.Object is not DefaultSynapseObject { MoveInElevator: true }) continue;
                     if (!synapseObjects.Add(synapse.Object)) continue;
-                    if (!InsideAnyDestination(synapse.Object.Position, destinationId, out var local, out var transform,
-                            true))
-                        continue;
+
+                    var local = otherDestination.GetLocalPosition(synapse.Object.Position);
+                    
                     synapse.Object.Position = destination.GetWorldPosition(local);
                     synapse.Object.Rotation =
                         Quaternion.Euler(
                             destination.Transform.TransformVector(
-                                transform.InverseTransformVector(synapse.Object.Rotation.eulerAngles)));
+                                otherDestination.Transform.InverseTransformVector(synapse.Object.Rotation
+                                    .eulerAngles)));
                 }
             }
 
@@ -143,21 +144,17 @@ public abstract class DefaultElevator : IElevator
     public IElevatorDestination GetDestination(int id) => Destinations.FirstOrDefault(x => x.ElevatorId == id);
 
     private bool InsideAnyDestination(Vector3 position, int goalDestination, out Vector3 localPosition,
-        out Transform transform,bool synapseObject = false)
+        out Transform transform)
     {
         foreach (var destination in Destinations)
         {
             if (destination.ElevatorId == goalDestination) continue;
 
             var destinationPos = destination.DestinationPosition;
-
-            //Everything that is inside the Collider Box doesn't need a second check and just causes problem with some items like keycards on the ground
-            if (!synapseObject)
-            {
-                if (Mathf.Abs(destinationPos.x - position.x) > destination.RangeScale.x) continue;
-                if (Mathf.Abs(destinationPos.y - position.y) > destination.RangeScale.y * 1.5) continue;
-                if (Mathf.Abs(destinationPos.z - position.z) > destination.RangeScale.z) continue;   
-            }
+            
+            if (Mathf.Abs(destinationPos.x - position.x) > destination.RangeScale.x) continue;
+            if (Mathf.Abs(destinationPos.y - position.y) > destination.RangeScale.y * 1.5) continue;
+            if (Mathf.Abs(destinationPos.z - position.z) > destination.RangeScale.z) continue;  
 
             localPosition = destination.GetLocalPosition(position);
             transform = destination.Transform;

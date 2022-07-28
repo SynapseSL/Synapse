@@ -1,19 +1,25 @@
 ﻿using System;
+using Achievements;
 using GameCore;
 using HarmonyLib;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem;
+using InventorySystem.Disarming;
 using InventorySystem.Items;
+using InventorySystem.Items.Coin;
 using InventorySystem.Items.Firearms.BasicMessages;
 using MapGeneration.Distributors;
 using Mirror;
 using Neuron.Core.Logging;
 using PlayerStatsSystem;
+using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Player;
+using Synapse3.SynapseModule.Role;
 using UnityEngine;
+using Utils.Networking;
 
 namespace Synapse3.SynapseModule.Patches.PlayerPatches;
 
@@ -152,17 +158,370 @@ internal static class PlayerPatches
         }
         catch (Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Player Damage Event failed\n" + ex);
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Damage Event failed\n" + ex);
             return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(DisarmingHandlers), nameof(DisarmingHandlers.ServerProcessDisarmMessage))]
+    public static bool OnDisarm(NetworkConnection conn, DisarmMessage msg)
+    {
+        try
+        {
+            DecoratedPlayerPatches.OnDisarm(conn, msg);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Disarm Event failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Inventory), nameof(Inventory.UserCode_CmdDropAmmo))]
+    public static bool DropAmmo(Inventory __instance, ref byte ammoType, ref ushort amount)
+    {
+        try
+        {
+            var ev = new DropAmmoEvent(__instance.GetSynapsePlayer(), true, (AmmoType)ammoType, amount);
+            Synapse.Get<PlayerEvents>().DropAmmo.Raise(ev);
+            ammoType = (byte)ev.AmmoType;
+            amount = ev.Amount;
+            return ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Drop Ammo Event failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Inventory), nameof(Inventory.UserCode_CmdDropItem))]
+    public static bool DropItem(Inventory __instance,ref ushort itemSerial, ref bool tryThrow)
+    {
+        try
+        {
+            if (!__instance.UserInventory.Items.TryGetValue(itemSerial, out var itembase) || !itembase.CanHolster())
+                return false;
+
+            var ev = new DropItemEvent(__instance.GetSynapsePlayer(), true, itembase.GetItem(), tryThrow);
+            Synapse.Get<PlayerEvents>().DropItem.Raise(ev);
+            tryThrow = ev.Throw;
+            itemSerial = ev.ItemToDrop.Serial;
+            return ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Drop Item Event failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.AllowContain))]
+    public static bool EnterFemur(CharacterClassManager __instance)
+    {
+        try
+        {
+            DecoratedPlayerPatches.EnterFemur(__instance);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Enter Femur Event failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(CoinNetworkHandler), nameof(CoinNetworkHandler.ServerProcessMessage))]
+    public static bool CoinFlip(NetworkConnection conn)
+    {
+        try
+        {
+            var player = conn.GetSynapsePlayer();
+            if (player == null || !player.Hub._coinFlipRatelimit.CanExecute() ||
+                player.Inventory.ItemInHand.ItemType != ItemType.Coin) return false;
+            var isTails = UnityEngine.Random.value >= 0.5f;
+
+            var ev = new FlipCoinEvent(player.Inventory.ItemInHand, player, isTails);
+
+            if (ev.Allow)
+                new CoinNetworkHandler.CoinFlipMessage(player.Inventory.ItemInHand.Serial, ev.Tails)
+                    .SendToAuthenticated();
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Flip Coin Event failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp079Generator), nameof(Scp079Generator.ServerInteract))]
+    public static bool OnGeneratorInteract(Scp079Generator __instance, ReferenceHub ply, byte colliderId)
+    {
+        try
+        {
+            DecoratedPlayerPatches.OnGenInteract(__instance, ply, colliderId);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: GeneratorInteract Event failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(HealthStat), nameof(HealthStat.ServerHeal))]
+    public static bool OnHeal(HealthStat __instance, ref float healAmount)
+    {
+        try
+        {
+            var player = __instance.GetSynapsePlayer();
+            if (player == null) return false;
+            
+            var ev = new HealEvent(__instance.GetSynapsePlayer(), true, healAmount);
+            Synapse.Get<PlayerEvents>().Heal.Raise(ev);
+            healAmount = ev.Amount;
+            return ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Heal Event failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(NicknameSync), nameof(NicknameSync.SetNick))]
+    public static void OnJoin(NicknameSync __instance, ref string nick)
+    {
+        try
+        {
+            var player = __instance.GetSynapsePlayer();
+            if (player.PlayerType == PlayerType.Server) return;
+            var ev = new JoinEvent(__instance.GetSynapsePlayer(), nick);
+            Synapse.Get<PlayerEvents>().Join.Raise(ev);
+            nick = ev.NickName;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Join Event failed\n" + ex);
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(CustomNetworkManager), nameof(CustomNetworkManager.OnServerDisconnect))]
+    public static void OnLeave(NetworkConnection conn)
+    {
+        try
+        {
+            var player = conn.GetSynapsePlayer();
+            if (player.PlayerType != PlayerType.Player) return;
+
+            player.RemoveCustomRole(DespawnReason.Leave);
+
+            var ev = new LeaveEvent(player);
+            Synapse.Get<PlayerEvents>().Leave.Raise(ev);
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Leave Event failed\n" + ex);
         }
     }
 }
 
 internal static class DecoratedPlayerPatches
 {
+    public static void OnGenInteract(Scp079Generator gen, ReferenceHub hub, byte interaction)
+    {
+        if(gen._cooldownStopwatch.IsRunning && gen._cooldownStopwatch.Elapsed.TotalSeconds < gen._targetCooldown) return;
+
+        if (interaction != 0 && !gen.HasFlag(gen._flags, Scp079Generator.GeneratorFlags.Open))
+        {
+            return;
+        }
+        gen._cooldownStopwatch.Stop();
+        
+        var player = hub.GetSynapsePlayer();
+
+        switch (interaction)
+        {
+            //0 - Request interaction with Generator Doors (doors)
+            case 0:
+                if (gen.HasFlag(gen._flags, Scp079Generator.GeneratorFlags.Unlocked))
+                {
+                    var ev = new GeneratorInteractEvent(player, true, gen.GetSynapseGenerator(),
+                        gen.HasFlag(gen._flags, Scp079Generator.GeneratorFlags.Open)
+                            ? GeneratorInteract.CloseDoor
+                            : GeneratorInteract.OpenDoor);
+                    Synapse.Get<PlayerEvents>().GeneratorInteract.Raise(ev);
+
+                    if (ev.Allow)
+                    {
+                        gen.ServerSetFlag(Scp079Generator.GeneratorFlags.Open,
+                            !gen.HasFlag(gen._flags, Scp079Generator.GeneratorFlags.Open));
+                        gen._targetCooldown = gen._doorToggleCooldownTime;
+                    }
+                }
+                else
+                {
+                    var allow = gen._requiredPermission.CheckPermission(player);
+                    var ev = new GeneratorInteractEvent(player, allow, gen.GetSynapseGenerator(),
+                        GeneratorInteract.UnlockDoor);
+                    Synapse.Get<PlayerEvents>().GeneratorInteract.Raise(ev);
+
+                    if (ev.Allow)
+                    {
+                        gen.ServerSetFlag(Scp079Generator.GeneratorFlags.Unlocked, true);
+                    }
+                    else
+                    {
+                        gen.RpcDenied();
+                    }
+
+                    gen._targetCooldown = gen._unlockCooldownTime;
+                }
+                break;
+            
+            //1 - Request to swap the Activation State (lever)
+            case 1:
+                if ((Synapse3Extensions.CanHarmScp(player,true) || gen.Activating) && !gen.Engaged)
+                {
+                    var ev = new GeneratorInteractEvent(player, true, gen.GetSynapseGenerator(),
+                        gen.Activating ? GeneratorInteract.Cancel : GeneratorInteract.Activate);
+                    Synapse.Get<PlayerEvents>().GeneratorInteract.Raise(ev);
+                    if(!ev.Allow) break;
+                    
+                    gen.Activating = !gen.Activating;
+                    if (gen.Activating)
+                    {
+                        gen._leverStopwatch.Restart();
+                    }
+
+                    gen._targetCooldown = gen._doorToggleCooldownTime;
+                }
+                break;
+            
+            //2 - Request do Cancel The Activation (cancel button)
+            case 2:
+                if (gen.Activating && !gen.Engaged)
+                {
+                    var ev = new GeneratorInteractEvent(player, true, gen.GetSynapseGenerator(),
+                        GeneratorInteract.Cancel);
+                    Synapse.Get<PlayerEvents>().GeneratorInteract.Raise(ev);
+                    if (!ev.Allow) break;
+
+                    gen.ServerSetFlag(Scp079Generator.GeneratorFlags.Activating, false);
+                    gen._targetCooldown = gen._unlockCooldownTime;
+                }
+                break;
+            
+            default:
+                gen._targetCooldown = 1f;
+                break;
+        }
+        
+        gen._cooldownStopwatch.Restart();
+    }
+    
+    public static void EnterFemur(CharacterClassManager manager)
+    {
+        if(!NonFacilityCompatibility.currentSceneSettings.enableStandardGamplayItems) return;
+
+        foreach (var player in Synapse.Get<PlayerService>().Players)
+        {
+            if(!player.Hub.Ready || Vector3.Distance(player.transform.position,manager._lureSpj.transform.position) >= 1.97f) continue;
+            if (player.Team is Team.SCP or Team.RIP || player.GodMode) return;
+            if (!Synapse3Extensions.CanHarmScp(player, false)) return;
+
+            var service = Synapse.Get<RoundService>();
+            var closeFemur = service.FemurSacrifices + 1 >=
+                        Synapse.Get<SynapseConfigService>().GamePlayConfiguration.RequiredForFemur;
+
+            var ev = new EnterFemurEvent(player, true, closeFemur);
+            Synapse.Get<PlayerEvents>().EnterFemur.Raise(ev);
+
+            if (ev.Allow)
+            {
+                service.FemurSacrifices++;
+                player.PlayerStats.DealDamage(new UniversalDamageHandler(-1f, DeathTranslations.UsedAs106Bait));
+
+                if (ev.CloseFemur)
+                    manager._lureSpj.SetState(false, true);
+            }
+        }
+    }
+    
+    public static void OnDisarm(NetworkConnection connection, DisarmMessage msg)
+    {
+        if(!DisarmingHandlers.ServerCheckCooldown(connection))
+            return;
+
+        var player = connection.GetSynapsePlayer();
+        if(player == null) return;
+
+        if (!msg.PlayerIsNull)
+        {
+            if((msg.PlayerToDisarm.transform.position - player.transform.position).sqrMagnitude > 20f) return;
+            if (msg.PlayerToDisarm.inventory.CurInstance != null &&
+                msg.PlayerToDisarm.inventory.CurInstance.TierFlags != ItemTierFlags.Common) return;
+        }
+
+        var freePlayer = !msg.PlayerIsNull && msg.PlayerToDisarm.inventory.IsDisarmed();
+        var canDisarm = !msg.PlayerIsNull && player.Hub.CanDisarm(msg.PlayerToDisarm);
+
+        if (freePlayer && !msg.Disarm && player.Team != Team.SCP)
+        {
+            if (!player.IsDisarmed)
+            {
+                var ev = new FreePlayerEvent(player, true, msg.PlayerToDisarm.GetSynapsePlayer());
+                Synapse.Get<PlayerEvents>().FreePlayer.Raise(ev);
+                if (ev.Allow)
+                    msg.PlayerToDisarm.inventory.SetDisarmedStatus(null);
+            }
+        }
+        else
+        {
+            if (freePlayer || !canDisarm || !msg.Disarm)
+            {
+                player.SendNetworkMessage(DisarmingHandlers.NewDisarmedList);
+                return;
+            }
+
+            if (msg.PlayerToDisarm.inventory.CurInstance == null ||
+                msg.PlayerToDisarm.inventory.CurInstance.CanHolster())
+            {
+                var ev = new DisarmEvent(player.Inventory.ItemInHand, ItemInteractState.Finalize,
+                    player, msg.PlayerToDisarm.GetSynapsePlayer());
+                Synapse.Get<ItemEvents>().Disarm.Raise(ev);
+                
+                if(!ev.Allow) return;
+                
+                if (msg.PlayerToDisarm.characterClassManager.CurRole.team == Team.MTF &&
+                    player.RoleType == RoleType.ClassD)
+                {
+                    AchievementHandlerBase.ServerAchieve(player.Connection,AchievementName.TablesHaveTurned);
+                }
+
+                msg.PlayerToDisarm.inventory.SetDisarmedStatus(player.VanillaInventory);
+            }
+        }
+
+        DisarmingHandlers.NewDisarmedList.SendToAuthenticated();
+    }
+    
     public static bool OnDealDamage(PlayerStats stats, DamageHandlerBase handler)
     {
         if (!stats._hub.characterClassManager.IsAlive || stats._hub.characterClassManager.GodMode) return false;
+        var damage = (handler as StandardDamageHandler)?.Damage ?? 0;
+
         var player = stats.GetSynapsePlayer();
         SynapsePlayer attacker = null;
         if (handler is AttackerDamageHandler aHandler)
@@ -175,7 +534,7 @@ internal static class DecoratedPlayerPatches
             if (attacker != null && !Synapse3Extensions.GetHarmPermission(attacker, player)) return false;
         }
 
-        var ev = new DamageEvent(player, true, attacker, damageType, ((StandardDamageHandler)handler).Damage);
+        var ev = new DamageEvent(player, true, attacker, damageType, damage);
         Synapse.Get<PlayerEvents>().Damage.Raise(ev);
         ((StandardDamageHandler)handler).Damage = ev.Damage;
         return ev.Allow;

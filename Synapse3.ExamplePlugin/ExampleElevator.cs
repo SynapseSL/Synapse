@@ -16,9 +16,16 @@ public class ExampleElevator : CustomElevator
         var list = new List<IElevatorDestination>();
         var service = Synapse.Get<SchematicService>();
 
-        list.Add(new SchematicDestination(service.SpawnSchematic(8, new Vector3(0f, 1000f, 0f)), 0, "First", this,Vector3.one * 3));
-        list.Add(new SchematicDestination(service.SpawnSchematic(8, new Vector3(0f, 1000f, -50f)), 1, "First", this,Vector3.one * 3));
-        list.Add(new SchematicDestination(service.SpawnSchematic(8, new Vector3(170f, 992.5f, -60)), 2, "First", this,Vector3.one * 3));
+        var range = Vector3.one * 3;
+        range.y *= 1.5f;
+
+        var schematic1 = service.SpawnSchematic(8, new Vector3(0f, 1000f, 2.5f), Quaternion.Euler(0f, 90f, 0f));
+        var schematic2 = service.SpawnSchematic(8, new Vector3(0f, 1000f, -70f), Quaternion.Euler(0f, -90f, 0f));
+        list.Add(new SchematicDestination(schematic1, 0, "First", this,range));
+        list.Add(new SchematicDestination(schematic2, 1, "First", this,range));
+        list.Add(new SchematicDestination(
+            service.SpawnSchematic(8, new Vector3(190f, 992.5f, -87), Quaternion.Euler(0f, -90f, 0f)), 2, "First", this,
+            range));
 
         foreach (var destination in list)
         {
@@ -65,6 +72,8 @@ public class EventHandler
         if (ev.Door.ObjectData.ContainsKey("elev"))
         {
             var elevator = (ExampleElevator)ev.Door.ObjectData["elev"];
+            
+            
             var id = (int)ev.Door.ObjectData["id"];
 
             if (elevator.CurrentDestination.ElevatorId == id)

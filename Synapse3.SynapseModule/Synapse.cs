@@ -69,8 +69,10 @@ public class Synapse : Module
     {
         var version = $"{Major}.{Minor}.{Patch}";
         
+        #if DEBUG
         if (Type != VersionType.None)
             version += $"-{Type}-{SubVersion}";
+        #endif
 
         return version;
     }
