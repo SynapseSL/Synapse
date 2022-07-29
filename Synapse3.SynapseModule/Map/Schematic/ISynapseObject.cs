@@ -44,6 +44,10 @@ public interface ISynapseObject
     /// The Synapse ObjectType
     /// </summary>
     public ObjectType Type { get; }
+    
+    public ISynapseObject Parent { get; set; }
+    
+    public ISynapseObject RootParent { get; }
 
     /// <summary>
     /// Removes this Object parent

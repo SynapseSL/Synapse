@@ -8,6 +8,9 @@ using InventorySystem.Disarming;
 using InventorySystem.Items;
 using InventorySystem.Items.Coin;
 using InventorySystem.Items.Firearms.BasicMessages;
+using InventorySystem.Items.Firearms.Modules;
+using InventorySystem.Items.Radio;
+using InventorySystem.Searching;
 using MapGeneration.Distributors;
 using Mirror;
 using Neuron.Core.Logging;
@@ -16,6 +19,7 @@ using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
 using UnityEngine;
@@ -333,6 +337,72 @@ internal static class PlayerPatches
         catch (Exception ex)
         {
             NeuronLogger.For<Synapse>().Error("Sy3 Event: Leave Event failed\n" + ex);
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(SearchCoordinator), nameof(SearchCoordinator.ContinuePickupServer))]
+    public static bool OnPickUpRequest(SearchCoordinator __instance)
+    {
+        try
+        {
+            var item = __instance.Completor.TargetPickup?.GetItem();
+            if (item == null) return true;
+
+            //Item is just used for the Event so I just redirect to the RootItem directly here
+            if (item.RootParent is SynapseItem root)
+                item = root;
+            
+            if (__instance.Completor.ValidateUpdate())
+            {
+                if (NetworkTime.time >= __instance.SessionPipe.Session.FinishTime)
+                {
+                    var ev = new PickupEvent(__instance.Hub, true, item);
+                    Synapse.Get<PlayerEvents>().Pickup.Raise(ev);
+
+                    if (ev.Allow)
+                    {
+                        __instance.Completor.Complete();
+                    }
+                    else
+                    {
+                        __instance.SessionPipe.Invalidate();
+                    }
+                    return false;
+                }
+            }
+            else
+            {
+                __instance.SessionPipe.Invalidate();
+            }
+
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Pickup Event failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(StandardHitregBase), nameof(StandardHitregBase.PlaceBulletholeDecal))]
+    public static bool PlaceBulletHole(StandardHitregBase __instance, RaycastHit hit)
+    {
+        try
+        {
+            var player = __instance.Hub.GetSynapsePlayer();
+            if (player == null) return false;
+
+            var ev = new PlaceBulletHoleEvent(player, true, hit.point);
+            Synapse.Get<PlayerEvents>().PlaceBulletHole.Raise(ev);
+
+            return ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Place Bullet Hole Event failed\n" + ex);
+            return true;
         }
     }
 }

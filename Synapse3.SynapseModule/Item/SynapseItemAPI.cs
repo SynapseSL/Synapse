@@ -22,6 +22,12 @@ public partial class SynapseItem
             Drop(player.Position);
             return;
         }
+
+        if (RootParent is SynapseItem parent)
+        {
+            parent.EquipItem(player);
+            return;
+        }
         
         DestroyItem();
         Throwable.DestroyProjectile();
@@ -91,8 +97,8 @@ public partial class SynapseItem
         Pickup.transform.localScale = Scale;
         NetworkServer.Spawn(Pickup.gameObject);
         Pickup.InfoReceived(default, info);
-        UpdateSchematic();
         State = ItemState.Map;
+        CreateSchematic();
         
         var comp = Pickup.gameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
@@ -134,24 +140,27 @@ public partial class SynapseItem
             schematic._items.Remove(this);
             Parent = null;
         }
+        Schematic?.Destroy();
+        Schematic = null;
         if(Pickup == null) return;
 
         NetworkServer.Destroy(Pickup.gameObject);
         Pickup = null;
     }
 
-    internal void UpdateSchematic()
+    private void CreateSchematic()
     {
         try
         {
-            if(Schematic is null || Pickup is null || SchematicConfiguration is null) return;
+            if(Pickup == null || SchematicConfiguration == null) return;
 
             Schematic = new SynapseSchematic(SchematicConfiguration);
             Schematic.Position = Position;
             Schematic.Rotation = Rotation;
-            Schematic.Scale = Scale;
+            Schematic.Scale = _scale;
             Schematic.Parent = this;
-            
+            Schematic.GameObject.transform.parent = Pickup.transform;
+
             Pickup.netIdentity.UnSpawnForAllPlayers();
         }
         catch (Exception ex)

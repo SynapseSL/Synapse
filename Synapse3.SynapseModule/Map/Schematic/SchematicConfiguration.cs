@@ -84,13 +84,13 @@ public class SchematicConfiguration : IDocumentSection
     {
         public ItemType ItemType { get; set; }
 
-        public bool CanBePickedUp { get; set; }
+        public bool CanBePickedUp { get; set; } = true;
 
-        public bool Physics { get; set; }
+        public bool Physics { get; set; } = true;
 
-        public float Durabillity { get; set; }
+        public float Durabillity { get; set; } = 0;
 
-        public uint Attachments { get; set; }
+        public uint Attachments { get; set; } = 0;
     }
 
     public class DoorConfiguration : SimpleUpdateConfig

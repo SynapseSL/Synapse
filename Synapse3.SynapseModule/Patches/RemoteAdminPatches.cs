@@ -441,7 +441,7 @@ internal static class RemoteAdminPatches
             {
                 var sPlayer = player.GetSynapsePlayer();
                 message += "\nClass: " + sPlayer.RoleName;
-                message += "\nTeam: " + sPlayer.TeamID;
+                message += "\nTeam: " + sPlayer.TeamName;
                 message += $"\nHP: {sPlayer.Health}/{sPlayer.MaxHealth}";
                 message += $"\nAHP: {sPlayer.ArtificialHealth}/{sPlayer.MaxArtificialHealth}";
                 message += $"\nPosition: {sPlayer.Position}";

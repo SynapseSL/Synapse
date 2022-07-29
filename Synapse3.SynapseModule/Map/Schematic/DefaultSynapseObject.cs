@@ -36,6 +36,21 @@ public abstract class DefaultSynapseObject : ISynapseObject
         }
     }
 
+    public ISynapseObject RootParent
+    {
+        get
+        {
+            var parent = Parent;
+            if (parent == null) return null;
+            while (parent.Parent != null)
+            {
+                parent = parent.Parent;
+            }
+
+            return parent;
+        }
+    }
+
     public virtual Vector3 Position
     {
         get => GameObject.transform.position;

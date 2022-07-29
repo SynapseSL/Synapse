@@ -182,24 +182,59 @@ public partial class SynapseItem : DefaultSynapseObject
         UpgradeProcessor = processor;
     }
 
-    internal SynapseItem(SchematicConfiguration.ItemConfiguration configuration, SynapseSchematic schematic) : this(configuration.ItemType)
+    internal SynapseItem(SchematicConfiguration.ItemConfiguration configuration, SynapseSchematic schematic) : this()
     {
-        Parent = schematic;
-        schematic._items.Add(this);
+        Serial = ItemSerialGenerator.GenerateNext();
+        _item._allItems[Serial] = this;
+        ID = (int)configuration.ItemType;
         
-        OriginalScale = configuration.Scale;
-        CustomAttributes = configuration.CustomAttributes;
+        if (ID is >= 0 and <= ItemService.HighestItem)
+        {
+            IsCustomItem = false;
+            ItemType = (ItemType)ID;
+            Name = ItemType.ToString();
+        }
+        else
+        {
+            IsCustomItem = true;
+            ItemType = _item.GetBaseType(ID);
+            Name = _item.GetName(ID);
+        }
         
+        if (InventoryItemLoader.AvailableItems.TryGetValue(ItemType, out var exampleBase))
+        {
+            ItemCategory = exampleBase.Category;
+            TierFlags = exampleBase.TierFlags;
+            Weight = exampleBase.Weight;
+        }
+        
+        var processor = Synapse.Get<Scp914Service>().GetProcessor(ID);
+        if (processor == Default914Processor.DefaultProcessor)
+        {
+            if (Scp914Upgrader.TryGetProcessor(ItemType, out var vanillaProcessor))
+                processor = new Default914Processor(vanillaProcessor);
+        }
+        
+        UpgradeProcessor = processor;
+
         Drop(configuration.Position);
         Rotation = configuration.Rotation;
         Scale = configuration.Scale;
         CanBePickedUp = configuration.CanBePickedUp;
+        
         if (!configuration.Physics)
         {
             Pickup.Rb.useGravity = false;
             Pickup.Rb.isKinematic = true;
         }
-
+        
+        Parent = schematic;
+        Pickup.transform.parent = schematic.GameObject.transform;
+        schematic._items.Add(this);
+        
+        OriginalScale = configuration.Scale;
+        CustomAttributes = configuration.CustomAttributes;
+        
         Durability = configuration.Durabillity;
     }
 }

@@ -249,7 +249,7 @@ public static class Synapse3Extensions
     public static IElevator GetSynapseElevator(this Lift lift) =>
         Synapse.Get<ElevatorService>().Elevators
             .FirstOrDefault(x => x is SynapseElevator elevator && elevator.Lift == lift);
-    public static SynapseCamera GetSynapseCamera(this Camera079 cam) =>
+    public static SynapseCamera GetCamera(this Camera079 cam) =>
         Synapse.Get<MapService>()._synapseCameras.FirstOrDefault(x => x.Camera == cam);
 
     

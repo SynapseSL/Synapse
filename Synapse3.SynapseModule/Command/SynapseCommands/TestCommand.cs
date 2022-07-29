@@ -4,6 +4,7 @@ using System.Linq;
 using MEC;
 using Neuron.Modules.Commands;
 using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
@@ -25,6 +26,34 @@ public class TestCommand : SynapseCommand
     {
         result.Response = "Test";
 
+        var config = new SchematicConfiguration()
+        {
+            Items = new List<SchematicConfiguration.ItemConfiguration>()
+            {
+                new SchematicConfiguration.ItemConfiguration()
+                {
+                    Scale = Vector3.one * 0.5f,
+                    Position = Vector3.up * 0.3f,
+                    Rotation = Quaternion.identity,
+                    ItemType = ItemType.Medkit,
+                    CanBePickedUp = true,
+                }
+            },
+            Primitives = new List<SchematicConfiguration.PrimitiveConfiguration>()
+            {
+                new ()
+                {
+                    Color = Color.white,
+                    Position = Vector3.up * 3,
+                    PrimitiveType = PrimitiveType.Cube
+                }
+            },
+            ID = 61,
+            Name = "test"
+        };
+        Synapse.Get<SchematicService>().SpawnSchematic(config, context.Player.Position);
+        Synapse.Get<ItemService>().SetVanillaItemSchematic(ItemType.Coin, config);
+        result.Response = Synapse.Get<ItemService>().GetSchematicConfiguration(35).Name;
 
         /*
         var config = new SchematicConfiguration()

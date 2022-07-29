@@ -1,6 +1,7 @@
 ﻿using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using RemoteAdmin.Communication;
+using Subtitles;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Elevators;
@@ -109,9 +110,6 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                RaClipboard.Send(ev.Player.CommandSender, RaClipboard.RaClipBoardType.PlayerId,
-                    "Hallo dies ist eine Test Message");
-                ev.Player.SendRaConsoleMessage("<color=white>Klick mich an! <link=CP_ID></link></color>", true, RaCategory.PlayerInfo);
                 break;
         }
     }

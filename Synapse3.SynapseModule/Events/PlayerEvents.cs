@@ -37,6 +37,8 @@ public class PlayerEvents : Service
     public readonly EventReactor<HealEvent> Heal = new();
     public readonly EventReactor<JoinEvent> Join = new();
     public readonly EventReactor<LeaveEvent> Leave = new();
+    public readonly EventReactor<PickupEvent> Pickup = new();
+    public readonly EventReactor<PlaceBulletHoleEvent> PlaceBulletHole = new();
 
     public PlayerEvents(EventManager eventManager)
     {
@@ -67,6 +69,8 @@ public class PlayerEvents : Service
         _eventManager.RegisterEvent(Heal);
         _eventManager.RegisterEvent(Join);
         _eventManager.RegisterEvent(Leave);
+        _eventManager.RegisterEvent(Pickup);
+        _eventManager.RegisterEvent(PlaceBulletHole);
     }
 }
 
@@ -391,4 +395,24 @@ public class JoinEvent : PlayerEvent
 public class LeaveEvent : PlayerEvent
 {
     public LeaveEvent(SynapsePlayer player) : base(player) { }
+}
+
+public class PickupEvent : PlayerInteractEvent
+{
+    public PickupEvent(SynapsePlayer player, bool allow, SynapseItem item) : base(player, allow)
+    {
+        Item = item;
+    }
+
+    public SynapseItem Item { get; }
+}
+
+public class PlaceBulletHoleEvent : PlayerInteractEvent
+{
+    public PlaceBulletHoleEvent(SynapsePlayer player, bool allow, Vector3 position) : base(player, allow)
+    {
+        Position = position;
+    }
+
+    public Vector3 Position { get; }
 }

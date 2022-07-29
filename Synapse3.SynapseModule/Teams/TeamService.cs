@@ -55,6 +55,16 @@ public class TeamService : Service
 
     public ISynapseTeam GetTeam(int id) => _teams.FirstOrDefault(x => x.Attribute.Id == id);
 
+    public string GetTeamName(int id)
+    {
+        switch (id)
+        {
+            case 1: return "Mobile Task Force";
+            case 2: return "Chaos Insurgency";
+            default: return GetTeam(id)?.Attribute.Name ?? "";
+        }
+    }
+
     public bool IsIdRegistered(int id)
         => IsDefaultId(id) || _teams.Any(x => x.Attribute.Id == id);
 

@@ -39,7 +39,7 @@ public class Scp079Controller
 
     public SynapseCamera Camera
     {
-        get => Scp079Script.currentCamera.GetSynapseCamera();
+        get => Scp079Script.currentCamera.GetCamera();
         set => Scp079Script.RpcSwitchCamera(value.CameraID, false);
     }
 
