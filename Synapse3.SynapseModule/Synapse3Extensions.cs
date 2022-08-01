@@ -167,7 +167,7 @@ public static class Synapse3Extensions
         return DamageType.Unknown;
     }
     public static IRoom GetRoom(this RoomType type) =>
-        Synapse.Get<RoomService>()._rooms.FirstOrDefault(x => x.ID == (int)type);
+        Synapse.Get<RoomService>()._rooms.FirstOrDefault(x => x.Id == (int)type);
 
     public static IElevator GetSynapseElevator(this ElevatorType type) => Synapse.Get<ElevatorService>().Elevators
         .FirstOrDefault(x => x is SynapseElevator elevator && elevator.ElevatorType == type);

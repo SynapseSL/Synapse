@@ -38,10 +38,7 @@ public class SchematicService : Service
 
     public void Reload(ReloadEvent _ = null)
     {
-        foreach (var configuration in _schematicConfigurations)
-        {
-            if (configuration.Reload) _schematicConfigurations.Remove(configuration);
-        }
+        _schematicConfigurations.Clear();
 
         
         foreach (var file in Directory.GetFiles(_base.PrepareRelativeDirectory("Schematics"),"*.syml"))
@@ -101,18 +98,17 @@ public class SchematicService : Service
     public SchematicConfiguration GetConfiguration(string name) =>
         SchematicConfigurations.FirstOrDefault(x => x.Name == name);
 
-    public void RegisterSchematic(SchematicConfiguration configuration, bool removeOnReload = false)
+    public void RegisterSchematic(SchematicConfiguration configuration)
     {
         if(IsIDRegistered(configuration.ID)) return;
-
-        configuration.Reload = removeOnReload;
+        
         _schematicConfigurations.Add(configuration);
     }
 
     public bool SaveConfiguration(SchematicConfiguration configuration)
     {
         if (IsIDRegistered(configuration.ID) || string.IsNullOrWhiteSpace(configuration.Name)) return false;
-        RegisterSchematic(configuration, true);
+        RegisterSchematic(configuration);
         
         var file = Path.Combine(_base.PrepareRelativeDirectory("Schematics"), configuration.Name);
 

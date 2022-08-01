@@ -29,7 +29,7 @@ public class SynapseRoom : IVanillaRoom
 
     public string Name => RoomType.ToString();
     public RoomType RoomType { get; }
-    public int ID => (int)RoomType;
+    public int Id => (int)RoomType;
     
     public int Zone
     {

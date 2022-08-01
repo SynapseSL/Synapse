@@ -77,7 +77,7 @@ public partial class SynapsePlayer
         get
         {
             if (CustomRole == null) return (int)RoleType;
-            return CustomRole.Attribute.ID;
+            return CustomRole.Attribute.Id;
         }
         set
         {

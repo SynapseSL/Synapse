@@ -1,4 +1,5 @@
-﻿using Neuron.Core.Logging;
+﻿using InventorySystem.Items.Radio;
+using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using RemoteAdmin.Communication;
 using Subtitles;
@@ -24,8 +25,6 @@ public class DebugService : Service
         _round = round;
         _item = item;
     }
-
-    private SchematicDestination _destination;
 
     public override void Enable()
     {
@@ -59,13 +58,6 @@ public class DebugService : Service
     private void Tesla(TriggerTeslaEvent ev)
     {
         if (ev.Player.RoleType == RoleType.ClassD) ev.Allow = false;
-    }
-
-    private void Elevator(ElevatorMoveContentEvent ev)
-    {
-        if(ev.Elevator.Id != (int)ElevatorType.GateB || ev.Destination.ElevatorId != 0) return;
-        ev.Destination = _destination;
-        ev.OpenDoorManually = true;
     }
 
     public override void Disable()
@@ -110,6 +102,7 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
+                Logger.Warn(ev.Player.Room.Name);
                 break;
         }
     }

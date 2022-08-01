@@ -7,6 +7,7 @@ using RemoteAdmin;
 using RemoteAdmin.Communication;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Permissions;
+using Synapse3.SynapseModule.Permissions.RemoteAdmin;
 using Synapse3.SynapseModule.Player;
 using Utils;
 
@@ -120,7 +121,8 @@ internal static class RemoteAdminPatches
 
         var text = "\n";
         var addNoneRow = false;
-        
+        var categories = Synapse.Get<RemoteAdminCategoryService>().RemoteAdminCategories;
+
         if (config.BetterRemoteAdminList)
         {
             foreach (var player in players.ToList())
@@ -137,7 +139,14 @@ internal static class RemoteAdminPatches
                 addNoneRow = true;
         }
 
-        text += "<size=0>(10001)</size> <size=20></color><color=blue>[ Synapse]</color></size>\n";
+        var senderPlayer = sender.GetSynapsePlayer();
+
+        foreach (var category in categories)
+        {
+            if (category.CanSeeCategory(senderPlayer) && category.DisplayOnTop)
+                text +=
+                    $"<size=0>({category.Attribute.Id})</size> <size={category.Attribute.Size}></color><color={category.Attribute.Color}>{category.Attribute.Name}</color></size>\n";
+        }
 
         foreach (var group in remoteAdminGroups)
         {
@@ -167,6 +176,13 @@ internal static class RemoteAdminPatches
         foreach (var player in overWatch.Members)
         {
             text += player.Text + "\n";
+        }
+        
+        foreach (var category in categories)
+        {
+            if (category.CanSeeCategory(senderPlayer) && !category.DisplayOnTop)
+                text +=
+                    $"<size=0>{category.Attribute.Id}</size><color={category.Attribute.Color}><size={category.Attribute.Size}>{category.Attribute.Name}</size></color>";
         }
 
         return text;
@@ -200,37 +216,16 @@ internal static class RemoteAdminPatches
             if (args.Length != 2) return false;
 
             if (!int.TryParse(args[0], out var number)) return false;
-            
-            //The Player Request Synapse itself
-            if (args[1] == "10001.")
+
+            var arg = args[1].Split('.')[0];
+            if (int.TryParse(arg, out var categoryId))
             {
-                //If needed add a second page with the number
-                    
-                var synapseInfo = "<color=white>Welcome to <color=blue>Synapse3<color=white>";
-                synapseInfo += "\nSynapse manages Plugins as well as improving many vanilla features";
-                synapseInfo += "\n\n";
-                synapseInfo += "\nCurrent Version: " + Synapse.GetVersion();
-                synapseInfo += "\nBased Game Version: " + Synapse.BasedGameVersion;
-                synapseInfo += "\nCurrent Game Version: " + GameCore.Version.VersionString;
-
-                synapseInfo += "\n\n";
-                synapseInfo += "\nDownload: <size=10><i><link=CP_USERID>https://github.com/SynapseSL/Synapse/releases</link></i></size>";
-                synapseInfo += "\nDocs: <size=10><i><link=CP_IP>https://docs.synapsesl.xyz/</link></i></size>";
-                synapseInfo += "\nDiscord: <size=10><i><link=CP_ID>https://discord.gg/uVtNr9Czng</link></i></size>";
-                    
-                synapseInfo += "\n\n<size=15>Created by Dimenzio, Helight, Wholesome & Flo";
-
-                if (number == 0)
-                    synapseInfo += " (and maybe UselessJavaDev MineTech)";
-                    
-                synapseInfo += "</color>";
-                    
-                RaClipboard.Send(sender, RaClipboard.RaClipBoardType.UserId,
-                    "https://github.com/SynapseSL/Synapse/releases");
-                RaClipboard.Send(sender,RaClipboard.RaClipBoardType.Ip,"https://docs.synapsesl.xyz/");
-                RaClipboard.Send(sender, RaClipboard.RaClipBoardType.PlayerId, "https://discord.gg/uVtNr9Czng");
-                sender.RaReply("$1 " + synapseInfo, true, true, string.Empty);
-                return false;
+                var category = Synapse.Get<RemoteAdminCategoryService>().GetCategory(categoryId);
+                if (category != null && category.CanSeeCategory(sender.GetSynapsePlayer()))
+                {
+                    sender.RaReply("$1 " + category.GetInfo(sender, number == 0), true, true, string.Empty);
+                    return false;
+                }
             }
             
             var requestSensitiveData = number == 0;

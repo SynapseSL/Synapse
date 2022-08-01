@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using MapGeneration;
 using Neuron.Core.Meta;
+using Ninject;
 using Synapse3.SynapseModule.Events;
 using UnityEngine;
 
@@ -15,17 +17,27 @@ public class RoomService : Service
     
     private readonly RoundEvents _round;
     private readonly MapService _map;
+    private readonly IKernel _kernel;
+    private readonly Synapse _synapseModule;
 
-    public RoomService(RoundEvents round, MapService map)
+    public RoomService(RoundEvents round, MapService map, IKernel kernel, Synapse synapseModule)
     {
         _round = round;
         _map = map;
+        _kernel = kernel;
+        _synapseModule = synapseModule;
     }
 
     public override void Enable()
     {
         _round.Waiting.Subscribe(LoadRooms);
         _round.Restart.Subscribe(ClearRooms);
+        
+        while (_synapseModule.ModuleRoomBindingQueue.Count != 0)
+        {
+            var binding = _synapseModule.ModuleRoomBindingQueue.Dequeue();
+            LoadBinding(binding);
+        }
     }
 
     public override void Disable()
@@ -34,14 +46,18 @@ public class RoomService : Service
         _round.Restart.Unsubscribe(ClearRooms);
     }
 
+    internal void LoadBinding(SynapseRoomBinding binding) => RegisterCustomRoom(binding.Info);
+
     internal readonly List<IRoom> _rooms = new();
-    private readonly List<CustomRoomInformation> _customRoomInformation = new ();
+    private readonly List<CustomRoomAttribute> _customRoomInformation = new ();
+    
     
     public ReadOnlyCollection<IRoom> Rooms => _rooms.AsReadOnly();
-    public ReadOnlyCollection<CustomRoomInformation> CustomRoomInformation => _customRoomInformation.AsReadOnly();
+    public ReadOnlyCollection<CustomRoomAttribute> CustomRoomInformation => _customRoomInformation.AsReadOnly();
 
+    
     public IRoom GetRoom(int id)
-        => Rooms.FirstOrDefault(x => x.ID == id);
+        => Rooms.FirstOrDefault(x => x.Id == id);
 
     public IRoom GetRoom(string name)
         => Rooms.FirstOrDefault(x => x.Name == name);
@@ -52,42 +68,52 @@ public class RoomService : Service
         return Rooms.OrderBy(x => Vector3.Distance(x.Position, position))?.FirstOrDefault();
     }
 
+    public void AddRoom(IRoom room)
+    {
+        if (!_rooms.Contains(room))
+            _rooms.Add(room);
+    }
+
     public void RegisterCustomRoom<TRoom>() where TRoom : SynapseCustomRoom
     {
-        var room = (SynapseCustomRoom)Activator.CreateInstance(typeof(TRoom));
-        var info = new CustomRoomInformation
-        {
-            Name = room.Name,
-            ID = room.ID,
-            RoomType = typeof(TRoom)
-        };
+        var info = typeof(TRoom).GetCustomAttribute<CustomRoomAttribute>();
+        if(info == null) return;
+        info.RoomType = typeof(TRoom);
         
         RegisterCustomRoom(info);
     }
     
-    public void RegisterCustomRoom(CustomRoomInformation info)
+    public void RegisterCustomRoom(CustomRoomAttribute info)
     {
-        if(IsIdRegistered(info.ID)) return;
+        if(info.RoomType == null) return;
+        if(IsIdRegistered(info.Id)) return;
+        
         _customRoomInformation.Add(info);
     }
 
-    public void RemoveCustomRoom(int id)
+    public void UnRegisterCustomRoom(int id)
     {
         if(!IsIdRegistered(id)) return;
-        var info = _customRoomInformation.First(x => x.ID == id);
+        var info = _customRoomInformation.First(x => x.Id == id);
         _customRoomInformation.Remove(info);
     }
 
     public SynapseCustomRoom CreateRoom(int id)
     {
         if (!IsIdRegistered(id)) return null;
-        var info = _customRoomInformation.FirstOrDefault(x => x.ID == id);
+        var info = _customRoomInformation.FirstOrDefault(x => x.Id == id);
+        if (info == null) return null;
 
-        if (info.RoomType.GetConstructors().Any(x =>
-                x.GetParameters().Length == 1 && x.GetParameters().First().ParameterType == typeof(int)))
-            return (SynapseCustomRoom)Activator.CreateInstance(info.RoomType, new object[] { id });
+        return CreateRoom(info);
+    }
 
-        return (SynapseCustomRoom)Activator.CreateInstance(info.RoomType);
+    public SynapseCustomRoom CreateRoom(CustomRoomAttribute info)
+    {
+        if (info.RoomType == null) return null;
+        var room = (SynapseCustomRoom)_kernel.Get(info.RoomType);
+        room.Attribute = info;
+        room.Load();
+        return room;
     }
 
     public SynapseCustomRoom SpawnCustomRoom(int id, Vector3 position)
@@ -99,7 +125,7 @@ public class RoomService : Service
     }
 
     public bool IsIdRegistered(int id)
-        => id is >= 0 and <= HighestRoom || _customRoomInformation.Any(x => x.ID == id);
+        => id is >= 0 and <= HighestRoom || _customRoomInformation.Any(x => x.Id == id);
     
     private void LoadRooms(RoundWaitingEvent ev)
     {
@@ -201,12 +227,4 @@ public class RoomService : Service
             { "EZ_GateA", RoomType.GateA },
             { "EZ_GateB", RoomType.GateB }
         });
-    
-    public class TestRoom : SynapseCustomRoom
-    {
-        public override string Name => "Test";
-        public override int ID => 100;
-        public override int Zone => 99;
-        public override int SchematicID => 1;
-    }
 }

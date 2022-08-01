@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Achievements;
 using GameCore;
 using HarmonyLib;
@@ -10,6 +11,7 @@ using InventorySystem.Items.Coin;
 using InventorySystem.Items.Firearms.BasicMessages;
 using InventorySystem.Items.Firearms.Modules;
 using InventorySystem.Items.Radio;
+using InventorySystem.Items.ThrowableProjectiles;
 using InventorySystem.Searching;
 using MapGeneration.Distributors;
 using Mirror;
@@ -24,6 +26,7 @@ using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
 using UnityEngine;
 using Utils.Networking;
+using Console = System.Console;
 
 namespace Synapse3.SynapseModule.Patches.PlayerPatches;
 
@@ -405,10 +408,118 @@ internal static class PlayerPatches
             return true;
         }
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(RadioItem), nameof(RadioItem.ServerProcessCmd))]
+    public static bool OnRadioCommand(RadioMessages.RadioCommand command, RadioItem __instance)
+    {
+        try
+        {
+            DecoratedPlayerPatches.OnRadio(command, __instance);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Radio Use Event failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(CheaterReport), nameof(CheaterReport.UserCode_CmdReport))]
+    public static bool OnReport(CheaterReport __instance, int playerId, ref string reason, ref bool notifyGm)
+    {
+        try
+        {
+            var reported = Synapse.Get<PlayerService>().GetPlayer(playerId);
+            var ev = new ReportEvent(__instance.GetSynapsePlayer(), true, reported, reason, notifyGm);
+            Synapse.Get<PlayerEvents>().Report.Raise(ev);
+            reason = ev.Reason;
+            notifyGm = ev.SendToNorthWood;
+            return ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Report Event failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Radio), nameof(Radio.UserCode_CmdSyncTransmissionStatus))]
+    public static bool SyncAltActive(Radio __instance, bool b)
+    {
+        try
+        {
+            return DecoratedPlayerPatches.OnSpeak(__instance, b);
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Speak Secondary Event failed\n" + ex);
+            return true;
+        }
+    }
 }
 
 internal static class DecoratedPlayerPatches
 {
+    public static bool OnSpeak(Radio radio, bool alternativeChat)
+    {
+        var player = radio.GetSynapsePlayer();
+        
+        var radioChat = radio._dissonanceSetup.RadioAsHuman;
+        var scp939 = Synapse.Get<SynapseConfigService>().GamePlayConfiguration.SpeakingScp.Contains(player.RoleID);
+        
+        var ev = new SpeakSecondaryEvent(player, true, radioChat, scp939, alternativeChat);
+        Synapse.Get<PlayerEvents>().SpeakSecondary.Raise(ev);
+        
+        radio._dissonanceSetup.MimicAs939 = ev.Scp939Chat && alternativeChat && ev.Allow;
+        radio._dissonanceSetup.RadioAsHuman = ev.RadioChat && alternativeChat && ev.Allow;
+
+        return ev.Allow;
+    }
+    
+    public static void OnRadio(RadioMessages.RadioCommand command, RadioItem radio)
+    {
+        var item = radio.GetItem();
+        var player = item.ItemOwner;
+        var state = (RadioMessages.RadioRangeLevel)radio._radio.NetworkcurRangeId;
+
+        var nextState = command == RadioMessages.RadioCommand.ChangeRange
+            ? (int)state + 1 >= radio.Ranges.Length ? 0 : state + 1
+            : state;
+
+        var ev = new RadioUseEvent(item, ItemInteractState.Finalize, player, command, state, nextState);
+        Synapse.Get<ItemEvents>().RadioUse.Raise(ev);
+        
+        if(!ev.Allow) return;
+        
+        switch (command)
+        {
+            case RadioMessages.RadioCommand.Enable:
+                radio._enabled = true;
+                break;
+            
+            case RadioMessages.RadioCommand.Disable:
+                radio._enabled = false;
+                radio._radio.ForceDisableRadio();
+                break;
+            
+            case RadioMessages.RadioCommand.ChangeRange:
+                radio._rangeId = (byte)ev.NextRange;
+                radio._radio.NetworkcurRangeId = radio._rangeId;
+                break;
+        }
+
+        if (ev.CurrentRange == ev.NextRange)
+        {
+            radio._rangeId = (byte)ev.NextRange;
+            radio._radio.NetworkcurRangeId = radio._rangeId;   
+        }
+        
+        radio.SendStatusMessage();
+    }
+    
     public static void OnGenInteract(Scp079Generator gen, ReferenceHub hub, byte interaction)
     {
         if(gen._cooldownStopwatch.IsRunning && gen._cooldownStopwatch.Elapsed.TotalSeconds < gen._targetCooldown) return;
@@ -600,7 +711,8 @@ internal static class DecoratedPlayerPatches
 
         if (damageType == DamageType.PocketDecay)
         {
-            //TODO: PocketPlayers
+            attacker = Synapse.Get<PlayerService>().Players
+                .FirstOrDefault(x => x.ScpController.Scp106.PlayersInPocket.Contains(player));
             if (attacker != null && !Synapse3Extensions.GetHarmPermission(attacker, player)) return false;
         }
 

@@ -29,12 +29,19 @@ public class SynapseVector
             
             foreach (var file in Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), "Synapse", "Managed"), "*.dll"))
             {
-                var fileUri = new Uri(file);
-                var targetUri = currentUri.MakeRelativeUri(fileUri);
-                Log($"Loading assembly at {Uri.UnescapeDataString(targetUri.ToString())}", ConsoleColor.DarkGray);
-                var assembly = domain.Load(File.ReadAllBytes(file));
-                Log($"Loaded assembly {assembly.FullName}");
-                assemblies.Add(assembly);
+                try
+                {
+                    var fileUri = new Uri(file);
+                    var targetUri = currentUri.MakeRelativeUri(fileUri);
+                    Log($"Loading assembly at {Uri.UnescapeDataString(targetUri.ToString())}", ConsoleColor.DarkGray);
+                    var assembly = domain.Load(File.ReadAllBytes(file));
+                    Log($"Loaded assembly {assembly.FullName}");
+                    assemblies.Add(assembly);
+                }
+                catch (Exception ex)
+                {
+                    Log("Failed to load Assembly\n" + file + "\n" + ex, ConsoleColor.DarkRed);
+                }
             }
 
             domain.AssemblyResolve += delegate(object sender, ResolveEventArgs eventArgs)
@@ -57,6 +64,6 @@ public class SynapseVector
 
     private static void Log(string msg, ConsoleColor color = ConsoleColor.Gray)
     {
-        ServerConsole.AddLog("[Bootstrap]" + msg, color);
+        ServerConsole.AddLog("[Bootstrap] " + msg, color);
     }
 }

@@ -39,6 +39,8 @@ public class PlayerEvents : Service
     public readonly EventReactor<LeaveEvent> Leave = new();
     public readonly EventReactor<PickupEvent> Pickup = new();
     public readonly EventReactor<PlaceBulletHoleEvent> PlaceBulletHole = new();
+    public readonly EventReactor<ReportEvent> Report = new();
+    public readonly EventReactor<SpeakSecondaryEvent> SpeakSecondary = new();
 
     public PlayerEvents(EventManager eventManager)
     {
@@ -71,6 +73,8 @@ public class PlayerEvents : Service
         _eventManager.RegisterEvent(Leave);
         _eventManager.RegisterEvent(Pickup);
         _eventManager.RegisterEvent(PlaceBulletHole);
+        _eventManager.RegisterEvent(Report);
+        _eventManager.RegisterEvent(SpeakSecondary);
     }
 }
 
@@ -415,4 +419,35 @@ public class PlaceBulletHoleEvent : PlayerInteractEvent
     }
 
     public Vector3 Position { get; }
+}
+
+public class ReportEvent : PlayerInteractEvent
+{
+    public ReportEvent(SynapsePlayer player, bool allow, SynapsePlayer reportedPlayer, string reason, bool sendToNorthWood) : base(player, allow)
+    {
+        ReportedPlayer = reportedPlayer;
+        Reason = reason;
+        SendToNorthWood = sendToNorthWood;
+    }
+
+    public SynapsePlayer ReportedPlayer { get; }
+    
+    public string Reason { get; set; }
+    
+    public bool SendToNorthWood { get; set; }
+}
+
+public class SpeakSecondaryEvent : PlayerInteractEvent
+{
+    public SpeakSecondaryEvent(SynapsePlayer player, bool allow, bool radioChat, bool scp939Chat, bool startSpeaking) : base(player, allow)
+    {
+        RadioChat = radioChat;
+        Scp939Chat = scp939Chat;
+        StartSpeaking = startSpeaking;
+    }
+    
+    public bool RadioChat { get; set; }
+    public bool Scp939Chat { get; set; }
+
+    public bool StartSpeaking { get; }
 }

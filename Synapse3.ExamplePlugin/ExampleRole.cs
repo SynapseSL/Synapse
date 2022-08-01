@@ -8,7 +8,7 @@ namespace Synapse3.ExamplePlugin;
 [Automatic]
 [Role(
     Name = "ExampleRole",
-    ID = 60
+    Id = 60
 )]
 public class ExampleRole : SynapseRole
 {

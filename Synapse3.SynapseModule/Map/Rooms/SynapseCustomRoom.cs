@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Rooms;
 
-public abstract class SynapseCustomRoom : DefaultSynapseObject ,IRoom
+public abstract class SynapseCustomRoom : DefaultSynapseObject, IRoom
 {
     public SynapseSchematic RoomSchematic { get; private set; }
 
@@ -29,18 +29,19 @@ public abstract class SynapseCustomRoom : DefaultSynapseObject ,IRoom
         get => RoomSchematic.Scale;
         set => RoomSchematic.Scale = value;
     }
+    
+    public CustomRoomAttribute Attribute { get; set; }
 
+    public string Name => Attribute.Name;
 
-    public abstract string Name { get; }
-    public abstract int ID { get; }
+    public int Id => Attribute.Id;
+    
     public abstract int Zone { get; }
-    public abstract int SchematicID { get; }
-    
-    
+
     public virtual void OnGenerate() { }
-    public virtual void OnDespawn() { }
-
-
+    public virtual void OnDeSpawn() { }
+    public virtual void Load() { }
+    
     public void Generate(Vector3 position)
     {
         if(RoomSchematic != null) return;
@@ -49,7 +50,7 @@ public abstract class SynapseCustomRoom : DefaultSynapseObject ,IRoom
         var comp = GameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
         
-        RoomSchematic = Synapse.Get<SchematicService>().SpawnSchematic(SchematicID, position);
+        RoomSchematic = Synapse.Get<SchematicService>().SpawnSchematic(Attribute.SchematicId, position);
         RoomSchematic.Parent = this;
         
         Synapse.Get<RoomService>()._rooms.Add(this);
@@ -61,14 +62,14 @@ public abstract class SynapseCustomRoom : DefaultSynapseObject ,IRoom
         Object.Destroy(GameObject);
     }
 
-    public void Despawn()
+    public void DeSpawn()
     {
         Object.Destroy(GameObject);
     }
 
     public override void OnDestroy()
     {
-        OnDespawn();
+        OnDeSpawn();
         Synapse.Get<RoomService>()._rooms.Remove(this);
         base.OnDestroy();
     }

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.Map.Rooms;
+using Synapse3.SynapseModule.Permissions.RemoteAdmin;
 using Synapse3.SynapseModule.Role;
 using Synapse3.SynapseModule.Teams;
 
@@ -51,6 +53,20 @@ public class SynapseItemBinding : IMetaBinding
     public ItemAttribute Info { get; set; }
     
     public Type HandlerType { get; set; }
+    
+    public IEnumerable<Type> PromisedServices => new Type[] { };
+}
+
+public class SynapseRoomBinding : IMetaBinding
+{
+    public CustomRoomAttribute Info { get; set; }
+    
+    public IEnumerable<Type> PromisedServices => new Type[] { };
+}
+
+public class SynapseRaCategoryBinding : IMetaBinding
+{
+    public RaCategoryAttribute Info { get; set; }
     
     public IEnumerable<Type> PromisedServices => new Type[] { };
 }

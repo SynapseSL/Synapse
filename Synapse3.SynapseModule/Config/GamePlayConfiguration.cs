@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using Syml;
 
 namespace Synapse3.SynapseModule.Config;
@@ -20,4 +21,7 @@ public class GamePlayConfiguration : IDocumentSection
 
     [Description("The amount of persons that need to be sacrificed for SCP-106's recontainment")]
     public ushort RequiredForFemur = 1;
+    
+    [Description("All Scp's in this list are able to Speak to Humans")]
+    public List<int> SpeakingScp { get; set; } = new List<int> { 16, 17 };
 }

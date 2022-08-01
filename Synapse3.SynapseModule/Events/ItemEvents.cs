@@ -1,4 +1,5 @@
-﻿using InventorySystem.Items.Usables;
+﻿using InventorySystem.Items.Radio;
+using InventorySystem.Items.Usables;
 using Neuron.Core.Events;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Enums;
@@ -15,6 +16,7 @@ public class ItemEvents: Service
     public readonly EventReactor<KeyCardInteractEvent> KeyCardInteract = new ();
     public readonly EventReactor<ConsumeItemEvent> ConsumeItem = new();
     public readonly EventReactor<DisarmEvent> Disarm = new();
+    public readonly EventReactor<RadioUseEvent> RadioUse = new();
 
     public ItemEvents(EventManager eventManager)
     {
@@ -27,10 +29,12 @@ public class ItemEvents: Service
         _eventManager.RegisterEvent(KeyCardInteract);
         _eventManager.RegisterEvent(ConsumeItem);
         _eventManager.RegisterEvent(Disarm);
+        _eventManager.RegisterEvent(RadioUse);
 
         KeyCardInteract.Subscribe(ev => BasicInteract.Raise(ev));
         ConsumeItem.Subscribe(ev => BasicInteract.Raise(ev));
         Disarm.Subscribe(ev => BasicInteract.Raise(ev));
+        RadioUse.Subscribe(ev => BasicInteract.Raise(ev));
     }
 }
 
@@ -86,4 +90,20 @@ public class FlipCoinEvent : BasicItemInteractEvent
     }
 
     public bool Tails { get; set; }
+}
+
+public class RadioUseEvent : BasicItemInteractEvent
+{
+    public RadioUseEvent(SynapseItem item, ItemInteractState state, SynapsePlayer player, RadioMessages.RadioCommand radioCommand, RadioMessages.RadioRangeLevel currentRange, RadioMessages.RadioRangeLevel nextRange) : base(item, state, player)
+    {
+        RadioCommand = radioCommand;
+        CurrentRange = currentRange;
+        NextRange = nextRange;
+    }
+
+    public RadioMessages.RadioCommand RadioCommand { get; }
+    
+    public RadioMessages.RadioRangeLevel CurrentRange { get; }
+    
+    public RadioMessages.RadioRangeLevel NextRange { get; set; }
 }

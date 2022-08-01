@@ -17,7 +17,8 @@ public class RoleService : Service
     private readonly IKernel _kernel;
     private readonly SynapseCommandService _command;
     private readonly PlayerService _player;
-    private List<RoleAttribute> _customRoles = new();
+    private readonly List<RoleAttribute> _customRoles = new();
+    private readonly Synapse _synapseModule;
 
     /// <summary>
     /// The Hightest vanilla number for Roles
@@ -32,11 +33,12 @@ public class RoleService : Service
     /// <summary>
     /// Creates a new RoleService
     /// </summary>
-    public RoleService(IKernel kernel, SynapseCommandService command, PlayerService player)
+    public RoleService(IKernel kernel, SynapseCommandService command, PlayerService player,Synapse synapse)
     {
         _kernel = kernel;
         _command = command;
         _player = player;
+        _synapseModule = synapse;
     }
 
     /// <summary>
@@ -45,6 +47,12 @@ public class RoleService : Service
     public override void Enable()
     {
         _command.RemoteAdmin.Subscribe(OnRemoteAdmin);
+        
+        while (_synapseModule.ModuleRoleBindingQueue.Count != 0)
+        {
+            var binding = _synapseModule.ModuleRoleBindingQueue.Dequeue();
+            LoadBinding(binding);
+        }
     }
 
     /// <summary>
@@ -67,7 +75,7 @@ public class RoleService : Service
     {
         if (id is >= -1 and <= HighestRole) return true;
 
-        if (_customRoles.Any(x => x.ID == id)) return true;
+        if (_customRoles.Any(x => x.Id == id)) return true;
 
         return false;
     }
@@ -82,7 +90,7 @@ public class RoleService : Service
 
         if (!IsIdRegistered(id)) return string.Empty;
 
-        return _customRoles.FirstOrDefault(x => x.ID == id)?.Name;
+        return _customRoles.FirstOrDefault(x => x.Id == id)?.Name;
     }
 
     /// <summary>
@@ -103,8 +111,8 @@ public class RoleService : Service
     public bool RegisterRole(RoleAttribute info)
     {
         if (info.RoleScript == null) return false;
-        if (info.ID is >= -1 and <= HighestRole) return false;
-        if (IsIdRegistered(info.ID)) return false;
+        if (info.Id is >= -1 and <= HighestRole) return false;
+        if (IsIdRegistered(info.Id)) return false;
 
         _customRoles.Add(info);
         return true;
@@ -117,7 +125,7 @@ public class RoleService : Service
     /// <returns>true, when a role was found and could be removed</returns>
     public bool UnRegisterRole(int id)
     {
-        var role = _customRoles.FirstOrDefault(x => x.ID == id);
+        var role = _customRoles.FirstOrDefault(x => x.Id == id);
         if (role != null)
             return _customRoles.Remove(role);
 
@@ -138,7 +146,7 @@ public class RoleService : Service
     /// <inheritdoc cref="GetRole(RoleAttribute)"/>
     public ISynapseRole GetRole(int id)
     {
-        var info = CustomRoles.FirstOrDefault(x => x.ID == id);
+        var info = CustomRoles.FirstOrDefault(x => x.Id == id);
 
         if (info == null) 
             return null;

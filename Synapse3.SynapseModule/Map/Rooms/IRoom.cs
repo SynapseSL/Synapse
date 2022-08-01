@@ -12,7 +12,7 @@ public interface IRoom
     
     public string Name { get; }
     
-    public int ID { get; }
+    public int Id { get; }
     
     public int Zone { get; }
 

@@ -29,13 +29,8 @@ public class SynapseContext : ICommandContext
     /// <summary>
     /// Returns true if the Player is the Server
     /// </summary>
-    public bool IsAdmin
-    {
-        get => Platform == CommandPlatform.ServerConsole || Player.PlayerType == PlayerType.Server;
-        //TODO: Remove this once the New Nuget is released
-        set {}
-    }
-    
+    public bool IsAdmin => Platform == CommandPlatform.ServerConsole || Player.PlayerType == PlayerType.Server;
+
     /// <summary>
     /// Return the SynapseContext type
     /// </summary>
@@ -58,8 +53,7 @@ public class SynapseContext : ICommandContext
     {
         var context = new SynapseContext()
         {
-            FullCommand = message,
-            IsAdmin = true
+            FullCommand = message
         };
         var args = message.Split(' ').ToList();
         context.Command = args[0];

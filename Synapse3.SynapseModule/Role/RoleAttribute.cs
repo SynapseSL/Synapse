@@ -9,11 +9,11 @@ public class RoleAttribute : Attribute
     public RoleAttribute(string name, int id, Type script)
     {
         Name = name;
-        ID = id;
+        Id = id;
         RoleScript = script;
     }
 
     public string Name { get; set; }
-    public int ID { get; set; }
+    public int Id { get; set; }
     public Type RoleScript { get; internal set; }
 }

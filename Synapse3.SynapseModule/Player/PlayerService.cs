@@ -6,6 +6,7 @@ using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Permissions;
+using Synapse3.SynapseModule.Permissions.RemoteAdmin;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
@@ -142,6 +143,7 @@ public class PlayerService : Service
     /// <param name="me">The Player which should be returned for Me and Self</param>
     public bool TryGetPlayers(string arg, out HashSet<SynapsePlayer> players, SynapsePlayer me = null)
     {
+        var service = Synapse.Get<RemoteAdminCategoryService>();
         players = new HashSet<SynapsePlayer>();
         var all = GetAbsoluteAllPlayers();
         var args = arg.Split('.');
@@ -196,6 +198,17 @@ public class PlayerService : Service
                         {
                             foreach (var player in GetPlayers(id))
                                 players.Add(player);
+
+                            var category = service.GetCategory(id);
+                            if (category != null)
+                            {
+                                var categoryPlayers = category.GetPlayers();
+                                if(categoryPlayers != null)
+                                    foreach (var player in category.GetPlayers())
+                                    {
+                                        players.Add(player);
+                                    }
+                            }
                         }
                         continue;
                     }

@@ -10,13 +10,15 @@ namespace Synapse3.SynapseModule.Map.Schematic.CustomAttributes;
 
 public class CustomAttributeService : Service
 {
-    private IKernel _kernel;
-    private SynapseObjectEvents _events;
+    private readonly IKernel _kernel;
+    private readonly SynapseObjectEvents _events;
+    private readonly Synapse _synapseModule;
 
-    public CustomAttributeService(SynapseObjectEvents events, IKernel kernel)
+    public CustomAttributeService(SynapseObjectEvents events, IKernel kernel, Synapse synapseModule)
     {
         _events = events;
         _kernel = kernel;
+        _synapseModule = synapseModule;
     }
     
     public List<AttributeHandler> Handlers { get; } = new();
@@ -33,6 +35,12 @@ public class CustomAttributeService : Service
     {
         foreach(var type in DefaultAttributes)
             LoadHandlerFromType(type);
+        
+        while (_synapseModule.ModuleObjectAttributeBindingQueue.Count != 0)
+        {
+            var binding = _synapseModule.ModuleObjectAttributeBindingQueue.Dequeue();
+            LoadBinding(binding);
+        }
         
         _events.Load.Subscribe(OnLoad);
         _events.Update.Subscribe(OnUpdate);

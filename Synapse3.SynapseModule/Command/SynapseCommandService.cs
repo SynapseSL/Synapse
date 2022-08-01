@@ -71,9 +71,9 @@ public class SynapseCommandService : Service
         PlayerConsole = _command.CreateCommandReactor();
         PlayerConsole.NotFoundFallbackHandler = NotFound;
 
-        while (_synapseModule.moduleCommandBindingQueue.Count != 0)
+        while (_synapseModule.ModuleCommandBindingQueue.Count != 0)
         {
-            var binding = _synapseModule.moduleCommandBindingQueue.Dequeue();
+            var binding = _synapseModule.ModuleCommandBindingQueue.Dequeue();
             LoadBinding(binding);
         }
         

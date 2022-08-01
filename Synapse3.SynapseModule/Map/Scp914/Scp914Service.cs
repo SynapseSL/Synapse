@@ -12,12 +12,15 @@ namespace Synapse3.SynapseModule.Map.Scp914;
 
 public class Scp914Service : Service
 {
-    private IKernel _kernel;
-    private RoundEvents _round;
-    public Scp914Service(RoundEvents round, IKernel kernel)
+    private readonly IKernel _kernel;
+    private readonly RoundEvents _round;
+    private readonly Synapse _synapseModule;
+
+    public Scp914Service(RoundEvents round, IKernel kernel, Synapse synapseModule)
     {
         _kernel = kernel;
         _round = round;
+        _synapseModule = synapseModule;
 
         foreach (var item in (ItemType[])Enum.GetValues(typeof(ItemType)))
         {
@@ -28,6 +31,12 @@ public class Scp914Service : Service
     public override void Enable()
     {
         _round.Waiting.Subscribe(RoundInit);
+        
+        while (_synapseModule.ModuleScp914BindingQueue.Count != 0)
+        {
+            var binding = _synapseModule.ModuleScp914BindingQueue.Dequeue();
+            LoadBinding(binding);
+        }
     }
 
     public override void Disable()

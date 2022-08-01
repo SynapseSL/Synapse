@@ -44,12 +44,12 @@ public class ExampleElevator : CustomElevator
     public override ReadOnlyCollection<IElevatorDestination> Destinations { get; }
 }
 
-public class EventHandler
+public class ElevatorEventHandler
 {
     private readonly PlayerEvents _player;
     private readonly RoundEvents _round;
     
-    public EventHandler()
+    public ElevatorEventHandler()
     {
         _player = Synapse.Get<PlayerEvents>();
         _round = Synapse.Get<RoundEvents>();

@@ -15,20 +15,29 @@ public class ItemService : Service
 {
     public const int HighestItem = (int)ItemType.ParticleDisruptor;
 
-    private IKernel _kernel;
-    private RoundEvents _round;
+    private readonly IKernel _kernel;
+    private readonly RoundEvents _round;
+    private readonly Synapse _synapseModule;
+    
     private readonly List<ItemAttribute> _items = new();
     private readonly Dictionary<ItemType, SchematicConfiguration> overridenVanillaItems = new();
 
-    public ItemService(RoundEvents round, IKernel kernel)
+    public ItemService(RoundEvents round, IKernel kernel, Synapse synapseModule)
     {
         _kernel = kernel;
         _round = round;
+        _synapseModule = synapseModule;
     }
 
     public override void Enable()
     {
         _round.Restart.Subscribe(Clear);
+        
+        while (_synapseModule.ModuleItemBindingQueue.Count != 0)
+        {
+            var binding = _synapseModule.ModuleItemBindingQueue.Dequeue();
+            LoadBinding(binding);
+        }
     }
 
     public override void Disable()

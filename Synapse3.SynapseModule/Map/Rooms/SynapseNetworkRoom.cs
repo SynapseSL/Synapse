@@ -34,7 +34,7 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
     
     public override ObjectType Type => ObjectType.Room;
     public string Name => RoomType.ToString();
-    public int ID => (int)RoomType;
+    public int Id => (int)RoomType;
     public RoomType RoomType { get; }
     public ZoneType ZoneType => (ZoneType)Zone;
     public int Zone

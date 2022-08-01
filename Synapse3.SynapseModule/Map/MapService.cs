@@ -20,10 +20,12 @@ namespace Synapse3.SynapseModule.Map;
 public class MapService : Service
 {
     private readonly RoundEvents _round;
+    private readonly PlayerEvents _player;
 
-    public MapService(RoundEvents round)
+    public MapService(RoundEvents round, PlayerEvents player)
     {
         _round = round;
+        _player = player;
     }
 
     public override void Enable()

@@ -17,13 +17,16 @@ namespace Synapse3.ExamplePlugin
         [Inject]
         public ExampleTranslations Translations { get; set; }
         
-        public EventHandler Handler { get; set; }
+        public ElevatorEventHandler ElevatorHandler { get; set; }
+        
+        public RoomEventHandler RoomHandler { get; set; }
 
         public override void Load()
         {
             Logger.Info($"Before {Config}");
             Logger.Info($"Before {Translations}");
-            Handler = new EventHandler();
+            ElevatorHandler = new ElevatorEventHandler();
+            RoomHandler = new RoomEventHandler();
         }
 
         public override void Enable()
@@ -32,12 +35,14 @@ namespace Synapse3.ExamplePlugin
             Logger.Info(Config.IntEntry);
             Logger.Info(Config.ListEntry);
             Logger.Info(Translations.CommandMessage.Format("Example Command", "Helight"));
-            Handler.HookEvents();
+            ElevatorHandler.HookEvents();
+            RoomHandler.HookEvents();
         }
 
         public override void Disable()
         {
-            Handler.UnHookEvents();
+            ElevatorHandler.UnHookEvents();
+            RoomHandler.UnHookEvents();
         }
     }
 }

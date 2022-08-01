@@ -11,11 +11,6 @@ namespace Synapse3.SynapseModule.Map.Schematic;
 [Serializable]
 public class SchematicConfiguration : IDocumentSection
 {
-    /// <summary>
-    /// This is to determine if the Schematic should be removed on Reload
-    /// </summary>
-    [NonSerialized] internal bool Reload = true;
-    
     public string Name { get; set; }
     public int ID { get; set; }
     public List<string> CustomAttributes { get; set; }

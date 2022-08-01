@@ -17,10 +17,21 @@ public class TeamService : Service
 {
     private readonly List<ISynapseTeam> _teams = new();
     private readonly IKernel _kernel;
+    private readonly Synapse _synapseModule;
 
-    public TeamService(IKernel kernel)
+    public TeamService(IKernel kernel,Synapse synapseModule)
     {
         _kernel = kernel;
+        _synapseModule = synapseModule;
+    }
+
+    public override void Enable()
+    {
+        while (_synapseModule.ModuleTeamBindingQueue.Count != 0)
+        {
+            var binding = _synapseModule.ModuleTeamBindingQueue.Dequeue();
+            LoadBinding(binding);
+        }
     }
 
     public int NextTeam { get; internal set; } = -1;
