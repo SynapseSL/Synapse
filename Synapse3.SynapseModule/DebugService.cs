@@ -1,11 +1,7 @@
-﻿using InventorySystem.Items.Radio;
-using Neuron.Core.Logging;
+﻿using Neuron.Core.Logging;
 using Neuron.Core.Meta;
-using RemoteAdmin.Communication;
-using Subtitles;
-using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Map.Elevators;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule;
@@ -17,13 +13,15 @@ public class DebugService : Service
     private MapEvents _map;
     private RoundEvents _round;
     private ItemEvents _item;
+    private SynapseCommandService _commandService;
 
-    public DebugService(PlayerEvents player, MapEvents map, RoundEvents round, ItemEvents item)
+    public DebugService(PlayerEvents player, MapEvents map, RoundEvents round, ItemEvents item, SynapseCommandService commandService)
     {
         _player = player;
         _map = map;
         _round = round;
         _item = item;
+        _commandService = commandService;
     }
 
     public override void Enable()
@@ -102,7 +100,6 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                Logger.Warn(ev.Player.Room.Name);
                 break;
         }
     }

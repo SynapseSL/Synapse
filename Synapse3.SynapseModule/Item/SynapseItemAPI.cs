@@ -17,6 +17,8 @@ public partial class SynapseItem
 {
     public void EquipItem(SynapsePlayer player)
     {
+        if(player.RoleType is RoleType.Spectator or RoleType.None) return;
+        
         if (player.Inventory.Items.Count >= 8)
         {
             Drop(player.Position);
@@ -28,7 +30,7 @@ public partial class SynapseItem
             parent.EquipItem(player);
             return;
         }
-        
+
         DestroyItem();
         Throwable.DestroyProjectile();
 

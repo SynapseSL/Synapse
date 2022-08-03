@@ -3,7 +3,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using Neuron.Core.Meta;
+using Neuron.Modules.Commands.Event;
 using Ninject;
+using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Permissions.RemoteAdmin;
@@ -12,15 +14,18 @@ public class RemoteAdminCategoryService : Service
 {
     private IKernel _kernel;
     private Synapse _synapseModule;
+    private SynapseCommandService _commandService;
 
-    public RemoteAdminCategoryService(IKernel kernel, Synapse synapseModule)
+    public RemoteAdminCategoryService(IKernel kernel, Synapse synapseModule, SynapseCommandService commandService)
     {
         _kernel = kernel;
         _synapseModule = synapseModule;
+        _commandService = commandService;
     }
 
     public override void Enable()
     {
+        _commandService.RemoteAdmin.Subscribe(OnCommand);
         RegisterCategory<SynapseCategory>();
 
         while (_synapseModule.ModuleRaCategoryBindingQueue.Count != 0)
@@ -28,6 +33,11 @@ public class RemoteAdminCategoryService : Service
             var binding = _synapseModule.ModuleRaCategoryBindingQueue.Dequeue();
             LoadBinding(binding);
         }
+    }
+
+    public override void Disable()
+    {
+        _commandService.RemoteAdmin.Unsubscribe(OnCommand);
     }
 
     internal void LoadBinding(SynapseRaCategoryBinding binding) => RegisterCategory(binding.Info);
@@ -64,4 +74,18 @@ public class RemoteAdminCategoryService : Service
     }
 
     public bool IsIdRegistered(int id) => _remoteAdminCategories.Any(x => x.Attribute.Id == id);
+
+    private void OnCommand(CommandEvent ev)
+    {
+        if (ev.Context.Command.ToUpper() != "EXTERNALLOOKUP") return;
+        if(ev.Context.Arguments.Length == 0) return;
+        foreach (var category in _remoteAdminCategories)
+        {
+            if(ev.Context.Arguments[0] != category.Attribute.Id.ToString()) continue;
+            ev.IsHandled = true;
+            
+            var context = (SynapseContext)ev.Context;
+            context.Player.CommandSender.RaReply("% none % " + category.ExternalURL, true, false, "");
+        }
+    }
 }

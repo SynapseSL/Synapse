@@ -14,4 +14,6 @@ public abstract class RemoteAdminCategory
     public abstract bool DisplayOnTop { get; }
 
     public abstract bool CanSeeCategory(SynapsePlayer player);
+
+    public virtual string ExternalURL => "";
 }

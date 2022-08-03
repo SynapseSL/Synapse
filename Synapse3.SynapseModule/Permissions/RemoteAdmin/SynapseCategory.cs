@@ -44,4 +44,6 @@ public class SynapseCategory : RemoteAdminCategory
 
     public override bool DisplayOnTop => true;
     public override bool CanSeeCategory(SynapsePlayer player) => true;
+
+    public override string ExternalURL => "https://synapsesl.xyz/";
 }

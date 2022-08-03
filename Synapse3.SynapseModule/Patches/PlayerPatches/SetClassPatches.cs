@@ -126,10 +126,13 @@ internal static class SetClassPatches
             var player = ply.GetSynapsePlayer();
             var args = player?.setClassStored;
 
-            if (args == null || player?.LiteRoleSet == true)
+            if (player?.LiteRoleSet == true)
                 return false;
             
             player.Inventory.ClearAllItems();
+
+            //This is the case when someone is revived as SCP-049-2 or set to OverWatch
+            if (args == null) return false;
             
             foreach (var ammo in args.Ammo)
             {
