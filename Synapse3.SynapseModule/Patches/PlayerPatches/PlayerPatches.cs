@@ -324,26 +324,6 @@ internal static class PlayerPatches
     }
 
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(CustomNetworkManager), nameof(CustomNetworkManager.OnServerDisconnect))]
-    public static void OnLeave(NetworkConnection conn)
-    {
-        try
-        {
-            var player = conn.GetSynapsePlayer();
-            if (player.PlayerType != PlayerType.Player) return;
-
-            player.RemoveCustomRole(DespawnReason.Leave);
-
-            var ev = new LeaveEvent(player);
-            Synapse.Get<PlayerEvents>().Leave.Raise(ev);
-        }
-        catch (Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Leave Event failed\n" + ex);
-        }
-    }
-
-    [HarmonyPrefix]
     [HarmonyPatch(typeof(SearchCoordinator), nameof(SearchCoordinator.ContinuePickupServer))]
     public static bool OnPickUpRequest(SearchCoordinator __instance)
     {

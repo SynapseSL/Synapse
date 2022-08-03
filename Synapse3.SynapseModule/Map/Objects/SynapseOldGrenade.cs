@@ -22,12 +22,11 @@ public class SynapseOldGrenade : NetworkSynapseObject
         GameObject = Object.Instantiate(prefab, position, rotation);
         NetworkIdentity = GameObject.GetComponent<NetworkIdentity>();
         NetworkServer.Spawn(GameObject);
+        SetUp();
     }
 
     internal SynapseOldGrenade(SchematicConfiguration.OldGrenadeConfiguration config, SynapseSchematic schematic) :
-        this(
-            config.Position, config.Rotation, config.IsFlash)
-
+        this(config.Position, config.Rotation, config.IsFlash)
     {
         Parent = schematic;
         schematic._oldGrenades.Add(this);

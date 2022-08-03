@@ -13,7 +13,8 @@ public class SynapseRagdoll : NetworkSynapseObject
     public static Dictionary<RoleType, Ragdoll> Prefabs = new ();
 
     private readonly PlayerService _player;
-    
+
+    public Vector3 OriginalRagdollScale { get; private set; }
     public Ragdoll Ragdoll { get; }
     public override GameObject GameObject => Ragdoll.gameObject;
     public override ObjectType Type => ObjectType.Ragdoll;
@@ -30,7 +31,13 @@ public class SynapseRagdoll : NetworkSynapseObject
         
         if (Parent is SynapseSchematic schematic) schematic._ragdolls.Remove(this);
     }
-    
+
+    public override Vector3 Scale
+    {
+        get => RevertScale(base.Scale);
+        set => base.Scale = CreateScale(value);
+    }
+
     public DamageType DamageType { get; private set; }
     public RoleType RoleType { get; private set; }
 
@@ -85,5 +92,30 @@ public class SynapseRagdoll : NetworkSynapseObject
         rag.NetworkInfo = new RagdollInfo(_player.Host, damage.GetUniversalDamageHandler(), role, pos, rot, nick,
             NetworkTime.time);
         return rag;
+    }
+
+    protected override TComponent CreateNetworkObject<TComponent>(TComponent component, Vector3 pos, Quaternion rot, Vector3 scale)
+    {
+        var gameObject = Object.Instantiate(component, pos, rot);
+        OriginalRagdollScale = gameObject.transform.localScale;
+        gameObject.transform.localScale = CreateScale(scale);
+        NetworkServer.Spawn(gameObject.gameObject);
+        return gameObject;
+    }
+
+    private Vector3 CreateScale(Vector3 newScale)
+    {
+        newScale.x *= OriginalRagdollScale.x;
+        newScale.y *= OriginalRagdollScale.y;
+        newScale.z *= OriginalRagdollScale.z;
+        return newScale;
+    }
+
+    private Vector3 RevertScale(Vector3 currentScale)
+    {
+        currentScale.x *= OriginalRagdollScale.x;
+        currentScale.y *= OriginalRagdollScale.y;
+        currentScale.z *= OriginalRagdollScale.z;
+        return currentScale;
     }
 }

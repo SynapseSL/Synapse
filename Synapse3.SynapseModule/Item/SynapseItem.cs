@@ -236,5 +236,6 @@ public partial class SynapseItem : DefaultSynapseObject
         CustomAttributes = configuration.CustomAttributes;
         
         Durability = configuration.Durabillity;
+        FireArm.Attachments = configuration.Attachments;
     }
 }

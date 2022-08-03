@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using MEC;
+using Neuron.Core.Logging;
 using Neuron.Modules.Commands;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
@@ -32,11 +33,12 @@ public class TestCommand : SynapseCommand
             {
                 new SchematicConfiguration.ItemConfiguration()
                 {
-                    Scale = Vector3.one * 0.5f,
-                    Position = Vector3.up * 0.3f,
+                    Scale = Vector3.one,
+                    Position = Vector3.up * 1,
                     Rotation = Quaternion.identity,
                     ItemType = ItemType.Medkit,
-                    CanBePickedUp = true,
+                    CanBePickedUp = false,
+                    Physics = false
                 }
             },
             Primitives = new List<SchematicConfiguration.PrimitiveConfiguration>()
@@ -48,101 +50,105 @@ public class TestCommand : SynapseCommand
                     PrimitiveType = PrimitiveType.Cube
                 }
             },
-            ID = 61,
-            Name = "test"
-        };
-        Synapse.Get<SchematicService>().SpawnSchematic(config, context.Player.Position);
-        Synapse.Get<ItemService>().SetVanillaItemSchematic(ItemType.Coin, config);
-        result.Response = Synapse.Get<ItemService>().GetSchematicConfiguration(35).Name;
-
-        /*
-        var config = new SchematicConfiguration()
-        {
-            Name = "ExampleRoom",
-            ID = 1,
-            Primitives = new List<SchematicConfiguration.PrimitiveConfiguration>()
+            Doors = new List<SchematicConfiguration.DoorConfiguration>()
             {
-                new SchematicConfiguration.PrimitiveConfiguration()
+                new ()
                 {
-                    PrimitiveType = PrimitiveType.Cube,
-                    Position = Vector3.down,
-                    Scale = new SerializedVector3(10f, 0.2f, 10f),
-                    Color = new SerializedColor(0.5f, 0.5f, 0.5f, 1f)
-                },
-                new SchematicConfiguration.PrimitiveConfiguration()
-                {
-                    PrimitiveType = PrimitiveType.Cube,
-                    Position = Vector3.up * 4,
-                    Scale = new SerializedVector3(10f, 0.2f, 10f),
-                    Color = new SerializedColor(0.5f, 0.5f, 0.5f, 1f)
-                },
-                new SchematicConfiguration.PrimitiveConfiguration()
-                {
-                    PrimitiveType = PrimitiveType.Cube,
-                    Position = new SerializedVector3(5f, 1.5f, 0f),
-                    Scale = new SerializedVector3(0.2f, 5f, 10f),
-                    Color = new SerializedColor(0.5f, 0.5f, 0.5f, 1f)
-                },
-                new SchematicConfiguration.PrimitiveConfiguration()
-                {
-                    PrimitiveType = PrimitiveType.Cube,
-                    Position = new SerializedVector3(-5f, 1.5f, 0f),
-                    Scale = new SerializedVector3(0.2f, 5f, 10f),
-                    Color = new SerializedColor(0.5f, 0.5f, 0.5f, 1f)
-                },
-                new SchematicConfiguration.PrimitiveConfiguration()
-                {
-                    PrimitiveType = PrimitiveType.Cube,
-                    Position = new SerializedVector3(0f, 1.5f, 5f),
-                    Scale = new SerializedVector3(10f, 5f, 0.2f),
-                    Color = new SerializedColor(0.5f, 0.5f, 0.5f, 0.3f)
-                },
-                new SchematicConfiguration.PrimitiveConfiguration()
-                {
-                    PrimitiveType = PrimitiveType.Cube,
-                    Position = new SerializedVector3(3f, 1.5f, -5f),
-                    Scale = new SerializedVector3(4f, 5f, 0.2f),
-                    Color = new SerializedColor(0.5f, 0.5f, 0.5f, 1f)
-                },
-                new SchematicConfiguration.PrimitiveConfiguration()
-                {
-                    PrimitiveType = PrimitiveType.Cube,
-                    Position = new SerializedVector3(-3f, 1.5f, -5f),
-                    Scale = new SerializedVector3(4f, 5f, 0.2f),
-                    Color = new SerializedColor(0.5f, 0.5f, 0.5f, 1f)
-                },
-                new SchematicConfiguration.PrimitiveConfiguration()
-                {
-                    PrimitiveType = PrimitiveType.Cube,
-                    Position = new SerializedVector3(0f, 3.2f, -5f),
-                    Scale = new SerializedVector3(2f, 1.6f, 0.2f),
-                    Color = new SerializedColor(0.5f, 0.5f, 0.5f, 1f)
+                    Locked = false,
+                    Open = false,
+                    Position = Vector3.right * 3,
+                    Rotation = Quaternion.identity,
+                    Scale = Vector3.one,
+                    DoorType = SynapseDoor.SpawnableDoorType.Hcz
                 }
             },
-            Lights = new List<SchematicConfiguration.LightSourceConfiguration>
+            Generators = new List<SchematicConfiguration.SimpleUpdateConfig>()
+            {
+                new()
+                {
+                    Position = Vector3.left * 3,
+                    Rotation = Quaternion.identity,
+                    Scale = Vector3.one
+                }
+            },
+            Dummies = new List<SchematicConfiguration.DummyConfiguration>()
+            {
+                new SchematicConfiguration.DummyConfiguration()
+                {
+                    Position = Vector3.forward * 3,
+                    Name = "test",
+                    Rotation = Quaternion.identity,
+                    Role = RoleType.ClassD,
+                    Scale = Vector3.one,
+                    HeldItem = ItemType.None
+                }
+            },
+            Lights = new List<SchematicConfiguration.LightSourceConfiguration>()
             {
                 new SchematicConfiguration.LightSourceConfiguration()
                 {
-                    Color = new SerializedColor(1f, 1f, 1f, 1f),
-                    LightIntensity = 0.5f,
-                    LightRange = 50,
-                    LightShadows = false
+                    Position = Vector3.zero,
+                    Color = Color.blue,
+                    Rotation = Quaternion.identity,
+                    Scale = Vector3.zero,
+                    LightIntensity = 1,
+                    LightRange = 10,
+                    LightShadows = true
                 }
             },
-            Doors = new List<SchematicConfiguration.DoorConfiguration>
+            Lockers = new List<SchematicConfiguration.LockerConfiguration>()
             {
-                new SchematicConfiguration.DoorConfiguration()
+                new ()
                 {
-                    Position = new SerializedVector3(0f, -1f, -5f),
-                    DoorType = SynapseDoor.SpawnableDoorType.Lcz,
+                    Position = Vector3.back * 3,
+                    Chambers = new List<SchematicConfiguration.LockerConfiguration.LockerChamber>(),
+                    Rotation = Quaternion.identity,
+                    Scale = Vector3.one,
+                    LockerType = SynapseLocker.LockerType.ScpPedestal
                 }
-            }
+            },
+            Ragdolls = new List<SchematicConfiguration.RagdollConfiguration>()
+            {
+                new SchematicConfiguration.RagdollConfiguration()
+                {
+                    Nick = "test",
+                    Position = Vector3.zero,
+                    Rotation = Quaternion.identity,
+                    DamageType = DamageType.Explosion,
+                    Scale = Vector3.one,
+                    RoleType = RoleType.Scp049
+                }
+            },
+            Targets = new List<SchematicConfiguration.TargetConfiguration>()
+            {
+                new SchematicConfiguration.TargetConfiguration()
+                {
+                    Position = Vector3.right * 6,
+                    Rotation = Quaternion.identity,
+                    Scale = Vector3.one,
+                    TargetType = SynapseTarget.TargetType.Binary
+                }
+            },
+            WorkStations = new List<SchematicConfiguration.SimpleUpdateConfig>()
+            {
+                new ()
+                {
+                    Position = Vector3.forward * 6,
+                    Rotation = Quaternion.identity,
+                    Scale = Vector3.one
+                }
+            },
+            OldGrenades = new List<SchematicConfiguration.OldGrenadeConfiguration>()
+            {
+                new SchematicConfiguration.OldGrenadeConfiguration()
+                {
+                    UpdateEveryFrame = true,
+                    Position = Vector3.left * 10,
+                }
+            },
+            ID = 61,
+            Name = "test"
         };
-        Synapse.Get<SchematicService>().SaveConfiguration(config);
-        Synapse.Get<RoomService>().RegisterCustomRoom<RoomService.TestRoom>();
-        var room = Synapse.Get<RoomService>().SpawnCustomRoom(100,context.Player.Position);
-
-        room.Position = new Vector3(0f, 1020f, 0f);
-        */
+        var schematic = Synapse.Get<SchematicService>().SpawnSchematic(config, context.Player.Position);
     }
 }

@@ -3,12 +3,13 @@ using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
 using Mirror;
 using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Objects;
 
 //TODO: Add DoorType
-public class SynapseDoor : NetworkSynapseObject
+public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
 {
     public static Dictionary<SpawnableDoorType, BreakableDoor> Prefab { get; } = new();
 
@@ -98,6 +99,7 @@ public class SynapseDoor : NetworkSynapseObject
     public SynapseDoor(SpawnableDoorType type, Vector3 position, Quaternion rotation, Vector3 scale)
     {
         Variant = CreateDoor(type, position, rotation, scale);
+        NeedsJoinUpdate = true;
         SetUp(type);
     }
     
@@ -142,5 +144,11 @@ public class SynapseDoor : NetworkSynapseObject
         Lcz,
         Hcz,
         Ez
+    }
+
+    public bool NeedsJoinUpdate { get; } = false;
+    public void Refresh(SynapsePlayer player)
+    {
+        player.SendNetworkMessage(NetworkIdentity.GetSpawnMessage());
     }
 }

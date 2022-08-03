@@ -1,5 +1,7 @@
 ﻿using System;
+using Neuron.Core.Logging;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Role;
 
 namespace Synapse3.SynapseModule.Player;
 
@@ -19,6 +21,17 @@ public partial class SynapsePlayer
         if(!service.Players.Contains(this)) return;
 
         service.RemovePlayer(this);
+        
+        try
+        {
+            RemoveCustomRole(DespawnReason.Leave);
+            var ev = new LeaveEvent(this);
+            Synapse.Get<PlayerEvents>().Leave.Raise(ev);
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Leave Event failed\n" + ex);
+        }
     }
 
     public void Update()

@@ -1,7 +1,11 @@
-﻿using Neuron.Core.Logging;
+﻿using MEC;
+using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Command;
+using Synapse3.SynapseModule.Dummy;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Map.Objects;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule;
@@ -26,13 +30,7 @@ public class DebugService : Service
 
     public override void Enable()
     {
-        _player.Ban.Subscribe(BasicInteract);
-        _player.Damage.Subscribe(BasicInteract);
-        _player.Shoot.Subscribe(BasicInteract);
-        
-        _map.Scp914Upgrade.Subscribe(Upgrade);
         _player.DoorInteract.Subscribe(OnDoor);
-        _map.TriggerTesla.Subscribe(Tesla);
         _player.KeyPress.Subscribe(OnKeyPress);
         _round.SelectTeam.Subscribe(SelectTeam);
         _round.SpawnTeam.Subscribe(SpawnTeam);
@@ -48,19 +46,8 @@ public class DebugService : Service
             NeuronLogger.For<Synapse>().Warn($"Damage: {ev.Player.NickName} {ev.Damage} {ev.DamageType}"));
     }
 
-    private void BasicInteract(PlayerInteractEvent ev)
-    {
-        
-    }
-
-    private void Tesla(TriggerTeslaEvent ev)
-    {
-        if (ev.Player.RoleType == RoleType.ClassD) ev.Allow = false;
-    }
-
     public override void Disable()
     {
-        _map.Scp914Upgrade.Unsubscribe(Upgrade);
         _player.KeyPress.Unsubscribe(OnKeyPress);
     }
 
@@ -89,17 +76,14 @@ public class DebugService : Service
         NeuronLogger.For<Synapse>().Warn("SpawnTeam: " + ev.TeamId);
     }
 
-    private void Upgrade(Scp914UpgradeEvent ev)
-    {
-        ev.MoveItems = false;
-        ev.MovePlayers = false;
-    }
-
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
+                var dummy = new SynapseDummy(ev.Player.Position, ev.Player.RotationVector2, ev.Player.RoleType,
+                    ev.Player.NickName, "", "");
+                Timing.CallDelayed(1f, () => dummy.Position = ev.Player.Position + Vector3.up * 5);
                 break;
         }
     }

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Objects;
 
-public class SynapseWorkStation : NetworkSynapseObject
+public class SynapseWorkStation : NetworkSynapseObject, IJoinUpdate
 {
     public static WorkstationController Prefab { get; internal set; }
     
@@ -40,6 +40,7 @@ public class SynapseWorkStation : NetworkSynapseObject
     public SynapseWorkStation(Vector3 position, Quaternion rotation, Vector3 scale)
     {
         WorkstationController = CreateNetworkObject(Prefab, position, rotation, scale);
+        NeedsJoinUpdate = true;
         SetUp();
     }
     internal SynapseWorkStation(WorkstationController station)
@@ -64,5 +65,11 @@ public class SynapseWorkStation : NetworkSynapseObject
         Map._synapseWorkStations.Add(this);
         var comp = GameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
+    }
+
+    public bool NeedsJoinUpdate { get; } = false;
+    public void Refresh(SynapsePlayer player)
+    {
+        player.SendNetworkMessage(NetworkIdentity.GetSpawnMessage());
     }
 }

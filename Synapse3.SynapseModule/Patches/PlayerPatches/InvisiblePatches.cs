@@ -14,6 +14,7 @@ using UnityEngine;
 
 namespace Synapse3.SynapseModule.Patches.PlayerPatches;
 
+[Patches]
 internal static class InvisiblePatches
 {
     [HarmonyPrefix]
