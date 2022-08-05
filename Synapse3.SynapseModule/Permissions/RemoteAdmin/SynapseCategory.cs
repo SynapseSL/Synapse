@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GameCore;
 using RemoteAdmin.Communication;
 using Synapse3.SynapseModule.Player;
 
@@ -18,7 +19,7 @@ public class SynapseCategory : RemoteAdminCategory
         synapseInfo += "\n\n";
         synapseInfo += "\nCurrent Version: " + Synapse.GetVersion();
         synapseInfo += "\nBased Game Version: " + Synapse.BasedGameVersion;
-        synapseInfo += "\nCurrent Game Version: " + GameCore.Version.VersionString;
+        synapseInfo += "\nCurrent Game Version: " + Version.VersionString;
 
         synapseInfo += "\n\n";
         synapseInfo += "\nDownload: <size=10><i><link=CP_USERID>https://github.com/SynapseSL/Synapse/releases</link></i></size>";

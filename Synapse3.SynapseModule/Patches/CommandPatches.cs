@@ -5,6 +5,7 @@ using Neuron.Modules.Commands.Command;
 using RemoteAdmin;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Player;
+using Console = GameCore.Console;
 
 namespace Synapse3.SynapseModule.Patches;
 
@@ -12,7 +13,7 @@ namespace Synapse3.SynapseModule.Patches;
 internal static class CommandPatches
 {
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(GameCore.Console), nameof(GameCore.Console.TypeCommand))]
+    [HarmonyPatch(typeof(Console), nameof(Console.TypeCommand))]
     public static bool OnServerConsoleCommand(string cmd)
     {
         try

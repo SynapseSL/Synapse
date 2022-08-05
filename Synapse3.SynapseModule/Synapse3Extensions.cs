@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Footprinting;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items;
 using InventorySystem.Items.Firearms.Attachments;
 using InventorySystem.Items.Keycards;
 using InventorySystem.Items.Pickups;
+using MapGeneration;
 using MapGeneration.Distributors;
 using Mirror;
 using Neuron.Core.Logging;
+using PlayableScps;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Config;
@@ -109,7 +112,7 @@ public static class Synapse3Extensions
             var overlappingPerms = ((KeycardItem)item.Item).Permissions & permissions;
             var ev = new KeyCardInteractEvent(item, ItemInteractState.Finalize, player)
             {
-                Allow = needIdentical ? overlappingPerms == permissions : overlappingPerms >= 0,
+                Allow = needIdentical ? overlappingPerms == permissions : overlappingPerms > KeycardPermissions.None,
             };
             
             Synapse.Get<ItemEvents>().KeyCardInteract.Raise(ev);
@@ -122,13 +125,13 @@ public static class Synapse3Extensions
     
     
     
-    public static SynapsePlayer GetSynapsePlayer(this NetworkConnection connection) => connection?.identity.GetSynapsePlayer();
+    public static SynapsePlayer GetSynapsePlayer(this NetworkConnection connection) => connection?.identity?.GetSynapsePlayer();
     public static SynapsePlayer GetSynapsePlayer(this MonoBehaviour mono) => mono?.gameObject?.GetComponent<SynapsePlayer>();
     public static SynapsePlayer GetSynapsePlayer(this GameObject gameObject) => gameObject?.GetComponent<SynapsePlayer>();
-    public static SynapsePlayer GetSynapsePlayer(this PlayableScps.PlayableScp scp) => scp?.Hub?.GetSynapsePlayer();
+    public static SynapsePlayer GetSynapsePlayer(this PlayableScp scp) => scp?.Hub?.GetSynapsePlayer();
     public static SynapsePlayer GetSynapsePlayer(this CommandSender sender) => Synapse.Get<PlayerService>().GetPlayer(x => x.CommandSender == sender);
     public static SynapsePlayer GetSynapsePlayer(this StatBase stat) => stat.Hub.GetSynapsePlayer();
-    public static SynapsePlayer GetSynapsePlayer(this Footprinting.Footprint footprint) => footprint.Hub?.GetSynapsePlayer();
+    public static SynapsePlayer GetSynapsePlayer(this Footprint footprint) => footprint.Hub?.GetSynapsePlayer();
 
     
     public static SynapseItem GetItem(this ItemPickupBase pickupBase) =>
@@ -171,8 +174,11 @@ public static class Synapse3Extensions
 
     public static IElevator GetSynapseElevator(this ElevatorType type) => Synapse.Get<ElevatorService>().Elevators
         .FirstOrDefault(x => x is SynapseElevator elevator && elevator.ElevatorType == type);
-    
 
+
+    public static IVanillaRoom GetVanillaRoom(this RoomIdentifier identifier) => (IVanillaRoom)Synapse.Get<RoomService>()._rooms
+        .FirstOrDefault(x => x.GameObject == identifier.gameObject);
+    
     public static SynapseDoor GetSynapseDoor(this DoorVariant variant)
     {
         var script = variant.GetComponent<SynapseObjectScript>();

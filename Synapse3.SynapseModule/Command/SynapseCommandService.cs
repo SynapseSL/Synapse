@@ -28,6 +28,7 @@ public class SynapseCommandService : Service
         typeof(HelpCommand),
         typeof(RoomPointCommand),
         typeof(SchematicCommand),
+        typeof(PluginCommand)
     };
     
     private readonly CommandService _command;
@@ -128,7 +129,7 @@ public class SynapseCommandService : Service
     /// </summary>
     private static CommandResult NotFound(CommandEvent args)
     {
-        return new CommandResult()
+        return new CommandResult
         {
             StatusCode = 0,
             Response = "You shouldn't be able to see this since the default game response should come"

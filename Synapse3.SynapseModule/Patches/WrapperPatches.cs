@@ -8,6 +8,7 @@ using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
+using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule.Patches;
 
@@ -58,7 +59,7 @@ internal static class WrapperPatches
 
             var prefab = hub.characterClassManager.CurRole?.model_ragdoll;
 
-            if (prefab == null || !UnityEngine.Object.Instantiate(prefab).TryGetComponent<Ragdoll>(out var ragdoll))
+            if (prefab == null || !Object.Instantiate(prefab).TryGetComponent<Ragdoll>(out var ragdoll))
                 return false;
 
             ragdoll.NetworkInfo = new RagdollInfo(hub, handler, prefab.transform.localPosition,

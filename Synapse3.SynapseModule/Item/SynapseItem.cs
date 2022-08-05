@@ -51,7 +51,7 @@ public partial class SynapseItem : DefaultSynapseObject
     {
         if (id == uint.MaxValue && None == null)
         {
-            ID = uint.MaxValue;
+            Id = uint.MaxValue;
             ItemType = ItemType.None;
             Name = "None";
             return;
@@ -59,9 +59,9 @@ public partial class SynapseItem : DefaultSynapseObject
 
         Serial = ItemSerialGenerator.GenerateNext();
         _item._allItems[Serial] = this;
-        ID = id;
+        Id = id;
 
-        SchematicConfiguration = _item.GetSchematicConfiguration(ID);
+        SchematicConfiguration = _item.GetSchematicConfiguration(Id);
 
         if (id is >= 0 and <= ItemService.HighestItem)
         {
@@ -83,7 +83,7 @@ public partial class SynapseItem : DefaultSynapseObject
             Weight = exampleBase.Weight;
         }
 
-        var processor = Synapse.Get<Scp914Service>().GetProcessor(ID);
+        var processor = Synapse.Get<Scp914Service>().GetProcessor(Id);
         if (processor == Default914Processor.DefaultProcessor)
         {
             if (Scp914Upgrader.TryGetProcessor(ItemType, out var vanillaProcessor))
@@ -129,8 +129,8 @@ public partial class SynapseItem : DefaultSynapseObject
         Item = itemBase;
         Serial = itemBase.ItemSerial;
         _item._allItems[Serial] = this;
-        ID = (uint)itemBase.ItemTypeId;
-        SchematicConfiguration = _item.GetSchematicConfiguration(ID);
+        Id = (uint)itemBase.ItemTypeId;
+        SchematicConfiguration = _item.GetSchematicConfiguration(Id);
         Name = itemBase.ItemTypeId.ToString();
         IsCustomItem = false;
         ItemType = itemBase.ItemTypeId;
@@ -140,7 +140,7 @@ public partial class SynapseItem : DefaultSynapseObject
 
         State = ItemState.Inventory;
         
-        var processor = Synapse.Get<Scp914Service>().GetProcessor(ID);
+        var processor = Synapse.Get<Scp914Service>().GetProcessor(Id);
         if (processor == Default914Processor.DefaultProcessor)
         {
             if (Scp914Upgrader.TryGetProcessor(ItemType, out var vanillaProcessor))
@@ -158,8 +158,8 @@ public partial class SynapseItem : DefaultSynapseObject
         Serial = pickupBase.Info.Serial;
         Pickup = pickupBase;
         _item._allItems[Serial] = this;
-        ID = (uint)pickupBase.Info.ItemId;
-        SchematicConfiguration = _item.GetSchematicConfiguration(ID);
+        Id = (uint)pickupBase.Info.ItemId;
+        SchematicConfiguration = _item.GetSchematicConfiguration(Id);
         Name = pickupBase.Info.ItemId.ToString();
         IsCustomItem = false;
         ItemType = pickupBase.Info.ItemId;
@@ -172,7 +172,7 @@ public partial class SynapseItem : DefaultSynapseObject
 
         State = ItemState.Map;
 
-        var processor = Synapse.Get<Scp914Service>().GetProcessor(ID);
+        var processor = Synapse.Get<Scp914Service>().GetProcessor(Id);
         if (processor == Default914Processor.DefaultProcessor)
         {
             if (Scp914Upgrader.TryGetProcessor(ItemType, out var vanillaProcessor))
@@ -186,19 +186,19 @@ public partial class SynapseItem : DefaultSynapseObject
     {
         Serial = ItemSerialGenerator.GenerateNext();
         _item._allItems[Serial] = this;
-        ID = (uint)configuration.ItemType;
+        Id = (uint)configuration.ItemType;
         
-        if (ID is >= 0 and <= ItemService.HighestItem)
+        if (Id is >= 0 and <= ItemService.HighestItem)
         {
             IsCustomItem = false;
-            ItemType = (ItemType)ID;
+            ItemType = (ItemType)Id;
             Name = ItemType.ToString();
         }
         else
         {
             IsCustomItem = true;
-            ItemType = _item.GetBaseType(ID);
-            Name = _item.GetName(ID);
+            ItemType = _item.GetBaseType(Id);
+            Name = _item.GetName(Id);
         }
         
         if (InventoryItemLoader.AvailableItems.TryGetValue(ItemType, out var exampleBase))
@@ -208,7 +208,7 @@ public partial class SynapseItem : DefaultSynapseObject
             Weight = exampleBase.Weight;
         }
         
-        var processor = Synapse.Get<Scp914Service>().GetProcessor(ID);
+        var processor = Synapse.Get<Scp914Service>().GetProcessor(Id);
         if (processor == Default914Processor.DefaultProcessor)
         {
             if (Scp914Upgrader.TryGetProcessor(ItemType, out var vanillaProcessor))

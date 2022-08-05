@@ -72,6 +72,7 @@ public class ItemService : Service
         var handler = (CustomItemHandler)_kernel.GetSafe(handlerType);
         _kernel.Bind(handlerType).ToConstant(handler).InSingletonScope();
         handler.Attribute = info;
+        handler.HookEvents();
         return RegisterItem(info);
     }
     

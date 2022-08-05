@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using InventorySystem.Items;
+using MEC;
 using Mirror;
 using Neuron.Core.Logging;
 using RemoteAdmin;
@@ -9,6 +10,7 @@ using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule.Dummy;
 
@@ -86,7 +88,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         _map = Synapse.Get<MapService>();
         _dummy = Synapse.Get<DummyService>();
         
-        Player = UnityEngine.Object.Instantiate(NetworkManager.singleton.playerPrefab, _dummy._dummyParent)
+        Player = Object.Instantiate(NetworkManager.singleton.playerPrefab, _dummy._dummyParent)
             .GetComponent<DummyPlayer>();
         GameObject = Player.gameObject;
         var comp = GameObject.AddComponent<SynapseObjectScript>();
@@ -109,7 +111,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         Player.PlayerMovementSync.NetworkGrounded = true;
         RunSpeed = CharacterClassManager._staticClasses[(int)role].runSpeed;
         WalkSpeed = CharacterClassManager._staticClasses[(int)role].walkSpeed;
-        _ = MEC.Timing.RunCoroutine(Update());
+        _ = Timing.RunCoroutine(Update());
 
         NetworkServer.Spawn(GameObject);
 
@@ -154,7 +156,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
     {
         for (;;)
         {
-            yield return MEC.Timing.WaitForSeconds(0.1f);
+            yield return Timing.WaitForSeconds(0.1f);
             try
             {
                 if (GameObject == null) yield break;

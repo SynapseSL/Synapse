@@ -89,7 +89,7 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
         }
     }
 
-    public bool UnDestroyable { get; set; } = false;
+    public bool UnDestroyable { get; set; }
 
 
     public bool IsBreakable => Variant is BreakableDoor;
@@ -181,7 +181,7 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
         Ez
     }
 
-    public bool NeedsJoinUpdate { get; } = false;
+    public bool NeedsJoinUpdate { get; }
     public void Refresh(SynapsePlayer player)
     {
         player.SendNetworkMessage(NetworkIdentity.GetSpawnMessage());

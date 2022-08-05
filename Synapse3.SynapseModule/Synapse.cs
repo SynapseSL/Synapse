@@ -1,4 +1,5 @@
 ﻿using CommandSystem.Commands.Shared;
+using GameCore;
 using Neuron.Core;
 using Neuron.Core.Meta;
 using Neuron.Core.Modules;
@@ -15,6 +16,7 @@ using Synapse3.SynapseModule.Map.Scp914;
 using Synapse3.SynapseModule.Permissions.RemoteAdmin;
 using Synapse3.SynapseModule.Role;
 using Synapse3.SynapseModule.Teams;
+
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace Synapse3.SynapseModule;
@@ -63,12 +65,12 @@ public partial class Synapse : Module
         pluginManager.PluginLoadLate.Subscribe(OnPluginLoadLate);
         
         CustomNetworkManager.Modded = true;
-        BuildInfoCommand.ModDescription = $"Plugin Framework: Synapse\n" +
+        BuildInfoCommand.ModDescription = "Plugin Framework: Synapse\n" +
                                           $"Synapse Version: {GetVersion()}\n" +
-                                          $"Description: Synapse is a heavily modded server software using extensive runtime patching to make development faster and the usage more accessible to end-users";
+                                          "Description: Synapse is a heavily modded server software using extensive runtime patching to make development faster and the usage more accessible to end-users";
         
-        if(BasedGameVersion != GameCore.Version.VersionString)
-            Logger.Warn($"Sy3 Version: This Version of Synapse3 is build for SCPSL Version {BasedGameVersion} Currently installed: {GameCore.Version.VersionString}\nBugs may occurs");
+        if(BasedGameVersion != Version.VersionString)
+            Logger.Warn($"Sy3 Version: This Version of Synapse3 is build for SCPSL Version {BasedGameVersion} Currently installed: {Version.VersionString}\nBugs may occurs");
     }
 
     public override void Enable()

@@ -10,6 +10,7 @@ using Synapse3.SynapseModule.Permissions;
 using Synapse3.SynapseModule.Permissions.RemoteAdmin;
 using Synapse3.SynapseModule.Player;
 using Utils;
+using Random = UnityEngine.Random;
 
 namespace Synapse3.SynapseModule.Patches;
 
@@ -96,7 +97,7 @@ internal static class RemoteAdminPatches
 
     private static string GenerateList(List<RemoteAdminPlayer> players, CommandSender sender)
     {
-        var remoteAdminGroups = Synapse.Get<PermissionService>().Groups.Select(x => new RemoteAdminGroup()
+        var remoteAdminGroups = Synapse.Get<PermissionService>().Groups.Select(x => new RemoteAdminGroup
         {
             Name = x.Key,
             GroupId = x.Value.GroupId,
@@ -151,7 +152,7 @@ internal static class RemoteAdminPatches
             if (string.Equals(color, "rainbow", StringComparison.OrdinalIgnoreCase))
             {
                 var colors = service.Colors;
-                color = colors.ElementAt(UnityEngine.Random.Range(0, colors.Count)).Value;
+                color = colors.ElementAt(Random.Range(0, colors.Count)).Value;
             }
                 
             text +=
@@ -167,7 +168,7 @@ internal static class RemoteAdminPatches
             if (string.Equals(color, "rainbow", StringComparison.OrdinalIgnoreCase))
             {
                 var colors = service.Colors;
-                color = colors.ElementAt(UnityEngine.Random.Range(0, colors.Count)).Value;
+                color = colors.ElementAt(Random.Range(0, colors.Count)).Value;
             }
             
             text += "<size=0>(" + group.GroupId + ")</size> <size=20><color=" + color  + ">[" + group.Name +
@@ -310,7 +311,7 @@ internal static class RemoteAdminPatches
                     RaClipboard.Send(sender, RaClipboard.RaClipBoardType.UserId, userIds);
                 }
 
-                sender.RaReply($"$1 " + text, true, true, string.Empty);
+                sender.RaReply("$1 " + text, true, true, string.Empty);
                 return false;
             }
 

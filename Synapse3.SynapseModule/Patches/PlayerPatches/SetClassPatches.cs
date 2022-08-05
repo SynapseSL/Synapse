@@ -2,6 +2,7 @@
 using System.Linq;
 using HarmonyLib;
 using InventorySystem;
+using InventorySystem.Configs;
 using InventorySystem.Items.Usables;
 using MEC;
 using Neuron.Core.Logging;
@@ -52,7 +53,7 @@ internal static class SetClassPatches
                 }
             }
 
-            if (InventorySystem.Configs.StartingInventories.DefinedInventories.TryGetValue(classid, out var roleItems))
+            if (StartingInventories.DefinedInventories.TryGetValue(classid, out var roleItems))
             {
                 foreach (var ammo in roleItems.Ammo)
                 {

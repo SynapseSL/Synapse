@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items.Firearms.Attachments;
+using MapGeneration;
 using MapGeneration.Distributors;
 using MEC;
 using Mirror;
@@ -14,6 +15,7 @@ using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule.Map;
 
@@ -96,7 +98,7 @@ public class MapService : Service
         set => ServerConfigSynchronizer.Singleton.NetworkHumanSprintSpeedMultiplier = value;
     }
     
-    public int Seed => MapGeneration.SeedSynchronizer.Seed;
+    public int Seed => SeedSynchronizer.Seed;
 
     public void Explode(Vector3 position, GrenadeType type)
     {
@@ -108,7 +110,7 @@ public class MapService : Service
     public GameObject SpawnTantrum(Vector3 position, float destroy = -1)
     {
         var prefab = NetworkClient.prefabs[Guid.Parse("a0e7ee93-b802-e5a4-38bd-95e27cc133ea")];
-        var gameObject = UnityEngine.Object.Instantiate(prefab, position, Quaternion.identity);
+        var gameObject = Object.Instantiate(prefab, position, Quaternion.identity);
         NetworkServer.Spawn(gameObject.gameObject);
 
         if (destroy >= 0)

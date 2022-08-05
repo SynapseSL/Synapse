@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Neuron.Core.Logging;
 using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Elevators;

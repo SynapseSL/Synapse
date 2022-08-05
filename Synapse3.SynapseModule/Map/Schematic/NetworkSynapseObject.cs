@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using Mirror;
+﻿using Mirror;
+using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Schematic;
 

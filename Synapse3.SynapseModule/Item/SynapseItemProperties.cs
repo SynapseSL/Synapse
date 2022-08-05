@@ -12,7 +12,7 @@ public partial class SynapseItem
 {
     private Dictionary<ItemCategory, ISubSynapseItem> _subApi = new();
 
-    public readonly uint ID;
+    public readonly uint Id;
     public readonly string Name;
     public readonly bool IsCustomItem;
     

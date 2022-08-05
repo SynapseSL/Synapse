@@ -11,8 +11,7 @@ namespace Synapse3.SynapseModule.Patches;
 internal static class FriendlyFirePatches
 {
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(HitboxIdentity), nameof(HitboxIdentity.CheckFriendlyFire),
-        new[] { typeof(ReferenceHub), typeof(ReferenceHub), typeof(bool) })]
+    [HarmonyPatch(typeof(HitboxIdentity), nameof(HitboxIdentity.CheckFriendlyFire), typeof(ReferenceHub), typeof(ReferenceHub), typeof(bool))]
     public static bool CheckFF(out bool __result, ReferenceHub attacker, ReferenceHub victim, bool ignoreConfig)
     {
         try

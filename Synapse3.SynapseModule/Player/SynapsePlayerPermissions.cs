@@ -1,5 +1,4 @@
-﻿using System;
-using Synapse3.SynapseModule.Config;
+﻿using Assets._Scripts.Dissonance;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Permissions;
 
@@ -24,7 +23,7 @@ public partial class SynapsePlayer
 
     private SynapseGroup _synapseGroup;
     /// <summary>
-    /// The Current SynapseRole and therefore all Permissions of the Player
+    /// The Current SynapseGroup and therefore all Permissions of the Player
     /// </summary>
     public SynapseGroup SynapseGroup
     {
@@ -214,7 +213,7 @@ public partial class SynapsePlayer
     public string RankColor
     {
         get => Rank.BadgeColor;
-        set => ServerRoles.SetColor(value.ToLower());
+        set => ServerRoles.SetColor(value);
     }
 
     /// <summary>
@@ -242,7 +241,7 @@ public partial class SynapsePlayer
     {
         get => DissonanceUserSetup.Muted;
         set => DissonanceUserSetup.NetworkmuteStatus =
-            value ? Assets._Scripts.Dissonance.VoicechatMuteStatus.AdministrativelyMuted : 0;
+            value ? VoicechatMuteStatus.AdministrativelyMuted : 0;
     }
 
     /// <summary>

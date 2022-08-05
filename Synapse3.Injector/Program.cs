@@ -8,7 +8,7 @@ namespace Synapse3.Injector
     {
         public static void Main(string[] args)
         {
-            var injector = new SynapseInjector(true);
+            var injector = new SynapseInjector();
             try
             {
                 if (args.Length == 0)

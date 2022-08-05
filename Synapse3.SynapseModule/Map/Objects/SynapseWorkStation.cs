@@ -67,7 +67,7 @@ public class SynapseWorkStation : NetworkSynapseObject, IJoinUpdate
         comp.Object = this;
     }
 
-    public bool NeedsJoinUpdate { get; } = false;
+    public bool NeedsJoinUpdate { get; }
     public void Refresh(SynapsePlayer player)
     {
         player.SendNetworkMessage(NetworkIdentity.GetSpawnMessage());

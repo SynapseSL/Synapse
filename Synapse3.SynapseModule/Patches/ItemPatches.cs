@@ -169,8 +169,7 @@ internal static class ItemPatches
     }
 
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(ThrowableItem), nameof(ThrowableItem.ServerThrow),
-        new[] { typeof(float), typeof(float), typeof(Vector3), typeof(Vector3) })]
+    [HarmonyPatch(typeof(ThrowableItem), nameof(ThrowableItem.ServerThrow), typeof(float), typeof(float), typeof(Vector3), typeof(Vector3))]
     public static bool ServerThrow(ThrowableItem __instance, float forceAmount, float upwardFactor, Vector3 torque,
         Vector3 startVel)
     {

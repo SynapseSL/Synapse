@@ -1,14 +1,16 @@
 ﻿using System;
+using GameCore;
 using Hints;
 using InventorySystem.Disarming;
 using InventorySystem.Items.Firearms.Attachments;
 using Mirror;
 using Neuron.Core.Logging;
 using PlayerStatsSystem;
+using RemoteAdmin;
+using Respawning;
 using RoundRestarting;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Role;
 using UnityEngine;
 
@@ -164,7 +166,7 @@ public partial class SynapsePlayer
     /// </summary>
     public void ExecuteCommand(string command, bool RA = true)
     {
-        if (RA) RemoteAdmin.CommandProcessor.ProcessQuery(command, CommandSender);
+        if (RA) CommandProcessor.ProcessQuery(command, CommandSender);
         else QueryProcessor.ProcessGameConsoleQuery(command);
     }
 
@@ -320,32 +322,32 @@ public partial class SynapsePlayer
 
         Escape.TargetShowEscapeMessage(Connection, ev.IsClassD, changeTeam);
         
-        var tickets = Respawning.RespawnTickets.Singleton;
+        var tickets = RespawnTickets.Singleton;
         //At this Point the Player already changed his role and therefore his Team as well
         switch (TeamID)
         {
             case (int)Team.MTF when changeTeam:
                 RoundSummary.EscapedScientists++;
-                tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
-                    GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_mtf_classd_cuffed_count", 1), false);
+                tickets.GrantTickets(SpawnableTeamType.NineTailedFox,
+                    ConfigFile.ServerConfig.GetInt("respawn_tickets_mtf_classd_cuffed_count", 1));
                 break;
 
             case (int)Team.MTF when !changeTeam:
                 RoundSummary.EscapedScientists++;
-                tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
-                    GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_mtf_scientist_count", 1), false);
+                tickets.GrantTickets(SpawnableTeamType.NineTailedFox,
+                    ConfigFile.ServerConfig.GetInt("respawn_tickets_mtf_scientist_count", 1));
                 break;
 
             case (int)Team.CHI when changeTeam:
                 RoundSummary.EscapedClassD++;
-                tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
-                    GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_ci_scientist_cuffed_count", 1), false);
+                tickets.GrantTickets(SpawnableTeamType.NineTailedFox,
+                    ConfigFile.ServerConfig.GetInt("respawn_tickets_ci_scientist_cuffed_count", 1));
                 break;
 
             case (int)Team.CHI when !changeTeam:
                 RoundSummary.EscapedClassD++;
-                tickets.GrantTickets(Respawning.SpawnableTeamType.NineTailedFox,
-                    GameCore.ConfigFile.ServerConfig.GetInt("respawn_tickets_ci_classd_count", 1), false);
+                tickets.GrantTickets(SpawnableTeamType.NineTailedFox,
+                    ConfigFile.ServerConfig.GetInt("respawn_tickets_ci_classd_count", 1));
                 break;
         }
     }

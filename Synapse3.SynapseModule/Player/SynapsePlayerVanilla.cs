@@ -1,4 +1,5 @@
-﻿using CustomPlayerEffects;
+﻿using Assets._Scripts.Dissonance;
+using CustomPlayerEffects;
 using Hints;
 using InventorySystem;
 using InventorySystem.Searching;
@@ -57,7 +58,7 @@ public partial class SynapsePlayer
 
     public PlayableScpsController ScpsController => Hub.scpsController;
     
-    public Assets._Scripts.Dissonance.DissonanceUserSetup DissonanceUserSetup { get; }
+    public DissonanceUserSetup DissonanceUserSetup { get; }
 
     public Radio Radio { get; }
 

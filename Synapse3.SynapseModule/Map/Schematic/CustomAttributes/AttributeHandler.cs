@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Synapse3.SynapseModule.Map.Schematic.CustomAttributes;
 
@@ -10,7 +11,7 @@ public abstract class AttributeHandler
 
     public virtual void Init() { }
 
-    public virtual void OnLoad(ISynapseObject synapseObject, System.ArraySegment<string> args) { }
+    public virtual void OnLoad(ISynapseObject synapseObject, ArraySegment<string> args) { }
 
     public virtual void OnDestroy(ISynapseObject synapseObject) { }
 

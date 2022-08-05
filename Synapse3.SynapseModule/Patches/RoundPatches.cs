@@ -11,6 +11,7 @@ using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
 using UnityEngine;
+using Console = GameCore.Console;
 
 // ReSharper disable InconsistentNaming
 
@@ -220,10 +221,10 @@ internal static class DecoratedRoundMethods
             var shouldRoundEnd = false; // Change temporary variable instead of real field
             float percentageDClass = roundSummary.classlistStart.class_ds == 0
                 ? 0.0f
-                : (float) (totalClassD / roundSummary.classlistStart.class_ds);
+                : totalClassD / roundSummary.classlistStart.class_ds;
             float percentageScientists = roundSummary.classlistStart.scientists == 0
                 ? 1f
-                : (float) (totalScientists / roundSummary.classlistStart.scientists);
+                : totalScientists / roundSummary.classlistStart.scientists;
             
             if (classList.class_ds <= 0 && totalMtfs <= 0)
             {
@@ -280,7 +281,7 @@ internal static class DecoratedRoundMethods
                 }
             }
             
-            var ev = new RoundCheckEndEvent()
+            var ev = new RoundCheckEndEvent
             {
                 EndRound = shouldRoundEnd,
                 WinningTeam = leadingTeam
@@ -304,7 +305,7 @@ internal static class DecoratedRoundMethods
             string str = "Round finished! Anomalies: " + totalScps + " | Chaos: " + totalChaos +
                          " | Facility Forces: " + totalMtfs + " | D escaped percentage: " + percentageDClass +
                          " | S escaped percentage: : " + percentageScientists;
-            GameCore.Console.AddLog(str, Color.gray);
+            Console.AddLog(str, Color.gray);
             ServerLogs.AddLog(ServerLogs.Modules.Logger, str, ServerLogs.ServerLogType.GameEvent);
             
             yield return Timing.WaitForSeconds(1.5f);
@@ -316,7 +317,7 @@ internal static class DecoratedRoundMethods
                     RoundSummary.EscapedClassD, RoundSummary.EscapedScientists, RoundSummary.KilledBySCPs,
                     roundCd);
             
-            yield return Timing.WaitForSeconds((float) (roundCd - 1));
+            yield return Timing.WaitForSeconds(roundCd - 1);
             
             roundSummary.RpcDimScreen();
             
@@ -330,7 +331,7 @@ internal static class DecoratedRoundMethods
     {
         if(!manager.isLocalPlayer || !manager.isServer) return;
         manager.RunDefaultClassPicker(first, out var roles, out var playersRoleList);
-        if (first && ConfigFile.ServerConfig.GetBool("smart_class_picker", true) && GameCore.Console.EnableSCP)
+        if (first && ConfigFile.ServerConfig.GetBool("smart_class_picker", true) && Console.EnableSCP)
         {
             manager.RunSmartClassPicker(roles, out playersRoleList);
         }
@@ -343,7 +344,7 @@ internal static class DecoratedRoundMethods
             players[player] = (uint)pair.Value;
         }
 
-        var ev = new FirstSpawnEvent()
+        var ev = new FirstSpawnEvent
         {
             PlayerAndRoles = players
         };

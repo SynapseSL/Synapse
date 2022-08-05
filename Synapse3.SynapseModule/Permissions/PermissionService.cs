@@ -14,15 +14,13 @@ public class PermissionService : Service
     private uint _currentGroupId = 500;
     private ConfigService _configService;
     private ServerEvents _server;
-    public ConfigContainer Container { get; set; }
-    public Dictionary<string, SynapseGroup> Groups { get; set; } = new ();
+    public ConfigContainer Container { get; private set; }
+    public Dictionary<string, SynapseGroup> Groups { get; private set; } = new ();
 
-    private SynapseGroup _fallbackDefault = new()
+    private readonly SynapseGroup _fallBackDefault = new()
     {
         Default = true,
-        Permissions = new List<string> {"synapse.command.help", "synapse.command.plugins"},
-        Members = null,
-        Inheritance = null,
+        Permissions = new List<string> { "synapse.command.help", "synapse.command.plugins" }
     };
 
     public PermissionService(ConfigService configService,ServerEvents server)
@@ -64,25 +62,44 @@ public class PermissionService : Service
         }
         
         Container.Store();
-        Reload(null);
+        Reload();
     }
 
-    public SynapseGroup GetGroupInsensitive(string key) => Groups
+    private SynapseGroup GetGroupInsensitive(string key) => Groups
         .FirstOrDefault(x => string.Equals(x.Key, key, StringComparison.OrdinalIgnoreCase)).Value;
 
     private void LoadGroups()
     {
-        Groups = Container.Document.Sections.Select(x => (x.Key, Value: x.Value.Export<SynapseGroup>())).ToDictionary(
-            x => x.Key,
-            x => x.Value
-        );
+        var groups = new Dictionary<string, SynapseGroup>();
+        foreach (var section in Container.Document.Sections)
+        {
+            try
+            {
+                if (groups.ContainsKey(section.Key))
+                {
+                    NeuronLogger.For<SynapseGroup>()
+                        .Warn("Sy3 Permission: Group with same name was found a second time. Group will be skipped");
+                    continue;
+                }
+
+                var group = section.Value.Export<SynapseGroup>();
+                groups[section.Key] = group;
+            }
+            catch (Exception ex)
+            {
+                NeuronLogger.For<Synapse>()
+                    .Error($"Sy3 Permission: Loading of Permissions section {section.Key} failed\n" + ex);
+            }
+        }
+
+        Groups = groups;
 
         if (Groups.Count == 0)
         {
-            Groups["Owner"] = new SynapseGroup()
+            Groups["Owner"] = new SynapseGroup
             {
                 Badge = "Owner",
-                Color = "red",
+                Color = "rainbow",
                 Cover = true,
                 Hidden = true,
                 KickPower = 254,
@@ -116,8 +133,8 @@ public class PermissionService : Service
             player.RefreshPermission(player.HideRank);
     }
 
-    public SynapseGroup GetDefaultGroup() => Groups.Values.FirstOrDefault(x => x.Default) ?? _fallbackDefault;
-    public SynapseGroup GetNorthwoodGroup() => Groups.Values.FirstOrDefault(x => x.Northwood)?.Copy();
+    public SynapseGroup GetDefaultGroup() => Groups.Values.FirstOrDefault(x => x.Default) ?? _fallBackDefault;
+    public SynapseGroup GetNorthwoodGroup() => Groups.Values.FirstOrDefault(x => x.NorthWood)?.Copy();
 
     public bool AddServerGroup(SynapseGroup group, string groupName)
     {
@@ -153,10 +170,10 @@ public class PermissionService : Service
         if (group != null)
             return group.Copy();
 
-        var nwgroup = GetNorthwoodGroup();
+        var nwGroup = GetNorthwoodGroup();
 
-        if (player.ServerRoles.Staff && nwgroup != null)
-            return nwgroup;
+        if (player.ServerRoles.Staff && nwGroup != null)
+            return nwGroup;
 
         return GetDefaultGroup();
     }
@@ -168,23 +185,23 @@ public class PermissionService : Service
         if (group != null)
             return group.Copy();
 
-        var nwgroup = GetNorthwoodGroup();
+        var nwGroup = GetNorthwoodGroup();
 
-        if (UserID.ToLower().Contains("@northwood") && nwgroup != null)
-            return nwgroup;
+        if (UserID.ToLower().Contains("@northwood") && nwGroup != null)
+            return nwGroup;
 
         return GetDefaultGroup();
     }
     
-    public bool AddPlayerToGroup(string groupname, string userid)
+    public bool AddPlayerToGroup(string groupName, string userid)
     {
-        var group = GetGroupInsensitive(groupname);
+        var group = GetGroupInsensitive(groupName);
         if (group == null) return false;
         if (!userid.Contains("@")) return false;
 
         RemovePlayerGroup(userid);
 
-        if (group.Members == null) group.Members = new List<string>();
+        group.Members ??= new List<string>();
 
         group.Members.Add(userid);
         Store();

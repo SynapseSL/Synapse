@@ -1,4 +1,5 @@
-﻿using Synapse3.SynapseModule.Config;
+﻿using Assets._Scripts.Dissonance;
+using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
@@ -33,7 +34,7 @@ public partial class SynapsePlayer : MonoBehaviour
     {
         Hub = GetComponent<ReferenceHub>();
         GameConsoleTransmission = GetComponent<GameConsoleTransmission>();
-        DissonanceUserSetup = GetComponent<Assets._Scripts.Dissonance.DissonanceUserSetup>();
+        DissonanceUserSetup = GetComponent<DissonanceUserSetup>();
         Radio = GetComponent<Radio>();
         Escape = GetComponent<Escape>();
         Scp939VisionController = GetComponent<Scp939_VisionController>();

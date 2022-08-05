@@ -5,6 +5,7 @@ using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Role;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Synapse3.SynapseModule.Player;
 
@@ -45,6 +46,6 @@ public partial class SynapsePlayer
 
         if (Time.time < _updateTime) return;
         _updateTime = Time.time + _config.PermissionConfiguration.RainbowUpdateTime;
-        RankColor = _server.Colors.ElementAt(UnityEngine.Random.Range(0, _server.Colors.Count)).Key.ToString();
+        RankColor = _server.ValidatedBadgeColors.ElementAt(Random.Range(0, _server.ValidatedBadgeColors.Count));
     }
 }

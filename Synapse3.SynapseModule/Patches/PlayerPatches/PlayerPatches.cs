@@ -8,8 +8,10 @@ using InventorySystem;
 using InventorySystem.Disarming;
 using InventorySystem.Items;
 using InventorySystem.Items.Coin;
+using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Firearms.BasicMessages;
 using InventorySystem.Items.Firearms.Modules;
+using InventorySystem.Items.Keycards;
 using InventorySystem.Items.Radio;
 using InventorySystem.Searching;
 using MapGeneration.Distributors;
@@ -23,6 +25,7 @@ using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 using Utils.Networking;
+using Random = UnityEngine.Random;
 
 namespace Synapse3.SynapseModule.Patches.PlayerPatches;
 
@@ -248,7 +251,7 @@ internal static class PlayerPatches
             var player = conn.GetSynapsePlayer();
             if (player == null || !player.Hub._coinFlipRatelimit.CanExecute() ||
                 player.Inventory.ItemInHand.ItemType != ItemType.Coin) return false;
-            var isTails = UnityEngine.Random.value >= 0.5f;
+            var isTails = Random.value >= 0.5f;
 
             var ev = new FlipCoinEvent(player.Inventory.ItemInHand, player, isTails);
 
@@ -435,10 +438,79 @@ internal static class PlayerPatches
             return true;
         }
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.UserCode_CmdSwitchAWButton))]
+    public static bool OnWarheadButtonKeyCard(PlayerInteract __instance)
+    {
+        try
+        {
+            DecoratedPlayerPatches.WarheadKeyCard(__instance);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Enter Warhead KeyCard Event failed\n" + ex);
+            return true;
+        }
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(FirearmBasicMessagesHandler), nameof(FirearmBasicMessagesHandler.ServerRequestReceived))]
+    public static bool WeaponRequest(NetworkConnection conn, RequestMessage msg)
+    {
+        try
+        {
+            return DecoratedPlayerPatches.OnWeaponRequest(conn, msg);
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Reload Weapon Event failed\n" + ex);
+            return true;
+        }
+    }
 }
 
 internal static class DecoratedPlayerPatches
 {
+    public static bool OnWeaponRequest(NetworkConnection connection, RequestMessage msg)
+    {
+        if (msg.Request != RequestType.Reload) return true;
+        
+        var player = connection.GetSynapsePlayer();
+        if (player == null) return false;
+        if (msg.Serial != player.Inventory.ItemInHand.Serial) return false;
+        if (player.Inventory.ItemInHand.Item is not Firearm firearm) return false;
+
+        var ev = new ReloadWeaponEvent(player.Inventory.ItemInHand, ItemInteractState.Finalize, player, false);
+
+        Synapse.Get<ItemEvents>().ReloadWeapon.Raise(ev);
+        
+        if ((ev.Allow && firearm.AmmoManagerModule.ServerTryReload()) || ev.PlayAnimationOverride)
+            player.SendNetworkMessage(new RequestMessage(msg.Serial, RequestType.Reload));
+
+        return false;
+    }
+    
+    public static void WarheadKeyCard(PlayerInteract interact)
+    {
+        if(!interact.CanInteract) return;
+        var gameObject = GameObject.Find("OutsitePanelScript");
+        if (!interact.ChckDis(gameObject.transform.position)) return;
+
+        var player = interact.GetSynapsePlayer();
+        var allow = interact._sr.BypassMode || KeycardPermissions.AlphaWarhead.CheckPermission(player);
+        var component = gameObject.GetComponentInParent<AlphaWarheadOutsitePanel>();
+
+        var open = !Synapse.Get<SynapseConfigService>().GamePlayConfiguration.CloseWarheadButton || !component.NetworkkeycardEntered;
+        
+        var ev = new OpenWarheadButtonEvent(player, allow, open);
+        if(!ev.Allow) return;
+        
+        component.NetworkkeycardEntered = ev.Open;
+        interact.OnInteract();
+    }
+    
     public static bool OnSpeak(Radio radio, bool alternativeChat)
     {
         var player = radio.GetSynapsePlayer();
@@ -840,7 +912,7 @@ internal static class DecoratedPlayerPatches
     {
         if(!player.CanInteract) return;
         
-        if(!player._playerInteractRateLimit.CanExecute(true)) return;
+        if(!player._playerInteractRateLimit.CanExecute()) return;
         
         var panel = GameObject.Find("OutsitePanelScript");
         var sPlayer = player.GetSynapsePlayer();

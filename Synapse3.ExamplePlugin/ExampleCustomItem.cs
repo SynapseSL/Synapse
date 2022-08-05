@@ -1,6 +1,7 @@
 ﻿using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Scp914;
+using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Scp914;
 using UnityEngine;
@@ -16,17 +17,14 @@ namespace Synapse3.ExamplePlugin;
 [Item(
     Name = "Example",
     Id = 99,
-    BasedItemType = ItemType.Coin,
+    BasedItemType = ItemType.GunCOM15,
     SchematicID = 1
 )]
 public class ExampleCustomItem : CustomItemHandler, ISynapse914Processor
 {
-    public ExampleCustomItem()
-    {
-        NeuronLogger.For<ExamplePlugin>().Warn("CREATED ITEM HANDLER/914 PROCESSOR");
-    }
+    public ExampleCustomItem(ItemEvents items, PlayerEvents player) : base(items, player) { }
     
-    //Destroy the custom item 99 and create a "real" coin
+    //Destroy the custom item 99 and create a coin
     public void CreateUpgradedItem(SynapseItem item, Scp914KnobSetting setting, Vector3 position = default)
     {
         var state = item.State;
@@ -44,4 +42,16 @@ public class ExampleCustomItem : CustomItemHandler, ISynapse914Processor
                 break;
         }
     }
+
+    public override void OnEquip(ChangeItemEvent ev)
+    {
+        ev.Player.SendHint("You Equipped my Custom Weapon!");
+    }
+
+    //This means you can load up to 6 Adrenaline inside your Weapon at the same time and gain up to 3 Shoots (3 Shoots that are each "shooting" 2 adrenaline)
+    public override bool VanillaReload => false;
+    public override int AmmoType => (int)ItemType.Adrenaline;
+    public override int MagazineSize => 3;
+    public override bool Reloadable => true;
+    public override int NeededForOneShot => 2;
 }

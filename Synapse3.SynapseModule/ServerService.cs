@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Neuron.Core.Meta;
+using Neuron.Core.Plugins;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
 using Console = GameCore.Console;
@@ -11,11 +13,16 @@ namespace Synapse3.SynapseModule;
 public class ServerService : Service
 {
     private readonly ServerEvents _server;
-    public ServerService(ServerEvents server)
+    private readonly PluginManager _plugin;
+
+    public ServerService(ServerEvents server, PluginManager plugin)
     {
         _server = server;
+        _plugin = plugin;
     }
-    
+
+    public ReadOnlyCollection<PluginContext> Plugins => _plugin.Plugins.AsReadOnly();
+
     /// <summary>
     /// Configures the ServerName that will be displayed on the Server List
     /// </summary>
@@ -63,7 +70,19 @@ public class ServerService : Service
     /// Returns an array of all Colors that are allowed to use in Badges
     /// </summary>
     public Dictionary<Misc.PlayerInfoColorTypes, string> Colors { get; } = Misc.AllowedColors;
-    
+
+    /// <summary>
+    /// Rank badges needs an exact string for each color and therefore returns this a version of the colors that will actually be displayed
+    /// </summary>
+    public List<string> ValidatedBadgeColors { get; } = Misc.AllowedColors.Keys.Select(x => x switch
+    {
+        Misc.PlayerInfoColorTypes.LightGreen => "light_green",
+        Misc.PlayerInfoColorTypes.DeepPink => "deep_pink",
+        Misc.PlayerInfoColorTypes.BlueGreen => "blue_green",
+        Misc.PlayerInfoColorTypes.ArmyGreen => "army_green",
+        _ => x.ToString().ToLower(),
+    }).ToList();
+
     /// <summary>
     /// Returns the ServerConsole Object from the base game
     /// </summary>

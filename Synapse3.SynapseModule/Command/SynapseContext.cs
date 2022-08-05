@@ -51,7 +51,7 @@ public class SynapseContext : ICommandContext
     /// </summary>
     public static SynapseContext Of(string message, SynapsePlayer player, CommandPlatform platform)
     {
-        var context = new SynapseContext()
+        var context = new SynapseContext
         {
             FullCommand = message
         };

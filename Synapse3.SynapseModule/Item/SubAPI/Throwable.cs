@@ -6,7 +6,6 @@ using Respawning;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule.Item.SubAPI;
 

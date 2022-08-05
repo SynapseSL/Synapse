@@ -15,6 +15,7 @@ public class ItemEvents: Service
     public readonly EventReactor<BasicItemInteractEvent> BasicInteract = new();
     public readonly EventReactor<KeyCardInteractEvent> KeyCardInteract = new ();
     public readonly EventReactor<ConsumeItemEvent> ConsumeItem = new();
+    public readonly EventReactor<ReloadWeaponEvent> ReloadWeapon = new();
     public readonly EventReactor<DisarmEvent> Disarm = new();
     public readonly EventReactor<RadioUseEvent> RadioUse = new();
 
@@ -28,11 +29,13 @@ public class ItemEvents: Service
         _eventManager.RegisterEvent(BasicInteract);
         _eventManager.RegisterEvent(KeyCardInteract);
         _eventManager.RegisterEvent(ConsumeItem);
+        _eventManager.RegisterEvent(ReloadWeapon);
         _eventManager.RegisterEvent(Disarm);
         _eventManager.RegisterEvent(RadioUse);
 
         KeyCardInteract.Subscribe(ev => BasicInteract.Raise(ev));
         ConsumeItem.Subscribe(ev => BasicInteract.Raise(ev));
+        ReloadWeapon.Subscribe(ev => BasicInteract.Raise(ev));
         Disarm.Subscribe(ev => BasicInteract.Raise(ev));
         RadioUse.Subscribe(ev => BasicInteract.Raise(ev));
     }
@@ -106,4 +109,14 @@ public class RadioUseEvent : BasicItemInteractEvent
     public RadioMessages.RadioRangeLevel CurrentRange { get; }
     
     public RadioMessages.RadioRangeLevel NextRange { get; set; }
+}
+
+public class ReloadWeaponEvent : BasicItemInteractEvent
+{
+    public ReloadWeaponEvent(SynapseItem item, ItemInteractState state, SynapsePlayer player, bool playAnimationOverride) : base(item, state, player)
+    {
+        PlayAnimationOverride = playAnimationOverride;
+    }
+
+    public bool PlayAnimationOverride { get; set; }
 }

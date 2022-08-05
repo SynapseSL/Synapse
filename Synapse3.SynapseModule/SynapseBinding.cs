@@ -35,7 +35,7 @@ public partial class Synapse
         if (!args.MetaType.Is<RemoteAdminCategory>()) return;
 
         info.CategoryType = args.MetaType.Type;
-        args.Outputs.Add(new SynapseRaCategoryBinding()
+        args.Outputs.Add(new SynapseRaCategoryBinding
         {
             Info = info
         });
@@ -48,7 +48,7 @@ public partial class Synapse
         if (!args.MetaType.Is<SynapseCustomRoom>()) return;
 
         roomInfo.RoomType = args.MetaType.Type;
-        args.Outputs.Add(new SynapseRoomBinding()
+        args.Outputs.Add(new SynapseRoomBinding
         {
             Info = roomInfo
         });
@@ -61,7 +61,7 @@ public partial class Synapse
         if (!args.MetaType.Is<ISynapseRole>()) return;
 
         roleInformation.RoleScript = args.MetaType.Type;
-        args.Outputs.Add(new SynapseRoleBinding()
+        args.Outputs.Add(new SynapseRoleBinding
         {
             Info = roleInformation
         });
@@ -73,7 +73,7 @@ public partial class Synapse
         if (!args.MetaType.TryGetAttribute<SynapseCommandAttribute>(out var _)) return;
         if (!args.MetaType.Is<SynapseCommand>()) return;
         
-        args.Outputs.Add(new SynapseCommandBinding()
+        args.Outputs.Add(new SynapseCommandBinding
         {
             Type = args.MetaType.Type,
         });
@@ -85,7 +85,7 @@ public partial class Synapse
         if (!args.MetaType.TryGetAttribute<TeamAttribute>(out var info)) return;
         if (!args.MetaType.Is<ISynapseTeam>()) return;
         
-        args.Outputs.Add(new SynapseTeamBinding()
+        args.Outputs.Add(new SynapseTeamBinding
         {
             Info = info,
             Type = args.MetaType.Type
@@ -97,7 +97,7 @@ public partial class Synapse
         if (!args.MetaType.TryGetAttribute<AutomaticAttribute>(out var _)) return;
         if(!args.MetaType.Is<AttributeHandler>()) return;
 
-        args.Outputs.Add(new SynapseCustomObjectAttributeBinding()
+        args.Outputs.Add(new SynapseCustomObjectAttributeBinding
         {
             Type = args.MetaType.Type
         });
@@ -109,7 +109,7 @@ public partial class Synapse
         if (!args.MetaType.TryGetAttribute<Scp914ProcessorAttribute>(out var info)) return;
         if (!args.MetaType.Is<ISynapse914Processor>()) return;
 
-        args.Outputs.Add(new SynapseScp914ProcessorBinding()
+        args.Outputs.Add(new SynapseScp914ProcessorBinding
         {
             Processor = args.MetaType.Type,
             ReplaceHandlers = info.ReplaceHandlers
@@ -122,7 +122,7 @@ public partial class Synapse
         if (!args.MetaType.TryGetAttribute<ItemAttribute>(out var info)) return;
         if (!args.MetaType.Is<CustomItemHandler>()) return;
 
-        args.Outputs.Add(new SynapseItemBinding()
+        args.Outputs.Add(new SynapseItemBinding
         {
             Info = info,
             HandlerType = args.MetaType.Type

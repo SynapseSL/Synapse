@@ -21,11 +21,11 @@ public class TestCommand : SynapseCommand
     {
         result.Response = "Test";
 
-        var config = new SchematicConfiguration()
+        var config = new SchematicConfiguration
         {
-            Items = new List<SchematicConfiguration.ItemConfiguration>()
+            Items = new List<SchematicConfiguration.ItemConfiguration>
             {
-                new SchematicConfiguration.ItemConfiguration()
+                new SchematicConfiguration.ItemConfiguration
                 {
                     Scale = Vector3.one,
                     Position = Vector3.up * 1,
@@ -35,7 +35,7 @@ public class TestCommand : SynapseCommand
                     Physics = false
                 }
             },
-            Primitives = new List<SchematicConfiguration.PrimitiveConfiguration>()
+            Primitives = new List<SchematicConfiguration.PrimitiveConfiguration>
             {
                 new ()
                 {
@@ -44,7 +44,7 @@ public class TestCommand : SynapseCommand
                     PrimitiveType = PrimitiveType.Cube
                 }
             },
-            Doors = new List<SchematicConfiguration.DoorConfiguration>()
+            Doors = new List<SchematicConfiguration.DoorConfiguration>
             {
                 new ()
                 {
@@ -56,7 +56,7 @@ public class TestCommand : SynapseCommand
                     DoorType = SynapseDoor.SpawnableDoorType.Hcz
                 }
             },
-            Generators = new List<SchematicConfiguration.SimpleUpdateConfig>()
+            Generators = new List<SchematicConfiguration.SimpleUpdateConfig>
             {
                 new()
                 {
@@ -65,9 +65,9 @@ public class TestCommand : SynapseCommand
                     Scale = Vector3.one
                 }
             },
-            Dummies = new List<SchematicConfiguration.DummyConfiguration>()
+            Dummies = new List<SchematicConfiguration.DummyConfiguration>
             {
-                new SchematicConfiguration.DummyConfiguration()
+                new SchematicConfiguration.DummyConfiguration
                 {
                     Position = Vector3.forward * 3,
                     Name = "test",
@@ -77,9 +77,9 @@ public class TestCommand : SynapseCommand
                     HeldItem = ItemType.None
                 }
             },
-            Lights = new List<SchematicConfiguration.LightSourceConfiguration>()
+            Lights = new List<SchematicConfiguration.LightSourceConfiguration>
             {
-                new SchematicConfiguration.LightSourceConfiguration()
+                new SchematicConfiguration.LightSourceConfiguration
                 {
                     Position = Vector3.zero,
                     Color = Color.blue,
@@ -90,7 +90,7 @@ public class TestCommand : SynapseCommand
                     LightShadows = true
                 }
             },
-            Lockers = new List<SchematicConfiguration.LockerConfiguration>()
+            Lockers = new List<SchematicConfiguration.LockerConfiguration>
             {
                 new ()
                 {
@@ -101,9 +101,9 @@ public class TestCommand : SynapseCommand
                     LockerType = SynapseLocker.LockerType.ScpPedestal
                 }
             },
-            Ragdolls = new List<SchematicConfiguration.RagdollConfiguration>()
+            Ragdolls = new List<SchematicConfiguration.RagdollConfiguration>
             {
-                new SchematicConfiguration.RagdollConfiguration()
+                new SchematicConfiguration.RagdollConfiguration
                 {
                     Nick = "test",
                     Position = Vector3.zero,
@@ -113,9 +113,9 @@ public class TestCommand : SynapseCommand
                     RoleType = RoleType.Scp049
                 }
             },
-            Targets = new List<SchematicConfiguration.TargetConfiguration>()
+            Targets = new List<SchematicConfiguration.TargetConfiguration>
             {
-                new SchematicConfiguration.TargetConfiguration()
+                new SchematicConfiguration.TargetConfiguration
                 {
                     Position = Vector3.right * 6,
                     Rotation = Quaternion.identity,
@@ -123,7 +123,7 @@ public class TestCommand : SynapseCommand
                     TargetType = SynapseTarget.TargetType.Binary
                 }
             },
-            WorkStations = new List<SchematicConfiguration.SimpleUpdateConfig>()
+            WorkStations = new List<SchematicConfiguration.SimpleUpdateConfig>
             {
                 new ()
                 {
@@ -132,9 +132,9 @@ public class TestCommand : SynapseCommand
                     Scale = Vector3.one
                 }
             },
-            OldGrenades = new List<SchematicConfiguration.OldGrenadeConfiguration>()
+            OldGrenades = new List<SchematicConfiguration.OldGrenadeConfiguration>
             {
-                new SchematicConfiguration.OldGrenadeConfiguration()
+                new SchematicConfiguration.OldGrenadeConfiguration
                 {
                     UpdateEveryFrame = true,
                     Position = Vector3.left * 10,

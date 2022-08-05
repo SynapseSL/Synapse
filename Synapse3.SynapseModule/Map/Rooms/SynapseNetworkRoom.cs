@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using MapGeneration;
@@ -84,13 +85,13 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
         switch (room)
         {
             case RoomType.Scp330:
-                return _networkIdentities.FirstOrDefault(x => x?.assetId == new System.Guid("17f38aa5-1bc8-8bc4-0ad1-fffcbe4214ae"));
+                return _networkIdentities.FirstOrDefault(x => x?.assetId == new Guid("17f38aa5-1bc8-8bc4-0ad1-fffcbe4214ae"));
 
             case RoomType.Scp939:
-                return _networkIdentities.FirstOrDefault(x => x?.assetId == new System.Guid("d1566564-d477-24c4-c953-c619898e4751"));
+                return _networkIdentities.FirstOrDefault(x => x?.assetId == new Guid("d1566564-d477-24c4-c953-c619898e4751"));
 
             case RoomType.Scp106:
-                return _networkIdentities.FirstOrDefault(x => x?.assetId == new System.Guid("c1ae9ee4-cc8e-0794-3b2c-358aa6e57565"));
+                return _networkIdentities.FirstOrDefault(x => x?.assetId == new Guid("c1ae9ee4-cc8e-0794-3b2c-358aa6e57565"));
 
             default: return null;
         }

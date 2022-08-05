@@ -1,5 +1,4 @@
 ﻿using Synapse3.SynapseModule.Role;
-using Synapse3.SynapseModule.Teams;
 
 namespace Synapse3.SynapseModule.Player;
 

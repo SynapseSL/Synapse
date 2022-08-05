@@ -29,7 +29,7 @@ internal static class TeamPatches
                 case RespawnManager.RespawnSequencePhase.SelectingTeam:
                     var nextTeam = (uint)RespawnTickets.Singleton.DrawRandomTeam();
 
-                    var ev = new SelectTeamEvent()
+                    var ev = new SelectTeamEvent
                     {
                         TeamId = nextTeam
                     };

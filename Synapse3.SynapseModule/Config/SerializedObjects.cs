@@ -19,7 +19,7 @@ public class SerializedItem
     public SerializedItem() { }
 
     public SerializedItem(SynapseItem item)
-        : this(item.ID, item.Durability, item.FireArm.Attachments, item.Scale) { }
+        : this(item.Id, item.Durability, item.FireArm.Attachments, item.Scale) { }
 
     public SerializedItem(uint id, float durability, uint weaponAttachment, Vector3 scale)
     {
@@ -58,7 +58,7 @@ public class SerializedPlayerItem : SerializedItem
     public SerializedPlayerItem() { }
 
     public SerializedPlayerItem(SynapseItem item, short chance, bool preference) 
-        : this(item.ID, item.Durability, item.FireArm.Attachments, item.Scale, chance, preference) { }
+        : this(item.Id, item.Durability, item.FireArm.Attachments, item.Scale, chance, preference) { }
 
     public SerializedPlayerItem(uint id, float durability, uint weaponAttachment, Vector3 scale, short chance, bool preference) 
         : base(id, durability, weaponAttachment, scale)

@@ -26,4 +26,7 @@ public class GamePlayConfiguration : IDocumentSection
     
     [Description("All Scp's in this list are able to Speak to Humans")]
     public List<uint> SpeakingScp { get; set; } = new List<uint> { 16, 17 };
+
+    [Description("If Enabled the button inside the AlphaWarhead(outside) can be closed again with a keycard")]
+    public bool CloseWarheadButton { get; set; } = false;
 }

@@ -24,7 +24,7 @@ public class PermissionCommand : SynapseCommand
                 var group = context.Player.SynapseGroup;
                 result.Response = "\nYour Group:" +
                                   $"\nDefault: {group.Default}" +
-                                  $"\nNorthWood: {group.Northwood}" +
+                                  $"\nNorthWood: {group.NorthWood}" +
                                   $"\nRemoteAdmin: {group.RemoteAdmin}" +
                                   $"\nBadge: {group.Badge}" +
                                   $"\nColor: {group.Color}" +
@@ -32,12 +32,12 @@ public class PermissionCommand : SynapseCommand
                                   $"\nHidden: {group.Hidden}" +
                                   $"\nKickPower: {group.KickPower}" +
                                   $"\nRequiredKickPower: {group.RequiredKickPower}" +
-                                  $"\nPermissions:";
+                                  "\nPermissions:";
 
                 foreach (var perm in group.Permissions)
                     result.Response += $"\n    - {perm}";
 
-                result.Response += $"\nInheritance:";
+                result.Response += "\nInheritance:";
                 foreach (var inherit in group.Inheritance)
                     result.Response += $"\n    - {inherit}";
 

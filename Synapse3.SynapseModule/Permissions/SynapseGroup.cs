@@ -15,9 +15,9 @@ public class SynapseGroup : IDocumentSection
     public bool Default;
 
     [Description("If Enabled this Group will be assigned to Northwood staff players, which are in no other Group")]
-    public bool Northwood;
+    public bool NorthWood;
 
-    [Description("If Enabled this Group has Acces to RemoteAdmin")]
+    [Description("If Enabled this Group has Access to RemoteAdmin")]
     public bool RemoteAdmin;
 
     [Description("The Badge which will be displayed in game")]
@@ -39,13 +39,13 @@ public class SynapseGroup : IDocumentSection
     public byte RequiredKickPower = 1;
 
     [Description("The Permissions which the group has")]
-    public List<string> Permissions = new() { };
+    public List<string> Permissions = new();
 
     [Description("Gives the Group the Permissions of all Groups in this List")]
-    public List<string> Inheritance = new() { };
+    public List<string> Inheritance = new();
 
     [Description("The UserID's of the Players in the Group")]
-    public List<string> Members = new() { };
+    public List<string> Members = new();
 
     public bool HasPermission(string permission) => HasPermission(permission, 0);
 
@@ -92,7 +92,7 @@ public class SynapseGroup : IDocumentSection
     }
 
     public bool HasVanillaPermission(PlayerPermissions permission) =>
-        HasPermission(VanillaPrefix + "." + permission.ToString());
+        HasPermission(VanillaPrefix + "." + permission);
 
     public ulong GetVanillaPermissionValue()
     {
@@ -119,7 +119,7 @@ public class SynapseGroup : IDocumentSection
         Inheritance = Inheritance,
         KickPower = KickPower,
         Members = Members,
-        Northwood = Northwood,
+        NorthWood = NorthWood,
         Permissions = Permissions,
         RemoteAdmin = RemoteAdmin,
         RequiredKickPower = RequiredKickPower

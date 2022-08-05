@@ -17,7 +17,7 @@ public abstract class SynapseCommand : Command<SynapseContext>
         if (context.IsAdmin) return null;
         
         if (Meta is not SynapseCommandAttribute attribute)
-            return new CommandResult()
+            return new CommandResult
             {
                 Response = "Invalid Command, cant check for Permissions",
                 StatusCode = CommandStatusCode.Error
@@ -27,7 +27,7 @@ public abstract class SynapseCommand : Command<SynapseContext>
         {
             if (!context.Player.HasPermission(attribute.Permission))
             {
-                return new CommandResult()
+                return new CommandResult
                 {
                     Response = $"You don't have access to this Command ({attribute.Permission})",
                     StatusCode = CommandStatusCode.Forbidden

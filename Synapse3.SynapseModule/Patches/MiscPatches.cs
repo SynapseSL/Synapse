@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using PlayableScps;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule.Config;
 using UnityEngine;
@@ -58,8 +59,8 @@ internal static class MiscPatches
     }
     
     [HarmonyPostfix]
-    [HarmonyPatch(typeof(PlayableScps.Scp096), "CurMaxShield", MethodType.Getter)]
-    public static void GetMaxShield(PlayableScps.Scp096 __instance, ref float __result)
+    [HarmonyPatch(typeof(Scp096), "CurMaxShield", MethodType.Getter)]
+    public static void GetMaxShield(Scp096 __instance, ref float __result)
     {
         try
         {

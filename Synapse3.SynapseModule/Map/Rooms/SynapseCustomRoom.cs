@@ -1,4 +1,5 @@
-﻿using Synapse3.SynapseModule.Map.Objects;
+﻿using MEC;
+using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using UnityEngine;
 
@@ -81,7 +82,7 @@ public abstract class SynapseCustomRoom : DefaultSynapseObject, IRoom
             light.ToyBase.netIdentity.UnSpawnForAllPlayers();
         }
 
-        MEC.Timing.CallDelayed(duration, () =>
+        Timing.CallDelayed(duration, () =>
         {
             foreach (var light in RoomSchematic.Lights)
             {

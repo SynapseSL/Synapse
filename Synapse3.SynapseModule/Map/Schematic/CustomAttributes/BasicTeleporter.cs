@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 using Synapse3.SynapseModule.Player;
+using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Schematic.CustomAttributes;
 

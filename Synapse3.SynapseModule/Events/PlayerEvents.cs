@@ -41,6 +41,7 @@ public class PlayerEvents : Service
     public readonly EventReactor<PlaceBulletHoleEvent> PlaceBulletHole = new();
     public readonly EventReactor<ReportEvent> Report = new();
     public readonly EventReactor<SpeakSecondaryEvent> SpeakSecondary = new();
+    public readonly EventReactor<OpenWarheadButtonEvent> OpenWarheadButton = new();
 
     public PlayerEvents(EventManager eventManager)
     {
@@ -75,6 +76,7 @@ public class PlayerEvents : Service
         _eventManager.RegisterEvent(PlaceBulletHole);
         _eventManager.RegisterEvent(Report);
         _eventManager.RegisterEvent(SpeakSecondary);
+        _eventManager.RegisterEvent(OpenWarheadButton);
     }
 }
 
@@ -450,4 +452,14 @@ public class SpeakSecondaryEvent : PlayerInteractEvent
     public bool Scp939Chat { get; set; }
 
     public bool StartSpeaking { get; }
+}
+
+public class OpenWarheadButtonEvent : PlayerInteractEvent
+{
+    public OpenWarheadButtonEvent(SynapsePlayer player, bool allow, bool open) : base(player, allow)
+    {
+        Open = open;
+    }
+
+    public bool Open { get; set; }
 }

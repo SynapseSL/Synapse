@@ -60,11 +60,12 @@ public class RoomService : Service
 
     public IRoom GetRoom(string name)
         => Rooms.FirstOrDefault(x => x.Name == name);
-
-    //TODO: Find a better solution maybe Raycasts
+    
     public IRoom GetNearestRoom(Vector3 position)
     {
-        return Rooms.OrderBy(x => Vector3.Distance(x.Position, position))?.FirstOrDefault();
+        var room = RoomIdUtils.RoomAtPosition(position);
+        
+        return room != null ? room.GetVanillaRoom() : Rooms.OrderBy(x => Vector3.Distance(x.Position, position))?.FirstOrDefault();
     }
 
     public void AddRoom(IRoom room)

@@ -13,7 +13,7 @@ public partial class SynapsePlayer
     public Vector3 Position
     {
         get => PlayerMovementSync.GetRealPosition();
-        set => PlayerMovementSync.OverridePosition(value, null);
+        set => PlayerMovementSync.OverridePosition(value);
     }
 
     /// <summary>
