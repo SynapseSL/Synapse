@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Player;
 using Console = GameCore.Console;
 
 namespace Synapse3.SynapseModule;
@@ -57,11 +58,11 @@ public class ServerService : Service
             ServerConfigSynchronizer.RefreshAllConfigs();
         }
     }
-    
+
     /// <summary>
     /// Returns an array of all Colors that are allowed to use in Badges
     /// </summary>
-    public string[] Colors => Misc.AllowedColors.Values.ToArray();
+    public Dictionary<Misc.PlayerInfoColorTypes, string> Colors { get; } = Misc.AllowedColors;
     
     /// <summary>
     /// Returns the ServerConsole Object from the base game
@@ -119,5 +120,34 @@ public class ServerService : Service
     public void Reload()
     {
         _server.Reload.Raise(new ReloadEvent());
+    }
+
+    /// <summary>
+    /// Tries to get a LeaderBoard with this Key from a potentially implemented Database
+    /// </summary>
+    public Dictionary<SynapsePlayer, string> GetLeaderBoard(string key, bool orderByHighest = true)
+    {
+        var ev = new GetLeaderBoardEvent(key, orderByHighest);
+        Synapse.Get<ServerEvents>().GetLeaderBoard.Raise(ev);
+        return ev.Data;
+    }
+
+    /// <summary>
+    /// Gets Data from a potentially implemented Database with the given Key
+    /// </summary>
+    public string GetData(string key)
+    {
+        var ev = new GetDataEvent(key);
+        Synapse.Get<ServerEvents>().GetData.Raise(ev);
+        return ev.Data;
+    }
+
+    /// <summary>
+    /// Sets Data from a potentially implemented Database
+    /// </summary>
+    public void SetData(string key, string value)
+    {
+        var ev = new SetDataEvent(key, value);
+        Synapse.Get<ServerEvents>().SetData.Raise(ev);
     }
 }

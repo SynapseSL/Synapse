@@ -52,7 +52,7 @@ public partial class SynapsePlayer
 
             var method = typeof(NetworkServer).GetMethod("SendSpawnMessage", BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public);
 
-            foreach (var ply in Synapse.Get<PlayerService>().Players)
+            foreach (var ply in _player.Players)
                 _ = method.Invoke(null, new object[] { NetworkIdentity, ply.Connection });
         }
     }
@@ -62,7 +62,7 @@ public partial class SynapsePlayer
     /// </summary>
     public IRoom Room
     {
-        get => Synapse.Get<RoomService>().GetNearestRoom(Position);
+        get => _room.GetNearestRoom(Position);
         set => Position = value.Position;
     }
 
@@ -80,5 +80,5 @@ public partial class SynapsePlayer
         }
     }
 
-    public int ZoneId => Room.Zone;
+    public uint ZoneId => Room.Zone;
 }

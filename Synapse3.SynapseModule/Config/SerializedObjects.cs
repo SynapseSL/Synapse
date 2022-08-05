@@ -21,7 +21,7 @@ public class SerializedItem
     public SerializedItem(SynapseItem item)
         : this(item.ID, item.Durability, item.FireArm.Attachments, item.Scale) { }
 
-    public SerializedItem(int id, float durability, uint weaponAttachment, Vector3 scale)
+    public SerializedItem(uint id, float durability, uint weaponAttachment, Vector3 scale)
     {
         ID = id;
         Durability = durability;
@@ -31,7 +31,7 @@ public class SerializedItem
         ZSize = scale.z;
     }
 
-    public int ID { get; set; }
+    public uint ID { get; set; }
         
     public float Durability { get; set; }
     public uint WeaponAttachments { get; set; }
@@ -60,7 +60,7 @@ public class SerializedPlayerItem : SerializedItem
     public SerializedPlayerItem(SynapseItem item, short chance, bool preference) 
         : this(item.ID, item.Durability, item.FireArm.Attachments, item.Scale, chance, preference) { }
 
-    public SerializedPlayerItem(int id, float durability, uint weaponAttachment, Vector3 scale, short chance, bool preference) 
+    public SerializedPlayerItem(uint id, float durability, uint weaponAttachment, Vector3 scale, short chance, bool preference) 
         : base(id, durability, weaponAttachment, scale)
     {
         Chance = chance;
@@ -323,7 +323,7 @@ public class SerializedPlayerState
 
         public List<SerializedEffect> Effects { get; set; } = new();
 
-        public int RoleID { get; set; }
+        public uint RoleID { get; set; }
 
         public float Health { get; set; } = 100f;
 

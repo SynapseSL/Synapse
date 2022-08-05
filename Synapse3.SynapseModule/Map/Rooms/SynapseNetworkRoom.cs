@@ -34,24 +34,24 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
     
     public override ObjectType Type => ObjectType.Room;
     public string Name => RoomType.ToString();
-    public int Id => (int)RoomType;
+    public uint Id => (uint)RoomType;
     public RoomType RoomType { get; }
     public ZoneType ZoneType => (ZoneType)Zone;
-    public int Zone
+    public uint Zone
     {
         get
         {
             switch (Position.y)
             {
                 case 0f:
-                    return (int)ZoneType.LCZ;
+                    return (int)ZoneType.Lcz;
 
                 case 1000f:
                     return (int)ZoneType.Surface;
 
                 case -1000f:
                     if (Name.Contains("HCZ"))
-                        return (int)ZoneType.HCZ;
+                        return (int)ZoneType.Hcz;
 
                     return (int)ZoneType.Entrance;
 

@@ -1,11 +1,13 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using Syml;
 
 namespace Synapse3.SynapseModule.Config;
 
 /// <summary>
-/// The Synapse Configuration Section for all Hosting related stuff
+/// The Synapse Configuration Section for all Hosting related configs
 /// </summary>
+[Serializable]
 [DocumentSection("Hosting")]
 public class HostingConfiguration : IDocumentSection
 {

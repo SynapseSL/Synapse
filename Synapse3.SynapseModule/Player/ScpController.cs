@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Synapse3.SynapseModule.Player;
+﻿namespace Synapse3.SynapseModule.Player;
 
 public class ScpController
 {

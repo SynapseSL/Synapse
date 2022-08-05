@@ -27,7 +27,7 @@ internal static class TeamPatches
             switch (__instance._curSequence)
             {
                 case RespawnManager.RespawnSequencePhase.SelectingTeam:
-                    var nextTeam = (int)RespawnTickets.Singleton.DrawRandomTeam();
+                    var nextTeam = (uint)RespawnTickets.Singleton.DrawRandomTeam();
 
                     var ev = new SelectTeamEvent()
                     {
@@ -70,7 +70,7 @@ internal static class TeamPatches
         try
         {
             var service = Synapse.Get<TeamService>();
-            service.NextTeam = (int)teamToSpawn;
+            service.NextTeam = (uint)teamToSpawn;
             service.Spawn();
             __instance.RestartSequence();
             return false;

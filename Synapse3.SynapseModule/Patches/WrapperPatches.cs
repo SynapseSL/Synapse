@@ -1,5 +1,6 @@
 ﻿using System;
 using HarmonyLib;
+using Interactables.Interobjects;
 using Mirror;
 using Neuron.Core.Logging;
 using PlayerStatsSystem;
@@ -92,7 +93,7 @@ internal static class WrapperPatches
         }
         catch (Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Generator Engage Event failed\n" + ex);
+            NeuronLogger.For<Synapse>().Error("Sy3 API: Use Lift failed\n" + ex);
             return true;
         }
     }
@@ -101,5 +102,20 @@ internal static class WrapperPatches
     //In order to fix this we block this Command entirely and do everything on our own.
     [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.UserCode_CmdRegisterEscape))]
     [HarmonyPrefix]
-    private static bool RegisterEscape() => false;
+    public static bool RegisterEscape() => false;
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(BreakableDoor), nameof(BreakableDoor.ServerDamage))]
+    public static bool OnDoorDamage(BreakableDoor __instance,float hp)
+    {
+        try
+        {
+            return !__instance.GetSynapseDoor()?.UnDestroyable ?? true;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 API: Damage Door failed\n" + ex);
+            return true;
+        }
+    }
 }

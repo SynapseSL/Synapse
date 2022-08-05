@@ -9,13 +9,13 @@ namespace Synapse3.ExamplePlugin;
 
 [Automatic]
 //You don't have to also create a Processor in the same class but that way others can see how this CustomItem is upgraded more easily
-[Scp914Processor(ReplaceHandlers = new []
+[Scp914Processor(ReplaceHandlers = new uint[]
 {
     99
 })]
 [Item(
     Name = "Example",
-    ID = 99,
+    Id = 99,
     BasedItemType = ItemType.Coin,
     SchematicID = 1
 )]
@@ -26,6 +26,7 @@ public class ExampleCustomItem : CustomItemHandler, ISynapse914Processor
         NeuronLogger.For<ExamplePlugin>().Warn("CREATED ITEM HANDLER/914 PROCESSOR");
     }
     
+    //Destroy the custom item 99 and create a "real" coin
     public void CreateUpgradedItem(SynapseItem item, Scp914KnobSetting setting, Vector3 position = default)
     {
         var state = item.State;

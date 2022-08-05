@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Mirror;
-using Neuron.Core.Logging;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
@@ -96,11 +95,8 @@ public class SynapseRagdoll : NetworkSynapseObject
 
     protected override TComponent CreateNetworkObject<TComponent>(TComponent component, Vector3 pos, Quaternion rot, Vector3 scale)
     {
-        var gameObject = Object.Instantiate(component, pos, rot);
-        OriginalRagdollScale = gameObject.transform.localScale;
-        gameObject.transform.localScale = CreateScale(scale);
-        NetworkServer.Spawn(gameObject.gameObject);
-        return gameObject;
+        OriginalRagdollScale = component.transform.localScale;
+        return base.CreateNetworkObject(component, pos, rot, CreateScale(scale));
     }
 
     private Vector3 CreateScale(Vector3 newScale)

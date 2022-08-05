@@ -43,9 +43,12 @@ public partial class Synapse
     {
         var version = $"{Major}.{Minor}.{Patch}";
         
-#if DEBUG
+#if CUSTOM_VERSION
         if (Type != VersionType.None)
             version += $"-{Type}-{SubVersion}";
+#endif
+#if DEBUG
+        version += "-Debug";
 #endif
 
         return version;

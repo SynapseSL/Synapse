@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Linq;
 using Neuron.Core.Logging;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Role;
+using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
 
@@ -9,24 +12,22 @@ public partial class SynapsePlayer
 {
     public virtual void Awake()
     {
-        var service = Synapse.Get<PlayerService>();
-        if(service.Players.Contains(this)) return;
+        if(_player.Players.Contains(this)) return;
 
-        service.AddPlayer(this);
+        _player.AddPlayer(this);
     }
 
     public virtual void OnDestroy()
     {
-        var service = Synapse.Get<PlayerService>();
-        if(!service.Players.Contains(this)) return;
+        if(!_player.Players.Contains(this)) return;
 
-        service.RemovePlayer(this);
+        _player.RemovePlayer(this);
         
         try
         {
             RemoveCustomRole(DespawnReason.Leave);
             var ev = new LeaveEvent(this);
-            Synapse.Get<PlayerEvents>().Leave.Raise(ev);
+            _playerEvents.Leave.Raise(ev);
         }
         catch (Exception ex)
         {
@@ -34,8 +35,16 @@ public partial class SynapsePlayer
         }
     }
 
+    private float _updateTime;
     public void Update()
     {
-        Synapse.Get<PlayerEvents>().Update.Raise(new UpdateEvent(this));
+        _playerEvents.Update.Raise(new UpdateEvent(this));
+
+        if (PlayerType != PlayerType.Player || HideRank ||
+            !string.Equals(SynapseGroup.Color, "rainbow", StringComparison.OrdinalIgnoreCase)) return;
+
+        if (Time.time < _updateTime) return;
+        _updateTime = Time.time + _config.PermissionConfiguration.RainbowUpdateTime;
+        RankColor = _server.Colors.ElementAt(UnityEngine.Random.Range(0, _server.Colors.Count)).Key.ToString();
     }
 }

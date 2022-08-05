@@ -6,7 +6,7 @@ public class RaCategoryAttribute : Attribute
 {
     public RaCategoryAttribute() { }
 
-    public RaCategoryAttribute(string name, int id, Type categoryType)
+    public RaCategoryAttribute(string name, uint id, Type categoryType)
     {
         Name = name;
         Id = id;
@@ -19,7 +19,7 @@ public class RaCategoryAttribute : Attribute
 
     public int Size { get; set; } = 20;
     
-    public int Id { get; set; }
+    public uint Id { get; set; }
     
     public Type CategoryType { get; internal set; }
 }

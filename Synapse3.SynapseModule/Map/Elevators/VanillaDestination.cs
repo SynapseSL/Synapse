@@ -4,7 +4,7 @@ namespace Synapse3.SynapseModule.Map.Elevators;
 
 public class VanillaDestination : IElevatorDestination
 {
-    public VanillaDestination(SynapseElevator elevator, Lift.Elevator dest, string name, int id)
+    public VanillaDestination(SynapseElevator elevator, Lift.Elevator dest, string name, uint id)
     {
         VanillaElevator = dest;
         Elevator = elevator;
@@ -59,7 +59,7 @@ public class VanillaDestination : IElevatorDestination
 
     public bool Locked { get; set; }
     
-    public int ElevatorId { get; }
+    public uint ElevatorId { get; }
     public Vector3 RangeScale { get; set; }
 
     public Vector3 DestinationPosition

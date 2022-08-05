@@ -1,4 +1,5 @@
-﻿using Synapse3.SynapseModule.Config;
+﻿using System;
+using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Permissions;
 
@@ -30,7 +31,7 @@ public partial class SynapsePlayer
         get
         {
             if (_synapseGroup == null)
-                return Synapse.Get<PermissionService>().GetPlayerGroup(this);
+                return _permission.GetPlayerGroup(this);
 
             return _synapseGroup;
         }
@@ -114,16 +115,16 @@ public partial class SynapsePlayer
         switch (ServerRoles.GlobalBadgeType)
         {
             case 1:
-                globalAccessAllowed = Synapse.Get<SynapseConfigService>().PermissionConfiguration.StaffAccess;
+                globalAccessAllowed = _config.PermissionConfiguration.StaffAccess;
                 break;
             case 2:
-                globalAccessAllowed = Synapse.Get<SynapseConfigService>().PermissionConfiguration.ManagerAccess;
+                globalAccessAllowed = _config.PermissionConfiguration.ManagerAccess;
                 break;
             case 3:
-                globalAccessAllowed = Synapse.Get<SynapseConfigService>().PermissionConfiguration.GlobalBanTeamAccess;
+                globalAccessAllowed = _config.PermissionConfiguration.GlobalBanTeamAccess;
                 break;
             case 4:
-                globalAccessAllowed = Synapse.Get<SynapseConfigService>().PermissionConfiguration.GlobalBanTeamAccess;
+                globalAccessAllowed = _config.PermissionConfiguration.GlobalBanTeamAccess;
                 break;
         }
 
@@ -180,7 +181,7 @@ public partial class SynapsePlayer
                     PermissionsHandler.IsPermitted(group.Permissions, PlayerPermissions.ViewHiddenGlobalBadges);
 
         if (flag || flag2)
-            foreach (var player in Synapse.Get<PlayerService>().Players)
+            foreach (var player in _player.Players)
             {
                 if (!string.IsNullOrEmpty(player.ServerRoles.HiddenBadge) &&
                     (!player.ServerRoles.GlobalHidden || flag2) && (player.ServerRoles.GlobalHidden || flag))
@@ -213,7 +214,7 @@ public partial class SynapsePlayer
     public string RankColor
     {
         get => Rank.BadgeColor;
-        set => ServerRoles.SetColor(value);
+        set => ServerRoles.SetColor(value.ToLower());
     }
 
     /// <summary>

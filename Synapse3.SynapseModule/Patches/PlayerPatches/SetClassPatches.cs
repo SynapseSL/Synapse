@@ -61,7 +61,8 @@ internal static class SetClassPatches
 
                 foreach (var itemType in roleItems.Items)
                 {
-                    ev.Items.Add((int)itemType);
+                    if (itemType == ItemType.None) continue;
+                    ev.Items.Add((uint)itemType);
                 }
             }
 

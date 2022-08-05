@@ -10,8 +10,8 @@ namespace Synapse3.ExamplePlugin;
 [SynapseCommand(
     CommandName = "Example",
     Description = "An example command",
-    Aliases = new []{"Ex"},
-    Platforms = new [] {CommandPlatform.RemoteAdmin, CommandPlatform.PlayerConsole, CommandPlatform.ServerConsole}
+    Aliases = new []{ "Ex" },
+    Platforms = new [] { CommandPlatform.RemoteAdmin, CommandPlatform.PlayerConsole, CommandPlatform.ServerConsole }
 )]
 public class ExampleCommand : SynapseCommand
 {

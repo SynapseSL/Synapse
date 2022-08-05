@@ -13,7 +13,7 @@ public class SynapseElevator : DefaultElevator
     {
         Lift = lift;
         var list = new List<IElevatorDestination>();
-        for (int i = 0; i < lift.elevators.Length; i++)
+        for (uint i = 0; i < lift.elevators.Length; i++)
         {
             list.Add(new VanillaDestination(this, lift.elevators[i], lift.elevatorName + "-" + i, i));
         }
@@ -23,7 +23,7 @@ public class SynapseElevator : DefaultElevator
     }
     
     public override string Name => Lift.elevatorName;
-    public override int Id => (int)ElevatorType;
+    public override uint Id => (uint)ElevatorType;
     
     public override bool Locked 
     {
@@ -43,13 +43,13 @@ public class SynapseElevator : DefaultElevator
     
     public bool Operative => Lift.operative;
 
-    public override void MoveToDestination(int destinationId)
+    public override void MoveToDestination(uint destinationId)
     {
         if (destinationId is 0 or 1 && destinationId != CurrentDestination.ElevatorId)
             Timing.RunCoroutine(_MoveTo(destinationId));
     }
 
-    private IEnumerator<float> _MoveTo(int destinationId)
+    private IEnumerator<float> _MoveTo(uint destinationId)
     {
         var previous = Lift.status;
         Lift.SetStatus(2);

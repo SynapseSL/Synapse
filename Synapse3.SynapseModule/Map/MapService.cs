@@ -100,7 +100,7 @@ public class MapService : Service
 
     public void Explode(Vector3 position, GrenadeType type)
     {
-        var item = new SynapseItem((int)type, position);
+        var item = new SynapseItem((uint)type, position);
         item.Throwable.Fuse();
         Timing.CallDelayed(Timing.WaitForOneFrame, item.Destroy);
     }

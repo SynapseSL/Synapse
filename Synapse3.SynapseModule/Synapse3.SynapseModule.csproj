@@ -6,17 +6,11 @@
         <LangVersion>10.0</LangVersion>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <OutputType>Library</OutputType>
-        <Configurations>Debug;Release</Configurations>
+        <Configurations>Debug;Custom Version;Main Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <RootNamespace>Synapse3.SynapseModule</RootNamespace>
         <PackageId>Synapse3.SynapseModule</PackageId>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-        <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-        <GenerateDocumentationFile>True</GenerateDocumentationFile>
-        <DebugType>Portable</DebugType>
     </PropertyGroup>
 
     <ItemGroup>
@@ -62,6 +56,18 @@
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
 
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Main Release' ">
+      <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+      <GenerateDocumentationFile>True</GenerateDocumentationFile>
+      <DebugType>Portable</DebugType>
+      <Optimize Condition=" '$(Optimize)' == '' ">true</Optimize>
+      <DocumentationFile />
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Custom Version' ">
+      <Optimize>true</Optimize>
     </PropertyGroup>
 
 </Project>

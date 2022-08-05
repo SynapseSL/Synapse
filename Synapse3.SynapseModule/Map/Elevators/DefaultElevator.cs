@@ -16,13 +16,13 @@ namespace Synapse3.SynapseModule.Map.Elevators;
 public abstract class DefaultElevator : IElevator
 {
     public abstract string Name { get; }
-    public abstract int Id { get; }
+    public abstract uint Id { get; }
     public abstract bool Locked { get; set; }
     public abstract bool IsMoving { get; }
     public IElevatorDestination CurrentDestination { get; set; }
     public abstract ReadOnlyCollection<IElevatorDestination> Destinations { get; }
 
-    public abstract void MoveToDestination(int destinationId);
+    public abstract void MoveToDestination(uint destinationId);
 
     public void MoveToNext()
     {
@@ -45,7 +45,7 @@ public abstract class DefaultElevator : IElevator
         }
     }
 
-    public void MoveContent(int destinationId)
+    public void MoveContent(uint destinationId)
     {
         try
         {
@@ -141,9 +141,9 @@ public abstract class DefaultElevator : IElevator
         }
     }
     
-    public IElevatorDestination GetDestination(int id) => Destinations.FirstOrDefault(x => x.ElevatorId == id);
+    public IElevatorDestination GetDestination(uint id) => Destinations.FirstOrDefault(x => x.ElevatorId == id);
 
-    private bool InsideAnyDestination(Vector3 position, int goalDestination, out Vector3 localPosition,
+    private bool InsideAnyDestination(Vector3 position, uint goalDestination, out Vector3 localPosition,
         out Transform transform)
     {
         foreach (var destination in Destinations)

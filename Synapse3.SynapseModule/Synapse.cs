@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using CommandSystem.Commands.Shared;
+﻿using CommandSystem.Commands.Shared;
 using Neuron.Core;
 using Neuron.Core.Meta;
 using Neuron.Core.Modules;

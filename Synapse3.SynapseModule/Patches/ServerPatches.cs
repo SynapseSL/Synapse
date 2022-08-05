@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using HarmonyLib;
-using LiteNetLib;
-using LiteNetLib.Utils;
-using Neuron.Core.Logging;
-using Synapse3.SynapseModule.Events;
-
-namespace Synapse3.SynapseModule.Patches;
+﻿namespace Synapse3.SynapseModule.Patches;
 
 //[Patches]
 internal static class ServerPatches

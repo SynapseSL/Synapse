@@ -2,6 +2,7 @@
 using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
 using Mirror;
+using Neuron.Core.Logging;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -64,9 +65,34 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
         set => Variant.RequiredPermissions = value;
     }
 
-    public bool IsBreakable => Variant is BreakableDoor;
+    public float Health
+    {
+        get => Variant is BreakableDoor breakableDoor ? breakableDoor._remainingHealth : -1f;
+        set
+        {
+            if (Variant is BreakableDoor breakableDoor)
+            {
+                breakableDoor._remainingHealth = value;
+                breakableDoor._maxHealth = value;
+                NeuronLogger.For<Synapse>().Warn(breakableDoor._remainingHealth);
+            }
+        }
+    }
 
-    public bool IsDestroyed => Variant is BreakableDoor { IsDestroyed: true };
+    public bool IsDestroyed
+    {
+        get => Variant is IDamageableDoor { IsDestroyed: true };
+        set
+        {
+            if (Variant is IDamageableDoor damageableDoor)
+                damageableDoor.IsDestroyed = value;
+        }
+    }
+
+    public bool UnDestroyable { get; set; } = false;
+
+
+    public bool IsBreakable => Variant is BreakableDoor;
 
     public bool IsPryable => Variant is PryableDoor;
     
@@ -93,6 +119,12 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
 
     public void LockWithReason(DoorLockReason reason) => Variant.ServerChangeLock(reason, true);
 
+    public void Damage(float damageAmount, DoorDamageType damageType = DoorDamageType.None)
+    {
+        if (Variant is IDamageableDoor damageableDoor)
+            damageableDoor.ServerDamage(damageAmount, damageType);
+    }
+
     public override string ToString() => Name;
 
 
@@ -118,6 +150,9 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
 
         Locked = configuration.Locked;
         Open = configuration.Open;
+        UnDestroyable = configuration.UnDestroyable;
+        if (configuration.Health > 0f)
+            Health = configuration.Health;
         OriginalScale = configuration.Scale;
         CustomAttributes = configuration.CustomAttributes;
         UpdateEveryFrame = configuration.UpdateEveryFrame;

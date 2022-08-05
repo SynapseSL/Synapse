@@ -12,14 +12,17 @@ namespace Synapse3.ExamplePlugin;
 )]
 public class ExampleRole : SynapseRole
 {
-    public override int GetTeamID() => 15;
+    public override uint GetTeamID() => 15;
 
     public override void SpawnPlayer(bool spawnLite)
     {
-        Player.RoleType = RoleType.ClassD;
+        if(spawnLite) return;
+        Player.RoleType = RoleType.NtfCaptain;
+        Player.Inventory.ClearAllItems();
+        Player.Inventory.GiveItem(ItemType.Coin);
     }
 
-    public override List<int> GetEnemiesID() => new (){ (int)Team.CDP };
+    public override List<uint> GetEnemiesID() => new (){ (uint)Team.CDP };
 
     public override void DeSpawn(DespawnReason reason)
     {

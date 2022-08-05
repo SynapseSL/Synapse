@@ -43,7 +43,7 @@ public class SynapseScp914ProcessorBinding : IMetaBinding
 {
     public Type Processor { get; set; }
     
-    public int[] ReplaceHandlers { get; set; }
+    public uint[] ReplaceHandlers { get; set; }
 
     public IEnumerable<Type> PromisedServices => new Type[] { };
 }

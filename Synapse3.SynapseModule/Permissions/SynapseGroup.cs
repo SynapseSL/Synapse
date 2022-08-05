@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using Syml;
+using YamlDotNet.Serialization;
 
 namespace Synapse3.SynapseModule.Permissions;
 
 public class SynapseGroup : IDocumentSection
 {
-    public int GroupId { get; internal set; }
+    [YamlIgnore]
+    public uint GroupId { get; internal set; }
     
     [Description("If Enabled this Group will be assigned to all players, which are in no other Group")]
     public bool Default;

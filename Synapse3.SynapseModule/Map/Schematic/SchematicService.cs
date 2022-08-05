@@ -83,31 +83,31 @@ public class SchematicService : Service
         => SpawnSchematic(configuration, position, Quaternion.identity, Vector3.one);
 
 
-    public SynapseSchematic SpawnSchematic(int id, Vector3 position, Quaternion rotation,
+    public SynapseSchematic SpawnSchematic(uint id, Vector3 position, Quaternion rotation,
         Vector3 scale)
         => SpawnSchematic(GetConfiguration(id), position, rotation, scale);
     
-    public SynapseSchematic SpawnSchematic(int id, Vector3 position, Quaternion rotation)
+    public SynapseSchematic SpawnSchematic(uint id, Vector3 position, Quaternion rotation)
         => SpawnSchematic(GetConfiguration(id), position, rotation, Vector3.one);
     
-    public SynapseSchematic SpawnSchematic(int id, Vector3 position)
+    public SynapseSchematic SpawnSchematic(uint id, Vector3 position)
         => SpawnSchematic(GetConfiguration(id), position, Quaternion.identity, Vector3.one);
 
-    public SchematicConfiguration GetConfiguration(int id) => _schematicConfigurations.FirstOrDefault(x => x.ID == id);
+    public SchematicConfiguration GetConfiguration(uint id) => _schematicConfigurations.FirstOrDefault(x => x.Id == id);
 
     public SchematicConfiguration GetConfiguration(string name) =>
         SchematicConfigurations.FirstOrDefault(x => x.Name == name);
 
     public void RegisterSchematic(SchematicConfiguration configuration)
     {
-        if(IsIDRegistered(configuration.ID)) return;
+        if(IsIDRegistered(configuration.Id)) return;
         
         _schematicConfigurations.Add(configuration);
     }
 
     public bool SaveConfiguration(SchematicConfiguration configuration)
     {
-        if (IsIDRegistered(configuration.ID) || string.IsNullOrWhiteSpace(configuration.Name)) return false;
+        if (IsIDRegistered(configuration.Id) || string.IsNullOrWhiteSpace(configuration.Name)) return false;
         RegisterSchematic(configuration);
         
         var file = Path.Combine(_base.PrepareRelativeDirectory("Schematics"), configuration.Name);
@@ -118,7 +118,7 @@ public class SchematicService : Service
         return true;
     }
 
-    public bool IsIDRegistered(int id) => _schematicConfigurations.Any(x => x.ID == id);
+    public bool IsIDRegistered(uint id) => _schematicConfigurations.Any(x => x.Id == id);
 
 
     public override void Enable()
@@ -146,8 +146,8 @@ public class SchematicService : Service
                     SynapsePrimitive.Prefab = pref;
                     break;
 
-                case "LightSourceToy" when prefab.TryGetComponent<LightSourceToy>(out var lightpref):
-                    SynapseLight.Prefab = lightpref;
+                case "LightSourceToy" when prefab.TryGetComponent<LightSourceToy>(out var light):
+                    SynapseLight.Prefab = light;
                     break;
 
                 case "sportTargetPrefab" when prefab.TryGetComponent<ShootingTarget>(out var target):

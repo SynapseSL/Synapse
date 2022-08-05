@@ -1,19 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using MEC;
-using Neuron.Core.Logging;
 
 namespace Synapse3.SynapseModule.Map.Elevators;
 
 public abstract class CustomElevator : DefaultElevator
 {
     public override string Name { get; }
-    public override int Id { get; }
+    public override uint Id { get; }
     public override bool Locked { get; set; }
     private bool _moving;
     public override bool IsMoving => _moving;
 
-    public override void MoveToDestination(int destinationId)
+    public override void MoveToDestination(uint destinationId)
     {
         if (Destinations.Any(x => x.ElevatorId == destinationId) && !_moving)
         {
@@ -35,13 +34,13 @@ public abstract class CustomElevator : DefaultElevator
         }
     }
 
-    protected virtual void OpenDestination(int destinationId)
+    protected virtual void OpenDestination(uint destinationId)
     {
         var destination = GetDestination(destinationId);
         destination.Open = true;
     }
 
-    protected virtual IEnumerator<float> MoveTo(int destinationId)
+    protected virtual IEnumerator<float> MoveTo(uint destinationId)
     {
         CloseAllDestinations();
         yield return Timing.WaitForSeconds(MoveContentDelay);

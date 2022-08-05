@@ -32,7 +32,7 @@ public class GiveCustomItemCommand : SynapseCommand
             return;
         }
 
-        if (!int.TryParse(context.Arguments[1], out var id)) 
+        if (!uint.TryParse(context.Arguments[1], out var id)) 
         {
             result.Response = "Invalid Parameter for ItemID";
             result.StatusCode = CommandStatusCode.Error;

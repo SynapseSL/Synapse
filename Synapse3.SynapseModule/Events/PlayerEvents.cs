@@ -171,7 +171,7 @@ public class SetClassEvent : PlayerInteractEvent
     
     public CharacterClassManager.SpawnReason SpawnReason { get; }
 
-    public List<int> Items { get; set; } = new();
+    public List<uint> Items { get; set; } = new();
 
     public List<SynapseItem> EscapeItems { get; set; } = new();
     
@@ -326,14 +326,14 @@ public class DropAmmoEvent : PlayerInteractEvent
 
 public class EscapeEvent : PlayerInteractEvent
 {
-    public EscapeEvent(SynapsePlayer player, bool allow, int newRole, bool isClassD, bool changeTeam) : base(player, allow)
+    public EscapeEvent(SynapsePlayer player, bool allow, uint newRole, bool isClassD, bool changeTeam) : base(player, allow)
     {
         NewRole = newRole;
         IsClassD = isClassD;
         ChangeTeam = changeTeam;
     }
 
-    public int NewRole { get; set; }
+    public uint NewRole { get; set; }
     
     public bool IsClassD { get; }
     

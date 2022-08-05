@@ -29,31 +29,31 @@ public class SynapseRoom : IVanillaRoom
 
     public string Name => RoomType.ToString();
     public RoomType RoomType { get; }
-    public int Id => (int)RoomType;
+    public uint Id => (uint)RoomType;
     
-    public int Zone
+    public uint Zone
     {
         get
         {
             switch (Position.y)
             {
                 case 0f:
-                    return (int)ZoneType.LCZ;
+                    return (uint)ZoneType.Lcz;
 
                 case 1000f:
-                    return (int)ZoneType.Surface;
+                    return (uint)ZoneType.Surface;
 
                 case -1000f:
                     if (Name.Contains("HCZ"))
-                        return (int)ZoneType.HCZ;
+                        return (uint)ZoneType.Hcz;
 
-                    return (int)ZoneType.Entrance;
+                    return (uint)ZoneType.Entrance;
 
                 case -2000f:
-                    return (int)ZoneType.Pocket;
+                    return (uint)ZoneType.Pocket;
 
                 default:
-                    return (int)ZoneType.None;
+                    return (uint)ZoneType.None;
             }
         }
     }

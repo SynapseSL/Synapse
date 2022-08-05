@@ -6,7 +6,6 @@ using Neuron.Core.Meta;
 using Neuron.Modules.Commands.Event;
 using Ninject;
 using Synapse3.SynapseModule.Command;
-using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Permissions.RemoteAdmin;
 
@@ -73,12 +72,13 @@ public class RemoteAdminCategoryService : Service
         _remoteAdminCategories.Add(category);
     }
 
-    public bool IsIdRegistered(int id) => _remoteAdminCategories.Any(x => x.Attribute.Id == id);
+    public bool IsIdRegistered(uint id) => _remoteAdminCategories.Any(x => x.Attribute.Id == id);
 
     private void OnCommand(CommandEvent ev)
     {
         if (ev.Context.Command.ToUpper() != "EXTERNALLOOKUP") return;
         if(ev.Context.Arguments.Length == 0) return;
+        
         foreach (var category in _remoteAdminCategories)
         {
             if(ev.Context.Arguments[0] != category.Attribute.Id.ToString()) continue;

@@ -12,9 +12,9 @@ public interface IRoom
     
     public string Name { get; }
     
-    public int Id { get; }
+    public uint Id { get; }
     
-    public int Zone { get; }
+    public uint Zone { get; }
 
     public void TurnOffLights(float duration);
 }

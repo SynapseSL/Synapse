@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection;
-using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Ninject;
 using Respawning;
@@ -34,7 +32,7 @@ public class TeamService : Service
         }
     }
 
-    public int NextTeam { get; internal set; } = -1;
+    public uint NextTeam { get; internal set; } = uint.MaxValue;
 
     public ReadOnlyCollection<ISynapseTeam> Teams => _teams.AsReadOnly();
 
@@ -64,28 +62,33 @@ public class TeamService : Service
         _teams.Add(team);
     }
 
-    public ISynapseTeam GetTeam(int id) => _teams.FirstOrDefault(x => x.Attribute.Id == id);
+    public ISynapseTeam GetTeam(uint id) => _teams.FirstOrDefault(x => x.Attribute.Id == id);
 
-    public string GetTeamName(int id)
+    public string GetTeamName(uint id)
     {
-        switch (id)
+        return id switch
         {
-            case 1: return "Mobile Task Force";
-            case 2: return "Chaos Insurgency";
-            default: return GetTeam(id)?.Attribute.Name ?? "";
-        }
+            0 => "SCP",
+            1 => "Mobile Task Force",
+            2 => "Chaos Insurgency",
+            3 => "Scientist",
+            4 => "Class-D",
+            5 => "Spectator",
+            6 => "Tutorial",
+            _ => GetTeam(id)?.Attribute.Name ?? ""
+        };
     }
 
-    public bool IsIdRegistered(int id)
+    public bool IsIdRegistered(uint id)
         => IsDefaultId(id) || _teams.Any(x => x.Attribute.Id == id);
 
-    public bool IsDefaultId(int id)
-        => id is >= (int)Team.SCP and <= (int)Team.TUT;
+    public bool IsDefaultId(uint id)
+        => id is >= (uint)Team.SCP and <= (uint)Team.TUT;
     
-    public bool IsDefaultSpawnableID(int id) 
-        => id is (int)Team.MTF or (int)Team.CHI;
+    public bool IsDefaultSpawnableID(uint id) 
+        => id is (uint)Team.MTF or (uint)Team.CHI;
 
-    public float GetRespawnTime(int id)
+    public float GetRespawnTime(uint id)
     {
         switch (id)
         {
@@ -103,7 +106,7 @@ public class TeamService : Service
         }
     }
 
-    public int GetMaxWaveSize(int id, bool addTickets = false)
+    public int GetMaxWaveSize(uint id, bool addTickets = false)
     {
         switch (id)
         {
@@ -134,7 +137,7 @@ public class TeamService : Service
         }
     }
 
-    public void ExecuteRespawnAnnouncement(int id)
+    public void ExecuteRespawnAnnouncement(uint id)
     {
         switch (id)
         {
@@ -152,7 +155,7 @@ public class TeamService : Service
         }
     }
     
-    public void SpawnCustomTeam(int id, List<SynapsePlayer> players)
+    public void SpawnCustomTeam(uint id, List<SynapsePlayer> players)
     {
         if (IsDefaultSpawnableID(id)) return;
 
@@ -169,7 +172,7 @@ public class TeamService : Service
 
     public void Spawn()
     {
-        if (NextTeam <= 0)
+        if (NextTeam == uint.MaxValue)
             goto ResetTeam;
 
         var players = Synapse.Get<PlayerService>().Players.ToList();
@@ -257,6 +260,6 @@ public class TeamService : Service
         }
 
         ResetTeam:
-        NextTeam = -1;
+        NextTeam = uint.MaxValue;
     }
 }

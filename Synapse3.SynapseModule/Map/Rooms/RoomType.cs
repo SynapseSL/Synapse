@@ -1,6 +1,6 @@
 ﻿namespace Synapse3.SynapseModule.Map.Rooms;
 
-public enum RoomType
+public enum RoomType : uint
 {
     //Others
     None,

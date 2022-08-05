@@ -53,7 +53,7 @@ public class HeavyZoneService : Service
     {
         foreach (var room in _room.Rooms)
         {
-            if (!onlyHeavy || (ZoneType)room.Zone == ZoneType.HCZ)
+            if (!onlyHeavy || (ZoneType)room.Zone == ZoneType.Hcz)
             {
                 room.TurnOffLights(duration);
             }

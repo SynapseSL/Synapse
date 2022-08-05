@@ -7,7 +7,7 @@ namespace Synapse3.SynapseModule.Map.Elevators;
 
 public class SchematicDestination : DefaultSynapseObject, IElevatorDestination
 {
-    public SchematicDestination(SynapseSchematic destination, int id, string name, IElevator elevator, Vector3 range)
+    public SchematicDestination(SynapseSchematic destination, uint id, string name, IElevator elevator, Vector3 range)
     {
         Elevator = elevator;
         DestinationName = name;
@@ -46,7 +46,7 @@ public class SchematicDestination : DefaultSynapseObject, IElevatorDestination
             }
         }
     }
-    public int ElevatorId { get; }
+    public uint ElevatorId { get; }
     
     public Vector3 RangeScale { get; set; }
 

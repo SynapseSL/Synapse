@@ -8,7 +8,7 @@ public interface IElevator
 {
     public string Name { get; }
     
-    public int Id { get; }
+    public uint Id { get; }
 
     public bool Locked { get; set; }
     
@@ -18,7 +18,7 @@ public interface IElevator
     
     public ReadOnlyCollection<IElevatorDestination> Destinations { get; }
 
-    public void MoveToDestination(int destinationId);
+    public void MoveToDestination(uint destinationId);
 
     public void MoveToNext();
 }

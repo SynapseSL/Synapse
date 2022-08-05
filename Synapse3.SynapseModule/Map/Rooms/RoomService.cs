@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
@@ -56,7 +55,7 @@ public class RoomService : Service
     public ReadOnlyCollection<CustomRoomAttribute> CustomRoomInformation => _customRoomInformation.AsReadOnly();
 
     
-    public IRoom GetRoom(int id)
+    public IRoom GetRoom(uint id)
         => Rooms.FirstOrDefault(x => x.Id == id);
 
     public IRoom GetRoom(string name)
@@ -91,14 +90,14 @@ public class RoomService : Service
         _customRoomInformation.Add(info);
     }
 
-    public void UnRegisterCustomRoom(int id)
+    public void UnRegisterCustomRoom(uint id)
     {
         if(!IsIdRegistered(id)) return;
         var info = _customRoomInformation.First(x => x.Id == id);
         _customRoomInformation.Remove(info);
     }
 
-    public SynapseCustomRoom CreateRoom(int id)
+    public SynapseCustomRoom CreateRoom(uint id)
     {
         if (!IsIdRegistered(id)) return null;
         var info = _customRoomInformation.FirstOrDefault(x => x.Id == id);
@@ -116,7 +115,7 @@ public class RoomService : Service
         return room;
     }
 
-    public SynapseCustomRoom SpawnCustomRoom(int id, Vector3 position)
+    public SynapseCustomRoom SpawnCustomRoom(uint id, Vector3 position)
     {
         if (!IsIdRegistered(id) || id is >= 0 and <= HighestRoom) return null;
         var room = CreateRoom(id);
@@ -124,7 +123,7 @@ public class RoomService : Service
         return room;
     }
 
-    public bool IsIdRegistered(int id)
+    public bool IsIdRegistered(uint id)
         => id is >= 0 and <= HighestRoom || _customRoomInformation.Any(x => x.Id == id);
     
     private void LoadRooms(RoundWaitingEvent ev)

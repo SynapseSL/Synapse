@@ -6,7 +6,7 @@ public class RoleAttribute : Attribute
 {
     public RoleAttribute() { }
     
-    public RoleAttribute(string name, int id, Type script)
+    public RoleAttribute(string name, uint id, Type script)
     {
         Name = name;
         Id = id;
@@ -14,6 +14,6 @@ public class RoleAttribute : Attribute
     }
 
     public string Name { get; set; }
-    public int Id { get; set; }
+    public uint Id { get; set; }
     public Type RoleScript { get; internal set; }
 }

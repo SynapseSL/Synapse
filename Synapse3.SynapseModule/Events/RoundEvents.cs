@@ -58,19 +58,19 @@ public class RoundCheckEndEvent : IEvent
 
 public class SelectTeamEvent : IEvent
 {
-    public int TeamId { get; set; }
+    public uint TeamId { get; set; }
 
     public bool Reset { get; set; } = false;
 }
 
 public class SpawnTeamEvent : IEvent
 {
-    public SpawnTeamEvent(int teamId)
+    public SpawnTeamEvent(uint teamId)
     {
         TeamId = teamId;
     }
     
-    public int TeamId { get; }
+    public uint TeamId { get; }
     
     public List<SynapsePlayer> Players { get; set; }
 
@@ -79,7 +79,7 @@ public class SpawnTeamEvent : IEvent
 
 public class FirstSpawnEvent : IEvent
 {
-    public Dictionary<SynapsePlayer,int> PlayerAndRoles { get; set; }
+    public Dictionary<SynapsePlayer,uint> PlayerAndRoles { get; set; }
 }
 
 public class DecontaminationEvent : IEvent

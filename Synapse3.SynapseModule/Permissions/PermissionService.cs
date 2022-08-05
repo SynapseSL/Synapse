@@ -11,7 +11,7 @@ namespace Synapse3.SynapseModule.Permissions;
 
 public class PermissionService : Service
 {
-    private int _currentGroupId = 500;
+    private uint _currentGroupId = 500;
     private ConfigService _configService;
     private ServerEvents _server;
     public ConfigContainer Container { get; set; }

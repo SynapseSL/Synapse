@@ -1,12 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using MEC;
-using Neuron.Core.Logging;
 using Neuron.Modules.Commands;
 using Synapse3.SynapseModule.Enums;
-using Synapse3.SynapseModule.Item;
-using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using UnityEngine;
@@ -146,7 +140,7 @@ public class TestCommand : SynapseCommand
                     Position = Vector3.left * 10,
                 }
             },
-            ID = 61,
+            Id = 61,
             Name = "test"
         };
         var schematic = Synapse.Get<SchematicService>().SpawnSchematic(config, context.Player.Position);

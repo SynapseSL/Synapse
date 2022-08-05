@@ -6,7 +6,7 @@ public class CustomRoomAttribute : Attribute
 {
     public CustomRoomAttribute() { }
     
-    public CustomRoomAttribute(string name, int id, int schematicId, Type roomType)
+    public CustomRoomAttribute(string name, uint id, uint schematicId, Type roomType)
     {
         Name = name;
         Id = id;
@@ -16,9 +16,9 @@ public class CustomRoomAttribute : Attribute
     
     public string Name { get; set; }
     
-    public int Id { get; set; }
+    public uint Id { get; set; }
     
-    public int SchematicId { get; set; }
+    public uint SchematicId { get; set; }
     
     public Type RoomType { get; internal set; }
 }

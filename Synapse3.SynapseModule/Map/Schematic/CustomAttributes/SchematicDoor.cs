@@ -17,7 +17,7 @@ public class SchematicDoor : AttributeHandler
     public override void OnLoad(ISynapseObject synapseObject, ArraySegment<string> args)
     {
         if(!(synapseObject is SynapseDoor door)) return;
-        if (args.Count == 0 || !int.TryParse(args.At(0), out var leftSchematicID) || !_schematic.IsIDRegistered(leftSchematicID)) return;
+        if (args.Count == 0 || !uint.TryParse(args.At(0), out var leftSchematicID) || !_schematic.IsIDRegistered(leftSchematicID)) return;
 
         var leftDoor = door.GameObject.transform.GetChild(2).GetChild(1).GetChild(0);
         var leftSchematic = _schematic.SpawnSchematic(leftSchematicID, leftDoor.transform.position, door.Rotation);
@@ -25,7 +25,7 @@ public class SchematicDoor : AttributeHandler
 
         if (door.SpawnableType != SynapseDoor.SpawnableDoorType.Ez)
         {
-            if (args.Count < 2 || !int.TryParse(args.At(1), out var righttschematicID) || !_schematic.IsIDRegistered(righttschematicID)) return;
+            if (args.Count < 2 || !uint.TryParse(args.At(1), out var righttschematicID) || !_schematic.IsIDRegistered(righttschematicID)) return;
 
             var rightDoor = door.GameObject.transform.GetChild(2).GetChild(1).GetChild(1);
             var rightSchematic =

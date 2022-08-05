@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
-using Neuron.Core;
 using Neuron.Core.Meta;
 using Neuron.Modules.Commands.Event;
 using Ninject;
@@ -23,7 +22,7 @@ public class RoleService : Service
     /// <summary>
     /// The Hightest vanilla number for Roles
     /// </summary>
-    public const int HighestRole = (int)RoleType.ChaosMarauder;
+    public const uint HighestRole = (uint)RoleType.ChaosMarauder;
     
     /// <summary>
     /// A list of all Registered CustomRoles that can spawn
@@ -71,26 +70,22 @@ public class RoleService : Service
     /// <summary>
     /// Returns true if the Id is registered or is an Vanilla Role
     /// </summary>
-    public bool IsIdRegistered(int id)
+    public bool IsIdRegistered(uint id)
     {
-        if (id is >= -1 and <= HighestRole) return true;
+        if (id is >= 0 and <= HighestRole) return true;
 
-        if (_customRoles.Any(x => x.Id == id)) return true;
-
-        return false;
+        return _customRoles.Any(x => x.Id == id);
     }
     
     /// <summary>
     /// Returns the Name of an Custom or Vanilla Role
     /// </summary>
-    public string GetRoleName(int id)
+    public string GetRoleName(uint id)
     {
-        if (id is >= -1 and <= HighestRole)
+        if (id is >= 0 and <= HighestRole)
             return ((RoleType)id).ToString();
 
-        if (!IsIdRegistered(id)) return string.Empty;
-
-        return _customRoles.FirstOrDefault(x => x.Id == id)?.Name;
+        return !IsIdRegistered(id) ? string.Empty : _customRoles.FirstOrDefault(x => x.Id == id)?.Name;
     }
 
     /// <summary>
@@ -111,7 +106,7 @@ public class RoleService : Service
     public bool RegisterRole(RoleAttribute info)
     {
         if (info.RoleScript == null) return false;
-        if (info.Id is >= -1 and <= HighestRole) return false;
+        if (info.Id is >= 0 and <= HighestRole) return false;
         if (IsIdRegistered(info.Id)) return false;
 
         _customRoles.Add(info);
@@ -123,13 +118,10 @@ public class RoleService : Service
     /// </summary>
     /// <param name="id">The Id of the Custom Role</param>
     /// <returns>true, when a role was found and could be removed</returns>
-    public bool UnRegisterRole(int id)
+    public bool UnRegisterRole(uint id)
     {
         var role = _customRoles.FirstOrDefault(x => x.Id == id);
-        if (role != null)
-            return _customRoles.Remove(role);
-
-        return false;
+        return role != null && _customRoles.Remove(role);
     }
     
     /// <inheritdoc cref="GetRole(RoleAttribute)"/>
@@ -137,21 +129,15 @@ public class RoleService : Service
     {
         var info = CustomRoles.FirstOrDefault(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
 
-        if (info == null)
-            return null;
-
-        return GetRole(info);
+        return info == null ? null : GetRole(info);
     }
 
     /// <inheritdoc cref="GetRole(RoleAttribute)"/>
-    public ISynapseRole GetRole(int id)
+    public ISynapseRole GetRole(uint id)
     {
         var info = CustomRoles.FirstOrDefault(x => x.Id == id);
 
-        if (info == null) 
-            return null;
-
-        return GetRole(info);
+        return info == null ? null : GetRole(info);
     }
 
     /// <summary>
@@ -172,10 +158,10 @@ public class RoleService : Service
     private void OnRemoteAdmin(CommandEvent ev)
     {
         var kill = string.Equals(ev.Context.Command, "kill", StringComparison.OrdinalIgnoreCase);
-        
-        if(!string.Equals(ev.Context.Command,"overwatch",StringComparison.OrdinalIgnoreCase) &&
-           !kill &&
-           !string.Equals(ev.Context.Command,"forceclass",StringComparison.OrdinalIgnoreCase)) return;
+
+        if (!string.Equals(ev.Context.Command, "overwatch", StringComparison.OrdinalIgnoreCase) &&
+            !kill &&
+            !string.Equals(ev.Context.Command, "forceclass", StringComparison.OrdinalIgnoreCase)) return;
         
         if(ev.Context.Arguments.Length == 0) return;
 

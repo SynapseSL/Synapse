@@ -79,7 +79,7 @@ public class SynapseSchematic : DefaultSynapseObject
 
     public string Name { get; }
 
-    public int ID { get; }
+    public uint ID { get; }
 
     public void DespawnForOnePlayer(SynapsePlayer player)
     {
@@ -99,7 +99,7 @@ public class SynapseSchematic : DefaultSynapseObject
     public SynapseSchematic(SchematicConfiguration configuration)
     {
         Name = configuration.Name;
-        ID = configuration.ID;
+        ID = configuration.Id;
         GameObject = new GameObject(Name);
         
         //Add children

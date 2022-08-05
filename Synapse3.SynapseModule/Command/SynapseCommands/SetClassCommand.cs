@@ -31,7 +31,7 @@ public class SetClassCommand : SynapseCommand
             return;
         }
 
-        if(!int.TryParse(context.Arguments[1],out var id))
+        if(!uint.TryParse(context.Arguments[1],out var id))
         {
             result.Response = "Invalid parameter for RoleID";
             result.StatusCode = CommandStatusCode.Error;

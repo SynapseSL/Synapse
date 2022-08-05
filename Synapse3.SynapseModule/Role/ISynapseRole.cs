@@ -11,11 +11,11 @@ public interface ISynapseRole
 
     void Load();
 
-    int GetTeamID();
+    uint GetTeamID();
 
-    List<int> GetFriendsID();
+    List<uint> GetFriendsID();
 
-    List<int> GetEnemiesID();
+    List<uint> GetEnemiesID();
 
     void TryEscape();
 

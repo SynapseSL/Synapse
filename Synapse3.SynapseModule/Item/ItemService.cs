@@ -82,7 +82,7 @@ public class ItemService : Service
     /// <returns></returns>
     public bool RegisterItem(ItemAttribute info)
     {
-        if (IsIdRegistered(info.ID)) return false;
+        if (IsIdRegistered(info.Id)) return false;
         
         _items.Add(info);
         return true;
@@ -91,7 +91,7 @@ public class ItemService : Service
     /// <summary>
     /// Removes the CustomItem so that it can no longer be spawned
     /// </summary>
-    public bool UnRegisterItem(int id)
+    public bool UnRegisterItem(uint id)
     {
         var info = GetInfo(id);
         if (info == null) return false;
@@ -108,11 +108,15 @@ public class ItemService : Service
     /// <summary>
     /// Returns the Schematic Configuration registered with this ID
     /// </summary>
-    public SchematicConfiguration GetSchematicConfiguration(int id)
+    public SchematicConfiguration GetSchematicConfiguration(uint id)
     {
-        if (id is >= 0 and <= HighestItem)
+        switch (id)
         {
-            return overridenVanillaItems.FirstOrDefault(x => x.Key == (ItemType)id).Value;
+            case uint.MaxValue:
+                return null;
+            
+            case >= 0 and <= HighestItem:
+                return overridenVanillaItems.FirstOrDefault(x => x.Key == (ItemType)id).Value;
         }
 
         var info = GetInfo(id);
@@ -120,10 +124,10 @@ public class ItemService : Service
         return Synapse.Get<SchematicService>().GetConfiguration(info.SchematicID);
     }
     
-    public bool IsIdRegistered(int id)
-        => id is >= 0 and <= HighestItem || _items.Any(x => x.ID == id);
+    public bool IsIdRegistered(uint id)
+        => id is >= 0 and <= HighestItem || _items.Any(x => x.Id == id);
 
-    public ItemType GetBaseType(int id)
+    public ItemType GetBaseType(uint id)
     {
         if (id is >= 0 and <= HighestItem) return (ItemType)id;
 
@@ -132,7 +136,7 @@ public class ItemService : Service
         return GetInfo(id)?.BasedItemType ?? ItemType.None;
     }
 
-    public string GetName(int id)
+    public string GetName(uint id)
     {
         if (id is >= 0 and <= HighestItem) return ((ItemType)id).ToString();
 
@@ -141,14 +145,13 @@ public class ItemService : Service
         return GetInfo(id)?.Name ?? "";
     }
     
-    private ItemAttribute GetInfo(int id) => _items.FirstOrDefault(x => x.ID == id);
+    private ItemAttribute GetInfo(uint id) => _items.FirstOrDefault(x => x.Id == id);
 
     private void Clear(RoundRestartEvent ev)
     {
         foreach (var item in _allItems)
         {
-            if(item.Value == null) continue;
-            item.Value.OnDestroy();
+            item.Value?.OnDestroy();
         }
         _allItems.Clear();
     }

@@ -25,9 +25,9 @@ public abstract class SynapseRole : ISynapseRole
     
     public virtual void Load() { }
     
-    public abstract int GetTeamID();
-    public virtual List<int> GetFriendsID() => new ();
-    public virtual List<int> GetEnemiesID() => new ();
+    public abstract uint GetTeamID();
+    public virtual List<uint> GetFriendsID() => new ();
+    public virtual List<uint> GetEnemiesID() => new ();
 
     public virtual void TryEscape() { }
     public abstract void SpawnPlayer(bool spawnLite);

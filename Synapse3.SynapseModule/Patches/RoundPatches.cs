@@ -8,11 +8,9 @@ using MEC;
 using Neuron.Core.Logging;
 using RoundRestarting;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
 using UnityEngine;
-using Console = System.Console;
 
 // ReSharper disable InconsistentNaming
 
@@ -162,7 +160,7 @@ internal static class DecoratedRoundMethods
             
             var classList = new RoundSummary.SumInfo_ClassList();
             var customRoles = new List<ISynapseRole>();
-            var livingTeamsById = new List<int>();
+            var livingTeamsById = new List<uint>();
 
             foreach (var player in playerService.Players)
             {
@@ -337,12 +335,12 @@ internal static class DecoratedRoundMethods
             manager.RunSmartClassPicker(roles, out playersRoleList);
         }
 
-        var players = new Dictionary<SynapsePlayer, int>();
+        var players = new Dictionary<SynapsePlayer, uint>();
         foreach (var pair in playersRoleList)
         {
             var player = pair.Key.GetSynapsePlayer();
             if (player == null || player.OverWatch) continue;
-            players[player] = (int)pair.Value;
+            players[player] = (uint)pair.Value;
         }
 
         var ev = new FirstSpawnEvent()

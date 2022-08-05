@@ -233,7 +233,7 @@ public partial class SynapsePlayer
             var id = DisarmedPlayers.Entries.FirstOrDefault(x => x.DisarmedPlayer == NetworkIdentity.netId).Disarmer;
             if (id == 0) return ReferenceHub.LocalHub.GetSynapsePlayer();
 
-            Synapse.Get<PlayerService>().GetPlayer(id);
+            _player.GetPlayer(id);
             return null;
         }
         set => VanillaInventory.SetDisarmedStatus(value.VanillaInventory);
@@ -280,7 +280,7 @@ public partial class SynapsePlayer
     /// <summary>
     /// The current team id of the player
     /// </summary>
-    public int TeamID => CustomRole?.GetTeamID() ?? (int)Team;
+    public uint TeamID => CustomRole?.GetTeamID() ?? (uint)Team;
 
     /// <summary>
     /// The current faction of the player

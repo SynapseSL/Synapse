@@ -51,8 +51,8 @@ public partial class SynapsePlayer
     }
 
     /// <inheritdoc cref="SpawnCustomRole(ISynapseRole,bool)"/>
-    public void SpawnCustomRole(int id, bool liteSpawn = false)
-        => SpawnCustomRole(Synapse.Get<RoleService>().GetRole(id), liteSpawn);
+    public void SpawnCustomRole(uint id, bool liteSpawn = false)
+        => SpawnCustomRole(_role.GetRole(id), liteSpawn);
     
     /// <summary>
     /// Spawns the Player with that CustomRole
@@ -72,26 +72,24 @@ public partial class SynapsePlayer
     /// <summary>
     /// The Current RoleID of the Player. Combines RoleType and CustomRole
     /// </summary>
-    public int RoleID
+    public uint RoleID
     {
         get
         {
-            if (CustomRole == null) return (int)RoleType;
+            if (CustomRole == null) return RoleType == RoleType.None ? uint.MaxValue : (uint)RoleType;
             return CustomRole.Attribute.Id;
         }
         set
         {
-            if (value is >= -1 and <= (int)RoleService.HighestRole)
+            if (value is >= 0 and <= (int)RoleService.HighestRole)
             {
                 RemoveCustomRole(DespawnReason.API);
                 RoleType = (RoleType)value;
                 return;
             }
+            if(!_role.IsIdRegistered(value)) return;
 
-            var service = Synapse.Get<RoleService>();
-            if(!service.IsIdRegistered(value)) return;
-
-            CustomRole = service.GetRole(value);
+            CustomRole = _role.GetRole(value);
         }
     }
 
@@ -107,5 +105,5 @@ public partial class SynapsePlayer
         }
     }
 
-    public string TeamName => Synapse.Get<TeamService>().GetTeamName(TeamID);
+    public string TeamName => _team.GetTeamName(TeamID);
 }

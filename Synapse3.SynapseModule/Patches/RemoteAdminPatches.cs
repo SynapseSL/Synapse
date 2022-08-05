@@ -140,12 +140,22 @@ internal static class RemoteAdminPatches
         }
 
         var senderPlayer = sender.GetSynapsePlayer();
+        var service = Synapse.Get<ServerService>();
 
         foreach (var category in categories)
         {
-            if (category.CanSeeCategory(senderPlayer) && category.DisplayOnTop)
-                text +=
-                    $"<size=0>({category.Attribute.Id})</size> <size={category.Attribute.Size}></color><color={category.Attribute.Color}>{category.Attribute.Name}</color></size>\n";
+            if (!category.CanSeeCategory(senderPlayer) || !category.DisplayOnTop) continue;
+            
+            var color = category.Attribute.Color;
+                
+            if (string.Equals(color, "rainbow", StringComparison.OrdinalIgnoreCase))
+            {
+                var colors = service.Colors;
+                color = colors.ElementAt(UnityEngine.Random.Range(0, colors.Count)).Value;
+            }
+                
+            text +=
+                $"<size=0>({category.Attribute.Id})</size> <size={category.Attribute.Size}></color><color={color}>{category.Attribute.Name}</color></size>\n";
         }
 
         foreach (var group in remoteAdminGroups)
@@ -153,7 +163,14 @@ internal static class RemoteAdminPatches
             
             if(group.Members.Count == 0) continue;
 
-            text += "<size=0>(" + group.GroupId + ")</size> <size=20><color=" + group.Color + ">[" + group.Name +
+            var color = group.Color;
+            if (string.Equals(color, "rainbow", StringComparison.OrdinalIgnoreCase))
+            {
+                var colors = service.Colors;
+                color = colors.ElementAt(UnityEngine.Random.Range(0, colors.Count)).Value;
+            }
+            
+            text += "<size=0>(" + group.GroupId + ")</size> <size=20><color=" + color  + ">[" + group.Name +
                     "]</color></size>\n";
 
             foreach (var player in group.Members)
@@ -201,7 +218,7 @@ internal static class RemoteAdminPatches
 
         public List<RemoteAdminPlayer> Members { get; } = new ();
         
-        public int GroupId { get; set; }
+        public uint GroupId { get; set; }
         
         public string Color { get; set; }
     }

@@ -23,7 +23,7 @@ public class SchematicCommand : SynapseCommand
             return;
         }
 
-        if (!int.TryParse(context.Arguments[0], out var id))
+        if (!uint.TryParse(context.Arguments[0], out var id))
         {
             result.Response = "Invalid ID";
             result.StatusCode = CommandStatusCode.Error;

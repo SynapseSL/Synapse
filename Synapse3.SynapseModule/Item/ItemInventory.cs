@@ -47,7 +47,7 @@ public class ItemInventory
     public AmmoBox AmmoBox { get; }
 
     public void GiveItem(SynapseItem item) => item.EquipItem(_player);
-    public SynapseItem GiveItem(int id) => new(id, _player);
+    public SynapseItem GiveItem(uint id) => new(id, _player);
     public SynapseItem GiveItem(ItemType itemType) => new(itemType, _player);
 
     public void RemoveItem(SynapseItem item) => item.Destroy();

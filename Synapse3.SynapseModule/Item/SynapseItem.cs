@@ -17,9 +17,9 @@ public partial class SynapseItem : DefaultSynapseObject
     /// <summary>
     /// The Default SynapseItem that will be returned instead of null
     /// </summary>
-    public static SynapseItem None { get; } = new(-1);
+    public static SynapseItem None { get; } = new(uint.MaxValue);
 
-    private ItemService _item;
+    private readonly ItemService _item;
     
     /// <summary>
     /// Private constructor that will be called by all other constructors
@@ -47,11 +47,11 @@ public partial class SynapseItem : DefaultSynapseObject
     /// <summary>
     /// Creates a new SynapseItem based on an given ID
     /// </summary>
-    public SynapseItem(int id) : this()
+    public SynapseItem(uint id) : this()
     {
-        if (id == -1 && None == null)
+        if (id == uint.MaxValue && None == null)
         {
-            ID = -1;
+            ID = uint.MaxValue;
             ItemType = ItemType.None;
             Name = "None";
             return;
@@ -96,29 +96,29 @@ public partial class SynapseItem : DefaultSynapseObject
     /// <summary>
     /// Creates a new SynapseItem based on an given ID and adds it to the player's inventory
     /// </summary>
-    public SynapseItem(int id, SynapsePlayer player) : this(id)
+    public SynapseItem(uint id, SynapsePlayer player) : this(id)
         => EquipItem(player);
 
     /// <summary>
     /// Creates a new SynapseItem based on an given ID and spawns it on the Map
     /// </summary>
-    public SynapseItem(int id, Vector3 position) : this(id)
+    public SynapseItem(uint id, Vector3 position) : this(id)
         => Drop(position);
     
     /// <summary>
     /// Creates a new SynapseItem based on an given ItemType
     /// </summary>
-    public SynapseItem(ItemType role) : this((int)role) { }
-    
+    public SynapseItem(ItemType item) : this((uint)item) { }
+
     /// <summary>
     /// Creates a new SynapseItem based on an given ItemType and adds it to the player's inventory
     /// </summary>
-    public SynapseItem(ItemType role, SynapsePlayer player) : this((int)role, player) { }
-    
+    public SynapseItem(ItemType item, SynapsePlayer player) : this((uint)item, player) { }
+
     /// <summary>
     /// Creates a new SynapseItem based on an given ItemType and spawns it on the Map
     /// </summary>
-    public SynapseItem(ItemType role, Vector3 position) : this((int)role,position) { }
+    public SynapseItem(ItemType item, Vector3 position) : this((uint)item, position) { }
 
 
     /// <summary>
@@ -129,7 +129,7 @@ public partial class SynapseItem : DefaultSynapseObject
         Item = itemBase;
         Serial = itemBase.ItemSerial;
         _item._allItems[Serial] = this;
-        ID = (int)itemBase.ItemTypeId;
+        ID = (uint)itemBase.ItemTypeId;
         SchematicConfiguration = _item.GetSchematicConfiguration(ID);
         Name = itemBase.ItemTypeId.ToString();
         IsCustomItem = false;
@@ -158,7 +158,7 @@ public partial class SynapseItem : DefaultSynapseObject
         Serial = pickupBase.Info.Serial;
         Pickup = pickupBase;
         _item._allItems[Serial] = this;
-        ID = (int)pickupBase.Info.ItemId;
+        ID = (uint)pickupBase.Info.ItemId;
         SchematicConfiguration = _item.GetSchematicConfiguration(ID);
         Name = pickupBase.Info.ItemId.ToString();
         IsCustomItem = false;
@@ -186,7 +186,7 @@ public partial class SynapseItem : DefaultSynapseObject
     {
         Serial = ItemSerialGenerator.GenerateNext();
         _item._allItems[Serial] = this;
-        ID = (int)configuration.ItemType;
+        ID = (uint)configuration.ItemType;
         
         if (ID is >= 0 and <= ItemService.HighestItem)
         {

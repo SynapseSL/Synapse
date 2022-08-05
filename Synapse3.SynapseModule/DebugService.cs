@@ -1,9 +1,9 @@
 ﻿using MEC;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
+using Respawning;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Dummy;
-using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Objects;
 using UnityEngine;
@@ -81,9 +81,19 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                var dummy = new SynapseDummy(ev.Player.Position, ev.Player.RotationVector2, ev.Player.RoleType,
-                    ev.Player.NickName, "", "");
-                Timing.CallDelayed(1f, () => dummy.Position = ev.Player.Position + Vector3.up * 5);
+                new SynapseDoor(SynapseDoor.SpawnableDoorType.Hcz, ev.Player.Position, ev.Player.Rotation,
+                    Vector3.one)
+                {
+                    Health = 5000,
+                };
+                break;
+            
+            case KeyCode.Alpha2:
+                new SynapseDoor(SynapseDoor.SpawnableDoorType.Hcz, ev.Player.Position, ev.Player.Rotation,
+                    Vector3.one)
+                {
+                    UnDestroyable = true
+                };
                 break;
         }
     }

@@ -12,7 +12,7 @@ namespace Synapse3.SynapseModule.Map.Schematic;
 public class SchematicConfiguration : IDocumentSection
 {
     public string Name { get; set; }
-    public int ID { get; set; }
+    public uint Id { get; set; }
     public List<string> CustomAttributes { get; set; }
 
     public List<PrimitiveConfiguration> Primitives { get; set; } = new();
@@ -95,6 +95,10 @@ public class SchematicConfiguration : IDocumentSection
         public bool Open { get; set; }
 
         public bool Locked { get; set; }
+
+        public float Health { get; set; } = -1f;
+
+        public bool UnDestroyable { get; set; } = false;
     }
 
     public class CustomObjectConfiguration : DefaultConfig

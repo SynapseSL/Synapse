@@ -5,7 +5,6 @@ using System.Linq;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Permissions;
 using Synapse3.SynapseModule.Permissions.RemoteAdmin;
 using UnityEngine;
 

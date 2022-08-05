@@ -11,7 +11,6 @@ using InventorySystem.Items.Coin;
 using InventorySystem.Items.Firearms.BasicMessages;
 using InventorySystem.Items.Firearms.Modules;
 using InventorySystem.Items.Radio;
-using InventorySystem.Items.ThrowableProjectiles;
 using InventorySystem.Searching;
 using MapGeneration.Distributors;
 using Mirror;
@@ -21,12 +20,9 @@ using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
-using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
-using Synapse3.SynapseModule.Role;
 using UnityEngine;
 using Utils.Networking;
-using Console = System.Console;
 
 namespace Synapse3.SynapseModule.Patches.PlayerPatches;
 

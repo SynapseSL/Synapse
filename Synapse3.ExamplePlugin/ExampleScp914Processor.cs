@@ -7,9 +7,9 @@ using UnityEngine;
 namespace Synapse3.ExamplePlugin;
 
 [Automatic]
-[Scp914Processor(ReplaceHandlers = new []
+[Scp914Processor(ReplaceHandlers = new uint[]
 {
-    0,1,2,3,4,5,6,7,8,9,10,11 // This means that this Processor wil be responsible for all Items with the ID 0-11 (all Keycards)
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 // This means that this Processor wil be responsible for all Items with the ID 0-11 (all KeyCards)
 })]
 public class ExampleScp914Processor : ISynapse914Processor
 {
@@ -24,8 +24,8 @@ public class ExampleScp914Processor : ISynapse914Processor
             Scp914KnobSetting.VeryFine => ItemType.KeycardO5,
             _ => ItemType.None
         };
-        
-        if(type == ItemType.None) return;
+
+        if (type == ItemType.None) return;
         var state = item.State;
         var owner = item.ItemOwner;
         

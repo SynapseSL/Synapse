@@ -92,7 +92,7 @@ public class CassieService : Service
     {
         foreach (var player in _player.Players)
         {
-            player.SendBroadcast(time, message);
+            player.SendBroadcast(message, time);
         }
     }
 }

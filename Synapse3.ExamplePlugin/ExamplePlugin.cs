@@ -7,7 +7,8 @@ namespace Synapse3.ExamplePlugin
     [Plugin(
         Name = "Example Plugin",
         Description = "Example Description",
-        Version = "1.0.0"
+        Version = "1.0.0",
+        Author = "Helight & Dimenzio"
     )]
     public class ExamplePlugin : Plugin
     {
@@ -25,6 +26,7 @@ namespace Synapse3.ExamplePlugin
         {
             Logger.Info($"Before {Config}");
             Logger.Info($"Before {Translations}");
+            
             ElevatorHandler = new ElevatorEventHandler();
             RoomHandler = new RoomEventHandler();
         }
@@ -35,6 +37,7 @@ namespace Synapse3.ExamplePlugin
             Logger.Info(Config.IntEntry);
             Logger.Info(Config.ListEntry);
             Logger.Info(Translations.CommandMessage.Format("Example Command", "Helight"));
+            
             ElevatorHandler.HookEvents();
             RoomHandler.HookEvents();
         }

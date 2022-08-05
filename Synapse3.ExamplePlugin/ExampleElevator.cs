@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Neuron.Core.Logging;
 using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Elevators;
@@ -21,11 +22,11 @@ public class ExampleElevator : CustomElevator
 
         var schematic1 = service.SpawnSchematic(8, new Vector3(0f, 1000f, 2.5f), Quaternion.Euler(0f, 90f, 0f));
         var schematic2 = service.SpawnSchematic(8, new Vector3(0f, 1000f, -70f), Quaternion.Euler(0f, -90f, 0f));
-        list.Add(new SchematicDestination(schematic1, 0, "First", this,range));
-        list.Add(new SchematicDestination(schematic2, 1, "First", this,range));
-        list.Add(new SchematicDestination(
-            service.SpawnSchematic(8, new Vector3(190f, 992.5f, -87), Quaternion.Euler(0f, -90f, 0f)), 2, "First", this,
-            range));
+        var schematic3 = service.SpawnSchematic(8, new Vector3(190f, 992.5f, -87), Quaternion.Euler(0f, -90f, 0f));
+
+        list.Add(new SchematicDestination(schematic1, 0, "Gate-A", this, range));
+        list.Add(new SchematicDestination(schematic2, 1, "Above Chaos", this, range));
+        list.Add(new SchematicDestination(schematic3, 2, "MTF Spawn", this, range));
 
         foreach (var destination in list)
         {
@@ -74,7 +75,7 @@ public class ElevatorEventHandler
             var elevator = (ExampleElevator)ev.Door.ObjectData["elev"];
             
             
-            var id = (int)ev.Door.ObjectData["id"];
+            var id = (uint)ev.Door.ObjectData["id"];
 
             if (elevator.CurrentDestination.ElevatorId == id)
             {

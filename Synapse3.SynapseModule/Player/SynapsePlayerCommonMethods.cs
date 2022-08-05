@@ -40,9 +40,14 @@ public partial class SynapsePlayer
     }
     
     /// <summary>
+    /// Opens the Window that is usually used for Reports with a Custom Message
+    /// </summary>
+    public void SendWindowMessage(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
+    
+    /// <summary>
     /// Displays a hint on the Player's screen
     /// </summary>
-    public void GiveTextHint(string message, float duration = 5f)
+    public void SendHint(string message, float duration = 5f)
     {
         Hub.hints.Show(new TextHint(message, new HintParameter[]
         {
@@ -53,7 +58,7 @@ public partial class SynapsePlayer
     /// <summary>
     /// Displays a Broadcast on the Player's screen
     /// </summary>
-    public Broadcast SendBroadcast(ushort time, string message, bool instant = false)
+    public Broadcast SendBroadcast(string message, ushort time, bool instant = false)
     {
         if (PlayerType == PlayerType.Server)
             NeuronLogger.For<Synapse>().Info($"Broadcast: {message}", ConsoleColor.White);
@@ -139,14 +144,9 @@ public partial class SynapsePlayer
     {
         var result = Kill(reason);
         if (result)
-            Synapse.Get<CassieService>().Announce(cassie);
+            _cassie.Announce(cassie);
         return result;
     }
-    
-    /// <summary>
-    /// Opens the Window that is usually used for Reports with a Custom Message
-    /// </summary>
-    public void OpenReportWindow(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
 
     /// <summary>
     /// Removes one of the Information of the Player that can be seen when someone else looks at him
@@ -259,7 +259,7 @@ public partial class SynapsePlayer
         }
 
         var allow = true;
-        var escapeRole = -1;
+        var escapeRole = uint.MaxValue;
         var changeTeam = false;
 
         foreach (var disarmedEntry in DisarmedPlayers.Entries)
@@ -302,14 +302,14 @@ public partial class SynapsePlayer
                 break;
         }
 
-        if (escapeRole < 0) allow = false;
+        if (escapeRole == uint.MaxValue) allow = false;
 
         var ev = new EscapeEvent(this, allow, escapeRole, RoleID == (int)RoleType.ClassD, changeTeam);
-        Synapse.Get<PlayerEvents>().Escape.Raise(ev);
+        _playerEvents.Escape.Raise(ev);
         
-        if(ev.NewRole < 0 || !ev.Allow) return;
+        if(!ev.Allow) return;
 
-        if (ev.NewRole is >= -1 and <= RoleService.HighestRole)
+        if (ev.NewRole is >= 0 and <= RoleService.HighestRole)
         {
             ClassManager.SetPlayersClass((RoleType)ev.NewRole, gameObject, CharacterClassManager.SpawnReason.Escaped);
         }

@@ -1,10 +1,10 @@
 ﻿namespace Synapse3.SynapseModule.Map.Rooms;
 
-public enum ZoneType
+public enum ZoneType : uint
 {
-    None = -1,
-    LCZ,
-    HCZ,
+    None,
+    Lcz,
+    Hcz,
     Entrance,
     Surface,
     Pocket,

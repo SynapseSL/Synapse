@@ -15,7 +15,7 @@ namespace Synapse3.ExamplePlugin;
     )]
 public class ExampleRoom : SynapseCustomRoom
 {
-    public override int Zone => (int)ZoneType.Surface;
+    public override uint Zone => (int)ZoneType.Surface;
 
     public override void OnGenerate()
     {

@@ -14,7 +14,7 @@ public interface IElevatorDestination
     
     public bool Locked { get; set; }
     
-    public int ElevatorId { get; }
+    public uint ElevatorId { get; }
     
 
     public Vector3 RangeScale { get; set; }

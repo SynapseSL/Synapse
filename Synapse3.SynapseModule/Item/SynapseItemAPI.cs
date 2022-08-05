@@ -168,7 +168,7 @@ public partial class SynapseItem
         catch (Exception ex)
         {
             NeuronLogger.For<Synapse>()
-                .Error($"Sy3 Item: Creating schematic {SchematicConfiguration?.ID} failed for item {Name}\n" + ex);
+                .Error($"Sy3 Item: Creating schematic {SchematicConfiguration?.Id} failed for item {Name}\n" + ex);
         }
     }
 }

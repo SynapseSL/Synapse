@@ -1,7 +1,6 @@
 ﻿using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Command;
 using RemoteAdmin.Communication;
-using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Rooms;
 using UnityEngine;
 

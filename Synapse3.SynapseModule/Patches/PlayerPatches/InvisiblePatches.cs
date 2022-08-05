@@ -3,7 +3,6 @@ using System.Linq;
 using CustomPlayerEffects;
 using HarmonyLib;
 using Neuron.Core.Logging;
-using Ninject.Infrastructure.Language;
 using PlayableScps;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Dummy;

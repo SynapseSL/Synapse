@@ -34,9 +34,9 @@ public abstract class SynapseCustomRoom : DefaultSynapseObject, IRoom
 
     public string Name => Attribute.Name;
 
-    public int Id => Attribute.Id;
+    public uint Id => Attribute.Id;
     
-    public abstract int Zone { get; }
+    public abstract uint Zone { get; }
 
     public virtual void OnGenerate() { }
     public virtual void OnDeSpawn() { }

@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Linq;
 using HarmonyLib;
 using Neuron.Core.Logging;
 using Neuron.Modules.Commands.Command;
 using RemoteAdmin;
 using Synapse3.SynapseModule.Command;
-using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Patches;

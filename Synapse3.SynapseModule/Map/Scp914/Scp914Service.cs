@@ -24,7 +24,9 @@ public class Scp914Service : Service
 
         foreach (var item in (ItemType[])Enum.GetValues(typeof(ItemType)))
         {
-            Synapse914Processors[(int)item] = Default914Processor.DefaultProcessor;
+            if (item == ItemType.None) continue;
+            
+            Synapse914Processors[(uint)item] = Default914Processor.DefaultProcessor;
         }
     }
 
@@ -94,9 +96,9 @@ public class Scp914Service : Service
 
     public void Activate() => Scp914.ServerInteract(null, 0);
 
-    public Dictionary<int, ISynapse914Processor> Synapse914Processors { get; set; } = new();
+    public Dictionary<uint, ISynapse914Processor> Synapse914Processors { get; set; } = new();
 
-    public ISynapse914Processor GetProcessor(int id) => Synapse914Processors.TryGetValue(id, out var processor)
+    public ISynapse914Processor GetProcessor(uint id) => Synapse914Processors.TryGetValue(id, out var processor)
         ? processor
         : Default914Processor.DefaultProcessor;
 
