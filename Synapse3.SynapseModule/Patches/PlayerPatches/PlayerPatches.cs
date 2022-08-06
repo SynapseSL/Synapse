@@ -1,18 +1,11 @@
 ﻿using System;
 using System.Linq;
-using Achievements;
 using GameCore;
 using HarmonyLib;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem;
-using InventorySystem.Disarming;
 using InventorySystem.Items;
-using InventorySystem.Items.Coin;
-using InventorySystem.Items.Firearms;
-using InventorySystem.Items.Firearms.BasicMessages;
 using InventorySystem.Items.Firearms.Modules;
-using InventorySystem.Items.Keycards;
-using InventorySystem.Items.Radio;
 using InventorySystem.Searching;
 using MapGeneration.Distributors;
 using Mirror;
@@ -22,33 +15,16 @@ using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
-using Utils.Networking;
-using Random = UnityEngine.Random;
+// ReSharper disable InconsistentNaming
 
 namespace Synapse3.SynapseModule.Patches.PlayerPatches;
 
 [Patches]
 internal static class PlayerPatches
 {
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(FirearmBasicMessagesHandler), nameof(FirearmBasicMessagesHandler.ServerShotReceived))]
-    public static bool OnShootMsg(NetworkConnection conn, ShotMessage msg)
-    {
-        try
-        {
-            var ev = new ShootEvent(conn.GetSynapsePlayer(), msg.TargetNetId, msg.ShooterWeaponSerial, true);
-            Synapse.Get<PlayerEvents>().Shoot.Raise(ev);
-            return ev.Allow;
-        }
-        catch (Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Player Shoot Event failed\n" + ex);
-            return true;
-        }
-    }
-    
     [HarmonyPrefix]
     [HarmonyPatch(typeof(PlayerInteract),nameof(PlayerInteract.UserCode_CmdDetonateWarhead))]
     public static bool OnStartWarhead(PlayerInteract __instance)
@@ -64,22 +40,31 @@ internal static class PlayerPatches
             return true;
         }
     }
-
+    
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(AlphaWarheadController), nameof(AlphaWarheadController.CancelDetonation), typeof(GameObject))]
-    public static bool OnCancelWarhead(AlphaWarheadController __instance, GameObject disabler)
+    [HarmonyPatch(typeof(PlayerInteract),nameof(PlayerInteract.UserCode_CmdUsePanel))]
+    public static bool OnPanelInteract(PlayerInteract __instance ,ref PlayerInteract.AlphaPanelOperations n)
     {
         try
         {
-            return DecoratedPlayerPatches.OnCancelWarhead(__instance, disabler);
+            if (!__instance.ChckDis(AlphaWarheadOutsitePanel.nukeside.transform.position) ||
+                !__instance.CanInteract) return false;
+
+            var ev = new WarheadPanelInteractEvent(__instance.GetSynapsePlayer(),
+                !Synapse.Get<NukeService>().InsidePanel.Locked, n);
+            
+            Synapse.Get<PlayerEvents>().WarheadPanelInteract.Raise(ev);
+            n = ev.Operation;
+            
+            return ev.Allow;
         }
         catch (Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Cancel Warhead Event failed\n" + ex);
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Warhead Panel Interact Event failed\n" + ex);
             return true;
         }
     }
-    
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(DoorVariant), nameof(DoorVariant.ServerInteract))]
     public static bool OnDoorInteract(DoorVariant __instance,ReferenceHub ply, byte colliderId)
@@ -138,23 +123,6 @@ internal static class PlayerPatches
     }
 
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(Inventory), nameof(Inventory.ServerSelectItem))]
-    public static bool OnSelectItem(Inventory __instance, ushort itemSerial)
-
-    {
-        try
-        {
-            DecoratedPlayerPatches.OnChangeItem(__instance, itemSerial);
-            return false;
-        }
-        catch (Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Change Item Event failed\n" + ex);
-            return true;
-        }
-    }
-
-    [HarmonyPrefix]
     [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.DealDamage))]
     public static bool OnDamage(PlayerStats __instance, DamageHandlerBase handler)
     {
@@ -165,22 +133,6 @@ internal static class PlayerPatches
         catch (Exception ex)
         {
             NeuronLogger.For<Synapse>().Error("Sy3 Event: Damage Event failed\n" + ex);
-            return true;
-        }
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(DisarmingHandlers), nameof(DisarmingHandlers.ServerProcessDisarmMessage))]
-    public static bool OnDisarm(NetworkConnection conn, DisarmMessage msg)
-    {
-        try
-        {
-            DecoratedPlayerPatches.OnDisarm(conn, msg);
-            return false;
-        }
-        catch (Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Disarm Event failed\n" + ex);
             return true;
         }
     }
@@ -205,28 +157,6 @@ internal static class PlayerPatches
     }
 
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(Inventory), nameof(Inventory.UserCode_CmdDropItem))]
-    public static bool DropItem(Inventory __instance,ref ushort itemSerial, ref bool tryThrow)
-    {
-        try
-        {
-            if (!__instance.UserInventory.Items.TryGetValue(itemSerial, out var itembase) || !itembase.CanHolster())
-                return false;
-
-            var ev = new DropItemEvent(__instance.GetSynapsePlayer(), true, itembase.GetItem(), tryThrow);
-            Synapse.Get<PlayerEvents>().DropItem.Raise(ev);
-            tryThrow = ev.Throw;
-            itemSerial = ev.ItemToDrop.Serial;
-            return ev.Allow;
-        }
-        catch (Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Drop Item Event failed\n" + ex);
-            return true;
-        }
-    }
-
-    [HarmonyPrefix]
     [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.AllowContain))]
     public static bool EnterFemur(CharacterClassManager __instance)
     {
@@ -238,31 +168,6 @@ internal static class PlayerPatches
         catch (Exception ex)
         {
             NeuronLogger.For<Synapse>().Error("Sy3 Event: Enter Femur Event failed\n" + ex);
-            return true;
-        }
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(CoinNetworkHandler), nameof(CoinNetworkHandler.ServerProcessMessage))]
-    public static bool CoinFlip(NetworkConnection conn)
-    {
-        try
-        {
-            var player = conn.GetSynapsePlayer();
-            if (player == null || !player.Hub._coinFlipRatelimit.CanExecute() ||
-                player.Inventory.ItemInHand.ItemType != ItemType.Coin) return false;
-            var isTails = Random.value >= 0.5f;
-
-            var ev = new FlipCoinEvent(player.Inventory.ItemInHand, player, isTails);
-
-            if (ev.Allow)
-                new CoinNetworkHandler.CoinFlipMessage(player.Inventory.ItemInHand.Serial, ev.Tails)
-                    .SendToAuthenticated();
-            return false;
-        }
-        catch (Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Flip Coin Event failed\n" + ex);
             return true;
         }
     }
@@ -323,6 +228,78 @@ internal static class PlayerPatches
     }
 
     [HarmonyPrefix]
+    [HarmonyPatch(typeof(StandardHitregBase), nameof(StandardHitregBase.PlaceBulletholeDecal))]
+    public static bool PlaceBulletHole(StandardHitregBase __instance, RaycastHit hit)
+    {
+        try
+        {
+            var player = __instance.Hub.GetSynapsePlayer();
+            if (player == null) return false;
+
+            var ev = new PlaceBulletHoleEvent(player, true, hit.point);
+            Synapse.Get<PlayerEvents>().PlaceBulletHole.Raise(ev);
+
+            return ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Place Bullet Hole Event failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(CheaterReport), nameof(CheaterReport.UserCode_CmdReport))]
+    public static bool OnReport(CheaterReport __instance, int playerId, ref string reason, ref bool notifyGm)
+    {
+        try
+        {
+            var reported = Synapse.Get<PlayerService>().GetPlayer(playerId);
+            var ev = new ReportEvent(__instance.GetSynapsePlayer(), true, reported, reason, notifyGm);
+            Synapse.Get<PlayerEvents>().Report.Raise(ev);
+            reason = ev.Reason;
+            notifyGm = ev.SendToNorthWood;
+            return ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Report Event failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Radio), nameof(Radio.UserCode_CmdSyncTransmissionStatus))]
+    public static bool SyncAltActive(Radio __instance, bool b)
+    {
+        try
+        {
+            return DecoratedPlayerPatches.OnSpeak(__instance, b);
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Speak Secondary Event failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.UserCode_CmdSwitchAWButton))]
+    public static bool OnOpenWarheadButton(PlayerInteract __instance)
+    {
+        try
+        {
+            DecoratedPlayerPatches.OpenWarheadButton(__instance);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Enter Warhead KeyCard Event failed\n" + ex);
+            return true;
+        }
+    }
+    
+    [HarmonyPrefix]
     [HarmonyPatch(typeof(SearchCoordinator), nameof(SearchCoordinator.ContinuePickupServer))]
     public static bool OnPickUpRequest(SearchCoordinator __instance)
     {
@@ -366,106 +343,42 @@ internal static class PlayerPatches
             return true;
         }
     }
-
+    
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(StandardHitregBase), nameof(StandardHitregBase.PlaceBulletholeDecal))]
-    public static bool PlaceBulletHole(StandardHitregBase __instance, RaycastHit hit)
+    [HarmonyPatch(typeof(Inventory), nameof(Inventory.UserCode_CmdDropItem))]
+    public static bool DropItem(Inventory __instance,ref ushort itemSerial, ref bool tryThrow)
     {
         try
         {
-            var player = __instance.Hub.GetSynapsePlayer();
-            if (player == null) return false;
+            if (!__instance.UserInventory.Items.TryGetValue(itemSerial, out var itembase) || !itembase.CanHolster())
+                return false;
 
-            var ev = new PlaceBulletHoleEvent(player, true, hit.point);
-            Synapse.Get<PlayerEvents>().PlaceBulletHole.Raise(ev);
-
+            var ev = new DropItemEvent(__instance.GetSynapsePlayer(), true, itembase.GetItem(), tryThrow);
+            Synapse.Get<PlayerEvents>().DropItem.Raise(ev);
+            tryThrow = ev.Throw;
+            itemSerial = ev.ItemToDrop.Serial;
             return ev.Allow;
         }
         catch (Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Place Bullet Hole Event failed\n" + ex);
-            return true;
-        }
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(RadioItem), nameof(RadioItem.ServerProcessCmd))]
-    public static bool OnRadioCommand(RadioMessages.RadioCommand command, RadioItem __instance)
-    {
-        try
-        {
-            DecoratedPlayerPatches.OnRadio(command, __instance);
-            return false;
-        }
-        catch (Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Radio Use Event failed\n" + ex);
-            return true;
-        }
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(CheaterReport), nameof(CheaterReport.UserCode_CmdReport))]
-    public static bool OnReport(CheaterReport __instance, int playerId, ref string reason, ref bool notifyGm)
-    {
-        try
-        {
-            var reported = Synapse.Get<PlayerService>().GetPlayer(playerId);
-            var ev = new ReportEvent(__instance.GetSynapsePlayer(), true, reported, reason, notifyGm);
-            Synapse.Get<PlayerEvents>().Report.Raise(ev);
-            reason = ev.Reason;
-            notifyGm = ev.SendToNorthWood;
-            return ev.Allow;
-        }
-        catch (Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Report Event failed\n" + ex);
-            return true;
-        }
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(Radio), nameof(Radio.UserCode_CmdSyncTransmissionStatus))]
-    public static bool SyncAltActive(Radio __instance, bool b)
-    {
-        try
-        {
-            return DecoratedPlayerPatches.OnSpeak(__instance, b);
-        }
-        catch (Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Speak Secondary Event failed\n" + ex);
-            return true;
-        }
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.UserCode_CmdSwitchAWButton))]
-    public static bool OnWarheadButtonKeyCard(PlayerInteract __instance)
-    {
-        try
-        {
-            DecoratedPlayerPatches.WarheadKeyCard(__instance);
-            return false;
-        }
-        catch (Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Enter Warhead KeyCard Event failed\n" + ex);
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Drop Item Event failed\n" + ex);
             return true;
         }
     }
     
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(FirearmBasicMessagesHandler), nameof(FirearmBasicMessagesHandler.ServerRequestReceived))]
-    public static bool WeaponRequest(NetworkConnection conn, RequestMessage msg)
+    [HarmonyPatch(typeof(Inventory), nameof(Inventory.ServerSelectItem))]
+    public static bool OnSelectItem(Inventory __instance, ushort itemSerial)
+
     {
         try
         {
-            return DecoratedPlayerPatches.OnWeaponRequest(conn, msg);
+            DecoratedPlayerPatches.OnChangeItem(__instance, itemSerial);
+            return false;
         }
         catch (Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Reload Weapon Event failed\n" + ex);
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Change Item Event failed\n" + ex);
             return true;
         }
     }
@@ -473,26 +386,7 @@ internal static class PlayerPatches
 
 internal static class DecoratedPlayerPatches
 {
-    public static bool OnWeaponRequest(NetworkConnection connection, RequestMessage msg)
-    {
-        if (msg.Request != RequestType.Reload) return true;
-        
-        var player = connection.GetSynapsePlayer();
-        if (player == null) return false;
-        if (msg.Serial != player.Inventory.ItemInHand.Serial) return false;
-        if (player.Inventory.ItemInHand.Item is not Firearm firearm) return false;
-
-        var ev = new ReloadWeaponEvent(player.Inventory.ItemInHand, ItemInteractState.Finalize, player, false);
-
-        Synapse.Get<ItemEvents>().ReloadWeapon.Raise(ev);
-        
-        if ((ev.Allow && firearm.AmmoManagerModule.ServerTryReload()) || ev.PlayAnimationOverride)
-            player.SendNetworkMessage(new RequestMessage(msg.Serial, RequestType.Reload));
-
-        return false;
-    }
-    
-    public static void WarheadKeyCard(PlayerInteract interact)
+    public static void OpenWarheadButton(PlayerInteract interact)
     {
         if(!interact.CanInteract) return;
         var gameObject = GameObject.Find("OutsitePanelScript");
@@ -526,48 +420,7 @@ internal static class DecoratedPlayerPatches
 
         return ev.Allow;
     }
-    
-    public static void OnRadio(RadioMessages.RadioCommand command, RadioItem radio)
-    {
-        var item = radio.GetItem();
-        var player = item.ItemOwner;
-        var state = (RadioMessages.RadioRangeLevel)radio._radio.NetworkcurRangeId;
 
-        var nextState = command == RadioMessages.RadioCommand.ChangeRange
-            ? (int)state + 1 >= radio.Ranges.Length ? 0 : state + 1
-            : state;
-
-        var ev = new RadioUseEvent(item, ItemInteractState.Finalize, player, command, state, nextState);
-        Synapse.Get<ItemEvents>().RadioUse.Raise(ev);
-        
-        if(!ev.Allow) return;
-        
-        switch (command)
-        {
-            case RadioMessages.RadioCommand.Enable:
-                radio._enabled = true;
-                break;
-            
-            case RadioMessages.RadioCommand.Disable:
-                radio._enabled = false;
-                radio._radio.ForceDisableRadio();
-                break;
-            
-            case RadioMessages.RadioCommand.ChangeRange:
-                radio._rangeId = (byte)ev.NextRange;
-                radio._radio.NetworkcurRangeId = radio._rangeId;
-                break;
-        }
-
-        if (ev.CurrentRange == ev.NextRange)
-        {
-            radio._rangeId = (byte)ev.NextRange;
-            radio._radio.NetworkcurRangeId = radio._rangeId;   
-        }
-        
-        radio.SendStatusMessage();
-    }
-    
     public static void OnGenInteract(Scp079Generator gen, ReferenceHub hub, byte interaction)
     {
         if(gen._cooldownStopwatch.IsRunning && gen._cooldownStopwatch.Elapsed.TotalSeconds < gen._targetCooldown) return;
@@ -687,65 +540,7 @@ internal static class DecoratedPlayerPatches
             }
         }
     }
-    
-    public static void OnDisarm(NetworkConnection connection, DisarmMessage msg)
-    {
-        if(!DisarmingHandlers.ServerCheckCooldown(connection))
-            return;
 
-        var player = connection.GetSynapsePlayer();
-        if(player == null) return;
-
-        if (!msg.PlayerIsNull)
-        {
-            if((msg.PlayerToDisarm.transform.position - player.transform.position).sqrMagnitude > 20f) return;
-            if (msg.PlayerToDisarm.inventory.CurInstance != null &&
-                msg.PlayerToDisarm.inventory.CurInstance.TierFlags != ItemTierFlags.Common) return;
-        }
-
-        var freePlayer = !msg.PlayerIsNull && msg.PlayerToDisarm.inventory.IsDisarmed();
-        var canDisarm = !msg.PlayerIsNull && player.Hub.CanDisarm(msg.PlayerToDisarm);
-
-        if (freePlayer && !msg.Disarm && player.Team != Team.SCP)
-        {
-            if (!player.IsDisarmed)
-            {
-                var ev = new FreePlayerEvent(player, true, msg.PlayerToDisarm.GetSynapsePlayer());
-                Synapse.Get<PlayerEvents>().FreePlayer.Raise(ev);
-                if (ev.Allow)
-                    msg.PlayerToDisarm.inventory.SetDisarmedStatus(null);
-            }
-        }
-        else
-        {
-            if (freePlayer || !canDisarm || !msg.Disarm)
-            {
-                player.SendNetworkMessage(DisarmingHandlers.NewDisarmedList);
-                return;
-            }
-
-            if (msg.PlayerToDisarm.inventory.CurInstance == null ||
-                msg.PlayerToDisarm.inventory.CurInstance.CanHolster())
-            {
-                var ev = new DisarmEvent(player.Inventory.ItemInHand, ItemInteractState.Finalize,
-                    player, msg.PlayerToDisarm.GetSynapsePlayer());
-                Synapse.Get<ItemEvents>().Disarm.Raise(ev);
-                
-                if(!ev.Allow) return;
-                
-                if (msg.PlayerToDisarm.characterClassManager.CurRole.team == Team.MTF &&
-                    player.RoleType == RoleType.ClassD)
-                {
-                    AchievementHandlerBase.ServerAchieve(player.Connection,AchievementName.TablesHaveTurned);
-                }
-
-                msg.PlayerToDisarm.inventory.SetDisarmedStatus(player.VanillaInventory);
-            }
-        }
-
-        DisarmingHandlers.NewDisarmedList.SendToAuthenticated();
-    }
-    
     public static bool OnDealDamage(PlayerStats stats, DamageHandlerBase handler)
     {
         if (!stats._hub.characterClassManager.IsAlive || stats._hub.characterClassManager.GodMode) return false;
@@ -898,16 +693,7 @@ internal static class DecoratedPlayerPatches
 
         chamber.Open = !chamber.Open;
     }
-    
-    public static bool OnCancelWarhead(AlphaWarheadController controller, GameObject playerObject)
-    {
-        if (!controller.inProgress || controller.timeToDetonation <= 10.0 || controller._isLocked) return false;
 
-        var ev = new CancelWarheadEvent(playerObject.GetSynapsePlayer(), true);
-        Synapse.Get<PlayerEvents>().CancelWarhead.Raise(ev);
-        return ev.Allow;
-    }
-    
     public static void OnStartWarhead(PlayerInteract player)
     {
         if(!player.CanInteract) return;

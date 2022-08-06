@@ -2,6 +2,8 @@
 using Achievements.Handlers;
 using InventorySystem;
 using InventorySystem.Items;
+using InventorySystem.Items.Firearms;
+using InventorySystem.Items.Firearms.Attachments;
 using InventorySystem.Items.Pickups;
 using Mirror;
 using Neuron.Core.Logging;
@@ -15,7 +17,7 @@ namespace Synapse3.SynapseModule.Item;
 
 public partial class SynapseItem
 {
-    public void EquipItem(SynapsePlayer player)
+    public void EquipItem(SynapsePlayer player, bool provideFully = false)
     {
         if(player.RoleType is RoleType.Spectator or RoleType.None) return;
         
@@ -59,6 +61,19 @@ public partial class SynapseItem
         
         DestroyPickup();
         State = ItemState.Inventory;
+
+        if (provideFully && Item is Firearm firearm)
+        {
+            firearm.ApplyAttachmentsCode(player.GetPreference(ItemType), true);
+            var flags = FirearmStatusFlags.MagazineInserted;
+            if (firearm.HasAdvantageFlag(AttachmentDescriptiveAdvantages.Flashlight))
+            {
+                flags |= FirearmStatusFlags.FlashlightEnabled;
+            }
+
+            firearm.Status = new FirearmStatus(firearm.AmmoManagerModule.MaxAmmo, flags,
+                firearm.GetCurrentAttachmentsCode());
+        }
     }
 
     public void Drop()

@@ -1,6 +1,7 @@
 ﻿using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Command;
+using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Objects;
 using UnityEngine;
@@ -34,6 +35,11 @@ public class DebugService : Service
         
         _item.KeyCardInteract.Subscribe(KeyCardItem);
         _item.BasicInteract.Subscribe(BasicItem);
+        
+        _item.Shoot.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"Shoot {ev.Player.NickName} {ev.Target?.NickName} {ev.Item.ItemType}");
+        });
 
         _player.Death.Subscribe(ev =>
         {
@@ -77,7 +83,12 @@ public class DebugService : Service
     {
         switch (ev.KeyCode)
         {
-            case KeyCode.Alpha1:
+            case KeyCode.Alpha2:
+                var dummy = new SynapseDummy(ev.Player.Position, ev.Player.RotationVector2, ev.Player.RoleType, ev.Player.NickName,
+                    "", "");
+                dummy.Player.GodMode = false;
+                
+                NeuronLogger.For<Synapse>().Warn(dummy.Player.NetworkIdentity.netId);
                 break;
             
         }

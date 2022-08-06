@@ -32,8 +32,6 @@ public abstract class CustomItemHandler
         _player.DropItem.Unsubscribe(Drop);
         _player.ChangeItem.Unsubscribe(SwitchHoldItem);
     }
-    
-    //TODO: Shoot
 
     public virtual void OnReload(ReloadWeaponEvent ev)
     {
@@ -98,6 +96,8 @@ public abstract class CustomItemHandler
     public virtual void OnEquip(ChangeItemEvent ev) { }
     
     public virtual void OnUnEquip(ChangeItemEvent ev) { }
+    
+    public virtual void OnShoot(ShootEvent ev) { }
 
 
     private void SwitchHoldItem(ChangeItemEvent ev)
@@ -125,6 +125,12 @@ public abstract class CustomItemHandler
     {
         if (ev.Item?.Id != Attribute.Id) return;
         OnReload(ev);
+    }
+
+    private void Shoot(ShootEvent ev)
+    {
+        if(ev.Item?.Id != Attribute.Id) return;
+        OnShoot(ev);
     }
     
     public ItemAttribute Attribute { get; internal set; }

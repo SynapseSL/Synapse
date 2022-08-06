@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using HarmonyLib;
+using MEC;
 using Neuron.Core.Logging;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule.Dummy;
@@ -51,11 +52,12 @@ internal static class DeathPatches
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.KillPlayer))]
-    public static void PostDeath(PlayerStats __instance)
+    public static void PostDeath(PlayerStats __instance, bool __runOriginal)
+
     {
         try
         {
-            if (__instance._hub.characterClassManager.CurClass == RoleType.Spectator)
+            if (__runOriginal)
             {
                 var victim = __instance.GetSynapsePlayer();
                 var service = Synapse.Get<PlayerService>();
@@ -64,9 +66,11 @@ internal static class DeathPatches
                 {
                     larry.ScpController.Scp106.PlayersInPocket.Remove(victim);
                 }
-
-                if(victim.PlayerType == PlayerType.Dummy)
-                    (victim as DummyPlayer)?.SynapseDummy.Destroy();
+                
+                if (victim.PlayerType == PlayerType.Dummy)
+                {
+                    Timing.CallDelayed(Timing.WaitForOneFrame, () => (victim as DummyPlayer)?.SynapseDummy.Destroy());
+                }
 
                 victim.RemoveCustomRole(DespawnReason.Death);
             }

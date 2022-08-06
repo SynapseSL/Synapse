@@ -1,4 +1,5 @@
-﻿using InventorySystem.Items.Radio;
+﻿using System.Numerics;
+using InventorySystem.Items.Radio;
 using InventorySystem.Items.Usables;
 using Neuron.Core.Events;
 using Neuron.Core.Meta;
@@ -15,8 +16,10 @@ public class ItemEvents: Service
     public readonly EventReactor<BasicItemInteractEvent> BasicInteract = new();
     public readonly EventReactor<KeyCardInteractEvent> KeyCardInteract = new ();
     public readonly EventReactor<ConsumeItemEvent> ConsumeItem = new();
+    public readonly EventReactor<ShootEvent> Shoot = new();
     public readonly EventReactor<ReloadWeaponEvent> ReloadWeapon = new();
     public readonly EventReactor<DisarmEvent> Disarm = new();
+    public readonly EventReactor<FlipCoinEvent> FlipCoin = new();
     public readonly EventReactor<RadioUseEvent> RadioUse = new();
 
     public ItemEvents(EventManager eventManager)
@@ -29,14 +32,18 @@ public class ItemEvents: Service
         _eventManager.RegisterEvent(BasicInteract);
         _eventManager.RegisterEvent(KeyCardInteract);
         _eventManager.RegisterEvent(ConsumeItem);
+        _eventManager.RegisterEvent(Shoot);
         _eventManager.RegisterEvent(ReloadWeapon);
         _eventManager.RegisterEvent(Disarm);
+        _eventManager.RegisterEvent(FlipCoin);
         _eventManager.RegisterEvent(RadioUse);
 
         KeyCardInteract.Subscribe(ev => BasicInteract.Raise(ev));
         ConsumeItem.Subscribe(ev => BasicInteract.Raise(ev));
+        Shoot.Subscribe(ev => BasicInteract.Raise(ev));
         ReloadWeapon.Subscribe(ev => BasicInteract.Raise(ev));
         Disarm.Subscribe(ev => BasicInteract.Raise(ev));
+        FlipCoin.Subscribe(ev => BasicInteract.Raise(ev));
         RadioUse.Subscribe(ev => BasicInteract.Raise(ev));
     }
 }
@@ -119,4 +126,14 @@ public class ReloadWeaponEvent : BasicItemInteractEvent
     }
 
     public bool PlayAnimationOverride { get; set; }
+}
+
+public class ShootEvent : BasicItemInteractEvent
+{
+    public ShootEvent(SynapseItem item, ItemInteractState state, SynapsePlayer player, SynapsePlayer target) : base(item, state, player)
+    {
+        Target = target;
+    }
+
+    public SynapsePlayer Target { get; }
 }

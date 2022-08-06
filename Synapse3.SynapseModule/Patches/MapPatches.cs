@@ -91,25 +91,16 @@ internal static class MapPatches
     }
     
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(PlayerInteract),nameof(PlayerInteract.UserCode_CmdUsePanel))]
-    public static bool OnPanelInteract(PlayerInteract __instance ,ref PlayerInteract.AlphaPanelOperations n)
+    [HarmonyPatch(typeof(AlphaWarheadController), nameof(AlphaWarheadController.CancelDetonation), typeof(GameObject))]
+    public static bool OnCancelWarhead(AlphaWarheadController __instance, GameObject disabler)
     {
         try
         {
-            if (!__instance.ChckDis(AlphaWarheadOutsitePanel.nukeside.transform.position) ||
-                !__instance.CanInteract) return false;
-
-            var ev = new WarheadPanelInteractEvent(__instance.GetSynapsePlayer(),
-                !Synapse.Get<NukeService>().InsidePanel.Locked, n);
-            
-            Synapse.Get<PlayerEvents>().WarheadPanelInteract.Raise(ev);
-            n = ev.Operation;
-            
-            return ev.Allow;
+            return DecoratedMapPatches.OnCancelWarhead(__instance, disabler);
         }
         catch (Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Warhead Panel Interact Event failed\n" + ex);
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Cancel Warhead Event failed\n" + ex);
             return true;
         }
     }
@@ -117,6 +108,15 @@ internal static class MapPatches
 
 internal static class DecoratedMapPatches
 {
+    public static bool OnCancelWarhead(AlphaWarheadController controller, GameObject playerObject)
+    {
+        if (!controller.inProgress || controller.timeToDetonation <= 10.0 || controller._isLocked) return false;
+
+        var ev = new CancelWarheadEvent(playerObject?.GetSynapsePlayer(), true);
+        Synapse.Get<MapEvents>().CancelWarhead.Raise(ev);
+        return ev.Allow;
+    }
+    
     public static void GeneratorUpdate(Scp079Generator generator)
     {
         var engageReady = generator._currentTime >= generator._totalActivationTime;

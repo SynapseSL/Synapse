@@ -142,11 +142,12 @@ public class SynapseCommandService : Service
     private void GenerateCommandCompletion(RoundWaitingEvent _)
     {
         var list = QueryProcessor.ParseCommandsToStruct(CommandProcessor.GetAllCommands()).ToList();
+        list.Remove(list.FirstOrDefault(x => x.Command == "give"));
 
         foreach (var command in RemoteAdmin.Handler.Commands)
         {
             if(command.Meta is not SynapseRaCommandAttribute meta) continue;
-            
+
             list.Add(new QueryProcessor.CommandData
             {
                 Command = meta.CommandName,

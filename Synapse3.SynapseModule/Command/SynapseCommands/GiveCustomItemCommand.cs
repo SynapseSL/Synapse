@@ -27,7 +27,7 @@ public class GiveCustomItemCommand : SynapseCommand
         
         if (!Synapse.Get<PlayerService>().TryGetPlayers(context.Arguments[0],out var players,context.Player))
         {
-            result.Response = "No Player was found";
+            result.Response = "No Valid Player was found/selected";
             result.StatusCode = CommandStatusCode.Error;
             return;
         }
@@ -94,18 +94,27 @@ public class GiveCustomItemCommand : SynapseCommand
 
         foreach (var player in players)
         {
-            _ = new SynapseItem(id, player)
+            if (context.Arguments.Length > 2)
             {
-                Scale = new Vector3(xsize, ysize, zsize),
-                Durability = durabillity,
-                FireArm =
+                new SynapseItem(id, player)
                 {
-                    Attachments = attachments
-                }
-            };   
+                    Scale = new Vector3(xsize, ysize, zsize),
+                    Durability = durabillity,
+                    FireArm =
+                    {
+                        Attachments = attachments
+                    }
+                };  
+            }
+            else
+            {
+                var item = new SynapseItem(id);
+                item.EquipItem(player, true);
+            }
         }
-        
-        result.Response = "Added Item to Players Inventory!";
+
+        result.Response = string.Format("Done! The request affected {0} player{1}", players.Count.ToString(),
+            players.Count == 1 ? "!" : "s!");
         result.StatusCode = CommandStatusCode.Ok;
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Achievements;
 using HarmonyLib;
+using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Firearms.BasicMessages;
 using InventorySystem.Items.Firearms.Modules;
 using Mirror;
@@ -49,13 +50,32 @@ internal static class DummyPatches
     {
         return Synapse.Get<PlayerService>().GetPlayer(netId).Connection != null;
     }
+    
+
+    //The Dummy is not properly Spawned - need to investigate this later - could cause other bugs as well
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(HitboxIdentity), nameof(HitboxIdentity.NetworkId), MethodType.Getter)]
+    public static bool GetNetworkID(HitboxIdentity __instance, out uint __result)
+    {
+        if (__instance.TargetHub == null || __instance.TargetHub.networkIdentity == null)
+        {
+            var player = __instance.transform.GetComponentInParent<SynapsePlayer>();
+            __instance.TargetHub = player.Hub;
+            __result = player.NetworkIdentity.netId;
+        }
+        else
+        {
+            __result = __instance.TargetHub.inventory.netId;
+        }
+        return false;
+    }
 
     [HarmonyFinalizer]
     [HarmonyPatch(typeof(FirearmBasicMessagesHandler), nameof(FirearmBasicMessagesHandler.ServerShotReceived))]
     public static Exception OnShoot(Exception __exception)
     {
         if (__exception != null)
-            NeuronLogger.For<Synapse>().Error(__exception);
+            NeuronLogger.For<Synapse>().Error("Sy3 API: Dummy Shoot fail check activated:\n" + __exception);
         return null;
     }
 }

@@ -1,5 +1,4 @@
-﻿using Neuron.Core.Logging;
-using Neuron.Core.Meta;
+﻿using Neuron.Core.Meta;
 using Scp914;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
@@ -17,8 +16,7 @@ namespace Synapse3.ExamplePlugin;
 [Item(
     Name = "Example",
     Id = 99,
-    BasedItemType = ItemType.GunCOM15,
-    SchematicID = 1
+    BasedItemType = ItemType.GunCOM15
 )]
 public class ExampleCustomItem : CustomItemHandler, ISynapse914Processor
 {

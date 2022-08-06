@@ -16,28 +16,26 @@ public class PlayerEvents : Service
     public readonly EventReactor<LoadComponentEvent> LoadComponent = new();
     public readonly EventReactor<KeyPressEvent> KeyPress = new();
     public readonly EventReactor<HarmPermissionEvent> HarmPermission = new();
-    public readonly EventReactor<ShootEvent> Shoot = new();
     public readonly EventReactor<SetClassEvent> SetClass = new();
     public readonly EventReactor<UpdateEvent> Update = new();
     public readonly EventReactor<DoorInteractEvent> DoorInteract = new();
     public readonly EventReactor<LockerUseEvent> LockerUse = new();
     public readonly EventReactor<StartWarheadEvent> StartWarhead = new();
-    public readonly EventReactor<CancelWarheadEvent> CancelWarhead = new();
     public readonly EventReactor<WarheadPanelInteractEvent> WarheadPanelInteract = new();
     public readonly EventReactor<BanEvent> Ban = new();
-    public readonly EventReactor<ChangeItemEvent> ChangeItem = new();
     public readonly EventReactor<DamageEvent> Damage = new();
     public readonly EventReactor<DeathEvent> Death = new();
     public readonly EventReactor<FreePlayerEvent> FreePlayer = new();
     public readonly EventReactor<DropAmmoEvent> DropAmmo = new();
     public readonly EventReactor<EscapeEvent> Escape = new();
+    public readonly EventReactor<ChangeItemEvent> ChangeItem = new();
+    public readonly EventReactor<PickupEvent> Pickup = new();
     public readonly EventReactor<DropItemEvent> DropItem = new();
     public readonly EventReactor<EnterFemurEvent> EnterFemur = new();
     public readonly EventReactor<GeneratorInteractEvent> GeneratorInteract = new();
     public readonly EventReactor<HealEvent> Heal = new();
     public readonly EventReactor<JoinEvent> Join = new();
     public readonly EventReactor<LeaveEvent> Leave = new();
-    public readonly EventReactor<PickupEvent> Pickup = new();
     public readonly EventReactor<PlaceBulletHoleEvent> PlaceBulletHole = new();
     public readonly EventReactor<ReportEvent> Report = new();
     public readonly EventReactor<SpeakSecondaryEvent> SpeakSecondary = new();
@@ -53,10 +51,8 @@ public class PlayerEvents : Service
         _eventManager.RegisterEvent(LoadComponent);
         _eventManager.RegisterEvent(KeyPress);
         _eventManager.RegisterEvent(HarmPermission);
-        _eventManager.RegisterEvent(Shoot);
         _eventManager.RegisterEvent(SetClass);
         _eventManager.RegisterEvent(StartWarhead);
-        _eventManager.RegisterEvent(CancelWarhead);
         _eventManager.RegisterEvent(DoorInteract);
         _eventManager.RegisterEvent(LockerUse);
         _eventManager.RegisterEvent(WarheadPanelInteract);
@@ -145,21 +141,6 @@ public class HarmPermissionEvent : IEvent
     public SynapsePlayer Victim { get; }
 }
 
-public class ShootEvent : PlayerInteractEvent
-{
-    public ShootEvent(SynapsePlayer player, uint targetNetID, ushort itemSerial, bool allow) : base(player, allow)
-    {
-        if (targetNetID > 0)
-            Target = Synapse.Get<PlayerService>().GetPlayer(targetNetID);
-        
-        Item = Synapse.Get<ItemService>().GetSynapseItem(itemSerial);
-    }
-    
-    public SynapsePlayer Target { get; }
-    
-    public SynapseItem Item { get; }
-}
-
 public class SetClassEvent : PlayerInteractEvent
 {
     public SetClassEvent(SynapsePlayer player, RoleType role, CharacterClassManager.SpawnReason reason) : base(player,
@@ -207,7 +188,8 @@ public class DoorInteractEvent : PlayerInteractEvent
 
 public class LockerUseEvent : PlayerInteractEvent
 {
-    public LockerUseEvent(SynapsePlayer player, bool allow, SynapseLocker locker, SynapseLocker.SynapseLockerChamber chamber) : base(player, allow)
+    public LockerUseEvent(SynapsePlayer player, bool allow, SynapseLocker locker,
+        SynapseLocker.SynapseLockerChamber chamber) : base(player, allow)
     {
         Locker = locker;
         Chamber = chamber;
@@ -221,11 +203,6 @@ public class LockerUseEvent : PlayerInteractEvent
 public class StartWarheadEvent : PlayerInteractEvent
 {
     public StartWarheadEvent(SynapsePlayer player, bool allow) : base(player, allow) { }
-}
-
-public class CancelWarheadEvent : PlayerInteractEvent
-{
-    public CancelWarheadEvent(SynapsePlayer player, bool allow) : base(player, allow) { }
 }
 
 public class WarheadPanelInteractEvent : PlayerInteractEvent
@@ -273,7 +250,8 @@ public class ChangeItemEvent : PlayerInteractEvent
 
 public class DamageEvent : PlayerInteractEvent
 {
-    public DamageEvent(SynapsePlayer player, bool allow, SynapsePlayer attacker, DamageType damageType, float damage) : base(player, allow)
+    public DamageEvent(SynapsePlayer player, bool allow, SynapsePlayer attacker, DamageType damageType, float damage) :
+        base(player, allow)
     {
         Attacker = attacker;
         DamageType = damageType;

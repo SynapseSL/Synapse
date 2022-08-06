@@ -78,7 +78,8 @@ public class PermissionService : Service
                 if (groups.ContainsKey(section.Key))
                 {
                     NeuronLogger.For<SynapseGroup>()
-                        .Warn("Sy3 Permission: Group with same name was found a second time. Group will be skipped");
+                        .Warn(
+                            $"Sy3 Permission: Group {section.Key} was found a second time. Second instance will be skipped");
                     continue;
                 }
 

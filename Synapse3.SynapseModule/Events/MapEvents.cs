@@ -18,6 +18,7 @@ public class MapEvents : Service
     public readonly EventReactor<ElevatorMoveContentEvent> ElevatorMoveContent = new();
     public readonly EventReactor<TriggerTeslaEvent> TriggerTesla = new();
     public readonly EventReactor<DetonateWarheadEvent> DetonateWarhead = new();
+    public readonly EventReactor<CancelWarheadEvent> CancelWarhead = new();
 
     public MapEvents(EventManager eventManager)
     {
@@ -30,6 +31,7 @@ public class MapEvents : Service
         _eventManager.RegisterEvent(ElevatorMoveContent);
         _eventManager.RegisterEvent(TriggerTesla);
         _eventManager.RegisterEvent(DetonateWarhead);
+        _eventManager.RegisterEvent(CancelWarhead);
     }
 }
 
@@ -110,3 +112,8 @@ public class TriggerTeslaEvent : PlayerInteractEvent
 }
 
 public class DetonateWarheadEvent : IEvent { }
+
+public class CancelWarheadEvent : PlayerInteractEvent
+{
+    public CancelWarheadEvent(SynapsePlayer player, bool allow) : base(player, allow) { }
+}

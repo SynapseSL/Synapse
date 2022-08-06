@@ -1,4 +1,5 @@
-﻿using InventorySystem.Items.Firearms;
+﻿using InventorySystem;
+using InventorySystem.Items.Firearms;
 
 namespace Synapse3.SynapseModule.Item.SubAPI;
 
@@ -38,6 +39,20 @@ public class FireArm : ISubSynapseItem
                     firearm.Status = new FirearmStatus(value, firearm.Status.Flags, firearm.Status.Attachments);
                     break;
             }
+        }
+    }
+
+    public byte DefaultMaxAmmo
+    {
+        get
+        {
+            if (_item.Item != null && _item.Item is Firearm firearm)
+                return firearm.AmmoManagerModule.MaxAmmo;
+
+            if (InventoryItemLoader.AvailableItems.TryGetValue(_item.ItemType, out var firearmPrefab))
+                return (firearmPrefab as Firearm)?.AmmoManagerModule.MaxAmmo ?? 0;
+
+            return 0;
         }
     }
     
