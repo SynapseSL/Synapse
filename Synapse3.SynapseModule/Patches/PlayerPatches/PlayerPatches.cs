@@ -453,10 +453,39 @@ internal static class PlayerPatches
             return true;
         }
     }
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(CheckpointKiller), nameof(CheckpointKiller.OnTriggerEnter))]
+    public static bool OnCheckpointEnter(Collider other)
+    {
+        try
+        {
+            DecoratedPlayerPatches.OnFallingIntoAbyss(other);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: FallingIntoAbyss event failed\n" + ex);
+            return true;
+        }
+    }
 }
 
 internal static class DecoratedPlayerPatches
 {
+    public static void OnFallingIntoAbyss(Collider other)
+    {
+        var player = other.GetComponentInParent<ReferenceHub>();
+        var allow = other.isTrigger;
+
+        var ev = new FallingIntoAbyssEvent(player, allow);
+        if (other.isTrigger)
+            player.GetSynapsePlayer().Kill();
+        Synapse.Get<PlayerEvents>().FallingIntoAbyss.Raise(ev);
+        if (!ev.Allow) return;
+        else
+            player.playerStats.DealDamage(new UniversalDamageHandler(-1f, DeathTranslations.Crushed, null));
+    }
+    
     public static void OpenWarheadButton(PlayerInteract interact)
     {
         if(!interact.CanInteract) return;
