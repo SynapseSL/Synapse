@@ -23,6 +23,13 @@ public class SynapseObjectEvents : Service
         _eventManager.RegisterEvent(Update);
         _eventManager.RegisterEvent(Destroy);
     }
+
+    public override void Disable()
+    {
+        _eventManager.UnregisterEvent(Load);
+        _eventManager.UnregisterEvent(Update);
+        _eventManager.UnregisterEvent(Destroy);
+    }
 }
 
 public class LoadObjectEvent : IEvent

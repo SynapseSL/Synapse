@@ -36,6 +36,19 @@ public class RoundEvents : Service
         _eventManager.RegisterEvent(FirstSpawn);
         _eventManager.RegisterEvent(Decontamination);
     }
+
+    public override void Disable()
+    {
+        _eventManager.UnregisterEvent(Start);
+        _eventManager.UnregisterEvent(End);
+        _eventManager.UnregisterEvent(Waiting);
+        _eventManager.UnregisterEvent(Restart);
+        _eventManager.UnregisterEvent(CheckEnd);
+        _eventManager.UnregisterEvent(SelectTeam);
+        _eventManager.UnregisterEvent(SpawnTeam);
+        _eventManager.UnregisterEvent(FirstSpawn);
+        _eventManager.UnregisterEvent(Decontamination);
+    }
 }
 
 public class RoundStartEvent : IEvent { }

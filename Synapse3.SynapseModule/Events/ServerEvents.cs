@@ -34,6 +34,17 @@ public class ServerEvents: Service
         _eventManager.RegisterEvent(GetData);
         _eventManager.RegisterEvent(SetData);
     }
+
+    public override void Disable()
+    {
+        _eventManager.UnregisterEvent(Reload);
+        _eventManager.UnregisterEvent(PreAuthentication);
+        _eventManager.UnregisterEvent(GetPlayerData);
+        _eventManager.UnregisterEvent(SetPlayerData);
+        _eventManager.UnregisterEvent(GetLeaderBoard);
+        _eventManager.UnregisterEvent(GetData);
+        _eventManager.UnregisterEvent(SetData);
+    }
 }
 
 public class ReloadEvent : IEvent { }

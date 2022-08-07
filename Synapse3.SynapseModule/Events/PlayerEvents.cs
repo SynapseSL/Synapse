@@ -81,8 +81,42 @@ public class PlayerEvents : Service
         _eventManager.RegisterEvent(StartWorkStation);
         _eventManager.RegisterEvent(FallingIntoAbyss);
 
-        WalkOnSinkhole.Subscribe(ev => WalkOnHazard.Raise(ev));
-        WalkOnTantrum.Subscribe(ev => WalkOnHazard.Raise(ev));
+        WalkOnSinkhole.Subscribe(WalkOnHazard.Raise);
+        WalkOnTantrum.Subscribe(WalkOnHazard.Raise);
+    }
+
+    public override void Disable()
+    {
+        _eventManager.UnregisterEvent(LoadComponent);
+        _eventManager.UnregisterEvent(KeyPress);
+        _eventManager.UnregisterEvent(HarmPermission);
+        _eventManager.UnregisterEvent(SetClass);
+        _eventManager.UnregisterEvent(StartWarhead);
+        _eventManager.UnregisterEvent(DoorInteract);
+        _eventManager.UnregisterEvent(LockerUse);
+        _eventManager.UnregisterEvent(WarheadPanelInteract);
+        _eventManager.UnregisterEvent(Ban);
+        _eventManager.UnregisterEvent(ChangeItem);
+        _eventManager.UnregisterEvent(Death);
+        _eventManager.UnregisterEvent(FreePlayer);
+        _eventManager.UnregisterEvent(DropAmmo);
+        _eventManager.UnregisterEvent(Escape);
+        _eventManager.UnregisterEvent(DropItem);
+        _eventManager.UnregisterEvent(EnterFemur);
+        _eventManager.UnregisterEvent(GeneratorInteract);
+        _eventManager.UnregisterEvent(Heal);
+        _eventManager.UnregisterEvent(Join);
+        _eventManager.UnregisterEvent(Leave);
+        _eventManager.UnregisterEvent(Pickup);
+        _eventManager.UnregisterEvent(PlaceBulletHole);
+        _eventManager.UnregisterEvent(Report);
+        _eventManager.UnregisterEvent(SpeakSecondary);
+        _eventManager.UnregisterEvent(OpenWarheadButton);
+        _eventManager.UnregisterEvent(StartWorkStation);
+        _eventManager.UnregisterEvent(FallingIntoAbyss);
+        
+        WalkOnSinkhole.Unsubscribe(WalkOnHazard.Raise);
+        WalkOnTantrum.Unsubscribe(WalkOnHazard.Raise);
     }
 }
 
@@ -500,6 +534,5 @@ public class FallingIntoAbyssEvent : PlayerEvent
         Allow = allow;
     }
     public bool Allow { get; set; }
-    public SynapsePlayer Player { get; }
 }
 

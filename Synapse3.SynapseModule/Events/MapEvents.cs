@@ -33,6 +33,15 @@ public class MapEvents : Service
         _eventManager.RegisterEvent(DetonateWarhead);
         _eventManager.RegisterEvent(CancelWarhead);
     }
+
+    public override void Disable()
+    {
+        _eventManager.UnregisterEvent(Scp914Upgrade);
+        _eventManager.UnregisterEvent(ElevatorMoveContent);
+        _eventManager.UnregisterEvent(TriggerTesla);
+        _eventManager.UnregisterEvent(DetonateWarhead);
+        _eventManager.UnregisterEvent(CancelWarhead);
+    }
 }
 
 public class Scp914UpgradeEvent : IEvent

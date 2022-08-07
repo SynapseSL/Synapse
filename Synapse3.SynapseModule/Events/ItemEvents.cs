@@ -43,15 +43,39 @@ public class ItemEvents: Service
         _eventManager.RegisterEvent(ThrowGrenade);
         _eventManager.RegisterEvent(MicroUse);
 
-        KeyCardInteract.Subscribe(ev => BasicInteract.Raise(ev));
-        ConsumeItem.Subscribe(ev => BasicInteract.Raise(ev));
-        Shoot.Subscribe(ev => BasicInteract.Raise(ev));
-        ReloadWeapon.Subscribe(ev => BasicInteract.Raise(ev));
-        Disarm.Subscribe(ev => BasicInteract.Raise(ev));
-        FlipCoin.Subscribe(ev => BasicInteract.Raise(ev));
-        RadioUse.Subscribe(ev => BasicInteract.Raise(ev));
-        ThrowGrenade.Subscribe(ev => BasicInteract.Raise(ev));
-        MicroUse.Subscribe(ev => BasicInteract.Raise(ev));
+        KeyCardInteract.Subscribe(BasicInteract.Raise);
+        ConsumeItem.Subscribe(BasicInteract.Raise);
+        Shoot.Subscribe(BasicInteract.Raise);
+        ReloadWeapon.Subscribe(BasicInteract.Raise);
+        Disarm.Subscribe(BasicInteract.Raise);
+        FlipCoin.Subscribe(BasicInteract.Raise);
+        RadioUse.Subscribe(BasicInteract.Raise);
+        ThrowGrenade.Subscribe(BasicInteract.Raise);
+        MicroUse.Subscribe(BasicInteract.Raise);
+    }
+
+    public override void Disable()
+    {
+        _eventManager.UnregisterEvent(BasicInteract);
+        _eventManager.UnregisterEvent(KeyCardInteract);
+        _eventManager.UnregisterEvent(ConsumeItem);
+        _eventManager.UnregisterEvent(Shoot);
+        _eventManager.UnregisterEvent(ReloadWeapon);
+        _eventManager.UnregisterEvent(Disarm);
+        _eventManager.UnregisterEvent(FlipCoin);
+        _eventManager.UnregisterEvent(RadioUse);
+        _eventManager.UnregisterEvent(ThrowGrenade);
+        _eventManager.UnregisterEvent(MicroUse);
+        
+        KeyCardInteract.Unsubscribe(BasicInteract.Raise);
+        ConsumeItem.Unsubscribe(BasicInteract.Raise);
+        Shoot.Unsubscribe(BasicInteract.Raise);
+        ReloadWeapon.Unsubscribe(BasicInteract.Raise);
+        Disarm.Unsubscribe(BasicInteract.Raise);
+        FlipCoin.Unsubscribe(BasicInteract.Raise);
+        RadioUse.Unsubscribe(BasicInteract.Raise);
+        ThrowGrenade.Unsubscribe(BasicInteract.Raise);
+        MicroUse.Unsubscribe(BasicInteract.Raise);
     }
 }
 
