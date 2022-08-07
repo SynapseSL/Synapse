@@ -493,11 +493,10 @@ public class StartWorkStationEvent : PlayerInteractEvent
     public SynapseWorkStation WorkStation { get; }
 }
 
-public class FallingIntoAbyssEvent : IEvent
+public class FallingIntoAbyssEvent : PlayerEvent
 {
-    public FallingIntoAbyssEvent(SynapsePlayer player, bool allow)
+    public FallingIntoAbyssEvent(SynapsePlayer player, bool allow) : base(player)
     {
-        Player = player;
         Allow = allow;
     }
     public bool Allow { get; set; }
