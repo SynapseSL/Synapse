@@ -44,6 +44,7 @@ public class PlayerEvents : Service
     public readonly EventReactor<WalkOnSinkholeEvent> WalkOnSinkhole = new();
     public readonly EventReactor<WalkOnTantrumEvent> WalkOnTantrum = new();
     public readonly EventReactor<StartWorkStationEvent> StartWorkStation = new();
+    public readonly EventReactor<FallingIntoAbyssEvent> FallingIntoAbyss = new();
 
     public PlayerEvents(EventManager eventManager)
     {
@@ -78,6 +79,7 @@ public class PlayerEvents : Service
         _eventManager.RegisterEvent(SpeakSecondary);
         _eventManager.RegisterEvent(OpenWarheadButton);
         _eventManager.RegisterEvent(StartWorkStation);
+        _eventManager.RegisterEvent(FallingIntoAbyss);
 
         WalkOnSinkhole.Subscribe(ev => WalkOnHazard.Raise(ev));
         WalkOnTantrum.Subscribe(ev => WalkOnHazard.Raise(ev));
@@ -489,5 +491,16 @@ public class StartWorkStationEvent : PlayerInteractEvent
     }
 
     public SynapseWorkStation WorkStation { get; }
+}
+
+public class FallingIntoAbyssEvent : IEvent
+{
+    public FallingIntoAbyssEvent(SynapsePlayer player, bool allow)
+    {
+        Player = player;
+        Allow = allow;
+    }
+    public bool Allow { get; set; }
+    public SynapsePlayer Player { get; }
 }
 
