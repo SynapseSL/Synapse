@@ -474,14 +474,14 @@ internal static class DecoratedPlayerPatches
 {
     public static void OnFallingIntoAbyss(Collider other)
     {
-        var player = other.GetComponentInParent<ReferenceHub>();
+        var player = other.GetComponentInParent<SynapsePlayer>();
         var allow = other.isTrigger;
 
         var ev = new FallingIntoAbyssEvent(player, allow);
         Synapse.Get<PlayerEvents>().FallingIntoAbyss.Raise(ev);
         if (!ev.Allow) return;
         else
-            player.playerStats.DealDamage(new UniversalDamageHandler(-1f, DeathTranslations.Crushed, null));
+            player.Hub.playerStats.DealDamage(new UniversalDamageHandler(-1f, DeathTranslations.Crushed, null));
     }
     
     public static void OpenWarheadButton(PlayerInteract interact)
