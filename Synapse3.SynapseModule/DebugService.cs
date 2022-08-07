@@ -73,6 +73,9 @@ public class DebugService : Service
         });
         _player.Damage.Subscribe(ev =>
             NeuronLogger.For<Synapse>().Warn($"Damage: {ev.Player.NickName} {ev.Damage} {ev.DamageType}"));
+            
+        _player.FallingIntoAbyss.Subscribe(ev =>
+                NeuronLogger.For<Synapse>().Warn($"{ev.Player.NickName} falled into an abyss"));
     }
 
     public override void Disable()
