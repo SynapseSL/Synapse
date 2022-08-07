@@ -478,8 +478,6 @@ internal static class DecoratedPlayerPatches
         var allow = other.isTrigger;
 
         var ev = new FallingIntoAbyssEvent(player, allow);
-        if (other.isTrigger)
-            player.GetSynapsePlayer().Kill();
         Synapse.Get<PlayerEvents>().FallingIntoAbyss.Raise(ev);
         if (!ev.Allow) return;
         else
