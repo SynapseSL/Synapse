@@ -40,6 +40,10 @@ public class PlayerEvents : Service
     public readonly EventReactor<ReportEvent> Report = new();
     public readonly EventReactor<SpeakSecondaryEvent> SpeakSecondary = new();
     public readonly EventReactor<OpenWarheadButtonEvent> OpenWarheadButton = new();
+    public readonly EventReactor<WalkOnHazardEvent> WalkOnHazard = new();
+    public readonly EventReactor<WalkOnSinkholeEvent> WalkOnSinkhole = new();
+    public readonly EventReactor<WalkOnTantrumEvent> WalkOnTantrum = new();
+    public readonly EventReactor<StartWorkStationEvent> StartWorkStation = new();
 
     public PlayerEvents(EventManager eventManager)
     {
@@ -73,6 +77,10 @@ public class PlayerEvents : Service
         _eventManager.RegisterEvent(Report);
         _eventManager.RegisterEvent(SpeakSecondary);
         _eventManager.RegisterEvent(OpenWarheadButton);
+        _eventManager.RegisterEvent(StartWorkStation);
+
+        WalkOnSinkhole.Subscribe(ev => WalkOnHazard.Raise(ev));
+        WalkOnTantrum.Subscribe(ev => WalkOnHazard.Raise(ev));
     }
 }
 
@@ -441,3 +449,45 @@ public class OpenWarheadButtonEvent : PlayerInteractEvent
 
     public bool Open { get; set; }
 }
+
+public abstract class WalkOnHazardEvent : PlayerInteractEvent
+{
+    protected WalkOnHazardEvent(SynapsePlayer player, bool allow, EnvironmentalHazard hazard) : base(player, allow)
+    {
+        Hazard = hazard;
+    }
+
+    public EnvironmentalHazard Hazard { get; }
+}
+
+public class WalkOnSinkholeEvent : WalkOnHazardEvent
+{
+    public WalkOnSinkholeEvent(SynapsePlayer player, bool allow, SinkholeEnvironmentalHazard hazard) : base(player,
+        allow, hazard)
+    {
+        Hazard = hazard;
+    }
+    
+    public new SinkholeEnvironmentalHazard Hazard { get; }
+}
+
+public class WalkOnTantrumEvent : WalkOnHazardEvent
+{
+    public WalkOnTantrumEvent(SynapsePlayer player, bool allow, TantrumEnvironmentalHazard hazard) : base(player, allow, hazard)
+    {
+        Hazard = hazard;
+    }
+    
+    public new TantrumEnvironmentalHazard Hazard { get; }
+}
+
+public class StartWorkStationEvent : PlayerInteractEvent
+{
+    public StartWorkStationEvent(SynapsePlayer player, bool allow, SynapseWorkStation workStation) : base(player, allow)
+    {
+        WorkStation = workStation;
+    }
+
+    public SynapseWorkStation WorkStation { get; }
+}
+

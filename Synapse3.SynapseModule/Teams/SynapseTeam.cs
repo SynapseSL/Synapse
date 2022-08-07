@@ -8,7 +8,7 @@ public abstract class SynapseTeam : ISynapseTeam
     public abstract void SpawnPlayers(List<SynapsePlayer> players);
 
     public abstract int MaxWaveSize { get; }
-    public virtual float RespawnTime => 0f;
+    public virtual float RespawnTime => 15f;
     
     public virtual void RespawnAnnouncement() { }
     public TeamAttribute Attribute { get; set; }

@@ -5,6 +5,7 @@ using HarmonyLib;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem;
 using InventorySystem.Items;
+using InventorySystem.Items.Firearms.Attachments;
 using InventorySystem.Items.Firearms.Modules;
 using InventorySystem.Searching;
 using MapGeneration.Distributors;
@@ -382,6 +383,76 @@ internal static class PlayerPatches
             return true;
         }
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(SinkholeEnvironmentalHazard), nameof(SinkholeEnvironmentalHazard.OnEnter))]
+    public static bool OnEnterSinkhole(SinkholeEnvironmentalHazard __instance, ReferenceHub player)
+    {
+        try
+        {
+            var sPlayer = player.GetSynapsePlayer();
+            var allow = !(!Synapse3Extensions.CanHarmScp(sPlayer, false) || sPlayer.GodMode);
+
+            var ev = new WalkOnSinkholeEvent(sPlayer, allow, __instance);
+            Synapse.Get<PlayerEvents>().WalkOnSinkhole.Raise(ev);
+
+            return ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Enter Hazard Event failed\n" + ex);
+            return true;
+        }
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(TantrumEnvironmentalHazard),nameof(TantrumEnvironmentalHazard.OnEnter))]
+    [HarmonyPatch(typeof(TantrumEnvironmentalHazard),nameof(TantrumEnvironmentalHazard.OnExit))]
+    public static bool OnEnterTantrum(TantrumEnvironmentalHazard __instance, ReferenceHub player)
+    {
+        try
+        {
+            if (player == null || __instance.DisableEffect || __instance._correctPosition == null ||
+                player.characterClassManager == null)
+                return false;
+            
+            var sPlayer = player.GetSynapsePlayer();
+            var allow = !(!Synapse3Extensions.CanHarmScp(sPlayer, false) || sPlayer.GodMode);
+
+            var ev = new WalkOnTantrumEvent(sPlayer, allow, __instance);
+            Synapse.Get<PlayerEvents>().WalkOnTantrum.Raise(ev);
+
+            return ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Enter Hazard Event failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(WorkstationController), nameof(WorkstationController.ServerInteract))]
+    public static bool OnUseWorkstation(WorkstationController __instance, ReferenceHub ply, byte colliderId)
+    {
+        try
+        {
+            if (colliderId != __instance._activateCollder.ColliderId || __instance.Status != 0 || ply == null)
+                return false;
+
+            var ev = new StartWorkStationEvent(ply, true, __instance.GetSynapseWorkStation());
+
+            if (ev.Player == null || ev.WorkStation == null) return false;
+            Synapse.Get<PlayerEvents>().StartWorkStation.Raise(ev);
+
+            return ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Start WorkStation Event failed\n" + ex);
+            return true;
+        }
+    }
 }
 
 internal static class DecoratedPlayerPatches
@@ -399,6 +470,7 @@ internal static class DecoratedPlayerPatches
         var open = !Synapse.Get<SynapseConfigService>().GamePlayConfiguration.CloseWarheadButton || !component.NetworkkeycardEntered;
         
         var ev = new OpenWarheadButtonEvent(player, allow, open);
+        Synapse.Get<PlayerEvents>().OpenWarheadButton.Raise(ev);
         if(!ev.Allow) return;
         
         component.NetworkkeycardEntered = ev.Open;

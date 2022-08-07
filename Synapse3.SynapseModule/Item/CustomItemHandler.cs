@@ -98,6 +98,8 @@ public abstract class CustomItemHandler
     public virtual void OnUnEquip(ChangeItemEvent ev) { }
     
     public virtual void OnShoot(ShootEvent ev) { }
+    
+    public virtual void OnThrow(ThrowGrenadeEvent ev) { }
 
 
     private void SwitchHoldItem(ChangeItemEvent ev)
@@ -126,11 +128,16 @@ public abstract class CustomItemHandler
         if (ev.Item?.Id != Attribute.Id) return;
         OnReload(ev);
     }
-
     private void Shoot(ShootEvent ev)
     {
         if(ev.Item?.Id != Attribute.Id) return;
         OnShoot(ev);
+    }
+
+    private void Throw(ThrowGrenadeEvent ev)
+    {
+        if(ev.Item?.Id != Attribute.Id) return;
+        OnThrow(ev);
     }
     
     public ItemAttribute Attribute { get; internal set; }

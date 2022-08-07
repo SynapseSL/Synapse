@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+﻿using InventorySystem.Items.MicroHID;
 using InventorySystem.Items.Radio;
 using InventorySystem.Items.Usables;
 using Neuron.Core.Events;
@@ -21,6 +21,9 @@ public class ItemEvents: Service
     public readonly EventReactor<DisarmEvent> Disarm = new();
     public readonly EventReactor<FlipCoinEvent> FlipCoin = new();
     public readonly EventReactor<RadioUseEvent> RadioUse = new();
+    public readonly EventReactor<ThrowGrenadeEvent> ThrowGrenade = new();
+    public readonly EventReactor<MicroUseEvent> MicroUse = new();
+
 
     public ItemEvents(EventManager eventManager)
     {
@@ -37,6 +40,8 @@ public class ItemEvents: Service
         _eventManager.RegisterEvent(Disarm);
         _eventManager.RegisterEvent(FlipCoin);
         _eventManager.RegisterEvent(RadioUse);
+        _eventManager.RegisterEvent(ThrowGrenade);
+        _eventManager.RegisterEvent(MicroUse);
 
         KeyCardInteract.Subscribe(ev => BasicInteract.Raise(ev));
         ConsumeItem.Subscribe(ev => BasicInteract.Raise(ev));
@@ -45,12 +50,14 @@ public class ItemEvents: Service
         Disarm.Subscribe(ev => BasicInteract.Raise(ev));
         FlipCoin.Subscribe(ev => BasicInteract.Raise(ev));
         RadioUse.Subscribe(ev => BasicInteract.Raise(ev));
+        ThrowGrenade.Subscribe(ev => BasicInteract.Raise(ev));
+        MicroUse.Subscribe(ev => BasicInteract.Raise(ev));
     }
 }
 
 public abstract class BasicItemInteractEvent : PlayerInteractEvent
 {
-    public BasicItemInteractEvent(SynapseItem item, ItemInteractState state, SynapsePlayer player) :
+    protected BasicItemInteractEvent(SynapseItem item, ItemInteractState state, SynapsePlayer player) :
         base(player, true)
     {
         Item = item;
@@ -136,4 +143,33 @@ public class ShootEvent : BasicItemInteractEvent
     }
 
     public SynapsePlayer Target { get; }
+}
+
+public class ThrowGrenadeEvent : BasicItemInteractEvent
+{
+    public ThrowGrenadeEvent(SynapseItem item, ItemInteractState state, SynapsePlayer player, bool throwFullForce) : base(item, state, player)
+    {
+        ThrowFullForce = throwFullForce;
+    }
+
+    public bool ThrowFullForce { get; set; }
+}
+
+public class MicroUseEvent : BasicItemInteractEvent
+{
+    public MicroUseEvent(SynapseItem item, ItemInteractState state, SynapsePlayer player, byte energy,
+        bool canScp939Hear, HidState microState) : base(item, state, player)
+    {
+        Energy = energy;
+        CanScp939Hear = canScp939Hear;
+        MicroState = microState;
+    }
+
+    public byte Energy { get; set; }
+    
+    public bool CanScp939Hear { get; set; }
+    
+    public HidState MicroState { get; set; }
+
+    public bool AllowChangingState { get; set; } = true;
 }

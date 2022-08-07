@@ -2,7 +2,9 @@
 
 public enum ItemInteractState
 {
+    Idle,
     Start,
+    Active,
     Finalize,
     Cancel
 }

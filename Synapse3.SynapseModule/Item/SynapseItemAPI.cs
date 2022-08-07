@@ -90,7 +90,8 @@ public partial class SynapseItem
         var owner = ItemOwner;
         var rot = _rotation;
 
-        Destroy();
+        DestroyPickup();
+        Throwable.DestroyProjectile();
         
         if(!InventoryItemLoader.AvailableItems.TryGetValue(ItemType, out var exampleBase)) return;
 
@@ -117,6 +118,8 @@ public partial class SynapseItem
         State = ItemState.Map;
         CreateSchematic();
         
+        DestroyItem();
+
         var comp = Pickup.gameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
     }
@@ -132,12 +135,12 @@ public partial class SynapseItem
 
     internal void DestroyItem()
     {
-        if(Item is null) return;
+        if(Item == null) return;
+        Item.OnRemoved(Pickup);
+        
         var holder = ItemOwner;
         if (holder != null)
         {
-            Item.OnRemoved(Pickup);
-
             if (holder.Inventory.ItemInHand == this)
                 holder.Inventory.ItemInHand = None;
             

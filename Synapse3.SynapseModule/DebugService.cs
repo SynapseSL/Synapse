@@ -1,9 +1,10 @@
-﻿using Neuron.Core.Logging;
+﻿using InventorySystem.Items.MicroHID;
+using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Dummy;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Map.Objects;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule;
@@ -40,10 +41,35 @@ public class DebugService : Service
         {
             NeuronLogger.For<Synapse>().Warn($"Shoot {ev.Player.NickName} {ev.Target?.NickName} {ev.Item.ItemType}");
         });
+        
+        _item.ThrowGrenade.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"Throw {ev.State}");
+            ev.Allow = false;
+        });
+        
+        _item.MicroUse.Subscribe(ev =>
+        {
+            if (ev.MicroState == HidState.PoweringUp)
+            {
+                ev.AllowChangingState = false;
+                ev.MicroState = HidState.Firing;
+            }
+        });
 
         _player.Death.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Warn($"{ev.Player.NickName} {ev.DamageType} {ev.LastTakenDamage}");
+        });
+        
+        _player.WalkOnHazard.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"HAZARD {ev.Player.NickName}");
+        });
+        
+        _player.StartWorkStation.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"WorkStation {ev.Player.NickName}");
         });
         _player.Damage.Subscribe(ev =>
             NeuronLogger.For<Synapse>().Warn($"Damage: {ev.Player.NickName} {ev.Damage} {ev.DamageType}"));

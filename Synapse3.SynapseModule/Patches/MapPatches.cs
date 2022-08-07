@@ -8,7 +8,6 @@ using Neuron.Core.Logging;
 using Scp914;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
-using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Achievements;
 using HarmonyLib;
-using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Firearms.BasicMessages;
 using InventorySystem.Items.Firearms.Modules;
 using Mirror;
