@@ -101,17 +101,23 @@ public class SetPlayerDataEvent : PlayerEvent
 
 public class GetLeaderBoardEvent : IEvent
 {
-    public GetLeaderBoardEvent(string key, bool orderByHighest)
+    public GetLeaderBoardEvent(string key, bool orderByHighest, int maxDataSize)
     {
         Key = key;
         OrderByHighest = orderByHighest;
+        MaxDataSize = maxDataSize;
     }
 
     public string Key { get; }
     
     public bool OrderByHighest { get; }
+    
+    public int MaxDataSize { get; }
 
-    public Dictionary<SynapsePlayer, string> Data { get; set; } = new();
+    /// <summary>
+    /// The first string is the Player's UserID and the Second the Value
+    /// </summary>
+    public Dictionary<string, string> Data { get; set; } = new();
 }
 
 public class GetDataEvent : IEvent

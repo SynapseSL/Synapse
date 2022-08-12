@@ -1,4 +1,7 @@
-﻿using Mirror;
+﻿using System.Collections.Generic;
+using Mirror;
+using Neuron.Core.Logging;
+using Neuron.Modules.Configs.Localization;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
@@ -34,4 +37,18 @@ public partial class SynapsePlayer
     public void SendNetworkMessage<TNetworkMessage>(TNetworkMessage msg, int channel = 0)
         where TNetworkMessage : struct, NetworkMessage =>
         Connection?.Send(msg, channel);
+
+    public TTranslation GetTranslation<TTranslation>(TTranslation translation) where TTranslation : Translations<TTranslation>, new()
+    {
+        var language = new List<string>();
+        
+        var playerTranslation = GetData("language");
+        if (!string.IsNullOrWhiteSpace(playerTranslation))
+            language.Add(playerTranslation);
+        
+        language.AddRange(Synapse.Get<SynapseConfigService>().HostingConfiguration.Language);
+        
+        //TODO: NuGet Update
+        return translation.WithLocale(language[0]);
+    }
 }

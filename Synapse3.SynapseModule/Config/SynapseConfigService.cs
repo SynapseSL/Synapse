@@ -1,5 +1,6 @@
 ﻿using Neuron.Core.Meta;
 using Neuron.Modules.Configs;
+using Neuron.Modules.Configs.Localization;
 using Synapse3.SynapseModule.Events;
 
 namespace Synapse3.SynapseModule.Config;
@@ -9,23 +10,26 @@ namespace Synapse3.SynapseModule.Config;
 /// </summary>
 public class SynapseConfigService : Service
 {
-    private ConfigService _configService;
+    private readonly ConfigService _config;
+    private readonly TranslationService _translation;
     private readonly ServerEvents _server;
     private readonly PlayerEvents _player;
 
     public ConfigContainer Container { get; set; }
 
+    public SynapseTranslation Translation { get; set; }
+    
     public HostingConfiguration HostingConfiguration { get; private set; }
-    
-    public JoinMessageConfiguration JoinMessageConfiguration { get; private set; }
-    
+
     public PermissionConfiguration PermissionConfiguration { get; private set; }
     
     public GamePlayConfiguration GamePlayConfiguration { get; private set; }
 
-    public SynapseConfigService(ConfigService configService, ServerEvents server, PlayerEvents player)
+    public SynapseConfigService(ConfigService config, TranslationService translation, ServerEvents server,
+        PlayerEvents player)
     {
-        _configService = configService;
+        _config = config;
+        _translation = translation;
         _server = server;
         _player = player;
     }
@@ -34,7 +38,7 @@ public class SynapseConfigService : Service
     {
         _server.Reload.Subscribe(Reload);
         _player.Join.Subscribe(OnJoin);
-        Container = _configService.GetContainer("synapse.syml");
+        Container = _config.GetContainer("synapse.syml");
         Reload();
     }
 
@@ -48,22 +52,27 @@ public class SynapseConfigService : Service
     {
         Container.Load();
         HostingConfiguration = Container.Get<HostingConfiguration>();
-        JoinMessageConfiguration = Container.Get<JoinMessageConfiguration>();
         PermissionConfiguration = Container.Get<PermissionConfiguration>();
         GamePlayConfiguration = Container.Get<GamePlayConfiguration>();
+        
+        _config.ReloadModuleConfigs();
+        _config.ReloadPluginConfigs();
+        //TODO: _translation.Reload();
+        Translation = Synapse.Get<SynapseTranslation>();
     }
 
     private void OnJoin(JoinEvent ev)
     {
-        if (!string.IsNullOrWhiteSpace(JoinMessageConfiguration.Broadcast) &&
-            JoinMessageConfiguration.BroadcastDuration > 0)
-            ev.Player.SendBroadcast(JoinMessageConfiguration.Broadcast, JoinMessageConfiguration.BroadcastDuration);
+        var playerTranslation = ev.Player.GetTranslation(Translation);
+        if (!string.IsNullOrWhiteSpace(playerTranslation.Broadcast) &&
+            playerTranslation.BroadcastDuration > 0)
+            ev.Player.SendBroadcast(playerTranslation.Broadcast, playerTranslation.BroadcastDuration);
 
-        if (!string.IsNullOrWhiteSpace(JoinMessageConfiguration.Hint) &&
-            JoinMessageConfiguration.HintDuration > 0)
-            ev.Player.SendHint(JoinMessageConfiguration.Hint, JoinMessageConfiguration.HintDuration);
+        if (!string.IsNullOrWhiteSpace(playerTranslation.Hint) &&
+            playerTranslation.HintDuration > 0)
+            ev.Player.SendHint(playerTranslation.Hint, playerTranslation.HintDuration);
 
-        if (!string.IsNullOrWhiteSpace(JoinMessageConfiguration.Window))
-            ev.Player.SendWindowMessage(JoinMessageConfiguration.Window);
+        if (!string.IsNullOrWhiteSpace(playerTranslation.Window))
+            ev.Player.SendWindowMessage(playerTranslation.Window);
     }
 }

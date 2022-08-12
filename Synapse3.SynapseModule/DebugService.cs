@@ -2,6 +2,7 @@
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Command;
+using Synapse3.SynapseModule.Command.SynapseCommands;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
@@ -113,13 +114,9 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha2:
-                var dummy = new SynapseDummy(ev.Player.Position, ev.Player.RotationVector2, ev.Player.RoleType, ev.Player.NickName,
-                    "", "");
-                dummy.Player.GodMode = false;
-                
-                NeuronLogger.For<Synapse>().Warn(dummy.Player.NetworkIdentity.netId);
+                var command = Synapse.Get<TestCommand>();
+                Logger.Warn(command == null);
                 break;
-            
         }
     }
 }

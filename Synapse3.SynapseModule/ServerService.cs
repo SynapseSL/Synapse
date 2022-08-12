@@ -144,9 +144,9 @@ public class ServerService : Service
     /// <summary>
     /// Tries to get a LeaderBoard with this Key from a potentially implemented Database
     /// </summary>
-    public Dictionary<SynapsePlayer, string> GetLeaderBoard(string key, bool orderByHighest = true)
+    public Dictionary<string, string> GetLeaderBoard(string key, bool orderByHighest = true, int maxDataSize = -1)
     {
-        var ev = new GetLeaderBoardEvent(key, orderByHighest);
+        var ev = new GetLeaderBoardEvent(key, orderByHighest, maxDataSize);
         Synapse.Get<ServerEvents>().GetLeaderBoard.Raise(ev);
         return ev.Data;
     }

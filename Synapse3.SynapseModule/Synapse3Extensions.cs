@@ -12,6 +12,7 @@ using MapGeneration;
 using MapGeneration.Distributors;
 using Mirror;
 using Neuron.Core.Logging;
+using Neuron.Modules.Configs.Localization;
 using PlayableScps;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule;
@@ -261,13 +262,13 @@ public static class Synapse3Extensions
     
     public static bool CanHarmScp(SynapsePlayer player, bool message)
     {
-        if (player.TeamID == (int)Team.SCP || player.CustomRole?.GetFriendsID().Any(x => x == (int)Team.SCP) == true)
-        {
-            //TODO: Message
-            return false;
-        }
+        if (player.TeamID != (int)Team.SCP &&
+            player.CustomRole?.GetFriendsID().Any(x => x == (int)Team.SCP) != true) return true;
+        
+        if (message)
+            player.SendHint(Synapse.Get<SynapseConfigService>().Translation.Get(player).ScpTeam);
+        return false;
 
-        return true;
     }
     public static bool GetHarmPermission(SynapsePlayer attacker, SynapsePlayer victim, bool ignoreFFConfig = false)
     {
@@ -309,13 +310,13 @@ public static class Synapse3Extensions
                 if (attacker.CustomRole != null && attacker.CustomRole.GetFriendsID().Any(x => x == victim.TeamID))
                 {
                     allow = false;
-                    //TODO: Same Team Message
+                    attacker.SendHint(Synapse.Get<SynapseConfigService>().Translation.Get(attacker).SameTeam);
                 }
 
                 if (victim.CustomRole != null && victim.CustomRole.GetFriendsID().Any(x => x == attacker.TeamID))
                 {
                     allow = false;
-                    //Same Team Message
+                    attacker.SendHint(Synapse.Get<SynapseConfigService>().Translation.Get(attacker).SameTeam);
                 }
             }
 
@@ -329,4 +330,14 @@ public static class Synapse3Extensions
             return true;
         }
     }
+
+    public static TTranslation Get<TTranslation>(this TTranslation translation) where TTranslation : Translations<TTranslation>, new()
+    {
+        //TODO: Wait until the NuGet Update to support multiple Languages
+        return translation.WithLocale(Synapse.Get<SynapseConfigService>().HostingConfiguration.Language[0]);
+    }
+
+    public static TTranslation Get<TTranslation>(this TTranslation translation, SynapsePlayer player)
+        where TTranslation : Translations<TTranslation>, new()
+        => player.GetTranslation(translation);
 }
