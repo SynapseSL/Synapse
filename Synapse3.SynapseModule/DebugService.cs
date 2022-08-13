@@ -6,6 +6,7 @@ using Synapse3.SynapseModule.Command.SynapseCommands;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Map.Rooms;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule;
@@ -114,8 +115,12 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha2:
-                var command = Synapse.Get<TestCommand>();
-                Logger.Warn(command == null);
+                var room = (SynapseNetworkRoom)RoomType.Scp939.GetRoom();
+                room.Position = ev.Player.Position;
+                break;
+            
+            case KeyCode.Alpha3:
+                ev.Player.Scale *= 3;
                 break;
         }
     }

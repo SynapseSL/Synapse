@@ -60,6 +60,8 @@ public static class Synapse3Extensions
         var writer = NetworkWriterPool.GetWriter();
         var writer2 = NetworkWriterPool.GetWriter();
         var payload = NetworkServer.CreateSpawnMessagePayload(false, identity, writer, writer2);
+        NetworkWriterPool.Recycle(writer);
+        NetworkWriterPool.Recycle(writer2);
         var gameObject = identity.gameObject;
         return new SpawnMessage
         {

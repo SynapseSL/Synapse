@@ -16,7 +16,7 @@ public abstract class NetworkSynapseObject :  DefaultSynapseObject, IRefreshable
         get => base.Position;
         set
         {
-            base.Position = value;
+            NetworkIdentity.transform.position = value;
             Refresh();
         }
     }
@@ -26,7 +26,7 @@ public abstract class NetworkSynapseObject :  DefaultSynapseObject, IRefreshable
         get => base.Rotation;
         set
         {
-            base.Rotation = value;
+            NetworkIdentity.transform.rotation = value;
             Refresh();
         }
     }
@@ -36,7 +36,7 @@ public abstract class NetworkSynapseObject :  DefaultSynapseObject, IRefreshable
         get => base.Scale;
         set
         {
-            base.Scale = value;
+            NetworkIdentity.transform.localScale = value;
             Refresh();
         }
     }

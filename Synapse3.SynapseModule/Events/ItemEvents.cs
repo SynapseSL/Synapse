@@ -95,7 +95,13 @@ public abstract class BasicItemInteractEvent : PlayerInteractEvent
 
 public class KeyCardInteractEvent : BasicItemInteractEvent
 {
-    public KeyCardInteractEvent(SynapseItem item, ItemInteractState state, SynapsePlayer player) : base(item, state,player) { }
+    public KeyCardInteractEvent(SynapseItem item, ItemInteractState state, SynapsePlayer player) : base(item, state,
+        player)
+    {
+        IsRemoteKeyCard = item != player.Inventory.ItemInHand;
+    }
+    
+    public bool IsRemoteKeyCard { get; }
 }
 
 public class ConsumeItemEvent : BasicItemInteractEvent
