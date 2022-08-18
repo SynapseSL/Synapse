@@ -180,12 +180,6 @@ public class PlayerService : Service
                     foreach (var player2 in all)
                         players.Add(player2);
                     continue;
-                
-                //10000 is reserved for Overwatch Players since the Overwatch category needs an Id and this number will most likely never be reached on a normal Server
-                case "10000":
-                    foreach (var player in GetPlayers(x => x.OverWatch))
-                        players.Add(player);
-                    continue;
 
                 default:
                     var player3 = GetPlayer(parameter);
@@ -201,12 +195,10 @@ public class PlayerService : Service
                             var category = service.GetCategory(id);
                             if (category != null)
                             {
-                                var categoryPlayers = category.GetPlayers();
-                                if(categoryPlayers != null)
-                                    foreach (var player in category.GetPlayers())
-                                    {
-                                        players.Add(player);
-                                    }
+                                foreach (var player in category.GetPlayers() ?? new())
+                                {
+                                    players.Add(player);
+                                }
                             }
                         }
                         continue;

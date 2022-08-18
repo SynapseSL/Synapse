@@ -18,15 +18,17 @@ public class DebugService : Service
     private MapEvents _map;
     private RoundEvents _round;
     private ItemEvents _item;
+    private ScpEvents _scp;
     private SynapseCommandService _commandService;
 
-    public DebugService(PlayerEvents player, MapEvents map, RoundEvents round, ItemEvents item, SynapseCommandService commandService)
+    public DebugService(PlayerEvents player, MapEvents map, RoundEvents round, ItemEvents item,ScpEvents scp, SynapseCommandService commandService)
     {
         _player = player;
         _map = map;
         _round = round;
         _item = item;
         _commandService = commandService;
+        _scp = scp;
     }
 
     public override void Enable()
@@ -42,6 +44,12 @@ public class DebugService : Service
         _item.Shoot.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Warn($"Shoot {ev.Player.NickName} {ev.Target?.NickName} {ev.Item.ItemType}");
+        });
+        
+        _scp.Scp049Attack.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"Scp049 Attack {ev.Cooldown} {ev.Damage} {ev.Scp.NickName} {ev.Victim.NickName}");
+            ev.Cooldown = 0f;
         });
         
         _item.ThrowGrenade.Subscribe(ev =>
@@ -120,7 +128,8 @@ public class DebugService : Service
                 break;
             
             case KeyCode.Alpha3:
-                ev.Player.Scale *= 3;
+                new SynapseDummy(ev.Player.Position, ev.Player.RotationVector2, ev.Player.RoleType, ev.Player.NickName,
+                    "", "");
                 break;
         }
     }

@@ -79,7 +79,7 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
     internal static List<NetworkIdentity> _networkIdentities;
     private NetworkIdentity GetNetworkIdentity(RoomType room)
     {
-        if (_networkIdentities == null)
+        if (_networkIdentities == null || _networkIdentities.Count == 0)
             _networkIdentities = Synapse.GetObjects<NetworkIdentity>().Where(x => x.name.Contains("All"))
                 .ToList();
         switch (room)

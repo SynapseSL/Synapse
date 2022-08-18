@@ -37,6 +37,6 @@ public class LanguageCommand : SynapseCommand
         
         context.Player.SetData("language",context.Arguments[0].ToUpper());
         result.Response = context.Player.GetTranslation(_config.Translation).TranslationCommandSetTranslation
-            .Format(context.Arguments[0]);
+            .Format(context.Arguments[0].ToUpper());
     }
 }

@@ -15,6 +15,8 @@ public abstract class CustomItemHandler
         _player = player;
     }
 
+    public virtual void Load() => HookEvents();
+
     public virtual void HookEvents()
     {
         _items.ReloadWeapon.Subscribe(Reload);

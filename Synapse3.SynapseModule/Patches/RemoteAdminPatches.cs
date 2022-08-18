@@ -106,38 +106,26 @@ internal static class RemoteAdminPatches
                 ? "white"
                 : x.Value.Color
         }).ToList();
-        
-        var overWatch = new RemoteAdminGroup();
 
         var config = Synapse.Get<SynapseConfigService>().PermissionConfiguration;
 
-        if (config.OverWatchListDown)
-        {
-            foreach (var player in players.Where(x => x.Player.OverWatch).ToList())
-            {
-                overWatch.Members.Add(player);
-                players.Remove(player);
-            }
-        }
-
         var text = "\n";
-        var addNoneRow = false;
         var categories = Synapse.Get<RemoteAdminCategoryService>().RemoteAdminCategories;
 
+        var groupPlayers = players.ToList();
         if (config.BetterRemoteAdminList)
         {
-            foreach (var player in players.ToList())
+            foreach (var player in groupPlayers.ToList())
             {
                 if (remoteAdminGroups.Any(x => x.GroupId == player.Player.SynapseGroup.GroupId))
                 {
                     var group = remoteAdminGroups.FirstOrDefault(x => x.GroupId == player.Player.SynapseGroup.GroupId);
+                    if(group == null) continue;
+                    
                     group.Members.Add(player);
-                    players.Remove(player);
+                    groupPlayers.Remove(player);
                 }
             }
-
-            if (players.Count > 0)
-                addNoneRow = true;
         }
 
         var senderPlayer = sender.GetSynapsePlayer();
@@ -157,11 +145,19 @@ internal static class RemoteAdminPatches
                 
             text +=
                 $"<size=0>({category.Attribute.Id})</size> <size={category.Attribute.Size}></color><color={color}>{category.Attribute.Name}</color></size>\n";
+
+            if (!config.DisplayPlayerMultipleTimes) continue;
+            
+            foreach (var player in category.GetPlayers() ?? new List<SynapsePlayer>())
+            {
+                var raPlayer = players.FirstOrDefault(x => x.Player == player);
+                if(raPlayer != null)
+                    text += raPlayer.Text + "\n";
+            }
         }
 
         foreach (var group in remoteAdminGroups)
         {
-            
             if(group.Members.Count == 0) continue;
 
             var color = group.Color;
@@ -179,28 +175,38 @@ internal static class RemoteAdminPatches
                 text += player.Text + "\n";
             }
         }
-
-        if(addNoneRow)
-            text += "<size=0>(0)</size> <size=20>[None]</size>\n";
         
-        foreach (var player in players)
-        {
-            text += player.Text + "\n";
-        }
-
-        if(overWatch.Members.Count > 0)
-            text += "<size=0>(10000)</size> <size=20></color><color=#03f8fc>[ OverWatch]</color></size>\n";
+        if(config.BetterRemoteAdminList && groupPlayers.Count > 0)
+            text += "<size=0>(0)</size> <size=20>[Default]</size>\n";
         
-        foreach (var player in overWatch.Members)
+        foreach (var player in groupPlayers)
         {
             text += player.Text + "\n";
         }
         
         foreach (var category in categories)
         {
-            if (category.CanSeeCategory(senderPlayer) && !category.DisplayOnTop)
-                text +=
-                    $"<size=0>{category.Attribute.Id}</size><color={category.Attribute.Color}><size={category.Attribute.Size}>{category.Attribute.Name}</size></color>";
+            if (!category.CanSeeCategory(senderPlayer) || category.DisplayOnTop) continue;
+            
+            var color = category.Attribute.Color;
+                
+            if (string.Equals(color, "rainbow", StringComparison.OrdinalIgnoreCase))
+            {
+                var colors = service.Colors;
+                color = colors.ElementAt(Random.Range(0, colors.Count)).Value;
+            }
+                
+            text +=
+                $"<size=0>({category.Attribute.Id})</size> <size={category.Attribute.Size}></color><color={color}>{category.Attribute.Name}</color></size>\n";
+
+            if (!config.DisplayPlayerMultipleTimes) continue;
+
+            foreach (var player in category.GetPlayers() ?? new List<SynapsePlayer>())
+            {
+                var raPlayer = players.FirstOrDefault(x => x.Player == player);
+                if(raPlayer != null)
+                    text += raPlayer.Text + "\n";
+            }
         }
 
         return text;

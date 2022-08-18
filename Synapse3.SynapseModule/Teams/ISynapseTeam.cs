@@ -14,4 +14,6 @@ public interface ISynapseTeam
     public float RespawnTime { get; }
 
     public void RespawnAnnouncement();
+
+    public void Load();
 }

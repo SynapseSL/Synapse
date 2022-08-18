@@ -6,11 +6,19 @@ namespace Synapse3.SynapseModule.Map.Elevators;
 
 public abstract class CustomElevator : DefaultElevator
 {
+    public ElevatorService ElevatorService;
+    
     public override string Name { get; }
     public override uint Id { get; }
     public override bool Locked { get; set; }
     private bool _moving;
     public override bool IsMoving => _moving;
+
+    public CustomElevator()
+    {
+        ElevatorService = Synapse.Get<ElevatorService>();
+        ElevatorService._elevators.Add(this);
+    }
 
     public override void MoveToDestination(uint destinationId)
     {

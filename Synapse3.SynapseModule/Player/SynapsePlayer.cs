@@ -1,5 +1,6 @@
 ﻿using Assets._Scripts.Dissonance;
 using Synapse3.SynapseModule.Config;
+using Synapse3.SynapseModule.Database;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
@@ -24,6 +25,7 @@ public partial class SynapsePlayer : MonoBehaviour
     private readonly PlayerEvents _playerEvents;
     private readonly ServerEvents _serverEvents;
     private readonly SynapseConfigService _config;
+    private readonly DataBaseService _dataBase;
 
     /// <summary>
     /// The Type of Player this is. It can be a normal Player the Server itself or a Dummy
@@ -52,5 +54,6 @@ public partial class SynapsePlayer : MonoBehaviour
         _playerEvents = Synapse.Get<PlayerEvents>();
         _serverEvents = Synapse.Get<ServerEvents>();
         _config = Synapse.Get<SynapseConfigService>();
+        _dataBase = Synapse.Get<DataBaseService>();
     }
 }

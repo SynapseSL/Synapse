@@ -140,33 +140,4 @@ public class ServerService : Service
     {
         _server.Reload.Raise(new ReloadEvent());
     }
-
-    /// <summary>
-    /// Tries to get a LeaderBoard with this Key from a potentially implemented Database
-    /// </summary>
-    public Dictionary<string, string> GetLeaderBoard(string key, bool orderByHighest = true, int maxDataSize = -1)
-    {
-        var ev = new GetLeaderBoardEvent(key, orderByHighest, maxDataSize);
-        Synapse.Get<ServerEvents>().GetLeaderBoard.Raise(ev);
-        return ev.Data;
-    }
-
-    /// <summary>
-    /// Gets Data from a potentially implemented Database with the given Key
-    /// </summary>
-    public string GetData(string key)
-    {
-        var ev = new GetDataEvent(key);
-        Synapse.Get<ServerEvents>().GetData.Raise(ev);
-        return ev.Data;
-    }
-
-    /// <summary>
-    /// Sets Data from a potentially implemented Database
-    /// </summary>
-    public void SetData(string key, string value)
-    {
-        var ev = new SetDataEvent(key, value);
-        Synapse.Get<ServerEvents>().SetData.Raise(ev);
-    }
 }

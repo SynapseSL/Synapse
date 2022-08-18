@@ -26,6 +26,8 @@ internal static class ItemPatches
     {
         try
         {
+            if (__instance.Info.Serial == 0) return true;
+            
             var item = __instance.GetItem();
         
             //Whenever the Item should be transformed to a Inventory Item a ItemBase will be created before

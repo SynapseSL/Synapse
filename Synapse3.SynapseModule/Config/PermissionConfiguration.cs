@@ -23,8 +23,11 @@ public class PermissionConfiguration : IDocumentSection
     [Description("If Enabled the RemoteAdmin Player List will be sorted by the Players SynapseGroup")]
     public bool BetterRemoteAdminList { get; set; } = true;
 
-    [Description("If Enabled all Player in Overwatch will be displayed at the bottom of the Remote Admin List")]
-    public bool OverWatchListDown { get; set; } = true;
+    [Description("If Enabled the Categories OverWatch, Invisible, GodMode and NoClip are visible")]
+    public bool EnableGameModeCategories { get; set; } = true;
+
+    [Description("If Enabled the Players will be displayed below each Category they belong to")]
+    public bool DisplayPlayerMultipleTimes { get; set; } = false;
 
     [Description("How long Synapse waits until Updating the color when a SynapseGroup uses the color Rainbow")]
     public float RainbowUpdateTime { get; set; } = 1f;

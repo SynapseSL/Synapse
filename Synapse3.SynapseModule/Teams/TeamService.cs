@@ -48,7 +48,10 @@ public class TeamService : Service
         
         var teamHandler = (ISynapseTeam)_kernel.Get(teamType);
         _kernel.Bind(teamType).ToConstant(teamHandler).InSingletonScope();
+        
         teamHandler.Attribute = info;
+        teamHandler.Load();
+        
         _teams.Add(teamHandler);
     }
 

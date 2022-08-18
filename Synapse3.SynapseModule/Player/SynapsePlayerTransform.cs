@@ -49,11 +49,9 @@ public partial class SynapsePlayer
         set
         {
             transform.localScale = value;
-
-            var method = typeof(NetworkServer).GetMethod("SendSpawnMessage", BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public);
-
+            
             foreach (var ply in _player.Players)
-                _ = method.Invoke(null, new object[] { NetworkIdentity, ply.Connection });
+                NetworkServer.SendSpawnMessage(NetworkIdentity, ply.Connection);
         }
     }
 

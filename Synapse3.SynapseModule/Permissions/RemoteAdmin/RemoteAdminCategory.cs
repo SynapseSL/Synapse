@@ -16,4 +16,6 @@ public abstract class RemoteAdminCategory
     public abstract bool CanSeeCategory(SynapsePlayer player);
 
     public virtual string ExternalURL => "";
+
+    public virtual void Load() { }
 }

@@ -9,6 +9,7 @@ using Neuron.Modules.Configs;
 using Neuron.Modules.Patcher;
 using Ninject;
 using Synapse3.SynapseModule.Command;
+using Synapse3.SynapseModule.Database;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic.CustomAttributes;
@@ -49,6 +50,7 @@ public partial class Synapse : Module
     public Scp914Service Scp914Service { get; private set; }
     public ItemService ItemService { get; private set; }
     public RoomService RoomService { get; private set; }
+    public DataBaseService DataBaseService { get; private set; }
     
     public RemoteAdminCategoryService RemoteAdminCategoryService { get; private set; }
 
@@ -83,6 +85,7 @@ public partial class Synapse : Module
         ItemService = _kernel.GetSafe<ItemService>();
         RoomService = _kernel.GetSafe<RoomService>();
         RemoteAdminCategoryService = _kernel.GetSafe<RemoteAdminCategoryService>();
+        DataBaseService = _kernel.GetSafe<DataBaseService>();
         
         Logger.Info("Synapse3 enabled!");
     }

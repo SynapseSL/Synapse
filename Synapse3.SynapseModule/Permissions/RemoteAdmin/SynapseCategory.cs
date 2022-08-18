@@ -8,7 +8,7 @@ namespace Synapse3.SynapseModule.Permissions.RemoteAdmin;
 [RaCategory(
     Name = "[ Synapse 3]",
     Color = "blue",
-    Id = 10001
+    Id = 10000
     )]
 public class SynapseCategory : RemoteAdminCategory
 {

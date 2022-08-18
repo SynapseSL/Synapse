@@ -26,13 +26,8 @@ public class ElevatorService : Service
         _round.Restart.Unsubscribe(Clear);
     }
 
-    private List<IElevator> _elevators = new ();
+    internal List<IElevator> _elevators = new ();
     public ReadOnlyCollection<IElevator> Elevators => _elevators.AsReadOnly();
-
-    public void AddElevator(IElevator elevator)
-    {
-        _elevators.Add(elevator);
-    }
 
     private void GetVanillaElevators(RoundWaitingEvent _)
     {

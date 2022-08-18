@@ -56,12 +56,16 @@ public class ItemService : Service
     /// </summary>
     public SynapseItem GetSynapseItem(ushort serial)
     {
-        if (!_allItems.ContainsKey(serial))
+        if (serial == 0)
         {
-            NeuronLogger.For<Synapse>().Warn("If this message appears exists a Item that is not registered. Please report this bug in our Discord as detailed as possible");
+            NeuronLogger.For<Synapse>().Debug("Item with Serial 0 was requested");
             return SynapseItem.None;
         }
-        return _allItems[serial];
+
+        if (_allItems.ContainsKey(serial)) return _allItems[serial];
+        
+        NeuronLogger.For<Synapse>().Warn("If this message appears exists a Item that is not registered. Please report this bug in our Discord as detailed as possible Serial:" + serial);
+        return SynapseItem.None;
     }
 
     /// <summary>
@@ -71,8 +75,10 @@ public class ItemService : Service
     {
         var handler = (CustomItemHandler)_kernel.GetSafe(handlerType);
         _kernel.Bind(handlerType).ToConstant(handler).InSingletonScope();
+        
         handler.Attribute = info;
-        handler.HookEvents();
+        handler.Load();
+
         return RegisterItem(info);
     }
     

@@ -9,7 +9,7 @@ using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Events;
 
-public class ItemEvents: Service
+public class ItemEvents : Service
 {
     private readonly EventManager _eventManager;
 

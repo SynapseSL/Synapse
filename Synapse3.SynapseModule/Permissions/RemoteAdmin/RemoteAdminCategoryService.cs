@@ -26,6 +26,10 @@ public class RemoteAdminCategoryService : Service
     {
         _commandService.RemoteAdmin.Subscribe(OnCommand);
         RegisterCategory<SynapseCategory>();
+        RegisterCategory<OverWatchCategory>();
+        RegisterCategory<InvisibleCategory>();
+        RegisterCategory<GodModeCategory>();
+        RegisterCategory<NoClipCategory>();
 
         while (_synapseModule.ModuleRaCategoryBindingQueue.Count != 0)
         {
@@ -68,7 +72,10 @@ public class RemoteAdminCategoryService : Service
 
         var category = (RemoteAdminCategory)_kernel.Get(info.CategoryType);
         _kernel.Bind(info.CategoryType).ToConstant(category).InSingletonScope();
+        
         category.Attribute = info;
+        category.Load();
+        
         _remoteAdminCategories.Add(category);
     }
 

@@ -102,9 +102,7 @@ public class RoomService : Service
     {
         if (!IsIdRegistered(id)) return null;
         var info = _customRoomInformation.FirstOrDefault(x => x.Id == id);
-        if (info == null) return null;
-
-        return CreateRoom(info);
+        return info == null ? null : CreateRoom(info);
     }
 
     public SynapseCustomRoom CreateRoom(CustomRoomAttribute info)

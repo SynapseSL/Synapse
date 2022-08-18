@@ -4,6 +4,7 @@ using Neuron.Core.Meta;
 using Neuron.Core.Modules;
 using Neuron.Core.Plugins;
 using Synapse3.SynapseModule.Command;
+using Synapse3.SynapseModule.Database;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic.CustomAttributes;
@@ -26,6 +27,20 @@ public partial class Synapse
         OnGenerateItemBinding(args);
         OnGenerateRoomBindings(args);
         OnGenerateRemoteAdminBindings(args);
+        OnGenerateDataBaseBinding(args);
+    }
+    
+    private void OnGenerateDataBaseBinding(MetaGenerateBindingsEvent args)
+    {
+        if (!args.MetaType.TryGetAttribute<AutomaticAttribute>(out _)) return;
+        if (!args.MetaType.TryGetAttribute<DataBaseAttribute>(out var info)) return;
+        if (!args.MetaType.Is<IDataBase>()) return;
+
+        info.DataBaseType = args.MetaType.Type;
+        args.Outputs.Add(new SynapseDataBaseBinding()
+        {
+            Info = info
+        });
     }
 
     private void OnGenerateRemoteAdminBindings(MetaGenerateBindingsEvent args)
@@ -162,6 +177,10 @@ public partial class Synapse
         args.Context.MetaBindings
             .OfType<SynapseRaCategoryBinding>()
             .ToList().ForEach(x => RemoteAdminCategoryService.LoadBinding(x));
+        
+        args.Context.MetaBindings
+            .OfType<SynapseDataBaseBinding>()
+            .ToList().ForEach(x => DataBaseService.LoadBinding(x));
     }
     
     internal readonly Queue<SynapseCommandBinding> ModuleCommandBindingQueue = new();
@@ -172,6 +191,7 @@ public partial class Synapse
     internal readonly Queue<SynapseItemBinding> ModuleItemBindingQueue = new();
     internal readonly Queue<SynapseRoomBinding> ModuleRoomBindingQueue = new();
     internal readonly Queue<SynapseRaCategoryBinding> ModuleRaCategoryBindingQueue = new();
+    internal readonly Queue<SynapseDataBaseBinding> ModuleDataBaseBindingQueue = new();
 
     private void LoadModuleLate(ModuleLoadEvent args)
     {
@@ -231,6 +251,13 @@ public partial class Synapse
             .ToList().ForEach(binding =>
             {
                 ModuleRaCategoryBindingQueue.Enqueue(binding);
+            });
+        
+        args.Context.MetaBindings
+            .OfType<SynapseDataBaseBinding>()
+            .ToList().ForEach(binding =>
+            {
+                ModuleDataBaseBindingQueue.Enqueue(binding);
             });
     }
 }
