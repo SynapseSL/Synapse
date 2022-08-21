@@ -1,6 +1,5 @@
 ﻿using Neuron.Core.Logging;
 using Neuron.Core.Meta;
-using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Rooms;
 using UnityEngine;
@@ -25,23 +24,18 @@ public class ExampleRoom : SynapseCustomRoom
 
 public class RoomEventHandler
 {
-    private RoundEvents _round;
-    private RoomService _roomService;
-    
-    public RoomEventHandler()
+    private readonly RoundEvents _round;
+    private readonly RoomService _roomService;
+
+    public RoomEventHandler(RoundEvents roundEvents, RoomService roomService)
     {
-        _round = Synapse.Get<RoundEvents>();
-        _roomService = Synapse.Get<RoomService>();
+        _round = roundEvents;
+        _roomService = roomService;
     }
 
     public void HookEvents()
     {
         _round.Start.Subscribe(OnStart);
-    }
-
-    public void UnHookEvents()
-    {
-        _round.Start.Unsubscribe(OnStart);
     }
 
     private void OnStart(RoundStartEvent _)

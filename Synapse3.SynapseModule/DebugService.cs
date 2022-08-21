@@ -49,7 +49,6 @@ public class DebugService : Service
         _scp.Scp049Attack.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Warn($"Scp049 Attack {ev.Cooldown} {ev.Damage} {ev.Scp.NickName} {ev.Victim.NickName}");
-            ev.Cooldown = 0f;
         });
         
         _item.ThrowGrenade.Subscribe(ev =>

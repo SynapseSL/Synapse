@@ -57,7 +57,7 @@ public class SynapseConfigService : Service
         
         _config.ReloadModuleConfigs();
         _config.ReloadPluginConfigs();
-        //TODO: _translation.Reload();
+        _translation.ReloadTranslation();
         Translation = Synapse.Get<SynapseTranslation>();
     }
 

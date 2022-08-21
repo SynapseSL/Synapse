@@ -48,42 +48,33 @@ public class ElevatorEventHandler
 {
     private readonly PlayerEvents _player;
     private readonly RoundEvents _round;
-    
-    public ElevatorEventHandler()
+
+    public ElevatorEventHandler(PlayerEvents playerEvents, RoundEvents roundEvents)
     {
-        _player = Synapse.Get<PlayerEvents>();
-        _round = Synapse.Get<RoundEvents>();
+        _player = playerEvents;
+        _round = roundEvents;
     }
 
     public void HookEvents()
     {
-        _player.DoorInteract.Subscribe(OnDoor);
+        _player.DoorInteract.Subscribe(DoorInteract);
         _round.Start.Subscribe(CreateElevator);
     }
 
-    public void UnHookEvents()
+    private void DoorInteract(DoorInteractEvent ev)
     {
-        _player.DoorInteract.Unsubscribe(OnDoor);
-        _round.Start.Unsubscribe(CreateElevator);
-    }
+        if (!ev.Door.ObjectData.ContainsKey("elev")) return;
+        
+        var elevator = (ExampleElevator)ev.Door.ObjectData["elev"];
+        var id = (uint)ev.Door.ObjectData["id"];
 
-    private void OnDoor(DoorInteractEvent ev)
-    {
-        if (ev.Door.ObjectData.ContainsKey("elev"))
+        if (elevator.CurrentDestination.ElevatorId == id)
         {
-            var elevator = (ExampleElevator)ev.Door.ObjectData["elev"];
-            
-            
-            var id = (uint)ev.Door.ObjectData["id"];
-
-            if (elevator.CurrentDestination.ElevatorId == id)
-            {
-                elevator.MoveToNext();
-            }
-            else
-            {
-                elevator.MoveToDestination(id);
-            }
+            elevator.MoveToNext();
+        }
+        else
+        {
+            elevator.MoveToDestination(id);
         }
     }
 

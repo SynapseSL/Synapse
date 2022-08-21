@@ -333,11 +333,9 @@ public static class Synapse3Extensions
         }
     }
 
-    public static TTranslation Get<TTranslation>(this TTranslation translation) where TTranslation : Translations<TTranslation>, new()
-    {
-        //TODO: Wait until the NuGet Update to support multiple Languages
-        return translation.WithLocale(Synapse.Get<SynapseConfigService>().HostingConfiguration.Language[0]);
-    }
+    public static TTranslation Get<TTranslation>(this TTranslation translation)
+        where TTranslation : Translations<TTranslation>, new()
+        => translation.WithLocale(Synapse.Get<SynapseConfigService>().HostingConfiguration.Language);
 
     public static TTranslation Get<TTranslation>(this TTranslation translation, SynapsePlayer player)
         where TTranslation : Translations<TTranslation>, new()

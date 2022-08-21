@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Synapse3.SynapseModule.Config;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Permissions.RemoteAdmin;
@@ -33,7 +34,7 @@ public class GodModeCategory : RemoteAdminCategory
         return text + "</color>";
     }
 
-    public override List<SynapsePlayer> GetPlayers() => _player.GetPlayers(x => x.GodMode);
+    public override List<SynapsePlayer> GetPlayers() => _player.GetPlayers(x => x.GodMode, PlayerType.Player);
 
     public override bool DisplayOnTop => false;
 

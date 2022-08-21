@@ -8,7 +8,11 @@ namespace Synapse3.ExamplePlugin;
 [DocumentSection("Example")]
 public class ExampleConfig : IDocumentSection
 {
-    public string StringEntry { get; set; } = "DefaultStringValue";
-    public int IntEntry { get; set; } = 1337;
-    public List<string> ListEntry { get; set; } = new(new[] {"Entry 1", "Entry 2", "Entry 3"});
+    public int ConfigValue { get; set; } = 5;
+    
+    public List<uint> ItemsWithMessage { get; set; } = new()
+    {
+        (uint)ItemType.Medkit,
+        (uint)ItemType.Adrenaline
+    };
 }

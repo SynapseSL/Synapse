@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Dummy;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Permissions.RemoteAdmin;
 using UnityEngine;
@@ -59,45 +60,79 @@ public class PlayerService : Service
     /// <summary>
     /// Returns all Player objects even the Host and all Dummies
     /// </summary>
-    public List<SynapsePlayer> GetAbsoluteAllPlayers()
+    public List<SynapsePlayer> GetAbsoluteAllPlayers() =>
+        GetPlayers(PlayerType.Player, PlayerType.Server, PlayerType.Dummy);
+    
+    public List<SynapsePlayer> GetPlayers(params PlayerType[] playerTypes)
     {
-        var list = Players.ToList();
-        list.Add(Host);
-        foreach (var dummy in _dummy._dummies)
-        {
-            list.Add(dummy.Player);
-        }
-        return list;
-    }
+        var result = new List<SynapsePlayer>();
 
+        if (playerTypes.Contains(PlayerType.Player))
+        {
+            result.AddRange(Players);
+        }
+
+        if (playerTypes.Contains(PlayerType.Server))
+        {
+            result.Add(Host);
+        }
+
+        if (playerTypes.Contains(PlayerType.Dummy))
+        {
+            foreach (var dummy in _dummy._dummies)
+            {
+                result.Add(dummy.Player);
+            }
+        }
+
+        return result;
+    }
+    
+    public List<SynapsePlayer> GetPlayers(Func<SynapsePlayer, bool> func)
+        => GetAbsoluteAllPlayers().Where(func).ToList();
+
+    public List<SynapsePlayer> GetPlayers(Func<SynapsePlayer, bool> func, params PlayerType[] playerTypes)
+        => GetPlayers(playerTypes).Where(func).ToList();
+    
+    public SynapsePlayer GetPlayer(Func<SynapsePlayer, bool> func)
+        => GetAbsoluteAllPlayers().FirstOrDefault(func);
+
+    public SynapsePlayer GetPlayer(Func<SynapsePlayer, bool> func, params PlayerType[] playerTypes)
+        => GetPlayers(playerTypes).FirstOrDefault(func);
+
+
+    public SynapsePlayer GetPlayer(string argument) =>
+        GetPlayer(argument, PlayerType.Player, PlayerType.Server, PlayerType.Dummy);
+    
     /// <summary>
     /// Returns a Player based upon the given argument
     /// </summary>
     /// <param name="argument">UserID, Name, PlayerID or NetID as string</param>
-    public SynapsePlayer GetPlayer(string argument)
+    /// <param name="playerTypes">The Player Types that should be returned</param>
+    public SynapsePlayer GetPlayer(string argument, params PlayerType[] playerTypes)
     {
         if (argument.Contains("@"))
         {
-            var player = GetPlayerByUserId(argument);
+            var player = GetPlayerByUserId(argument, playerTypes);
             if (player != null)
                 return player;
         }
 
-        if (int.TryParse(argument, out var playerid))
+        if (int.TryParse(argument, out var playerId))
         {
-            var player = GetPlayer(playerid);
+            var player = GetPlayer(playerId, playerTypes);
             if (player != null)
                 return player;
         }
         
         if (uint.TryParse(argument, out var netId))
         {
-            var player = GetPlayer(netId);
+            var player = GetPlayer(netId, playerTypes);
             if (player != null)
                 return player;
         }
 
-        return GetPlayerByName(argument);
+        return GetPlayerByName(argument, playerTypes);
     }
 
     /// <summary>
@@ -105,21 +140,36 @@ public class PlayerService : Service
     /// </summary>
     public SynapsePlayer GetPlayer(int playerId)
         => GetPlayer(x => x.PlayerId == playerId);
+    
+    /// <summary>
+    /// Returns the player with that playerID
+    /// </summary>
+    public SynapsePlayer GetPlayer(int playerId, params PlayerType[] playerTypes)
+        => GetPlayer(x => x.PlayerId == playerId,playerTypes);
 
     /// <summary>
     /// Returns the player with that NetworkID
     /// </summary>
     public SynapsePlayer GetPlayer(uint netId)
         => GetPlayer(x => x.NetworkIdentity.netId == netId);
-    
-    public SynapsePlayer GetPlayer(Func<SynapsePlayer, bool> func)
-        => GetAbsoluteAllPlayers().FirstOrDefault(func);
+
+    /// <summary>
+    /// Returns the player with that NetworkID
+    /// </summary>
+    public SynapsePlayer GetPlayer(uint netId, params PlayerType[] playerTypes)
+        => GetPlayer(x => x.NetworkIdentity.netId == netId, playerTypes);
 
     /// <summary>
     /// Returns the player with that UserID
     /// </summary>
     public SynapsePlayer GetPlayerByUserId(string userid)
         => GetPlayer(x => x.UserId == userid || x.SecondUserID == userid);
+
+    /// <summary>
+    /// Returns the player with that UserID
+    /// </summary>
+    public SynapsePlayer GetPlayerByUserId(string userid, params PlayerType[] playerTypes)
+        => GetPlayer(x => x.UserId == userid || x.SecondUserID == userid, playerTypes);
 
     /// <summary>
     /// Returns the player with that Name
@@ -129,22 +179,44 @@ public class PlayerService : Service
             string.Equals(x.DisplayName, name, StringComparison.OrdinalIgnoreCase) ||
             string.Equals(x.NickName, name, StringComparison.OrdinalIgnoreCase));
 
+    /// <summary>
+    /// Returns the player with that Name
+    /// </summary>
+    public SynapsePlayer GetPlayerByName(string name, params PlayerType[] playerTypes)
+        => GetPlayer(x =>
+            string.Equals(x.DisplayName, name, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(x.NickName, name, StringComparison.OrdinalIgnoreCase), playerTypes);
+
     public List<SynapsePlayer> GetPlayers(int synapseGroupId)
         => GetPlayers(x => x.SynapseGroup.GroupId == synapseGroupId);
 
-    public List<SynapsePlayer> GetPlayers(Func<SynapsePlayer, bool> func)
-        => GetAbsoluteAllPlayers().Where(func).ToList();
+    public List<SynapsePlayer> GetPlayers(int synapseGroupId, params PlayerType[] playerTypes)
+        => GetPlayers(x => x.SynapseGroup.GroupId == synapseGroupId, playerTypes);
 
     /// <summary>
     /// Returns multiple Player that are parsed from a string.
     /// Use . between each player
     /// </summary>
+    /// <param name="arg">The Argument that should be parsed to a player list</param>
+    /// <param name="players">The Player List that will be returned</param>
     /// <param name="me">The Player which should be returned for Me and Self</param>
-    public bool TryGetPlayers(string arg, out HashSet<SynapsePlayer> players, SynapsePlayer me = null)
+    /// <param name="playerTypes">The Player Types which can be returned</param>
+    public bool TryGetPlayers(string arg, out HashSet<SynapsePlayer> players, SynapsePlayer me = null) =>
+        TryGetPlayers(arg, out players, me, PlayerType.Player);
+    
+    /// <summary>
+    /// Returns multiple Player that are parsed from a string.
+    /// Use . between each player
+    /// </summary>
+    /// <param name="arg">The Argument that should be parsed to a player list</param>
+    /// <param name="players">The Player List that will be returned</param>
+    /// <param name="me">The Player which should be returned for Me and Self</param>
+    /// <param name="playerTypes">The Player Types which can be returned</param>
+    public bool TryGetPlayers(string arg, out HashSet<SynapsePlayer> players, SynapsePlayer me = null, params PlayerType[] playerTypes)
     {
         var service = Synapse.Get<RemoteAdminCategoryService>();
         players = new HashSet<SynapsePlayer>();
-        var all = GetAbsoluteAllPlayers();
+        var all = GetPlayers(playerTypes);
         var args = arg.Split('.');
 
         foreach (var parameter in args)
@@ -159,6 +231,7 @@ public class PlayerService : Service
                     players.Add(me);
                     continue;
 
+                case "RA":
                 case "REMOTEADMIN":
                 case "ADMIN":
                 case "STAFF":
@@ -169,6 +242,7 @@ public class PlayerService : Service
 
                 case "NW":
                 case "NORTHWOOD":
+                case "GLOBALSTAFF":
                     foreach (var player in all)
                         if (player.ServerRoles.Staff)
                             players.Add(player);
@@ -186,12 +260,13 @@ public class PlayerService : Service
                     
                     if (player3 == null)
                     {
-                        //Check For SynapseGroupID
                         if (int.TryParse(parameter, out var id))
                         {
+                            //Check For SynapseGroupID
                             foreach (var player in GetPlayers(id))
                                 players.Add(player);
 
+                            //Check for RemoteAdmin Category
                             var category = service.GetCategory(id);
                             if (category != null)
                             {

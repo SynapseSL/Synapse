@@ -73,7 +73,7 @@ public class Scp049AttackEvent : ScpAttackEvent
 
     public override ScpAttackType ScpAttackType => ScpAttackType.Scp049Touch;
     
-    public float Cooldown { get; set; }
+    public float Cooldown { get; }
 }
 
 public class Scp0492AttackEvent : ScpAttackEvent

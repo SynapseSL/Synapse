@@ -23,6 +23,19 @@ public partial class Synapse
     /// injection usable.
     /// </summary>
     public static T Get<T>() => Globals.Get<T>();
+
+    /// <summary>
+    /// Returns an instance of the specified object by either resolving it using
+    /// ninject bindings (I.e. the object is already present in the ninject kernel)
+    /// or by creating and binding a new instance of the type using the ninject kernel making
+    /// injection usable.
+    /// </summary>
+    public static T GetAndBind<T>()
+    {
+        var returning = Globals.Get<T>();
+        Globals.Kernel.Bind<T>().ToConstant(returning).InSingletonScope();
+        return returning;
+    }
     
     /// <summary>
     /// Returns an List of all instances of the specified object from Unity

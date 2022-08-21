@@ -38,7 +38,7 @@ internal static class DecoratedScpPatches
 
         var scp = scp049.GetSynapsePlayer();
         var victim = go.GetSynapsePlayer();
-        if(scp == null || victim == null) return;
+        if (scp == null || victim == null || victim.GodMode) return;
         if (!Synapse3Extensions.GetHarmPermission(scp, victim)) return;
         
         if(Vector3.Distance(go.transform.position, scp049.Hub.playerMovementSync.RealModelPosition) >= Scp049.AttackDistance * 1.25f) return;

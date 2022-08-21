@@ -16,13 +16,6 @@ namespace Synapse3.ExamplePlugin;
 )]
 public class ExampleTeam : SynapseTeam
 {
-    //You don't have to create a constructor but you can get all services with the constructor and Neuron will create the Team with all required services,configs, translation, etc.
-    public ExampleTeam(PlayerService service, ExampleConfig config)
-    {
-        NeuronLogger.For<ExamplePlugin>()
-            .Warn("Loaded Config and PlayerService! " + (config != null) + " " + (service != null));
-    }
-    
     public override void SpawnPlayers(List<SynapsePlayer> players)
     {
         foreach (var player in players)
@@ -37,6 +30,7 @@ public class ExampleTeam : SynapseTeam
     public override float RespawnTime => 5f;
 
     //This method is called when it's decided that this team will be spawned and after 5 Seconds (see above) will the players actually be spawned
+    //This will also be called if it is not possible to Spawn the Team since there aren't enough Spectators
     public override void RespawnAnnouncement()
     {
         Synapse.Get<CassieService>().Announce("New Team will be spawned in 5 seconds", CassieSettings.DisplayText);

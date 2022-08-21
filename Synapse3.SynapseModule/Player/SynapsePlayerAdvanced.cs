@@ -48,7 +48,6 @@ public partial class SynapsePlayer
         
         language.AddRange(Synapse.Get<SynapseConfigService>().HostingConfiguration.Language);
         
-        //TODO: NuGet Update
-        return translation.WithLocale(language[0]);
+        return translation.WithLocale(language.ToArray());
     }
 }

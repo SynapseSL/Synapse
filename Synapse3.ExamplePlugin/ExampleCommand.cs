@@ -1,7 +1,5 @@
-﻿using Neuron.Core.Dev;
-using Neuron.Core.Meta;
+﻿using Neuron.Core.Meta;
 using Neuron.Modules.Commands;
-using Ninject;
 using Synapse3.SynapseModule.Command;
 
 namespace Synapse3.ExamplePlugin;
@@ -15,17 +13,15 @@ namespace Synapse3.ExamplePlugin;
 )]
 public class ExampleCommand : SynapseCommand
 {
-    
-    [Inject]
-    public ExampleConfig Config { get; set; }
-    
-    [Inject]
-    public ExampleTranslations Translations { get; set; }
+    private ExamplePlugin _plugin;
+
+    public ExampleCommand(ExamplePlugin plugin)
+    {
+        _plugin = plugin;
+    }
     
     public override void Execute(SynapseContext context, ref CommandResult result)
     {
-        Logger.Fatal(Config);
-        Logger.Fatal(Translations);
-        result.Response = Translations.CommandMessage.Format(Config.StringEntry, "Günter");
+        result.Response = "Config Value is: " + _plugin.Config.ConfigValue;
     }
 }

@@ -6,5 +6,7 @@ namespace Synapse3.ExamplePlugin;
 [Automatic]
 public class ExampleTranslations : Translations<ExampleTranslations>
 {
-    public string CommandMessage { get; set; } = "You just executed the {0} example command, {1}!";
+    public string EnableMessage { get; set; } = "Plugin will be enabled!";
+
+    public string ConsumeItemMessage { get; set; } = "You just used an {0}";
 }
