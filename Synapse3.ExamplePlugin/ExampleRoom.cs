@@ -24,18 +24,13 @@ public class ExampleRoom : SynapseCustomRoom
 
 public class RoomEventHandler
 {
-    private readonly RoundEvents _round;
     private readonly RoomService _roomService;
 
     public RoomEventHandler(RoundEvents roundEvents, RoomService roomService)
     {
-        _round = roundEvents;
         _roomService = roomService;
-    }
-
-    public void HookEvents()
-    {
-        _round.Start.Subscribe(OnStart);
+        
+        roundEvents.Start.Subscribe(OnStart);
     }
 
     private void OnStart(RoundStartEvent _)

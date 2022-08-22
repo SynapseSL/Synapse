@@ -66,24 +66,25 @@ internal static class InvisiblePatches
                         invisible = true;
                         goto ExecuteEnd;
                     }
-                    
-                    //Spectators should be able to see everyone therefore any other checks like Invisible Effect will be skipped for them
-                    if(player.RoleType is RoleType.Spectator) continue;
-                    
-                    if (player.RoleType is RoleType.Scp93953 or RoleType.Scp93989)
+
+                    switch (player.RoleType)
                     {
-                        if (!isOnSurface && Synapse3Extensions.CanHarmScp(playerToShow, false) &&
-                            !playerToShow.Scp939VisionController.CanSee(player.GetEffect<Visuals939>()))
+                        //Spectators should be able to see everyone therefore any other checks like Invisible Effect will be skipped for them
+                        case RoleType.Spectator: continue;
+                        
+                        case RoleType.Scp93953 or RoleType.Scp93989:
                         {
-                            invisible = true;
-                            goto ExecuteEnd;
+                            if (!isOnSurface && Synapse3Extensions.CanHarmScp(playerToShow, false) &&
+                                !playerToShow.Scp939VisionController.CanSee(player.GetEffect<Visuals939>()))
+                            {
+                                invisible = true;
+                                goto ExecuteEnd;
+                            }
+
+                            break;
                         }
                     }
-                    else if (player.RoleType is RoleType.Scp173)
-                    {
-                        //TODO: Peanut Checks
-                    }
-                    
+
                     //SCP-096 bypasses mostly any invisible checks from here on out so that he can see everyone anywhere even when he is enraged
                     var scp = playerToShow.ScpsController.CurrentScp as Scp096;
 
@@ -160,6 +161,4 @@ internal static class InvisiblePatches
             return true;
         }
     }
-    
-    //TODO: Peanut Patch that actually works!
 }

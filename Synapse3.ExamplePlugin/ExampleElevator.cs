@@ -46,19 +46,10 @@ public class ExampleElevator : CustomElevator
 
 public class ElevatorEventHandler
 {
-    private readonly PlayerEvents _player;
-    private readonly RoundEvents _round;
-
     public ElevatorEventHandler(PlayerEvents playerEvents, RoundEvents roundEvents)
     {
-        _player = playerEvents;
-        _round = roundEvents;
-    }
-
-    public void HookEvents()
-    {
-        _player.DoorInteract.Subscribe(DoorInteract);
-        _round.Start.Subscribe(CreateElevator);
+        playerEvents.DoorInteract.Subscribe(DoorInteract);
+        roundEvents.Start.Subscribe(CreateElevator);
     }
 
     private void DoorInteract(DoorInteractEvent ev)

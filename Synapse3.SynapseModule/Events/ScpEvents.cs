@@ -1,6 +1,7 @@
 ﻿using Neuron.Core.Events;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Events;
@@ -15,6 +16,8 @@ public class ScpEvents : Service
     public readonly EventReactor<Scp173AttackEvent> Scp173Attack = new();
     public readonly EventReactor<Scp939AttackEvent> Scp939Attack = new();
     public readonly EventReactor<Scp106AttackEvent> Scp106Attack = new();
+    public readonly EventReactor<ObserveScp173Event> ObserveScp173 = new();
+    public readonly EventReactor<ReviveEvent> Revive = new();
 
     public ScpEvents(EventManager eventManager)
     {
@@ -29,6 +32,8 @@ public class ScpEvents : Service
         _eventManager.RegisterEvent(Scp173Attack);
         _eventManager.RegisterEvent(Scp939Attack);
         _eventManager.RegisterEvent(Scp106Attack);
+        _eventManager.RegisterEvent(ObserveScp173);
+        _eventManager.RegisterEvent(Revive);
     }
 
     public override void Disable()
@@ -39,6 +44,8 @@ public class ScpEvents : Service
         _eventManager.UnregisterEvent(Scp173Attack);
         _eventManager.UnregisterEvent(Scp939Attack);
         _eventManager.UnregisterEvent(Scp106Attack);
+        _eventManager.UnregisterEvent(ObserveScp173);
+        _eventManager.UnregisterEvent(Revive);
     }
 }
 
@@ -109,4 +116,35 @@ public class Scp106AttackEvent : ScpAttackEvent
     public Scp106AttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage, bool allow) : base(scp, victim, damage, allow) { }
 
     public override ScpAttackType ScpAttackType => ScpAttackType.Scp106Grab;
+}
+
+public class ObserveScp173Event : PlayerInteractEvent
+{
+    public ObserveScp173Event(SynapsePlayer player, bool allow, SynapsePlayer scp173) : base(player, allow)
+    {
+        Scp173 = scp173;
+    }
+
+    public SynapsePlayer Scp173 { get; }
+}
+
+public class ReviveEvent : IEvent
+{
+    public ReviveEvent(SynapsePlayer scp049, SynapsePlayer humanToRevive, SynapseRagdoll ragdoll, bool finishRevive)
+    {
+        Scp049 = scp049;
+        HumanToRevive = humanToRevive;
+        Ragdoll = ragdoll;
+        FinishRevive = finishRevive;
+    }
+    
+    public SynapsePlayer Scp049 { get; }
+    
+    public SynapsePlayer HumanToRevive { get; }
+    
+    public SynapseRagdoll Ragdoll { get; }
+    
+    public bool FinishRevive { get; }
+
+    public bool Allow { get; set; } = true;
 }

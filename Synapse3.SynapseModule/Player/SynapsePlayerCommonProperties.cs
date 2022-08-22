@@ -280,7 +280,7 @@ public partial class SynapsePlayer
     /// <summary>
     /// The current team id of the player
     /// </summary>
-    public uint TeamID => CustomRole?.GetTeamID() ?? (uint)Team;
+    public uint TeamID => CustomRole?.Attribute?.TeamId ?? (uint)Team;
 
     /// <summary>
     /// The current faction of the player

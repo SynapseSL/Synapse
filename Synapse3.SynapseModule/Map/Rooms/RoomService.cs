@@ -159,7 +159,7 @@ public class RoomService : Service
 
     public RoomType GetRoomTypeFromName(string roomName)
     {
-        foreach (var pair in RoomTypes)
+        foreach (var pair in RoomByNames)
         {
             if (roomName.ToLower().Contains(pair.Key.ToLower())) return pair.Value;
         }
@@ -167,7 +167,7 @@ public class RoomService : Service
         return RoomType.None;
     }
 
-    public readonly ReadOnlyDictionary<string, RoomType> RoomTypes = new(
+    public readonly ReadOnlyDictionary<string, RoomType> RoomByNames = new(
         new Dictionary<string, RoomType>
         {
             { "PocketWorld", RoomType.Pocket },

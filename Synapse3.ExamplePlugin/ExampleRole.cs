@@ -8,12 +8,11 @@ namespace Synapse3.ExamplePlugin;
 [Automatic]
 [Role(
     Name = "ExampleRole",
-    Id = 60
+    Id = 60,
+    TeamId = 15
 )]
 public class ExampleRole : SynapseRole
 {
-    public override uint GetTeamID() => 15;
-
     public override void SpawnPlayer(bool spawnLite)
     {
         //One Example of SpawnLite would be to set a Players PlayerState since the State itself will set Role/Position/Items/Health and so on.
@@ -24,6 +23,8 @@ public class ExampleRole : SynapseRole
         Player.Inventory.ClearAllItems();
         Player.Inventory.GiveItem(ItemType.Coin);
     }
+
+    public override List<uint> GetFriendsID() => new (){ (uint)Team.SCP };
 
     public override List<uint> GetEnemiesID() => new (){ (uint)Team.CDP };
 

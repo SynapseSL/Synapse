@@ -6,6 +6,7 @@ using Synapse3.SynapseModule.Command.SynapseCommands;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Rooms;
 using UnityEngine;
 
@@ -49,6 +50,17 @@ public class DebugService : Service
         _scp.Scp049Attack.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Warn($"Scp049 Attack {ev.Cooldown} {ev.Damage} {ev.Scp.NickName} {ev.Victim.NickName}");
+        });
+        
+        _scp.Scp0492Attack.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"Scp0492 Attack {ev.Damage} {ev.Scp.NickName} {ev.Victim.NickName} {ev.Allow}");
+        });
+        
+        _scp.Revive.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>()
+                .Warn($"Revive {ev.Scp049.NickName} {ev.HumanToRevive.NickName} {ev.Ragdoll.RoleType} Finish: {ev.FinishRevive}");
         });
         
         _item.ThrowGrenade.Subscribe(ev =>
@@ -128,7 +140,17 @@ public class DebugService : Service
             
             case KeyCode.Alpha3:
                 new SynapseDummy(ev.Player.Position, ev.Player.RotationVector2, ev.Player.RoleType, ev.Player.NickName,
-                    "", "");
+                    "", "")
+                {
+                    Player = { GodMode = false, Health = 1 }
+                };
+                break;
+            
+            case KeyCode.Alpha4:
+                foreach (var door in Synapse.Get<MapService>().SynapseDoors)
+                {
+                    Logger.Warn($"{door.DoorType} {door.Name}");
+                }
                 break;
         }
     }

@@ -29,4 +29,18 @@ public class GamePlayConfiguration : IDocumentSection
 
     [Description("If Enabled the button inside the AlphaWarhead(outside) can be closed again with a keycard")]
     public bool CloseWarheadButton { get; set; } = false;
+
+    [Description("Every Role in this List won't stop SCP-173 from moving when the player is looking at it")]
+    public List<uint> CantObserve173 { get; set; } = new()
+    {
+        (uint)RoleType.Scp173,
+        (uint)RoleType.Scp106,
+        (uint)RoleType.Scp049,
+        (uint)RoleType.Scp079,
+        (uint)RoleType.Scp096,
+        (uint)RoleType.Scp0492,
+        (uint)RoleType.Scp93953,
+        (uint)RoleType.Scp93989,
+        (uint)RoleType.Tutorial
+    };
 }

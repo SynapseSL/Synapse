@@ -3,13 +3,13 @@ using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
 using Mirror;
 using Neuron.Core.Logging;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Objects;
 
-//TODO: Add DoorType
 public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
 {
     public static Dictionary<SpawnableDoorType, BreakableDoor> Prefab { get; } = new();
@@ -31,6 +31,8 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
     }
 
     private string _name;
+    
+    public DoorType DoorType { get; private set; }
 
     public string Name
     {
@@ -160,17 +162,25 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
     private void SetUp(SpawnableDoorType type)
     {
         SpawnableType = type;
-        
+
         Map._synapseDoors.Add(this);
         var comp = GameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
         if (Variant.TryGetComponent<DoorNametagExtension>(out var nametag))
             _name = nametag.GetName;
+        
+        DoorType = Map.GetDoorByName(Name);
     }
     
     private DoorVariant CreateDoor(SpawnableDoorType type, Vector3 position, Quaternion rotation, Vector3 scale)
     {
         return CreateNetworkObject(Prefab[type], position, rotation, scale);
+    }
+
+    public bool NeedsJoinUpdate { get; }
+    public void Refresh(SynapsePlayer player)
+    {
+        player.SendNetworkMessage(NetworkIdentity.GetSpawnMessage());
     }
     
     public enum SpawnableDoorType
@@ -179,11 +189,5 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
         Lcz,
         Hcz,
         Ez
-    }
-
-    public bool NeedsJoinUpdate { get; }
-    public void Refresh(SynapsePlayer player)
-    {
-        player.SendNetworkMessage(NetworkIdentity.GetSpawnMessage());
     }
 }

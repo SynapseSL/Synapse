@@ -11,8 +11,6 @@ public interface ISynapseRole
 
     void Load();
 
-    uint GetTeamID();
-
     List<uint> GetFriendsID();
 
     List<uint> GetEnemiesID();

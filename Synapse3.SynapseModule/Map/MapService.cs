@@ -164,4 +164,80 @@ public class MapService : Service
                 joinUpdate.Refresh(ev.Player);
         }
     }
+
+    public DoorType GetDoorByName(string doorName)
+    {
+        if (_doorByName.ContainsKey(doorName))
+            return _doorByName[doorName];
+        
+        var newKey = doorName.Split('(')[0];
+        return _doorByName.ContainsKey(newKey) ? _doorByName[newKey] : DoorType.Other;
+    }
+
+    private readonly Dictionary<string, DoorType> _doorByName = new()
+    {
+        { "LCZ BreakableDoor", DoorType.LczDoor },
+        { "LCZ BreakableDoor ", DoorType.LczDoor },
+        { "HCZ BreakableDoor", DoorType.HczDoor },
+        { "HCZ BreakableDoor ", DoorType.HczDoor },
+        { "EZ BreakableDoor", DoorType.EzDoor },
+        { "EZ BreakableDoor ", DoorType.EzDoor },
+        { "LCZ PortallessBreakableDoor", DoorType.Airlock },
+        { "LCZ PortallessBreakableDoor ", DoorType.Airlock },
+        { "Prison BreakableDoor", DoorType.PrisonDoor },
+        { "Prison BreakableDoor ", DoorType.PrisonDoor },
+        
+        { "LCZ_CAFE", DoorType.Pc },
+        { "LCZ_WC", DoorType.Wc },
+        { "LCZ_ARMORY", DoorType.LczArmory },
+        
+        { "GR18", DoorType.Gr18 },
+        { "GR18_INNER", DoorType.Gr18Inner },
+        
+        { "330", DoorType.Scp330 },
+        { "330_CHAMBER", DoorType.Scp330Chamber },
+        
+        { "173_BOTTOM", DoorType.Scp173Bottom },
+        { "173_ARMORY", DoorType.Scp173Armory },
+        { "173_CONNECTOR", DoorType.Scp173Connector },
+        { "173_GATE", DoorType.Scp173Gate },
+        
+        { "914", DoorType.Scp914 },
+        { "914 Door", DoorType.Scp914Door },
+        { "914 Door ", DoorType.Scp914Door },
+        
+        { "CHECKPOINT_LCZ_A", DoorType.CheckpointLczA },
+        { "CHECKPOINT_LCZ_B", DoorType.CheckpointLczB },
+        { "CHECKPOINT_EZ_HCZ", DoorType.Checkpoint },
+        
+        { "HID_LEFT", DoorType.MicroLeft },
+        { "HID", DoorType.Micro },
+        { "HID_RIGHT", DoorType.MicroRight },
+        { "NUKE_ARMORY", DoorType.NukeArmory },
+        { "HCZ_ARMORY", DoorType.HczArmory },
+        
+        { "SERVERS_BOTTOM", DoorType.ServersBottom },
+        
+        { "106_PRIMARY", DoorType.Scp106Primary },
+        { "106_SECONDARY", DoorType.Scp106Secondary },
+        { "106_BOTTOM", DoorType.Scp106Bottom },
+        
+        { "Unsecured Pryable GateDoor", DoorType.Scp049Gate },
+        { "049_ARMORY", DoorType.Scp049Armory },
+        
+        { "079_FIRST", DoorType.Scp079First },
+        { "079_SECOND", DoorType.Scp079Second },
+        
+        { "096", DoorType.Scp096 },
+        
+        { "INTERCOM", DoorType.Intercom },
+        { "GATE_A", DoorType.GateA },
+        { "GATE_B", DoorType.GateB },
+        
+        { "SURFACE_NUKE", DoorType.SurfaceNuke },
+        { "SURFACE_GATE", DoorType.SurfaceGate },
+        { "ESCAPE_PRIMARY", DoorType.EscapePrimary },
+        { "ESCAPE_SECONDARY", DoorType.EscapeSecondary },
+        { "", DoorType.Other }
+    };
 }
