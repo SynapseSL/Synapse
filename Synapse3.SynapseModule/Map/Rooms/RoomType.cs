@@ -38,8 +38,8 @@ public enum RoomType : uint
     Servers,
     Tesla,
     MicroHid,
-    HczCheckpointA,
-    HczCheckpointB,
+    HczElevatorA,
+    HczElevatorB,
     HeavyEntranceCheckpoint,
     
     Scp049,

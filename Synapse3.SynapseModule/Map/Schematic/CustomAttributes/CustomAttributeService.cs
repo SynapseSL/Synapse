@@ -27,6 +27,7 @@ public class CustomAttributeService : Service
         typeof(SchematicDoor),
         typeof(StaticTeleporter),
         typeof(MapTeleporter),
+        typeof(ButtonHandler)
     };
 
     internal void LoadBinding(SynapseCustomObjectAttributeBinding binding) => LoadHandlerFromType(binding.Type);

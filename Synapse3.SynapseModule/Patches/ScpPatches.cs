@@ -1,14 +1,18 @@
 ﻿using System;
+using CustomPlayerEffects;
 using HarmonyLib;
 using InventorySystem.Items.MicroHID;
 using MapGeneration;
 using Neuron.Core.Logging;
 using PlayableScps;
+using PlayableScps.Messages;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule.Config;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
+using Utils.Networking;
 
 namespace Synapse3.SynapseModule.Patches;
 
@@ -41,7 +45,7 @@ internal static class ScpPatches
         }
         catch (Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp0492Attack Event Failed\n" + ex);
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp0492 Attack Event Failed\n" + ex);
             return true;
         }
     }
@@ -61,10 +65,97 @@ internal static class ScpPatches
             return true;
         }
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp173), nameof(Scp173.ServerKillPlayer))]
+    public static bool Scp173Attack(Scp173 __instance, ReferenceHub target)
+    {
+        try
+        {
+            DecoratedScpPatches.Scp173Attack(__instance, target);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp173 Attack Event Failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp939), nameof(Scp939.ServerAttack))]
+    public static bool Scp939Attack(Scp939 __instance, GameObject target, out bool __result)
+    {
+        try
+        {
+            __result = DecoratedScpPatches.Scp939Attack(__instance, target);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp939 Attack Event Failed\n" + ex);
+            __result = false;
+            return true;
+        }
+    }
 }
 
 internal static class DecoratedScpPatches
 {
+    public static bool Scp939Attack(Scp939 scp939, GameObject go)
+    {
+        if (go.TryGetComponent<BreakableWindow>(out var breakableWindow))
+        {
+            breakableWindow.Damage(50f, new ScpDamageHandler(scp939.Hub, 50f, DeathTranslations.Scp939), Vector3.zero);
+            return true;
+        }
+
+        var victim = go?.GetSynapsePlayer();
+        var scp = scp939.GetSynapsePlayer();
+
+        if (scp == null | victim == null || victim.GodMode || victim.RoleType == RoleType.Spectator) return false;
+        if (!Synapse3Extensions.GetHarmPermission(scp, victim)) return false;
+
+        var ev = new Scp939AttackEvent(scp, victim, 50f, true);
+        Synapse.Get<ScpEvents>().Scp939Attack.Raise(ev);
+        if (!ev.Allow) return false;
+        if (!victim.PlayerStats.DealDamage(new ScpDamageHandler(scp939.Hub, ev.Damage, DeathTranslations.Scp939)))
+            return false;
+
+        scp.ClassManager.RpcPlaceBlood(victim.transform.position, 0, 2f);
+        //Dummies can't get Effects currently
+        if (victim.PlayerType != PlayerType.Dummy)
+            victim.PlayerEffectsController.EnableEffect<Amnesia>(3f, true);
+        return true;
+    }
+    
+    public static void Scp173Attack(Scp173 scp173, ReferenceHub hub)
+    {
+        var victim = hub?.GetSynapsePlayer();
+        var scp = scp173.GetSynapsePlayer();
+
+        if (scp == null | victim == null || victim.GodMode || victim.RoleType == RoleType.Spectator) return;
+        if (!Synapse3Extensions.GetHarmPermission(scp, victim)) return;
+
+        var damage = new ScpDamageHandler(scp173.Hub, DeathTranslations.Scp173);
+        var ev = new Scp173AttackEvent(scp, victim, damage.Damage, true);
+        Synapse.Get<ScpEvents>().Scp173Attack.Raise(ev);
+        if(!ev.Allow) return;
+        damage.Damage = ev.Damage;
+        
+        if (victim.GetEffect<Stained>().IsEnabled)
+        {
+            scp173.Shield.CurrentAmount = Mathf.Min(scp173.Shield.Limit,
+                scp173.Shield.CurrentAmount + victim.GetStatBase<HealthStat>().CurValue);
+        }
+        
+        if(!victim.PlayerStats.DealDamage(damage)) return;
+
+        victim.ClassManager.RpcPlaceBlood(victim.Position, 0, 2.2f);
+        Hitmarker.SendHitmarker(scp.Hub, 1.35f);
+        new Scp173RpcMessage(scp.Hub, Scp173RpcMessage.Scp173RpcType.SnappedNecked).SendToAuthenticated();
+    }
+    
     public static void ObserveScp173(Scp173 scp173)
     {
         var count = scp173._observingPlayers.Count;
@@ -150,7 +241,7 @@ internal static class DecoratedScpPatches
         
         var bloodPos = victim.Position;
         damage.Damage = ev.Damage;
-        victim.PlayerStats.DealDamage(damage);
+        if(!victim.PlayerStats.DealDamage(damage)) return;
         Hitmarker.SendHitmarker(script.connectionToClient, 1f);
         scp.ClassManager.RpcPlaceBlood(bloodPos, 0, victim.RoleType == RoleType.Spectator ? 1.3f : 0.5f);
     }

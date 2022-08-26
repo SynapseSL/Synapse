@@ -3,7 +3,6 @@ using Neuron.Core.Plugins;
 using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Plugin;
 
 namespace Synapse3.ExamplePlugin;
 
@@ -13,7 +12,7 @@ namespace Synapse3.ExamplePlugin;
     Version = "1.0.0",
     Author = "Helight & Dimenzio"
 )]
-public class ExamplePlugin : ReloadablePlugin<ExampleConfig,ExampleTranslations>
+public class ExamplePlugin : ReloadablePlugin<ExampleConfig, ExampleTranslations>
 {
     public ExampleEventHandler EventHandler { get; set; }
     public ElevatorEventHandler ElevatorHandler { get; set; }

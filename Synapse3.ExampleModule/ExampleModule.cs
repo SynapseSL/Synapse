@@ -1,6 +1,4 @@
-﻿using Neuron.Core.Dev;
-using Neuron.Core.Modules;
-using Ninject;
+﻿using Neuron.Core.Modules;
 using Synapse3.SynapseModule;
 
 namespace Synapse3.ExampleModule;
@@ -8,30 +6,15 @@ namespace Synapse3.ExampleModule;
 [Module(
     Name = "Example Module",
     Description = "Example Description",
-    Dependencies = new []
+    Dependencies = new[]
     {
         typeof(Synapse)
     }
 )]
-public class ExampleModule : Module
+public class ExampleModule : ReloadableModule<ExampleConfig, ExampleTranslations>
 {
-    [Inject]
-    public ExampleConfig Config { get; set; }
-        
-    [Inject]
-    public ExampleTranslations Translations { get; set; }
-
-    public override void Load(IKernel kernel)
+    public override void EnableModule()
     {
-        Logger.Info($"Before {Config}");
-        Logger.Info($"Before {Translations}");
-    }
-
-    public override void Enable()
-    {
-        Logger.Info(Config.StringEntry);
-        Logger.Info(Config.IntEntry);
-        Logger.Info(Config.ListEntry);
-        Logger.Info(Translations.CommandMessage.Format("Example Command", "Helight"));
+        Logger.Info(Translation.Get().EnableMessage);
     }
 }

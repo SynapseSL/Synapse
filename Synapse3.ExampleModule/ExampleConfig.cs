@@ -8,7 +8,5 @@ namespace Synapse3.ExampleModule;
 [DocumentSection("Example")]
 public class ExampleConfig : IDocumentSection
 {
-    public string StringEntry { get; set; } = "DefaultStringValue";
-    public int IntEntry { get; set; } = 1337;
-    public List<string> ListEntry { get; set; } = new(new[] {"Entry 1", "Entry 2", "Entry 3"});
+    public int ConfigValue { get; set; } = 5;
 }

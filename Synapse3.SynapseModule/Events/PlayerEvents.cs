@@ -221,7 +221,9 @@ public class DoorInteractEvent : PlayerInteractEvent
     /// <summary>
     /// This is true when a player tries to open/close a locked door and he is not in Bypass or something else causes to overrides the lock like the Nuke
     /// </summary>
-    public bool LockBypassRejected { get; }
+    public bool LockBypassRejected { get; set; }
+
+    public bool PlayDeniedSound { get; set; } = true;
 
     public DoorInteractEvent(SynapsePlayer player, bool allow, SynapseDoor door, bool lockBypass) : base(player, allow)
     {

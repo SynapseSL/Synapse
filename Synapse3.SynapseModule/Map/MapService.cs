@@ -100,11 +100,11 @@ public class MapService : Service
     
     public int Seed => SeedSynchronizer.Seed;
 
-    public void Explode(Vector3 position, GrenadeType type)
+    public void Explode(Vector3 position, GrenadeType type, SynapsePlayer owner = null)
     {
         var item = new SynapseItem((uint)type, position);
-        item.Throwable.Fuse();
-        Timing.CallDelayed(Timing.WaitForOneFrame, item.Destroy);
+        item.Throwable.Fuse(owner);
+        Timing.CallDelayed(0.1f, item.Destroy);
     }
 
     public GameObject SpawnTantrum(Vector3 position, float destroy = -1)
@@ -128,8 +128,8 @@ public class MapService : Service
         {
             _ = new SynapseDoor(doorVariant);
         }
-
-        foreach (var generator in Recontainer079.AllGenerators)
+        
+        foreach (var generator in Synapse.GetObjects<Scp079Generator>())
         {
             _ = new SynapseGenerator(generator);
         }

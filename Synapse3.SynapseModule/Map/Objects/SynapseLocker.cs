@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Objects;
 
-//TODO: Fix Floating Bug
+//TODO: Fix Item Floating
 public class SynapseLocker : StructureSyncSynapseObject
 {
     public static Dictionary<LockerType, Locker> Prefabs { get; } = new ();

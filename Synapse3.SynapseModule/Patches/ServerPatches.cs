@@ -1,10 +1,14 @@
-﻿namespace Synapse3.SynapseModule.Patches;
+﻿using System;
+using HarmonyLib;
+using LiteNetLib;
+using Neuron.Core.Logging;
+using Synapse3.SynapseModule.Events;
 
-//[Patches]
+namespace Synapse3.SynapseModule.Patches;
+
+[Patches]
 internal static class ServerPatches
 {
-    //TODO: Fix the Transpiler
-    /*
     [HarmonyPostfix]
     [HarmonyPatch(typeof(CustomLiteNetLib4MirrorTransport),
         nameof(CustomLiteNetLib4MirrorTransport.ProcessConnectionRequest))]
@@ -12,33 +16,18 @@ internal static class ServerPatches
     {
         try
         {
-            var allow = true;
-            var reason = "No Reason";
-
             if (!request.Data.EndOfData)
                 return;
 
             var userId = "";
-
             if (CustomLiteNetLib4MirrorTransport.UserIds.ContainsKey(request.RemoteEndPoint))
                 userId = CustomLiteNetLib4MirrorTransport.UserIds[request.RemoteEndPoint].UserId;
 
-            var ev = new PreAuthenticationEvent(request)
-            {
-                UserId = userId
-            };
-
+            var ev = new PreAuthenticationEvent(request, userId);
             Synapse.Get<ServerEvents>().PreAuthentication.Raise(ev);
-
-            if (ev.Rejected) return;
             
-            if (!ev.Allow)
-            {
-                ev.Reject("No Reason");
-                return;
-            }
-
-            request.Accept();
+            if (ev.Rejected || ev.Allow) return;
+            ev.Reject("No Reason");
         }
         catch (Exception ex)
         {
@@ -46,25 +35,4 @@ internal static class ServerPatches
             request.Accept();
         }
     }
-
-    [HarmonyTranspiler]
-    [HarmonyPatch(typeof(CustomLiteNetLib4MirrorTransport),
-        nameof(CustomLiteNetLib4MirrorTransport.ProcessConnectionRequest))]
-    public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-    {
-        var codes = new List<CodeInstruction>(instructions);
-
-        foreach (var code in codes.Select((x, i) => new { Value = x, Index = i }))
-        {
-            if (code.Value.opcode != OpCodes.Callvirt) continue;
-            if (codes[code.Index + 2].opcode != OpCodes.Ldstr) continue;
-
-            var strOperand = codes[code.Index + 2].operand as string;
-
-            if (strOperand == "Player {0} preauthenticated from endpoint {1}.") code.Value.opcode = OpCodes.Nop;
-        }
-
-        return codes.AsEnumerable();
-    }
-    */
 }

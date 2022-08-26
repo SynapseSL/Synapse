@@ -38,9 +38,10 @@ public class PreAuthenticationEvent : IEvent
 {
     private readonly ConnectionRequest _request;
 
-    public PreAuthenticationEvent(ConnectionRequest request)
+    public PreAuthenticationEvent(ConnectionRequest request, string userId)
     {
         _request = request;
+        UserId = userId;
     }
     
     public string UserId { get; set; }
@@ -51,10 +52,6 @@ public class PreAuthenticationEvent : IEvent
 
     public void Reject(string reason)
     {
-        var data = new NetDataWriter();
-        data.Put((byte)10);
-        data.Put(reason);
-        _request.RejectForce(data);
-        Rejected = true;
+        //TODO: find a way to reject at this point in authentication
     }
 }

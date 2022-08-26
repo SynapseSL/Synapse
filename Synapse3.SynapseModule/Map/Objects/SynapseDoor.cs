@@ -119,7 +119,7 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
         return false;
     }
 
-    public void LockWithReason(DoorLockReason reason) => Variant.ServerChangeLock(reason, true);
+    public void LockWithReason(DoorLockReason reason, bool open = true) => Variant.ServerChangeLock(reason, open);
 
     public void Damage(float damageAmount, DoorDamageType damageType = DoorDamageType.None)
     {

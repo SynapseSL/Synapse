@@ -1,4 +1,6 @@
-﻿using InventorySystem.Items.MicroHID;
+﻿using System.Collections.Generic;
+using InventorySystem.Items.MicroHID;
+using MEC;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Command;
@@ -8,6 +10,7 @@ using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Rooms;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule;
@@ -20,14 +23,17 @@ public class DebugService : Service
     private RoundEvents _round;
     private ItemEvents _item;
     private ScpEvents _scp;
+    private ServerEvents _server;
     private SynapseCommandService _commandService;
 
-    public DebugService(PlayerEvents player, MapEvents map, RoundEvents round, ItemEvents item,ScpEvents scp, SynapseCommandService commandService)
+    public DebugService(PlayerEvents player, MapEvents map, RoundEvents round, ItemEvents item, ScpEvents scp,
+        SynapseCommandService commandService, ServerEvents server)
     {
         _player = player;
         _map = map;
         _round = round;
         _item = item;
+        _server = server;
         _commandService = commandService;
         _scp = scp;
     }
@@ -46,17 +52,7 @@ public class DebugService : Service
         {
             NeuronLogger.For<Synapse>().Warn($"Shoot {ev.Player.NickName} {ev.Target?.NickName} {ev.Item.ItemType}");
         });
-        
-        _scp.Scp049Attack.Subscribe(ev =>
-        {
-            NeuronLogger.For<Synapse>().Warn($"Scp049 Attack {ev.Cooldown} {ev.Damage} {ev.Scp.NickName} {ev.Victim.NickName}");
-        });
-        
-        _scp.Scp0492Attack.Subscribe(ev =>
-        {
-            NeuronLogger.For<Synapse>().Warn($"Scp0492 Attack {ev.Damage} {ev.Scp.NickName} {ev.Victim.NickName} {ev.Allow}");
-        });
-        
+
         _scp.Revive.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>()
@@ -66,7 +62,6 @@ public class DebugService : Service
         _item.ThrowGrenade.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Warn($"Throw {ev.State}");
-            ev.Allow = false;
         });
         
         _item.MicroUse.Subscribe(ev =>
@@ -97,6 +92,25 @@ public class DebugService : Service
             
         _player.FallingIntoAbyss.Subscribe(ev =>
                 NeuronLogger.For<Synapse>().Warn($"{ev.Player.NickName} falled into an abyss"));
+        
+        _server.PreAuthentication.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"Pre Auth {ev.UserId}");
+        });
+        
+        _scp.Scp049Attack.Subscribe(ScpEvent);
+        _scp.Scp0492Attack.Subscribe(ScpEvent);
+        _scp.Scp173Attack.Subscribe(ScpEvent);
+        _scp.Scp096Attack.Subscribe(ScpEvent);
+        _scp.Scp939Attack.Subscribe(ScpEvent);
+        _scp.Scp106Attack.Subscribe(ScpEvent);
+
+        Synapse.Get<SynapseObjectEvents>().ButtonPressed
+            .Subscribe(ev =>
+            {
+                NeuronLogger.For<Synapse>().Warn("Button Pressed " + ev.ButtonId);
+                ev.Player.SendBroadcast("You pressed me!", 5);
+            });
     }
 
     public override void Disable()
@@ -104,6 +118,12 @@ public class DebugService : Service
         _player.KeyPress.Unsubscribe(OnKeyPress);
     }
 
+    private void ScpEvent(ScpAttackEvent ev)
+    {
+        NeuronLogger.For<Synapse>().Warn($"{ev.ScpAttackType} {ev.Damage} {ev.Scp.NickName} {ev.Victim.NickName}");
+        //ev.Allow = false;
+    }
+    
     private void OnDoor(DoorInteractEvent ev)
     {
         NeuronLogger.For<Synapse>().Warn("Door Interact");
@@ -142,17 +162,27 @@ public class DebugService : Service
                 new SynapseDummy(ev.Player.Position, ev.Player.RotationVector2, ev.Player.RoleType, ev.Player.NickName,
                     "", "")
                 {
-                    Player = { GodMode = false, Health = 1 }
+                    Player = { GodMode = false, Health = 300 }
                 };
                 break;
             
             case KeyCode.Alpha4:
-                foreach (var door in Synapse.Get<MapService>().SynapseDoors)
-                {
-                    Logger.Warn($"{door.DoorType} {door.Name}");
-                }
+                Timing.RunCoroutine(Test(ev.Player));
                 break;
         }
+    }
+
+    private IEnumerator<float> Test(SynapsePlayer player)
+    {
+        for (int i = 0; i < 479; i++)
+        {
+            player.ExecuteCommand("forceclass 2 2");
+            player.ExecuteCommand("server_event force_mtf_respawn");
+            yield return Timing.WaitForSeconds(0.2f);
+        }
+        Logger.Warn("DONE");
+        
+        yield break;
     }
 }
 #endif

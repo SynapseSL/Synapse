@@ -119,7 +119,7 @@ internal static class DecoratedMapPatches
     public static void GeneratorUpdate(Scp079Generator generator)
     {
         var engageReady = generator._currentTime >= generator._totalActivationTime;
-        if (engageReady)
+        if (!engageReady)
         {
             var time = Mathf.FloorToInt(generator._totalActivationTime - generator._currentTime);
             if (time != generator._syncTime)

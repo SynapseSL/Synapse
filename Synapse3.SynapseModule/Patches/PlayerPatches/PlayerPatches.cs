@@ -475,13 +475,11 @@ internal static class DecoratedPlayerPatches
     public static void OnFallingIntoAbyss(Collider other)
     {
         var player = other.GetComponentInParent<SynapsePlayer>();
-        var allow = other.isTrigger;
-
-        var ev = new FallingIntoAbyssEvent(player, allow);
+        var ev = new FallingIntoAbyssEvent(player, true);
         Synapse.Get<PlayerEvents>().FallingIntoAbyss.Raise(ev);
         if (!ev.Allow) return;
-        else
-            player.Hub.playerStats.DealDamage(new UniversalDamageHandler(-1f, DeathTranslations.Crushed, null));
+
+        player.Hub.playerStats.DealDamage(new UniversalDamageHandler(-1f, DeathTranslations.Crushed));
     }
     
     public static void OpenWarheadButton(PlayerInteract interact)
@@ -553,7 +551,8 @@ internal static class DecoratedPlayerPatches
                 }
                 else
                 {
-                    var allow = gen._requiredPermission.CheckPermission(player);
+                    var allow = gen._requiredPermission.CheckPermission(player) &&
+                                Synapse3Extensions.CanHarmScp(player, true);
                     var ev = new GeneratorInteractEvent(player, allow, gen.GetSynapseGenerator(),
                         GeneratorInteract.UnlockDoor);
                     Synapse.Get<PlayerEvents>().GeneratorInteract.Raise(ev);
@@ -573,7 +572,7 @@ internal static class DecoratedPlayerPatches
             
             //1 - Request to swap the Activation State (lever)
             case 1:
-                if ((Synapse3Extensions.CanHarmScp(player,true) || gen.Activating) && !gen.Engaged)
+                if ((gen.Activating || Synapse3Extensions.CanHarmScp(player,true)) && !gen.Engaged)
                 {
                     var ev = new GeneratorInteractEvent(player, true, gen.GetSynapseGenerator(),
                         gen.Activating ? GeneratorInteract.Cancel : GeneratorInteract.Activate);
@@ -762,8 +761,9 @@ internal static class DecoratedPlayerPatches
             door.LockBypassDenied(hub, colliderId);
             return;
         }
-        
-        door.PermissionsDenied(hub, colliderId);
+
+        if (ev.PlayDeniedSound)
+            door.PermissionsDenied(hub, colliderId);
         DoorEvents.TriggerAction(door, DoorAction.AccessDenied, hub); 
     }
     

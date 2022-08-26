@@ -4,6 +4,7 @@ using System.Linq;
 using GameCore;
 using HarmonyLib;
 using LightContainmentZoneDecontamination;
+using MapGeneration.Distributors;
 using MEC;
 using Neuron.Core.Logging;
 using RoundRestarting;
@@ -22,8 +23,8 @@ internal static class RoundPatches
 {
     private static bool _firstTime = true;
     
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(SpawnpointManager), nameof(SpawnpointManager.FillSpawnPoints))]
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(StructureDistributor), nameof(StructureDistributor.PlaceSpawnables))]
     public static void RoundWaitingPatch()
     {
         try
@@ -41,7 +42,7 @@ internal static class RoundPatches
         }
     }
 
-    
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ServerLogs), nameof(ServerLogs.AddLog))]
     public static void RoundEndPatch(ref ServerLogs.Modules module, ref string msg, ref ServerLogs.ServerLogType type, ref bool init)

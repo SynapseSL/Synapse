@@ -14,13 +14,16 @@ namespace Synapse3.ExampleModule;
 )]
 public class ExampleCommand : SynapseCommand
 {
-    [Inject] public ExampleConfig Config { get; set; }
-
-    [Inject] public ExampleTranslations Translations { get; set; }
-
+    private readonly ExampleModule _module;
+    
+    public ExampleCommand(ExampleModule module)
+    {
+        _module = module;
+    }
+    
     public override void Execute(SynapseContext context, ref CommandResult result)
     {
-        Logger.Fatal(Config);
+        result.Response = _module.Translation.Get(context.Player).CommandMessage + _module.Config.ConfigValue;
     }
 }
     

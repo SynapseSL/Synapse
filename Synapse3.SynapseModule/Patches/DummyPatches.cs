@@ -47,7 +47,7 @@ internal static class DummyPatches
     [HarmonyPatch(typeof(StandardHitregBase), nameof(StandardHitregBase.ShowHitIndicator))]
     public static bool OnIndicator(uint netId)
     {
-        return Synapse.Get<PlayerService>().GetPlayer(netId).Connection != null;
+        return Synapse.Get<PlayerService>().GetPlayer(netId)?.Connection != null;
     }
     
 
