@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using InventorySystem.Items.MicroHID;
 using MEC;
 using Neuron.Core.Logging;
@@ -105,6 +106,8 @@ public class DebugService : Service
         _scp.Scp939Attack.Subscribe(ScpEvent);
         _scp.Scp106Attack.Subscribe(ScpEvent);
 
+        _scp.Revive.Subscribe(ev => ev.Allow = false);
+
         Synapse.Get<SynapseObjectEvents>().ButtonPressed
             .Subscribe(ev =>
             {
@@ -153,21 +156,11 @@ public class DebugService : Service
     {
         switch (ev.KeyCode)
         {
-            case KeyCode.Alpha2:
-                var room = (SynapseNetworkRoom)RoomType.Scp939.GetRoom();
-                room.Position = ev.Player.Position;
-                break;
-            
-            case KeyCode.Alpha3:
-                new SynapseDummy(ev.Player.Position, ev.Player.RotationVector2, ev.Player.RoleType, ev.Player.NickName,
-                    "", "")
+            case KeyCode.Alpha1:
+                for (int i = 0; i < 51; i++)
                 {
-                    Player = { GodMode = false, Health = 300 }
-                };
-                break;
-            
-            case KeyCode.Alpha4:
-                Timing.RunCoroutine(Test(ev.Player));
+                    NeuronLogger.For<Synapse>().Warn(i + " " + LayerMask.LayerToName(i));
+                }
                 break;
         }
     }

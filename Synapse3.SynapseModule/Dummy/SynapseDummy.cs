@@ -38,18 +38,20 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
 
     public override Quaternion Rotation
     {
-        get => Quaternion.Euler(RotationVector2.x, RotationVector2.y, 90f);
-        set => RotationVector2 = new Vector2(value.eulerAngles.x, value.eulerAngles.y);
+        get => Player.Rotation;
+        set => Player.Rotation = value;
     }
-    
+
     public Vector2 RotationVector2
     {
         get => Player.RotationVector2;
-        set
-        {
-            Player.RotationVector2 = value;
-            Player.CameraReference.rotation = Quaternion.Euler(value.x, value.y, 90f);
-        }
+        set => Player.RotationVector2 = value;
+    }
+
+    public float RotationSimple
+    {
+        get => Player.RotationFloat;
+        set => Player.RotationFloat = value;
     }
 
     public override Vector3 Scale
@@ -81,9 +83,37 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
     }
 
     public DummyPlayer Player { get; }
+    
+    public bool PlayerUpdate { get; set; }
 
-    public SynapseDummy(Vector3 position, Vector2 rotation, RoleType role, string name, string badge,
-        string badgeColor)
+    public SynapseDummy(Vector3 position, Quaternion rotation, RoleType role, string name, string badge = "",
+        string badgeColor = ""): this(position, role, name, badge, badgeColor)
+    {
+        PlayerUpdate = false;
+
+        Rotation = rotation;
+        NetworkServer.Spawn(GameObject);
+    }
+
+    public SynapseDummy(Vector3 position, Vector2 rotation, RoleType role, string name, string badge = "",
+        string badgeColor = "") : this(position, role, name, badge, badgeColor)
+    {
+        PlayerUpdate = true;
+
+        RotationVector2 = rotation;
+        NetworkServer.Spawn(GameObject);
+    }
+    
+    public SynapseDummy(Vector3 position, float rotation, RoleType role, string name, string badge = "",
+        string badgeColor = "") : this(position, role, name, badge, badgeColor)
+    {
+        PlayerUpdate = true;
+
+        RotationSimple = rotation;
+        NetworkServer.Spawn(GameObject);
+    }
+
+    private SynapseDummy(Vector3 position, RoleType role, string name, string badge, string badgeColor)
     {
         _map = Synapse.Get<MapService>();
         _dummy = Synapse.Get<DummyService>();
@@ -99,7 +129,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         transform.localScale = Vector3.one;
         transform.position = position;
         Player.PlayerMovementSync.RealModelPosition = position;
-        RotationVector2 = rotation;
+        
         Player.QueryProcessor.NetworkPlayerId = QueryProcessor._idIterator;
         Player.QueryProcessor._ipAddress = Synapse.Get<PlayerService>().Host.IpAddress;
         Player.ClassManager.CurClass = role;
@@ -107,19 +137,17 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         Player.NicknameSync.Network_myNickSync = name;
         Player.RankName = badge;
         Player.RankColor = badgeColor;
-        Player.GodMode = true;
+
         Player.PlayerMovementSync.NetworkGrounded = true;
         RunSpeed = CharacterClassManager._staticClasses[(int)role].runSpeed;
         WalkSpeed = CharacterClassManager._staticClasses[(int)role].walkSpeed;
         _ = Timing.RunCoroutine(Update());
-
-        NetworkServer.Spawn(GameObject);
-
+        
         MoveInElevator = true;
     }
 
     internal SynapseDummy(SchematicConfiguration.DummyConfiguration configuration, SynapseSchematic schematic) :
-        this(configuration.Position, new Vector2(configuration.Rotation.X, configuration.Rotation.Y),
+        this(configuration.Position, configuration.Rotation,
             configuration.Role, configuration.Name,
             configuration.Badge, configuration.BadgeColor)
     {
@@ -140,8 +168,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
     
     public void RotateToPosition(Vector3 pos)
     {
-        var rot = Quaternion.LookRotation((pos - GameObject.transform.position).normalized);
-        RotationVector2 = new Vector2(rot.eulerAngles.x, rot.eulerAngles.y);
+        Rotation = Quaternion.LookRotation((pos - GameObject.transform.position).normalized);
     }
 
     public void Despawn()

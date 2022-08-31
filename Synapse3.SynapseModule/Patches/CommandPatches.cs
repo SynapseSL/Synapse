@@ -10,6 +10,7 @@ using Console = GameCore.Console;
 namespace Synapse3.SynapseModule.Patches;
 
 [Patches]
+[HarmonyPatch]
 internal static class CommandPatches
 {
     [HarmonyPrefix]

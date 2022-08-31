@@ -57,28 +57,25 @@ public class SerializedPlayerItem : SerializedItem
 {
     public SerializedPlayerItem() { }
 
-    public SerializedPlayerItem(SynapseItem item, short chance, bool preference) 
-        : this(item.Id, item.Durability, item.FireArm.Attachments, item.Scale, chance, preference) { }
+    public SerializedPlayerItem(SynapseItem item, short chance, bool provide) 
+        : this(item.Id, item.Durability, item.FireArm.Attachments, item.Scale, chance, provide) { }
 
-    public SerializedPlayerItem(uint id, float durability, uint weaponAttachment, Vector3 scale, short chance, bool preference) 
+    public SerializedPlayerItem(uint id, float durability, uint weaponAttachment, Vector3 scale, short chance, bool provide) 
         : base(id, durability, weaponAttachment, scale)
     {
         Chance = chance;
-        UsePreferences = preference;
+        ProvideFully = provide;
     }
 
     public short Chance { get; set; } = 100;
-    public bool UsePreferences { get; set; }
+    public bool ProvideFully { get; set; } = true;
 
     public SynapseItem Apply(SynapsePlayer player)
     {
         var item = Parse();
 
-        if (UsePreferences && item.ItemCategory == ItemCategory.Firearm)
-            item.FireArm.Attachments = player.GetPreference(Synapse.Get<ItemService>().GetBaseType(ID));
-
         if (Random.Range(1f, 100f) <= Chance)
-            item.EquipItem(player);
+            item.EquipItem(player, ProvideFully);
 
         return item;
     }
@@ -290,6 +287,7 @@ public class SerializedPlayerState
             Position = player.Position;
             Rotation = player.RotationVector2;
             Scale = player.Scale;
+            RoleType = player.RoleType;
             RoleID = player.RoleID;
             Health = player.Health;
             MaxHealth = player.MaxHealth;
@@ -322,6 +320,8 @@ public class SerializedPlayerState
         public SerializedPlayerInventory Inventory { get; set; } = new();
 
         public List<SerializedEffect> Effects { get; set; } = new();
+
+        public RoleType RoleType { get; set; }
 
         public uint RoleID { get; set; }
 
@@ -356,9 +356,8 @@ public class SerializedPlayerState
                 player.Invisible = Invisible;
             }
 
-            if (RoleID is >= 0 and <= RoleService.HighestRole)
-                player.ChangeRoleLite((RoleType)RoleID);
-            else
+            player.ChangeRoleLite(RoleType);
+            if (RoleID > RoleService.HighestRole)
                 player.SpawnCustomRole(RoleID, true);
             
             player.Position = Position;

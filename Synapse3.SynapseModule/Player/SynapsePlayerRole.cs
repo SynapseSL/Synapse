@@ -45,8 +45,9 @@ public partial class SynapsePlayer
     /// </summary>
     public void RemoveCustomRole(DespawnReason reason)
     {
-        _customRole?.DeSpawn(reason);
+        var storedRole = _customRole;
         _customRole = null;
+        storedRole?.DeSpawn(reason);
     }
 
     /// <inheritdoc cref="SpawnCustomRole(ISynapseRole,bool)"/>

@@ -38,6 +38,12 @@ public class FireArm : ISubSynapseItem
                 case ItemState.Inventory when _item.Item is Firearm firearm:
                     firearm.Status = new FirearmStatus(value, firearm.Status.Flags, firearm.Status.Attachments);
                     break;
+                
+                case ItemState.BeforeSpawn:
+                case ItemState.Despawned:
+                    _setAmmo = true;
+                    _ammo = value;
+                    break;
             }
         }
     }
@@ -55,7 +61,7 @@ public class FireArm : ISubSynapseItem
             return 0;
         }
     }
-    
+
     public uint Attachments
     {
         get
@@ -82,6 +88,12 @@ public class FireArm : ISubSynapseItem
                 case ItemState.Inventory when _item.Item is Firearm firearm:
                     firearm.Status = new FirearmStatus(firearm.Status.Ammo, firearm.Status.Flags, value);
                     break;
+                
+                case ItemState.BeforeSpawn:
+                case ItemState.Despawned:
+                    _setAttachments = true;
+                    _attachments = value;
+                    break;
             }
         }
     }
@@ -90,5 +102,25 @@ public class FireArm : ISubSynapseItem
     {
         get => Ammo;
         set => Ammo = (byte)value;
+    }
+
+    private byte _ammo;
+    private uint _attachments;
+    private bool _setAmmo;
+    private bool _setAttachments;
+
+    public void ChangeState(ItemState newState)
+    {
+        if (_setAmmo)
+        {
+            Ammo = _ammo;
+            _setAmmo = false;
+        }
+
+        if (_setAttachments)
+        {
+            Attachments = _attachments;
+            _setAttachments = false;   
+        }
     }
 }

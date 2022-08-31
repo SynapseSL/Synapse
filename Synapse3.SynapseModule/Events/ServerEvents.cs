@@ -52,6 +52,11 @@ public class PreAuthenticationEvent : IEvent
 
     public void Reject(string reason)
     {
-        //TODO: find a way to reject at this point in authentication
+        if (Rejected) return;
+        
+        var data = new NetDataWriter();
+        data.Put((byte)10);
+        data.Put(reason);
+        _request.RejectForce(data);
     }
 }

@@ -13,6 +13,7 @@ using Synapse3.SynapseModule.Role;
 namespace Synapse3.SynapseModule.Patches.PlayerPatches;
 
 [Patches]
+[HarmonyPatch]
 internal static class DeathPatches
 {
     [HarmonyPrefix]
@@ -57,23 +58,21 @@ internal static class DeathPatches
     {
         try
         {
-            if (__runOriginal)
+            if (!__runOriginal) return;
+            var victim = __instance.GetSynapsePlayer();
+            var service = Synapse.Get<PlayerService>();
+
+            foreach (var larry in service.GetPlayers(x => x.ScpController.Scp106.PlayersInPocket.Contains(victim)))
             {
-                var victim = __instance.GetSynapsePlayer();
-                var service = Synapse.Get<PlayerService>();
-
-                foreach (var larry in service.GetPlayers(x => x.ScpController.Scp106.PlayersInPocket.Contains(victim)))
-                {
-                    larry.ScpController.Scp106.PlayersInPocket.Remove(victim);
-                }
-                
-                if (victim.PlayerType == PlayerType.Dummy)
-                {
-                    Timing.CallDelayed(Timing.WaitForOneFrame, () => (victim as DummyPlayer)?.SynapseDummy.Destroy());
-                }
-
-                victim.RemoveCustomRole(DespawnReason.Death);
+                larry.ScpController.Scp106.PlayersInPocket.Remove(victim);
             }
+                
+            if (victim.PlayerType == PlayerType.Dummy)
+            {
+                Timing.CallDelayed(Timing.WaitForOneFrame, () => (victim as DummyPlayer)?.SynapseDummy.Destroy());
+            }
+
+            victim.RemoveCustomRole(DespawnReason.Death);
         }
         catch (Exception ex)
         {

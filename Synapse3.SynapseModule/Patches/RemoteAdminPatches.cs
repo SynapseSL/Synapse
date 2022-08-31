@@ -15,6 +15,7 @@ using Random = UnityEngine.Random;
 namespace Synapse3.SynapseModule.Patches;
 
 [Patches]
+[HarmonyPatch]
 internal static class RemoteAdminPatches
 {
     [HarmonyPrefix]

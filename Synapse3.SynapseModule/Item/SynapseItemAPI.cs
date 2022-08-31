@@ -60,20 +60,19 @@ public partial class SynapseItem
         }
         
         DestroyPickup();
-        State = ItemState.Inventory;
+        SetState(ItemState.Inventory);
 
-        if (provideFully && Item is Firearm firearm)
+        if (!provideFully || Item is not Firearm firearm) return;
+        
+        firearm.ApplyAttachmentsCode(player.GetPreference(ItemType), true);
+        var flags = FirearmStatusFlags.MagazineInserted;
+        if (firearm.HasAdvantageFlag(AttachmentDescriptiveAdvantages.Flashlight))
         {
-            firearm.ApplyAttachmentsCode(player.GetPreference(ItemType), true);
-            var flags = FirearmStatusFlags.MagazineInserted;
-            if (firearm.HasAdvantageFlag(AttachmentDescriptiveAdvantages.Flashlight))
-            {
-                flags |= FirearmStatusFlags.FlashlightEnabled;
-            }
-
-            firearm.Status = new FirearmStatus(firearm.AmmoManagerModule.MaxAmmo, flags,
-                firearm.GetCurrentAttachmentsCode());
+            flags |= FirearmStatusFlags.FlashlightEnabled;
         }
+
+        firearm.Status = new FirearmStatus(firearm.AmmoManagerModule.MaxAmmo, flags,
+            firearm.GetCurrentAttachmentsCode());
     }
 
     public void Drop()
@@ -115,7 +114,7 @@ public partial class SynapseItem
         Pickup.transform.localScale = Scale;
         NetworkServer.Spawn(Pickup.gameObject);
         Pickup.InfoReceived(default, info);
-        State = ItemState.Map;
+        SetState(ItemState.Map);
         CreateSchematic();
         
         DestroyItem();
@@ -130,7 +129,7 @@ public partial class SynapseItem
         DestroyPickup();
         Throwable.DestroyProjectile();
         
-        State = ItemState.Despawned;
+        SetState(ItemState.Despawned);
     }
 
     internal void DestroyItem()
@@ -188,5 +187,11 @@ public partial class SynapseItem
             NeuronLogger.For<Synapse>()
                 .Error($"Sy3 Item: Creating schematic {SchematicConfiguration?.Id} failed for item {Name}\n" + ex);
         }
+    }
+
+    internal void SetState(ItemState state)
+    {
+        State = state;
+        _subApi[ItemCategory]?.ChangeState(state);
     }
 }

@@ -10,22 +10,22 @@ public abstract class SynapseCustomRoom : DefaultSynapseObject, IRoom
     public SynapseSchematic RoomSchematic { get; private set; }
 
     private GameObject _gameObject;
-    public override GameObject GameObject => _gameObject;
-    public override ObjectType Type => ObjectType.Room;
+    public sealed override GameObject GameObject => _gameObject;
+    public sealed override ObjectType Type => ObjectType.Room;
 
-    public override Vector3 Position
+    public sealed override Vector3 Position
     {
         get => RoomSchematic.Position;
         set => RoomSchematic.Position = value;
     }
 
-    public override Quaternion Rotation
+    public sealed override Quaternion Rotation
     {
         get => RoomSchematic.Rotation;
         set => RoomSchematic.Rotation = value;
     }
 
-    public override Vector3 Scale
+    public sealed override Vector3 Scale
     {
         get => RoomSchematic.Scale;
         set => RoomSchematic.Scale = value;
@@ -68,14 +68,14 @@ public abstract class SynapseCustomRoom : DefaultSynapseObject, IRoom
         Object.Destroy(GameObject);
     }
 
-    public override void OnDestroy()
+    public sealed override void OnDestroy()
     {
         OnDeSpawn();
         Synapse.Get<RoomService>()._rooms.Remove(this);
         base.OnDestroy();
     }
 
-    public void TurnOffLights(float duration)
+    public virtual void TurnOffLights(float duration)
     {
         foreach (var light in RoomSchematic.Lights)
         {

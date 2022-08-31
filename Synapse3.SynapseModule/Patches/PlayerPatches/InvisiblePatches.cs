@@ -14,6 +14,7 @@ using UnityEngine;
 namespace Synapse3.SynapseModule.Patches.PlayerPatches;
 
 [Patches]
+[HarmonyPatch]
 internal static class InvisiblePatches
 {
     [HarmonyPrefix]
@@ -29,7 +30,7 @@ internal static class InvisiblePatches
 
             var service = Synapse.Get<PlayerService>();
             var players = service.Players.ToList();
-            players.AddRange(Synapse.Get<DummyService>().Dummies.Select(x => x.Player));
+            players.AddRange(Synapse.Get<DummyService>().Dummies.Where(x => x.PlayerUpdate).Select(x => x.Player));
             __instance._usedData = players.Count;
 
             if (__instance.ReceivedData == null || __instance.ReceivedData.Length < __instance._usedData)

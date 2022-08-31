@@ -120,7 +120,7 @@ public class Throwable : ISubSynapseItem
 
         _item.DestroyItem();
         _item.DestroyPickup();
-        _item.State = ItemState.Thrown;
+        _item.SetState(ItemState.Thrown);
     }
 
     /// <summary>
@@ -138,4 +138,6 @@ public class Throwable : ISubSynapseItem
         get => FuseTime;
         set => FuseTime = value;
     }
+
+    public void ChangeState(ItemState newState) { }
 }

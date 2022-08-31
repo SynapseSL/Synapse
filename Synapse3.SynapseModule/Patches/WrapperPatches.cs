@@ -13,6 +13,7 @@ using Object = UnityEngine.Object;
 namespace Synapse3.SynapseModule.Patches;
 
 [Patches]
+[HarmonyPatch]
 internal static class WrapperPatches
 {
     [HarmonyPostfix]

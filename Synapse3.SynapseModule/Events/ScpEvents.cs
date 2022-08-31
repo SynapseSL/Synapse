@@ -3,6 +3,7 @@ using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
+using UnityEngine;
 
 namespace Synapse3.SynapseModule.Events;
 
@@ -17,7 +18,13 @@ public class ScpEvents : Service
     public readonly EventReactor<Scp939AttackEvent> Scp939Attack = new();
     public readonly EventReactor<Scp106AttackEvent> Scp106Attack = new();
     public readonly EventReactor<ObserveScp173Event> ObserveScp173 = new();
+    public readonly EventReactor<PlaceTantrumEvent> PlaceTantrum = new();
+    public readonly EventReactor<ActivateBreakneckSpeedEvent> ActivateBreakneckSpeed = new();
     public readonly EventReactor<ReviveEvent> Revive = new();
+    public readonly EventReactor<ContainScp106Event> ContainScp106 = new();
+    public readonly EventReactor<CreatePortalEvent> CreatePortal = new();
+    public readonly EventReactor<LeavePocketEvent> LeavePocket = new();
+    public readonly EventReactor<ObserveScp096Event> ObserveScp096 = new();
 
     public ScpEvents(EventManager eventManager)
     {
@@ -33,7 +40,13 @@ public class ScpEvents : Service
         _eventManager.RegisterEvent(Scp939Attack);
         _eventManager.RegisterEvent(Scp106Attack);
         _eventManager.RegisterEvent(ObserveScp173);
+        _eventManager.RegisterEvent(PlaceTantrum);
+        _eventManager.RegisterEvent(ActivateBreakneckSpeed);
         _eventManager.RegisterEvent(Revive);
+        _eventManager.RegisterEvent(ContainScp106);
+        _eventManager.RegisterEvent(CreatePortal);
+        _eventManager.RegisterEvent(LeavePocket);
+        _eventManager.RegisterEvent(ObserveScp096);
     }
 
     public override void Disable()
@@ -46,6 +59,10 @@ public class ScpEvents : Service
         _eventManager.UnregisterEvent(Scp106Attack);
         _eventManager.UnregisterEvent(ObserveScp173);
         _eventManager.UnregisterEvent(Revive);
+        _eventManager.UnregisterEvent(ContainScp106);
+        _eventManager.UnregisterEvent(CreatePortal);
+        _eventManager.UnregisterEvent(LeavePocket);
+        _eventManager.UnregisterEvent(ObserveScp096);
     }
 }
 
@@ -92,9 +109,11 @@ public class Scp0492AttackEvent : ScpAttackEvent
 
 public class Scp096AttackEvent : ScpAttackEvent
 {
-    public Scp096AttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage, bool allow) : base(scp, victim, damage, allow) { }
+    public Scp096AttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage) : base(scp, victim, damage, true) { }
 
     public override ScpAttackType ScpAttackType => ScpAttackType.Scp096Tear;
+
+    public bool RemoveTarget { get; set; } = true;
 }
 
 public class Scp173AttackEvent : ScpAttackEvent
@@ -113,9 +132,14 @@ public class Scp939AttackEvent : ScpAttackEvent
 
 public class Scp106AttackEvent : ScpAttackEvent
 {
-    public Scp106AttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage, bool allow) : base(scp, victim, damage, allow) { }
+    public Scp106AttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage, bool allow, bool takeToPocket) : base(scp, victim, damage, allow)
+    {
+        TakeToPocket = takeToPocket;
+    }
 
     public override ScpAttackType ScpAttackType => ScpAttackType.Scp106Grab;
+    
+    public bool TakeToPocket { get; set; }
 }
 
 public class ObserveScp173Event : PlayerInteractEvent
@@ -126,6 +150,30 @@ public class ObserveScp173Event : PlayerInteractEvent
     }
 
     public SynapsePlayer Scp173 { get; }
+}
+
+public class PlaceTantrumEvent : IEvent
+{
+    public PlaceTantrumEvent(SynapsePlayer scp173)
+    {
+        Scp173 = scp173;
+    }
+
+    public SynapsePlayer Scp173 { get; }
+
+    public bool Allow { get; set; } = true;
+}
+
+public class ActivateBreakneckSpeedEvent : IEvent
+{
+    public ActivateBreakneckSpeedEvent(SynapsePlayer scp173)
+    {
+        Scp173 = scp173;
+    }
+
+    public SynapsePlayer Scp173 { get; }
+
+    public bool Allow { get; set; } = true;
 }
 
 public class ReviveEvent : IEvent
@@ -147,4 +195,48 @@ public class ReviveEvent : IEvent
     public bool FinishRevive { get; }
 
     public bool Allow { get; set; } = true;
+}
+
+public class ContainScp106Event : PlayerInteractEvent
+{
+    public ContainScp106Event(SynapsePlayer player) : base(player, true) { }
+}
+
+public class CreatePortalEvent : IEvent
+{
+    public CreatePortalEvent(SynapsePlayer scp106, Vector3 position)
+    {
+        Scp106 = scp106;
+        Position = position;
+    }
+
+    public SynapsePlayer Scp106 { get; }
+    
+    public Vector3 Position { get; set; }
+    
+    public bool Allow { get; set; }
+}
+
+public class LeavePocketEvent : PlayerEvent
+{
+    public LeavePocketEvent(SynapsePlayer player, bool escapePocket, Vector3 enteredPosition) : base(player)
+    {
+        EscapePocket = escapePocket;
+        EnteredPosition = enteredPosition;
+    }
+    
+    public bool EscapePocket { get; set; }
+    
+    public Vector3 EnteredPosition { get; set; }
+}
+
+public class ObserveScp096Event : PlayerInteractEvent
+{
+    public ObserveScp096Event(SynapsePlayer player, bool allow, SynapsePlayer scp096) : base(player, allow)
+    {
+        Scp096 = scp096;
+    }
+    
+    public SynapsePlayer Scp096 { get; }
+    
 }

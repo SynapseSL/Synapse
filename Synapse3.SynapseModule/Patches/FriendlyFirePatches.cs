@@ -8,6 +8,7 @@ using Synapse3.SynapseModule.Player;
 namespace Synapse3.SynapseModule.Patches;
 
 [Patches]
+[HarmonyPatch]
 internal static class FriendlyFirePatches
 {
     [HarmonyPrefix]

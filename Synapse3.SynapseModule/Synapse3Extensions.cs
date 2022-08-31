@@ -283,6 +283,10 @@ public static class Synapse3Extensions
             {
                 allow = true;
             }
+            else if (victim.PlayerType == PlayerType.Dummy)
+            {
+                allow = false;
+            }
             else if (attacker == victim)
             {
                 allow = true;

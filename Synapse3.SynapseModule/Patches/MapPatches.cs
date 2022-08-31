@@ -14,6 +14,7 @@ using UnityEngine;
 namespace Synapse3.SynapseModule.Patches;
 
 [Patches]
+[HarmonyPatch]
 internal static class MapPatches
 {
     [HarmonyPrefix]

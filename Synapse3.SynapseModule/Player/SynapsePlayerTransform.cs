@@ -19,28 +19,42 @@ public partial class SynapsePlayer
     /// <summary>
     /// The Rotation of the Player as Quaternion
     /// </summary>
-    public Quaternion Rotation => transform.rotation;
+    public virtual Quaternion Rotation
+    {
+        get => Quaternion.Euler(CameraReference.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, 0f);
+        set
+        {
+            var euler = value.eulerAngles;
+            PlayerMovementSync.TargetForceRotation(Connection, -euler.x, true, euler.y, true);
+        }
+    }
 
     /// <summary>
     /// The Rotation of the Player as vector2
     /// </summary>
-    public Vector2 RotationVector2
+    public virtual Vector2 RotationVector2
     {
-        get => PlayerMovementSync.RotationSync;
-        set => PlayerMovementSync.NetworkRotationSync = value;
+        get => PlayerMovementSync.Rotations;
+        set => PlayerMovementSync.TargetForceRotation(Connection, -value.x, true, value.y, true);
+    }
+
+    public virtual float RotationFloat
+    {
+        get => RotationVector2.y;
+        set => PlayerMovementSync.TargetForceRotation(Connection, 0f, false, value, true);
     }
     
     /// <summary>
     /// The Rotation of the Player as PlayerRotation
     /// </summary>
-    public PlayerMovementSync.PlayerRotation PlayerRotation
+    public virtual PlayerMovementSync.PlayerRotation PlayerRotation
     {
         get
         {
             var vec2 = RotationVector2;
             return new PlayerMovementSync.PlayerRotation(vec2.x, vec2.y);
         }
-        set => RotationVector2 = new Vector2(value.x.Value, value.y.Value);
+        set => PlayerMovementSync.TargetForceRotation(Connection, -(value.x ?? 0f), true, value.y ?? 0f, true);
     }
 
     public Vector3 Scale

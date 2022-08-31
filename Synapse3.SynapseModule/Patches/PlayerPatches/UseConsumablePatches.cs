@@ -13,6 +13,7 @@ using Utils.Networking;
 namespace Synapse3.SynapseModule.Patches.PlayerPatches;
 
 [Patches]
+[HarmonyPatch]
 internal static class UseConsumablePatches
 {
     [HarmonyPrefix]

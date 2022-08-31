@@ -43,4 +43,17 @@ public class GamePlayConfiguration : IDocumentSection
         (uint)RoleType.Scp93989,
         (uint)RoleType.Tutorial
     };
+
+    public List<uint> CantObserve096 { get; set; } = new()
+    {
+        (uint)RoleType.Scp173,
+        (uint)RoleType.Scp106,
+        (uint)RoleType.Scp049,
+        (uint)RoleType.Scp079,
+        (uint)RoleType.Scp096,
+        (uint)RoleType.Scp0492,
+        (uint)RoleType.Scp93953,
+        (uint)RoleType.Scp93989,
+        (uint)RoleType.Tutorial
+    };
 }

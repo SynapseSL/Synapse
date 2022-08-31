@@ -4,8 +4,10 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Neuron.Core.Meta;
 using Neuron.Core.Plugins;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
+using UnityEngine;
 using Console = GameCore.Console;
 
 namespace Synapse3.SynapseModule;
@@ -19,6 +21,7 @@ public class ServerService : Service
     {
         _server = server;
         _plugin = plugin;
+        WallMask = GetMask(Layer.Default, Layer.Glass, Layer.Cameras, Layer.Door, Layer.Locker);
     }
 
     public ReadOnlyCollection<PluginContext> Plugins => _plugin.Plugins.AsReadOnly();
@@ -132,6 +135,11 @@ public class ServerService : Service
             Expires = DateTime.UtcNow.AddSeconds(duration).Ticks
         }, BanHandler.BanType.IP);
     }
+
+    public LayerMask WallMask { get; }
+
+    public LayerMask GetMask(params Layer[] layers)
+        => LayerMask.GetMask(layers.Select(x => x.ToString()).ToArray());
 
     /// <summary>
     /// Reloads all Services of Synapse

@@ -5,6 +5,7 @@ using Neuron.Core.Logging;
 namespace Synapse3.SynapseModule.Patches;
 
 [Patches]
+[HarmonyPatch]
 public static class PermissionPatches
 {
     [HarmonyPatch(typeof(ServerRoles), nameof(ServerRoles.RefreshPermissions)), HarmonyPrefix]
