@@ -6,6 +6,7 @@ namespace Synapse3.SynapseModule.Map.Schematic;
 public class SynapseObjectScript : MonoBehaviour
 {
     private SynapseObjectEvents _events;
+    private float _nextUpdate = 0f;
 
     public ISynapseObject Object { get; internal set; }
 
@@ -20,14 +21,26 @@ public class SynapseObjectScript : MonoBehaviour
         
         Parent = (Object as DefaultSynapseObject)?.Parent;
         IsChild = Parent != null;
+
+        if (Object is IRefreshable refreshable)
+            _nextUpdate = Time.time + refreshable.UpdateFrequency;
     }
 
     public void Update()
     {
         _events.Update.Raise(new UpdateObjectEvent(Object));
 
-        if(Object is IRefreshable { UpdateEveryFrame: true } refresh)
-            refresh.Refresh();
+        if (Object is IRefreshable { Update: true } refresh)
+        {
+            if (refresh.UpdateFrequency <= 0)
+                refresh.Refresh();
+
+            if (Time.time <= _nextUpdate)
+            {
+                _nextUpdate = Time.time + refresh.UpdateFrequency;
+                refresh.Refresh();
+            }
+        }
     }
 
     public void OnDestroy()

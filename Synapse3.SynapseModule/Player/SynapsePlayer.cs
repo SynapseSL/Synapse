@@ -23,9 +23,9 @@ public partial class SynapsePlayer : MonoBehaviour
     private readonly TeamService _team;
     private readonly RoomService _room;
     private readonly PlayerEvents _playerEvents;
-    private readonly ServerEvents _serverEvents;
     private readonly SynapseConfigService _config;
     private readonly DataBaseService _dataBase;
+    private readonly MirrorService _mirror;
 
     /// <summary>
     /// The Type of Player this is. It can be a normal Player the Server itself or a Dummy
@@ -52,8 +52,8 @@ public partial class SynapsePlayer : MonoBehaviour
         _team = Synapse.Get<TeamService>();
         _room = Synapse.Get<RoomService>();
         _playerEvents = Synapse.Get<PlayerEvents>();
-        _serverEvents = Synapse.Get<ServerEvents>();
         _config = Synapse.Get<SynapseConfigService>();
         _dataBase = Synapse.Get<DataBaseService>();
+        _mirror = Synapse.Get<MirrorService>();
     }
 }

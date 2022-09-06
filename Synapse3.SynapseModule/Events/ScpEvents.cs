@@ -25,6 +25,10 @@ public class ScpEvents : Service
     public readonly EventReactor<CreatePortalEvent> CreatePortal = new();
     public readonly EventReactor<LeavePocketEvent> LeavePocket = new();
     public readonly EventReactor<ObserveScp096Event> ObserveScp096 = new();
+    public readonly EventReactor<ContainScp079Event> ContainScp079 = new();
+    public readonly EventReactor<SwitchCameraEvent> SwitchCamera = new();
+    public readonly EventReactor<Scp079DoorInteractEvent> Scp079DoorInteract = new();
+    public readonly EventReactor<Scp079LockDoorEvent> Scp079LockDoor = new();
 
     public ScpEvents(EventManager eventManager)
     {
@@ -47,6 +51,10 @@ public class ScpEvents : Service
         _eventManager.RegisterEvent(CreatePortal);
         _eventManager.RegisterEvent(LeavePocket);
         _eventManager.RegisterEvent(ObserveScp096);
+        _eventManager.RegisterEvent(ContainScp079);
+        _eventManager.RegisterEvent(SwitchCamera);
+        _eventManager.RegisterEvent(Scp079DoorInteract);
+        _eventManager.RegisterEvent(Scp079LockDoor);
     }
 
     public override void Disable()
@@ -63,6 +71,10 @@ public class ScpEvents : Service
         _eventManager.UnregisterEvent(CreatePortal);
         _eventManager.UnregisterEvent(LeavePocket);
         _eventManager.UnregisterEvent(ObserveScp096);
+        _eventManager.UnregisterEvent(ContainScp079);
+        _eventManager.UnregisterEvent(SwitchCamera);
+        _eventManager.UnregisterEvent(Scp079DoorInteract);
+        _eventManager.UnregisterEvent(Scp079LockDoor);
     }
 }
 
@@ -238,5 +250,73 @@ public class ObserveScp096Event : PlayerInteractEvent
     }
     
     public SynapsePlayer Scp096 { get; }
+}
+
+public class ContainScp079Event : IEvent
+{
+    public ContainScp079Event(Scp079ContainmentStatus status)
+    {
+        Status = status;
+    }
+
+    public Scp079ContainmentStatus Status { get; }
+
+    public bool Allow { get; set; } = true;
+}
+
+public class SwitchCameraEvent : IEvent
+{
+    public SwitchCameraEvent(bool spawning, SynapsePlayer scp079, SynapseCamera camera)
+    {
+        Spawning = spawning;
+        Scp079 = scp079;
+        Camera = camera;
+    }
+
+    public SynapseCamera Camera { get; set; }
     
+    public SynapsePlayer Scp079 { get; }
+
+    public bool Allow { get; set; } = true;
+    
+    public bool Spawning { get; }
+}
+
+public class Scp079DoorInteractEvent : IEvent
+{
+    public Scp079DoorInteractEvent(SynapsePlayer scp079, SynapseDoor door, float energy)
+    {
+        Scp079 = scp079;
+        Door = door;
+        Energy = energy;
+    }
+
+    public SynapsePlayer Scp079 { get; }
+    
+    public SynapseDoor Door { get; }
+    
+    public float Energy { get; set; }
+
+    public bool Allow { get; set; } = true;
+}
+
+public class Scp079LockDoorEvent : IEvent
+{
+    public Scp079LockDoorEvent(SynapsePlayer scp079, SynapseDoor door, bool unlock, float energy)
+    {
+        Scp079 = scp079;
+        Door = door;
+        Unlock = unlock;
+        Energy = energy;
+    }
+
+    public SynapsePlayer Scp079 { get; }
+    
+    public SynapseDoor Door { get; }
+
+    public bool Unlock { get; }
+    
+    public float Energy { get; set; }
+
+    public bool Allow { get; set; } = true;
 }

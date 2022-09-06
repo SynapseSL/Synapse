@@ -63,7 +63,8 @@ public class SynapseLocker : StructureSyncSynapseObject
 
         OriginalScale = configuration.Scale;
         CustomAttributes = configuration.CustomAttributes;
-        UpdateEveryFrame = configuration.UpdateEveryFrame;
+        Update = configuration.Update;
+        UpdateFrequency = configuration.UpdateFrequency;
         
         for (int i = 0; i < configuration.Chambers.Count; i++)
         {

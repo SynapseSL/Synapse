@@ -61,11 +61,15 @@ internal static class InvisiblePatches
                     var isOnSurface = (player.Room as SynapseRoom)?.RoomType == RoomType.Surface;
                     
                     if (player == playerToShow || playerToShow.RoleType is RoleType.Spectator) continue;
-                    
-                    if (playerToShow.Invisible && !player.HasPermission("synapse.invisible"))
+
+                    switch (playerToShow.Invisible)
                     {
-                        invisible = true;
-                        goto ExecuteEnd;
+                        case InvisibleMode.Visual when player.RoleType is not RoleType.Scp079 and not RoleType.Scp93953 and not RoleType.Scp93989 and not RoleType.Scp096 and not RoleType.Spectator:
+                        case InvisibleMode.Alive or InvisibleMode.Ghost when player.RoleType != RoleType.Spectator:
+                        case InvisibleMode.Admin when !player.HasPermission("synapse.invisible"):
+                        case InvisibleMode.Full:
+                            invisible = true;
+                            goto ExecuteEnd;
                     }
 
                     switch (player.RoleType)
@@ -84,6 +88,14 @@ internal static class InvisiblePatches
 
                             break;
                         }
+                        
+                        case RoleType.Scp096 when playerToShow.Invisible == InvisibleMode.Visual:
+                            if (player.ScpController.Scp096.Is096Instance &&
+                                player.ScpController.Scp096.Scp096.EnragedOrEnraging &&
+                                player.ScpController.Scp096.Targets.Contains(playerToShow))
+                                break;
+                            invisible = true;
+                            goto ExecuteEnd;
                     }
 
                     //SCP-096 bypasses mostly any invisible checks from here on out so that he can see everyone anywhere even when he is enraged
@@ -130,7 +142,7 @@ internal static class InvisiblePatches
                     if (invisible)
                     {
                         __instance._transmitBuffer[i] =
-                            new PlayerPositionData(Vector3.up * 6000f, 0.0f, playerToShow.PlayerId);
+                            new PlayerPositionData(Vector3.up * 7000f, 0.0f, playerToShow.PlayerId);
                     }
                 }
 

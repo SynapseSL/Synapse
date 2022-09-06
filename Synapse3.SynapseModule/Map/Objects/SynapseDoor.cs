@@ -157,7 +157,8 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
             Health = configuration.Health;
         OriginalScale = configuration.Scale;
         CustomAttributes = configuration.CustomAttributes;
-        UpdateEveryFrame = configuration.UpdateEveryFrame;
+        Update = configuration.Update;
+        UpdateFrequency = configuration.UpdateFrequency;
     }
     private void SetUp(SpawnableDoorType type)
     {

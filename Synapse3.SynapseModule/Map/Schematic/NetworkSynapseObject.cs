@@ -7,9 +7,9 @@ public abstract class NetworkSynapseObject :  DefaultSynapseObject, IRefreshable
 {
     public abstract NetworkIdentity NetworkIdentity { get; }
 
-    public bool UpdateEveryFrame { get; set; } = false;
-
     public virtual void Refresh() => NetworkIdentity.UpdatePositionRotationScale();
+    public bool Update { get; set; } = false;
+    public float UpdateFrequency { get; set; } = 0;
 
     public override Vector3 Position
     {

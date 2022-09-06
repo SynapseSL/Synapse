@@ -141,7 +141,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         Player.PlayerMovementSync.NetworkGrounded = true;
         RunSpeed = CharacterClassManager._staticClasses[(int)role].runSpeed;
         WalkSpeed = CharacterClassManager._staticClasses[(int)role].walkSpeed;
-        _ = Timing.RunCoroutine(Update());
+        _ = Timing.RunCoroutine(UpdateMovement());
         
         MoveInElevator = true;
     }
@@ -164,14 +164,16 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         Scale = base.Scale;
     }
 
-    public bool UpdateEveryFrame { get; }
-    
+    public bool Update { get; set; } = false;
+
+    public float UpdateFrequency { get; set; }
+
     public void RotateToPosition(Vector3 pos)
     {
         Rotation = Quaternion.LookRotation((pos - GameObject.transform.position).normalized);
     }
 
-    public void Despawn()
+    public void DeSpawn()
         => NetworkServer.UnSpawn(GameObject);
 
     public void Spawn()
@@ -179,7 +181,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
     
     
     //Thanks to GameHunt.I used some of his code for the Dummy API https://github.com/gamehunt/CustomNPCs
-    private IEnumerator<float> Update()
+    private IEnumerator<float> UpdateMovement()
     {
         for (;;)
         {

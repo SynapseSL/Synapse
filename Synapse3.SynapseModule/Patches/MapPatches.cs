@@ -6,6 +6,7 @@ using InventorySystem.Items.Pickups;
 using MapGeneration.Distributors;
 using Neuron.Core.Logging;
 using Scp914;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Player;
@@ -59,7 +60,7 @@ internal static class MapPatches
 
             if (__instance.InRange(sPlayer.Position))
             {
-                __result = !sPlayer.Invisible;
+                __result = sPlayer.Invisible < InvisibleMode.Ghost;
                 
                 var ev = new TriggerTeslaEvent(sPlayer, __result, __instance.GetSynapseTesla());
                 Synapse.Get<MapEvents>().TriggerTesla.Raise(ev);

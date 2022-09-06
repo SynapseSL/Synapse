@@ -136,7 +136,8 @@ public class TestCommand : SynapseCommand
             {
                 new SchematicConfiguration.OldGrenadeConfiguration
                 {
-                    UpdateEveryFrame = true,
+                    Update = true,
+                    UpdateFrequency = 0,
                     Position = Vector3.left * 10,
                 }
             },

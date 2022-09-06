@@ -8,7 +8,12 @@ public interface IRefreshable
     public void Refresh();
 
     /// <summary>
-    /// If the Object should be automatically be updated every Frame
+    /// If the Object should be updated regularly
     /// </summary>
-    public bool UpdateEveryFrame { get; }
+    public bool Update { get; set; }
+    
+    /// <summary>
+    /// The Frequency of which the Object should be updated use -1 or 0 for every frame
+    /// </summary>
+    public float UpdateFrequency { get; set; }
 }

@@ -42,7 +42,9 @@ public class SchematicConfiguration : IDocumentSection
 
     public class SimpleUpdateConfig : DefaultConfig
     {
-        public bool UpdateEveryFrame { get; set; } = false;
+        public bool Update { get; set; }
+
+        public float UpdateFrequency { get; set; }
     }
     
     public class OldGrenadeConfiguration : SimpleUpdateConfig

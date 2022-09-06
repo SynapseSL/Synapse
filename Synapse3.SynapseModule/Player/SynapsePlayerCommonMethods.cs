@@ -175,24 +175,13 @@ public partial class SynapsePlayer
     /// </summary>
     public void SendToServer(ushort port)
         => Connection.Send(new RoundRestartMessage(RoundRestartType.RedirectRestart, 1f, port, true, false));
-    
+
     /// <summary>
     /// Turns the Screen of the Player for the entire Round black
     /// </summary>
     public void DimScreen()
-        {
-            var component = RoundSummary.singleton;
-            var writer = NetworkWriterPool.GetWriter();
-            var msg = new RpcMessage
-            {
-                netId = component.netId,
-                componentIndex = component.ComponentIndex,
-                functionHash = typeof(RoundSummary).FullName.GetStableHashCode() * 503 + "RpcDimScreen".GetStableHashCode(),
-                payload = writer.ToArraySegment()
-            };
-            Connection.Send(msg);
-            NetworkWriterPool.Recycle(writer);
-        }
+        => Connection.Send(_mirror.GetCustomRpcMessage(RoundSummary.singleton, nameof(RoundSummary.RpcDimScreen),
+            null));
 
     /// <summary>
     /// Shakes the Screen of the Player like the Alpha Warhead
@@ -204,22 +193,14 @@ public partial class SynapsePlayer
     /// Places Blood locally on the Map of the Player
     /// </summary>
     public void PlaceBlood(Vector3 pos, int type = 1, float size = 2f)
-    {
-        var component = ClassManager;
-        var writer = NetworkWriterPool.GetWriter();
-        writer.WriteVector3(pos);
-        writer.WriteInt32(type);
-        writer.WriteSingle(size);
-        var msg = new RpcMessage
-        {
-            netId = component.netId,
-            componentIndex = component.ComponentIndex,
-            functionHash = typeof(CharacterClassManager).FullName.GetStableHashCode() * 503 + "RpcPlaceBlood".GetStableHashCode(),
-            payload = writer.ToArraySegment()
-        };
-        Connection.Send(msg);
-        NetworkWriterPool.Recycle(writer);
-    }
+        => Connection.Send(_mirror.GetCustomRpcMessage(ClassManager,
+            nameof(CharacterClassManager.RpcPlaceBlood),
+            writer =>
+            {
+                writer.WriteVector3(pos);
+                writer.WriteInt32(type);
+                writer.WriteSingle(size);
+            }));
 
     /// <summary>
     /// Opens the Menu of the Player

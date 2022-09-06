@@ -24,7 +24,7 @@ public class InvisibleCategory : RemoteAdminCategory
 
     public override string GetInfo(CommandSender sender, bool secondPage)
     {
-        var text = "<color=white>Selects all Players that are currently Invisible:\n";
+        var text = "<color=white>Selects all Players that are currently in Admin Invisible:\n";
 
         foreach (var player in GetPlayers())
         {
@@ -34,7 +34,8 @@ public class InvisibleCategory : RemoteAdminCategory
         return text + "</color>";
     }
 
-    public override List<SynapsePlayer> GetPlayers() => _player.GetPlayers(x => x.Invisible, PlayerType.Player);
+    public override List<SynapsePlayer> GetPlayers() =>
+        _player.GetPlayers(x => x.Invisible == InvisibleMode.Admin, PlayerType.Player);
 
     public override bool DisplayOnTop => false;
 

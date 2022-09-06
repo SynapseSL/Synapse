@@ -58,7 +58,8 @@ public class SynapseWorkStation : NetworkSynapseObject, IJoinUpdate
 
         OriginalScale = configuration.Scale;
         CustomAttributes = configuration.CustomAttributes;
-        UpdateEveryFrame = configuration.UpdateEveryFrame;
+        Update = configuration.Update;
+        UpdateFrequency = configuration.UpdateFrequency;
     }
     private void SetUp()
     {

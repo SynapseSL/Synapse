@@ -2,6 +2,7 @@
 using InventorySystem.Disarming;
 using Mirror.LiteNetLib4Mirror;
 using PlayerStatsSystem;
+using Synapse3.SynapseModule.Enums;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
@@ -95,9 +96,9 @@ public partial class SynapsePlayer
     }
 
     /// <summary>
-    /// When enabled only players with the synapse.invisible Permission can see the player
+    /// The Current Invisible Mode of the Player
     /// </summary>
-    public bool Invisible { get; set; }
+    public InvisibleMode Invisible { get; set; } = InvisibleMode.None;
 
     /// <summary>
     /// The last position the player died. Used to revive him as SCP-049-2

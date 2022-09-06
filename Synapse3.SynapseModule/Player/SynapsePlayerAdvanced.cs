@@ -34,6 +34,8 @@ public partial class SynapsePlayer
     
     public ScpController ScpController { get; }
 
+    public Dictionary<string, object> Data { get; set; } = new();
+
     public void SendNetworkMessage<TNetworkMessage>(TNetworkMessage msg, int channel = 0)
         where TNetworkMessage : struct, NetworkMessage =>
         Connection?.Send(msg, channel);

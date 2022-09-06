@@ -8,6 +8,7 @@ using Respawning;
 using Respawning.NamingRules;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
+using Synapse3.SynapseModule.Role;
 
 namespace Synapse3.SynapseModule.Teams;
 
@@ -194,20 +195,21 @@ public class TeamService : Service
         {
             players.RemoveAt(players.Count - 1);
         }
-        
-        if(players.Count == 0)
-            goto ResetTeam;
 
         var ev = new SpawnTeamEvent(NextTeam)
         {
             Players = players
         };
         Synapse.Get<RoundEvents>().SpawnTeam.Raise(ev);
-
         players = ev.Players;
 
         if (!ev.Allow || players.Count == 0)
             goto ResetTeam;
+        
+        while (players.Count > GetMaxWaveSize(NextTeam))
+        {
+            players.RemoveAt(players.Count - 1);
+        }
         
         players.ShuffleList();
 
@@ -239,6 +241,7 @@ public class TeamService : Service
                 foreach (var player in players)
                 {
                     var role = roles.Dequeue();
+                    player.RemoveCustomRole(DespawnReason.API);
                     player.ClassManager.SetPlayersClass(role, player.gameObject,
                         CharacterClassManager.SpawnReason.Respawn);
                     

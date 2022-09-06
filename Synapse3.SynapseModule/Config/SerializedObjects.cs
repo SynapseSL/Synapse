@@ -343,7 +343,7 @@ public class SerializedPlayerState
 
         public bool OverWatch { get; set; }
 
-        public bool Invisible { get; set; }
+        public InvisibleMode Invisible { get; set; }
 
         public void Apply(SynapsePlayer player, bool applyModes = false)
         {

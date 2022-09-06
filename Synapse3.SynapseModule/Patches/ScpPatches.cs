@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using CustomPlayerEffects;
+using GameCore;
 using HarmonyLib;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items.MicroHID;
@@ -8,12 +11,15 @@ using Neuron.Core.Logging;
 using PlayableScps;
 using PlayableScps.Messages;
 using PlayerStatsSystem;
+using Subtitles;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 using Utils.Networking;
+using Console = GameCore.Console;
 using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule.Patches;
@@ -234,7 +240,7 @@ internal static class ScpPatches
                 if (scp == null || player == null || player == scp) return false;
                 
                 var ev = new ObserveScp096Event(player,
-                    !player.Invisible && !Synapse.Get<SynapseConfigService>().GamePlayConfiguration.CantObserve096
+                    player.Invisible < InvisibleMode.Ghost && !Synapse.Get<SynapseConfigService>().GamePlayConfiguration.CantObserve096
                         .Contains(player.RoleID), scp);
                 Synapse.Get<ScpEvents>().ObserveScp096.Raise(ev);
                 if (!ev.Allow) return false;
@@ -300,10 +306,235 @@ internal static class ScpPatches
             return true;
         }
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Recontainer079), nameof(Recontainer079.UpdateStatus))]
+    public static bool UpdateContain079Status(Recontainer079 __instance, int engagedGenerators)
+    {
+        try
+        {
+            DecoratedScpPatches.UpdateStatus(__instance, engagedGenerators);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp079 Contain (OverrideDoors) Event Failed\n" + ex);
+            return true;
+        }
+    }
+    
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Recontainer079), nameof(Recontainer079.EndOvercharge))]
+    public static void End079Contain()
+    {
+        try
+        {
+            var ev = new ContainScp079Event(Scp079ContainmentStatus.Finished);
+            Synapse.Get<ScpEvents>().ContainScp079.Raise(ev);
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp079 Contain (End) Event Failed\n" + ex);
+        }
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Recontainer079), nameof(Recontainer079.Recontain))]
+    public static bool Start079Contain()
+    {
+        try
+        {
+            var ev = new ContainScp079Event(Scp079ContainmentStatus.AnnounceOvercharge);
+            Synapse.Get<ScpEvents>().ContainScp079.Raise(ev);
+            return ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp079 Contain (Start) Event Failed\n" + ex);
+            return true;
+        }
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Recontainer079), nameof(Recontainer079.RefreshActivator))]
+    public static bool Refresh079ContainActivator(Recontainer079 __instance)
+    {
+        try
+        {
+            if (!__instance._delayStopwatch.IsRunning ||
+                __instance._delayStopwatch.Elapsed.TotalSeconds <= __instance._activationDelay) return true;
+            
+            var ev = new ContainScp079Event(Scp079ContainmentStatus.Overcharge);
+            Synapse.Get<ScpEvents>().ContainScp079.Raise(ev);
+            return ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp079 Contain (Refresh) Event Failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.RpcSwitchCamera))]
+    public static bool SwitchCamera(Scp079PlayerScript __instance, ref ushort camId)
+    {
+        try
+        {
+            var id = camId;
+            var player = __instance.GetSynapsePlayer();
+            var camera = Synapse.Get<MapService>()._synapseCameras.FirstOrDefault(x => x.CameraID == id);
+            if (player == null || camera == null) return false;
+
+            var ev = new SwitchCameraEvent(!player.ScpController.Scp079.Spawned, player, camera);
+            Synapse.Get<ScpEvents>().SwitchCamera.Raise(ev);
+            
+            if (ev.Spawning)
+                player.ScpController.Scp079.Spawned = true;
+
+            camId = ev.Camera.CameraID;
+
+            return ev.Allow || ev.Spawning;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Switch Camera Event Failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.UserCode_CmdInteract))]
+    public static bool Scp079BulkPatch(Scp079PlayerScript __instance, Command079 command, string args, GameObject target)
+    {
+        try
+        {
+            DecoratedScpPatches.Scp079BulkPatch(__instance, command, args, target);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp079 Bulk Patch Failed\n" + ex);
+            return true;
+        }
+    }
 }
 
 internal static class DecoratedScpPatches
 {
+    public static void Scp079BulkPatch(Scp079PlayerScript script, Command079 command, string args,
+        GameObject gameObject)
+    {
+        if (!script._interactRateLimit.CanExecute() || !script.iAm079) return;
+        Console.AddDebugLog("SCP079", "Command received from a client: " + command, MessageImportance.LessImportant);
+        script.RefreshCurrentRoom();
+        if (!script.CheckInteractableLegitness(script.CurrentRoom, gameObject, true)) return;
+        var player = script.GetSynapsePlayer();
+        if (player == null) return;
+        
+        switch (command)
+        {
+            case Command079.Door:
+                if(AlphaWarheadController.Host.inProgress) return;
+                if(gameObject == null || !gameObject.TryGetComponent<DoorVariant>(out var doorVariant)) return;
+
+                var door = doorVariant.GetSynapseDoor();
+                if (door == null) return;
+                
+                var blacklistedDoors = ConfigFile.ServerConfig.GetStringList("scp079_door_blacklist") ?? new List<string>();
+                if (blacklistedDoors.Contains(door.Name)) return;
+                var permission = doorVariant.RequiredPermissions.RequiredPermissions.ToString();
+                var mana = script.GetManaFromLabel("Door Interaction " + permission.Split(',')[0], script.abilities);
+
+                var ev = new Scp079DoorInteractEvent(player, door, mana);
+                Synapse.Get<ScpEvents>().Scp079DoorInteract.Raise(ev);
+                
+                if (ev.Energy > script._curMana)
+                {
+                    script.RpcNotEnoughMana(mana, script._curMana);
+                    return;
+                }
+
+                if (!ev.Allow) return;
+
+                var state = doorVariant.TargetState;
+                doorVariant.ServerInteract(player, 0);
+                if (state == doorVariant.TargetState) return;
+                
+                script.Mana -= ev.Energy;
+                script.AddInteractionToHistory(gameObject, true);
+                return;
+            
+            case Command079.Doorlock:
+                if(AlphaWarheadController.Host.inProgress) return;
+                if(gameObject == null || !gameObject.TryGetComponent(out doorVariant)) return;
+
+                door = doorVariant.GetSynapseDoor();
+                if (door == null) return;
+                
+                blacklistedDoors = ConfigFile.ServerConfig.GetStringList("scp079_door_blacklist") ?? new List<string>();
+                if (blacklistedDoors.Contains(door.Name)) return;
+
+                var mode = DoorLockUtils.GetMode((DoorLockReason)doorVariant.ActiveLocks);
+                if (!mode.HasFlagFast(DoorLockMode.CanOpen) && !mode.HasFlagFast(DoorLockMode.CanClose) &&
+                    !mode.HasFlagFast(DoorLockMode.ScpOverride)) return;
+
+                var ev2 = new Scp079LockDoorEvent(player, door,
+                    ((DoorLockReason)doorVariant.ActiveLocks).HasFlag(DoorLockReason.Regular079),
+                    script.GetManaFromLabel("Door Lock Minimum", script.abilities));
+                Synapse.Get<ScpEvents>().Scp079LockDoor.Raise(ev2);
+                
+                if (!ev2.Allow) return;
+                
+                if (ev2.Unlock)
+                {
+                    if (!script.lockedDoors.Contains(doorVariant.netId)) return;
+                    script.lockedDoors.Remove(doorVariant.netId);
+                    doorVariant.ServerChangeLock(DoorLockReason.Regular079, false);
+                }
+                else
+                {
+                    if (ev2.Energy > script.Mana)
+                    {
+                        script.RpcNotEnoughMana(ev2.Energy, script._curMana);
+                        return;
+                    }
+
+                    if (!script.lockedDoors.Contains(doorVariant.netId))
+                        script.lockedDoors.Add(doorVariant.netId);
+
+                    doorVariant.ServerChangeLock(DoorLockReason.Regular079, true);
+                    script.AddInteractionToHistory(doorVariant.gameObject, true);
+                    script.Mana -= ev2.Energy;
+                }
+                return;
+        }
+    }
+    
+    public static void UpdateStatus(Recontainer079 container079, int generators)
+    {
+        var count = Recontainer079.AllGenerators.Count;
+        var announcement = string.Format(container079._announcementProgress, generators, count);
+        var parts = new List<SubtitlePart>
+        {
+            new(SubtitleType.GeneratorsActivated, new[] { generators.ToString(), count.ToString() })
+        };
+        
+        if (generators >= count)
+        {
+            var ev = new ContainScp079Event(Scp079ContainmentStatus.OverrideDoors);
+            Synapse.Get<ScpEvents>().ContainScp079.Raise(ev);
+            if(!ev.Allow) return;
+
+            announcement += container079._announcementAllActivated;
+            container079.SetContainmentDoors(true, Scp079PlayerScript.instances.Count > 0);
+            parts.Add(new SubtitlePart(SubtitleType.AllGeneratorsEngaged, null));
+        }
+
+        new SubtitleMessage(parts.ToArray()).SendToAuthenticated();
+        container079.PlayAnnouncement(announcement, 1f);
+    }
+    
     public static void Pry(Scp096 scp096)
     {
         if(!scp096.PryingGate) return;
@@ -422,7 +653,7 @@ internal static class DecoratedScpPatches
 
             if (!visionInfo.IsLooking) continue;
             var ev = new ObserveScp096Event(player,
-                !player.Invisible && !Synapse.Get<SynapseConfigService>().GamePlayConfiguration.CantObserve096
+                player.Invisible < InvisibleMode.Ghost && !Synapse.Get<SynapseConfigService>().GamePlayConfiguration.CantObserve096
                     .Contains(player.RoleID), scp);
             Synapse.Get<ScpEvents>().ObserveScp096.Raise(ev);
             if(!ev.Allow) continue;
@@ -616,7 +847,7 @@ internal static class DecoratedScpPatches
                         player.CameraReference.position, VisionInformation.VisionLayerMask)))
                 {
                     var ev = new ObserveScp173Event(player,
-                        !player.Invisible && !config.GamePlayConfiguration.CantObserve173.Contains(player.RoleID), scp);
+                        player.Invisible < InvisibleMode.Ghost && !config.GamePlayConfiguration.CantObserve173.Contains(player.RoleID), scp);
                     Synapse.Get<ScpEvents>().ObserveScp173.Raise(ev);
                     if(!ev.Allow) continue;
                     

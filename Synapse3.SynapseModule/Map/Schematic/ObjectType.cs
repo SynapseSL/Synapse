@@ -8,13 +8,14 @@ public enum ObjectType
     Target,
     Door,
     Workstation,
+    Locker,
+    Generator,
     Item,
+    OldGrenade,
     Ragdoll,
     Dummy,
     Custom,
-    Locker,
-    Generator,
     Room,
-    OldGrenade,
-    ElevatorDestination
+    ElevatorDestination,
+    Other
 }

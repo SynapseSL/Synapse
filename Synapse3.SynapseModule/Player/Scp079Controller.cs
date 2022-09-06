@@ -48,4 +48,6 @@ public class Scp079Controller
     public void ForceLevel(byte level) => Scp079Script.ForceLevel(level, true);
 
     public void UnlockDoors() => Scp079Script.CmdResetDoors();
+    
+    public bool Spawned { get; internal set; }
 }

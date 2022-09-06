@@ -82,12 +82,16 @@ internal static class RemoteAdminPatches
                 }
                 catch{}
 
-                element.Text = badgeText + overWatchText + "<color={RA_ClassColor}>(" + player.PlayerId + ") " +
-                               player.NicknameSync.CombinedName.Replace("\n", "").Replace("RA_", string.Empty) +
-                               "</color>";
+                element.Text = badgeText + overWatchText + "<color={RA_ClassColor}>(" +
+                      player.PlayerId + ") " +
+                      player.NicknameSync.CombinedName.Replace("\n", "").Replace("RA_", string.Empty) +
+                      "</color>";
+
+                if (!string.IsNullOrWhiteSpace(player.CustomRemoteAdminBadge))
+                    element.Text = player.CustomRemoteAdminBadge + " " + element.Text;
             }
 
-            sender.RaReply("$0 " + GenerateList(players,sender), true, logRequest, string.Empty);
+            sender.RaReply("$0 " + GenerateList(players, sender), true, logRequest, string.Empty);
         }
         catch (Exception ex)
         {

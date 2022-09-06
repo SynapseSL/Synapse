@@ -1,48 +1,60 @@
 ﻿using Neuron.Core.Meta;
+using Subtitles;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Rooms;
+using Utils.Networking;
 
 namespace Synapse3.SynapseModule.Map;
 
 public class HeavyZoneService : Service
 {
     private readonly RoomService _room;
+    private readonly NukeService _nuke;
 
-    public HeavyZoneService(RoomService room)
+    public HeavyZoneService(RoomService room, NukeService nuke)
     {
         _room = room;
+        _nuke = nuke;
     }
 
-    private  Recontainer079 Recontainer => Synapse.GetObject<Recontainer079>();
+    private Recontainer079 ReContainer => Synapse.GetObject<Recontainer079>();
 
-    public byte ActiveGenerators => (byte)Recontainer._prevEngaged;
+    public byte ActiveGenerators => (byte)ReContainer._prevEngaged;
 
     /// <summary>
-    /// True if SCP079 has been recontained
+    /// True if SCP079 has been contained
     /// </summary>
-    public bool Is079Recontained
+    public bool Is079Contained
     {
         get
         {
-            var recontainer = Recontainer;
-            return Recontainer._alreadyRecontained && Recontainer._delayStopwatch.Elapsed.TotalSeconds > recontainer._activationDelay;
+            var reContainer = ReContainer;
+            //TODO: Rework this when the 079 Soft Rework was released
+            return (reContainer._alreadyRecontained &&
+                    reContainer._delayStopwatch.Elapsed.TotalSeconds > reContainer._activationDelay) ||
+                   _nuke.State == NukeState.Detonated;
         }
     }
 
     /// <summary>
-    /// Recontain SCP079 manually
+    /// Contain SCP079 manually instant and without any Power outages
     /// </summary>
-    public void Recontain079()
+    public void Contain079()
     {
-        var recontainer = Recontainer;
-
-        recontainer.TryKill079();
-        recontainer.PlayAnnouncement(recontainer._announcementSuccess + " Unknown", 1f);
+        var reContainer = ReContainer;
+        if (!reContainer.TryKill079()) return;
+        
+        reContainer.PlayAnnouncement(reContainer._announcementFailure, 1f);
+        new SubtitleMessage(new[]
+        {
+            new SubtitlePart(SubtitleType.OperationalMode, null)
+        }).SendToAuthenticated();
     }
 
     /// <summary>
     /// Trigger Heavy Containment Zone overcharge manually 
     /// </summary>
-    public void Overcharge() => Recontainer.Recontain();
+    public void Overcharge() => ReContainer.Recontain();
 
     /// <summary>
     /// Turn off all lights (in the HCZ)

@@ -25,16 +25,17 @@ public class SynapseOldGrenade : NetworkSynapseObject
         SetUp();
     }
 
-    internal SynapseOldGrenade(SchematicConfiguration.OldGrenadeConfiguration config, SynapseSchematic schematic) :
-        this(config.Position, config.Rotation, config.IsFlash)
+    internal SynapseOldGrenade(SchematicConfiguration.OldGrenadeConfiguration configuration, SynapseSchematic schematic) :
+        this(configuration.Position, configuration.Rotation, configuration.IsFlash)
     {
         Parent = schematic;
         schematic._oldGrenades.Add(this);
-        Scale = config.Scale;
+        Scale = configuration.Scale;
 
-        OriginalScale = config.Scale;
-        CustomAttributes = config.CustomAttributes;
-        UpdateEveryFrame = config.UpdateEveryFrame;
+        OriginalScale = configuration.Scale;
+        CustomAttributes = configuration.CustomAttributes;
+        Update = configuration.Update;
+        UpdateFrequency = configuration.UpdateFrequency;
     }
 
     private void SetUp()

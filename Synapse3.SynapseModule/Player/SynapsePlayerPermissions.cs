@@ -252,4 +252,6 @@ public partial class SynapsePlayer
         get => ClassManager.NetworkIntercomMuted;
         set => ClassManager.NetworkIntercomMuted = value;
     }
+
+    public string CustomRemoteAdminBadge { get; set; } = "";
 }

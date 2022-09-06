@@ -89,7 +89,8 @@ public class SynapseGenerator : StructureSyncSynapseObject
 
         OriginalScale = configuration.Scale;
         CustomAttributes = configuration.CustomAttributes;
-        UpdateEveryFrame = configuration.UpdateEveryFrame;
+        Update = configuration.Update;
+        UpdateFrequency = configuration.UpdateFrequency;
     }
     private void SetUp()
     {
