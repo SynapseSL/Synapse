@@ -1,9 +1,11 @@
 ﻿using System;
 using HarmonyLib;
 using Interactables.Interobjects;
+using MEC;
 using Mirror;
 using Neuron.Core.Logging;
 using PlayerStatsSystem;
+using Respawning.NamingRules;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Objects;
@@ -120,4 +122,101 @@ internal static class WrapperPatches
             return true;
         }
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.SerializeSyncVars))]
+    public static bool OnSerializeClassManager(CharacterClassManager __instance, out  bool __result, NetworkWriter writer,
+        bool forceAll)
+    {
+        __result = false;
+        try
+        {
+            var player = __instance.GetSynapsePlayer();
+            if (player == null || player.VisibleRole == RoleType.None) return true;
+            if (!forceAll && (__instance.syncVarDirtyBits & 8ul) == 0ul) return true;
+
+            if (forceAll)
+            {
+                writer.WriteString(__instance.Pastebin);
+                writer.WriteBoolean(__instance.IntercomMuted);
+                writer.WriteBoolean(__instance.NoclipEnabled);
+                writer.WriteSByte((sbyte)player.VisibleRole);
+                writer.WriteByte(__instance.CurSpawnableTeamType);
+                writer.WriteString(__instance.CurUnitName);
+                writer.WriteBoolean(__instance.RoundStarted);
+                writer.WriteBoolean(__instance.IsVerified);
+                writer.WriteString(__instance.SyncedUserId);
+                __result = true;
+                return false;
+            }
+
+            writer.WriteUInt64(__instance.syncVarDirtyBits);
+            
+            if ((__instance.syncVarDirtyBits & 1UL) != 0UL)
+            {
+                writer.WriteString(__instance.Pastebin);
+                __result = true;
+            }
+            if ((__instance.syncVarDirtyBits & 2UL) != 0UL)
+            {
+                writer.WriteBoolean(__instance.IntercomMuted);
+                __result = true;
+            }
+            if ((__instance.syncVarDirtyBits & 4UL) != 0UL)
+            {
+                writer.WriteBoolean(__instance.NoclipEnabled);
+                __result = true;
+            }
+            if ((__instance.syncVarDirtyBits & 8UL) != 0UL)
+            {
+                GeneratedNetworkCode._Write_RoleType(writer, player.VisibleRole);
+                __result = true;
+            }
+            if ((__instance.syncVarDirtyBits & 16UL) != 0UL)
+            {
+                writer.WriteByte(__instance.CurSpawnableTeamType);
+                __result = true;
+            }
+            if ((__instance.syncVarDirtyBits & 32UL) != 0UL)
+            {
+                writer.WriteString(__instance.CurUnitName);
+                __result = true;
+            }
+            if ((__instance.syncVarDirtyBits & 64UL) != 0UL)
+            {
+                writer.WriteBoolean(__instance.RoundStarted);
+                __result = true;
+            }
+            if ((__instance.syncVarDirtyBits & 128UL) != 0UL)
+            {
+                writer.WriteBoolean(__instance.IsVerified);
+                __result = true;
+            }
+            if ((__instance.syncVarDirtyBits & 256UL) != 0UL)
+            {
+                writer.WriteString(__instance.SyncedUserId);
+                __result = true;
+            }
+            
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 API: Serialize ClassManager failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.SetClassIDAdv))]
+    public static void RefreshVisibleRole(CharacterClassManager __instance)
+    {
+        var player = __instance.GetSynapsePlayer();
+        if (player.VisibleRole != RoleType.None)
+            Timing.CallDelayed(0.2f, () => player.ChangeOneOwnVisibleRole(player.RoleType));
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(UnitNamingManager), nameof(UnitNamingManager.GenerateDefaults))]
+    public static bool OnGenerateDefaults() => false;
 }

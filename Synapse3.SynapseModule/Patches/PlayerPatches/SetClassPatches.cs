@@ -10,6 +10,7 @@ using PlayerStatsSystem;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map;
+using Synapse3.SynapseModule.Teams.Unit;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Patches.PlayerPatches;
@@ -67,6 +68,11 @@ internal static class SetClassPatches
                     ev.Items.Add((uint)itemType);
                 }
             }
+
+            var unitInfo = Synapse.Get<UnitService>()
+                .GetPlayerUnit(player, player.CustomRole?.Attribute?.Id ?? (uint)classid);
+            ev.UnitId = unitInfo.UnitId;
+            ev.Unit = unitInfo.UnitName;
 
             Synapse.Get<PlayerEvents>().SetClass.Raise(ev);
 
@@ -216,5 +222,107 @@ internal static class SetClassPatches
             NeuronLogger.For<Synapse>().Error("Sy3 Event: PlayerSetClass(Effects) Patch failed\n" + ex);
             return true;
         }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.ApplyProperties))]
+    public static bool OnApplyProperties(CharacterClassManager __instance, ref bool lite, bool escape)
+    {
+        try
+        {
+            var player = __instance.GetSynapsePlayer();
+            if (player != null)
+                lite = player.LiteRoleSet;
+            
+            var curRole = __instance.CurRole;
+            if (!__instance._wasAnytimeAlive && __instance.CurClass != RoleType.Spectator &&
+                __instance.CurClass != RoleType.None)
+            {
+                __instance._wasAnytimeAlive = true;
+            }
+
+            __instance.InitSCPs();
+            __instance.AliveTime = 0f;
+            var team = curRole.team;
+            if (team - Team.RSC <= 1)
+            {
+                __instance.EscapeStartTime = (int)Time.realtimeSinceStartup;
+            }
+
+            try
+            {
+                __instance._hub.footstepSync.SetLoudness(curRole.team, curRole.roleId.Is939());
+            }
+            catch
+            {
+                // ignored
+            }
+            
+            if (!lite)
+            {
+                if (player?.setClassStored != null)
+                {
+                    __instance.NetworkCurUnitName = player.setClassStored.Unit;
+                    __instance.NetworkCurSpawnableTeamType = player.setClassStored.UnitId;
+                }
+                else if (player != null)
+                {
+                    var defaultUnit = Synapse.Get<UnitService>().GetPlayerUnit(player, player.RoleID);
+                    __instance.NetworkCurUnitName = defaultUnit.UnitName;
+                    __instance.NetworkCurSpawnableTeamType = defaultUnit.UnitId;
+                }
+                else
+                {
+                    __instance.NetworkCurUnitName = "";
+                    __instance.NetworkCurSpawnableTeamType = 0;
+                }   
+            }
+
+            if (curRole.team != Team.RIP)
+            {
+                if (!lite)
+                {
+                    Vector3 constantRespawnPoint = NonFacilityCompatibility.currentSceneSettings.constantRespawnPoint;
+                    if (constantRespawnPoint != Vector3.zero)
+                    {
+                        __instance._pms.OnPlayerClassChange(constantRespawnPoint, null);
+                        __instance._pms.IsAFK = true;
+                    }
+                    else
+                    {
+                        GameObject randomPosition = SpawnpointManager.GetRandomPosition(__instance.CurClass);
+                        if (randomPosition != null)
+                        {
+                            __instance._pms.OnPlayerClassChange(randomPosition.transform.position,
+                                new PlayerMovementSync.PlayerRotation?(new PlayerMovementSync.PlayerRotation(
+                                    new float?(0f), new float?(randomPosition.transform.rotation.eulerAngles.y))));
+                            __instance._pms.IsAFK = true;
+                        }
+                        else
+                        {
+                            __instance._pms.OnPlayerClassChange(__instance.DeathPosition, null);
+                        }
+                    }
+
+                    if (!__instance.SpawnProtected && CharacterClassManager.EnableSP &&
+                        CharacterClassManager.SProtectedTeam.Contains((int)curRole.team))
+                    {
+                        __instance.GodMode = true;
+                        __instance.SpawnProtected = true;
+                        __instance.ProtectedTime = Time.time;
+                    }
+                }
+            }
+
+            __instance.Scp0492.iAm049_2 = __instance.CurClass == RoleType.Scp0492;
+            __instance.Scp106.iAm106 = __instance.CurClass == RoleType.Scp106;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: PlayerSetClass(Apply) Patch failed\n" + ex);
+            return true;
+        }
+
+        return false;
     }
 }

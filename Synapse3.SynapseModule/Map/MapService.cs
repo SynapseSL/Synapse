@@ -34,14 +34,12 @@ public class MapService : Service
     {
         _round.Waiting.Subscribe(LoadObjects);
         _round.Restart.Subscribe(ClearObjects);
-        _player.Join.Subscribe(OnJoin);
     }
 
     public override void Disable()
     {
         _round.Waiting.Unsubscribe(LoadObjects);
         _round.Restart.Unsubscribe(ClearObjects);
-        _player.Join.Unsubscribe(OnJoin);
     }
 
     //Schematic Objects
@@ -154,15 +152,6 @@ public class MapService : Service
     {
         _synapseTeslas.Clear();
         _synapseCameras.Clear();
-    }
-
-    private void OnJoin(JoinEvent ev)
-    {
-        foreach (var synapseObject in _synapseObjects)
-        {
-            if (synapseObject is IJoinUpdate { NeedsJoinUpdate: true } joinUpdate)
-                joinUpdate.Refresh(ev.Player);
-        }
     }
 
     public DoorType GetDoorByName(string doorName)

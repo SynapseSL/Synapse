@@ -55,5 +55,7 @@ public partial class SynapsePlayer : MonoBehaviour
         _config = Synapse.Get<SynapseConfigService>();
         _dataBase = Synapse.Get<DataBaseService>();
         _mirror = Synapse.Get<MirrorService>();
+
+        CustomInfo = new CustomInfoList(this, _player, _mirror, _playerEvents);
     }
 }

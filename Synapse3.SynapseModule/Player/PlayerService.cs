@@ -16,6 +16,8 @@ public class PlayerService : Service
     private DummyService _dummy;
     private PlayerEvents _player;
 
+    public List<IJoinUpdate> JoinUpdates { get; } = new();
+
     public PlayerService(DummyService dummy, PlayerEvents player)
     {
         _dummy = dummy;
@@ -25,11 +27,13 @@ public class PlayerService : Service
     public override void Enable()
     {
         _player.Update.Subscribe(PlayerUpdate);
+        _player.Join.Subscribe(Join);
     }
 
     public override void Disable()
     {
         _player.Update.Unsubscribe(PlayerUpdate);
+        _player.Join.Unsubscribe(Join);
     }
 
     private void PlayerUpdate(UpdateEvent ev)
@@ -285,5 +289,14 @@ public class PlayerService : Service
         }
 
         return players.Count > 0;
+    }
+
+    private void Join(JoinEvent ev)
+    {
+        foreach (var joinUpdate in JoinUpdates)
+        {
+            if (joinUpdate.NeedsJoinUpdate)
+                joinUpdate.UpdatePlayer(ev.Player);
+        }
     }
 }

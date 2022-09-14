@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using Mirror;
 using Neuron.Core.Meta;
+using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule;
 
@@ -66,5 +69,30 @@ public class MirrorService : Service
         writer.Reset();
         NetworkWriterPool.Recycle(writer);
         return msg;
+    }
+
+    /// <summary>
+    /// Returns a SpawnMessage for an NetworkObject that can be modified
+    /// </summary>
+    public SpawnMessage GetSpawnMessage(NetworkIdentity identity)
+    {
+        var writer = NetworkWriterPool.GetWriter();
+        var writer2 = NetworkWriterPool.GetWriter();
+        var payload = NetworkServer.CreateSpawnMessagePayload(false, identity, writer, writer2);
+        NetworkWriterPool.Recycle(writer);
+        NetworkWriterPool.Recycle(writer2);
+        var gameObject = identity.gameObject;
+        return new SpawnMessage
+        {
+            netId = identity.netId,
+            isLocalPlayer = false,
+            isOwner = false,
+            sceneId = identity.sceneId,
+            assetId = identity.assetId,
+            position = gameObject.transform.position,
+            rotation = gameObject.transform.rotation,
+            scale = gameObject.transform.localScale,
+            payload = payload
+        };
     }
 }

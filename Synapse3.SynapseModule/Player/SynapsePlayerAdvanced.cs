@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Mirror;
 using Neuron.Core.Logging;
 using Neuron.Modules.Configs.Localization;
@@ -27,7 +28,7 @@ public partial class SynapsePlayer
         so.Position = (transform1 = transform).TransformPoint(offset);
         so.GameObject.transform.parent = transform1;
     }
-    
+
     public ItemInventory Inventory { get; }
 
     public BroadcastList ActiveBroadcasts { get; }
@@ -51,5 +52,37 @@ public partial class SynapsePlayer
         language.AddRange(Synapse.Get<SynapseConfigService>().HostingConfiguration.Language);
         
         return translation.WithLocale(language.ToArray());
+    }
+
+    public void ChangeOneOwnVisibleRole(RoleType role) => SendNetworkMessage(_mirror.GetCustomVarMessage(ClassManager,
+        writer =>
+        {
+            writer.WriteUInt64(8ul); //This is the id that is assigned to the Role inside the ClassManager
+            writer.WriteSByte((sbyte)role);
+        }));
+
+    internal RoleType _visibleRole = RoleType.None;
+
+    public RoleType VisibleRole
+    {
+        get => _visibleRole;
+        set
+        {
+            if (_visibleRole == value) return;
+            
+            var msg = _mirror.GetCustomVarMessage(ClassManager, writer =>
+            {
+                writer.WriteUInt64(8ul);
+                writer.WriteSByte((sbyte)(value == RoleType.None ? RoleType : value));
+            });
+
+            foreach (var player in _player.Players)
+            {
+                if(player == this) continue;
+                player.SendNetworkMessage(msg);
+            }
+
+            _visibleRole = value;
+        }
     }
 }

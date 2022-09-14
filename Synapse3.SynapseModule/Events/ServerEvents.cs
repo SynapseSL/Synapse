@@ -13,6 +13,7 @@ public class ServerEvents : Service
 
     public readonly EventReactor<ReloadEvent> Reload = new();
     public readonly EventReactor<PreAuthenticationEvent> PreAuthentication = new();
+    public readonly EventReactor<StopServerEvent> StopServer = new();
 
     public ServerEvents(EventManager eventManager)
     {
@@ -60,3 +61,5 @@ public class PreAuthenticationEvent : IEvent
         _request.RejectForce(data);
     }
 }
+
+public class StopServerEvent : IEvent { }

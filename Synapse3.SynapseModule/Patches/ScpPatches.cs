@@ -422,27 +422,27 @@ internal static class ScpPatches
 
 internal static class DecoratedScpPatches
 {
-    public static void Scp079BulkPatch(Scp079PlayerScript script, Command079 command, string args,
+    public static bool Scp079BulkPatch(Scp079PlayerScript script, Command079 command, string args,
         GameObject gameObject)
     {
-        if (!script._interactRateLimit.CanExecute() || !script.iAm079) return;
+        if (!script._interactRateLimit.CanExecute() || !script.iAm079) return false;
         Console.AddDebugLog("SCP079", "Command received from a client: " + command, MessageImportance.LessImportant);
         script.RefreshCurrentRoom();
-        if (!script.CheckInteractableLegitness(script.CurrentRoom, gameObject, true)) return;
+        if (!script.CheckInteractableLegitness(script.CurrentRoom, gameObject, true)) return false;
         var player = script.GetSynapsePlayer();
-        if (player == null) return;
+        if (player == null) return false;
         
         switch (command)
         {
             case Command079.Door:
-                if(AlphaWarheadController.Host.inProgress) return;
-                if(gameObject == null || !gameObject.TryGetComponent<DoorVariant>(out var doorVariant)) return;
+                if(AlphaWarheadController.Host.inProgress) return false;
+                if(gameObject == null || !gameObject.TryGetComponent<DoorVariant>(out var doorVariant)) return false;
 
                 var door = doorVariant.GetSynapseDoor();
-                if (door == null) return;
+                if (door == null) return false;
                 
                 var blacklistedDoors = ConfigFile.ServerConfig.GetStringList("scp079_door_blacklist") ?? new List<string>();
-                if (blacklistedDoors.Contains(door.Name)) return;
+                if (blacklistedDoors.Contains(door.Name)) return false;
                 var permission = doorVariant.RequiredPermissions.RequiredPermissions.ToString();
                 var mana = script.GetManaFromLabel("Door Interaction " + permission.Split(',')[0], script.abilities);
 
@@ -452,43 +452,43 @@ internal static class DecoratedScpPatches
                 if (ev.Energy > script._curMana)
                 {
                     script.RpcNotEnoughMana(mana, script._curMana);
-                    return;
+                    return false;
                 }
 
-                if (!ev.Allow) return;
+                if (!ev.Allow) return false;
 
                 var state = doorVariant.TargetState;
                 doorVariant.ServerInteract(player, 0);
-                if (state == doorVariant.TargetState) return;
+                if (state == doorVariant.TargetState) return false;
                 
                 script.Mana -= ev.Energy;
                 script.AddInteractionToHistory(gameObject, true);
-                return;
+                return false;
             
             case Command079.Doorlock:
-                if(AlphaWarheadController.Host.inProgress) return;
-                if(gameObject == null || !gameObject.TryGetComponent(out doorVariant)) return;
+                if(AlphaWarheadController.Host.inProgress) return false;
+                if(gameObject == null || !gameObject.TryGetComponent(out doorVariant)) return false;
 
                 door = doorVariant.GetSynapseDoor();
-                if (door == null) return;
+                if (door == null) return false;
                 
                 blacklistedDoors = ConfigFile.ServerConfig.GetStringList("scp079_door_blacklist") ?? new List<string>();
-                if (blacklistedDoors.Contains(door.Name)) return;
+                if (blacklistedDoors.Contains(door.Name)) return false;
 
                 var mode = DoorLockUtils.GetMode((DoorLockReason)doorVariant.ActiveLocks);
                 if (!mode.HasFlagFast(DoorLockMode.CanOpen) && !mode.HasFlagFast(DoorLockMode.CanClose) &&
-                    !mode.HasFlagFast(DoorLockMode.ScpOverride)) return;
+                    !mode.HasFlagFast(DoorLockMode.ScpOverride)) return false;
 
                 var ev2 = new Scp079LockDoorEvent(player, door,
                     ((DoorLockReason)doorVariant.ActiveLocks).HasFlag(DoorLockReason.Regular079),
                     script.GetManaFromLabel("Door Lock Minimum", script.abilities));
                 Synapse.Get<ScpEvents>().Scp079LockDoor.Raise(ev2);
                 
-                if (!ev2.Allow) return;
+                if (!ev2.Allow) return false;
                 
                 if (ev2.Unlock)
                 {
-                    if (!script.lockedDoors.Contains(doorVariant.netId)) return;
+                    if (!script.lockedDoors.Contains(doorVariant.netId)) return false;
                     script.lockedDoors.Remove(doorVariant.netId);
                     doorVariant.ServerChangeLock(DoorLockReason.Regular079, false);
                 }
@@ -497,7 +497,7 @@ internal static class DecoratedScpPatches
                     if (ev2.Energy > script.Mana)
                     {
                         script.RpcNotEnoughMana(ev2.Energy, script._curMana);
-                        return;
+                        return false;
                     }
 
                     if (!script.lockedDoors.Contains(doorVariant.netId))
@@ -507,7 +507,43 @@ internal static class DecoratedScpPatches
                     script.AddInteractionToHistory(doorVariant.gameObject, true);
                     script.Mana -= ev2.Energy;
                 }
-                return;
+                return false;
+            
+            case Command079.Speaker:
+                var speakerName = script.CurrentRoom.transform.parent.name + "/" + script.CurrentRoom.name +
+                              "/Scp079Speaker";
+                mana = script.GetManaFromLabel("Speaker Start", script.abilities);
+                var ev3 = new Scp079StartSpeakerEvent(player, mana, speakerName);
+                Synapse.Get<ScpEvents>().Scp079StartSpeaker.Raise(ev3);
+                var speaker = GameObject.Find(speakerName);
+                if(speaker == null) return false;
+                
+                if (!ev3.Allow) return false;
+
+                if (ev3.Energy > script._curMana)
+                {
+                    script.RpcNotEnoughMana(ev3.Energy, script._curMana);
+                    return false;
+                }
+
+                script.Mana -= ev3.Energy;
+                script.Speaker = speakerName;
+                script.AddInteractionToHistory(speaker, true);
+                return false;
+            
+            case Command079.StopSpeaker:
+                var ev4 = new Scp079StopSpeakerEvent(player, script.Speaker);
+                Synapse.Get<ScpEvents>().Scp079StopSpeaker.Raise(ev4);
+                if(!ev4.Allow) return false;
+                script.Speaker = string.Empty;
+                return false;
+            
+            //TODO: Add the other 079 Events
+            
+            default:
+                NeuronLogger.For<Synapse>().Warn(command);
+                script._interactRateLimit._usages--;
+                return true;
         }
     }
     

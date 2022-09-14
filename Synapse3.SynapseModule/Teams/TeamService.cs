@@ -9,6 +9,7 @@ using Respawning.NamingRules;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
+using Synapse3.SynapseModule.Teams.Unit;
 
 namespace Synapse3.SynapseModule.Teams;
 
@@ -17,11 +18,13 @@ public class TeamService : Service
     private readonly List<ISynapseTeam> _teams = new();
     private readonly IKernel _kernel;
     private readonly Synapse _synapseModule;
+    private readonly UnitService _unit;
 
-    public TeamService(IKernel kernel,Synapse synapseModule)
+    public TeamService(IKernel kernel, Synapse synapseModule, UnitService unit)
     {
         _kernel = kernel;
         _synapseModule = synapseModule;
+        _unit = unit;
     }
 
     public override void Enable()
@@ -217,6 +220,8 @@ public class TeamService : Service
         {
             RespawnTickets.Singleton.IsFirstWave = false;
         }
+
+        var unitName = _unit.PrepareSpawnNewUnit(_unit.GetUnitIdFromTeamId(NextTeam), players);
             
         switch (NextTeam)
         {
@@ -230,12 +235,10 @@ public class TeamService : Service
 
                 RespawnTickets.Singleton.GrantTickets((SpawnableTeamType)NextTeam,
                     -players.Count * handlerBase.TicketRespawnCost);
-
-                var unit = "";
+                
                 if (UnitNamingRules.TryGetNamingRule((SpawnableTeamType)NextTeam, out var naming))
                 {
-                    naming.GenerateNew((SpawnableTeamType)NextTeam, out unit);
-                    naming.PlayEntranceAnnouncement(unit);
+                    naming.PlayEntranceAnnouncement(unitName);
                 }
 
                 foreach (var player in players)
@@ -244,12 +247,6 @@ public class TeamService : Service
                     player.RemoveCustomRole(DespawnReason.API);
                     player.ClassManager.SetPlayersClass(role, player.gameObject,
                         CharacterClassManager.SpawnReason.Respawn);
-                    
-                    if (unit != "")
-                    {
-                        player.ClassManager.NetworkCurSpawnableTeamType = (byte)NextTeam;
-                        player.ClassManager.NetworkCurUnitName = unit;
-                    }
                 }
 
                 RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.UponRespawn,

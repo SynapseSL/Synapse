@@ -10,6 +10,8 @@ using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
+using Synapse3.SynapseModule.Role;
+using Synapse3.SynapseModule.Teams.Unit;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -127,11 +129,6 @@ public class DebugService : Service
             });
     }
 
-    public override void Disable()
-    {
-        _player.KeyPress.Unsubscribe(OnKeyPress);
-    }
-
     private void ScpEvent(ScpAttackEvent ev)
     {
         NeuronLogger.For<Synapse>().Warn($"{ev.ScpAttackType} {ev.Damage} {ev.Scp.NickName} {ev.Victim.NickName}");
@@ -168,72 +165,12 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                
-                var msg2 = Synapse.Get<MirrorService>().GetCustomVarMessage(ev.Player.ClassManager, writer =>
-                {
-                    writer.WriteUInt64(8ul); //8 is the "ID" of the role sync var
-                    GeneratedNetworkCode._Write_RoleType(writer, RoleType.ClassD);
-                });
+                Synapse.Get<RoleService>().RegisterRole<TestRole>();
+                break;
 
-                ev.Player.SendNetworkMessage(msg2);
-                break;
-            
-            case KeyCode.Alpha2:
-                ev.Player.PlaceBlood(ev.Player.Position);
-                break;
-            
             case KeyCode.Alpha3:
-                ev.Player.DimScreen();
+                ev.Player.CustomInfo.Add("Mtf", _player => _player.TeamID != (uint)Team.MTF);
                 break;
-            
-            case KeyCode.Alpha4:
-                RespawnManager.Singleton.NamingManager.AllUnitNames.Add(new SyncUnit()
-                {
-                    SpawnableTeam = (byte)SpawnableTeamType.NineTailedFox,
-                    UnitName = "Unit-Custom"
-                });
-                
-                RespawnManager.Singleton.NamingManager.AllUnitNames.Add(new SyncUnit()
-                {
-                    SpawnableTeam = (byte)SpawnableTeamType.ChaosInsurgency,
-                    UnitName = "CHAOS!"
-                });
-                
-                RespawnManager.Singleton.NamingManager.AllUnitNames.Add(new SyncUnit()
-                {
-                    SpawnableTeam = (byte)SpawnableTeamType.None,
-                    UnitName = "None"
-                });
-                
-                RespawnManager.Singleton.NamingManager.AllUnitNames.Add(new SyncUnit()
-                {
-                    SpawnableTeam = 3,
-                    UnitName = "Custom"
-                });
-
-                UnitNamingManager.RolesWithEnforcedDefaultName[RoleType.ChaosConscript] =
-                    SpawnableTeamType.ChaosInsurgency;
-                UnitNamingManager.RolesWithEnforcedDefaultName[RoleType.ChaosMarauder] =
-                    SpawnableTeamType.ChaosInsurgency;
-                UnitNamingManager.RolesWithEnforcedDefaultName[RoleType.ChaosRepressor] =
-                    SpawnableTeamType.ChaosInsurgency;
-                UnitNamingManager.RolesWithEnforcedDefaultName[RoleType.ChaosRifleman] =
-                    SpawnableTeamType.ChaosInsurgency;
-                UnitNamingManager.RolesWithEnforcedDefaultName[RoleType.Scientist] = (SpawnableTeamType)3;
-                break;
-            
-            case KeyCode.Alpha5:
-                Timing.RunCoroutine(Flicker(ev.Player));
-                break;
-        }
-    }
-
-    private IEnumerator<float> Flicker(SynapsePlayer player)
-    {
-        for (;;)
-        {
-            player.DimScreen();
-            yield return Timing.WaitForSeconds(Random.Range(0.2f, 1.5f));
         }
     }
 }

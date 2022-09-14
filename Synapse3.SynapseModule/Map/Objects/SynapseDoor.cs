@@ -12,6 +12,9 @@ namespace Synapse3.SynapseModule.Map.Objects;
 
 public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
 {
+    private readonly MirrorService _mirror;
+    private readonly PlayerService _player;
+    
     public static Dictionary<SpawnableDoorType, BreakableDoor> Prefab { get; } = new();
 
     public DoorVariant Variant { get; }
@@ -130,14 +133,19 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
     public override string ToString() => Name;
 
 
-    public SynapseDoor(SpawnableDoorType type, Vector3 position, Quaternion rotation, Vector3 scale)
+    private SynapseDoor()
+    {
+        _mirror = Synapse.Get<MirrorService>();
+        _player = Synapse.Get<PlayerService>();
+    }
+    public SynapseDoor(SpawnableDoorType type, Vector3 position, Quaternion rotation, Vector3 scale) : this()
     {
         Variant = CreateDoor(type, position, rotation, scale);
         NeedsJoinUpdate = true;
         SetUp(type);
     }
     
-    internal SynapseDoor(DoorVariant variant)
+    internal SynapseDoor(DoorVariant variant) : this()
     {
         Variant = variant;
         SetUp(SpawnableDoorType.None);
@@ -171,6 +179,8 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
             _name = nametag.GetName;
         
         DoorType = Map.GetDoorByName(Name);
+
+        _player.JoinUpdates.Add(this);
     }
     
     private DoorVariant CreateDoor(SpawnableDoorType type, Vector3 position, Quaternion rotation, Vector3 scale)
@@ -179,11 +189,11 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
     }
 
     public bool NeedsJoinUpdate { get; }
-    public void Refresh(SynapsePlayer player)
+    public void UpdatePlayer(SynapsePlayer player)
     {
-        player.SendNetworkMessage(NetworkIdentity.GetSpawnMessage());
+        player.SendNetworkMessage(_mirror.GetSpawnMessage(NetworkIdentity));
     }
-    
+
     public enum SpawnableDoorType
     {
         None,

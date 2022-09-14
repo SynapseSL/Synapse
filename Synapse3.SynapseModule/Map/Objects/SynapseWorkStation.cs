@@ -9,6 +9,9 @@ namespace Synapse3.SynapseModule.Map.Objects;
 
 public class SynapseWorkStation : NetworkSynapseObject, IJoinUpdate
 {
+    private readonly MirrorService _mirror;
+    private readonly PlayerService _player;
+    
     public static WorkstationController Prefab { get; internal set; }
     
     public WorkstationController WorkstationController { get; }
@@ -37,13 +40,18 @@ public class SynapseWorkStation : NetworkSynapseObject, IJoinUpdate
         set => WorkstationController.NetworkStatus = (byte)value;
     }
 
-    public SynapseWorkStation(Vector3 position, Quaternion rotation, Vector3 scale)
+    private SynapseWorkStation()
+    {
+        _mirror = Synapse.Get<MirrorService>();
+        _player = Synapse.Get<PlayerService>();
+    }
+    public SynapseWorkStation(Vector3 position, Quaternion rotation, Vector3 scale) : this()
     {
         WorkstationController = CreateNetworkObject(Prefab, position, rotation, scale);
         NeedsJoinUpdate = true;
         SetUp();
     }
-    internal SynapseWorkStation(WorkstationController station)
+    internal SynapseWorkStation(WorkstationController station) : this()
     {
         WorkstationController = station;
         SetUp();
@@ -66,11 +74,14 @@ public class SynapseWorkStation : NetworkSynapseObject, IJoinUpdate
         Map._synapseWorkStations.Add(this);
         var comp = GameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
+
+        _player.JoinUpdates.Add(this);
     }
 
     public bool NeedsJoinUpdate { get; }
-    public void Refresh(SynapsePlayer player)
+
+    public void UpdatePlayer(SynapsePlayer player)
     {
-        player.SendNetworkMessage(NetworkIdentity.GetSpawnMessage());
+        player.SendNetworkMessage(_mirror.GetSpawnMessage(NetworkIdentity));
     }
 }

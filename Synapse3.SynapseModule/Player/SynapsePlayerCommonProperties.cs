@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using InventorySystem.Disarming;
+using Mirror;
 using Mirror.LiteNetLib4Mirror;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule.Enums;
@@ -26,11 +27,7 @@ public partial class SynapsePlayer
     /// <summary>
     /// Custom Info that will be displayed below the players name
     /// </summary>
-    public string DisplayInfo
-    {
-        get => NicknameSync._customPlayerInfoString;
-        set => NicknameSync.Network_customPlayerInfoString = value;
-    }
+    public CustomInfoList CustomInfo { get; set; }
     
     /// <summary>
     /// The PlayerID of the Player that the server assigned
@@ -211,6 +208,34 @@ public partial class SynapsePlayer
     {
         get => Hub.fpc.staminaController.StaminaUse * 100;
         set => Hub.fpc.staminaController.StaminaUse = (value / 100);
+    }
+
+    public byte UnitId
+    {
+        get => ClassManager.CurSpawnableTeamType;
+        set
+        {
+            ClassManager.CurSpawnableTeamType = value;
+            SendNetworkMessage(_mirror.GetCustomVarMessage(ClassManager, writer =>
+            {
+                writer.WriteUInt64(16ul);
+                writer.WriteByte(value);
+            }));
+        }
+    }
+
+    public string Unit
+    {
+        get => ClassManager.CurUnitName;
+        set
+        {
+            ClassManager.CurUnitName = value;
+            SendNetworkMessage(_mirror.GetCustomVarMessage(ClassManager, writer =>
+            {
+                writer.WriteUInt64(32ul);
+                writer.WriteString(value);
+            }));
+        }
     }
 
     /// <summary>

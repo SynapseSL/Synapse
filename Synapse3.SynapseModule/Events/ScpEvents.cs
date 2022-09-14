@@ -29,6 +29,8 @@ public class ScpEvents : Service
     public readonly EventReactor<SwitchCameraEvent> SwitchCamera = new();
     public readonly EventReactor<Scp079DoorInteractEvent> Scp079DoorInteract = new();
     public readonly EventReactor<Scp079LockDoorEvent> Scp079LockDoor = new();
+    public readonly EventReactor<Scp079StartSpeakerEvent> Scp079StartSpeaker = new();
+    public readonly EventReactor<Scp079StopSpeakerEvent> Scp079StopSpeaker = new();
 
     public ScpEvents(EventManager eventManager)
     {
@@ -55,6 +57,8 @@ public class ScpEvents : Service
         _eventManager.RegisterEvent(SwitchCamera);
         _eventManager.RegisterEvent(Scp079DoorInteract);
         _eventManager.RegisterEvent(Scp079LockDoor);
+        _eventManager.RegisterEvent(Scp079StartSpeaker);
+        _eventManager.RegisterEvent(Scp079StopSpeaker);
     }
 
     public override void Disable()
@@ -75,6 +79,8 @@ public class ScpEvents : Service
         _eventManager.UnregisterEvent(SwitchCamera);
         _eventManager.UnregisterEvent(Scp079DoorInteract);
         _eventManager.UnregisterEvent(Scp079LockDoor);
+        _eventManager.UnregisterEvent(Scp079StartSpeaker);
+        _eventManager.UnregisterEvent(Scp079StopSpeaker);
     }
 }
 
@@ -318,5 +324,38 @@ public class Scp079LockDoorEvent : IEvent
     
     public float Energy { get; set; }
 
+    public bool Allow { get; set; } = true;
+}
+
+public class Scp079StartSpeakerEvent : IEvent
+{
+    public Scp079StartSpeakerEvent(SynapsePlayer scp079, float energy, string speakerName)
+    {
+        Scp079 = scp079;
+        Energy = energy;
+        SpeakerName = speakerName;
+    }
+
+    public SynapsePlayer Scp079 { get; }
+    
+    public string SpeakerName { get; }
+
+    public float Energy { get; set; }
+
+    public bool Allow { get; set; } = true;
+}
+
+public class Scp079StopSpeakerEvent : IEvent
+{
+    public Scp079StopSpeakerEvent(SynapsePlayer scp079, string speakerName)
+    {
+        Scp079 = scp079;
+        SpeakerName = speakerName;
+    }
+
+    public SynapsePlayer Scp079 { get; }
+
+    public string SpeakerName { get; }
+    
     public bool Allow { get; set; } = true;
 }

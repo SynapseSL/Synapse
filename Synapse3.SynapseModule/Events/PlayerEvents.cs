@@ -45,6 +45,7 @@ public class PlayerEvents : Service
     public readonly EventReactor<WalkOnTantrumEvent> WalkOnTantrum = new();
     public readonly EventReactor<StartWorkStationEvent> StartWorkStation = new();
     public readonly EventReactor<FallingIntoAbyssEvent> FallingIntoAbyss = new();
+    public readonly EventReactor<SimpleSetClassEvent> SimpleSetClass = new();
 
     public PlayerEvents(EventManager eventManager)
     {
@@ -80,9 +81,12 @@ public class PlayerEvents : Service
         _eventManager.RegisterEvent(OpenWarheadButton);
         _eventManager.RegisterEvent(StartWorkStation);
         _eventManager.RegisterEvent(FallingIntoAbyss);
+        _eventManager.RegisterEvent(SimpleSetClass);
 
         WalkOnSinkhole.Subscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Subscribe(WalkOnHazard.Raise);
+        
+        CharacterClassManager.OnClassChanged += CallSimpleSetClass;
     }
 
     public override void Disable()
@@ -114,9 +118,20 @@ public class PlayerEvents : Service
         _eventManager.UnregisterEvent(OpenWarheadButton);
         _eventManager.UnregisterEvent(StartWorkStation);
         _eventManager.UnregisterEvent(FallingIntoAbyss);
+        _eventManager.UnregisterEvent(SimpleSetClass);
         
         WalkOnSinkhole.Unsubscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Unsubscribe(WalkOnHazard.Raise);
+
+        CharacterClassManager.OnClassChanged -= CallSimpleSetClass;
+    }
+
+    private void CallSimpleSetClass(ReferenceHub hub, RoleType previous, RoleType next)
+    {
+        var player = hub.GetSynapsePlayer();
+        if (player == null) return;
+        var ev = new SimpleSetClassEvent(player, previous, next);
+        SimpleSetClass.Raise(ev);
     }
 }
 
@@ -207,6 +222,10 @@ public class SetClassEvent : PlayerInteractEvent
     public PlayerMovementSync.PlayerRotation Rotation { get; set; }
 
     public Dictionary<AmmoType, ushort> Ammo { get; set; } = new();
+
+    public byte UnitId { get; set; } = 0;
+
+    public string Unit { get; set; } = "";
 }
 
 public class UpdateEvent : PlayerEvent
@@ -532,5 +551,18 @@ public class StartWorkStationEvent : PlayerInteractEvent
 public class FallingIntoAbyssEvent : PlayerInteractEvent
 {
     public FallingIntoAbyssEvent(SynapsePlayer player, bool allow) : base(player, allow) { }
+}
+
+public class SimpleSetClassEvent : PlayerEvent
+{
+    public RoleType PreviousRole { get; }
+    
+    public RoleType NextRole { get; }
+
+    public SimpleSetClassEvent(SynapsePlayer player, RoleType previousRole, RoleType nextRole) : base(player)
+    {
+        PreviousRole = previousRole;
+        NextRole = nextRole;
+    }
 }
 

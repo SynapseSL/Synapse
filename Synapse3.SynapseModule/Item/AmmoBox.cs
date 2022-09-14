@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using InventorySystem;
 using Synapse3.SynapseModule.Enums;
@@ -30,6 +31,9 @@ public class AmmoBox
             _player.VanillaInventory.SendAmmoNextFrame = true;
         }
     }
+
+    public ReadOnlyDictionary<AmmoType, ushort> Ammo 
+        => new(_player.VanillaInventory.UserInventory.ReserveAmmo.ToDictionary(x => (AmmoType)x.Key, y => y.Value));
 
     public void SetAllAmmo(ushort amount)
     {

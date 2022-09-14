@@ -1,6 +1,4 @@
-﻿using Synapse3.SynapseModule.Player;
-
-namespace Synapse3.SynapseModule.Map.Schematic;
+﻿namespace Synapse3.SynapseModule.Player;
 
 public interface IJoinUpdate
 {
@@ -9,5 +7,5 @@ public interface IJoinUpdate
     /// <summary>
     /// Updates the Objects
     /// </summary>
-    public void Refresh(SynapsePlayer player);
+    public void UpdatePlayer(SynapsePlayer player);
 }

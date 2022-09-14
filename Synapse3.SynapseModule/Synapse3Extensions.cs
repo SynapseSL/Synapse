@@ -50,32 +50,9 @@ public static class Synapse3Extensions
     /// Updates Position Rotation and Scale of an NetworkObject for all players
     /// </summary>
     public static void UpdatePositionRotationScale(this NetworkIdentity identity)
-        => NetworkServer.SendToAll(GetSpawnMessage(identity));
+        => NetworkServer.SendToAll(Synapse.Get<MirrorService>().GetSpawnMessage(identity));
     
-    /// <summary>
-    /// Returns a Spawnmessage for an NetworkObject that can be modified
-    /// </summary>
-    public static SpawnMessage GetSpawnMessage(this NetworkIdentity identity)
-    {
-        var writer = NetworkWriterPool.GetWriter();
-        var writer2 = NetworkWriterPool.GetWriter();
-        var payload = NetworkServer.CreateSpawnMessagePayload(false, identity, writer, writer2);
-        NetworkWriterPool.Recycle(writer);
-        NetworkWriterPool.Recycle(writer2);
-        var gameObject = identity.gameObject;
-        return new SpawnMessage
-        {
-            netId = identity.netId,
-            isLocalPlayer = false,
-            isOwner = false,
-            sceneId = identity.sceneId,
-            assetId = identity.assetId,
-            position = gameObject.transform.position,
-            rotation = gameObject.transform.rotation,
-            scale = gameObject.transform.localScale,
-            payload = payload
-        };
-    }
+    
 
     /// <summary>
     /// Hides an NetworkObject for a single players
