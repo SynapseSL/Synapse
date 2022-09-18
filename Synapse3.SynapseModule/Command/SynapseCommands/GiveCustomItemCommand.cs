@@ -109,7 +109,7 @@ public class GiveCustomItemCommand : SynapseCommand
             else
             {
                 var item = new SynapseItem(id);
-                item.EquipItem(player, true);
+                item.EquipItem(player, true, true);
             }
         }
 

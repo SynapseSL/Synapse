@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Mirror;
-using Neuron.Core.Logging;
 using Neuron.Modules.Configs.Localization;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Events;
@@ -14,6 +12,8 @@ namespace Synapse3.SynapseModule.Player;
 public partial class SynapsePlayer
 {
     internal SetClassEvent setClassStored;
+    
+    public FakeRoleManager FakeRoleManager { get; }
     
     public SerializedPlayerState State
     {
@@ -54,35 +54,37 @@ public partial class SynapsePlayer
         return translation.WithLocale(language.ToArray());
     }
 
-    public void ChangeOneOwnVisibleRole(RoleType role) => SendNetworkMessage(_mirror.GetCustomVarMessage(ClassManager,
-        writer =>
-        {
-            writer.WriteUInt64(8ul); //This is the id that is assigned to the Role inside the ClassManager
-            writer.WriteSByte((sbyte)role);
-        }));
-
-    internal RoleType _visibleRole = RoleType.None;
-
-    public RoleType VisibleRole
+    private float _walkSpeed;
+    private bool _customWalkSpeed;
+    public float WalkSpeed
     {
-        get => _visibleRole;
+        get => _customWalkSpeed ? _walkSpeed : ServerConfigSynchronizer.Singleton.HumanWalkSpeedMultiplier;
         set
         {
-            if (_visibleRole == value) return;
-            
-            var msg = _mirror.GetCustomVarMessage(ClassManager, writer =>
+            _customWalkSpeed = true;
+            _walkSpeed = value;
+            SendNetworkMessage(_mirror.GetCustomVarMessage(ServerConfigSynchronizer.Singleton, writer =>
             {
-                writer.WriteUInt64(8ul);
-                writer.WriteSByte((sbyte)(value == RoleType.None ? RoleType : value));
-            });
-
-            foreach (var player in _player.Players)
+                writer.WriteUInt64(2ul);
+                writer.WriteSingle(value);
+            }));
+        }
+    }
+    
+    private float _sprintSpeed;
+    private bool _customSprintSpeed;
+    public float SprintSpeed
+    {
+        get => _customSprintSpeed ? _sprintSpeed : ServerConfigSynchronizer.Singleton.HumanSprintSpeedMultiplier;
+        set
+        {
+            _customSprintSpeed = true;
+            _sprintSpeed = value;
+            SendNetworkMessage(_mirror.GetCustomVarMessage(ServerConfigSynchronizer.Singleton, writer =>
             {
-                if(player == this) continue;
-                player.SendNetworkMessage(msg);
-            }
-
-            _visibleRole = value;
+                writer.WriteUInt64(4ul);
+                writer.WriteSingle(value);
+            }));
         }
     }
 }

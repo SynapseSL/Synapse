@@ -109,9 +109,6 @@ internal static class SetClassPatches
             var player = __instance.GetSynapsePlayer();
             var args = player.setClassStored;
 
-            if (player.LiteRoleSet)
-                return false;
-
             //SCP-049-2 Does not use SetPlayersClass therefore args are null for them
             if (args == null)
                 return true;
@@ -135,9 +132,6 @@ internal static class SetClassPatches
             var player = ply.GetSynapsePlayer();
             var args = player?.setClassStored;
 
-            if (player?.LiteRoleSet == true)
-                return false;
-            
             player.Inventory.ClearAllItems();
 
             //This is the case when someone is revived as SCP-049-2 or set to OverWatch
@@ -179,8 +173,6 @@ internal static class SetClassPatches
         try
         {
             var player = __instance.GetSynapsePlayer();
-            if (player.LiteRoleSet)
-                return false;
 
             player.MaxHealth = player.ClassManager.CurRole.maxHP;
             return true;
@@ -193,47 +185,13 @@ internal static class SetClassPatches
     }
 
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(UsableItemsController), nameof(UsableItemsController.ResetPlayerOnRoleChange))]
-    public static bool HandleUsableItems(ReferenceHub ply)
-    {
-        try
-        {
-            if (ply?.GetSynapsePlayer().LiteRoleSet == true) return false;
-            return true;
-        }
-        catch (Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: PlayerSetClass(UsableItem) Patch failed\n" + ex);
-            return true;
-        }
-    }
-    
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(PlayerEffectsController), nameof(PlayerEffectsController.CharacterClassManager_OnClassChanged))]
-    public static bool HandleEffects(ReferenceHub targetHub)
-    {
-        try
-        {
-            if (targetHub?.GetSynapsePlayer().LiteRoleSet == true) return false;
-            return true;
-        }
-        catch (Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: PlayerSetClass(Effects) Patch failed\n" + ex);
-            return true;
-        }
-    }
-
-    [HarmonyPrefix]
     [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.ApplyProperties))]
     public static bool OnApplyProperties(CharacterClassManager __instance, ref bool lite, bool escape)
     {
         try
         {
             var player = __instance.GetSynapsePlayer();
-            if (player != null)
-                lite = player.LiteRoleSet;
-            
+
             var curRole = __instance.CurRole;
             if (!__instance._wasAnytimeAlive && __instance.CurClass != RoleType.Spectator &&
                 __instance.CurClass != RoleType.None)
@@ -258,25 +216,22 @@ internal static class SetClassPatches
                 // ignored
             }
             
-            if (!lite)
+            if (player?.setClassStored != null)
             {
-                if (player?.setClassStored != null)
-                {
-                    __instance.NetworkCurUnitName = player.setClassStored.Unit;
-                    __instance.NetworkCurSpawnableTeamType = player.setClassStored.UnitId;
-                }
-                else if (player != null)
-                {
-                    var defaultUnit = Synapse.Get<UnitService>().GetPlayerUnit(player, player.RoleID);
-                    __instance.NetworkCurUnitName = defaultUnit.UnitName;
-                    __instance.NetworkCurSpawnableTeamType = defaultUnit.UnitId;
-                }
-                else
-                {
-                    __instance.NetworkCurUnitName = "";
-                    __instance.NetworkCurSpawnableTeamType = 0;
-                }   
+                __instance.NetworkCurUnitName = player.setClassStored.Unit;
+                __instance.NetworkCurSpawnableTeamType = player.setClassStored.UnitId;
             }
+            else if (player != null)
+            {
+                var defaultUnit = Synapse.Get<UnitService>().GetPlayerUnit(player, player.RoleID);
+                __instance.NetworkCurUnitName = defaultUnit.UnitName;
+                __instance.NetworkCurSpawnableTeamType = defaultUnit.UnitId;
+            }
+            else
+            {
+                __instance.NetworkCurUnitName = "";
+                __instance.NetworkCurSpawnableTeamType = 0;
+            } 
 
             if (curRole.team != Team.RIP)
             {

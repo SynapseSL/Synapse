@@ -877,7 +877,7 @@ internal static class DecoratedScpPatches
 
                 if (VisionInformation.GetVisionInformation(player, pos, -2f,
                         room?.Zone == FacilityZone.Surface ? 80f : 40f, false, false,
-                        player.LocalCurrentRoomEffects, 0).IsLooking &&
+                        player.LocalCurrentRoomEffects).IsLooking &&
                     (!Physics.Linecast(pos + new Vector3(0f, 1.5f, 0f), player.CameraReference.position,
                         VisionInformation.VisionLayerMask) || !Physics.Linecast(pos + new Vector3(0f, -1f, 0f),
                         player.CameraReference.position, VisionInformation.VisionLayerMask)))

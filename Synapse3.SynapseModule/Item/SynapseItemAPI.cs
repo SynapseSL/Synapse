@@ -17,19 +17,20 @@ namespace Synapse3.SynapseModule.Item;
 
 public partial class SynapseItem
 {
-    public void EquipItem(SynapsePlayer player, bool provideFully = false)
+    public void EquipItem(SynapsePlayer player, bool dropWhenFull = true, bool provideFully = false)
     {
         if(player.RoleType is RoleType.Spectator or RoleType.None) return;
         
         if (player.Inventory.Items.Count >= 8)
         {
-            Drop(player.Position);
+            if (dropWhenFull)
+                Drop(player.Position);
             return;
         }
 
         if (RootParent is SynapseItem parent)
         {
-            parent.EquipItem(player);
+            parent.EquipItem(player, false);
             return;
         }
 

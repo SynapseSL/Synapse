@@ -165,11 +165,15 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                Synapse.Get<RoleService>().RegisterRole<TestRole>();
+                ev.Player.FakeRoleManager.OwnVisibleRole = RoleType.Scp049;
+                break;
+            
+            case KeyCode.Alpha2:
+                ev.Player.FakeRoleManager.VisibleRole = RoleType.Scientist;
                 break;
 
             case KeyCode.Alpha3:
-                ev.Player.CustomInfo.Add("Mtf", _player => _player.TeamID != (uint)Team.MTF);
+                ev.Player.FakeRoleManager.VisibleRoleCondition[x => true] = RoleType.Tutorial;
                 break;
         }
     }

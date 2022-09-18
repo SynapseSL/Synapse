@@ -57,5 +57,6 @@ public partial class SynapsePlayer : MonoBehaviour
         _mirror = Synapse.Get<MirrorService>();
 
         CustomInfo = new CustomInfoList(this, _player, _mirror, _playerEvents);
+        FakeRoleManager = new(this, _mirror, _player);
     }
 }

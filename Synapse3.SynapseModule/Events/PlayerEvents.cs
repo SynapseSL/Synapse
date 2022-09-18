@@ -46,6 +46,7 @@ public class PlayerEvents : Service
     public readonly EventReactor<StartWorkStationEvent> StartWorkStation = new();
     public readonly EventReactor<FallingIntoAbyssEvent> FallingIntoAbyss = new();
     public readonly EventReactor<SimpleSetClassEvent> SimpleSetClass = new();
+    public readonly EventReactor<UpdateDisplayNameEvent> UpdateDisplayName = new();
 
     public PlayerEvents(EventManager eventManager)
     {
@@ -82,6 +83,7 @@ public class PlayerEvents : Service
         _eventManager.RegisterEvent(StartWorkStation);
         _eventManager.RegisterEvent(FallingIntoAbyss);
         _eventManager.RegisterEvent(SimpleSetClass);
+        _eventManager.RegisterEvent(UpdateDisplayName);
 
         WalkOnSinkhole.Subscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Subscribe(WalkOnHazard.Raise);
@@ -119,6 +121,7 @@ public class PlayerEvents : Service
         _eventManager.UnregisterEvent(StartWorkStation);
         _eventManager.UnregisterEvent(FallingIntoAbyss);
         _eventManager.UnregisterEvent(SimpleSetClass);
+        _eventManager.UnregisterEvent(UpdateDisplayName);
         
         WalkOnSinkhole.Unsubscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Unsubscribe(WalkOnHazard.Raise);
@@ -564,5 +567,15 @@ public class SimpleSetClassEvent : PlayerEvent
         PreviousRole = previousRole;
         NextRole = nextRole;
     }
+}
+
+public class UpdateDisplayNameEvent : PlayerEvent
+{
+    public UpdateDisplayNameEvent(SynapsePlayer player, string newDisplayName) : base(player)
+    {
+        NewDisplayName = newDisplayName;
+    }
+    
+    public string NewDisplayName { get; }
 }
 

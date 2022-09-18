@@ -1,6 +1,9 @@
 ﻿using System;
+using CustomPlayerEffects;
 using HarmonyLib;
 using Interactables.Interobjects;
+using InventorySystem.Items;
+using InventorySystem.Items.Armor;
 using MEC;
 using Mirror;
 using Neuron.Core.Logging;
@@ -124,99 +127,106 @@ internal static class WrapperPatches
     }
 
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.SerializeSyncVars))]
-    public static bool OnSerializeClassManager(CharacterClassManager __instance, out  bool __result, NetworkWriter writer,
-        bool forceAll)
+    [HarmonyPatch(typeof(UnitNamingManager), nameof(UnitNamingManager.GenerateDefaults))]
+    public static bool OnGenerateDefaults() => false;
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(FirstPersonController), nameof(FirstPersonController.GetSpeed))]
+    public static bool GetSpeed(FirstPersonController __instance, out float speed)
     {
-        __result = false;
         try
         {
+            speed = 0f;
             var player = __instance.GetSynapsePlayer();
-            if (player == null || player.VisibleRole == RoleType.None) return true;
-            if (!forceAll && (__instance.syncVarDirtyBits & 8ul) == 0ul) return true;
+            if (player == null) return false;
+            __instance.curRole = player.ClassManager.Classes.SafeGet(player.RoleType);
+            var isScp = player.ClassManager.IsAnyScp();
 
-            if (forceAll)
+            if (!__instance.isLocalPlayer)
             {
-                writer.WriteString(__instance.Pastebin);
-                writer.WriteBoolean(__instance.IntercomMuted);
-                writer.WriteBoolean(__instance.NoclipEnabled);
-                writer.WriteSByte((sbyte)player.VisibleRole);
-                writer.WriteByte(__instance.CurSpawnableTeamType);
-                writer.WriteString(__instance.CurUnitName);
-                writer.WriteBoolean(__instance.RoundStarted);
-                writer.WriteBoolean(__instance.IsVerified);
-                writer.WriteString(__instance.SyncedUserId);
-                __result = true;
-                return false;
+                __instance.IsSneaking = player.MovementState == PlayerMovementState.Sneaking && !isScp;
             }
 
-            writer.WriteUInt64(__instance.syncVarDirtyBits);
+            if (!isScp)
+            {
+                speed = __instance.staminaController.AllowMaxSpeed
+                    ? __instance.curRole.runSpeed
+                    : __instance.curRole.walkSpeed;
+                
+                speed *= __instance.staminaController.AllowMaxSpeed ? player.SprintSpeed : player.WalkSpeed;
+            }
+            else
+            {
+                if (player.ScpsController.CurrentScp != null)
+                {
+                    speed = player.ScpsController.CurrentScp.MaxSpeed;
+                }
+                else if(player.RoleType == RoleType.Scp106 && __instance.Slowdown106)
+                {
+                    speed = 1f;
+                }
+            }
+
+            if (__instance.IsSneaking)
+            {
+                speed += 0.4f;
+            }
+
+            foreach (var effect in player.PlayerEffectsController.AllEffects)
+            {
+                if (!effect.Value.IsEnabled || effect.Value is not IMovementSpeedEffect speedEffect) continue;
+                speed = speedEffect.GetMovementSpeed(speed);
+                if (speedEffect.DisableSprint)
+                {
+                    __instance.IsSprinting = false;
+                }
+            }
+
+            if (player.VanillaInventory.TryGetBodyArmor(out var armor))
+            {
+                BodyArmorUtils.GetMovementProperties(player.Team, armor, out var factor, out _);
+                speed += factor;
+            }
+
+            if (player.VanillaInventory.CurInstance is not IMobilityModifyingItem mobilityModifyingItem) return false;
             
-            if ((__instance.syncVarDirtyBits & 1UL) != 0UL)
-            {
-                writer.WriteString(__instance.Pastebin);
-                __result = true;
-            }
-            if ((__instance.syncVarDirtyBits & 2UL) != 0UL)
-            {
-                writer.WriteBoolean(__instance.IntercomMuted);
-                __result = true;
-            }
-            if ((__instance.syncVarDirtyBits & 4UL) != 0UL)
-            {
-                writer.WriteBoolean(__instance.NoclipEnabled);
-                __result = true;
-            }
-            if ((__instance.syncVarDirtyBits & 8UL) != 0UL)
-            {
-                GeneratedNetworkCode._Write_RoleType(writer, player.VisibleRole);
-                __result = true;
-            }
-            if ((__instance.syncVarDirtyBits & 16UL) != 0UL)
-            {
-                writer.WriteByte(__instance.CurSpawnableTeamType);
-                __result = true;
-            }
-            if ((__instance.syncVarDirtyBits & 32UL) != 0UL)
-            {
-                writer.WriteString(__instance.CurUnitName);
-                __result = true;
-            }
-            if ((__instance.syncVarDirtyBits & 64UL) != 0UL)
-            {
-                writer.WriteBoolean(__instance.RoundStarted);
-                __result = true;
-            }
-            if ((__instance.syncVarDirtyBits & 128UL) != 0UL)
-            {
-                writer.WriteBoolean(__instance.IsVerified);
-                __result = true;
-            }
-            if ((__instance.syncVarDirtyBits & 256UL) != 0UL)
-            {
-                writer.WriteString(__instance.SyncedUserId);
-                __result = true;
-            }
-            
+            speed += mobilityModifyingItem.MovementSpeedMultiplier;
+            if (speed > mobilityModifyingItem.MovementSpeedLimiter &&
+                mobilityModifyingItem.MovementSpeedLimiter >= 0f)
+                speed = mobilityModifyingItem.MovementSpeedLimiter;
             return false;
         }
         catch (Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 API: Serialize ClassManager failed\n" + ex);
+            NeuronLogger.For<Synapse>().Error("Sy3 API: GetSpeed failed\n" + ex);
+            speed = 0f;
             return true;
         }
     }
-
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.SetClassIDAdv))]
-    public static void RefreshVisibleRole(CharacterClassManager __instance)
-    {
-        var player = __instance.GetSynapsePlayer();
-        if (player.VisibleRole != RoleType.None)
-            Timing.CallDelayed(0.2f, () => player.ChangeOneOwnVisibleRole(player.RoleType));
-    }
-
+    
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(UnitNamingManager), nameof(UnitNamingManager.GenerateDefaults))]
-    public static bool OnGenerateDefaults() => false;
+    [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.NetworkCurClass), MethodType.Setter)]
+    public static bool OnSetRole(CharacterClassManager __instance, RoleType value)
+    {
+        try
+        {
+            var player = __instance.GetSynapsePlayer();
+            if (player == null) return false;
+            __instance.CurClass = value;
+            player.FakeRoleManager.UpdateAll();
+
+            //This is to check if any Conditions will now be true since the Player changed his Role
+            foreach (var otherPlayer in Synapse.Get<PlayerService>().Players)
+            {
+                if (otherPlayer == player) continue;
+                otherPlayer.FakeRoleManager.UpdatePlayer(player);
+            }
+            return true;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 API: SetRole failed\n" + ex);
+            return true;
+        }
+    }
 }

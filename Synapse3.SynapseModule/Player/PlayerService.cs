@@ -13,29 +13,35 @@ namespace Synapse3.SynapseModule.Player;
 
 public class PlayerService : Service
 {
-    private DummyService _dummy;
-    private PlayerEvents _player;
+    private readonly DummyService _dummy;
+    private readonly PlayerEvents _player;
+    private readonly RoundEvents _round;
 
     public List<IJoinUpdate> JoinUpdates { get; } = new();
 
-    public PlayerService(DummyService dummy, PlayerEvents player)
+    public PlayerService(DummyService dummy, PlayerEvents player, RoundEvents round)
     {
         _dummy = dummy;
         _player = player;
+        _round = round;
     }
 
     public override void Enable()
     {
         _player.Update.Subscribe(PlayerUpdate);
         _player.Join.Subscribe(Join);
+        _round.Restart.Subscribe(ClearJoinUpdates);
     }
 
     public override void Disable()
     {
         _player.Update.Unsubscribe(PlayerUpdate);
         _player.Join.Unsubscribe(Join);
+        _round.Restart.Unsubscribe(ClearJoinUpdates);
     }
 
+    private void ClearJoinUpdates(RoundRestartEvent _) => JoinUpdates.Clear();
+    
     private void PlayerUpdate(UpdateEvent ev)
     {
         if (Vector3.Distance(ev.Player.Position, ev.Player.Escape.worldPosition) < Escape.radius)
@@ -295,6 +301,8 @@ public class PlayerService : Service
     {
         foreach (var joinUpdate in JoinUpdates)
         {
+            if (joinUpdate == null) continue;
+            
             if (joinUpdate.NeedsJoinUpdate)
                 joinUpdate.UpdatePlayer(ev.Player);
         }

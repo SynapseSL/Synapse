@@ -75,7 +75,7 @@ public class SerializedPlayerItem : SerializedItem
         var item = Parse();
 
         if (Random.Range(1f, 100f) <= Chance)
-            item.EquipItem(player, ProvideFully);
+            item.EquipItem(player, true, ProvideFully);
 
         return item;
     }

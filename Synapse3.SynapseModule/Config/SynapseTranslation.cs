@@ -26,4 +26,8 @@ public class SynapseTranslation : Translations<SynapseTranslation>
     public string TranslationCommandNoTranslation { get; set; } = "No Translation was found for you. Type .language {Language here} in your console to set your Language";
     public string TranslationCommandGetTranslation { get; set; } = "Your current Translation is: {0}";
     public string TranslationCommandSetTranslation { get; set; } = "Your Translation is set to: {0}";
+
+    public string LowerRank { get; set; } = "FOLLOW ORDERS";
+    public string SameRank { get; set; } = "SAME RANK";
+    public string HigherRank { get; set; } = "GIVE ORDERS";
 }

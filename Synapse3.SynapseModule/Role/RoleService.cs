@@ -52,8 +52,8 @@ public class RoleService : Service
             var binding = _synapseModule.ModuleRoleBindingQueue.Dequeue();
             LoadBinding(binding);
         }
-        
-        RegisterRole<TestRole>();
+
+        RegisterRole<Test>();
     }
 
     /// <summary>

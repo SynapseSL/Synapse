@@ -65,7 +65,7 @@ internal static class ItemPatches
                 item.DestroyPickup();
             }
             item.Pickup = pickup;
-            item.EquipItem(player);
+            item.EquipItem(player, false);
             __result = item.Item;
         }
         catch (Exception ex)

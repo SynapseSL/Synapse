@@ -454,6 +454,7 @@ internal static class PlayerPatches
             return true;
         }
     }
+    
     [HarmonyPrefix]
     [HarmonyPatch(typeof(CheckpointKiller), nameof(CheckpointKiller.OnTriggerEnter))]
     public static bool OnCheckpointEnter(Collider other)
@@ -467,6 +468,23 @@ internal static class PlayerPatches
         {
             NeuronLogger.For<Synapse>().Error("Sy3 Event: FallingIntoAbyss event failed\n" + ex);
             return true;
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(NicknameSync), nameof(NicknameSync.DisplayName), MethodType.Setter)]
+    public static void SetDisplayName(NicknameSync __instance)
+    {
+        try
+        {
+            var player = __instance.GetSynapsePlayer();
+            if (player == null) return;
+            var ev = new UpdateDisplayNameEvent(player, __instance.DisplayName);
+            Synapse.Get<PlayerEvents>().UpdateDisplayName.Raise(ev);
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Update Display Name event failed\n" + ex);
         }
     }
 }
