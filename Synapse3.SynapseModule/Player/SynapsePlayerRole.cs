@@ -70,7 +70,7 @@ public partial class SynapsePlayer
     {
         get
         {
-            if (CustomRole == null) return RoleType == RoleType.None ? uint.MaxValue : (uint)RoleType;
+            if (CustomRole == null) return RoleType == RoleType.None ? RoleService.NoneRole : (uint)RoleType;
             return CustomRole.Attribute.Id;
         }
         set

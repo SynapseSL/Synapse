@@ -13,6 +13,7 @@ using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
+using Synapse3.SynapseModule.Role;
 using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule.Patches;
@@ -68,12 +69,15 @@ internal static class WrapperPatches
             if (prefab == null || !Object.Instantiate(prefab).TryGetComponent<Ragdoll>(out var ragdoll))
                 return false;
 
-            ragdoll.NetworkInfo = new RagdollInfo(hub, handler, prefab.transform.localPosition,
+            var info = new RagdollInfo(hub, handler, prefab.transform.localPosition,
                 prefab.transform.localRotation);
-            
+
+            ragdoll.SetSyncVar(info, ref ragdoll.Info, 1uL); // I don't use NetworkInfo to not call the patch of the get
+
             NetworkServer.Spawn(ragdoll.gameObject);
 
-            _ = new SynapseRagdoll(ragdoll);
+            _ = new SynapseRagdoll(ragdoll, true);
+
             return false;
         }
         catch (Exception ex)
@@ -204,6 +208,25 @@ internal static class WrapperPatches
         }
     }
     
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Ragdoll), nameof(Ragdoll.NetworkInfo), MethodType.Setter)]
+    public static bool OnSetInfo(Ragdoll __instance, RagdollInfo value)
+    {
+        try
+        {
+            var ragodll = __instance.GetSynapseRagdoll();
+            if (ragodll == null) return false;
+            __instance.Info = value;
+            ragodll.FakeInfoManger.UpdateAll();
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 API: SetRagdollInfo failed\n" + ex);
+            return true;
+        }
+    }
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.NetworkCurClass), MethodType.Setter)]
     public static bool OnSetRole(CharacterClassManager __instance, RoleType value)

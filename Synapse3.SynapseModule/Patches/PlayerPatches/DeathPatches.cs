@@ -32,7 +32,7 @@ internal static class DeathPatches
                 attacker = Synapse.Get<PlayerService>().Players
                     .FirstOrDefault(x => x.ScpController.Scp106.PlayersInPocket.Contains(player));
 
-            var ev = new DeathEvent(player, true, attacker, damageType, damage);
+            var ev = new DeathEvent(player, true, attacker, damageType, damage, null);
             Synapse.Get<PlayerEvents>().Death.Raise(ev);
 
             if (!ev.Allow)
@@ -40,6 +40,9 @@ internal static class DeathPatches
                 player.Health = 1;
                 return false;
             }
+
+            if (ev.DeathMesasge != null)
+                handler = new CustomReasonDamageHandler(ev.DeathMesasge);
 
             player.DeathPosition = player.Position;
             return true;
@@ -54,7 +57,6 @@ internal static class DeathPatches
     [HarmonyPostfix]
     [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.KillPlayer))]
     public static void PostDeath(PlayerStats __instance, bool __runOriginal)
-
     {
         try
         {

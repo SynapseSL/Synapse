@@ -335,11 +335,12 @@ public class DamageEvent : PlayerInteractEvent
 
 public class DeathEvent : PlayerInteractEvent
 {
-    public DeathEvent(SynapsePlayer player, bool allow, SynapsePlayer attacker, DamageType damageType, float lastTakenDamage) : base(player, allow)
+    public DeathEvent(SynapsePlayer player, bool allow, SynapsePlayer attacker, DamageType damageType, float lastTakenDamage, string message) : base(player, allow)
     {
         Attacker = attacker;
         DamageType = damageType;
         LastTakenDamage = lastTakenDamage;
+        DeathMesasge = message;
     }
 
     public SynapsePlayer Attacker { get; }
@@ -347,6 +348,8 @@ public class DeathEvent : PlayerInteractEvent
     public DamageType DamageType { get; }
     
     public float LastTakenDamage { get; }
+
+    public string DeathMesasge { get; set; }
 }
 
 public class FreePlayerEvent : PlayerInteractEvent
