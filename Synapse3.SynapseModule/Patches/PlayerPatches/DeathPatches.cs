@@ -35,6 +35,9 @@ internal static class DeathPatches
             var ev = new DeathEvent(player, true, attacker, damageType, damage, null);
             Synapse.Get<PlayerEvents>().Death.Raise(ev);
 
+            if (ev.DeathMesasge != null)
+                handler = new CustomReasonDamageHandler(ev.DeathMesasge);
+
             if (!ev.Allow)
             {
                 player.Health = 1;
