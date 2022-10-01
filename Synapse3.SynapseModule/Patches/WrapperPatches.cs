@@ -62,8 +62,7 @@ internal static class WrapperPatches
     {
         try
         {
-            if (hub is null) return false;
-
+            if (hub == null) return false;
             var prefab = hub.characterClassManager.CurRole?.model_ragdoll;
 
             if (prefab == null || !Object.Instantiate(prefab).TryGetComponent<Ragdoll>(out var ragdoll))
@@ -71,7 +70,8 @@ internal static class WrapperPatches
 
             var info = new RagdollInfo(hub, handler, prefab.transform.localPosition,
                 prefab.transform.localRotation);
-
+            
+            ragdoll.Info = info;
             ragdoll.SetSyncVar(info, ref ragdoll.Info, 1uL); // I don't use NetworkInfo to not call the patch of the get
 
             NetworkServer.Spawn(ragdoll.gameObject);

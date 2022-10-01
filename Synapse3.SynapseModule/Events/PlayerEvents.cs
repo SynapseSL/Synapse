@@ -340,7 +340,7 @@ public class DeathEvent : PlayerInteractEvent
         Attacker = attacker;
         DamageType = damageType;
         LastTakenDamage = lastTakenDamage;
-        DeathMesasge = message;
+        DeathMessage = message;
     }
 
     public SynapsePlayer Attacker { get; }
@@ -349,7 +349,7 @@ public class DeathEvent : PlayerInteractEvent
     
     public float LastTakenDamage { get; }
 
-    public string DeathMesasge { get; set; }
+    public string DeathMessage { get; set; }
 }
 
 public class FreePlayerEvent : PlayerInteractEvent

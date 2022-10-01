@@ -9,16 +9,14 @@ namespace Synapse3.SynapseModule.Map.Objects;
 
 public class FakeInfoManger<TInfo> : IJoinUpdate
 {
-    private readonly IFakableObjectInfo<TInfo> _fakableObject;
-    private readonly MirrorService _mirror;
+    private readonly IFakeAbleObjectInfo<TInfo> _fakeAbleObject;
     private readonly PlayerService _playerService;
     private readonly TInfo _defaultInfo;
     private readonly Dictionary<SynapsePlayer, TInfo> _sendInfo = new();
 
-    public FakeInfoManger(IFakableObjectInfo<TInfo> fakableObject, MirrorService mirror, PlayerService playerService, TInfo defaultInfo)
+    public FakeInfoManger(IFakeAbleObjectInfo<TInfo> fakeAbleObject, PlayerService playerService, TInfo defaultInfo)
     {
-        _fakableObject = fakableObject;
-        _mirror = mirror;
+        _fakeAbleObject = fakeAbleObject;
         _playerService = playerService;
         _defaultInfo = defaultInfo;
         _playerService.JoinUpdates.Add(this);
@@ -57,7 +55,7 @@ public class FakeInfoManger<TInfo> : IJoinUpdate
             return;
         _sendInfo[player] = info;
 
-        _fakableObject.SendInfo(player, info);
+        _fakeAbleObject.SendInfo(player, info);
     }
 
     public Dictionary<Func<SynapsePlayer, bool>, TInfo> VisibleInfoCondition { get; set; } = new();

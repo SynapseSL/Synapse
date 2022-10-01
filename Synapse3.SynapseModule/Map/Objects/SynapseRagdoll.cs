@@ -12,9 +12,9 @@ using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Objects;
 
-public class SynapseRagdoll : NetworkSynapseObject, IFakableObjectInfo<SynapseRagdoll.Info>
+public class SynapseRagdoll : NetworkSynapseObject, IFakeAbleObjectInfo<SynapseRagdoll.Info>
 {
-    public static Dictionary<RoleType, Ragdoll> Prefabs = new ();
+    public static readonly Dictionary<RoleType, Ragdoll> Prefabs = new ();
 
     private readonly PlayerService _player;
     private readonly MirrorService _mirror;
@@ -48,7 +48,7 @@ public class SynapseRagdoll : NetworkSynapseObject, IFakableObjectInfo<SynapseRa
     public string CustomReason { get; private set; }
     public bool CanBeRevive { get; set; }
     public bool CanBeReviveInTime => Ragdoll.Info.ExistenceTime <= Scp049.ReviveEligibilityDuration;
-    public uint RoleID { get; private set; }
+    public uint RoleID { get; }
     public FakeInfoManger<Info> FakeInfoManger { get; private set; }
     public SynapsePlayer Owner => _player.GetPlayer(Ragdoll.Info.OwnerHub.playerId);
 
@@ -125,7 +125,6 @@ public class SynapseRagdoll : NetworkSynapseObject, IFakableObjectInfo<SynapseRa
         Nick = nick;
         MoveInElevator = true;
         CanBeRevive = true;
-        //Position = Ragdoll.Info.StartPosition;
 
         Info defaultInfo;
         if (damage == DamageType.CustomReason && Ragdoll.Info.Handler is CustomReasonDamageHandler custom)
@@ -138,7 +137,7 @@ public class SynapseRagdoll : NetworkSynapseObject, IFakableObjectInfo<SynapseRa
             CustomReason = string.Empty;
             defaultInfo = new Info(Owner, nick, role, damage);
         }
-        FakeInfoManger = new FakeInfoManger<Info>(this, _mirror, _player, defaultInfo);
+        FakeInfoManger = new FakeInfoManger<Info>(this, _player, defaultInfo);
         FakeInfoManger.UpdateAll();
     }
 
