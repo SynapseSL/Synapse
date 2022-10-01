@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Elevators;
@@ -76,6 +77,14 @@ public class SchematicDestination : DefaultSynapseObject, IElevatorDestination
         get => Schematic.Scale;
         set => Schematic.Scale = value;
     }
+
+    public override void HideFromAll() => Schematic.HideFromAll();
+
+    public override void ShowAll() => Schematic.ShowAll();
+
+    public override void HideFromPlayer(SynapsePlayer player) => Schematic.HideFromPlayer(player);
+
+    public override void ShowPlayer(SynapsePlayer player) => Schematic.ShowPlayer(player);
 
 
     public Vector3 GetWorldPosition(Vector3 localPosition) => Transform.TransformPoint(localPosition);

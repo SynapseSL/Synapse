@@ -409,8 +409,7 @@ internal static class ScpPatches
     {
         try
         {
-            DecoratedScpPatches.Scp079BulkPatch(__instance, command, args, target);
-            return false;
+            return DecoratedScpPatches.Scp079BulkPatch(__instance, command, args, target);
         }
         catch (Exception ex)
         {

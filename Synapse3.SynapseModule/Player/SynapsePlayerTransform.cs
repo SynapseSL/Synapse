@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Mirror;
+﻿using Mirror;
 using Synapse3.SynapseModule.Map.Rooms;
 using UnityEngine;
 

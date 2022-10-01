@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Mirror;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Schematic;
@@ -48,6 +47,38 @@ public class SynapseSchematic : DefaultSynapseObject
         base.OnDestroy();
     }
 
+    public override void HideFromAll()
+    {
+        foreach (var child in _children)
+        {
+            child.HideFromAll();
+        }
+    }
+
+    public override void ShowAll()
+    {
+        foreach (var child in _children)
+        {
+            child.ShowAll();
+        }
+    }
+
+    public override void HideFromPlayer(SynapsePlayer player)
+    {
+        foreach (var child in _children)
+        {
+            child.HideFromPlayer(player);
+        }
+    }
+
+    public override void ShowPlayer(SynapsePlayer player)
+    {
+        foreach (var child in _children)
+        {
+            child.ShowPlayer(player);
+        }
+    }
+
 
     private readonly List<ISynapseObject> _children = new ();
     internal readonly List<SynapsePrimitive> _primitives = new ();
@@ -81,21 +112,6 @@ public class SynapseSchematic : DefaultSynapseObject
 
     public uint ID { get; }
 
-    public void DespawnForOnePlayer(SynapsePlayer player)
-    {
-        foreach (var child in Children)
-        {
-            if (child is NetworkSynapseObject network)
-            {
-                network.NetworkIdentity.UnSpawnForOnePlayer(player);
-            }
-            else if(child.GameObject.TryGetComponent<NetworkIdentity>(out var net))
-            {
-                net.UnSpawnForOnePlayer(player);
-            }
-        }
-    }
-    
     public SynapseSchematic(SchematicConfiguration configuration)
     {
         Name = configuration.Name;

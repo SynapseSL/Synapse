@@ -11,7 +11,7 @@ public class BroadcastList :
     private readonly List<Broadcast> _broadcasts = new();
     
     
-    public BroadcastList(SynapsePlayer player) => _player = player;
+    internal BroadcastList(SynapsePlayer player) => _player = player;
     
     
     public void Add(Broadcast item) => Add(item, false);

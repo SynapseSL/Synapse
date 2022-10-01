@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Enums;

@@ -1,6 +1,7 @@
 ﻿using MEC;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Rooms;
@@ -90,4 +91,12 @@ public abstract class SynapseCustomRoom : DefaultSynapseObject, IRoom
             }
         });
     }
+    
+    public override void HideFromAll() => RoomSchematic.HideFromAll();
+
+    public override void ShowAll() => RoomSchematic.ShowAll();
+
+    public override void HideFromPlayer(SynapsePlayer player) => RoomSchematic.HideFromPlayer(player);
+
+    public override void ShowPlayer(SynapsePlayer player) => RoomSchematic.ShowPlayer(player);
 }

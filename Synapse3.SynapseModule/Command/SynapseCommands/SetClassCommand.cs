@@ -48,7 +48,7 @@ public class SetClassCommand : SynapseCommand
 
         foreach (var player in players)
         {
-            player.RemoveCustomRole(DespawnReason.ForceClass);
+            player.RemoveCustomRole(DeSpawnReason.ForceClass);
 
             if (id is >= 0 and <= 17)
                 player.RoleType = (RoleType)id;

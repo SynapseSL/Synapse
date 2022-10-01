@@ -1,4 +1,5 @@
 ﻿using Mirror;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Schematic;
@@ -48,4 +49,12 @@ public abstract class NetworkSynapseObject :  DefaultSynapseObject, IRefreshable
         NetworkServer.Spawn(gameObject.gameObject);
         return gameObject;
     }
+
+    public override void HideFromAll() => NetworkIdentity.UnSpawnForAllPlayers();
+
+    public override void ShowAll() => Refresh();
+
+    public override void HideFromPlayer(SynapsePlayer player) => NetworkIdentity.UnSpawnForOnePlayer(player);
+
+    public override void ShowPlayer(SynapsePlayer player) => NetworkIdentity.SpawnForOnePlayer(player);
 }

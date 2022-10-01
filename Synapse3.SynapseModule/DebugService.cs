@@ -1,17 +1,11 @@
-﻿using System.Collections.Generic;
-using InventorySystem.Items.MicroHID;
-using MEC;
+﻿using InventorySystem.Items.MicroHID;
 using Mirror;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
-using Respawning;
-using Respawning.NamingRules;
+using PlayerStatsSystem;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Player;
-using Synapse3.SynapseModule.Role;
-using Synapse3.SynapseModule.Teams.Unit;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -159,21 +153,66 @@ public class DebugService : Service
     {
         NeuronLogger.For<Synapse>().Warn("SpawnTeam: " + ev.TeamId);
     }
-
+    
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                ev.Player.FakeRoleManager.OwnVisibleRole = RoleType.Scp049;
+                //SyncObjects are currently only used for Effects/Units/Scp-079 locked doors and some server configs
+                //All of them are syncLists
+                ev.Player.SendNetworkMessage(Synapse.Get<MirrorService>().GetCustomVarMessage(
+                    ev.Player.PlayerEffectsController,
+                    writer =>
+                    {
+                        writer.WriteUInt64(1); //Which SyncObject will be updated
+                        
+                        //SyncList Specific
+                        writer.WriteUInt32(1); //The amount of changes
+                        writer.WriteByte((byte)SyncList<byte>.Operation.OP_SET);
+                        writer.WriteUInt32(18); //effect id/index (Invisible)
+                        writer.Write<byte>(1); // Intensity
+                    }, false));
                 break;
             
             case KeyCode.Alpha2:
-                ev.Player.FakeRoleManager.VisibleRole = RoleType.Scientist;
+                ev.Player.SendFakeEffectIntensity(Effect.Invisible);
+                break;
+            
+            case KeyCode.Alpha3:
+                ev.Player.SendNetworkMessage(Synapse.Get<MirrorService>().GetCustomVarMessage(
+                    ServerConfigSynchronizer.Singleton,
+                    writer =>
+                    {
+                        writer.WriteUInt64(4); //Which SyncObject will be updated in this case 1 2 or 4 or a combination of those
+                        
+                        //SyncList Specific
+                        writer.WriteUInt32(1); //The amount of changes
+                        writer.WriteByte((byte)SyncList<byte>.Operation.OP_ADD);
+                        writer.Write(new ServerConfigSynchronizer.PredefinedBanTemplate()
+                        {
+                            Duration = 1,
+                            Reason = "test",
+                            DurationNice = "test duration"
+                        });
+                    }, false));
+                break;
+            
+            case KeyCode.Alpha4:
+                ev.Player.SendNetworkMessage(new SyncedStatMessages.StatMessage()
+                {
+                    NetId = ev.Player.NetworkIdentity.netId,
+                    SyncedValue = 15,
+                    SyncId = 2
+                });
                 break;
 
-            case KeyCode.Alpha3:
-                ev.Player.FakeRoleManager.VisibleRoleCondition[x => true] = RoleType.Tutorial;
+            case KeyCode.Alpha9:
+                for (int i = 0; i < ev.Player.PlayerEffectsController._allEffects.Length; i++)
+                {
+                    var effect = ev.Player.PlayerEffectsController._allEffects[i];
+                    Logger.Warn(i + " - " + effect.GetType());
+                }
                 break;
         }
     }

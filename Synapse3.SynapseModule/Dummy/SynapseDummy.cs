@@ -260,4 +260,13 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
             }
         }
     }
+    
+    public override void HideFromAll() => DeSpawn();
+
+    public override void ShowAll() => Spawn();
+
+    //TODO:
+    public override void HideFromPlayer(SynapsePlayer player) { }
+
+    public override void ShowPlayer(SynapsePlayer player) { }
 }

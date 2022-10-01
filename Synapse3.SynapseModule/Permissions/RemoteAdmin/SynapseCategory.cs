@@ -29,7 +29,7 @@ public class SynapseCategory : RemoteAdminCategory
         synapseInfo += "\n\n<size=15>Created by Dimenzio, Helight, Wholesome & Flo";
 
         if (secondPage)
-            synapseInfo += " (and maybe UselessJavaDev MineTech)";
+            synapseInfo += " (and maybe UselessJavaDev MineTech13)";
                     
         synapseInfo += "</color>";
                     

@@ -4,7 +4,6 @@ using HarmonyLib;
 using Interactables.Interobjects;
 using InventorySystem.Items;
 using InventorySystem.Items.Armor;
-using MEC;
 using Mirror;
 using Neuron.Core.Logging;
 using PlayerStatsSystem;
@@ -214,13 +213,6 @@ internal static class WrapperPatches
             if (player == null) return false;
             __instance.CurClass = value;
             player.FakeRoleManager.UpdateAll();
-
-            //This is to check if any Conditions will now be true since the Player changed his Role
-            foreach (var otherPlayer in Synapse.Get<PlayerService>().Players)
-            {
-                if (otherPlayer == player) continue;
-                otherPlayer.FakeRoleManager.UpdatePlayer(player);
-            }
             return true;
         }
         catch (Exception ex)

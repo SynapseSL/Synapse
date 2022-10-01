@@ -15,7 +15,7 @@ public abstract class SynapseRole : ISynapseRole
             if(_player == value)
                 return;
 
-            _player?.RemoveCustomRole(DespawnReason.API);
+            _player?.RemoveCustomRole(DeSpawnReason.API);
 
             _player = value;
         }
@@ -30,5 +30,5 @@ public abstract class SynapseRole : ISynapseRole
 
     public virtual void TryEscape() { }
     public abstract void SpawnPlayer(bool spawnLite);
-    public virtual void DeSpawn(DespawnReason reason) { }
+    public virtual void DeSpawn(DeSpawnReason reason) { }
 }

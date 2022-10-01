@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Schematic;
@@ -68,4 +69,12 @@ public interface ISynapseObject
     /// Method which is executed before the Object is destroyed. Don't call it manually
     /// </summary>
     public void OnDestroy();
+
+    public void HideFromAll();
+
+    public void ShowAll();
+    
+    public void HideFromPlayer(SynapsePlayer player);
+
+    public void ShowPlayer(SynapsePlayer player);
 }

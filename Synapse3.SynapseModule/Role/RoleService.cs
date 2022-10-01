@@ -52,8 +52,6 @@ public class RoleService : Service
             var binding = _synapseModule.ModuleRoleBindingQueue.Dequeue();
             LoadBinding(binding);
         }
-
-        RegisterRole<Test>();
     }
 
     /// <summary>
@@ -178,7 +176,7 @@ public class RoleService : Service
             var player = _player.GetPlayer(result);
             if (player == null) continue;
 
-            player.RemoveCustomRole(kill? DespawnReason.Death : DespawnReason.ForceClass);
+            player.RemoveCustomRole(kill? DeSpawnReason.Death : DeSpawnReason.ForceClass);
         }
     }
 }

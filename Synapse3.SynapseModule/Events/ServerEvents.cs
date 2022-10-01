@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using LiteNetLib;
+﻿using LiteNetLib;
 using LiteNetLib.Utils;
 using Neuron.Core.Events;
 using Neuron.Core.Meta;
-using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Events;
 
