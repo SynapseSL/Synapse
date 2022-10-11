@@ -42,8 +42,8 @@ internal static class DeathPatches
                 return false;
             }
             
-            if (ev.DeathMesasge != null)
-                handler = new CustomReasonDamageHandler(ev.DeathMesasge);
+            if (ev.DeathMessage != null)
+                handler = new CustomReasonDamageHandler(ev.DeathMessage);
 
             player.DeathPosition = player.Position;
 
