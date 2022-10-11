@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using HarmonyLib;
+using InventorySystem;
 using MEC;
 using Neuron.Core.Logging;
 using PlayerStatsSystem;
@@ -18,7 +19,7 @@ internal static class DeathPatches
 {
     [HarmonyPrefix]
     [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.KillPlayer))]
-    public static bool PreDeath(PlayerStats __instance, DamageHandlerBase handler)
+    public static bool PreDeath(PlayerStats __instance, ref DamageHandlerBase handler)
     {
         try
         {
@@ -45,6 +46,7 @@ internal static class DeathPatches
                 handler = new CustomReasonDamageHandler(ev.DeathMesasge);
 
             player.DeathPosition = player.Position;
+
             return true;
         }
         catch (Exception ex)
@@ -56,7 +58,7 @@ internal static class DeathPatches
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.KillPlayer))]
-    public static void PostDeath(PlayerStats __instance, bool __runOriginal)
+    public static void PostDeath(PlayerStats __instance, DamageHandlerBase handler/*to remove it after*/, bool __runOriginal)
     {
         try
         {

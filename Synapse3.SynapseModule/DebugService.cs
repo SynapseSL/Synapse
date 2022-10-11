@@ -28,6 +28,11 @@ public class DebugService : Service
     private ServerEvents _server;
     private SynapseCommandService _commandService;
 
+    /// <summary>
+    /// Remove it after the test
+    /// </summary>
+    public static bool DebugDeathMessage { get; set; } = false;
+
     public DebugService(PlayerEvents player, MapEvents map, RoundEvents round, ItemEvents item, ScpEvents scp,
         SynapseCommandService commandService, ServerEvents server)
     {
@@ -77,7 +82,9 @@ public class DebugService : Service
 
         _player.Death.Subscribe(ev =>
         {
-            NeuronLogger.For<Synapse>().Warn($"{ev.Player.NickName} {ev.DamageType} {ev.LastTakenDamage}");
+            if (DebugDeathMessage)
+                ev.DeathMesasge = "AMONGUS SUS VERY SUS DEATH";
+            NeuronLogger.For<Synapse>().Warn($"{ev.Player.NickName} {ev.DamageType} {ev.LastTakenDamage} {ev.DeathMesasge ?? "NONE"}");
         });
         
         _player.WalkOnHazard.Subscribe(ev =>
@@ -131,7 +138,7 @@ public class DebugService : Service
 
     private void ScpEvent(ScpAttackEvent ev)
     {
-        NeuronLogger.For<Synapse>().Warn($"{ev.ScpAttackType} {ev.Damage} {ev.Scp.NickName} {ev.Victim.NickName}");
+        NeuronLogger.For<Synapse>().Warn($"{ev.ScpAttackType} {ev.Damage} {ev.Scp.NickName} | {ev.Victim.NickName}");
         //ev.Allow = false;
     }
     

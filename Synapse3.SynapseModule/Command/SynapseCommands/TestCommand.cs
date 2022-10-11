@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Neuron.Modules.Commands;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Command.SynapseCommands;
@@ -21,7 +23,27 @@ public class TestCommand : SynapseCommand
     {
         result.Response = "Test";
 
-        var config = new SchematicConfiguration
+        DebugService.DebugDeathMessage = true;
+
+        context.Player.Kill();
+        context.Player.RoleType = RoleType.FacilityGuard;
+
+        //whait death (not a good work but it is for a fast test)
+        MEC.Timing.CallDelayed(2f, () =>
+        {
+            var map = Synapse.Get<Synapse3.SynapseModule.Map.MapService>();
+            var newrag = map.SynapseRagdolls.Last();
+            context.Player.Position = newrag.Position + Vector3.up * 2;
+
+            //check death reason
+            MEC.Timing.CallDelayed(5f, () =>
+            {
+                newrag.VisibleInfoCondition.Add((SynapsePlayer player) => true, new SynapseRagdoll.Info("YES IT WORK !"));
+                newrag.UpdateInfo();
+            });
+        });
+
+        /*var config = new SchematicConfiguration
         {
             Items = new List<SchematicConfiguration.ItemConfiguration>
             {
@@ -144,6 +166,6 @@ public class TestCommand : SynapseCommand
             Id = 61,
             Name = "test"
         };
-        var schematic = Synapse.Get<SchematicService>().SpawnSchematic(config, context.Player.Position);
+        var schematic = Synapse.Get<SchematicService>().SpawnSchematic(config, context.Player.Position);*/
     }
 }

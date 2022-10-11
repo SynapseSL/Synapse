@@ -12,23 +12,19 @@ using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Objects;
 
-public class SynapseRagdoll : NetworkSynapseObject, IFakableObjectInfo<SynapseRagdoll.Info>
+public class SynapseRagdoll : NetworkSynapseObject, IJoinUpdate
 {
     public static Dictionary<RoleType, Ragdoll> Prefabs = new ();
 
     private readonly PlayerService _player;
     private readonly MirrorService _mirror;
+    private readonly Dictionary<SynapsePlayer, DamageHandlerBase> _sendInfo = new();
 
     public Vector3 OriginalRagdollScale { get; private set; }
     public Ragdoll Ragdoll { get; }
     public override GameObject GameObject => Ragdoll.gameObject;
     public override ObjectType Type => ObjectType.Ragdoll;
     public override NetworkIdentity NetworkIdentity => Ragdoll.netIdentity;
-    public override void Refresh()
-    {
-        FakeInfoManger.UpdateAll();
-        base.Refresh();
-    }
     public override void OnDestroy()
     {
         Map._synapseRagdolls.Remove(this);
@@ -49,8 +45,10 @@ public class SynapseRagdoll : NetworkSynapseObject, IFakableObjectInfo<SynapseRa
     public bool CanBeRevive { get; set; }
     public bool CanBeReviveInTime => Ragdoll.Info.ExistenceTime <= Scp049.ReviveEligibilityDuration;
     public uint RoleID { get; private set; }
-    public FakeInfoManger<Info> FakeInfoManger { get; private set; }
     public SynapsePlayer Owner => _player.GetPlayer(Ragdoll.Info.OwnerHub.playerId);
+    public Dictionary<Func<SynapsePlayer, bool>, Info> VisibleInfoCondition { get; set; } = new();
+
+    public bool NeedsJoinUpdate => throw new NotImplementedException();
 
     public SynapseRagdoll(RoleType role, string reason, Vector3 pos, Quaternion rot, Vector3 scale,
         string nick, SynapsePlayer player = null, bool canBeRevive = false, uint roleID = RoleService.NoneRole) : this()
@@ -127,19 +125,11 @@ public class SynapseRagdoll : NetworkSynapseObject, IFakableObjectInfo<SynapseRa
         CanBeRevive = true;
         //Position = Ragdoll.Info.StartPosition;
 
-        Info defaultInfo;
         if (damage == DamageType.CustomReason && Ragdoll.Info.Handler is CustomReasonDamageHandler custom)
-        {
             CustomReason = custom._deathReason;
-            defaultInfo = new Info(Owner, nick, role, custom._deathReason);
-        }
         else
-        {
             CustomReason = string.Empty;
-            defaultInfo = new Info(Owner, nick, role, damage);
-        }
-        FakeInfoManger = new FakeInfoManger<Info>(this, _mirror, _player, defaultInfo);
-        FakeInfoManger.UpdateAll();
+        
     }
 
     private Ragdoll CreateRagdoll(RoleType role, DamageType damage, Vector3 pos, Quaternion rot, Vector3 scale,
@@ -182,14 +172,49 @@ public class SynapseRagdoll : NetworkSynapseObject, IFakableObjectInfo<SynapseRa
         return currentScale;
     }
 
-    public void SendInfo(SynapsePlayer player, Info info)
+    public void UpdateInfo()
     {
-        DamageHandlerBase damageHandler = info.IsCustomReason ? 
-            new CustomReasonDamageHandler(info.CustomDeathReason) :
-            info.DamageType.GetUniversalDamageHandler();
+        foreach (var player in _player.Players)
+            UpdateInfoPlayer(player);
+    }
 
-        var ragdollInfo = new RagdollInfo(info.Owner, damageHandler, info.RoleType, 
-            Position, Rotation, info.Nick, Ragdoll.Info.CreationTime);
+    public void UpdatePlayer(SynapsePlayer player) => UpdateInfoPlayer(player);
+
+    private void UpdateInfoPlayer(SynapsePlayer player)
+    {
+        var vanilaInfo = Ragdoll.Info;
+        var damgHandler = vanilaInfo.Handler;
+
+        foreach (var condition in VisibleInfoCondition)
+        {
+            if (condition.Key.Invoke(player))
+            {
+                var info = condition.Value;
+                damgHandler = condition.Value.DamageType == DamageType.CustomReason ?
+                    new CustomReasonDamageHandler(info.CustomInfo) :
+                    info.DamageType.GetUniversalDamageHandler();
+                break;
+            }
+        }
+
+        //This will prevent to send unnecessary packages from being send
+        if (!_sendInfo.ContainsKey(player)) _sendInfo.Add(player, default);
+        else if (_sendInfo[player] == damgHandler) return;
+        _sendInfo[player] = damgHandler;
+
+        RagdollInfo ragdollInfo;
+
+        // When you resend a RagdollInfo to the player owner of the ragdoll, the client thinks it just died and fades to black
+        /*            if (vanilaInfo.OwnerHub == player) 
+                    {
+                        ragdollInfo = new RagdollInfo(_player.Host, damgHandler, vanilaInfo.RoleType,
+                            vanilaInfo.StartPosition, vanilaInfo.StartRotation, vanilaInfo.Nickname, Ragdoll.Info.CreationTime);
+                    }
+                    else*/
+        {
+            ragdollInfo = new RagdollInfo(vanilaInfo.OwnerHub, damgHandler, vanilaInfo.RoleType,
+               vanilaInfo.StartPosition, vanilaInfo.StartRotation, vanilaInfo.Nickname, Ragdoll.Info.CreationTime);
+        }
 
         player.SendNetworkMessage(_mirror.GetCustomVarMessage(Ragdoll, writer =>
         {
@@ -200,58 +225,21 @@ public class SynapseRagdoll : NetworkSynapseObject, IFakableObjectInfo<SynapseRa
 
     public struct Info
     {
-        public RoleType RoleType { get; set; }
-        public SynapsePlayer Owner { get; set; }
-        public string Nick { get; set; }
-        public DamageType DamageType { get; set; }
-        public bool IsCustomReason => DamageType == DamageType.CustomReason;
-
-        private string _customDeathReason;
-        public string CustomDeathReason 
-        { 
-            get => IsCustomReason ? _customDeathReason : String.Empty;
-            set => _customDeathReason = value; 
-        }
-
-        public Info(SynapsePlayer owner, string nick, RoleType roleType, string deathReason)
+        public Info(string reason)
         {
-            RoleType = roleType;
-            Owner = owner;
-            Nick = nick;
+            CustomInfo = reason;
             DamageType = DamageType.CustomReason;
-            _customDeathReason = deathReason;
         }
 
-        public Info(SynapsePlayer owner, string nick, RoleType roleType, DamageType deathReason)
+        public Info(DamageType reason)
         {
-            RoleType = roleType;
-            Owner = owner;
-            Nick = nick;
-            DamageType = deathReason;
-            _customDeathReason = String.Empty;
+            CustomInfo = string.Empty;
+            DamageType = reason;
         }
 
-        public override bool Equals(object obj)
-        {
-            if (object.ReferenceEquals(this, obj)) return true;
+        public string CustomInfo { get; set; }
 
-            if (obj is not Info info) return false;
-
-            return RoleType == info.RoleType && Owner == info.Owner && Nick == info.Nick &&
-                DamageType == info.DamageType && CustomDeathReason == info.CustomDeathReason;
-        }
-
-        public override int GetHashCode()
-        {
-            int hashCode = -990623893;
-            hashCode = hashCode * -1521134295 + RoleType.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<SynapsePlayer>.Default.GetHashCode(Owner);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Nick);
-            hashCode = hashCode * -1521134295 + DamageType.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(CustomDeathReason);
-            return hashCode;
-        }
-
+        public DamageType DamageType { get; set; }
     }
 
 }

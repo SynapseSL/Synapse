@@ -217,7 +217,7 @@ internal static class WrapperPatches
             var ragodll = __instance.GetSynapseRagdoll();
             if (ragodll == null) return false;
             __instance.Info = value;
-            ragodll.FakeInfoManger.UpdateAll();
+            ragodll.UpdateInfo();
             return false;
         }
         catch (Exception ex)
