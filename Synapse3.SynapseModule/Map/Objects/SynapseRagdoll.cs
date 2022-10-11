@@ -48,7 +48,7 @@ public class SynapseRagdoll : NetworkSynapseObject, IJoinUpdate
     public SynapsePlayer Owner => _player.GetPlayer(Ragdoll.Info.OwnerHub.playerId);
     public Dictionary<Func<SynapsePlayer, bool>, Info> VisibleInfoCondition { get; set; } = new();
 
-    public bool NeedsJoinUpdate => throw new NotImplementedException();
+    public bool NeedsJoinUpdate => VisibleInfoCondition.Count != 0;
 
     public SynapseRagdoll(RoleType role, string reason, Vector3 pos, Quaternion rot, Vector3 scale,
         string nick, SynapsePlayer player = null, bool canBeRevive = false, uint roleID = RoleService.NoneRole) : this()
@@ -98,6 +98,7 @@ public class SynapseRagdoll : NetworkSynapseObject, IJoinUpdate
     {
         _player = Synapse.Get<PlayerService>();
         _mirror = Synapse.Get<MirrorService>();
+        _player.JoinUpdates.Add(this);
     }
 
     internal SynapseRagdoll(SchematicConfiguration.RagdollConfiguration configuration,
