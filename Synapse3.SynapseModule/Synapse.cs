@@ -1,6 +1,9 @@
-﻿using CommandSystem.Commands.Shared;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using CommandSystem.Commands.Shared;
 using GameCore;
 using Neuron.Core;
+using Neuron.Core.Events;
 using Neuron.Core.Meta;
 using Neuron.Core.Modules;
 using Neuron.Core.Plugins;
@@ -34,6 +37,10 @@ namespace Synapse3.SynapseModule;
 )]
 public partial class Synapse : Module
 {
+    private readonly List<Listener> _listeners = new();
+
+    public ReadOnlyCollection<Listener> Listeners => _listeners.AsReadOnly();
+
     [Inject]
     public PatcherService Patcher { get; set; }
     
@@ -51,7 +58,6 @@ public partial class Synapse : Module
     public ItemService ItemService { get; private set; }
     public RoomService RoomService { get; private set; }
     public DataBaseService DataBaseService { get; private set; }
-    
     public RemoteAdminCategoryService RemoteAdminCategoryService { get; private set; }
 
     public override void Load(IKernel kernel)
@@ -86,6 +92,13 @@ public partial class Synapse : Module
         RoomService = _kernel.GetSafe<RoomService>();
         RemoteAdminCategoryService = _kernel.GetSafe<RemoteAdminCategoryService>();
         DataBaseService = _kernel.GetSafe<DataBaseService>();
+        
+        //EventHandlers are the only Bindings that are loaded during the Enable Method of Synapse to ensure that the EventServices are all enabled
+        while (ModuleListenerBindingQueue.Count > 0)
+        {
+            var info = ModuleListenerBindingQueue.Dequeue();
+            _listeners.Add(GetEventHandler(info.ListenerType));
+        }
         
         Logger.Info("Synapse3 enabled!");
     }

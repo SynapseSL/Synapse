@@ -536,7 +536,7 @@ internal static class DecoratedScpPatches
                 if(!ev4.Allow) return false;
                 script.Speaker = string.Empty;
                 return false;
-            
+
             //TODO: Add the other 079 Events
             
             default:
@@ -777,11 +777,13 @@ internal static class DecoratedScpPatches
 
         if (!Physics.Raycast(new Ray(script.transform.position, -script.transform.up), out var raycast, 10f,
                 script.teleportPlacementMask)) return;
-        
+
         var ev = new CreatePortalEvent(scp, raycast.point - Vector3.up);
         Synapse.Get<ScpEvents>().CreatePortal.Raise(ev);
         if (ev.Allow)
+        {
             script.SetPortalPosition(Vector3.zero, ev.Position);
+        }
     }
     
     public static bool Contain106(PlayerInteract interact)

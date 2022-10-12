@@ -15,5 +15,5 @@ public class HostingConfiguration : IDocumentSection
     public bool NameTracking { get; set; } = true;
 
     [Description("A List of Languages that should be used as Server Language. Recommended: Your language first and then English")]
-    public string[] Language { get; set; } = new[] { "ENGLISH" };
+    public string[] Language { get; set; } = { "ENGLISH" };
 }

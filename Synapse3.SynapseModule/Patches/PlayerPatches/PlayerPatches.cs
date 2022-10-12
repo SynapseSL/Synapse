@@ -515,7 +515,8 @@ internal static class DecoratedPlayerPatches
     {
         if (!playerInteract.CanInteract || elevator == null) return;
         var player = playerInteract.GetSynapsePlayer();
-        var lift = elevator.GetComponent<Lift>()?.GetSynapseElevator();
+        var vanillaLift = elevator.GetComponent<Lift>();
+        var lift = vanillaLift?.GetSynapseElevator();
         if (player == null || lift == null) return;
 
         foreach (var destination in lift.Destinations)
@@ -525,9 +526,8 @@ internal static class DecoratedPlayerPatches
             var ev = new CallVanillaElevatorEvent(player, true, (SynapseElevator)lift, (VanillaDestination)destination);
             Synapse.Get<PlayerEvents>().CallVanillaElevator.Raise(ev);
             if (!ev.Allow) continue;
-            
-            lift.MoveToDestination((uint)lift.Destinations.IndexOf(destination));
-            playerInteract.OnInteract();
+
+            vanillaLift.UseLift();
         }
     }
     

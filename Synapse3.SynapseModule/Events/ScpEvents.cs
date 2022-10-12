@@ -231,8 +231,8 @@ public class CreatePortalEvent : IEvent
     public SynapsePlayer Scp106 { get; }
     
     public Vector3 Position { get; set; }
-    
-    public bool Allow { get; set; }
+
+    public bool Allow { get; set; } = true;
 }
 
 public class LeavePocketEvent : PlayerEvent

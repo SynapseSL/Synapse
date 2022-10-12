@@ -92,8 +92,8 @@ internal static class WrapperPatches
             if (!__instance.operative || AlphaWarheadController.Host.timeToDetonation == 0f ||
                 __instance._locked) return false;
 
-            __instance.GetSynapseElevator().MoveToNext();
             __instance.operative = false;
+            __instance.GetSynapseElevator().MoveToNext();
             __result = true;
             return false;
         }
@@ -137,6 +137,8 @@ internal static class WrapperPatches
         {
             speed = 0f;
             var player = __instance.GetSynapsePlayer();
+            //Scp's can't use the Speed config anyways so to prevent false anti cheat set backs we execute the original method
+            if (player.ClassManager.IsAnyScp()) return true;
             if (player == null) return false;
             __instance.curRole = player.ClassManager.Classes.SafeGet(player.RoleType);
             var isScp = player.ClassManager.IsAnyScp();

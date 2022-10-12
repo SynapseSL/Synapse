@@ -1,15 +1,4 @@
-﻿using InventorySystem.Items.MicroHID;
-using Mirror;
-using Neuron.Core.Logging;
-using Neuron.Core.Meta;
-using PlayerStatsSystem;
-using Synapse3.SynapseModule.Command;
-using Synapse3.SynapseModule.Enums;
-using Synapse3.SynapseModule.Events;
-using UnityEngine;
-using Random = UnityEngine.Random;
-
-namespace Synapse3.SynapseModule;
+﻿namespace Synapse3.SynapseModule;
 
 #if DEBUG
 public class DebugService : Service
@@ -159,20 +148,6 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                //SyncObjects are currently only used for Effects/Units/Scp-079 locked doors and some server configs
-                //All of them are syncLists
-                ev.Player.SendNetworkMessage(Synapse.Get<MirrorService>().GetCustomVarMessage(
-                    ev.Player.PlayerEffectsController,
-                    writer =>
-                    {
-                        writer.WriteUInt64(1); //Which SyncObject will be updated
-                        
-                        //SyncList Specific
-                        writer.WriteUInt32(1); //The amount of changes
-                        writer.WriteByte((byte)SyncList<byte>.Operation.OP_SET);
-                        writer.WriteUInt32(18); //effect id/index (Invisible)
-                        writer.Write<byte>(1); // Intensity
-                    }, false));
                 break;
             
             case KeyCode.Alpha2:

@@ -1,4 +1,7 @@
 ﻿using Neuron.Core.Dev;
+using Neuron.Core.Events;
+using Neuron.Core.Logging;
+using Neuron.Core.Meta;
 using Neuron.Core.Plugins;
 using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Enums;
@@ -14,7 +17,6 @@ namespace Synapse3.ExamplePlugin;
 )]
 public class ExamplePlugin : ReloadablePlugin<ExampleConfig, ExampleTranslations>
 {
-    public ExampleEventHandler EventHandler { get; set; }
     public ElevatorEventHandler ElevatorHandler { get; set; }
     public RoomEventHandler RoomHandler { get; set; }
 
@@ -24,27 +26,36 @@ public class ExamplePlugin : ReloadablePlugin<ExampleConfig, ExampleTranslations
         Logger.Info(Translation.Get().EnableMessage);
             
         //Get and Bind ensures that you can always get the same instance everywhere, although it is not used and Synapse.Get would be enough for this case
-        EventHandler = Synapse.GetAndBind<ExampleEventHandler>();
         ElevatorHandler = Synapse.GetAndBind<ElevatorEventHandler>();
         RoomHandler = Synapse.GetAndBind<RoomEventHandler>();
     }
 }
 
-public class ExampleEventHandler
+[Automatic]
+public class ExampleEventHandler : Listener
 {
     private readonly ExamplePlugin _pluginClass;
 
-    public ExampleEventHandler(ItemEvents itemEvents, ExamplePlugin pluginClass)
+    public ExampleEventHandler(ExamplePlugin pluginClass)
     {
         _pluginClass = pluginClass;
-            
-        itemEvents.ConsumeItem.Subscribe(Consume);
     }
 
-    private void Consume(ConsumeItemEvent ev)
+    [EventHandler]
+    public void StartRound(RoundStartEvent ev)
     {
+        NeuronLogger.For<ExamplePlugin>().Warn("START ROUND");
+    }
+
+    [EventHandler]
+    public void Consume(ConsumeItemEvent ev)
+    {
+        NeuronLogger.For<ExamplePlugin>().Warn("Consume " + ev.State);
         if (ev.State == ItemInteractState.Finalize)
+        {
+            NeuronLogger.For<ExamplePlugin>().Warn("Consume Finalize");
             ev.Player.SendBroadcast(
                 _pluginClass.Translation.Get(ev.Player).ConsumeItemMessage.Format(ev.Item.Name), 5);
+        }
     }
 }

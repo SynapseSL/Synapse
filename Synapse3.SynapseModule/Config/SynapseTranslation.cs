@@ -33,4 +33,5 @@ public class SynapseTranslation : Translations<SynapseTranslation>
 
     public string CommandHelp { get; set; } = "All Available Vanilla Commands:";
     public string CommandHelpSecond { get; set; } = "All Available Synapse Commands:";
+    public string CommandNotFound { get; set; } = "No command with that name was found";
 }

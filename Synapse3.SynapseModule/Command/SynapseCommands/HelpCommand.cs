@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Command;
@@ -57,7 +58,26 @@ public class HelpCommand : SynapseCommand
 
             if (context.Arguments.Length > 0 && !string.IsNullOrWhiteSpace(context.Arguments.First()))
             {
-                //Single Command Info
+                foreach (var command in commandlist)
+                {
+                    if (!string.Equals(command.Meta.CommandName, context.Arguments[0],
+                            StringComparison.OrdinalIgnoreCase)) continue;
+
+                    result.Response = GenerateCustomCommandInfo(command, context.Platform, context.Player);
+                    return;
+                }
+
+                foreach (var command in vanilla)
+                {
+                    if (!string.Equals(command.Command, context.Arguments[0],
+                            StringComparison.OrdinalIgnoreCase)) continue;
+
+                    result.Response = GenerateVanillaCommandInfo(command, context.Platform);
+                    return;
+                }
+
+                result.StatusCode = CommandStatusCode.NotFound;
+                result.Response = _configService.Translation.Get(context.Player).CommandNotFound;
                 return;
             }
 
@@ -100,7 +120,7 @@ public class HelpCommand : SynapseCommand
             if (customCommand.Meta is SynapseCommandAttribute synapseCommandAttribute)
             {
                 if (!string.IsNullOrWhiteSpace(synapseCommandAttribute.Permission) &&
-                    player.HasPermission(synapseCommandAttribute.Permission)) continue;
+                    !player.HasPermission(synapseCommandAttribute.Permission)) continue;
             }
 
             msg += $"\n{customCommand.Meta.CommandName}";
@@ -127,14 +147,62 @@ public class HelpCommand : SynapseCommand
         return msg.TrimEnd('\n');
     }
 
-    public string GenerateCustomCommandInfo(ICommand command)
+    public string GenerateCustomCommandInfo(ICommand command, CommandPlatform platform, SynapsePlayer player)
     {
-        return "";
+        var msg = "\n" + command.Meta.CommandName;
+        
+        if ((command.Meta.Aliases?.Length ?? 0) > 0)
+        {
+            msg += $"\n    Aliases: " + string.Join(", ", command.Meta.Aliases);
+        }
+        
+        if (command.Meta is SynapseCommandAttribute synapseCommandAttribute)
+        {
+            msg += $"\n    Platforms: " + string.Join(", ", synapseCommandAttribute.Platforms);
+            
+            if (!string.IsNullOrWhiteSpace(synapseCommandAttribute.Permission))
+            {
+                msg += "\n    Permission: " + synapseCommandAttribute.Permission;
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(command.Meta.Description))
+        {
+            if (command.Meta.Description.Length <= _maxLetters[platform])
+            {
+                msg += "\n    Description: " + command.Meta.Description;
+            }
+            else
+            {
+                msg += "\n    Description: " + SplitDescription(command.Meta.Description, platform);
+            }
+        }
+
+        return msg;
     }
 
-    public string GenerateVanillaCommandInfo(CommandSystem.ICommand command)
+    public string GenerateVanillaCommandInfo(CommandSystem.ICommand command,CommandPlatform platform)
     {
-        return "";
+        var msg = "\n" + command.Command;
+        
+        if ((command.Aliases?.Length ?? 0) > 0)
+        {
+            msg += $"\n    Aliases: " + string.Join(", ", command.Aliases);
+        }
+
+        if (!string.IsNullOrWhiteSpace(command.Description))
+        {
+            if (command.Description.Length <= _maxLetters[platform])
+            {
+                msg += "\n    Description: " + command.Description;
+            }
+            else
+            {
+                msg += "\n    Description: " + SplitDescription(command.Description, platform);
+            }
+        }
+
+        return msg;
     }
 
     private string SplitDescription(string message, CommandPlatform platform)
