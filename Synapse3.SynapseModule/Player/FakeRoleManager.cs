@@ -59,7 +59,7 @@ public class FakeRoleManager : IJoinUpdate
             }
         }
         
-        //This will prevent to send unnecessary packages from being send
+        //This will prevent to send unnecessary packages
         if(_sendRoles.ContainsKey(player) && _sendRoles[player] == role)
             return;
         _sendRoles[player] = role;

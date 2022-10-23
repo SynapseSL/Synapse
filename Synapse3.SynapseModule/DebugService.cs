@@ -4,11 +4,13 @@ using MEC;
 using Mirror;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
+using PlayerStatsSystem;
 using Respawning;
 using Respawning.NamingRules;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
 using Synapse3.SynapseModule.Teams.Unit;
@@ -165,15 +167,24 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                ev.Player.FakeRoleManager.OwnVisibleRole = RoleType.Scp049;
+                var rag = new SynapseRagdoll(ev.Player.RoleType, "1", ev.Player.Position, ev.Player.Rotation,
+                    Vector3.one, "Dimenzio the Second", ev.Player);
+                Timing.CallDelayed(3f, () =>
+                {
+                    rag.Info = new SynapseRagdoll.SynapseRagDollInfo("2", "New Dimenzio", RoleType.Scientist);
+                });
                 break;
             
             case KeyCode.Alpha2:
-                ev.Player.FakeRoleManager.VisibleRole = RoleType.Scientist;
-                break;
-
-            case KeyCode.Alpha3:
-                ev.Player.FakeRoleManager.VisibleRoleCondition[x => true] = RoleType.Tutorial;
+                rag = new SynapseRagdoll(ev.Player.RoleType, "3", ev.Player.Position, ev.Player.Rotation,
+                    Vector3.one, "Dimenzio the Second", ev.Player);
+                Timing.CallDelayed(8f, () =>
+                {
+                    rag.VisibleInfoCondition[x => true] =
+                        new SynapseRagdoll.SynapseRagDollInfo(new WarheadDamageHandler(), "New Dimenzio the second",
+                            RoleType.Scp096);
+                    rag.UpdateInfo();
+                });
                 break;
         }
     }

@@ -18,7 +18,6 @@ public class SynapseCommandService : Service
     /// </summary>
     private readonly List<Type> _synapseCommands = new()
     {
-        typeof(TestCommand),
         typeof(PermissionCommand),
         typeof(ReloadCommand),
         typeof(KeyPressCommand),

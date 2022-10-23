@@ -4,7 +4,6 @@ using HarmonyLib;
 using Interactables.Interobjects;
 using InventorySystem.Items;
 using InventorySystem.Items.Armor;
-using MEC;
 using Mirror;
 using Neuron.Core.Logging;
 using PlayerStatsSystem;
@@ -13,7 +12,6 @@ using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
-using Synapse3.SynapseModule.Role;
 using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule.Patches;
@@ -67,17 +65,13 @@ internal static class WrapperPatches
 
             if (prefab == null || !Object.Instantiate(prefab).TryGetComponent<Ragdoll>(out var ragdoll))
                 return false;
-
+            
             var info = new RagdollInfo(hub, handler, prefab.transform.localPosition,
                 prefab.transform.localRotation);
-            
             ragdoll.Info = info;
-            ragdoll.SetSyncVar(info, ref ragdoll.Info, 1uL); // I don't use NetworkInfo to not call the patch of the get
 
             NetworkServer.Spawn(ragdoll.gameObject);
-
-            _ = new SynapseRagdoll(ragdoll, true);
-
+            _ = new SynapseRagdoll(ragdoll);
             return false;
         }
         catch (Exception ex)
@@ -214,10 +208,10 @@ internal static class WrapperPatches
     {
         try
         {
-            var ragodll = __instance.GetSynapseRagdoll();
-            if (ragodll == null) return false;
+            var ragdoll = __instance.GetSynapseRagdoll();
+            if (ragdoll == null) return false;
             __instance.Info = value;
-            ragodll.UpdateInfo();
+            ragdoll.UpdateInfo();
             return false;
         }
         catch (Exception ex)

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using HarmonyLib;
-using InventorySystem;
 using MEC;
 using Neuron.Core.Logging;
 using PlayerStatsSystem;
@@ -58,7 +57,7 @@ internal static class DeathPatches
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.KillPlayer))]
-    public static void PostDeath(PlayerStats __instance, DamageHandlerBase handler/*to remove it after*/, bool __runOriginal)
+    public static void PostDeath(PlayerStats __instance, DamageHandlerBase handler, bool __runOriginal)
     {
         try
         {
