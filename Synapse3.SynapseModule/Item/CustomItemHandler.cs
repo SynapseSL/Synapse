@@ -20,7 +20,9 @@ public abstract class CustomItemHandler
     public virtual void HookEvents()
     {
         _items.ReloadWeapon.Subscribe(Reload);
+        _items.Shoot.Subscribe(Shoot);
         _items.ConsumeItem.Subscribe(Consume);
+        _items.ThrowGrenade.Subscribe(Throw);
         _player.Pickup.Subscribe(Pickup);
         _player.DropItem.Subscribe(Drop);
         _player.ChangeItem.Subscribe(SwitchHoldItem);
@@ -29,7 +31,9 @@ public abstract class CustomItemHandler
     public virtual void UnHookEvents()
     {
         _items.ReloadWeapon.Unsubscribe(Reload);
+        _items.Shoot.Unsubscribe(Shoot);
         _items.ConsumeItem.Unsubscribe(Consume);
+        _items.ThrowGrenade.Unsubscribe(Throw);
         _player.Pickup.Unsubscribe(Pickup);
         _player.DropItem.Unsubscribe(Drop);
         _player.ChangeItem.Unsubscribe(SwitchHoldItem);
@@ -142,11 +146,11 @@ public abstract class CustomItemHandler
         OnThrow(ev);
     }
     
-    public ItemAttribute Attribute { get; internal set; }
+    public ItemAttribute Attribute { get; set; }
 
     public virtual bool VanillaReload => true;
     public virtual bool Reloadable => true;
     public virtual int MagazineSize => 40;
     public virtual int NeededForOneShot => 1;
-    public virtual int AmmoType => (int)ItemType.Coin;
+    public virtual uint AmmoType => (uint)ItemType.Coin;
 }

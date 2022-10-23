@@ -51,6 +51,7 @@ public class PlayerEvents : Service
     public readonly EventReactor<UpdateDisplayNameEvent> UpdateDisplayName = new();
     public readonly EventReactor<CheckKeyCardPermissionEvent> CheckKeyCardPermission = new();
     public readonly EventReactor<CallVanillaElevatorEvent> CallVanillaElevator = new();
+    public readonly EventReactor<SendPlayerDataEvent> SendPlayerData = new();
 
     public PlayerEvents(EventManager eventManager)
     {
@@ -90,6 +91,7 @@ public class PlayerEvents : Service
         _eventManager.RegisterEvent(UpdateDisplayName);
         _eventManager.RegisterEvent(CheckKeyCardPermission);
         _eventManager.RegisterEvent(CallVanillaElevator);
+        _eventManager.RegisterEvent(SendPlayerData);
 
         WalkOnSinkhole.Subscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Subscribe(WalkOnHazard.Raise);
@@ -130,6 +132,7 @@ public class PlayerEvents : Service
         _eventManager.UnregisterEvent(UpdateDisplayName);
         _eventManager.UnregisterEvent(CheckKeyCardPermission);
         _eventManager.UnregisterEvent(CallVanillaElevator);
+        _eventManager.UnregisterEvent(SendPlayerData);
         
         WalkOnSinkhole.Unsubscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Unsubscribe(WalkOnHazard.Raise);
@@ -608,5 +611,18 @@ public class CallVanillaElevatorEvent : PlayerInteractEvent
         Elevator = elevator;
         RequestedDestination = requestedDestination;
     }
+}
+
+public class SendPlayerDataEvent : PlayerEvent
+{
+    public SynapsePlayer PlayerToSee { get; set; }
+    
+    public bool IsInvisible { get; set; }
+    
+    public Vector3 Position { get; set; }
+    
+    public float Rotation { get; set; }
+
+    public SendPlayerDataEvent(SynapsePlayer player) : base(player) { }
 }
 

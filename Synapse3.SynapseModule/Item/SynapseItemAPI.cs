@@ -148,7 +148,8 @@ public partial class SynapseItem
             holder.VanillaInventory.SendItemsNextFrame = true;
             holder.Inventory._items.Remove(this);
         }
-
+        
+        if(Item == null) return;
         Object.Destroy(Item.gameObject);
         Item = null;
     }

@@ -40,6 +40,7 @@ public partial class SynapsePlayer : MonoBehaviour
         Radio = GetComponent<Radio>();
         Escape = GetComponent<Escape>();
         Scp939VisionController = GetComponent<Scp939_VisionController>();
+        FirstPersonController = GetComponent<FirstPersonController>();
         Inventory = new ItemInventory(this);
         ActiveBroadcasts = new BroadcastList(this);
         ScpController = new ScpController(this);

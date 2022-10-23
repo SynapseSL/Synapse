@@ -94,22 +94,28 @@ public class GiveCustomItemCommand : SynapseCommand
 
         foreach (var player in players)
         {
-            if (context.Arguments.Length > 2)
+            switch (context.Arguments.Length)
             {
-                new SynapseItem(id, player)
-                {
-                    Scale = new Vector3(xsize, ysize, zsize),
-                    Durability = durabillity,
-                    FireArm =
+                case <=2:
+                    var item = new SynapseItem(id);
+                    item.EquipItem(player, true, true);
+                    break;
+                case 3:
+                    item = new SynapseItem(id);
+                    item.EquipItem(player, true, true);
+                    item.Durability = durabillity;
+                    break;
+                case >=4:
+                    _ = new SynapseItem(id, player)
                     {
-                        Attachments = attachments
-                    }
-                };  
-            }
-            else
-            {
-                var item = new SynapseItem(id);
-                item.EquipItem(player, true, true);
+                        Scale = new Vector3(xsize, ysize, zsize),
+                        Durability = durabillity,
+                        FireArm =
+                        {
+                            Attachments = attachments
+                        }
+                    };  
+                    break;
             }
         }
 

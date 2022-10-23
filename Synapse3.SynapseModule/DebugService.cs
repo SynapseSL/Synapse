@@ -1,4 +1,18 @@
-﻿namespace Synapse3.SynapseModule;
+﻿using System.Collections.Generic;
+using InventorySystem.Items.MicroHID;
+using MEC;
+using Mirror;
+using Neuron.Core.Logging;
+using Neuron.Core.Meta;
+using PlayerStatsSystem;
+using Synapse3.SynapseModule.Command;
+using Synapse3.SynapseModule.Dummy;
+using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Player;
+using UnityEngine;
+
+namespace Synapse3.SynapseModule;
 
 #if DEBUG
 public class DebugService : Service
@@ -151,7 +165,7 @@ public class DebugService : Service
                 break;
             
             case KeyCode.Alpha2:
-                ev.Player.SendFakeEffectIntensity(Effect.Invisible);
+                Timing.RunCoroutine(HAND(ev.Player));
                 break;
             
             case KeyCode.Alpha3:
@@ -189,6 +203,21 @@ public class DebugService : Service
                     Logger.Warn(i + " - " + effect.GetType());
                 }
                 break;
+        }
+    }
+
+    private IEnumerator<float> HAND(SynapsePlayer player)
+    {
+        var pos = player.Position;
+        pos.y += 10f;
+        var dummy = new SynapseDummy(pos, player.Rotation, player.RoleType, "Hand Spawner");
+        dummy.Scale = Vector3.zero;
+        for (;;)
+        {
+            player.SendFakeEffectIntensityFor(dummy.Player, Effect.SeveredHands, 1);
+            yield return Timing.WaitForOneFrame;
+            player.SendFakeEffectIntensityFor(dummy.Player, Effect.SeveredHands, 0);
+            yield return Timing.WaitForOneFrame;
         }
     }
 }

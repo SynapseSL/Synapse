@@ -120,7 +120,8 @@ public static class Synapse3Extensions
     public static SynapsePlayer GetSynapsePlayer(this MonoBehaviour mono) => mono?.gameObject?.GetComponent<SynapsePlayer>();
     public static SynapsePlayer GetSynapsePlayer(this GameObject gameObject) => gameObject?.GetComponent<SynapsePlayer>();
     public static SynapsePlayer GetSynapsePlayer(this PlayableScp scp) => scp?.Hub?.GetSynapsePlayer();
-    public static SynapsePlayer GetSynapsePlayer(this CommandSender sender) => Synapse.Get<PlayerService>().GetPlayer(x => x.CommandSender == sender);
+    public static SynapsePlayer GetSynapsePlayer(this CommandSender sender) => Synapse.Get<PlayerService>()
+        .GetPlayer(x => x.CommandSender == sender, PlayerType.Dummy, PlayerType.Player, PlayerType.Server);
     public static SynapsePlayer GetSynapsePlayer(this StatBase stat) => stat.Hub.GetSynapsePlayer();
     public static SynapsePlayer GetSynapsePlayer(this Footprint footprint) => footprint.Hub?.GetSynapsePlayer();
 

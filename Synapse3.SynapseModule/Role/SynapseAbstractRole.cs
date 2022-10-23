@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Events;
@@ -57,22 +58,33 @@ public abstract class SynapseAbstractRole : SynapseRole
         }
 
         PreSpawn();
-        var hasUnit = config.UnitId != 0 && !string.IsNullOrWhiteSpace(config.Unit);
+        var unit = config.Unit;
+        var hasUnit = config.UnitId != 0 && !string.IsNullOrWhiteSpace(unit);
         if (hasUnit)
         {
-            if (!_unit.UnitList.Any(x => x.SpawnableTeam == config.UnitId && x.UnitName == config.Unit))
+            if (string.Equals(config.Unit, "default", StringComparison.OrdinalIgnoreCase) &&
+                _unit.UnitList.Any(x => x.SpawnableTeam == config.UnitId))
+                unit = _unit.UnitList.FirstOrDefault(x => x.SpawnableTeam == config.UnitId).UnitName;
+            
+            else if (!_unit.UnitList.Any(x => x.SpawnableTeam == config.UnitId && x.UnitName == config.Unit))
             {
-                _unit.AddUnit(config.Unit, config.UnitId);
+                _unit.AddUnit(unit, config.UnitId);
             }
 
             Player.UnitId = config.UnitId;
-            Player.Unit = config.Unit;
+            Player.Unit = unit;
         }
         else
         {
             Player.UnitId = 0;
             Player.Unit = "";
         }
+        
+        foreach (var effect in Player.PlayerEffectsController._allEffects)
+        {
+            effect.OnClassChanged(RoleType.None, config.Role);
+        }
+        
         Player.ChangeRoleLite(config.Role);
         if (config.VisibleRole != RoleType.None)
         {
@@ -81,8 +93,10 @@ public abstract class SynapseAbstractRole : SynapseRole
         var spawn = config.PossibleSpawns?[Random.Range(0, config.PossibleSpawns.Length)];
         if (spawn != null)
         {
-            Player.Position = spawn.GetMapPosition();
-            Player.Rotation = spawn.GetMapRotation();   
+            var rot = spawn.GetMapRotation();
+            Player.PlayerMovementSync.OnPlayerClassChange(spawn.GetMapPosition(),
+                new PlayerMovementSync.PlayerRotation(rot.x, rot.y));
+            Player.Rotation = rot;
         }
         Player.Health = config.Health;
         Player.MaxHealth = config.MaxHealth;
@@ -112,7 +126,7 @@ public abstract class SynapseAbstractRole : SynapseRole
             RoleAndUnitEntry = new CustomInfoList.CustomInfoEntry()
             {
                 EveryoneCanSee = false,
-                Info = Attribute.Name + " (" + config.Unit + ")",
+                Info = Attribute.Name + " (" + unit + ")",
                 SeeCondition = CanSeeUnit
             };
 

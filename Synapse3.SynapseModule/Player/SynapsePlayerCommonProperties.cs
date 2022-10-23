@@ -158,7 +158,7 @@ public partial class SynapsePlayer
     public float ArtificialHealth
     {
         get => GetStatBase<AhpStat>().CurValue;
-        set => GetStatBase<AhpStat>().ServerAddProcess(value, value, 1.2f, 0f, 0f, false);
+        set => GetStatBase<AhpStat>().ServerAddProcess(value, MaxArtificialHealth, DecayArtificialHealth, 0f, 0f, false);
     }
 
     private float _maxAhp = AhpStat.DefaultMax;

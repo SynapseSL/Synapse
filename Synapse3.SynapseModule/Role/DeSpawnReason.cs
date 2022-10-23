@@ -2,9 +2,10 @@
 
 public enum DeSpawnReason
 {
+    Unknown,
     Death,
-    ForceClass,
-    API,
     Leave,
-    Other
+    ForceClass,
+    Lite,
+    API,
 }

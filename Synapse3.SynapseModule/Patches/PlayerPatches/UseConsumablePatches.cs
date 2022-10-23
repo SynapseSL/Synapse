@@ -2,6 +2,7 @@
 using CustomPlayerEffects;
 using HarmonyLib;
 using InventorySystem.Items.Usables;
+using InventorySystem.Items.Usables.Scp244;
 using InventorySystem.Items.Usables.Scp330;
 using Mirror;
 using Neuron.Core.Logging;
@@ -47,7 +48,7 @@ internal static class UseConsumablePatches
                     
                     if (!ev.Allow && ev.RemainingCoolDown > 0f)
                     {
-                        conn.Send(new ItemCooldownMessage(msg.ItemSerial, Time.timeSinceLevelLoad));
+                        conn.Send(new ItemCooldownMessage(msg.ItemSerial, ev.RemainingCoolDown));
                         return false;   
                     }
 
@@ -131,14 +132,64 @@ internal static class UseConsumablePatches
         
         Synapse.Get<ItemEvents>().ConsumeItem.Raise(ev);
 
-        return ev.Allow;
+        if (consumable == null || item.Item == null) return false;
+        if (ev.Allow) return true;
+
+        var handler = UsableItemsController.GetHandler(player);
+        handler.CurrentUsable.Item.OnUsingCancelled();
+        handler.CurrentUsable = CurrentlyUsedItem.None;
+        new StatusMessage(StatusMessage.StatusType.Cancel, consumable.ItemSerial).SendToAuthenticated();
+        return false;
     }
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(Consumable), nameof(Consumable.ServerOnUsingCompleted))]
-    [HarmonyPatch(typeof(Scp268), nameof(Scp268.ServerOnUsingCompleted))]
-    [HarmonyPatch(typeof(Scp330Bag), nameof(Scp330Bag.ServerOnUsingCompleted))]
     public static bool CompletePatch(Consumable __instance)
+    {
+        try
+        {
+            return FinalizeEvent(__instance);
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Consume Item(Complete) Event failed\n" + ex);
+            return true;
+        }
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp244Item),nameof(Scp244Item.ServerOnUsingCompleted))]
+    public static bool CompletePatch244(Consumable __instance)
+    {
+        try
+        {
+            return FinalizeEvent(__instance);
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Consume Item(Complete) Event failed\n" + ex);
+            return true;
+        }
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp268), nameof(Scp268.ServerOnUsingCompleted))]
+    public static bool CompletePatch268(Consumable __instance)
+    {
+        try
+        {
+            return FinalizeEvent(__instance);
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Consume Item(Complete) Event failed\n" + ex);
+            return true;
+        }
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp330Bag), nameof(Scp330Bag.ServerOnUsingCompleted))]
+    public static bool CompletePatch330(Consumable __instance)
     {
         try
         {

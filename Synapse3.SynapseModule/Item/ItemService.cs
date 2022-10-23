@@ -73,9 +73,9 @@ public class ItemService : Service
     /// </summary>
     public bool CreateAndRegisterItemHandler(ItemAttribute info, Type handlerType)
     {
-        var handler = (CustomItemHandler)_kernel.GetSafe(handlerType);
+        var handler = (CustomItemHandler)_kernel.Get(handlerType);
         _kernel.Bind(handlerType).ToConstant(handler).InSingletonScope();
-        
+
         handler.Attribute = info;
         handler.Load();
 

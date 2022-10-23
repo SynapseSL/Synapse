@@ -540,7 +540,7 @@ internal static class DecoratedScpPatches
             //TODO: Add the other 079 Events
             
             default:
-                NeuronLogger.For<Synapse>().Warn(command);
+                NeuronLogger.For<Synapse>().Debug(command);
                 script._interactRateLimit._usages--;
                 return true;
         }

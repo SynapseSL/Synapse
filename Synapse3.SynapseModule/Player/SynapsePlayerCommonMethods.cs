@@ -332,4 +332,18 @@ public partial class SynapsePlayer
                 break;
         }
     }
+
+    public void SetPlayerRoleTypeAdvance(RoleType role,Vector3 position,Vector2 rotation = default,byte unitId = 0, string unitName = "")
+    {
+        UnitId = unitId;
+        Unit = Unit;
+        foreach (var effect in PlayerEffectsController._allEffects)
+        {
+            effect.OnClassChanged(RoleType, role);
+        }
+        ChangeRoleLite(role);
+        PlayerMovementSync.OnPlayerClassChange(position, new PlayerMovementSync.PlayerRotation(rotation.x, rotation.y));
+        FirstPersonController.ResetStamina();
+        
+    }
 }

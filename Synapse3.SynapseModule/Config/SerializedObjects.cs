@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CustomPlayerEffects;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
 using UnityEngine;
@@ -284,11 +285,12 @@ public class SerializedPlayerState
 
         public SerializedPlayerState(SynapsePlayer player)
         {
-            Position = player.Position;
-            Rotation = player.RotationVector2;
+            Position = player.RoomPoint;
             Scale = player.Scale;
             RoleType = player.RoleType;
             RoleID = player.RoleID;
+            UnitId = player.UnitId;
+            UnitName = player.Unit;
             Health = player.Health;
             MaxHealth = player.MaxHealth;
             ArtificialHealth = player.ArtificialHealth;
@@ -311,9 +313,7 @@ public class SerializedPlayerState
             }
         }
 
-        public SerializedVector3 Position { get; set; } = Vector3.zero;
-
-        public SerializedVector2 Rotation { get; set; } = Vector2.zero;
+        public RoomPoint Position { get; set; } = new ();
 
         public SerializedVector3 Scale { get; set; } = Vector3.one;
 
@@ -325,13 +325,17 @@ public class SerializedPlayerState
 
         public uint RoleID { get; set; }
 
+        public byte UnitId { get; set; } = 0;
+
+        public string UnitName { get; set; } = "";
+
         public float Health { get; set; } = 100f;
 
         public float MaxHealth { get; set; } = 100f;
 
         public float ArtificialHealth { get; set; }
-        
-        public float MaxArtificialHealth { get; set; }
+
+        public float MaxArtificialHealth { get; set; } = 75;
 
         public float Stamina { get; set; } = 100f;
 
@@ -356,12 +360,19 @@ public class SerializedPlayerState
                 player.Invisible = Invisible;
             }
 
+            player.UnitId = UnitId;
+            player.Unit = UnitName;
             player.ChangeRoleLite(RoleType);
             if (RoleID > RoleService.HighestRole)
+            {
                 player.SpawnCustomRole(RoleID, true);
-            
-            player.Position = Position;
-            player.RotationVector2 = Rotation;
+            }
+            else
+            {
+                player.RemoveCustomRole(DeSpawnReason.Lite);
+            }
+
+            player.RoomPoint = Position;
 
             player.Health = Health;
             player.MaxHealth = MaxHealth;
@@ -372,6 +383,10 @@ public class SerializedPlayerState
 
             Inventory.Apply(player);
 
+            foreach (var effect in player.PlayerEffectsController._allEffects)
+            {
+                effect.OnClassChanged(RoleType.None, RoleType);
+            }
             foreach (var effect in Effects)
                 effect.Apply(player);
         }

@@ -68,6 +68,8 @@ public partial class SynapsePlayer
     
     public Scp939_VisionController Scp939VisionController { get; }
     
+    public FirstPersonController FirstPersonController { get; }
+    
     public CommandSender CommandSender
     {
         get

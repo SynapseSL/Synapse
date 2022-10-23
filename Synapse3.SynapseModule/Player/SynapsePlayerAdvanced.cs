@@ -34,6 +34,18 @@ public partial class SynapsePlayer
             writer.WriteByte(intensity); // Intensity
         }, false));
 
+    public void SendFakeEffectIntensityFor(SynapsePlayer player, Effect effect, byte intensity = 1)
+    => SendNetworkMessage(_mirror.GetCustomVarMessage(player.PlayerEffectsController, writer =>
+    {
+        writer.WriteUInt64(1); //Which SyncObject will be updated
+
+        //SyncList Specific
+        writer.WriteUInt32(1); //The amount of changes
+        writer.WriteByte((byte)SyncList<byte>.Operation.OP_SET);
+        writer.WriteUInt32((uint)effect); //effect id/index
+        writer.WriteByte(intensity); // Intensity
+    }, false));
+
     public void AttachSynapseObject(ISynapseObject so, Vector3 offset)
     {
         so.Rotation = transform.rotation;
