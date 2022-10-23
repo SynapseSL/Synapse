@@ -177,7 +177,7 @@ public class DebugService : Service
             
             case KeyCode.Alpha2:
                 rag = new SynapseRagdoll(ev.Player.RoleType, "3", ev.Player.Position, ev.Player.Rotation,
-                    Vector3.one, "Dimenzio the Second", ev.Player);
+                    Vector3.one, "Dimenzio the Second", ev.Player,false,uint.MaxValue,false);
                 Timing.CallDelayed(8f, () =>
                 {
                     rag.VisibleInfoCondition[x => true] =

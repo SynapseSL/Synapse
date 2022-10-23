@@ -154,18 +154,18 @@ public class SynapseRagdoll : NetworkSynapseObject, IJoinUpdate
     
     //Public for Plugins
     public SynapseRagdoll(RoleType role, string reason, Vector3 pos, Quaternion rot, Vector3 scale,
-        string nick, SynapsePlayer player = null, bool canBeRevive = false, uint roleID = RoleService.NoneRole) : this()
+        string nick, SynapsePlayer player = null, bool canBeRevive = false, uint roleID = RoleService.NoneRole, bool enableFadeOut = true) : this()
     {
         Ragdoll = CreateRagdoll(role, pos, rot, scale);
-        SetUp(role, DamageType.CustomReason, nick, player ?? _player.Host, false, canBeRevive, roleID,
+        SetUp(role, DamageType.CustomReason, nick, player ?? _player.Host, !enableFadeOut, canBeRevive, roleID,
             new CustomReasonDamageHandler(reason));
     }
 
     public SynapseRagdoll(RoleType role, DamageType damage, Vector3 pos, Quaternion rot, Vector3 scale, 
-        string nick, SynapsePlayer player = null, bool canBeRevive = false, uint roleID = RoleService.NoneRole) : this()
+        string nick, SynapsePlayer player = null, bool canBeRevive = false, uint roleID = RoleService.NoneRole, bool enableFadeOut = true) : this()
     {
         Ragdoll = CreateRagdoll(role, pos, rot, scale);
-        SetUp(role, damage, nick, player ?? _player.Host, false, canBeRevive, roleID);
+        SetUp(role, damage, nick, player ?? _player.Host, !enableFadeOut, canBeRevive, roleID);
     }
     
     internal SynapseRagdoll(Ragdoll ragdoll) : this()
