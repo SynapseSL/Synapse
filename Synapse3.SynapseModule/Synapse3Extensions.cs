@@ -63,6 +63,9 @@ public static class Synapse3Extensions
         player.Connection.Send(msg);
     }
 
+    public static void SpawnForOnePlayer(this NetworkIdentity identity, SynapsePlayer player)
+        => player.Connection.Send(Synapse.Get<MirrorService>().GetSpawnMessage(identity));
+
     /// <summary>
     /// Hides an NetworkObject for all Players on the Server that are currently connected
     /// </summary>
@@ -72,35 +75,43 @@ public static class Synapse3Extensions
         NetworkServer.SendToAll(msg);
     }
     
+    public static void SpawnForAllPlayers(this NetworkIdentity identity) => UpdatePositionRotationScale(identity);
+    
     public static bool CheckPermission(this DoorPermissions door, SynapsePlayer player) =>
         CheckPermission(door.RequiredPermissions, player, door.RequireAll);
     
     public static bool CheckPermission(this KeycardPermissions permissions, SynapsePlayer player,
         bool needIdentical = false)
     {
-        if (player.Bypass || (ushort)permissions == 0) return true;
-        if (player.ClassManager.IsAnyScp() && permissions.HasFlagFast(KeycardPermissions.ScpOverride)) return true;
-        
-        var items = Synapse.Get<SynapseConfigService>().GamePlayConfiguration.RemoteKeyCard
-            ? player.Inventory.Items.ToList()
-            : new List<SynapseItem> { player.Inventory.ItemInHand };
+        var ev2 = new CheckKeyCardPermissionEvent(player, false, permissions);
+        if (player.Bypass || (ushort)permissions == 0) ev2.Allow = true;
+        if (player.TeamID == (uint)Team.SCP && permissions.HasFlagFast(KeycardPermissions.ScpOverride)) ev2.Allow = true;
 
-        foreach (var item in items)
+        if (!ev2.Allow)
         {
-            if(item.ItemCategory != ItemCategory.Keycard || item.Item == null) continue;
+            var items = Synapse.Get<SynapseConfigService>().GamePlayConfiguration.RemoteKeyCard
+                ? player.Inventory.Items.ToList()
+                : new List<SynapseItem> { player.Inventory.ItemInHand };
 
-            var overlappingPerms = ((KeycardItem)item.Item).Permissions & permissions;
-            var ev = new KeyCardInteractEvent(item, ItemInteractState.Finalize, player)
+            foreach (var item in items)
             {
-                Allow = needIdentical ? overlappingPerms == permissions : overlappingPerms > KeycardPermissions.None,
-            };
+                if (item.ItemCategory != ItemCategory.Keycard || item.Item == null) continue;
+
+                var overlappingPerms = ((KeycardItem)item.Item).Permissions & permissions;
+                var ev = new KeyCardInteractEvent(item, ItemInteractState.Finalize, player, permissions)
+                {
+                    Allow = needIdentical ? overlappingPerms == permissions : overlappingPerms > KeycardPermissions.None,
+                };
             
-            Synapse.Get<ItemEvents>().KeyCardInteract.Raise(ev);
-            if (ev.Allow)
-                return true;
+                Synapse.Get<ItemEvents>().KeyCardInteract.Raise(ev);
+                if (!ev.Allow) continue;
+                ev2.Allow = true;
+                break;
+            }   
         }
 
-        return false;
+        Synapse.Get<PlayerEvents>().CheckKeyCardPermission.Raise(ev2);
+        return ev2.Allow;
     }
     
     
@@ -109,7 +120,8 @@ public static class Synapse3Extensions
     public static SynapsePlayer GetSynapsePlayer(this MonoBehaviour mono) => mono?.gameObject?.GetComponent<SynapsePlayer>();
     public static SynapsePlayer GetSynapsePlayer(this GameObject gameObject) => gameObject?.GetComponent<SynapsePlayer>();
     public static SynapsePlayer GetSynapsePlayer(this PlayableScp scp) => scp?.Hub?.GetSynapsePlayer();
-    public static SynapsePlayer GetSynapsePlayer(this CommandSender sender) => Synapse.Get<PlayerService>().GetPlayer(x => x.CommandSender == sender);
+    public static SynapsePlayer GetSynapsePlayer(this CommandSender sender) => Synapse.Get<PlayerService>()
+        .GetPlayer(x => x.CommandSender == sender, PlayerType.Dummy, PlayerType.Player, PlayerType.Server);
     public static SynapsePlayer GetSynapsePlayer(this StatBase stat) => stat.Hub.GetSynapsePlayer();
     public static SynapsePlayer GetSynapsePlayer(this Footprint footprint) => footprint.Hub?.GetSynapsePlayer();
 
@@ -321,4 +333,14 @@ public static class Synapse3Extensions
     public static TTranslation Get<TTranslation>(this TTranslation translation, SynapsePlayer player)
         where TTranslation : Translations<TTranslation>, new()
         => player.GetTranslation(translation);
+
+    public static string Replace(this string msg, Dictionary<string, string> values)
+    {
+        foreach (var value in values)
+        {
+            msg = msg.Replace(value.Key, value.Value);
+        }
+
+        return msg;
+    }
 }

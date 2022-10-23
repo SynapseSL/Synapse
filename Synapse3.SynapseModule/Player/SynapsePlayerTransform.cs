@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Mirror;
+﻿using Mirror;
 using Synapse3.SynapseModule.Map.Rooms;
 using UnityEngine;
 
@@ -87,8 +86,7 @@ public partial class SynapsePlayer
         set
         {
             Position = value.GetMapPosition();
-            var rot = value.GetMapRotation();
-            RotationVector2 = new Vector2(rot.x, rot.y);
+            Rotation = value.GetMapRotation();
         }
     }
 

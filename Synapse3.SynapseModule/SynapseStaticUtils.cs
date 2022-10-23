@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Neuron.Core;
+using Neuron.Core.Events;
+using Ninject;
 using Synapse3.SynapseModule.Enums;
-using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule;
 
@@ -22,7 +25,11 @@ public partial class Synapse
     /// or by creating a new instance of the type using the ninject kernel making
     /// injection usable.
     /// </summary>
+    /// <exception cref=""></exception>
     public static T Get<T>() => Globals.Get<T>();
+
+    /// <inheritdoc cref="Get{T}"/>
+    public static object Get(Type type) => Globals.Kernel.Get(type);
 
     /// <summary>
     /// Returns an instance of the specified object by either resolving it using
@@ -32,10 +39,48 @@ public partial class Synapse
     /// </summary>
     public static T GetAndBind<T>()
     {
-        var returning = Globals.Get<T>();
+        var returning = Get<T>();
         Globals.Kernel.Bind<T>().ToConstant(returning).InSingletonScope();
         return returning;
     }
+    
+    /// <inheritdoc cref="GetAndBind{T}"/>
+    public static object GetAndBind(Type type)
+    {
+        var returning = Get(type);
+        Globals.Kernel.Bind(type).ToConstant(returning).InSingletonScope();
+        return returning;
+    }
+
+    /// <summary>
+    /// Creates the Listener and Register all EventHandlers
+    /// </summary>
+    public static T GetEventHandler<T>() where T : Listener
+    {
+        var listener = GetAndBind<T>();
+        Get<EventManager>().RegisterListener(listener);
+        return listener;
+    }
+
+    /// <inheritdoc cref="GetEventHandler{T}"/>
+    public static Listener GetEventHandler(Type listenerType)
+    {
+        if (typeof(Listener) == listenerType || !typeof(Listener).IsAssignableFrom(listenerType))
+            throw new ArgumentException(
+                "listenerType of GetEventHandler was called with an invalid type that can not be casted to a Listener");
+
+        var listenerRaw = Get(listenerType);
+        if (listenerRaw is not Listener listener)
+            throw new ArgumentException(
+                "listenerType of GetEventHandler was called with an invalid type that can not be casted to a Listener");
+
+        Globals.Kernel.Bind(listenerType).ToConstant(listenerRaw).InSingletonScope();
+        
+        Get<EventManager>().RegisterListener(listener);
+        return listener;
+    }
+    
+    
     
     /// <summary>
     /// Returns an List of all instances of the specified object from Unity

@@ -19,5 +19,5 @@ public interface ISynapseRole
 
     void SpawnPlayer(bool spawnLite);
 
-    void DeSpawn(DespawnReason reason);
+    void DeSpawn(DeSpawnReason reason);
 }

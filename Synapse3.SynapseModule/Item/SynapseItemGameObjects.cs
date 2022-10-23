@@ -1,5 +1,6 @@
 ﻿using InventorySystem.Items;
 using InventorySystem.Items.Pickups;
+using Mirror;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
@@ -29,4 +30,19 @@ public partial class SynapseItem
     public ItemPickupBase Pickup { get; internal set; }
 
     public SynapsePlayer ItemOwner => Item?.Owner;
+
+    public NetworkIdentity NetworkIdentity
+    {
+        get
+        {
+            switch (State)
+            {
+                case ItemState.Map: return Pickup.netIdentity;
+                case ItemState.Thrown: return Throwable.Projectile.netIdentity;
+                
+                default:
+                    return null;
+            }
+        }
+    }
 }

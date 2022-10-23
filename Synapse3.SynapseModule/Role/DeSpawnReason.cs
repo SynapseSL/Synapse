@@ -1,10 +1,11 @@
 ﻿namespace Synapse3.SynapseModule.Role;
 
-public enum DespawnReason
+public enum DeSpawnReason
 {
+    Unknown,
     Death,
-    ForceClass,
-    API,
     Leave,
-    Other
+    ForceClass,
+    Lite,
+    API,
 }

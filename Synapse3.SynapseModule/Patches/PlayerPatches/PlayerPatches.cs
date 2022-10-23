@@ -17,6 +17,7 @@ using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map;
+using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 // ReSharper disable InconsistentNaming
@@ -256,6 +257,9 @@ internal static class PlayerPatches
     {
         try
         {
+            if (reason == null) return false;
+            if (Time.time - __instance._lastReport < 2f) return true;
+            
             var reported = Synapse.Get<PlayerService>().GetPlayer(playerId);
             var ev = new ReportEvent(__instance.GetSynapsePlayer(), true, reported, reason, notifyGm);
             Synapse.Get<PlayerEvents>().Report.Raise(ev);
@@ -487,10 +491,46 @@ internal static class PlayerPatches
             NeuronLogger.For<Synapse>().Error("Sy3 Event: Update Display Name event failed\n" + ex);
         }
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.UserCode_CmdUseElevator))]
+    public static bool UseElevator(PlayerInteract __instance, GameObject elevator)
+    {
+        try
+        {
+            DecoratedPlayerPatches.CallElevator(__instance, elevator);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Call Vanilla Elevator event failed\n" + ex);
+            return true;
+        }
+    }
 }
 
 internal static class DecoratedPlayerPatches
 {
+    public static void CallElevator(PlayerInteract playerInteract, GameObject elevator)
+    {
+        if (!playerInteract.CanInteract || elevator == null) return;
+        var player = playerInteract.GetSynapsePlayer();
+        var vanillaLift = elevator.GetComponent<Lift>();
+        var lift = vanillaLift?.GetSynapseElevator();
+        if (player == null || lift == null) return;
+
+        foreach (var destination in lift.Destinations)
+        {
+            if (!playerInteract.ChckDis(destination.DestinationPosition)) continue;
+
+            var ev = new CallVanillaElevatorEvent(player, true, (SynapseElevator)lift, (VanillaDestination)destination);
+            Synapse.Get<PlayerEvents>().CallVanillaElevator.Raise(ev);
+            if (!ev.Allow) continue;
+
+            vanillaLift.UseLift();
+        }
+    }
+    
     public static void OnFallingIntoAbyss(Collider other)
     {
         var player = other.GetComponentInParent<SynapsePlayer>();

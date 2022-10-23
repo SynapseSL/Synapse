@@ -8,14 +8,12 @@ using PlayerStatsSystem;
 using Respawning;
 using Respawning.NamingRules;
 using Synapse3.SynapseModule.Command;
+using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
-using Synapse3.SynapseModule.Role;
-using Synapse3.SynapseModule.Teams.Unit;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Synapse3.SynapseModule;
 
@@ -161,7 +159,7 @@ public class DebugService : Service
     {
         NeuronLogger.For<Synapse>().Warn("SpawnTeam: " + ev.TeamId);
     }
-
+    
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)
@@ -186,6 +184,57 @@ public class DebugService : Service
                     rag.UpdateInfo();
                 });
                 break;
+
+            case KeyCode.Alpha3:
+                ev.Player.SendNetworkMessage(Synapse.Get<MirrorService>().GetCustomVarMessage(
+                    ServerConfigSynchronizer.Singleton,
+                    writer =>
+                    {
+                        writer.WriteUInt64(4); //Which SyncObject will be updated in this case 1 2 or 4 or a combination of those
+                        
+                        //SyncList Specific
+                        writer.WriteUInt32(1); //The amount of changes
+                        writer.WriteByte((byte)SyncList<byte>.Operation.OP_ADD);
+                        writer.Write(new ServerConfigSynchronizer.PredefinedBanTemplate()
+                        {
+                            Duration = 1,
+                            Reason = "test",
+                            DurationNice = "test duration"
+                        });
+                    }, false));
+                break;
+            
+            case KeyCode.Alpha4:
+                ev.Player.SendNetworkMessage(new SyncedStatMessages.StatMessage()
+                {
+                    NetId = ev.Player.NetworkIdentity.netId,
+                    SyncedValue = 15,
+                    SyncId = 2
+                });
+                break;
+
+            case KeyCode.Alpha9:
+                for (int i = 0; i < ev.Player.PlayerEffectsController._allEffects.Length; i++)
+                {
+                    var effect = ev.Player.PlayerEffectsController._allEffects[i];
+                    Logger.Warn(i + " - " + effect.GetType());
+                }
+                break;
+        }
+    }
+
+    private IEnumerator<float> HAND(SynapsePlayer player)
+    {
+        var pos = player.Position;
+        pos.y += 10f;
+        var dummy = new SynapseDummy(pos, player.Rotation, player.RoleType, "Hand Spawner");
+        dummy.Scale = Vector3.zero;
+        for (;;)
+        {
+            player.SendFakeEffectIntensityFor(dummy.Player, Effect.SeveredHands, 1);
+            yield return Timing.WaitForOneFrame;
+            player.SendFakeEffectIntensityFor(dummy.Player, Effect.SeveredHands, 0);
+            yield return Timing.WaitForOneFrame;
         }
     }
 }

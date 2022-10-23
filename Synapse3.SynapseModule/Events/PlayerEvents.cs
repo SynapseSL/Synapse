@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using Interactables.Interobjects.DoorUtils;
 using Neuron.Core.Events;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -47,6 +49,9 @@ public class PlayerEvents : Service
     public readonly EventReactor<FallingIntoAbyssEvent> FallingIntoAbyss = new();
     public readonly EventReactor<SimpleSetClassEvent> SimpleSetClass = new();
     public readonly EventReactor<UpdateDisplayNameEvent> UpdateDisplayName = new();
+    public readonly EventReactor<CheckKeyCardPermissionEvent> CheckKeyCardPermission = new();
+    public readonly EventReactor<CallVanillaElevatorEvent> CallVanillaElevator = new();
+    public readonly EventReactor<SendPlayerDataEvent> SendPlayerData = new();
 
     public PlayerEvents(EventManager eventManager)
     {
@@ -84,6 +89,9 @@ public class PlayerEvents : Service
         _eventManager.RegisterEvent(FallingIntoAbyss);
         _eventManager.RegisterEvent(SimpleSetClass);
         _eventManager.RegisterEvent(UpdateDisplayName);
+        _eventManager.RegisterEvent(CheckKeyCardPermission);
+        _eventManager.RegisterEvent(CallVanillaElevator);
+        _eventManager.RegisterEvent(SendPlayerData);
 
         WalkOnSinkhole.Subscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Subscribe(WalkOnHazard.Raise);
@@ -122,6 +130,9 @@ public class PlayerEvents : Service
         _eventManager.UnregisterEvent(FallingIntoAbyss);
         _eventManager.UnregisterEvent(SimpleSetClass);
         _eventManager.UnregisterEvent(UpdateDisplayName);
+        _eventManager.UnregisterEvent(CheckKeyCardPermission);
+        _eventManager.UnregisterEvent(CallVanillaElevator);
+        _eventManager.UnregisterEvent(SendPlayerData);
         
         WalkOnSinkhole.Unsubscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Unsubscribe(WalkOnHazard.Raise);
@@ -580,5 +591,41 @@ public class UpdateDisplayNameEvent : PlayerEvent
     }
     
     public string NewDisplayName { get; }
+}
+
+public class CheckKeyCardPermissionEvent : PlayerInteractEvent
+{
+    public KeycardPermissions RequiredPermission { get; }
+
+    public CheckKeyCardPermissionEvent(SynapsePlayer player, bool allow, KeycardPermissions requiredPermission) : base(player, allow)
+    {
+        RequiredPermission = requiredPermission;
+    }
+}
+
+public class CallVanillaElevatorEvent : PlayerInteractEvent
+{
+    public SynapseElevator Elevator { get; }
+    
+    public VanillaDestination RequestedDestination { get; }
+
+    public CallVanillaElevatorEvent(SynapsePlayer player, bool allow, SynapseElevator elevator, VanillaDestination requestedDestination) : base(player, allow)
+    {
+        Elevator = elevator;
+        RequestedDestination = requestedDestination;
+    }
+}
+
+public class SendPlayerDataEvent : PlayerEvent
+{
+    public SynapsePlayer PlayerToSee { get; set; }
+    
+    public bool IsInvisible { get; set; }
+    
+    public Vector3 Position { get; set; }
+    
+    public float Rotation { get; set; }
+
+    public SendPlayerDataEvent(SynapsePlayer player) : base(player) { }
 }
 

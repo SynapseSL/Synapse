@@ -23,7 +23,7 @@ public partial class SynapsePlayer
         get => _customRole;
         set
         {
-            RemoveCustomRole(DespawnReason.API);
+            RemoveCustomRole(DeSpawnReason.API);
             
             if(value is null)
                 return;
@@ -37,7 +37,7 @@ public partial class SynapsePlayer
     /// <summary>
     /// Removes the CustomRole Of the Player if he has one
     /// </summary>
-    public void RemoveCustomRole(DespawnReason reason)
+    public void RemoveCustomRole(DeSpawnReason reason)
     {
         var storedRole = _customRole;
         _customRole = null;
@@ -56,7 +56,7 @@ public partial class SynapsePlayer
         if(role is null)
             return;
         
-        RemoveCustomRole(DespawnReason.API);
+        RemoveCustomRole(DeSpawnReason.API);
 
         _customRole = role;
         _customRole.Player = this;
@@ -77,7 +77,7 @@ public partial class SynapsePlayer
         {
             if (value is >= 0 and <= (int)RoleService.HighestRole)
             {
-                RemoveCustomRole(DespawnReason.API);
+                RemoveCustomRole(DeSpawnReason.API);
                 RoleType = (RoleType)value;
                 return;
             }

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Neuron.Core.Meta;
+﻿using Neuron.Core.Meta;
 using Syml;
 
 namespace Synapse3.ExampleModule;

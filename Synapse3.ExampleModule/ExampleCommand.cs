@@ -1,6 +1,5 @@
 ﻿using Neuron.Core.Meta;
 using Neuron.Modules.Commands;
-using Ninject;
 using Synapse3.SynapseModule.Command;
 
 namespace Synapse3.ExampleModule;

@@ -26,7 +26,7 @@ public partial class SynapsePlayer
         
         try
         {
-            RemoveCustomRole(DespawnReason.Leave);
+            RemoveCustomRole(DeSpawnReason.Leave);
             var ev = new LeaveEvent(this);
             _playerEvents.Leave.Raise(ev);
         }

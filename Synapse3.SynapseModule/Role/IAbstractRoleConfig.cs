@@ -16,4 +16,5 @@ public interface IAbstractRoleConfig
     public SerializedPlayerInventory[] PossibleInventories { get; }
     public byte UnitId { get; }
     public string Unit { get; }
+    public SerializedVector3 Scale { get; }
 }

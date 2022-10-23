@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using Neuron.Core.Logging;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Teams.Unit;
+using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Synapse3.SynapseModule.Role;
@@ -38,7 +38,7 @@ public abstract class SynapseAbstractRole : SynapseRole
     
     protected virtual void OnSpawn(IAbstractRoleConfig config) { }
     
-    protected virtual void OnDeSpawn(DespawnReason reason) { }
+    protected virtual void OnDeSpawn(DeSpawnReason reason) { }
 
     protected virtual bool CanSeeUnit(SynapsePlayer player) => player.UnitId == GetConfig().UnitId;
     protected virtual bool CanNotSeeUnit(SynapsePlayer player) => !CanSeeUnit(player);
@@ -58,17 +58,33 @@ public abstract class SynapseAbstractRole : SynapseRole
         }
 
         PreSpawn();
-        var hasUnit = config.UnitId != 0 && !string.IsNullOrWhiteSpace(config.Unit);
+        var unit = config.Unit;
+        var hasUnit = config.UnitId != 0 && !string.IsNullOrWhiteSpace(unit);
         if (hasUnit)
         {
-            if (!_unit.UnitList.Any(x => x.SpawnableTeam == config.UnitId && x.UnitName == config.Unit))
+            if (string.Equals(config.Unit, "default", StringComparison.OrdinalIgnoreCase) &&
+                _unit.UnitList.Any(x => x.SpawnableTeam == config.UnitId))
+                unit = _unit.UnitList.FirstOrDefault(x => x.SpawnableTeam == config.UnitId).UnitName;
+            
+            else if (!_unit.UnitList.Any(x => x.SpawnableTeam == config.UnitId && x.UnitName == config.Unit))
             {
-                _unit.AddUnit(config.Unit, config.UnitId);
+                _unit.AddUnit(unit, config.UnitId);
             }
 
             Player.UnitId = config.UnitId;
-            Player.Unit = config.Unit;
+            Player.Unit = unit;
         }
+        else
+        {
+            Player.UnitId = 0;
+            Player.Unit = "";
+        }
+        
+        foreach (var effect in Player.PlayerEffectsController._allEffects)
+        {
+            effect.OnClassChanged(RoleType.None, config.Role);
+        }
+        
         Player.ChangeRoleLite(config.Role);
         if (config.VisibleRole != RoleType.None)
         {
@@ -77,13 +93,16 @@ public abstract class SynapseAbstractRole : SynapseRole
         var spawn = config.PossibleSpawns?[Random.Range(0, config.PossibleSpawns.Length)];
         if (spawn != null)
         {
-            Player.Position = spawn.GetMapPosition();
-            Player.Rotation = spawn.GetMapRotation();   
+            var rot = spawn.GetMapRotation();
+            Player.PlayerMovementSync.OnPlayerClassChange(spawn.GetMapPosition(),
+                new PlayerMovementSync.PlayerRotation(rot.x, rot.y));
+            Player.Rotation = rot;
         }
         Player.Health = config.Health;
         Player.MaxHealth = config.MaxHealth;
         Player.ArtificialHealth = config.ArtificialHealth;
         Player.MaxArtificialHealth = config.MaxArtificialHealth;
+        Player.Scale = config.Scale;
         config.PossibleInventories?[Random.Range(0, config.PossibleInventories.Length)]?.Apply(Player);
         Player.GetComponent<FirstPersonController>().ResetStamina();
         
@@ -107,7 +126,7 @@ public abstract class SynapseAbstractRole : SynapseRole
             RoleAndUnitEntry = new CustomInfoList.CustomInfoEntry()
             {
                 EveryoneCanSee = false,
-                Info = Attribute.Name + " (" + config.Unit + ")",
+                Info = Attribute.Name + " (" + unit + ")",
                 SeeCondition = CanSeeUnit
             };
 
@@ -153,9 +172,10 @@ public abstract class SynapseAbstractRole : SynapseRole
         _player.UpdateDisplayName.Subscribe(UpdateDisplayName);
     }
 
-    public sealed override void DeSpawn(DespawnReason reason)
+    public sealed override void DeSpawn(DeSpawnReason reason)
     {
         Player.FakeRoleManager.VisibleRole = RoleType.None;
+        Player.Scale = Vector3.one;
         
         RemoveCustomDisplay();
 
@@ -174,9 +194,15 @@ public abstract class SynapseAbstractRole : SynapseRole
         Player.CustomInfo.Remove(NameEntry);
         Player.CustomInfo.Remove(RoleEntry);
         Player.CustomInfo.Remove(RoleAndUnitEntry);
-        Player.CustomInfo.Remove(PowerStatusEntries[PowerStatus.LowerRank]);
-        Player.CustomInfo.Remove(PowerStatusEntries[PowerStatus.SameRank]);
-        Player.CustomInfo.Remove(PowerStatusEntries[PowerStatus.HigherRank]);
+        
+        if (PowerStatusEntries.ContainsKey(PowerStatus.LowerRank))
+            Player.CustomInfo.Remove(PowerStatusEntries[PowerStatus.LowerRank]);
+
+        if (PowerStatusEntries.ContainsKey(PowerStatus.SameRank))
+            Player.CustomInfo.Remove(PowerStatusEntries[PowerStatus.SameRank]);
+
+        if (PowerStatusEntries.ContainsKey(PowerStatus.HigherRank))
+            Player.CustomInfo.Remove(PowerStatusEntries[PowerStatus.HigherRank]);
     }
 
     public override void TryEscape()
@@ -201,68 +227,5 @@ public abstract class SynapseAbstractRole : SynapseRole
     {
         NameEntry.Info = GetName();
         Player.CustomInfo.UpdateInfo();
-    }
-}
-
-[Role(
-    Name = "TestRole",
-    Id = 99,
-    TeamId = 10
-)]
-public class Test : SynapseAbstractRole
-{
-    protected override IAbstractRoleConfig GetConfig() => new Config()
-    {
-        Role = RoleType.Scientist,
-        Health = 101,
-        MaxHealth = 102,
-        Unit = "Custom Role Wave",
-        UnitId = 2,
-        ArtificialHealth = 9999,
-        EscapeRole = (uint)RoleType.NtfCaptain,
-        PossibleInventories = new[]
-        {
-            new SerializedPlayerInventory()
-            {
-                Ammo = new SerializedAmmo()
-                {
-                    Ammo9 = 20,
-                },
-                Items = new List<SerializedPlayerItem>()
-                {
-                    new SerializedPlayerItem()
-                    {
-                        Chance = 100,
-                        ProvideFully = true,
-                        ID = (uint)ItemType.GunRevolver
-                    }
-                }
-            }
-        },
-        MaxArtificialHealth = 9999,
-        PossibleSpawns = new[]
-        {
-            new RoomPoint()
-            {
-                roomName = "Shelter",
-                position = new SerializedVector3(0f, 2f, 0f),
-                rotation = new SerializedVector3(0f, 180f, 0f),
-            }
-        }
-    };
-
-    private class Config : IAbstractRoleConfig
-    {
-        public RoleType Role { get; set; }
-        public RoleType VisibleRole { get; set; }
-        public uint EscapeRole { get; set; }
-        public float Health { get; set; }
-        public float MaxHealth { get; set; }
-        public float ArtificialHealth { get; set; }
-        public float MaxArtificialHealth { get; set; }
-        public RoomPoint[] PossibleSpawns { get; set; }
-        public SerializedPlayerInventory[] PossibleInventories { get; set; }
-        public byte UnitId { get; set; }
-        public string Unit { get; set; }
     }
 }

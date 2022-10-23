@@ -28,7 +28,12 @@ public class ReloadableModule<TConfig,TTranslation> : ReloadableModule
     public TConfig Config { get; private set; }
     public TTranslation Translation { get; private set; }
 
-    public sealed override void FirstSetUp() => Reload();
+    public sealed override void FirstSetUp()
+    {
+        Config = Synapse.Get<TConfig>();
+        Translation = Synapse.Get<TTranslation>();
+        OnFirstSetUp();
+    }
     
     public sealed override void Reload(ReloadEvent _ = null)
     {
@@ -38,4 +43,6 @@ public class ReloadableModule<TConfig,TTranslation> : ReloadableModule
     }
     
     public virtual void OnReload() { }
+    
+    public virtual void OnFirstSetUp() { }
 }

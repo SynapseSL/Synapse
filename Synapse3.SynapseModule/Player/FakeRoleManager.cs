@@ -11,7 +11,7 @@ public class FakeRoleManager : IJoinUpdate
     private readonly PlayerService _playerService;
     private readonly Dictionary<SynapsePlayer, RoleType> _sendRoles = new();
 
-    public FakeRoleManager(SynapsePlayer player, MirrorService mirror, PlayerService playerService)
+    internal FakeRoleManager(SynapsePlayer player, MirrorService mirror, PlayerService playerService)
     {
         _player = player;
         _mirror = mirror;
@@ -59,7 +59,7 @@ public class FakeRoleManager : IJoinUpdate
             }
         }
         
-        //This will prevent to send unnecessary packages
+        //This will prevent unnecessary packages from being send
         if(_sendRoles.ContainsKey(player) && _sendRoles[player] == role)
             return;
         _sendRoles[player] = role;

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Neuron.Core.Events;
 using Neuron.Core.Meta;
 using Neuron.Core.Modules;
 using Neuron.Core.Plugins;
@@ -28,6 +29,18 @@ public partial class Synapse
         OnGenerateRoomBindings(args);
         OnGenerateRemoteAdminBindings(args);
         OnGenerateDataBaseBinding(args);
+        OnGenerateListenerBinding(args);
+    }
+
+    private void OnGenerateListenerBinding(MetaGenerateBindingsEvent args)
+    {
+        if (!args.MetaType.TryGetAttribute<AutomaticAttribute>(out _)) return;
+        if (!args.MetaType.Is<Listener>()) return;
+
+        args.Outputs.Add(new SynapseListenerBinding()
+        {
+            ListenerType = args.MetaType.Type
+        });
     }
     
     private void OnGenerateDataBaseBinding(MetaGenerateBindingsEvent args)
@@ -181,6 +194,10 @@ public partial class Synapse
         args.Context.MetaBindings
             .OfType<SynapseDataBaseBinding>()
             .ToList().ForEach(x => DataBaseService.LoadBinding(x));
+
+        args.Context.MetaBindings
+            .OfType<SynapseListenerBinding>()
+            .ToList().ForEach(x => _listeners.Add(GetEventHandler(x.ListenerType)));
     }
     
     internal readonly Queue<SynapseCommandBinding> ModuleCommandBindingQueue = new();
@@ -192,6 +209,7 @@ public partial class Synapse
     internal readonly Queue<SynapseRoomBinding> ModuleRoomBindingQueue = new();
     internal readonly Queue<SynapseRaCategoryBinding> ModuleRaCategoryBindingQueue = new();
     internal readonly Queue<SynapseDataBaseBinding> ModuleDataBaseBindingQueue = new();
+    private readonly Queue<SynapseListenerBinding> ModuleListenerBindingQueue = new();
 
     private void LoadModuleLate(ModuleLoadEvent args)
     {
@@ -258,6 +276,13 @@ public partial class Synapse
             .ToList().ForEach(binding =>
             {
                 ModuleDataBaseBindingQueue.Enqueue(binding);
+            });
+
+        args.Context.MetaBindings
+            .OfType<SynapseListenerBinding>()
+            .ToList().ForEach(binding =>
+            {
+                ModuleListenerBindingQueue.Enqueue(binding);
             });
     }
 }

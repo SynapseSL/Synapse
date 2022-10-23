@@ -1,6 +1,4 @@
-﻿using Synapse3.SynapseModule.Events;
-
-namespace Synapse3.SynapseModule.Player;
+﻿namespace Synapse3.SynapseModule.Player;
 
 public partial class SynapsePlayer
 {

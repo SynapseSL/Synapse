@@ -26,4 +26,6 @@ public class SynapseServerPlayer : SynapsePlayer
     {
         _serverEvents.StopServer.Raise(new StopServerEvent());
     }
+
+    public override TTranslation GetTranslation<TTranslation>(TTranslation translation) => translation.Get();
 }

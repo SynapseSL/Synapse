@@ -244,7 +244,7 @@ public class TeamService : Service
                 foreach (var player in players)
                 {
                     var role = roles.Dequeue();
-                    player.RemoveCustomRole(DespawnReason.API);
+                    player.RemoveCustomRole(DeSpawnReason.API);
                     player.ClassManager.SetPlayersClass(role, player.gameObject,
                         CharacterClassManager.SpawnReason.Respawn);
                 }

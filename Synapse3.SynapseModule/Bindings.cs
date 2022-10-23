@@ -78,3 +78,10 @@ public class SynapseDataBaseBinding : IMetaBinding
     
     public IEnumerable<Type> PromisedServices => new Type[] { };
 }
+
+public class SynapseListenerBinding : IMetaBinding
+{
+    public Type ListenerType { get; set; }
+    
+    public IEnumerable<Type> PromisedServices => new Type[] { };
+}

@@ -1,4 +1,5 @@
 ﻿using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Objects;
@@ -16,7 +17,7 @@ public class SynapseCustomObject : DefaultSynapseObject
         
         if (Parent is SynapseSchematic schematic) schematic._custom.Remove(this);
     }
-    
+
     public int ID { get; private set; }
 
     public SynapseCustomObject(Vector3 position, Quaternion rotation, Vector3 scale, int id)
@@ -55,4 +56,13 @@ public class SynapseCustomObject : DefaultSynapseObject
         };
         return gameObject;
     }
+    
+    //The Custom Object can never be seen by the Player visually in the first place so all of these methods are empty
+    public override void HideFromAll() { }
+
+    public override void ShowAll() { }
+
+    public override void HideFromPlayer(SynapsePlayer player) { }
+
+    public override void ShowPlayer(SynapsePlayer player) { }
 }

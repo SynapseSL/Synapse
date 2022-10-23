@@ -75,7 +75,7 @@ internal static class DeathPatches
                 Timing.CallDelayed(Timing.WaitForOneFrame, () => (victim as DummyPlayer)?.SynapseDummy.Destroy());
             }
 
-            victim.RemoveCustomRole(DespawnReason.Death);
+            victim.RemoveCustomRole(DeSpawnReason.Death);
         }
         catch (Exception ex)
         {

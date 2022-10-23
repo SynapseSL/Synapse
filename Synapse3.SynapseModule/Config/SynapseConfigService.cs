@@ -66,13 +66,13 @@ public class SynapseConfigService : Service
         var playerTranslation = ev.Player.GetTranslation(Translation);
         if (!string.IsNullOrWhiteSpace(playerTranslation.Broadcast) &&
             playerTranslation.BroadcastDuration > 0)
-            ev.Player.SendBroadcast(playerTranslation.Broadcast, playerTranslation.BroadcastDuration);
+            ev.Player.SendBroadcast(playerTranslation.Broadcast.Replace("\\n","\n"), playerTranslation.BroadcastDuration);
 
         if (!string.IsNullOrWhiteSpace(playerTranslation.Hint) &&
             playerTranslation.HintDuration > 0)
-            ev.Player.SendHint(playerTranslation.Hint, playerTranslation.HintDuration);
+            ev.Player.SendHint(playerTranslation.Hint.Replace("\\n","\n"), playerTranslation.HintDuration);
 
         if (!string.IsNullOrWhiteSpace(playerTranslation.Window))
-            ev.Player.SendWindowMessage(playerTranslation.Window);
+            ev.Player.SendWindowMessage(playerTranslation.Window.Replace("\\n","\n"));
     }
 }

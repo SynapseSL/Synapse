@@ -30,4 +30,8 @@ public class SynapseTranslation : Translations<SynapseTranslation>
     public string LowerRank { get; set; } = "FOLLOW ORDERS";
     public string SameRank { get; set; } = "SAME RANK";
     public string HigherRank { get; set; } = "GIVE ORDERS";
+
+    public string CommandHelp { get; set; } = "All Available Vanilla Commands:";
+    public string CommandHelpSecond { get; set; } = "All Available Synapse Commands:";
+    public string CommandNotFound { get; set; } = "No command with that name was found";
 }

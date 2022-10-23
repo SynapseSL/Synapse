@@ -6,7 +6,6 @@ using Neuron.Core.Meta;
 using Neuron.Core.Plugins;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Player;
 using UnityEngine;
 using Console = GameCore.Console;
 

@@ -28,7 +28,7 @@ public class ExampleRole : SynapseRole
 
     public override List<uint> GetEnemiesID() => new (){ (uint)Team.CDP };
 
-    public override void DeSpawn(DespawnReason reason)
+    public override void DeSpawn(DeSpawnReason reason)
     {
         NeuronLogger.For<ExamplePlugin>().Warn(reason);
     }

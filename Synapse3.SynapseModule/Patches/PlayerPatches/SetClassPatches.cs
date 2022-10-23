@@ -3,7 +3,6 @@ using System.Linq;
 using HarmonyLib;
 using InventorySystem;
 using InventorySystem.Configs;
-using InventorySystem.Items.Usables;
 using MEC;
 using Neuron.Core.Logging;
 using PlayerStatsSystem;

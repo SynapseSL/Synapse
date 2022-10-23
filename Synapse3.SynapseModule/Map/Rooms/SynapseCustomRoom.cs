@@ -1,6 +1,7 @@
 ﻿using MEC;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Rooms;
@@ -58,7 +59,7 @@ public abstract class SynapseCustomRoom : DefaultSynapseObject, IRoom
         OnGenerate();
     }
 
-    public override void Destroy()
+    public sealed override void Destroy()
     {
         Object.Destroy(GameObject);
     }
@@ -90,4 +91,12 @@ public abstract class SynapseCustomRoom : DefaultSynapseObject, IRoom
             }
         });
     }
+    
+    public sealed override void HideFromAll() => RoomSchematic.HideFromAll();
+
+    public sealed override void ShowAll() => RoomSchematic.ShowAll();
+
+    public sealed override void HideFromPlayer(SynapsePlayer player) => RoomSchematic.HideFromPlayer(player);
+
+    public sealed override void ShowPlayer(SynapsePlayer player) => RoomSchematic.ShowPlayer(player);
 }

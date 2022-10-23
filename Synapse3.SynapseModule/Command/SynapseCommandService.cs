@@ -102,7 +102,7 @@ public class SynapseCommandService : Service
     public void RegisterSynapseCommand(Type command)
     {
         var rawMeta = command.GetCustomAttribute(typeof(SynapseCommandAttribute));
-        if(rawMeta == null) return;
+        if (rawMeta == null) return;
         var meta = (SynapseCommandAttribute)rawMeta;
 
         foreach (var platform in meta.Platforms)

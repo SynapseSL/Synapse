@@ -1,4 +1,5 @@
-﻿using InventorySystem.Items.MicroHID;
+﻿using Interactables.Interobjects.DoorUtils;
+using InventorySystem.Items.MicroHID;
 using InventorySystem.Items.Radio;
 using InventorySystem.Items.Usables;
 using Neuron.Core.Events;
@@ -95,11 +96,14 @@ public abstract class BasicItemInteractEvent : PlayerInteractEvent
 
 public class KeyCardInteractEvent : BasicItemInteractEvent
 {
-    public KeyCardInteractEvent(SynapseItem item, ItemInteractState state, SynapsePlayer player) : base(item, state,
+    public KeyCardInteractEvent(SynapseItem item, ItemInteractState state, SynapsePlayer player, KeycardPermissions requiredPermission) : base(item, state,
         player)
     {
+        RequiredPermission = requiredPermission;
         IsRemoteKeyCard = item != player.Inventory.ItemInHand;
     }
+    
+    public KeycardPermissions RequiredPermission { get; }
     
     public bool IsRemoteKeyCard { get; }
 }

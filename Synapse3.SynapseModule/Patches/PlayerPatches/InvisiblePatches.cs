@@ -7,6 +7,7 @@ using PlayableScps;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -139,10 +140,25 @@ internal static class InvisiblePatches
 
                     ExecuteEnd:
 
+                    var ev = new SendPlayerDataEvent(player)
+                    {
+                        IsInvisible = invisible,
+                        PlayerToSee = playerToShow,
+                        Position = playerToShow.Position,
+                        Rotation = playerToShow.RotationFloat
+                    };
+                    Synapse.Get<PlayerEvents>().SendPlayerData.Raise(ev);
+                    
                     if (invisible)
                     {
                         __instance._transmitBuffer[i] =
                             new PlayerPositionData(Vector3.up * 7000f, 0.0f, playerToShow.PlayerId);
+                    }
+                    else
+                    {
+                        if (ev.Position != playerToShow.Position || Math.Abs(ev.Rotation - playerToShow.RotationFloat) > 1f)
+                            __instance._transmitBuffer[i] =
+                                new PlayerPositionData(ev.Position, ev.Rotation, playerToShow.PlayerId);
                     }
                 }
 

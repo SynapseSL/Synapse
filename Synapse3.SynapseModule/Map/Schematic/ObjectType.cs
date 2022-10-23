@@ -2,6 +2,7 @@
 
 public enum ObjectType
 {
+    Other,
     Schematic,
     Primitive,
     LightSource,
@@ -17,5 +18,4 @@ public enum ObjectType
     Custom,
     Room,
     ElevatorDestination,
-    Other
 }

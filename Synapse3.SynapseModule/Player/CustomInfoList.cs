@@ -18,7 +18,7 @@ public class CustomInfoList :
     private readonly List<CustomInfoEntry> _values = new();
 
 
-    public CustomInfoList(SynapsePlayer player, PlayerService playerService, MirrorService mirrorService,
+    internal CustomInfoList(SynapsePlayer player, PlayerService playerService, MirrorService mirrorService,
         PlayerEvents playerEvent)
     {
         _player = player;

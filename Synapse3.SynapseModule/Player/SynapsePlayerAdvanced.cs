@@ -2,6 +2,7 @@
 using Mirror;
 using Neuron.Modules.Configs.Localization;
 using Synapse3.SynapseModule.Config;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Schematic;
@@ -20,6 +21,30 @@ public partial class SynapsePlayer
         get => this;
         set => value.Apply(this, true);
     }
+
+    public void SendFakeEffectIntensity(Effect effect, byte intensity = 1)
+        => SendNetworkMessage(_mirror.GetCustomVarMessage(PlayerEffectsController, writer =>
+        {
+            writer.WriteUInt64(1); //Which SyncObject will be updated
+
+            //SyncList Specific
+            writer.WriteUInt32(1); //The amount of changes
+            writer.WriteByte((byte)SyncList<byte>.Operation.OP_SET);
+            writer.WriteUInt32((uint)effect); //effect id/index
+            writer.WriteByte(intensity); // Intensity
+        }, false));
+
+    public void SendFakeEffectIntensityFor(SynapsePlayer player, Effect effect, byte intensity = 1)
+    => SendNetworkMessage(_mirror.GetCustomVarMessage(player.PlayerEffectsController, writer =>
+    {
+        writer.WriteUInt64(1); //Which SyncObject will be updated
+
+        //SyncList Specific
+        writer.WriteUInt32(1); //The amount of changes
+        writer.WriteByte((byte)SyncList<byte>.Operation.OP_SET);
+        writer.WriteUInt32((uint)effect); //effect id/index
+        writer.WriteByte(intensity); // Intensity
+    }, false));
 
     public void AttachSynapseObject(ISynapseObject so, Vector3 offset)
     {
@@ -41,7 +66,7 @@ public partial class SynapsePlayer
         where TNetworkMessage : struct, NetworkMessage =>
         Connection?.Send(msg, channel);
 
-    public TTranslation GetTranslation<TTranslation>(TTranslation translation) where TTranslation : Translations<TTranslation>, new()
+    public virtual TTranslation GetTranslation<TTranslation>(TTranslation translation) where TTranslation : Translations<TTranslation>, new()
     {
         var language = new List<string>();
         

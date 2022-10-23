@@ -48,7 +48,7 @@ public class ExampleCustomItem : CustomItemHandler, ISynapse914Processor
 
     //This means you can load up to 6 Adrenaline inside your Weapon at the same time and gain up to 3 Shoots (3 Shoots that are each "shooting" 2 adrenaline)
     public override bool VanillaReload => false;
-    public override int AmmoType => (int)ItemType.Adrenaline;
+    public override uint AmmoType => (uint)ItemType.Adrenaline;
     public override int MagazineSize => 3;
     public override bool Reloadable => true;
     public override int NeededForOneShot => 2;

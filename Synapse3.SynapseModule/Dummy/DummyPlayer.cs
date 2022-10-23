@@ -1,6 +1,5 @@
 ﻿using MEC;
 using Mirror;
-using Neuron.Core.Logging;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -75,4 +74,6 @@ public class DummyPlayer : SynapsePlayer
     }
     
     public SynapseDummy SynapseDummy { get; internal set; }
+
+    public override TTranslation GetTranslation<TTranslation>(TTranslation translation) => translation.Get();
 }

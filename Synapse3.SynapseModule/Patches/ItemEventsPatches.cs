@@ -351,17 +351,17 @@ internal static class DecoratedItemPatches
         var player = connection.GetSynapsePlayer();
         if (player == null) return;
         if (player.Inventory.ItemInHand.Serial != msg.ShooterWeaponSerial) return;
-        if(player.Inventory.ItemInHand.Item is not Firearm firearm) return;
+        if (player.Inventory.ItemInHand.Item is not Firearm firearm) return;
         var target = msg.TargetNetId == 0 ? null : Synapse.Get<PlayerService>().GetPlayer(msg.TargetNetId);
         var ev = new ShootEvent(player.Inventory.ItemInHand, ItemInteractState.Finalize, player, target)
         {
-            Allow = firearm.ActionModule.ServerAuthorizeShot()
+            Allow = true
         };
         Synapse.Get<ItemEvents>().Shoot.Raise(ev);
-        
         if(!ev.Allow) return;
-
-        firearm.HitregModule.ServerProcessShot(msg);
+        
+        if (firearm.ActionModule.ServerAuthorizeShot())
+            firearm.HitregModule.ServerProcessShot(msg);
         firearm.OnWeaponShot();
     }
 
