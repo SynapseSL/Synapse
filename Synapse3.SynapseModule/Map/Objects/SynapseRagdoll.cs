@@ -168,6 +168,7 @@ public class SynapseRagdoll : NetworkSynapseObject, IJoinUpdate
         SetUp(role, damage, nick, player ?? _player.Host, !enableFadeOut, canBeRevive, roleID);
     }
     
+    //Only vanila Ragdoll
     internal SynapseRagdoll(Ragdoll ragdoll) : this()
     {
         Ragdoll = ragdoll;
