@@ -132,7 +132,7 @@ public partial class SynapsePlayer
     /// <summary>
     /// Kills the Player
     /// </summary>
-    public void Kill() => Kill("Unknown Reason");
+    public bool Kill() => Kill("Unknown Reason");
 
     /// <summary>
     /// Kills the Player
@@ -242,7 +242,7 @@ public partial class SynapsePlayer
         }
 
         var allow = true;
-        var escapeRole = uint.MaxValue;
+        var escapeRole = RoleService.NoneRole;
         var changeTeam = false;
 
         foreach (var disarmedEntry in DisarmedPlayers.Entries)
@@ -285,7 +285,7 @@ public partial class SynapsePlayer
                 break;
         }
 
-        if (escapeRole == uint.MaxValue) allow = false;
+        if (escapeRole == RoleService.NoneRole) allow = false;
 
         var ev = new EscapeEvent(this, allow, escapeRole, RoleID == (int)RoleType.ClassD, changeTeam);
         _playerEvents.Escape.Raise(ev);

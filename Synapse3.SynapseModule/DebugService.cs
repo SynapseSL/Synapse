@@ -5,10 +5,13 @@ using Mirror;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerStatsSystem;
+using Respawning;
+using Respawning.NamingRules;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
@@ -74,7 +77,7 @@ public class DebugService : Service
 
         _player.Death.Subscribe(ev =>
         {
-            NeuronLogger.For<Synapse>().Warn($"{ev.Player.NickName} {ev.DamageType} {ev.LastTakenDamage}");
+            NeuronLogger.For<Synapse>().Warn($"{ev.Player.NickName} {ev.DamageType} {ev.LastTakenDamage} {ev.DeathMessage ?? "NONE"}");
         });
         
         _player.WalkOnHazard.Subscribe(ev =>
@@ -128,7 +131,7 @@ public class DebugService : Service
 
     private void ScpEvent(ScpAttackEvent ev)
     {
-        NeuronLogger.For<Synapse>().Warn($"{ev.ScpAttackType} {ev.Damage} {ev.Scp.NickName} {ev.Victim.NickName}");
+        NeuronLogger.For<Synapse>().Warn($"{ev.ScpAttackType} {ev.Damage} {ev.Scp.NickName} | {ev.Victim.NickName}");
         //ev.Allow = false;
     }
     
@@ -162,12 +165,26 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
+                var rag = new SynapseRagdoll(ev.Player.RoleType, "1", ev.Player.Position, ev.Player.Rotation,
+                    Vector3.one, "Dimenzio the Second", ev.Player);
+                Timing.CallDelayed(3f, () =>
+                {
+                    rag.Info = new SynapseRagdoll.SynapseRagDollInfo("2", "New Dimenzio", RoleType.Scientist);
+                });
                 break;
             
             case KeyCode.Alpha2:
-                Timing.RunCoroutine(HAND(ev.Player));
+                rag = new SynapseRagdoll(ev.Player.RoleType, "3", ev.Player.Position, ev.Player.Rotation,
+                    Vector3.one, "Dimenzio the Second", ev.Player,false,uint.MaxValue,false);
+                Timing.CallDelayed(8f, () =>
+                {
+                    rag.VisibleInfoCondition[x => true] =
+                        new SynapseRagdoll.SynapseRagDollInfo(new WarheadDamageHandler(), "New Dimenzio the second",
+                            RoleType.Scp096);
+                    rag.UpdateInfo();
+                });
                 break;
-            
+
             case KeyCode.Alpha3:
                 ev.Player.SendNetworkMessage(Synapse.Get<MirrorService>().GetCustomVarMessage(
                     ServerConfigSynchronizer.Singleton,

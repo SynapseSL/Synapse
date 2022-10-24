@@ -60,18 +60,17 @@ internal static class WrapperPatches
     {
         try
         {
-            if (hub is null) return false;
-
+            if (hub == null) return false;
             var prefab = hub.characterClassManager.CurRole?.model_ragdoll;
 
             if (prefab == null || !Object.Instantiate(prefab).TryGetComponent<Ragdoll>(out var ragdoll))
                 return false;
-
-            ragdoll.NetworkInfo = new RagdollInfo(hub, handler, prefab.transform.localPosition,
-                prefab.transform.localRotation);
             
-            NetworkServer.Spawn(ragdoll.gameObject);
+            var info = new RagdollInfo(hub, handler, prefab.transform.localPosition,
+                prefab.transform.localRotation);
+            ragdoll.Info = info;
 
+            NetworkServer.Spawn(ragdoll.gameObject);
             _ = new SynapseRagdoll(ragdoll);
             return false;
         }
@@ -205,6 +204,25 @@ internal static class WrapperPatches
         }
     }
     
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Ragdoll), nameof(Ragdoll.NetworkInfo), MethodType.Setter)]
+    public static bool OnSetInfo(Ragdoll __instance, RagdollInfo value)
+    {
+        try
+        {
+            var ragdoll = __instance.GetSynapseRagdoll();
+            if (ragdoll == null) return false;
+            __instance.Info = value;
+            ragdoll.UpdateInfo();
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 API: SetRagdollInfo failed\n" + ex);
+            return true;
+        }
+    }
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.NetworkCurClass), MethodType.Setter)]
     public static bool OnSetRole(CharacterClassManager __instance, RoleType value)

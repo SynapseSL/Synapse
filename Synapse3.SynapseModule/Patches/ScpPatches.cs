@@ -968,10 +968,10 @@ internal static class DecoratedScpPatches
 
             if (!ev2.FinishRevive)
             {
-                if (ragdoll.Ragdoll.Info.ExistenceTime > Scp049.ReviveEligibilityDuration)
+                if (!ragdoll.CanBeReviveInTime)
                     ev2.Allow = false;
                 
-                if (scp.ClassManager.Classes.SafeGet(ragdoll.RoleType).team == Team.SCP)
+                if (!ragdoll.CanBeRevive)
                     ev2.Allow = false;
 
                 var rigidbodies = ragdoll.Ragdoll.GetComponentsInChildren<Rigidbody>();

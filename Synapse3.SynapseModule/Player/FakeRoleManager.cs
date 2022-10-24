@@ -78,6 +78,7 @@ public class FakeRoleManager : IJoinUpdate
         get => _ownVisibleRole;
         set
         {
+            if (value == _ownVisibleRole) return;
             _ownVisibleRole = value;
             UpdatePlayer(_player);
         }
@@ -90,6 +91,7 @@ public class FakeRoleManager : IJoinUpdate
         get => _visibleRole;
         set
         {
+            if (value == _visibleRole) return;
             _visibleRole = value;
             foreach (var player in _playerService.Players)
             {
