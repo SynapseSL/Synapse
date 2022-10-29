@@ -52,6 +52,7 @@ public class PlayerEvents : Service
     public readonly EventReactor<CheckKeyCardPermissionEvent> CheckKeyCardPermission = new();
     public readonly EventReactor<CallVanillaElevatorEvent> CallVanillaElevator = new();
     public readonly EventReactor<SendPlayerDataEvent> SendPlayerData = new();
+    public readonly EventReactor<KickEvent> KickEvent = new();
 
     public PlayerEvents(EventManager eventManager)
     {
@@ -92,6 +93,7 @@ public class PlayerEvents : Service
         _eventManager.RegisterEvent(CheckKeyCardPermission);
         _eventManager.RegisterEvent(CallVanillaElevator);
         _eventManager.RegisterEvent(SendPlayerData);
+        _eventManager.RegisterEvent(KickEvent);
 
         WalkOnSinkhole.Subscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Subscribe(WalkOnHazard.Raise);
@@ -133,6 +135,7 @@ public class PlayerEvents : Service
         _eventManager.UnregisterEvent(CheckKeyCardPermission);
         _eventManager.UnregisterEvent(CallVanillaElevator);
         _eventManager.UnregisterEvent(SendPlayerData);
+        _eventManager.RegisterEvent(KickEvent);
         
         WalkOnSinkhole.Unsubscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Unsubscribe(WalkOnHazard.Raise);
@@ -629,3 +632,21 @@ public class SendPlayerDataEvent : PlayerEvent
     public SendPlayerDataEvent(SynapsePlayer player) : base(player) { }
 }
 
+public class KickEvent : PlayerEvent
+{
+    public KickEvent(SynapsePlayer _kickedPlayer, SynapsePlayer _kicker, string _reason, bool _allow) : base(_kickedPlayer)
+    {
+        KickedPlayer = _kickedPlayer;
+        Kicker = _kicker;
+        Reason = _reason;
+        Allow = _allow;
+    }
+
+    public string Reason { get; }
+
+    public SynapsePlayer KickedPlayer { get; }
+
+    public SynapsePlayer Kicker { get; }
+
+    public bool Allow { get; }
+}

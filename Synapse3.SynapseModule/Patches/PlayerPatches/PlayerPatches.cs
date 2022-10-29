@@ -53,13 +53,13 @@ internal static class PlayerPatches
             if (!__instance.ChckDis(AlphaWarheadOutsitePanel.nukeside.transform.position) ||
                 !__instance.CanInteract) return false;
 
-            var ev = new WarheadPanelInteractEvent(__instance.GetSynapsePlayer(),
+            var warheadPanelInteractEvent = new WarheadPanelInteractEvent(__instance.GetSynapsePlayer(),
                 !Synapse.Get<NukeService>().InsidePanel.Locked, n);
             
-            Synapse.Get<PlayerEvents>().WarheadPanelInteract.Raise(ev);
-            n = ev.Operation;
+            Synapse.Get<PlayerEvents>().WarheadPanelInteract.Raise(warheadPanelInteractEvent);
+            n = warheadPanelInteractEvent.Operation;
             
-            return ev.Allow;
+            return warheadPanelInteractEvent.Allow;
         }
         catch (Exception ex)
         {
@@ -878,5 +878,31 @@ internal static class DecoratedPlayerPatches
             sPlayer.Hub.LoggedNameFromRefHub() + " started the Alpha Warhead detonation.",
             ServerLogs.ServerLogType.GameEvent);
         player.OnInteract();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(BanPlayer), nameof(BanPlayer.KickUser), typeof(GameObject), typeof(string), typeof(string))]
+    public static bool OnKick(GameObject user, string kickIssuer, string __reason, bool isGlobalBan, bool _allow)
+    {
+        try
+        {
+            var player = user.GetSynapsePlayer();
+            var kicker = kickIssuer.Contains("(")
+                    ? Synapse.Get<PlayerService>().GetPlayer(kickIssuer.Substring(kickIssuer.LastIndexOf('(') + 1,
+                        kickIssuer.Length - 2 - kickIssuer.LastIndexOf('(')))
+                    : Synapse.Get<PlayerService>().GetPlayer(kickIssuer);
+
+            var ev = new KickEvent(player, kicker, __reason, _allow);
+            Synapse.Get<PlayerEvents>().KickEvent.Raise(ev);
+
+            return isGlobalBan && ConfigFile.ServerConfig.GetBool("gban_ban_ip") || ev.Allow;
+
+        }
+        catch(Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Player Ban Event failed\n" + ex);
+            return true;
+        }
+        
     }
 }
