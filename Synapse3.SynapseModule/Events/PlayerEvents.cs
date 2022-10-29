@@ -135,7 +135,7 @@ public class PlayerEvents : Service
         _eventManager.UnregisterEvent(CheckKeyCardPermission);
         _eventManager.UnregisterEvent(CallVanillaElevator);
         _eventManager.UnregisterEvent(SendPlayerData);
-        _eventManager.RegisterEvent(KickEvent);
+        _eventManager.UnregisterEvent(KickEvent);
         
         WalkOnSinkhole.Unsubscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Unsubscribe(WalkOnHazard.Raise);
