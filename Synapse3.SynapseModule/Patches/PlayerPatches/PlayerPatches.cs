@@ -900,7 +900,7 @@ internal static class DecoratedPlayerPatches
         }
         catch(Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Player Ban Event failed\n" + ex);
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Player Kick Event failed\n" + ex);
             return true;
         }
         
