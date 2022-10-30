@@ -1,41 +1,21 @@
-﻿using System;
-using Neuron.Core.Logging;
+﻿using Neuron.Core.Logging;
 
-namespace Synapse3.SynapseModule
+namespace Synapse3.SynapseModule;
+
+public static class SynapseLogger<TName>
 {
-    public class SynapseLogger
-    {
-        //A Custom Synapse3 Logger, Uses Neuronlogger Utilites by Default.
+    private static ILogger _logger;
+    public static ILogger Logger => _logger ??= NeuronLogger.For<TName>();
 
-        public static void Debug(string msg)
-        {
-            NeuronLogger.For<Synapse>().Debug(msg);
-        }
+    public static void Debug(object msg) => Logger.Debug(msg);
 
-        public static void Warn(string msg)
-        {
-            NeuronLogger.For<Synapse>().Warn(msg);
-        }
+    public static void Warn(object msg) => Logger.Debug(msg);
 
-        public static void Log(string msg, object[] args)
-        {
-            NeuronLogger.For<Synapse>().Log(LogLevel.Information, msg, args, true);
-        }
+    public static void Info(object msg) => Logger.Info(msg);
 
-        public static void Info(string msg)
-        {
-            NeuronLogger.For<Synapse>().Info(msg);
-        }
+    public static void Error(object msg) => Logger.Error(msg);
 
-        public static void Error(string msg)
-        {
-            NeuronLogger.For<Synapse>().Error(msg);
-        }
+    public static void Fatal(object msg) => Logger.Fatal(msg);
 
-        public static void Fatal(string msg)
-        {
-            NeuronLogger.For<Synapse>().Fatal(msg);
-        }
-
-    }
+    public static void Verbose(object msg) => Logger.Verbose(msg);
 }

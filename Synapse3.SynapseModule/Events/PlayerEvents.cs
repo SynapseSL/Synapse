@@ -632,21 +632,16 @@ public class SendPlayerDataEvent : PlayerEvent
     public SendPlayerDataEvent(SynapsePlayer player) : base(player) { }
 }
 
-public class KickEvent : PlayerEvent
+public class KickEvent : PlayerInteractEvent
 {
-    public KickEvent(SynapsePlayer _kickedPlayer, SynapsePlayer _kicker, string _reason, bool _allow) : base(_kickedPlayer)
+    public KickEvent(SynapsePlayer kickedPlayer, SynapsePlayer admin, string reason, bool allow) : base(
+        kickedPlayer, allow)
     {
-        KickedPlayer = _kickedPlayer;
-        Kicker = _kicker;
-        Reason = _reason;
-        Allow = _allow;
+        Admin = admin;
+        Reason = reason;
     }
 
-    public string Reason { get; }
-
-    public SynapsePlayer KickedPlayer { get; }
-
-    public SynapsePlayer Kicker { get; }
-
-    public bool Allow { get; }
+    public SynapsePlayer Admin { get; }
+    
+    public string Reason { get; set; }
 }

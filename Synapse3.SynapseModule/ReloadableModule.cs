@@ -33,7 +33,6 @@ public class ReloadableModule<TConfig,TTranslation> : ReloadableModule
         Config = Synapse.Get<TConfig>();
         Translation = Synapse.Get<TTranslation>();
         OnFirstSetUp();
-       
     }
     
     public sealed override void Reload(ReloadEvent _ = null)

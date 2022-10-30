@@ -63,7 +63,7 @@ public partial class Synapse : Module
     public override void Load(IKernel kernel)
     {
         Logger.Info("Synapse3 is loading");
-
+        
         _kernel = kernel;
         var metaManager = kernel.Get<MetaManager>();
         var moduleManager = kernel.Get<ModuleManager>();
