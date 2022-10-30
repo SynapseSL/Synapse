@@ -1,17 +1,13 @@
-﻿using System.Collections.Generic;
-using InventorySystem.Items.MicroHID;
+﻿using InventorySystem.Items.MicroHID;
 using MEC;
 using Mirror;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule.Command;
-using Synapse3.SynapseModule.Dummy;
-using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map;
-using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule;
@@ -127,7 +123,8 @@ public class DebugService : Service
                 ev.Player.SendBroadcast("You pressed me!", 5);
             });
 
-        
+        _player.Kick.Subscribe(ev => Logger.Warn("KICK " + ev.Admin + " " + ev.Reason));
+        _player.Ban.Subscribe(ev => Logger.Warn("Ban " + ev.Admin + " " + ev.Reason));
     }
 
     private void ScpEvent(ScpAttackEvent ev)
