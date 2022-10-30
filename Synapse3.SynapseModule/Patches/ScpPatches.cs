@@ -907,7 +907,7 @@ internal static class DecoratedScpPatches
             MessageImportance.LeastImportant);
 
         scp173._blinkCooldownRemaining = Mathf.Max(0f,
-            scp173._blinkCooldownRemaining + (scp173._observingPlayers.Count - count) * (0f)); //Just don't ask why NorthWood is doing this
+            scp173._blinkCooldownRemaining + (scp173._observingPlayers.Count - count) * 0f); //Just don't ask why NorthWood is doing this
 
         GameCore.Console.AddDebugLog("SCP173", $"New blink cooldown: {scp173._blinkCooldownRemaining}",
             MessageImportance.LeastImportant);

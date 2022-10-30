@@ -221,9 +221,9 @@ internal static class DecoratedItemPatches
                 if (((micro.UserInput != HidUserInput.Prime && micro._stopwatch.Elapsed.TotalSeconds >= 0.35f) ||
                     micro.RemainingEnergy <= 0f) && ev.AllowChangingState)
                 {
-                    micro.State = ((micro.UserInput == HidUserInput.Fire && micro.RemainingEnergy > 0f)
+                    micro.State = micro.UserInput == HidUserInput.Fire && micro.RemainingEnergy > 0f
                         ? HidState.Firing
-                        : HidState.PoweringDown);
+                        : HidState.PoweringDown;
                     
                     micro._stopwatch.Restart();
                 }
@@ -244,9 +244,9 @@ internal static class DecoratedItemPatches
                     if ((micro.RemainingEnergy == 0f || (micro.UserInput != HidUserInput.Fire &&
                                                         micro._stopwatch.Elapsed.TotalSeconds >= 2.05f)) && ev.AllowChangingState)
                     {
-                        micro.State = ((micro.RemainingEnergy > 0f && micro.UserInput == HidUserInput.Prime)
+                        micro.State = micro.RemainingEnergy > 0f && micro.UserInput == HidUserInput.Prime
                             ? HidState.Primed
-                            : HidState.PoweringDown);
+                            : HidState.PoweringDown;
 
                         micro._stopwatch.Restart();
                     }

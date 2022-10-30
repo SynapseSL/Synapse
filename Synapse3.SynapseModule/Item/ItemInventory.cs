@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using InventorySystem.Items;
+using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Item;
@@ -42,6 +43,12 @@ public class ItemInventory
             _player.VanillaInventory.NetworkCurItem = new ItemIdentifier(value.ItemType, value.Serial);
             _player.VanillaInventory.CurInstance = value.Item;
         }
+    }
+
+    public SerializedPlayerInventory Serialized
+    {
+        get => new (_player);
+        set => value.Apply(_player);
     }
     
     public AmmoBox AmmoBox { get; }

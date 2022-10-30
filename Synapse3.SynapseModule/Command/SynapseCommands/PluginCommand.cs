@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Command;
@@ -37,7 +38,7 @@ public class PluginCommand : SynapseCommand
              }
 
              result.Response = $"\n{pl.Attribute.Name}" +
-                               $"\n    - Description: {pl.Attribute.Description}" +
+                               $"\n    - Description: {SplitDescription(pl.Attribute.Description, context.Platform)}" +
                                $"\n    - Author: {pl.Attribute.Author}" +
                                $"\n    - Version: {pl.Attribute.Version}" +
                                $"\n    - Repository: {pl.Attribute.Repository}" +
@@ -54,4 +55,39 @@ public class PluginCommand : SynapseCommand
 
         result.StatusCode = CommandStatusCode.Ok;
     }
+    
+    private string SplitDescription(string message, CommandPlatform platform)
+    {
+        var count = 0;
+        var msg = "";
+
+        foreach (var word in message.Split(' '))
+        {
+            count += word.Length;
+
+            if (count > _maxLetters[platform])
+            {
+                msg += "\n                ";
+                count = 0;
+            }
+
+            if (msg == string.Empty)
+            {
+                msg += word;
+            }
+            else
+            {
+                msg += " " + word;
+            }
+        }
+
+        return msg;
+    }
+
+    private readonly Dictionary<CommandPlatform, int> _maxLetters = new()
+    {
+        { CommandPlatform.PlayerConsole, 50 },
+        { CommandPlatform.RemoteAdmin, 50 },
+        { CommandPlatform.ServerConsole, 75 }
+    };
 }
