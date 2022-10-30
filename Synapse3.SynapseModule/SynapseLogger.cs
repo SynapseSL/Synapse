@@ -27,24 +27,14 @@ namespace Synapse3.SynapseModule
             NeuronLogger.For<Synapse>().Info(msg);
         }
 
-        public static void Error(string msg, Exception ex)
+        public static void Error(string msg)
         {
-            NeuronLogger.For<Synapse>().Error(msg, ex);
+            NeuronLogger.For<Synapse>().Error(msg);
         }
 
-        public static void ErrorNoException(string msg)
+        public static void Fatal(string msg)
         {
-            NeuronLogger.For<Synapse>().Error(msg); //Same Error Logging Method, But this method does not ask you to reference a Exception. 
-        }
-
-        public static void FatalNoException(string msg)
-        {
-            NeuronLogger.For<Synapse>().Fatal(msg); //Same Fatal Logging Method, But this method does not ask you to reference a Exception.
-        }
-
-        public static void Fatal(string msg, Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Fatal(msg, ex);
+            NeuronLogger.For<Synapse>().Fatal(msg);
         }
 
     }
