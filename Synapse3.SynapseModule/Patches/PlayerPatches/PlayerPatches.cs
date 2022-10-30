@@ -103,7 +103,7 @@ internal static class PlayerPatches
     [HarmonyPrefix]
     [HarmonyPatch(typeof(BanPlayer), nameof(BanPlayer.BanUser), typeof(GameObject), typeof(long), typeof(string),
         typeof(string), typeof(bool))]
-    public static bool OnBan(GameObject user, long duration, string reason, string issuer, bool isGlobalBan)
+    public static bool OnBan(GameObject user, ref  long duration, ref string reason, string issuer, bool isGlobalBan)
     {
         try
         {
@@ -113,10 +113,21 @@ internal static class PlayerPatches
                     issuer.Length - 2 - issuer.LastIndexOf('(')))
                 : Synapse.Get<PlayerService>().GetPlayer(issuer);
 
-            var ev = new BanEvent(player, true, banIssuer, reason, duration, isGlobalBan);
-            Synapse.Get<PlayerEvents>().Ban.Raise(ev);
-
-            return isGlobalBan && ConfigFile.ServerConfig.GetBool("gban_ban_ip") || ev.Allow;
+            if (duration == 0)
+            {
+                var ev = new KickEvent(player, banIssuer, reason, true);
+                Synapse.Get<PlayerEvents>().Kick.Raise(ev);
+                reason = ev.Reason;
+                return isGlobalBan || ev.Allow;   
+            }
+            else
+            {
+                var ev = new BanEvent(player, true, banIssuer, reason, duration, isGlobalBan);
+                Synapse.Get<PlayerEvents>().Ban.Raise(ev);
+                reason = ev.Reason;
+                duration = ev.Duration;
+                return isGlobalBan || ev.Allow;
+            }
         }
         catch (Exception ex)
         {
