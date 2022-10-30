@@ -53,13 +53,13 @@ internal static class PlayerPatches
             if (!__instance.ChckDis(AlphaWarheadOutsitePanel.nukeside.transform.position) ||
                 !__instance.CanInteract) return false;
 
-            var warheadPanelInteractEvent = new WarheadPanelInteractEvent(__instance.GetSynapsePlayer(),
+            var ev = new WarheadPanelInteractEvent(__instance.GetSynapsePlayer(),
                 !Synapse.Get<NukeService>().InsidePanel.Locked, n);
             
-            Synapse.Get<PlayerEvents>().WarheadPanelInteract.Raise(warheadPanelInteractEvent);
-            n = warheadPanelInteractEvent.Operation;
+            Synapse.Get<PlayerEvents>().WarheadPanelInteract.Raise(ev);
+            n = ev.Operation;
             
-            return warheadPanelInteractEvent.Allow;
+            return ev.Allow;
         }
         catch (Exception ex)
         {
