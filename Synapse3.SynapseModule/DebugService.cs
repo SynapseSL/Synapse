@@ -5,13 +5,12 @@ using Mirror;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerStatsSystem;
-using Respawning;
-using Respawning.NamingRules;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Objects;
+using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
@@ -127,6 +126,8 @@ public class DebugService : Service
                 NeuronLogger.For<Synapse>().Warn("Button Pressed " + ev.ButtonId);
                 ev.Player.SendBroadcast("You pressed me!", 5);
             });
+
+        
     }
 
     private void ScpEvent(ScpAttackEvent ev)
@@ -165,16 +166,12 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                var rag = new SynapseRagdoll(ev.Player.RoleType, "1", ev.Player.Position, ev.Player.Rotation,
-                    Vector3.one, "Dimenzio the Second", ev.Player);
-                Timing.CallDelayed(3f, () =>
-                {
-                    rag.Info = new SynapseRagdoll.SynapseRagDollInfo("2", "New Dimenzio", RoleType.Scientist);
-                });
+                ev.Player.SendNetworkMessage(Synapse.Get<MirrorService>()
+                    .GetCustomVarMessage(ev.Player.ClassManager, 8ul, RoleType.Scientist));
                 break;
             
             case KeyCode.Alpha2:
-                rag = new SynapseRagdoll(ev.Player.RoleType, "3", ev.Player.Position, ev.Player.Rotation,
+                var rag = new SynapseRagdoll(ev.Player.RoleType, "3", ev.Player.Position, ev.Player.Rotation,
                     Vector3.one, "Dimenzio the Second", ev.Player,false,uint.MaxValue,false);
                 Timing.CallDelayed(8f, () =>
                 {
@@ -205,36 +202,12 @@ public class DebugService : Service
                 break;
             
             case KeyCode.Alpha4:
-                ev.Player.SendNetworkMessage(new SyncedStatMessages.StatMessage()
+                foreach (var door in Synapse.Get<MapService>()._synapseDoors)
                 {
-                    NetId = ev.Player.NetworkIdentity.netId,
-                    SyncedValue = 15,
-                    SyncId = 2
-                });
-                break;
-
-            case KeyCode.Alpha9:
-                for (int i = 0; i < ev.Player.PlayerEffectsController._allEffects.Length; i++)
-                {
-                    var effect = ev.Player.PlayerEffectsController._allEffects[i];
-                    Logger.Warn(i + " - " + effect.GetType());
+                    ev.Player.SendNetworkMessage(Synapse.Get<MirrorService>()
+                        .GetCustomVarMessage(door.Variant, 1ul, true));
                 }
                 break;
-        }
-    }
-
-    private IEnumerator<float> HAND(SynapsePlayer player)
-    {
-        var pos = player.Position;
-        pos.y += 10f;
-        var dummy = new SynapseDummy(pos, player.Rotation, player.RoleType, "Hand Spawner");
-        dummy.Scale = Vector3.zero;
-        for (;;)
-        {
-            player.SendFakeEffectIntensityFor(dummy.Player, Effect.SeveredHands, 1);
-            yield return Timing.WaitForOneFrame;
-            player.SendFakeEffectIntensityFor(dummy.Player, Effect.SeveredHands, 0);
-            yield return Timing.WaitForOneFrame;
         }
     }
 }

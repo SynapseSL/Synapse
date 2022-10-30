@@ -50,6 +50,14 @@ public class MirrorService : Service
         return msg;
     }
 
+    public UpdateVarsMessage GetCustomVarMessage<TNetworkBehaviour, TValue>(TNetworkBehaviour behaviour, ulong id,
+        TValue value) where TNetworkBehaviour : NetworkBehaviour => GetCustomVarMessage(behaviour,
+        writer =>
+        {
+            writer.WriteUInt64(id);
+            writer.Write(value);
+        });
+
     public RpcMessage GetCustomRpcMessage<TNetworkBehaviour>(TNetworkBehaviour behaviour, string methodName,
         Action<NetworkWriter> writeArguments)
         where TNetworkBehaviour : NetworkBehaviour

@@ -30,7 +30,7 @@ public class RoomPointCommand : SynapseCommand
             point = new RoomPoint(raycastHit.point + Vector3.up * 0.1f, Quaternion.identity);
         }
 
-        result.Response = "\nThe position you are looking at as RoomPoint (change , to . in the syml config):" +
+        result.Response = $"\nThe position {(context.Arguments.Length != 0 ? "where you stand" : "you are looking at")} as RoomPoint (change , to . in the syml config):" +
                           $"\n  room: {point.roomName}" +
                           $"\n  x: {point.position.X}" +
                           $"\n  y: {point.position.Y}" +

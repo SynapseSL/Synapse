@@ -64,11 +64,7 @@ public class FakeRoleManager : IJoinUpdate
             return;
         _sendRoles[player] = role;
 
-        player.SendNetworkMessage(_mirror.GetCustomVarMessage(_player.ClassManager, writer =>
-        {
-            writer.WriteUInt64(8ul);
-            writer.WriteSByte((sbyte)role);
-        }));
+        player.SendNetworkMessage(_mirror.GetCustomVarMessage(_player.ClassManager, 8ul, role));
     }
 
     private RoleType _ownVisibleRole = RoleType.None;

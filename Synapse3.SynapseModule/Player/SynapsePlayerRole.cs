@@ -1,4 +1,5 @@
-﻿using Synapse3.SynapseModule.Role;
+﻿using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Role;
 
 namespace Synapse3.SynapseModule.Player;
 
@@ -31,6 +32,7 @@ public partial class SynapsePlayer
             _customRole = value;
             _customRole.Player = this;
             _customRole.SpawnPlayer(false);
+            _playerEvents.ChangeRole.Raise(new ChangeRoleEvent(this) { RoleId = value.Attribute.Id });
         }
     }
     

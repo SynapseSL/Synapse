@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Mirror;
 using Neuron.Modules.Configs.Localization;
 using Synapse3.SynapseModule.Config;
@@ -21,6 +22,10 @@ public partial class SynapsePlayer
         get => this;
         set => value.Apply(this, true);
     }
+
+    public void SendFakeSyncVar<TNetworkBehaviour, TValue>(TNetworkBehaviour behaviour, ulong id,
+        TValue value) where TNetworkBehaviour : NetworkBehaviour =>
+        SendNetworkMessage(_mirror.GetCustomVarMessage(behaviour, id, value));
 
     public void SendFakeEffectIntensity(Effect effect, byte intensity = 1)
         => SendNetworkMessage(_mirror.GetCustomVarMessage(PlayerEffectsController, writer =>
@@ -86,13 +91,17 @@ public partial class SynapsePlayer
         get => _customWalkSpeed ? _walkSpeed : ServerConfigSynchronizer.Singleton.HumanWalkSpeedMultiplier;
         set
         {
-            _customWalkSpeed = true;
-            _walkSpeed = value;
-            SendNetworkMessage(_mirror.GetCustomVarMessage(ServerConfigSynchronizer.Singleton, writer =>
+            if (Math.Abs(value - ServerConfigSynchronizer.Singleton.HumanWalkSpeedMultiplier) < 0.1f)
             {
-                writer.WriteUInt64(2ul);
-                writer.WriteSingle(value);
-            }));
+                _customWalkSpeed = false;
+            }
+            else
+            {
+                _customWalkSpeed = true;
+                _walkSpeed = value;   
+            }
+
+            SendNetworkMessage(_mirror.GetCustomVarMessage(ServerConfigSynchronizer.Singleton, 2ul, value));
         }
     }
     
@@ -103,13 +112,17 @@ public partial class SynapsePlayer
         get => _customSprintSpeed ? _sprintSpeed : ServerConfigSynchronizer.Singleton.HumanSprintSpeedMultiplier;
         set
         {
-            _customSprintSpeed = true;
-            _sprintSpeed = value;
-            SendNetworkMessage(_mirror.GetCustomVarMessage(ServerConfigSynchronizer.Singleton, writer =>
+            if (Math.Abs(value - ServerConfigSynchronizer.Singleton.HumanSprintSpeedMultiplier) < 0.1f)
             {
-                writer.WriteUInt64(4ul);
-                writer.WriteSingle(value);
-            }));
+                _customSprintSpeed = false;
+            }
+            else
+            {
+                _customSprintSpeed = true;
+                _sprintSpeed = value;
+            }
+            
+            SendNetworkMessage(_mirror.GetCustomVarMessage(ServerConfigSynchronizer.Singleton, 4ul, value));
         }
     }
 }

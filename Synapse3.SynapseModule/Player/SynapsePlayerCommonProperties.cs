@@ -198,7 +198,7 @@ public partial class SynapsePlayer
     public float Stamina
     {
         get => Hub.fpc.staminaController.RemainingStamina * 100;
-        set => Hub.fpc.staminaController.RemainingStamina = (value / 100);
+        set => Hub.fpc.staminaController.RemainingStamina = value / 100;
     }
 
     /// <summary>
@@ -207,7 +207,7 @@ public partial class SynapsePlayer
     public float StaminaUsage
     {
         get => Hub.fpc.staminaController.StaminaUse * 100;
-        set => Hub.fpc.staminaController.StaminaUse = (value / 100);
+        set => Hub.fpc.staminaController.StaminaUse = value / 100;
     }
 
     public byte UnitId

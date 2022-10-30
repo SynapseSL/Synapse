@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Interactables.Interobjects.DoorUtils;
+using MEC;
 using Neuron.Core.Events;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Enums;
@@ -52,6 +53,7 @@ public class PlayerEvents : Service
     public readonly EventReactor<CheckKeyCardPermissionEvent> CheckKeyCardPermission = new();
     public readonly EventReactor<CallVanillaElevatorEvent> CallVanillaElevator = new();
     public readonly EventReactor<SendPlayerDataEvent> SendPlayerData = new();
+    public readonly EventReactor<ChangeRoleEvent> ChangeRole = new();
 
     public PlayerEvents(EventManager eventManager)
     {
@@ -92,6 +94,7 @@ public class PlayerEvents : Service
         _eventManager.RegisterEvent(CheckKeyCardPermission);
         _eventManager.RegisterEvent(CallVanillaElevator);
         _eventManager.RegisterEvent(SendPlayerData);
+        _eventManager.RegisterEvent(ChangeRole);
 
         WalkOnSinkhole.Subscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Subscribe(WalkOnHazard.Raise);
@@ -133,6 +136,7 @@ public class PlayerEvents : Service
         _eventManager.UnregisterEvent(CheckKeyCardPermission);
         _eventManager.UnregisterEvent(CallVanillaElevator);
         _eventManager.UnregisterEvent(SendPlayerData);
+        _eventManager.UnregisterEvent(ChangeRole);
         
         WalkOnSinkhole.Unsubscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Unsubscribe(WalkOnHazard.Raise);
@@ -146,6 +150,10 @@ public class PlayerEvents : Service
         if (player == null) return;
         var ev = new SimpleSetClassEvent(player, previous, next);
         SimpleSetClass.Raise(ev);
+
+        if (player.CustomRole == null)
+            Timing.CallDelayed(Timing.WaitForOneFrame,
+                () => ChangeRole.Raise(new ChangeRoleEvent(player) { RoleId = (uint)next }));
     }
 }
 
@@ -627,5 +635,12 @@ public class SendPlayerDataEvent : PlayerEvent
     public float Rotation { get; set; }
 
     public SendPlayerDataEvent(SynapsePlayer player) : base(player) { }
+}
+
+public class ChangeRoleEvent : PlayerEvent
+{
+    public uint RoleId { get; set; }
+
+    public ChangeRoleEvent(SynapsePlayer player) : base(player) { }
 }
 

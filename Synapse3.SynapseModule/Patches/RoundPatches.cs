@@ -262,9 +262,9 @@ internal static class DecoratedRoundMethods
             else if (anyScps || anyScps & anyChaos)
                 leadingTeam = RoundSummary.EscapedClassD > RoundSummary.SurvivingSCPs
                     ? RoundSummary.LeadingTeam.ChaosInsurgency
-                    : (RoundSummary.SurvivingSCPs > RoundSummary.EscapedScientists
+                    : RoundSummary.SurvivingSCPs > RoundSummary.EscapedScientists
                         ? RoundSummary.LeadingTeam.Anomalies
-                        : RoundSummary.LeadingTeam.Draw);
+                        : RoundSummary.LeadingTeam.Draw;
             
             else if (anyChaos)
                 leadingTeam = RoundSummary.EscapedClassD >= RoundSummary.EscapedScientists

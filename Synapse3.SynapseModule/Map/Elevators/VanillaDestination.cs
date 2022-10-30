@@ -34,7 +34,7 @@ public class VanillaDestination : IElevatorDestination
         }
         set
         {
-            var elevator = ((SynapseElevator)Elevator);
+            var elevator = (SynapseElevator)Elevator;
             switch (ElevatorId)
             {
                 case 0:
