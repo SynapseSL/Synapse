@@ -52,7 +52,7 @@ public class PlayerEvents : Service
     public readonly EventReactor<CheckKeyCardPermissionEvent> CheckKeyCardPermission = new();
     public readonly EventReactor<CallVanillaElevatorEvent> CallVanillaElevator = new();
     public readonly EventReactor<SendPlayerDataEvent> SendPlayerData = new();
-    public readonly EventReactor<KickEvent> KickEvent = new();
+    public readonly EventReactor<KickEvent> Kick = new();
 
     public PlayerEvents(EventManager eventManager)
     {
@@ -93,7 +93,7 @@ public class PlayerEvents : Service
         _eventManager.RegisterEvent(CheckKeyCardPermission);
         _eventManager.RegisterEvent(CallVanillaElevator);
         _eventManager.RegisterEvent(SendPlayerData);
-        _eventManager.RegisterEvent(KickEvent);
+        _eventManager.RegisterEvent(Kick);
 
         WalkOnSinkhole.Subscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Subscribe(WalkOnHazard.Raise);
@@ -135,7 +135,7 @@ public class PlayerEvents : Service
         _eventManager.UnregisterEvent(CheckKeyCardPermission);
         _eventManager.UnregisterEvent(CallVanillaElevator);
         _eventManager.UnregisterEvent(SendPlayerData);
-        _eventManager.UnregisterEvent(KickEvent);
+        _eventManager.UnregisterEvent(Kick);
         
         WalkOnSinkhole.Unsubscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Unsubscribe(WalkOnHazard.Raise);

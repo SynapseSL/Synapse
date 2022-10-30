@@ -113,10 +113,18 @@ internal static class PlayerPatches
                     issuer.Length - 2 - issuer.LastIndexOf('(')))
                 : Synapse.Get<PlayerService>().GetPlayer(issuer);
 
-            var ev = new BanEvent(player, true, banIssuer, reason, duration, isGlobalBan);
-            Synapse.Get<PlayerEvents>().Ban.Raise(ev);
-
-            return isGlobalBan && ConfigFile.ServerConfig.GetBool("gban_ban_ip") || ev.Allow;
+            if (duration == 0)
+            {
+                var ev = new KickEvent(player, banIssuer, reason, true);
+                Synapse.Get<PlayerEvents>().Kick.Raise(ev);
+                return isGlobalBan || ev.Allow;   
+            }
+            else
+            {
+                var ev = new BanEvent(player, true, banIssuer, reason, duration, isGlobalBan);
+                Synapse.Get<PlayerEvents>().Ban.Raise(ev);
+                return isGlobalBan || ev.Allow;
+            }
         }
         catch (Exception ex)
         {
@@ -504,31 +512,6 @@ internal static class PlayerPatches
         catch (Exception ex)
         {
             NeuronLogger.For<Synapse>().Error("Sy3 Event: Call Vanilla Elevator event failed\n" + ex);
-            return true;
-        }
-    }
-    
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(BanPlayer), nameof(BanPlayer.KickUser), typeof(GameObject), typeof(string), typeof(string))]
-    public static bool OnKick(GameObject user, string kickIssuer, string __reason, bool isGlobalBan, bool _allow)
-    {
-        try
-        {
-            var player = user.GetSynapsePlayer();
-            var kicker = kickIssuer.Contains("(")
-                ? Synapse.Get<PlayerService>().GetPlayer(kickIssuer.Substring(kickIssuer.LastIndexOf('(') + 1,
-                    kickIssuer.Length - 2 - kickIssuer.LastIndexOf('(')))
-                : Synapse.Get<PlayerService>().GetPlayer(kickIssuer);
-
-            var ev = new KickEvent(player, kicker, __reason, _allow);
-            Synapse.Get<PlayerEvents>().KickEvent.Raise(ev);
-
-            return isGlobalBan && ConfigFile.ServerConfig.GetBool("gban_ban_ip") || ev.Allow;
-
-        }
-        catch(Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Player Kick Event failed\n" + ex);
             return true;
         }
     }
