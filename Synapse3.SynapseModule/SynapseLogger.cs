@@ -9,7 +9,7 @@ public static class SynapseLogger<TName>
 
     public static void Debug(object msg) => Logger.Debug(msg);
 
-    public static void Warn(object msg) => Logger.Debug(msg);
+    public static void Warn(object msg) => Logger.Warn(msg);
 
     public static void Info(object msg) => Logger.Info(msg);
 
