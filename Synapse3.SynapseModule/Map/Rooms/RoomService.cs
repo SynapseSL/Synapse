@@ -13,7 +13,7 @@ namespace Synapse3.SynapseModule.Map.Rooms;
 public class RoomService : Service
 {
     public const int HighestRoom = (int)RoomType.GateB;
-    
+
     private readonly RoundEvents _round;
     private readonly MapService _map;
     private readonly IKernel _kernel;
@@ -31,7 +31,7 @@ public class RoomService : Service
     {
         _round.Waiting.Subscribe(LoadRooms);
         _round.Restart.Subscribe(ClearRooms);
-        
+
         while (_synapseModule.ModuleRoomBindingQueue.Count != 0)
         {
             var binding = _synapseModule.ModuleRoomBindingQueue.Dequeue();
@@ -48,23 +48,23 @@ public class RoomService : Service
     internal void LoadBinding(SynapseRoomBinding binding) => RegisterCustomRoom(binding.Info);
 
     internal readonly List<IRoom> _rooms = new();
-    private readonly List<CustomRoomAttribute> _customRoomInformation = new ();
-    
-    
+    private readonly List<CustomRoomAttribute> _customRoomInformation = new();
+
+
     public ReadOnlyCollection<IRoom> Rooms => _rooms.AsReadOnly();
     public ReadOnlyCollection<CustomRoomAttribute> CustomRoomInformation => _customRoomInformation.AsReadOnly();
 
-    
+
     public IRoom GetRoom(uint id)
         => Rooms.FirstOrDefault(x => x.Id == id);
 
     public IRoom GetRoom(string name)
         => Rooms.FirstOrDefault(x => x.Name == name);
-    
+
     public IRoom GetNearestRoom(Vector3 position)
     {
         var room = RoomIdUtils.RoomAtPosition(position);
-        
+
         return room != null ? room.GetVanillaRoom() : Rooms.OrderBy(x => Vector3.Distance(x.Position, position))?.FirstOrDefault();
     }
 
@@ -77,23 +77,23 @@ public class RoomService : Service
     public void RegisterCustomRoom<TRoom>() where TRoom : SynapseCustomRoom
     {
         var info = typeof(TRoom).GetCustomAttribute<CustomRoomAttribute>();
-        if(info == null) return;
+        if (info == null) return;
         info.RoomType = typeof(TRoom);
-        
+
         RegisterCustomRoom(info);
     }
-    
+
     public void RegisterCustomRoom(CustomRoomAttribute info)
     {
-        if(info.RoomType == null) return;
-        if(IsIdRegistered(info.Id)) return;
-        
+        if (info.RoomType == null) return;
+        if (IsIdRegistered(info.Id)) return;
+
         _customRoomInformation.Add(info);
     }
 
     public void UnRegisterCustomRoom(uint id)
     {
-        if(!IsIdRegistered(id)) return;
+        if (!IsIdRegistered(id)) return;
         var info = _customRoomInformation.First(x => x.Id == id);
         _customRoomInformation.Remove(info);
     }
@@ -124,7 +124,7 @@ public class RoomService : Service
 
     public bool IsIdRegistered(uint id)
         => id is >= 0 and <= HighestRoom || _customRoomInformation.Any(x => x.Id == id);
-    
+
     private void LoadRooms(RoundWaitingEvent ev)
     {
         foreach (var room in RoomIdentifier.AllRoomIdentifiers)
@@ -135,15 +135,15 @@ public class RoomService : Service
             switch (type)
             {
                 case RoomType.Scp939:
-                    case RoomType.Scp330:
-                    case RoomType.Scp106:
+                case RoomType.Scp330:
+                case RoomType.Scp106:
                     iRoom = new SynapseNetworkRoom(room, type);
                     break;
-                
+
                 default:
                     iRoom = new SynapseRoom(room, type);
                     break;
-                    
+
             }
 
             _rooms.Add(iRoom);
@@ -159,9 +159,11 @@ public class RoomService : Service
 
     public RoomType GetRoomTypeFromName(string roomName)
     {
+        var nameLower = roomName.ToLower();
+
         foreach (var pair in RoomByNames)
         {
-            if (roomName.ToLower().Contains(pair.Key.ToLower())) return pair.Value;
+            if (nameLower.Contains(pair.Key.ToLower())) return pair.Value;
         }
 
         return RoomType.None;
