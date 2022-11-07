@@ -65,9 +65,9 @@ internal static class DeathPatches
             }
 
             victim.DeathPosition = victim.Position;
-
+            
+            playerMsg = ev.DeathMessage;
             var ragdollInfo = ev.RagdollInfo;
-            var playerMessage = ev.DeathMessage;
 
             //--Vanila Stuff rework--
             if (ragdollInfo != null)
@@ -75,7 +75,9 @@ internal static class DeathPatches
             else
                 Ragdoll.ServerSpawnRagdoll(victim, handler);
 
-            if (attacker != null)//I replace the NickName by display name, I find it more consistent for Synapse
+            if (playerMsg != null)
+                __instance.TargetReceiveSpecificDeathReason(new CustomReasonDamageHandler(playerMsg));
+            else if (attacker != null)//I replace the NickName by display name, I find it more consistent for Synapse
                 __instance.TargetReceiveAttackerDeathReason(attacker.DisplayName, attacker.RoleType);
             else
                 __instance.TargetReceiveSpecificDeathReason(handler);
