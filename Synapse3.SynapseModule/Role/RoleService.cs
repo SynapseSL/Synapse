@@ -128,6 +128,24 @@ public class RoleService : Service
         var role = _customRoles.FirstOrDefault(x => x.Id == id);
         return role != null && _customRoles.Remove(role);
     }
+
+    public TRole GetRole<TRole>()
+        where TRole : SynapseRole
+    {
+        var info = _customRoles.FirstOrDefault(x => x.RoleScript == typeof(TRole));
+        if (info == null) return null;
+        var role = GetRole(info);
+        return role as TRole;
+    }
+
+    public TRole GetRole<TRole>(uint id)
+        where TRole : SynapseRole
+    {
+        var info = _customRoles.FirstOrDefault(x => x.RoleScript == typeof(TRole) && x.Id == id);
+        if (info == null) return null;
+        var role = GetRole(info);
+        return role as TRole;
+    }
     
     /// <inheritdoc cref="GetRole(RoleAttribute)"/>
     public ISynapseRole GetRole(string name)

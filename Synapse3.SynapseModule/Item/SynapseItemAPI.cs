@@ -28,6 +28,11 @@ public partial class SynapseItem
             return;
         }
 
+        ForceEquipItem(player, provideFully);
+    }
+    
+    public void ForceEquipItem(SynapsePlayer player, bool provideFully = false)
+    {
         if (RootParent is SynapseItem parent)
         {
             parent.EquipItem(player, false);

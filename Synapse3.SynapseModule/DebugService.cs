@@ -3,6 +3,7 @@ using MEC;
 using Mirror;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
+using Neuron.Modules.Commands;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Events;
@@ -37,6 +38,8 @@ public class DebugService : Service
 
     public override void Enable()
     {
+        Synapse.Get<SynapseCommandService>().ServerConsole.Subscribe(ev => Logger.Warn(ev.Context.FullCommand));
+        
         _player.DoorInteract.Subscribe(OnDoor);
         _player.KeyPress.Subscribe(OnKeyPress);
         _round.SelectTeam.Subscribe(SelectTeam);
