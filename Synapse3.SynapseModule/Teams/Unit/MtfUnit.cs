@@ -34,7 +34,7 @@ public class MtfUnit : SynapseUnit
         do
         {
             var code = NineTailedFoxNamingRule.PossibleCodes[Random.Range(0, NineTailedFoxNamingRule.PossibleCodes.Length)];
-            var unite = Random.Range(1, 20).ToString("00");
+            var unite = Random.Range(1, 21).ToString("00");
 
             unit = $"{code}-{unite}";
         } while (UnitNamingRule.UsedCombinations.Contains(unit));
