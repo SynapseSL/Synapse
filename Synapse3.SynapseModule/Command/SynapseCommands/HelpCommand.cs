@@ -41,12 +41,12 @@ public class HelpCommand : SynapseCommand
 
             case CommandPlatform.RemoteAdmin:
                 commandlist = Synapse.Get<SynapseCommandService>().RemoteAdmin.Handler.Commands.ToList();
-                vanilla = GameCore.Console.singleton.ConsoleCommandHandler.AllCommands;
+                vanilla = CommandProcessor.RemoteAdminCommandHandler.AllCommands;
                 break;
 
             case CommandPlatform.ServerConsole:
                 commandlist = Synapse.Get<SynapseCommandService>().ServerConsole.Handler.Commands.ToList();
-                vanilla = CommandProcessor.RemoteAdminCommandHandler.AllCommands;
+                vanilla = GameCore.Console.singleton.ConsoleCommandHandler.AllCommands;
                 break;
 
             default:
