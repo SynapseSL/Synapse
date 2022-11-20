@@ -19,16 +19,12 @@ namespace Synapse3.SynapseModule.Patches.PlayerPatches;
 internal static class DeathPatches
 {
     static SynapseTranslation _translation;
-    static PlayerService _service;
+    static PlayerService _player;
 
-    [HarmonyPrepare]//Like a ctor but for Patch
-    public static void Initialize(MethodBase original)
+    static DeathPatches()
     {
-        //call several times (foreach patch of the class) but first call is with original = null 
-        if (original != null) return;
-
         _translation = Synapse.Get<SynapseConfigService>().Translation;
-        _service = Synapse.Get<PlayerService>();
+        _player = Synapse.Get<PlayerService>();
     }
 
     [HarmonyPrefix]
@@ -45,7 +41,7 @@ internal static class DeathPatches
             var damageType = handler.GetDamageType();
 
             if (damageType == DamageType.PocketDecay)
-                attacker = _service.Players.FirstOrDefault(x => x.ScpController.Scp106.PlayersInPocket.Contains(victim));
+                attacker = _player.Players.FirstOrDefault(x => x.ScpController.Scp106.PlayersInPocket.Contains(victim));
 
             string playerMsg = null;
 
@@ -89,7 +85,7 @@ internal static class DeathPatches
             classManager.TargetConsolePrint(classManager.connectionToClient, "You died. Reason: " + handler.ServerLogsText, "yellow");
 
             //--Synapse API--
-            foreach (var larry in _service.Players)
+            foreach (var larry in _player.Players)
             {
                 var playerPocket = larry.ScpController.Scp106.PlayersInPocket;
                 if (playerPocket.Contains(victim))
