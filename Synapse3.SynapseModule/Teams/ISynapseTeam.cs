@@ -16,4 +16,6 @@ public interface ISynapseTeam
     public void RespawnAnnouncement();
 
     public void Load();
+
+    public bool PlayerEvacuated(SynapsePlayer player);
 }

@@ -242,12 +242,15 @@ public class Scp106LeavePocketEvent : PlayerEvent
     public Scp106LeavePocketEvent(SynapsePlayer player, bool escapePocket, Vector3 enteredPosition) : base(player)
     {
         EscapePocket = escapePocket;
-        EnteredPosition = enteredPosition;
+        EscapePosition = enteredPosition;
+        VanillaRepositioning = true;
     }
     
     public bool EscapePocket { get; set; }
     
-    public Vector3 EnteredPosition { get; set; } //Maby rename it or redo the Event
+    public Vector3 EscapePosition { get; set; } 
+
+    public bool VanillaRepositioning { get; set; }
 }
 
 public class Scp096ObserveEvent : PlayerInteractEvent

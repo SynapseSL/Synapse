@@ -254,9 +254,11 @@ public partial class SynapsePlayer
     {
         get
         {
-            if (DisarmedPlayers.Entries.All(x => x.DisarmedPlayer != NetworkIdentity.netId)) return null;
+            var index = DisarmedPlayers.Entries.FindIndex(x => x.DisarmedPlayer != NetworkIdentity.netId);
 
-            var id = DisarmedPlayers.Entries.FirstOrDefault(x => x.DisarmedPlayer == NetworkIdentity.netId).Disarmer;
+            if (index == -1) return null;
+
+            var id = DisarmedPlayers.Entries.[index].Disarmer;
             if (id == 0) return ReferenceHub.LocalHub.GetSynapsePlayer();
 
             _player.GetPlayer(id);

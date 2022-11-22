@@ -13,5 +13,7 @@ public abstract class SynapseTeam : ISynapseTeam
     public virtual void RespawnAnnouncement() { }
     public virtual void Load() { }
 
+    public virtual bool PlayerEvacuated(SynapsePlayer player) { return false; }
+
     public TeamAttribute Attribute { get; set; }
 }

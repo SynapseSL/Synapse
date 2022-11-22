@@ -7,6 +7,7 @@ using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Player;
+using System.Numerics;
 
 namespace Synapse3.SynapseModule.Events;
 
@@ -171,12 +172,19 @@ public class ReloadWeaponEvent : BasicItemInteractEvent
 
 public class ShootEvent : BasicItemInteractEvent
 {
-    public ShootEvent(SynapseItem item, ItemInteractState state, SynapsePlayer player, SynapsePlayer target) : base(item, state, player)
+    public ShootEvent(SynapseItem item, ItemInteractState state, SynapsePlayer player, SynapsePlayer target,
+        UnityEngine.Vector3 targetPosition, UnityEngine.Quaternion targetRotation) : base(item, state, player)
     {
         Target = target;
+        TargetPosition = targetPosition;
+        TargetRotation = targetRotation;
     }
 
     public SynapsePlayer Target { get; }
+
+    public UnityEngine.Vector3 TargetPosition { get; set; }
+
+    public UnityEngine.Quaternion TargetRotation { get; set; }
 }
 
 public class ThrowGrenadeEvent : BasicItemInteractEvent
