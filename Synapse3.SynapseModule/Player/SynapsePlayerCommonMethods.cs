@@ -235,6 +235,12 @@ public partial class SynapsePlayer
 
     public void TriggerEscape()
     {
+        var disarmer = Disarmer;
+        if (disarmer != null && disarmer is not SynapseServerPlayer && _team.TryGetTeam(disarmer.TeamID, out var team))
+        {
+            if (team.PlayerEvacuated(this)) return;
+        }
+
         if (CustomRole != null)
         {
             CustomRole.TryEscape();

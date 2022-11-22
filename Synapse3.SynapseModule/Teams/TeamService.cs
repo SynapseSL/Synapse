@@ -71,6 +71,13 @@ public class TeamService : Service
 
     public ISynapseTeam GetTeam(uint id) => _teams.FirstOrDefault(x => x.Attribute.Id == id);
 
+    public bool TryGetTeam(uint id, out ISynapseTeam team)
+    {
+        team = GetTeam(id);
+        return team != null;
+    }
+
+
     public string GetTeamName(uint id)
     {
         return id switch

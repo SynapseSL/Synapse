@@ -705,11 +705,12 @@ internal static class DecoratedScpPatches
     {
         var player = other.gameObject.GetSynapsePlayer();
         if (player == null) return;
-        var escape = player.GodMode || exit._type == PocketDimensionTeleport.PDTeleportType.Exit ||
-                     !Synapse3Extensions.CanHarmScp(player, false);
+        var escape = player.GodMode || 
+                         exit._type == PocketDimensionTeleport.PDTeleportType.Exit ||
+                         !Synapse3Extensions.CanHarmScp(player, false);
+
         var ev = new Scp106LeavePocketEvent(player, escape, player.ClassManager.Scp106.GrabbedPosition);
         Synapse.Get<ScpEvents>().Scp106LeavePocket.Raise(ev);
-        player.ClassManager.Scp106.GrabbedPosition = ev.EnteredPosition;
 
         foreach (var scp in Synapse.Get<PlayerService>().Players)
         {
@@ -718,7 +719,10 @@ internal static class DecoratedScpPatches
 
         if (ev.EscapePocket)
         {
-            exit.SuccessEscape(player);
+            if (ev.VanillaRepositioning)
+                exit.SuccessEscape(player);
+            else 
+                player.Position = ev.EscapePosition;
         }
         else
         {
