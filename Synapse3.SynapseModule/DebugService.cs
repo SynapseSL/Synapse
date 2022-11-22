@@ -53,7 +53,7 @@ public class DebugService : Service
             NeuronLogger.For<Synapse>().Warn($"Shoot {ev.Player.NickName} {ev.Target?.NickName} {ev.Item.ItemType}");
         });
 
-        _scp.Revive.Subscribe(ev =>
+        _scp.Scp049Revive.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>()
                 .Warn($"Revive {ev.Scp049.NickName} {ev.HumanToRevive.NickName} {ev.Ragdoll.RoleType} Finish: {ev.FinishRevive}");
@@ -105,8 +105,8 @@ public class DebugService : Service
         _scp.Scp939Attack.Subscribe(ScpEvent);
         _scp.Scp106Attack.Subscribe(ScpEvent);
 
-        _scp.ContainScp079.Subscribe(ev => NeuronLogger.For<Synapse>().Warn("Contain 079: " + ev.Status));
-        _scp.SwitchCamera.Subscribe(ev =>
+        _scp.Scp079Contain.Subscribe(ev => NeuronLogger.For<Synapse>().Warn("Contain 079: " + ev.Status));
+        _scp.Scp079SwitchCamera.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Warn("Switch Cam " + ev.Scp079.NickName + " " + ev.Camera.CameraID);
             ev.Allow = Random.Range(0, 2) == 1;
@@ -117,7 +117,7 @@ public class DebugService : Service
             NeuronLogger.For<Synapse>().Warn("079 Door");
         });
 
-        _scp.Revive.Subscribe(ev => ev.Allow = false);
+        _scp.Scp049Revive.Subscribe(ev => ev.Allow = false);
 
         Synapse.Get<SynapseObjectEvents>().ButtonPressed
             .Subscribe(ev =>
@@ -128,7 +128,11 @@ public class DebugService : Service
 
         _player.Kick.Subscribe(ev => Logger.Warn("KICK " + ev.Admin + " " + ev.Reason));
         _player.Ban.Subscribe(ev => Logger.Warn("Ban " + ev.Admin + " " + ev.Reason));
+
+        _scp.Scp106LeavePocket.Subscribe(ev => ev.EnteredPosition = SavePos);
     }
+
+    Vector3 SavePos = default; 
 
     private void ScpEvent(ScpAttackEvent ev)
     {
@@ -207,6 +211,9 @@ public class DebugService : Service
                     ev.Player.SendNetworkMessage(Synapse.Get<MirrorService>()
                         .GetCustomVarMessage(door.Variant, 1ul, true));
                 }
+                break;
+            case KeyCode.Alpha5:
+                SavePos = ev.Player.Position;
                 break;
         }
     }

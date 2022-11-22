@@ -117,8 +117,8 @@ internal static class ScpPatches
         {
             var player = __instance.GetSynapsePlayer();
             if (player == null || __instance._breakneckSpeedsCooldownRemaining > 0f) return false;
-            var ev = new ActivateBreakneckSpeedEvent(player);
-            Synapse.Get<ScpEvents>().ActivateBreakneckSpeed.Raise(ev);
+            var ev = new Scp173ActivateBreakneckSpeedEvent(player);
+            Synapse.Get<ScpEvents>().Scp173ActivateBreakneckSpeed.Raise(ev);
             return ev.Allow;
         }
         catch (Exception ex)
@@ -136,8 +136,8 @@ internal static class ScpPatches
         {
             var player = __instance.GetSynapsePlayer();
             if (player == null || __instance._tantrumCooldownRemaining > 0f || __instance._isObserved) return false;
-            var ev = new PlaceTantrumEvent(player);
-            Synapse.Get<ScpEvents>().PlaceTantrum.Raise(ev);
+            var ev = new Scp173PlaceTantrumEvent(player);
+            Synapse.Get<ScpEvents>().Scp173PlaceTantrum.Raise(ev);
             return ev.Allow;
         }
         catch (Exception ex)
@@ -239,10 +239,10 @@ internal static class ScpPatches
                 var player = attackerDamageHandler.Attacker.GetSynapsePlayer();
                 if (scp == null || player == null || player == scp) return false;
                 
-                var ev = new ObserveScp096Event(player,
+                var ev = new Scp096ObserveEvent(player,
                     player.Invisible < InvisibleMode.Ghost && !Synapse.Get<SynapseConfigService>().GamePlayConfiguration.CantObserve096
                         .Contains(player.RoleID), scp);
-                Synapse.Get<ScpEvents>().ObserveScp096.Raise(ev);
+                Synapse.Get<ScpEvents>().Scp096Observed.Raise(ev);
                 if (!ev.Allow) return false;
                 __instance.AddTarget(player.gameObject);
                 __instance.Windup();
@@ -329,8 +329,8 @@ internal static class ScpPatches
     {
         try
         {
-            var ev = new ContainScp079Event(Scp079ContainmentStatus.Finished);
-            Synapse.Get<ScpEvents>().ContainScp079.Raise(ev);
+            var ev = new Scp079ContainEvent(Scp079ContainmentStatus.Finished);
+            Synapse.Get<ScpEvents>().Scp079Contain.Raise(ev);
         }
         catch (Exception ex)
         {
@@ -344,8 +344,8 @@ internal static class ScpPatches
     {
         try
         {
-            var ev = new ContainScp079Event(Scp079ContainmentStatus.AnnounceOvercharge);
-            Synapse.Get<ScpEvents>().ContainScp079.Raise(ev);
+            var ev = new Scp079ContainEvent(Scp079ContainmentStatus.AnnounceOvercharge);
+            Synapse.Get<ScpEvents>().Scp079Contain.Raise(ev);
             return ev.Allow;
         }
         catch (Exception ex)
@@ -364,8 +364,8 @@ internal static class ScpPatches
             if (!__instance._delayStopwatch.IsRunning ||
                 __instance._delayStopwatch.Elapsed.TotalSeconds <= __instance._activationDelay) return true;
             
-            var ev = new ContainScp079Event(Scp079ContainmentStatus.Overcharge);
-            Synapse.Get<ScpEvents>().ContainScp079.Raise(ev);
+            var ev = new Scp079ContainEvent(Scp079ContainmentStatus.Overcharge);
+            Synapse.Get<ScpEvents>().Scp079Contain.Raise(ev);
             return ev.Allow;
         }
         catch (Exception ex)
@@ -386,8 +386,8 @@ internal static class ScpPatches
             var camera = Synapse.Get<MapService>()._synapseCameras.FirstOrDefault(x => x.CameraID == id);
             if (player == null || camera == null) return false;
 
-            var ev = new SwitchCameraEvent(!player.ScpController.Scp079.Spawned, player, camera);
-            Synapse.Get<ScpEvents>().SwitchCamera.Raise(ev);
+            var ev = new Scp079SwitchCameraEvent(!player.ScpController.Scp079.Spawned, player, camera);
+            Synapse.Get<ScpEvents>().Scp079SwitchCamera.Raise(ev);
             
             if (ev.Spawning)
                 player.ScpController.Scp079.Spawned = true;
@@ -557,8 +557,8 @@ internal static class DecoratedScpPatches
         
         if (generators >= count)
         {
-            var ev = new ContainScp079Event(Scp079ContainmentStatus.OverrideDoors);
-            Synapse.Get<ScpEvents>().ContainScp079.Raise(ev);
+            var ev = new Scp079ContainEvent(Scp079ContainmentStatus.OverrideDoors);
+            Synapse.Get<ScpEvents>().Scp079Contain.Raise(ev);
             if(!ev.Allow) return;
 
             announcement += container079._announcementAllActivated;
@@ -687,10 +687,10 @@ internal static class DecoratedScpPatches
                 60f, true, true, scp096.Hub.localCurrentRoomEffects);
 
             if (!visionInfo.IsLooking) continue;
-            var ev = new ObserveScp096Event(player,
+            var ev = new Scp096ObserveEvent(player,
                 player.Invisible < InvisibleMode.Ghost && !Synapse.Get<SynapseConfigService>().GamePlayConfiguration.CantObserve096
                     .Contains(player.RoleID), scp);
-            Synapse.Get<ScpEvents>().ObserveScp096.Raise(ev);
+            Synapse.Get<ScpEvents>().Scp096Observed.Raise(ev);
             if(!ev.Allow) continue;
             
             var delay = visionInfo.LookingAmount / 0.25f * (visionInfo.Distance * 0.1f);
@@ -707,8 +707,8 @@ internal static class DecoratedScpPatches
         if (player == null) return;
         var escape = player.GodMode || exit._type == PocketDimensionTeleport.PDTeleportType.Exit ||
                      !Synapse3Extensions.CanHarmScp(player, false);
-        var ev = new LeavePocketEvent(player, escape, player.ClassManager.Scp106.GrabbedPosition);
-        Synapse.Get<ScpEvents>().LeavePocket.Raise(ev);
+        var ev = new Scp106LeavePocketEvent(player, escape, player.ClassManager.Scp106.GrabbedPosition);
+        Synapse.Get<ScpEvents>().Scp106LeavePocket.Raise(ev);
         player.ClassManager.Scp106.GrabbedPosition = ev.EnteredPosition;
 
         foreach (var scp in Synapse.Get<PlayerService>().Players)
@@ -778,8 +778,8 @@ internal static class DecoratedScpPatches
         if (!Physics.Raycast(new Ray(script.transform.position, -script.transform.up), out var raycast, 10f,
                 script.teleportPlacementMask)) return;
 
-        var ev = new CreatePortalEvent(scp, raycast.point - Vector3.up);
-        Synapse.Get<ScpEvents>().CreatePortal.Raise(ev);
+        var ev = new Scp106CreatePortalEvent(scp, raycast.point - Vector3.up);
+        Synapse.Get<ScpEvents>().Scp106CreatePortal.Raise(ev);
         if (ev.Allow)
         {
             script.SetPortalPosition(Vector3.zero, ev.Position);
@@ -794,10 +794,10 @@ internal static class DecoratedScpPatches
             !interact.ChckDis(GameObject.FindGameObjectWithTag("FemurBreaker").transform.position) ||
             !Synapse3Extensions.CanHarmScp(player, true)) return false;
 
-        var ev = new ContainScp106Event(player);
+        var ev = new Scp106ContainEvent(player);
         var container = Object.FindObjectOfType<LureSubjectContainer>();
         ev.Allow = container.allowContain;
-        Synapse.Get<ScpEvents>().ContainScp106.Raise(ev);
+        Synapse.Get<ScpEvents>().Scp106Contain.Raise(ev);
 
         if (!ev.Allow) return false;
         container.allowContain = true;
@@ -883,9 +883,9 @@ internal static class DecoratedScpPatches
                         VisionInformation.VisionLayerMask) || !Physics.Linecast(pos + new Vector3(0f, -1f, 0f),
                         player.CameraReference.position, VisionInformation.VisionLayerMask)))
                 {
-                    var ev = new ObserveScp173Event(player,
+                    var ev = new Scp173ObserveEvent(player,
                         player.Invisible < InvisibleMode.Ghost && !config.GamePlayConfiguration.CantObserve173.Contains(player.RoleID), scp);
-                    Synapse.Get<ScpEvents>().ObserveScp173.Raise(ev);
+                    Synapse.Get<ScpEvents>().Scp173Observed.Raise(ev);
                     if(!ev.Allow) continue;
                     
                     if (!scp173._observingPlayers.Contains(player))
@@ -964,7 +964,7 @@ internal static class DecoratedScpPatches
             var owner = ragdoll?.Owner;
             if (ragdoll == null || owner == null) return;
 
-            var ev2 = new ReviveEvent(scp, owner, ragdoll, action == 2);
+            var ev2 = new Scp049ReviveEvent(scp, owner, ragdoll, action == 2);
 
             if (!ev2.FinishRevive)
             {
@@ -987,7 +987,7 @@ internal static class DecoratedScpPatches
                 }
                 if (!distance) ev2.Allow = false;
                 
-                Synapse.Get<ScpEvents>().Revive.Raise(ev2);
+                Synapse.Get<ScpEvents>().Scp049Revive.Raise(ev2);
                 if(!ev2.Allow) return;
                 
                 scp049._recallHubServer = owner;
@@ -1005,7 +1005,7 @@ internal static class DecoratedScpPatches
                 if (owner.RoleType != RoleType.Spectator)
                     ev2.Allow = false;
                 
-                Synapse.Get<ScpEvents>().Revive.Raise(ev2);
+                Synapse.Get<ScpEvents>().Scp049Revive.Raise(ev2);
                 if(!ev2.Allow) return;
 
                 owner.ClassManager.SetClassID(RoleType.Scp0492, CharacterClassManager.SpawnReason.Revived);
