@@ -236,7 +236,9 @@ public partial class SynapsePlayer
     public void TriggerEscape()
     {
         var disarmer = Disarmer;
-        if (disarmer != null && disarmer is not SynapseServerPlayer && _team.TryGetTeam(disarmer.TeamID, out var team))
+        var cuffed = disarmer != null;
+
+        if (cuffed && disarmer is not SynapseServerPlayer && _team.TryGetTeam(disarmer.TeamID, out var team))
         {
             if (team.PlayerEvacuated(this)) return;
         }
@@ -248,47 +250,40 @@ public partial class SynapsePlayer
         }
 
         var allow = true;
+        var changeTeam = true;
         var escapeRole = RoleService.NoneRole;
-        var changeTeam = false;
 
-        foreach (var disarmedEntry in DisarmedPlayers.Entries)
+        if (cuffed) // Switch when change Team 
         {
-            if (disarmedEntry.DisarmedPlayer == NetworkIdentity.netId)
+            switch (RoleType)
             {
-                if (disarmedEntry.DisarmedPlayer == 0 && CharacterClassManager.ForceCuffedChangeTeam)
-                {
-                    changeTeam = true;
-                }
+                case RoleType.Scientist when CharacterClassManager.ForceCuffedChangeTeam || 
+                                             disarmer.Faction == Faction.FoundationEnemy:
+                    escapeRole = (int)RoleType.ChaosConscript;
+                    break;
 
-                var disarmer = Disarmer;
-
-                switch (RoleType)
-                {
-                    case RoleType.Scientist when disarmer.Faction == Faction.FoundationEnemy:
-                        changeTeam = true;
-                        break;
-                    
-                    case RoleType.ClassD when disarmer.Faction == Faction.FoundationStaff:
-                        changeTeam = true;
-                        break;
-                }
+                case RoleType.ClassD when CharacterClassManager.ForceCuffedChangeTeam ||
+                                          disarmer.Faction == Faction.FoundationStaff:
+                    escapeRole = (int)RoleType.NtfPrivate;
+                    break;
+                default:
+                    changeTeam = false;
+                    break;
             }
         }
+        else 
+        { 
+            switch (RoleType) // Switch when don't change Team
+            {
+                case RoleType.ClassD:
+                    escapeRole = (int)RoleType.ChaosConscript;
+                    break;
 
-        switch (RoleType)
-        {
-            case RoleType.ClassD when changeTeam:
-                escapeRole = (int)RoleType.NtfPrivate;
-                break;
-
-            case RoleType.ClassD:
-            case RoleType.Scientist when changeTeam:
-                escapeRole = (int)RoleType.ChaosConscript;
-                break;
-
-            case RoleType.Scientist:
-                escapeRole = (int)RoleType.NtfSpecialist;
-                break;
+                case RoleType.Scientist:
+                    escapeRole = (int)RoleType.NtfSpecialist;
+                    break;
+            }
+            changeTeam = false;
         }
 
         if (escapeRole == RoleService.NoneRole) allow = false;

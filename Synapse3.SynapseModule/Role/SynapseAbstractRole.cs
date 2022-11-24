@@ -169,7 +169,7 @@ public abstract class SynapseAbstractRole : SynapseRole
 
         OnSpawn(config);
         
-        _player.UpdateDisplayName.Subscribe(UpdateDisplayName);
+        _player.UpdateDisplayName.Subscribe(OnUpdateDisplayName);
     }
 
     public sealed override void DeSpawn(DeSpawnReason reason)
@@ -181,7 +181,7 @@ public abstract class SynapseAbstractRole : SynapseRole
 
         OnDeSpawn(reason);
         
-        _player.UpdateDisplayName.Unsubscribe(UpdateDisplayName);
+        _player.UpdateDisplayName.Unsubscribe(OnUpdateDisplayName);
     }
 
     public void RemoveCustomDisplay()
@@ -222,6 +222,13 @@ public abstract class SynapseAbstractRole : SynapseRole
 
     public virtual string GetName() =>
         Player.NicknameSync.HasCustomName ? Player.NicknameSync._displayName : Player.NickName;
+
+    private void OnUpdateDisplayName(UpdateDisplayNameEvent ev)
+    {
+        if (ev.Player != Player) return;
+
+        UpdateDisplayName(ev);
+    }
 
     public virtual void UpdateDisplayName(UpdateDisplayNameEvent ev)
     {

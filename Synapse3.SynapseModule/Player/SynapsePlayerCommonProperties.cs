@@ -258,7 +258,7 @@ public partial class SynapsePlayer
 
             if (index == -1) return null;
 
-            var id = DisarmedPlayers.Entries.[index].Disarmer;
+            var id = DisarmedPlayers.Entries[index].Disarmer;
             if (id == 0) return ReferenceHub.LocalHub.GetSynapsePlayer();
 
             _player.GetPlayer(id);
