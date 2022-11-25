@@ -128,11 +128,7 @@ public class DebugService : Service
 
         _player.Kick.Subscribe(ev => Logger.Warn("KICK " + ev.Admin + " " + ev.Reason));
         _player.Ban.Subscribe(ev => Logger.Warn("Ban " + ev.Admin + " " + ev.Reason));
-
-        _scp.Scp106LeavePocket.Subscribe(ev => ev.EscapePosition = SavePos);
     }
-
-    Vector3 SavePos = default; 
 
     private void ScpEvent(ScpAttackEvent ev)
     {
@@ -211,9 +207,6 @@ public class DebugService : Service
                     ev.Player.SendNetworkMessage(Synapse.Get<MirrorService>()
                         .GetCustomVarMessage(door.Variant, 1ul, true));
                 }
-                break;
-            case KeyCode.Alpha5:
-                SavePos = ev.Player.Position;
                 break;
         }
     }

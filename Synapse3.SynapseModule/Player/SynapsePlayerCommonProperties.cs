@@ -254,15 +254,14 @@ public partial class SynapsePlayer
     {
         get
         {
-            var index = DisarmedPlayers.Entries.FindIndex(x => x.DisarmedPlayer != NetworkIdentity.netId);
+            var index = DisarmedPlayers.Entries.FindIndex(x => x.DisarmedPlayer == NetworkIdentity.netId);
 
             if (index == -1) return null;
 
             var id = DisarmedPlayers.Entries[index].Disarmer;
             if (id == 0) return ReferenceHub.LocalHub.GetSynapsePlayer();
 
-            _player.GetPlayer(id);
-            return null;
+            return _player.GetPlayer(id);
         }
         set => VanillaInventory.SetDisarmedStatus(value.VanillaInventory);
     }

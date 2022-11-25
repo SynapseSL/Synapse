@@ -7,6 +7,7 @@ using Neuron.Core.Meta;
 using Neuron.Modules.Commands.Event;
 using Ninject;
 using Synapse3.SynapseModule.Command;
+using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Role;
@@ -15,7 +16,8 @@ public class RoleService : Service
 {
     private readonly IKernel _kernel;
     private readonly SynapseCommandService _command;
-    private readonly PlayerService _player;
+    private readonly PlayerService _playerService;
+    private readonly PlayerEvents _playerEvent;
     private readonly List<RoleAttribute> _customRoles = new();
     private readonly Synapse _synapseModule;
 
@@ -37,11 +39,12 @@ public class RoleService : Service
     /// <summary>
     /// Creates a new RoleService
     /// </summary>
-    public RoleService(IKernel kernel, SynapseCommandService command, PlayerService player,Synapse synapse)
+    public RoleService(IKernel kernel, SynapseCommandService command, PlayerService playerService, PlayerEvents playerEvent, Synapse synapse)
     {
         _kernel = kernel;
         _command = command;
-        _player = player;
+        _playerService = playerService;
+        _playerEvent = playerEvent;
         _synapseModule = synapse;
     }
 
@@ -51,7 +54,8 @@ public class RoleService : Service
     public override void Enable()
     {
         _command.RemoteAdmin.Subscribe(OnRemoteAdmin);
-        
+        _playerEvent.UpdateDisplayName.Subscribe(OnUpdateDisplayName);
+
         while (_synapseModule.ModuleRoleBindingQueue.Count != 0)
         {
             var binding = _synapseModule.ModuleRoleBindingQueue.Dequeue();
@@ -65,6 +69,7 @@ public class RoleService : Service
     public override void Disable()
     {
         _command.RemoteAdmin.Unsubscribe(OnRemoteAdmin);
+        _playerEvent.UpdateDisplayName.Unsubscribe(OnUpdateDisplayName);
     }
 
     /// <summary>
@@ -163,6 +168,36 @@ public class RoleService : Service
         return info == null ? null : GetRole(info);
     }
 
+
+    /// <summary>
+    /// Get the hierachi rank of a role
+    /// <para>For NTF level 1 is equivalent to gard and level 4 to captain</para>
+    /// For CHI level 2 is equivalent to conscript or rifleman and level 4 to repressor
+    /// </summary>
+    public float GetHierachiPower(SynapsePlayer player) => player.CustomRole != null ?
+            GetHierachiPower(player.CustomRole) :
+            GetHierachiPower(player.RoleType);
+
+    /// <inheritdoc cref="GetHierachiPower(SynapsePlayer)"/>
+    public float GetHierachiPower(ISynapseRole role) => role is IHierarchizedRole hierarchize ?
+            hierarchize.HierachiPower :
+            0;
+
+    /// <inheritdoc cref="GetHierachiPower(SynapsePlayer)"/>
+    public float GetHierachiPower(RoleType role) => role switch
+    {
+        RoleType.FacilityGuard  => 1,
+        RoleType.NtfPrivate     => 2,
+        RoleType.NtfSergeant    => 3,
+        RoleType.NtfSpecialist  => 3,
+        RoleType.NtfCaptain     => 3,
+        RoleType.ChaosConscript => 2, // this hierarchy of chaos is completely invented
+        RoleType.ChaosRifleman  => 2, // it is based on the Armor of the role and the % of spawn
+        RoleType.ChaosMarauder  => 3,
+        RoleType.ChaosRepressor => 4,
+        _                       => 0,
+     };
+
     /// <summary>
     /// Creates a new Instance of a CustomRole
     /// </summary>
@@ -196,10 +231,19 @@ public class RoleService : Service
             
             if(!int.TryParse(id,out var result)) continue;
 
-            var player = _player.GetPlayer(result);
+            var player = _playerService.GetPlayer(result);
             if (player == null) continue;
 
             player.RemoveCustomRole(kill? DeSpawnReason.Death : DeSpawnReason.ForceClass);
         }
+    }
+
+    /// <summary>
+    /// This is use to Call the UpdateDisplayName method of the IUpdateDisplayRole
+    /// </summary>
+    private void OnUpdateDisplayName(UpdateDisplayNameEvent ev)
+    {
+        if (ev.Player.CustomRole is IUpdateDisplayRole role)
+            role.UpdateDisplayName(ev);
     }
 }

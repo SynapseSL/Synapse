@@ -10,19 +10,21 @@ using Random = UnityEngine.Random;
 
 namespace Synapse3.SynapseModule.Role;
 
-public abstract class SynapseAbstractRole : SynapseRole
+public abstract class SynapseAbstractRole : SynapseRole, IUpdateDisplayRole, IHierarchizedRole
 {
     private readonly UnitService _unit;
     private readonly SynapseConfigService _config;
     private readonly PlayerEvents _player;
+    private readonly RoleService _role;
 
     protected SynapseAbstractRole()
     {
         _unit = Synapse.Get<UnitService>();
         _config = Synapse.Get<SynapseConfigService>();
         _player = Synapse.Get<PlayerEvents>();
+        _role = Synapse.Get<RoleService>();
     }
-    
+
     public CustomInfoList.CustomInfoEntry NameEntry { get; private set; }
     public CustomInfoList.CustomInfoEntry RoleEntry { get; private set; }
     public CustomInfoList.CustomInfoEntry RoleAndUnitEntry { get; private set; }
@@ -32,20 +34,22 @@ public abstract class SynapseAbstractRole : SynapseRole
         { PowerStatus.Invisible, null }
     };
 
+    public virtual float HierachiPower => 0;
+
     protected abstract IAbstractRoleConfig GetConfig();
-    
+
     protected virtual void PreSpawn() { }
-    
+
     protected virtual void OnSpawn(IAbstractRoleConfig config) { }
-    
+
     protected virtual void OnDeSpawn(DeSpawnReason reason) { }
 
     protected virtual bool CanSeeUnit(SynapsePlayer player) => player.UnitId == GetConfig().UnitId;
     protected virtual bool CanNotSeeUnit(SynapsePlayer player) => !CanSeeUnit(player);
 
-    protected virtual bool LowerRank(SynapsePlayer player) => CanSeeUnit(player) && player.RoleID < Player.RoleID;
-    protected virtual bool SameRank(SynapsePlayer player) => CanSeeUnit(player) && player.RoleID == Player.RoleID;
-    protected virtual bool HigherRank(SynapsePlayer player) => CanSeeUnit(player) && player.RoleID > Player.RoleID;
+    protected virtual bool LowerRank(SynapsePlayer player) => CanSeeUnit(player) && _role.GetHierachiPower(player) < HierachiPower;
+    protected virtual bool SameRank(SynapsePlayer player) => CanSeeUnit(player) && _role.GetHierachiPower(player) == HierachiPower;
+    protected virtual bool HigherRank(SynapsePlayer player) => CanSeeUnit(player) && _role.GetHierachiPower(player) > HierachiPower;
 
     public sealed override void SpawnPlayer(bool spawnLite)
     {
@@ -168,8 +172,6 @@ public abstract class SynapseAbstractRole : SynapseRole
         }
 
         OnSpawn(config);
-        
-        _player.UpdateDisplayName.Subscribe(OnUpdateDisplayName);
     }
 
     public sealed override void DeSpawn(DeSpawnReason reason)
@@ -180,8 +182,6 @@ public abstract class SynapseAbstractRole : SynapseRole
         RemoveCustomDisplay();
 
         OnDeSpawn(reason);
-        
-        _player.UpdateDisplayName.Unsubscribe(OnUpdateDisplayName);
     }
 
     public void RemoveCustomDisplay()
@@ -222,13 +222,6 @@ public abstract class SynapseAbstractRole : SynapseRole
 
     public virtual string GetName() =>
         Player.NicknameSync.HasCustomName ? Player.NicknameSync._displayName : Player.NickName;
-
-    private void OnUpdateDisplayName(UpdateDisplayNameEvent ev)
-    {
-        if (ev.Player != Player) return;
-
-        UpdateDisplayName(ev);
-    }
 
     public virtual void UpdateDisplayName(UpdateDisplayNameEvent ev)
     {

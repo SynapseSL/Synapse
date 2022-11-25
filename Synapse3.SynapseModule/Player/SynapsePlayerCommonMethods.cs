@@ -235,8 +235,13 @@ public partial class SynapsePlayer
 
     public void TriggerEscape()
     {
+        NeuronLogger.For<SynapsePlayer>().Warn("TriggerEscape");
+
         var disarmer = Disarmer;
         var cuffed = disarmer != null;
+
+        NeuronLogger.For<SynapsePlayer>().Warn(cuffed);
+        NeuronLogger.For<SynapsePlayer>().Warn(disarmer?.name);
 
         if (cuffed && disarmer is not SynapseServerPlayer && _team.TryGetTeam(disarmer.TeamID, out var team))
         {
@@ -255,6 +260,9 @@ public partial class SynapsePlayer
 
         if (cuffed) // Switch when change Team 
         {
+            NeuronLogger.For<SynapsePlayer>().Warn("CharacterClassManager.ForceCuffedChangeTeam: "+ CharacterClassManager.ForceCuffedChangeTeam);
+            NeuronLogger.For<SynapsePlayer>().Warn("disarmer.Faction == Faction.FoundationStaff: " + (disarmer.Faction == Faction.FoundationStaff));
+
             switch (RoleType)
             {
                 case RoleType.Scientist when CharacterClassManager.ForceCuffedChangeTeam || 
@@ -266,6 +274,7 @@ public partial class SynapsePlayer
                                           disarmer.Faction == Faction.FoundationStaff:
                     escapeRole = (int)RoleType.NtfPrivate;
                     break;
+                
                 default:
                     changeTeam = false;
                     break;

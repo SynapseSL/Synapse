@@ -80,4 +80,10 @@ public class ItemInventory
             item.Destroy();
         }
     }
+
+    public void ClearEverything()
+    {
+        ClearAllItems();
+        AmmoBox.Clear();
+    }
 } 

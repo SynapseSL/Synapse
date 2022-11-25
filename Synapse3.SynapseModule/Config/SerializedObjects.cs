@@ -137,8 +137,7 @@ public class SerializedPlayerInventory
 
     public void Apply(SynapsePlayer player)
     {
-        player.Inventory.ClearAllItems();
-        player.Inventory.AmmoBox.Clear();
+        player.Inventory.ClearEverything();
 
         foreach (var item in Items)
             item.Apply(player);
