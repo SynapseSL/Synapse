@@ -25,7 +25,11 @@ public abstract class SynapseDefaultUnit : SynapseUnit
         {
             unit = PossibleNames[UnityEngine.Random.Range(0, PossibleNames.Length)];
             if (GenerateNumbers)
-                unit += "-" + UnityEngine.Random.Range(0, UptoNumber + 1);
+            {
+                var number = UnityEngine.Random.Range(1, UptoNumber + 1).ToString("00");
+                unit += "-" + number;
+            }
+                
         } while (_usedNames.Contains(unit));
         _usedNames.Add(unit);
         return unit;

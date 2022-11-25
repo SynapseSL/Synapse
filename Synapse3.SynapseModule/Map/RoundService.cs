@@ -179,7 +179,11 @@ public class RoundService : Service
     /// Spawn the wave vehicle
     /// </summary>
     /// <param name="isCI"></param>
-    public void SpawnVehicle(bool isCI = false) => RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.Selection, isCI ? SpawnableTeamType.ChaosInsurgency : SpawnableTeamType.NineTailedFox);
+    public void SpawnVehicle(SpawnableTeamType team)
+    {
+        if (team == SpawnableTeamType.None) return;
+        RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.Selection, team);
+    } 
 
     /// <summary>
     /// Play the sound d-personnel hears, when ci respawns
@@ -207,5 +211,9 @@ public class RoundService : Service
     /// Manually force a wave to respawn
     /// </summary>
     /// <param name="isCI"></param>
-    public void SpawnWave(bool isCI = false) => RespawnManager.Singleton.ForceSpawnTeam(isCI ? SpawnableTeamType.ChaosInsurgency : SpawnableTeamType.NineTailedFox);
+    public void SpawnWave(SpawnableTeamType team)
+    {
+        if (team == SpawnableTeamType.None) return;
+        RespawnManager.Singleton.ForceSpawnTeam(team);
+    }
 }
