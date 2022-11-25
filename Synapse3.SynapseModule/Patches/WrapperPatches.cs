@@ -63,7 +63,8 @@ internal static class WrapperPatches
             if (hub == null) return false;
             var prefab = hub.characterClassManager.CurRole?.model_ragdoll;
 
-            if (prefab == null || !Object.Instantiate(prefab).TryGetComponent<Ragdoll>(out var ragdoll))
+            if (prefab == null || !Object.Instantiate(prefab, hub.transform.localPosition, hub.transform.localRotation)
+                    .TryGetComponent<Ragdoll>(out var ragdoll))
                 return false;
             
             var info = new RagdollInfo(hub, handler, prefab.transform.localPosition,
