@@ -75,7 +75,7 @@ public class DebugService : Service
 
         _player.Death.Subscribe(ev =>
         {
-            NeuronLogger.For<Synapse>().Warn($"{ev.Player.NickName} {ev.DamageType} {ev.LastTakenDamage} {ev.DeathMessage ?? "NONE"}");
+            NeuronLogger.For<Synapse>().Warn($"{ev.Player.NickName} {ev.DamageType} {ev.LastTakenDamage} Message: {ev.DeathMessage ?? "NONE"} RagdollInfo: {ev.RagdollInfo ?? "NONE"}");
         });
         
         _player.WalkOnHazard.Subscribe(ev =>

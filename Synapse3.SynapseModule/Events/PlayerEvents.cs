@@ -100,7 +100,7 @@ public class PlayerEvents : Service
 
         WalkOnSinkhole.Subscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Subscribe(WalkOnHazard.Raise);
-        
+
         CharacterClassManager.OnClassChanged += CallSimpleSetClass;
     }
 
@@ -140,7 +140,7 @@ public class PlayerEvents : Service
         _eventManager.UnregisterEvent(SendPlayerData);
         _eventManager.UnregisterEvent(ChangeRole);
         _eventManager.UnregisterEvent(Kick);
-        
+
         WalkOnSinkhole.Unsubscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Unsubscribe(WalkOnHazard.Raise);
 
@@ -178,11 +178,11 @@ public abstract class PlayerInteractEvent : PlayerEvent
     {
         Allow = allow;
     }
-} 
+}
 
 public class LoadComponentEvent : PlayerEvent
 {
-    public LoadComponentEvent(GameObject game,SynapsePlayer player) : base(player)
+    public LoadComponentEvent(GameObject game, SynapsePlayer player) : base(player)
     {
         PlayerGameObject = game;
     }
@@ -217,11 +217,11 @@ public class HarmPermissionEvent : IEvent
         Attacker = attacker;
         Allow = allow;
     }
-    
+
     public bool Allow { get; set; }
-    
+
     public SynapsePlayer Attacker { get; }
-    
+
     public SynapsePlayer Victim { get; }
 }
 
@@ -233,15 +233,15 @@ public class SetClassEvent : PlayerInteractEvent
         Role = role;
         SpawnReason = reason;
     }
-    
+
     public RoleType Role { get; set; }
-    
+
     public CharacterClassManager.SpawnReason SpawnReason { get; }
 
     public List<uint> Items { get; set; } = new();
 
     public List<SynapseItem> EscapeItems { get; set; } = new();
-    
+
     public Vector3 Position { get; set; } = Vector3.zero;
 
     public PlayerMovementSync.PlayerRotation Rotation { get; set; }
@@ -261,7 +261,7 @@ public class UpdateEvent : PlayerEvent
 public class DoorInteractEvent : PlayerInteractEvent
 {
     public SynapseDoor Door { get; }
-    
+
     /// <summary>
     /// This is true when a player tries to open/close a locked door and he is not in Bypass or something else causes to overrides the lock like the Nuke
     /// </summary>
@@ -286,7 +286,7 @@ public class LockerUseEvent : PlayerInteractEvent
     }
 
     public SynapseLocker Locker { get; }
-    
+
     public SynapseLocker.SynapseLockerChamber Chamber { get; }
 }
 
@@ -318,11 +318,11 @@ public class BanEvent : PlayerInteractEvent
     }
 
     public SynapsePlayer Admin { get; }
-    
+
     public string Reason { get; set; }
-    
+
     public long Duration { get; set; }
-    
+
     public bool GlobalBan { get; }
 }
 
@@ -334,7 +334,7 @@ public class ChangeItemEvent : PlayerInteractEvent
     }
 
     public SynapseItem PreviousItem => Player.Inventory.ItemInHand;
-    
+
     public SynapseItem NewItem { get; }
 }
 
@@ -349,29 +349,33 @@ public class DamageEvent : PlayerInteractEvent
     }
 
     public SynapsePlayer Attacker { get; }
-    
+
     public DamageType DamageType { get; }
-    
+
     public float Damage { get; set; }
 }
 
 public class DeathEvent : PlayerInteractEvent
 {
-    public DeathEvent(SynapsePlayer player, bool allow, SynapsePlayer attacker, DamageType damageType, float lastTakenDamage, string message) : base(player, allow)
+    public DeathEvent(SynapsePlayer player, bool allow, SynapsePlayer attacker, DamageType damageType,
+        float lastTakenDamage, string playerMessage, string ragdollMessage) : base(player, allow)
     {
         Attacker = attacker;
         DamageType = damageType;
         LastTakenDamage = lastTakenDamage;
-        DeathMessage = message;
+        DeathMessage = playerMessage;
+        RagdollInfo = ragdollMessage;
     }
 
     public SynapsePlayer Attacker { get; }
-    
+
     public DamageType DamageType { get; }
-    
+
     public float LastTakenDamage { get; }
 
     public string DeathMessage { get; set; }
+
+    public string RagdollInfo { get; set; }
 }
 
 public class FreePlayerEvent : PlayerInteractEvent
@@ -393,7 +397,7 @@ public class DropAmmoEvent : PlayerInteractEvent
     }
 
     public AmmoType AmmoType { get; set; }
-    
+
     public ushort Amount { get; set; }
 }
 
@@ -407,9 +411,9 @@ public class EscapeEvent : PlayerInteractEvent
     }
 
     public uint NewRole { get; set; }
-    
+
     public bool IsClassD { get; }
-    
+
     public bool ChangeTeam { get; }
 }
 
@@ -422,7 +426,7 @@ public class DropItemEvent : PlayerInteractEvent
     }
 
     public SynapseItem ItemToDrop { get; }
-    
+
     public bool Throw { get; set; }
 }
 
@@ -445,7 +449,7 @@ public class GeneratorInteractEvent : PlayerInteractEvent
     }
 
     public SynapseGenerator Generator { get; }
-    
+
     public GeneratorInteract InteractionType { get; }
 }
 
@@ -504,9 +508,9 @@ public class ReportEvent : PlayerInteractEvent
     }
 
     public SynapsePlayer ReportedPlayer { get; }
-    
+
     public string Reason { get; set; }
-    
+
     public bool SendToNorthWood { get; set; }
 }
 
@@ -518,7 +522,7 @@ public class SpeakSecondaryEvent : PlayerInteractEvent
         Scp939Chat = scp939Chat;
         StartSpeaking = startSpeaking;
     }
-    
+
     public bool RadioChat { get; set; }
     public bool Scp939Chat { get; set; }
 
@@ -552,7 +556,7 @@ public class WalkOnSinkholeEvent : WalkOnHazardEvent
     {
         Hazard = hazard;
     }
-    
+
     public new SinkholeEnvironmentalHazard Hazard { get; }
 }
 
@@ -562,7 +566,7 @@ public class WalkOnTantrumEvent : WalkOnHazardEvent
     {
         Hazard = hazard;
     }
-    
+
     public new TantrumEnvironmentalHazard Hazard { get; }
 }
 
@@ -584,7 +588,7 @@ public class FallingIntoAbyssEvent : PlayerInteractEvent
 public class SimpleSetClassEvent : PlayerEvent
 {
     public RoleType PreviousRole { get; }
-    
+
     public RoleType NextRole { get; }
 
     public SimpleSetClassEvent(SynapsePlayer player, RoleType previousRole, RoleType nextRole) : base(player)
@@ -600,7 +604,7 @@ public class UpdateDisplayNameEvent : PlayerEvent
     {
         NewDisplayName = newDisplayName;
     }
-    
+
     public string NewDisplayName { get; }
 }
 
@@ -617,7 +621,7 @@ public class CheckKeyCardPermissionEvent : PlayerInteractEvent
 public class CallVanillaElevatorEvent : PlayerInteractEvent
 {
     public SynapseElevator Elevator { get; }
-    
+
     public VanillaDestination RequestedDestination { get; }
 
     public CallVanillaElevatorEvent(SynapsePlayer player, bool allow, SynapseElevator elevator, VanillaDestination requestedDestination) : base(player, allow)
@@ -630,11 +634,11 @@ public class CallVanillaElevatorEvent : PlayerInteractEvent
 public class SendPlayerDataEvent : PlayerEvent
 {
     public SynapsePlayer PlayerToSee { get; set; }
-    
+
     public bool IsInvisible { get; set; }
-    
+
     public Vector3 Position { get; set; }
-    
+
     public float Rotation { get; set; }
 
     public SendPlayerDataEvent(SynapsePlayer player) : base(player) { }
@@ -657,6 +661,6 @@ public class KickEvent : PlayerInteractEvent
     }
 
     public SynapsePlayer Admin { get; }
-    
+
     public string Reason { get; set; }
 }
