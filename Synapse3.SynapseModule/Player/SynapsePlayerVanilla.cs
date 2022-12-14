@@ -1,9 +1,9 @@
-﻿using Assets._Scripts.Dissonance;
-using CustomPlayerEffects;
+﻿using CustomPlayerEffects;
 using Hints;
 using InventorySystem;
 using InventorySystem.Searching;
 using Mirror;
+using PlayerRoles;
 using PlayerStatsSystem;
 using RemoteAdmin;
 using Synapse3.SynapseModule.Enums;
@@ -24,27 +24,17 @@ public partial class SynapsePlayer
 
     public NetworkConnection Connection => ClassManager.Connection;
 
-    public LocalCurrentRoomEffects LocalCurrentRoomEffects => Hub.localCurrentRoomEffects;
-
     public HintDisplay HintDisplay => Hub.hints;
 
     public SearchCoordinator SearchCoordinator => Hub.searchCoordinator;
-
-    public FootstepSync FootstepSync => Hub.footstepSync;
 
     public PlayerEffectsController PlayerEffectsController => Hub.playerEffectsController;
 
     public PlayerInteract PlayerInteract => Hub.playerInteract;
 
-    public FallDamage FallDamage => Hub.falldamage;
-
     public AnimationController AnimationController => Hub.animationController;
 
-    public SpectatorManager SpectatorManager => Hub.spectatorManager;
-
     public NicknameSync NicknameSync => Hub.nicknameSync;
-
-    public PlayerMovementSync PlayerMovementSync => Hub.playerMovementSync;
 
     public QueryProcessor QueryProcessor => Hub.queryProcessor;
 
@@ -56,25 +46,17 @@ public partial class SynapsePlayer
 
     public CharacterClassManager ClassManager => Hub.characterClassManager;
 
-    public PlayableScpsController ScpsController => Hub.scpsController;
-    
-    public DissonanceUserSetup DissonanceUserSetup { get; }
+    public PlayableScpsController VanillaScpController => Hub.scpsController;
 
-    public Radio Radio { get; }
+    public PlayerRoleManager RoleManager => Hub.roleManager;
 
     public GameConsoleTransmission GameConsoleTransmission { get; }
 
-    public Escape Escape { get; }
-    
-    public Scp939_VisionController Scp939VisionController { get; }
-    
-    public FirstPersonController FirstPersonController { get; }
-    
     public CommandSender CommandSender
     {
         get
         {
-            if (PlayerType == PlayerType.Server) return ServerConsole._scs;
+            if (PlayerType == PlayerType.Server) return ServerConsole.Scs;
             return QueryProcessor._sender;
         }
     }
@@ -84,5 +66,5 @@ public partial class SynapsePlayer
     /// </summary>
     public TStat GetStatBase<TStat>() where TStat : StatBase => PlayerStats.GetModule<TStat>();
 
-    public TEffect GetEffect<TEffect>() where TEffect : PlayerEffect => PlayerEffectsController.GetEffect<TEffect>();
+    public TEffect GetEffect<TEffect>() where TEffect : StatusEffectBase => PlayerEffectsController.GetEffect<TEffect>();
 }

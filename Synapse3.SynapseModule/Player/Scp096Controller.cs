@@ -7,12 +7,14 @@ namespace Synapse3.SynapseModule.Player;
 
 public class Scp096Controller
 {
+    
     private readonly SynapsePlayer _player;
     
     internal Scp096Controller(SynapsePlayer player)
     {
         _player = player;
     }
+    /*
     
     public Scp096 Scp096 => _player.Hub.scpsController.CurrentScp as Scp096;
     public bool Is096Instance => Scp096 != null;
@@ -168,4 +170,5 @@ public class Scp096Controller
         if (!Is096Instance) return;
         Scp096.ChargeDoor(door.Variant);
     }
+    */
 }

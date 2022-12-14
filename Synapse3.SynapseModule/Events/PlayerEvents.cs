@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using Hazards;
 using Interactables.Interobjects.DoorUtils;
 using MEC;
 using Neuron.Core.Events;
 using Neuron.Core.Meta;
+using PlayerRoles;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Elevators;
@@ -101,7 +103,8 @@ public class PlayerEvents : Service
         WalkOnSinkhole.Subscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Subscribe(WalkOnHazard.Raise);
 
-        CharacterClassManager.OnClassChanged += CallSimpleSetClass;
+        //TODO:
+        //PlayerRoleManager.OnServerRoleSet += CallSimpleSetClass;
     }
 
     public override void Disable()
@@ -144,10 +147,11 @@ public class PlayerEvents : Service
         WalkOnSinkhole.Unsubscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Unsubscribe(WalkOnHazard.Raise);
 
-        CharacterClassManager.OnClassChanged -= CallSimpleSetClass;
+        //TODO:
+        //CharacterClassManager.OnClassChanged -= CallSimpleSetClass;
     }
 
-    private void CallSimpleSetClass(ReferenceHub hub, RoleType previous, RoleType next)
+    private void CallSimpleSetClass(ReferenceHub hub, RoleTypeId previous, RoleTypeId next)
     {
         var player = hub.GetSynapsePlayer();
         if (player == null) return;
@@ -227,16 +231,16 @@ public class HarmPermissionEvent : IEvent
 
 public class SetClassEvent : PlayerInteractEvent
 {
-    public SetClassEvent(SynapsePlayer player, RoleType role, CharacterClassManager.SpawnReason reason) : base(player,
+    public SetClassEvent(SynapsePlayer player, RoleTypeId role, RoleChangeReason reason) : base(player,
         true)
     {
         Role = role;
         SpawnReason = reason;
     }
 
-    public RoleType Role { get; set; }
+    public RoleTypeId Role { get; set; }
 
-    public CharacterClassManager.SpawnReason SpawnReason { get; }
+    public RoleChangeReason SpawnReason { get; }
 
     public List<uint> Items { get; set; } = new();
 
@@ -244,7 +248,8 @@ public class SetClassEvent : PlayerInteractEvent
 
     public Vector3 Position { get; set; } = Vector3.zero;
 
-    public PlayerMovementSync.PlayerRotation Rotation { get; set; }
+    //TODO:
+    //public PlayerMovementSync.PlayerRotation Rotation { get; set; }
 
     public Dictionary<AmmoType, ushort> Ammo { get; set; } = new();
 
@@ -587,11 +592,11 @@ public class FallingIntoAbyssEvent : PlayerInteractEvent
 
 public class SimpleSetClassEvent : PlayerEvent
 {
-    public RoleType PreviousRole { get; }
+    public RoleTypeId PreviousRole { get; }
 
-    public RoleType NextRole { get; }
+    public RoleTypeId NextRole { get; }
 
-    public SimpleSetClassEvent(SynapsePlayer player, RoleType previousRole, RoleType nextRole) : base(player)
+    public SimpleSetClassEvent(SynapsePlayer player, RoleTypeId previousRole, RoleTypeId nextRole) : base(player)
     {
         PreviousRole = previousRole;
         NextRole = nextRole;
@@ -620,6 +625,8 @@ public class CheckKeyCardPermissionEvent : PlayerInteractEvent
 
 public class CallVanillaElevatorEvent : PlayerInteractEvent
 {
+    //TODO:
+    /*
     public SynapseElevator Elevator { get; }
 
     public VanillaDestination RequestedDestination { get; }
@@ -628,6 +635,10 @@ public class CallVanillaElevatorEvent : PlayerInteractEvent
     {
         Elevator = elevator;
         RequestedDestination = requestedDestination;
+    }
+    */
+    public CallVanillaElevatorEvent(SynapsePlayer player, bool allow) : base(player, allow)
+    {
     }
 }
 

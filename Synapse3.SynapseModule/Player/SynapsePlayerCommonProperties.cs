@@ -2,7 +2,11 @@
 using InventorySystem.Disarming;
 using Mirror;
 using Mirror.LiteNetLib4Mirror;
+using PlayerRoles;
+using PlayerRoles.FirstPersonControl;
+using PlayerRoles.Spectating;
 using PlayerStatsSystem;
+using RelativePositioning;
 using Synapse3.SynapseModule.Enums;
 using UnityEngine;
 
@@ -34,8 +38,8 @@ public partial class SynapsePlayer
     /// </summary>
     public int PlayerId
     {
-        get => QueryProcessor.PlayerId;
-        set => QueryProcessor.NetworkPlayerId = value;
+        get => Hub.PlayerId;
+        set => Hub._playerId = new RecyclablePlayerId(value);
     }
     
     /// <summary>
@@ -61,8 +65,8 @@ public partial class SynapsePlayer
     /// </summary>
     public bool NoClip
     {
-        get => ServerRoles.NoclipReady;
-        set => ServerRoles.NoclipReady = value;
+        get => ServerRoles._noclipReady;
+        set => ServerRoles._noclipReady = value;
     }
 
     /// <summary>
@@ -102,18 +106,24 @@ public partial class SynapsePlayer
     /// </summary>
     public Vector3 DeathPosition
     {
-        get => ClassManager.DeathPosition;
-        set => ClassManager.DeathPosition = value;
+        get => (CurrentRole as SpectatorRole)?.DeathPosition.Position ?? Vector3.zero;
+        set
+        {
+            if (CurrentRole is SpectatorRole role) role.DeathPosition = new RelativePosition(value);
+        }
     }
 
+    //TODO:
+    /*
     /// <summary>
     /// The Time the player died
     /// </summary>
     public long DeathTime
     {
-        get => ClassManager.DeathTime;
+        get => ClassManager
         set => ClassManager.DeathTime = value;
     }
+    */
 
     /// <summary>
     /// The current movement of the player
@@ -124,19 +134,13 @@ public partial class SynapsePlayer
         set => AnimationController.UserCode_CmdChangeSpeedState((byte)value);
     }
 
+    //TODO:
+    /*
     /// <summary>
     /// Freezes the Player in his current location
     /// </summary>
     public bool StopInput { get => Hub.fpc.NetworkforceStopInputs; set => Hub.fpc.NetworkforceStopInputs = value; }
-    
-    /// <summary>
-    /// The Current RoleType of the Player. Use RoleID instead if you want to set the Role of the Player and remove potentially active custom roles
-    /// </summary>
-    public virtual RoleType RoleType
-    {
-        get => ClassManager.CurClass;
-        set => ClassManager.SetPlayersClass(value, gameObject, CharacterClassManager.SpawnReason.None);
-    }
+    */
 
     /// <summary>
     /// The current health of the player
@@ -192,6 +196,8 @@ public partial class SynapsePlayer
         }
     }
 
+    //TODO:
+    /*
     /// <summary>
     /// The current stamina of the player
     /// </summary>
@@ -209,6 +215,7 @@ public partial class SynapsePlayer
         get => Hub.fpc.staminaController.StaminaUse * 100;
         set => Hub.fpc.staminaController.StaminaUse = value / 100;
     }
+
 
     public byte UnitId
     {
@@ -238,6 +245,7 @@ public partial class SynapsePlayer
         }
     }
 
+
     /// <summary>
     /// The player who is spectated by the player
     /// </summary>
@@ -246,6 +254,7 @@ public partial class SynapsePlayer
         get => SpectatorManager.CurrentSpectatedPlayer != null ? SpectatorManager.CurrentSpectatedPlayer.GetSynapsePlayer() : null;
         set => SpectatorManager.CurrentSpectatedPlayer = value;
     }
+    */
 
     /// <summary>
     /// The player who disarmed the player
@@ -288,10 +297,13 @@ public partial class SynapsePlayer
     /// </summary>
     public bool IsDisarmed => VanillaInventory.IsDisarmed();
 
+    //TODO:
+    /*
     /// <summary>
     /// The time a player is alive
     /// </summary>
-    public float AliveTime => ClassManager.AliveTime;
+    public float AliveTime => ClassManager.alive
+    */
 
     /// <summary>
     /// I don't need to explain this, right?
@@ -301,7 +313,7 @@ public partial class SynapsePlayer
     /// <summary>
     /// The current Team of the player
     /// </summary>
-    public Team Team => ClassManager.CurRole.team;
+    public Team Team => CurrentRole.Team;
 
     /// <summary>
     /// The current team id of the player
@@ -311,7 +323,7 @@ public partial class SynapsePlayer
     /// <summary>
     /// The current faction of the player
     /// </summary>
-    public Faction Faction => ClassManager.Faction;
+    public Faction Faction => CurrentRole.Team.GetFaction();
 
     /// <summary>
     /// The ip address of the player

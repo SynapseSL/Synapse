@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Command;
+using PlayerRoles;
 using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Teams;
 
@@ -32,7 +33,7 @@ public class RespawnCommand : SynapseCommand
             return;
         }
         
-        var players = Synapse.Get<PlayerService>().GetPlayers(player => player.RoleType == RoleType.Spectator && !player.OverWatch).ToList();
+        var players = Synapse.Get<PlayerService>().GetPlayers(player => player.RoleType == RoleTypeId.Spectator && !player.OverWatch).ToList();
         if (context.Arguments.Length > 1 && int.TryParse(context.Arguments[1], out var size))
         {
             if (players.Count > size)

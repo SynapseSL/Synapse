@@ -5,6 +5,7 @@ using InventorySystem.Disarming;
 using InventorySystem.Items.Firearms.Attachments;
 using Mirror;
 using Neuron.Core.Logging;
+using PlayerRoles;
 using PlayerStatsSystem;
 using RemoteAdmin;
 using Respawning;
@@ -26,7 +27,8 @@ public partial class SynapsePlayer
     /// <summary>
     /// Bans the Player
     /// </summary>
-    public void Ban(int duration, string reason, string issuer = "Plugin") => Synapse.GetObject<BanPlayer>().BanUser(gameObject, duration, reason, issuer);
+    public void Ban(int duration, string reason, SynapsePlayer issuer = null) =>
+        BanPlayer.BanUser(Hub, issuer ?? _player.Host, reason, duration);
     
     /// <summary>
     /// Returns a uint Value that corresponds to the players favorite Attachments for a specific Weapon
@@ -93,11 +95,11 @@ public partial class SynapsePlayer
         ClearBroadcasts();
         Broadcast(time, message);
     }
-    
+
     /// <summary>
     /// Sends a Message to the Player in his Console
     /// </summary>
-    public void SendConsoleMessage(string message, string color = "red") => ClassManager.TargetConsolePrint(Connection, message, color);
+    public void SendConsoleMessage(string message, string color = "red") => ClassManager.ConsolePrint(message, color);
 
     /// <summary>
     /// Sends a Message to the Player in his (Text)RemoteAdmin
@@ -107,7 +109,8 @@ public partial class SynapsePlayer
     /// <summary>
     /// Gives the Player an effect
     /// </summary>
-    public void GiveEffect(Effect effect, byte intensity = 1, float duration = -1f) => PlayerEffectsController.ChangeByString(effect.ToString().ToLower(), intensity, duration);
+    public void GiveEffect(Effect effect, byte intensity = 1, float duration = -1f) =>
+        PlayerEffectsController.ChangeState(effect.ToString().ToLower(), intensity, duration);
 
     /// <summary>
     /// Heals the Player the specific amount without over healing him
@@ -183,11 +186,13 @@ public partial class SynapsePlayer
         => Connection.Send(_mirror.GetCustomRpcMessage(RoundSummary.singleton, nameof(RoundSummary.RpcDimScreen),
             null));
 
+    //TODO:
+    /*
     /// <summary>
     /// Shakes the Screen of the Player like the Alpha Warhead
     /// </summary>
     public void ShakeScreen(bool achieve = false)
-        => AlphaWarheadController.Host.TargetRpcShake(Connection, achieve, GodMode);
+        => AlphaWarheadController.Singleton.TargetRpcShake(Connection, achieve, GodMode);
 
     /// <summary>
     /// Places Blood locally on the Map of the Player
@@ -201,6 +206,7 @@ public partial class SynapsePlayer
                 writer.WriteInt32(type);
                 writer.WriteSingle(size);
             }));
+            */
 
     /// <summary>
     /// Opens the Menu of the Player
@@ -235,6 +241,8 @@ public partial class SynapsePlayer
 
     public void TriggerEscape()
     {
+        //TODO:
+        /*
         if (CustomRole != null)
         {
             CustomRole.TryEscape();
@@ -294,7 +302,7 @@ public partial class SynapsePlayer
 
         if (ev.NewRole is >= 0 and <= RoleService.HighestRole)
         {
-            ClassManager.SetPlayersClass((RoleType)ev.NewRole, gameObject, CharacterClassManager.SpawnReason.Escaped);
+            ClassManager.SetPlayersClass((RoleTypeId)ev.NewRole, gameObject, CharacterClassManager.SpawnReason.Escaped);
         }
         else
         {
@@ -331,9 +339,12 @@ public partial class SynapsePlayer
                     ConfigFile.ServerConfig.GetInt("respawn_tickets_ci_classd_count", 1));
                 break;
         }
+        */
     }
 
-    public void SetPlayerRoleTypeAdvance(RoleType role,Vector3 position,Vector2 rotation = default,byte unitId = 0, string unitName = "")
+    //TODO:
+    /*
+    public void SetPlayerRoleTypeAdvance(RoleTypeID role,Vector3 position,Vector2 rotation = default,byte unitId = 0, string unitName = "")
     {
         UnitId = unitId;
         Unit = Unit;
@@ -346,4 +357,5 @@ public partial class SynapsePlayer
         FirstPersonController.ResetStamina();
         
     }
+    */
 }

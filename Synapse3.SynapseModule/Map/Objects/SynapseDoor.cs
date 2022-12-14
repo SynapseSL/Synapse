@@ -72,14 +72,14 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
 
     public float Health
     {
-        get => Variant is BreakableDoor breakableDoor ? breakableDoor._remainingHealth : -1f;
+        get => Variant is BreakableDoor breakableDoor ? breakableDoor.RemainingHealth : -1f;
         set
         {
             if (Variant is BreakableDoor breakableDoor)
             {
-                breakableDoor._remainingHealth = value;
+                breakableDoor.RemainingHealth = value;
                 breakableDoor._maxHealth = value;
-                NeuronLogger.For<Synapse>().Warn(breakableDoor._remainingHealth);
+                NeuronLogger.For<Synapse>().Warn(breakableDoor.RemainingHealth);
             }
         }
     }

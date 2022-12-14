@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Mirror;
 using Neuron.Core.Logging;
 using PlayableScps;
+using PlayerRoles;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Schematic;
@@ -12,9 +13,11 @@ using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Objects;
 
-public class SynapseRagdoll : NetworkSynapseObject, IJoinUpdate
+//TODO:
+public class SynapseRagDoll //: NetworkSynapseObject, IJoinUpdate
 {
-    public static Dictionary<RoleType, Ragdoll> Prefabs = new ();
+    /*
+    public static Dictionary<RoleTypeId, Ragdoll> Prefabs = new ();
 
     private readonly PlayerService _player;
     private readonly MirrorService _mirror;
@@ -46,7 +49,7 @@ public class SynapseRagdoll : NetworkSynapseObject, IJoinUpdate
     public Ragdoll Ragdoll { get; }
     public Vector3 OriginalRagdollScale { get; private set; }
     public DamageType DamageType { get; private set; }
-    public RoleType RoleType { get; private set; }
+    public RoleTypeId RoleType { get; private set; }
     public string Nick { get; private set; }
     public string CustomReason => (Info?.DamageHandler as CustomReasonDamageHandler)?._deathReason ?? string.Empty;
     public bool CanBeRevive { get; set; }
@@ -86,7 +89,7 @@ public class SynapseRagdoll : NetworkSynapseObject, IJoinUpdate
 
         if (infoToSend == null)
         {
-            NeuronLogger.For<SynapseRagdoll>().Debug("Info of RagDoll is null can't spawn RagDoll on Players Client");
+            NeuronLogger.For<SynapseRagDoll>().Debug("Info of RagDoll is null can't spawn RagDoll on Players Client");
             return;
         }
 
@@ -114,14 +117,14 @@ public class SynapseRagdoll : NetworkSynapseObject, IJoinUpdate
 
     public class SynapseRagDollInfo
     {
-        public SynapseRagDollInfo(string reason, string nick, RoleType displayedRole)
+        public SynapseRagDollInfo(string reason, string nick, RoleTypeId displayedRole)
         {
             DamageHandler = new CustomReasonDamageHandler(reason);
             NickName = nick;
             DisplayedRole = displayedRole;
         }
 
-        public SynapseRagDollInfo(DamageHandlerBase damageHandler, string nick, RoleType displayedRole)
+        public SynapseRagDollInfo(DamageHandlerBase damageHandler, string nick, RoleTypeId displayedRole)
         {
             DamageHandler = damageHandler;
             NickName = nick;
@@ -132,7 +135,7 @@ public class SynapseRagdoll : NetworkSynapseObject, IJoinUpdate
         
         public string NickName { get; set; }
         
-        public RoleType DisplayedRole { get; set; }
+        public RoleTypeId DisplayedRole { get; set; }
         
         public bool UseHostId { get; set; }
 
@@ -145,7 +148,7 @@ public class SynapseRagdoll : NetworkSynapseObject, IJoinUpdate
 
     #region Constructor
     //Always called
-    private SynapseRagdoll()
+    private SynapseRagDoll()
     {
         _player = Synapse.Get<PlayerService>();
         _mirror = Synapse.Get<MirrorService>();
@@ -153,7 +156,7 @@ public class SynapseRagdoll : NetworkSynapseObject, IJoinUpdate
     }
     
     //Public for Plugins
-    public SynapseRagdoll(RoleType role, string reason, Vector3 pos, Quaternion rot, Vector3 scale,
+    public SynapseRagDoll(RoleTypeId role, string reason, Vector3 pos, Quaternion rot, Vector3 scale,
         string nick, SynapsePlayer player = null, bool canBeRevive = false, uint roleID = RoleService.NoneRole, bool enableFadeOut = true) : this()
     {
         Ragdoll = CreateRagdoll(role, pos, rot, scale);
@@ -161,7 +164,7 @@ public class SynapseRagdoll : NetworkSynapseObject, IJoinUpdate
             new CustomReasonDamageHandler(reason));
     }
 
-    public SynapseRagdoll(RoleType role, DamageType damage, Vector3 pos, Quaternion rot, Vector3 scale, 
+    public SynapseRagDoll(RoleTypeId role, DamageType damage, Vector3 pos, Quaternion rot, Vector3 scale, 
         string nick, SynapsePlayer player = null, bool canBeRevive = false, uint roleID = RoleService.NoneRole, bool enableFadeOut = true) : this()
     {
         Ragdoll = CreateRagdoll(role, pos, rot, scale);
@@ -169,16 +172,16 @@ public class SynapseRagdoll : NetworkSynapseObject, IJoinUpdate
     }
     
     //Only vanila Ragdoll
-    internal SynapseRagdoll(Ragdoll ragdoll) : this()
+    internal SynapseRagDoll(Ragdoll ragdoll) : this()
     {
         Ragdoll = ragdoll;
-        var owner = _player.GetPlayer(Ragdoll.Info.OwnerHub.playerId);
+        var owner = _player.GetPlayer(Ragdoll.Info.OwnerHub.PlayerId);
         SetUp(ragdoll.Info.RoleType, ragdoll.Info.Handler.GetDamageType(), ragdoll.Info.Nickname, owner, false,
-            owner.TeamID != (uint)Team.SCP, owner.RoleID, ragdoll.Info.Handler);
+            owner.TeamID != (uint)Team.SCPs, owner.RoleID, ragdoll.Info.Handler);
     }
 
     //Schematic
-    internal SynapseRagdoll(SchematicConfiguration.RagdollConfiguration configuration,
+    internal SynapseRagDoll(SchematicConfiguration.RagdollConfiguration configuration,
         SynapseSchematic schematic) :
         this(configuration.RoleType, configuration.DamageType, configuration.Position, configuration.Rotation,
             configuration.Scale, configuration.Nick)
@@ -190,7 +193,7 @@ public class SynapseRagdoll : NetworkSynapseObject, IJoinUpdate
         CustomAttributes = configuration.CustomAttributes;
     }
 
-    private void SetUp(RoleType role, DamageType damage, string nick, SynapsePlayer owner, bool useHost,
+    private void SetUp(RoleTypeId role, DamageType damage, string nick, SynapsePlayer owner, bool useHost,
         bool canRevive, uint customRole, DamageHandlerBase handlerBase = null)
     {
         Map._synapseRagdolls.Add(this);
@@ -213,7 +216,7 @@ public class SynapseRagdoll : NetworkSynapseObject, IJoinUpdate
         UpdateInfo();
     }
 
-    private Ragdoll CreateRagdoll(RoleType role, Vector3 pos, Quaternion rot, Vector3 scale) =>
+    private Ragdoll CreateRagdoll(RoleTypeId role, Vector3 pos, Quaternion rot, Vector3 scale) =>
         CreateNetworkObject(Prefabs[role], pos, rot, scale);
 
     protected override TComponent CreateNetworkObject<TComponent>(TComponent component, Vector3 pos, Quaternion rot, Vector3 scale)
@@ -238,4 +241,5 @@ public class SynapseRagdoll : NetworkSynapseObject, IJoinUpdate
         return currentScale;
     }
     #endregion
+    */
 }

@@ -147,10 +147,6 @@ public class CustomInfoList :
         UpdateInfo();
     }
     
-    
-
-    public bool Contains(string item)
-        => _values.Any(x => x.Info == item);
 
     public bool Contains(CustomInfoEntry item)
         => _values.Contains(item);

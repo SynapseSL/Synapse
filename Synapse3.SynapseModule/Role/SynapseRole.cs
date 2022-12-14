@@ -29,6 +29,6 @@ public abstract class SynapseRole : ISynapseRole
     public virtual List<uint> GetEnemiesID() => new ();
 
     public virtual void TryEscape() { }
-    public abstract void SpawnPlayer(bool spawnLite);
+    public abstract void SpawnPlayer(ISynapseRole previousRole = null, bool spawnLite = false);
     public virtual void DeSpawn(DeSpawnReason reason) { }
 }

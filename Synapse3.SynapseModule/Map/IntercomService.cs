@@ -1,4 +1,6 @@
-﻿using Neuron.Core.Meta;
+﻿using Mirror;
+using Neuron.Core.Meta;
+using PlayerRoles.Voice;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
 
@@ -30,23 +32,27 @@ public class IntercomService : Service
     {
         get
         {
-            if (Intercom.Networkspeaker == null) return null;
+            if (Intercom._curSpeaker == null) return null;
 
-            return Intercom.Networkspeaker.GetSynapsePlayer();
+            return Intercom._curSpeaker.GetSynapsePlayer();
         }
-        set => Intercom.RequestTransmission(value.gameObject);
+        set { }
+        //TODO:
+        //Intercom.RequestTransmission(value.gameObject);
     }
 
+    /*
     public string DisplayText
     {
         get => Intercom.CustomContent;
         set => Intercom.CustomContent = string.IsNullOrWhiteSpace(value) ? null : value;
     }
+    */
 
-    public ushort RemainingTime
+    public float RemainingTime
     {
-        get => Intercom.NetworkIntercomTime;
-        set => Intercom.NetworkIntercomTime = value;
+        get => Intercom.RemainingTime;
+        set => Intercom._nextTime = value + NetworkTime.time;
     }
 
     private void GetIntercom(RoundWaitingEvent ev)

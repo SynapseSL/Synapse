@@ -7,6 +7,7 @@ using InventorySystem.Items.Firearms.Attachments;
 using InventorySystem.Items.Pickups;
 using Mirror;
 using Neuron.Core.Logging;
+using PlayerRoles;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
@@ -19,7 +20,7 @@ public partial class SynapseItem
 {
     public void EquipItem(SynapsePlayer player, bool dropWhenFull = true, bool provideFully = false)
     {
-        if(player.RoleType is RoleType.Spectator or RoleType.None) return;
+        if(player.RoleType is RoleTypeId.Spectator or RoleTypeId.None) return;
         
         if (player.Inventory.Items.Count >= 8)
         {
@@ -55,7 +56,7 @@ public partial class SynapseItem
         //Normally it will call a event but we can't call it from here
         try
         {
-            ItemPickupHandler.OnItemAdded(player.VanillaInventory, Item, Pickup);
+            ItemPickupHandler.OnItemAdded(player, Item, Pickup);
         }
         catch { }
 
@@ -108,13 +109,13 @@ public partial class SynapseItem
         Pickup = Object.Instantiate(exampleBase.PickupDropModel, position, rot);
         var info = new PickupSyncInfo
         {
-            Position = position,
-            Rotation = new LowPrecisionQuaternion(rot),
             ItemId = ItemType,
             Serial = Serial,
             Weight = Weight,
             Locked = !CanBePickedUp,
         };
+        //TODO: Test this
+        info.ServerSetPositionAndRotation(position, rot);
         Pickup.Info = info;
         Pickup.NetworkInfo = info;
         Pickup.transform.localScale = Scale;

@@ -124,7 +124,10 @@ public class RoundService : Service
         get => RoundSummary.ChangedIntoZombies;
         set => RoundSummary.ChangedIntoZombies = value;
     }
-
+    
+    
+    //TODO:
+    /*
     /// <summary>
     /// The number of respawn tickets for mtf
     /// </summary>
@@ -142,6 +145,7 @@ public class RoundService : Service
         get => RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.ChaosInsurgency);
         set => RespawnTickets.Singleton._tickets[SpawnableTeamType.ChaosInsurgency] = value;
     }
+    */
 
     /// <summary>
     /// The length of the round
@@ -156,7 +160,7 @@ public class RoundService : Service
     /// <summary>
     /// True when the round has ended
     /// </summary>
-    public bool RoundEnded => Rs.RoundEnded;
+    public bool RoundEnded => Rs._roundEnded;
     
     internal bool ForceEnd { get; set; }
 
@@ -204,7 +208,8 @@ public class RoundService : Service
     {
         var timeToRoundRestart = Mathf.Clamp(ConfigFile.ServerConfig.GetInt("auto_round_restart_time", 10), 5, 1000);
         
-        Rs.RpcShowRoundSummary(Rs.classlistStart, remainingPlayers, leadingTeam, EscapedDPersonnel, EscapedScientists, ScpKills, timeToRoundRestart);
+        //TODO:
+        //Rs.RpcShowRoundSummary(Rs.classlistStart, remainingPlayers, leadingTeam, EscapedDPersonnel, EscapedScientists, ScpKills, timeToRoundRestart);
     }
 
     /// <summary>

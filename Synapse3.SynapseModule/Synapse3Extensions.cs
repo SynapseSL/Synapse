@@ -14,6 +14,7 @@ using Mirror;
 using Neuron.Core.Logging;
 using Neuron.Modules.Configs.Localization;
 using PlayableScps;
+using PlayerRoles;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Config;
@@ -85,7 +86,7 @@ public static class Synapse3Extensions
     {
         var ev2 = new CheckKeyCardPermissionEvent(player, false, permissions);
         if (player.Bypass || (ushort)permissions == 0) ev2.Allow = true;
-        if (player.TeamID == (uint)Team.SCP && permissions.HasFlagFast(KeycardPermissions.ScpOverride)) ev2.Allow = true;
+        if (player.TeamID == (uint)Team.SCPs && permissions.HasFlagFast(KeycardPermissions.ScpOverride)) ev2.Allow = true;
 
         if (!ev2.Allow)
         {
@@ -164,8 +165,11 @@ public static class Synapse3Extensions
     public static IRoom GetRoom(this RoomType type) =>
         Synapse.Get<RoomService>()._rooms.FirstOrDefault(x => x.Id == (int)type);
 
+    //TODO:
+    /*
     public static IElevator GetSynapseElevator(this ElevatorType type) => Synapse.Get<ElevatorService>().Elevators
         .FirstOrDefault(x => x is SynapseElevator elevator && elevator.ElevatorType == type);
+        */
 
 
     public static IVanillaRoom GetVanillaRoom(this RoomIdentifier identifier) => (IVanillaRoom)Synapse.Get<RoomService>()._rooms
@@ -226,35 +230,41 @@ public static class Synapse3Extensions
         return new SynapseLocker(locker);
     }
 
-    public static SynapseRagdoll GetSynapseRagdoll(this Ragdoll rag)
+    //TODO:
+    /*
+    public static SynapseRagDoll GetSynapseRagdoll(this Ragdoll rag)
     {
         var script = rag.GetComponent<SynapseObjectScript>();
 
-        if (script != null && script.Object is SynapseRagdoll ragdoll)
+        if (script != null && script.Object is SynapseRagDoll ragdoll)
         {
             return ragdoll;
         }
 
         NeuronLogger.For<Synapse>()
             .Debug("Found Ragdoll without SynapseObjectScript ... creating new SynapseRagdoll");
-        return new SynapseRagdoll(rag);
+        return new SynapseRagDoll(rag);
     }
+    */
 
     
     public static SynapseTesla GetSynapseTesla(this TeslaGate gate) =>
         Synapse.Get<MapService>()._synapseTeslas.FirstOrDefault(x => x.Gate == gate);
 
+    //TODO:
+    /*
     public static IElevator GetSynapseElevator(this Lift lift) =>
         Synapse.Get<ElevatorService>().Elevators
             .FirstOrDefault(x => x is SynapseElevator elevator && elevator.Lift == lift);
     public static SynapseCamera GetCamera(this Camera079 cam) =>
         Synapse.Get<MapService>()._synapseCameras.FirstOrDefault(x => x.Camera == cam);
+        */
 
     
     public static bool CanHarmScp(SynapsePlayer player, bool message)
     {
-        if (player.TeamID != (int)Team.SCP &&
-            player.CustomRole?.GetFriendsID().Any(x => x == (int)Team.SCP) != true) return true;
+        if (player.TeamID != (int)Team.SCPs &&
+            player.CustomRole?.GetFriendsID().Any(x => x == (int)Team.SCPs) != true) return true;
         
         if (message)
             player.SendHint(Synapse.Get<SynapseConfigService>().Translation.Get(player).ScpTeam);
@@ -280,13 +290,13 @@ public static class Synapse3Extensions
             {
                 allow = true;
             }
-            else if (attacker.Team == Team.RIP && victim.Team == Team.RIP)
+            else if (attacker.Team == Team.Dead && victim.Team == Team.Dead)
             {
                 allow = false;
             }
             else if (attacker.CustomRole == null && victim.CustomRole == null)
             {
-                if (attacker.Team == Team.SCP && victim.Team == Team.SCP) allow = false;
+                if (attacker.Team == Team.SCPs && victim.Team == Team.SCPs) allow = false;
 
                 var ff = ignoreFFConfig || Synapse.Get<ServerService>().FF;
 

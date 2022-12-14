@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using PlayerRoles;
 using Syml;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
@@ -112,14 +113,14 @@ public class SchematicConfiguration : IDocumentSection
     {
         public string Nick { get; set; }
 
-        public RoleType RoleType { get; set; }
+        public RoleTypeId RoleType { get; set; }
 
         public DamageType DamageType { get; set; }
     }
 
     public class DummyConfiguration : DefaultConfig
     {
-        public RoleType Role { get; set; }
+        public RoleTypeId Role { get; set; }
 
         public ItemType HeldItem { get; set; }
 

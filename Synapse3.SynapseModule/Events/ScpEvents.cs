@@ -196,11 +196,11 @@ public class ActivateBreakneckSpeedEvent : IEvent
 
 public class ReviveEvent : IEvent
 {
-    public ReviveEvent(SynapsePlayer scp049, SynapsePlayer humanToRevive, SynapseRagdoll ragdoll, bool finishRevive)
+    public ReviveEvent(SynapsePlayer scp049, SynapsePlayer humanToRevive, SynapseRagDoll ragDoll, bool finishRevive)
     {
         Scp049 = scp049;
         HumanToRevive = humanToRevive;
-        Ragdoll = ragdoll;
+        RagDoll = ragDoll;
         FinishRevive = finishRevive;
     }
     
@@ -208,7 +208,7 @@ public class ReviveEvent : IEvent
     
     public SynapsePlayer HumanToRevive { get; }
     
-    public SynapseRagdoll Ragdoll { get; }
+    public SynapseRagDoll RagDoll { get; }
     
     public bool FinishRevive { get; }
 

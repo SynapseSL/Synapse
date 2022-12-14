@@ -90,7 +90,9 @@ public class Throwable : ISubSynapseItem
 
         throwableItem._destroyTime = Time.timeSinceLevelLoad + throwableItem._postThrownAnimationTime;
         throwableItem._alreadyFired = true;
-        GameplayTickets.Singleton.HandleItemTickets(throwableItem);
+        
+        //TODO:
+        //GameplayTickets.Singleton.HandleItemTickets(throwableItem);
 
         Projectile = Object.Instantiate(throwableItem.Projectile, throwableItem.Owner.PlayerCameraReference.position,
             throwableItem.Owner.PlayerCameraReference.rotation);
@@ -101,9 +103,9 @@ public class Throwable : ISubSynapseItem
             Locked = !throwableItem._repickupable,
             Serial = _item.Serial,
             Weight = _item.Weight,
-            Position = transform.position,
-            Rotation = new LowPrecisionQuaternion(transform.rotation)
         };
+        //TODO: Test this
+        info.ServerSetPositionAndRotation(transform.position, transform.rotation);
         Projectile.NetworkInfo = info;
         Projectile.PreviousOwner = _item.ItemOwner;
         NetworkServer.Spawn(Projectile.gameObject);

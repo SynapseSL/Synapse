@@ -84,6 +84,20 @@ public partial class SynapsePlayer
         return translation.WithLocale(language.ToArray());
     }
 
+    public float MovementMultiplier
+    {
+        get => VanillaInventory._syncMovementMultiplier;
+        set => VanillaInventory.Network_syncMovementLimiter = value;
+    }
+
+    public float MovementLimiter
+    {
+        get => VanillaInventory._syncMovementLimiter;
+        set => VanillaInventory.Network_syncMovementMultiplier = value;
+    }
+    
+    //TODO:
+    /*
     private float _walkSpeed;
     private bool _customWalkSpeed;
     public float WalkSpeed
@@ -125,4 +139,5 @@ public partial class SynapsePlayer
             SendNetworkMessage(_mirror.GetCustomVarMessage(ServerConfigSynchronizer.Singleton, 4ul, value));
         }
     }
+    */
 }

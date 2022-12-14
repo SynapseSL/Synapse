@@ -57,7 +57,7 @@ public partial class Synapse : Module
     public Scp914Service Scp914Service { get; private set; }
     public ItemService ItemService { get; private set; }
     public RoomService RoomService { get; private set; }
-    public DataBaseService DataBaseService { get; private set; }
+    public DatabaseService DatabaseService { get; private set; }
     public RemoteAdminCategoryService RemoteAdminCategoryService { get; private set; }
 
     public override void Load(IKernel kernel)
@@ -91,7 +91,7 @@ public partial class Synapse : Module
         ItemService = _kernel.GetSafe<ItemService>();
         RoomService = _kernel.GetSafe<RoomService>();
         RemoteAdminCategoryService = _kernel.GetSafe<RemoteAdminCategoryService>();
-        DataBaseService = _kernel.GetSafe<DataBaseService>();
+        DatabaseService = _kernel.GetSafe<DatabaseService>();
         
         //EventHandlers are the only Bindings that are loaded during the Enable Method of Synapse to ensure that the EventServices are all enabled
         while (ModuleListenerBindingQueue.Count > 0)

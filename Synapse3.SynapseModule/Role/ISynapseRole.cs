@@ -17,7 +17,7 @@ public interface ISynapseRole
 
     void TryEscape();
 
-    void SpawnPlayer(bool spawnLite);
+    void SpawnPlayer(ISynapseRole previousRole, bool spawnLite);
 
     void DeSpawn(DeSpawnReason reason);
 }

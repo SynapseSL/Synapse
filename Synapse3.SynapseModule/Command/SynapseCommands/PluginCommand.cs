@@ -7,8 +7,8 @@ using Neuron.Modules.Commands.Command;
 namespace Synapse3.SynapseModule.Command.SynapseCommands;
 
 [SynapseRaCommand(
-    CommandName = "Plugin",
-    Aliases = new [] { "pl, plugins" },
+    CommandName = "Plugins",
+    Aliases = new [] { "pl, plugin" },
     Parameters = new [] { "(pluginName)" },
     Description = "A command which provides information about the currently installed Plugins",
     Permission = "synapse.command.plugins",

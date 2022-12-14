@@ -1,5 +1,4 @@
-﻿using Assets._Scripts.Dissonance;
-using Synapse3.SynapseModule.Config;
+﻿using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Database;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
@@ -24,7 +23,7 @@ public partial class SynapsePlayer : MonoBehaviour
     private readonly RoomService _room;
     private readonly PlayerEvents _playerEvents;
     private readonly SynapseConfigService _config;
-    private readonly DataBaseService _dataBase;
+    private readonly DatabaseService _database;
     private readonly MirrorService _mirror;
 
     /// <summary>
@@ -36,11 +35,7 @@ public partial class SynapsePlayer : MonoBehaviour
     {
         Hub = GetComponent<ReferenceHub>();
         GameConsoleTransmission = GetComponent<GameConsoleTransmission>();
-        DissonanceUserSetup = GetComponent<DissonanceUserSetup>();
-        Radio = GetComponent<Radio>();
-        Escape = GetComponent<Escape>();
-        Scp939VisionController = GetComponent<Scp939_VisionController>();
-        FirstPersonController = GetComponent<FirstPersonController>();
+
         Inventory = new ItemInventory(this);
         ActiveBroadcasts = new BroadcastList(this);
         ScpController = new ScpController(this);
@@ -54,7 +49,7 @@ public partial class SynapsePlayer : MonoBehaviour
         _room = Synapse.Get<RoomService>();
         _playerEvents = Synapse.Get<PlayerEvents>();
         _config = Synapse.Get<SynapseConfigService>();
-        _dataBase = Synapse.Get<DataBaseService>();
+        _database = Synapse.Get<DatabaseService>();
         _mirror = Synapse.Get<MirrorService>();
 
         CustomInfo = new CustomInfoList(this, _player, _mirror, _playerEvents);

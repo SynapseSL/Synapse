@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net472</TargetFramework>
+        <TargetFramework>net48</TargetFramework>
         <PlatformTarget>x64</PlatformTarget>
         <LangVersion>10.0</LangVersion>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <OutputType>Exe</OutputType>
-        <Configurations>Debug;Custom Version;Main Release</Configurations>
+        <Configurations>Debug;Custom Version;Main Release;Dev</Configurations>
         <Platforms>AnyCPU</Platforms>
         <RootNamespace>Synapse3.Injector</RootNamespace>
         <PackageId>Synapse3.Injector</PackageId>

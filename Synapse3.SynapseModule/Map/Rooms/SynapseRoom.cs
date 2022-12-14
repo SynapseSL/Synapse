@@ -14,10 +14,13 @@ public class SynapseRoom : IVanillaRoom
         RoomType = type;
         LightController = Identifier.GetComponentInChildren<FlickerableLightController>();
 
+        //TODO:
+        /*
         foreach (var camera079 in identifier.GetComponentsInChildren<Camera079>())
         {
             _cameras.Add(new SynapseCamera(camera079, this));
         }
+        */
     }
     
     public RoomIdentifier Identifier { get; }

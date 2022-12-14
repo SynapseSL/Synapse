@@ -216,8 +216,11 @@ public class SchematicService : Service
             }
         }
         
+        //TODO:
+        /*
         foreach (var role in CharacterClassManager._staticClasses)
             if (role != null)
                 SynapseRagdoll.Prefabs[role.roleId] = role.model_ragdoll?.GetComponent<Ragdoll>();
+                */
     }
 }

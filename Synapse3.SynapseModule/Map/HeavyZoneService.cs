@@ -8,6 +8,8 @@ namespace Synapse3.SynapseModule.Map;
 
 public class HeavyZoneService : Service
 {
+    //TODO:
+    /*
     private readonly RoomService _room;
     private readonly NukeService _nuke;
 
@@ -17,6 +19,7 @@ public class HeavyZoneService : Service
         _nuke = nuke;
     }
 
+    
     private Recontainer079 ReContainer => Synapse.GetObject<Recontainer079>();
 
     public byte ActiveGenerators => (byte)ReContainer._prevEngaged;
@@ -71,4 +74,5 @@ public class HeavyZoneService : Service
             }
         }
     }
+    */
 }

@@ -31,10 +31,13 @@ public class ElevatorService : Service
 
     private void GetVanillaElevators(RoundWaitingEvent _)
     {
+        //TODO:
+        /*
         foreach (var lift in Synapse.GetObjects<Lift>())
         {
             _elevators.Add(new SynapseElevator(lift));
         }
+        */
     }
 
     private void Clear(RoundRestartEvent _)

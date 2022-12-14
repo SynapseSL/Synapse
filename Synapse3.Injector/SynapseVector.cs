@@ -4,11 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Synapse3.Injector;
+namespace Synapse3.SynapseVector;
 
-/// <summary>
-/// Vector that will be injected into the Assembly-CSharp.dll
-/// </summary>
 public class SynapseVector
 {
     public static void Execute()

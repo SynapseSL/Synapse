@@ -1,4 +1,5 @@
 ﻿using Mirror;
+using PlayerRoles.FirstPersonControl;
 using Synapse3.SynapseModule.Map.Rooms;
 using UnityEngine;
 
@@ -11,10 +12,11 @@ public partial class SynapsePlayer
     /// </summary>
     public Vector3 Position
     {
-        get => PlayerMovementSync.GetRealPosition();
-        set => PlayerMovementSync.OverridePosition(value);
+        get => (CurrentRole as IFpcRole)?.FpcModule?.Position ?? Vector3.zero;
+        //TODO:
+        set => Hub.TryOverridePosition(value, new Vector3(0f, 0f, 0f));
     }
-
+    
     /// <summary>
     /// The Rotation of the Player as Quaternion
     /// </summary>
@@ -23,10 +25,13 @@ public partial class SynapsePlayer
         get => Quaternion.Euler(CameraReference.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, 0f);
         set
         {
+            //TODO:
             var euler = value.eulerAngles;
-            PlayerMovementSync.TargetForceRotation(Connection, -euler.x, true, euler.y, true);
+            //PlayerMovementSync.TargetForceRotation(Connection, -euler.x, true, euler.y, true);
         }
     }
+    //TODO:
+    /*
 
     /// <summary>
     /// The Rotation of the Player as vector2
@@ -42,7 +47,10 @@ public partial class SynapsePlayer
         get => RotationVector2.y;
         set => PlayerMovementSync.TargetForceRotation(Connection, 0f, false, value, true);
     }
+    */
     
+    //TODO:
+    /*
     /// <summary>
     /// The Rotation of the Player as PlayerRotation
     /// </summary>
@@ -55,6 +63,7 @@ public partial class SynapsePlayer
         }
         set => PlayerMovementSync.TargetForceRotation(Connection, -(value.x ?? 0f), true, value.y ?? 0f, true);
     }
+    */
 
     public Vector3 Scale
     {

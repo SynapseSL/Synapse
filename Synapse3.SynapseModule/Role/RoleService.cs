@@ -6,6 +6,7 @@ using System.Reflection;
 using Neuron.Core.Meta;
 using Neuron.Modules.Commands.Event;
 using Ninject;
+using PlayerRoles;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Player;
 
@@ -27,7 +28,7 @@ public class RoleService : Service
     /// <summary>
     /// The Hightest vanilla number for Roles
     /// </summary>
-    public const uint HighestRole = (uint)RoleType.ChaosMarauder;
+    public const uint HighestRole = (uint)RoleTypeId.Overwatch;
     
     /// <summary>
     /// A list of all Registered CustomRoles that can spawn
@@ -88,7 +89,7 @@ public class RoleService : Service
     public string GetRoleName(uint id)
     {
         if (id is >= 0 and <= HighestRole)
-            return ((RoleType)id).ToString();
+            return ((RoleTypeId)id).ToString();
 
         return !IsIdRegistered(id) ? string.Empty : _customRoles.FirstOrDefault(x => x.Id == id)?.Name;
     }
@@ -147,7 +148,7 @@ public class RoleService : Service
         return role as TRole;
     }
     
-    /// <inheritdoc cref="GetRole(RoleAttribute)"/>
+    /// <inheritdoc cref="GetRole(Synapse3.SynapseModule.Role.RoleAttribute)"/>
     public ISynapseRole GetRole(string name)
     {
         var info = CustomRoles.FirstOrDefault(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
@@ -155,7 +156,7 @@ public class RoleService : Service
         return info == null ? null : GetRole(info);
     }
 
-    /// <inheritdoc cref="GetRole(RoleAttribute)"/>
+    /// <inheritdoc cref="GetRole(Synapse3.SynapseModule.Role.RoleAttribute)"/>
     public ISynapseRole GetRole(uint id)
     {
         var info = CustomRoles.FirstOrDefault(x => x.Id == id);

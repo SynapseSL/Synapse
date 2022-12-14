@@ -51,7 +51,7 @@ public partial class SynapseItem
                 return ItemOwner?.Rotation ?? _rotation;
 
             if (Pickup is not null)
-                return Pickup.Info.Rotation.Value;
+                return Pickup.Info.Rotation;
 
             return _rotation;
         }

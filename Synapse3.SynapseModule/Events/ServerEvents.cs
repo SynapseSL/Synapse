@@ -1,27 +1,36 @@
-﻿using LiteNetLib;
+﻿using System;
+using System.Reflection;
+using LiteNetLib;
 using LiteNetLib.Utils;
 using Neuron.Core.Events;
 using Neuron.Core.Meta;
+using PluginAPI.Core.Attributes;
+using PluginAPI.Enums;
+using PluginAPI.Events;
+using EventManager = Neuron.Core.Events.EventManager;
 
 namespace Synapse3.SynapseModule.Events;
 
-public class ServerEvents : Service
+public partial class ServerEvents : Service
 {
     private readonly EventManager _eventManager;
+    private readonly Synapse _synapse;
 
     public readonly EventReactor<ReloadEvent> Reload = new();
     public readonly EventReactor<PreAuthenticationEvent> PreAuthentication = new();
     public readonly EventReactor<StopServerEvent> StopServer = new();
 
-    public ServerEvents(EventManager eventManager)
+    public ServerEvents(EventManager eventManager, Synapse synapse)
     {
         _eventManager = eventManager;
+        _synapse = synapse;
     }
 
     public override void Enable()
     {
         _eventManager.RegisterEvent(Reload);
         _eventManager.RegisterEvent(PreAuthentication);
+        PluginAPI.Events.EventManager.RegisterEvents(_synapse,this);
     }
 
     public override void Disable()
@@ -35,29 +44,43 @@ public class ReloadEvent : IEvent { }
 
 public class PreAuthenticationEvent : IEvent
 {
-    private readonly ConnectionRequest _request;
-
-    public PreAuthenticationEvent(ConnectionRequest request, string userId)
+    public PreAuthenticationEvent(string userId, string address, string country, CentralAuthPreauthFlags flags)
     {
-        _request = request;
         UserId = userId;
+        Address = address;
+        Country = country;
+        Flags = flags;
+        ReturningData = PreauthCancellationData.Accept();
     }
+
+
+    public string UserId { get; }
     
-    public string UserId { get; set; }
+    public string Address { get; }
+    
+    public string Country { get; }
+    
+    public CentralAuthPreauthFlags Flags { get; }
+    
+    public PreauthCancellationData ReturningData { get; set; }
 
-    public bool Allow { get; set; } = true;
+    public void Reject(string customReason, bool isForced = false) =>
+        ReturningData = PreauthCancellationData.Reject(customReason, isForced);
+    
+    public void Reject(RejectionReason reason, bool isForced = false) =>
+        ReturningData = PreauthCancellationData.Reject(reason, isForced);
 
-    public bool Rejected { get; private set; }
+    public void Delay(byte seconds, bool isForced = false) =>
+        ReturningData = PreauthCancellationData.RejectDelay(seconds, isForced);
 
-    public void Reject(string reason)
-    {
-        if (Rejected) return;
-        
-        var data = new NetDataWriter();
-        data.Put((byte)10);
-        data.Put(reason);
-        _request.RejectForce(data);
-    }
+    public void Redirect(ushort port, bool isForced = false) =>
+        ReturningData = PreauthCancellationData.RejectRedirect(port, isForced);
+
+    public void Ban(string reason, DateTime expiration, bool isForced = false) =>
+        ReturningData = PreauthCancellationData.RejectBanned(reason, expiration, isForced);
+    
+    public void Ban(string reason, long expiration, bool isForced = false) =>
+        ReturningData = PreauthCancellationData.RejectBanned(reason, expiration, isForced);
 }
 
 public class StopServerEvent : IEvent { }

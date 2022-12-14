@@ -15,9 +15,18 @@ public partial class Synapse
     public const int Minor = 0;
     public const int Patch = 0;
     
-    public const VersionType Type = VersionType.Beta;
-    public const string SubVersion = "1.0";
-    public const string BasedGameVersion = "11.2.1";
+#if CUSTOM_VERSION
+public const VersionType Type = VersionType.Beta;
+#elif DEBUG
+public const VersionType Type = VersionType.Debug;
+#elif DEV
+public const VersionType Type = VersionType.Dev;
+#elif MAIN_RELEASE
+    public const VersionType Type = VersionType.None;
+#endif
+
+    public const string SubVersion = "";
+    public const string BasedGameVersion = "12.0.0-pb-rc-ed50329c";
     
     /// <summary>
     /// Returns an instance of the specified object by either resolving it using
@@ -99,7 +108,8 @@ public partial class Synapse
     /// </summary>
     public static string GetVersion()
     {
-        var version = $"{Major}.{Minor}.{Patch}";
+        var version = $"{Major}.{Minor}.{Patch}" + (Type == VersionType.None ? "" :
+            (SubVersion == "" ? "-" + Type : "-" + Type + "-" + SubVersion));
         
 #if CUSTOM_VERSION
         if (Type != VersionType.None)

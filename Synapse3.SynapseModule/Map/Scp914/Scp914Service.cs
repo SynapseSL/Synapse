@@ -67,14 +67,14 @@ public class Scp914Service : Service
 
     public Vector3 OutputPosition
     {
-        get => Scp914._outputChamber.position;
-        set => Scp914._outputChamber.transform.position = value;
+        get => Scp914.OutputChamber.position;
+        set => Scp914.OutputChamber.transform.position = value;
     }
 
     public Vector3 InputPosition
     {
-        get => Scp914._intakeChamber.position;
-        set => Scp914._intakeChamber.position = value;
+        get => Scp914.IntakeChamber.position;
+        set => Scp914.IntakeChamber.position = value;
     }
 
     public Vector3 ChamberSize

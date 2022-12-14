@@ -4,12 +4,12 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Neuron.Core.Meta;
 using Ninject;
+using PlayerRoles;
 using Respawning;
 using Respawning.NamingRules;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
-using Synapse3.SynapseModule.Teams.Unit;
 
 namespace Synapse3.SynapseModule.Teams;
 
@@ -18,13 +18,11 @@ public class TeamService : Service
     private readonly List<ISynapseTeam> _teams = new();
     private readonly IKernel _kernel;
     private readonly Synapse _synapseModule;
-    private readonly UnitService _unit;
 
-    public TeamService(IKernel kernel, Synapse synapseModule, UnitService unit)
+    public TeamService(IKernel kernel, Synapse synapseModule)
     {
         _kernel = kernel;
         _synapseModule = synapseModule;
-        _unit = unit;
     }
 
     public override void Enable()
@@ -76,7 +74,7 @@ public class TeamService : Service
         return id switch
         {
             0 => "SCP",
-            1 => "Mobile Task Force",
+            1 => "Foundation Forces",
             2 => "Chaos Insurgency",
             3 => "Scientist",
             4 => "Class-D",
@@ -90,10 +88,10 @@ public class TeamService : Service
         => IsDefaultId(id) || _teams.Any(x => x.Attribute.Id == id);
 
     public bool IsDefaultId(uint id)
-        => id is >= (uint)Team.SCP and <= (uint)Team.TUT;
+        => id is >= (uint)Team.SCPs and <= (uint)Team.OtherAlive;
     
     public bool IsDefaultSpawnableID(uint id) 
-        => id is (uint)Team.MTF or (uint)Team.CHI;
+        => id is (uint)Team.FoundationForces or (uint)Team.ChaosInsurgency;
 
     public float GetRespawnTime(uint id)
     {
@@ -102,8 +100,9 @@ public class TeamService : Service
             case 0: return 0;
             case 1:
             case 2:
-                if (RespawnWaveGenerator.SpawnableTeams.TryGetValue((SpawnableTeamType)id, out var handler))
-                    return handler.EffectTime;
+                //TODO:
+                //if (RespawnWaveGenerator.SpawnableTeams.TryGetValue((SpawnableTeamType)id, out var handler))
+                //    return handler.EffectTime;
                 return 0;
 
             default:
@@ -121,6 +120,8 @@ public class TeamService : Service
             
             case 1:
             case 2:
+                //TODO:
+                /*
                 var maxSize = RespawnTickets.Singleton.GetAvailableTickets((SpawnableTeamType)id);
                 if (maxSize == 0 && addTickets)
                 {
@@ -135,6 +136,8 @@ public class TeamService : Service
                 }
 
                 return maxSize;
+                */
+                return 0;
 
             default:
                 if (!IsIdRegistered(id)) return 0;
@@ -179,6 +182,8 @@ public class TeamService : Service
 
     public void Spawn()
     {
+    //TODO:
+        /*
         if (NextTeam == uint.MaxValue)
             goto ResetTeam;
 
@@ -230,7 +235,7 @@ public class TeamService : Service
                 if (!RespawnWaveGenerator.SpawnableTeams.TryGetValue((SpawnableTeamType)NextTeam, out var handlerBase))
                     goto ResetTeam;
 
-                var roles = new Queue<RoleType>();
+                var roles = new Queue<RoleTypeId>();
                 handlerBase.GenerateQueue(roles, players.Count);
 
                 RespawnTickets.Singleton.GrantTickets((SpawnableTeamType)NextTeam,
@@ -264,5 +269,6 @@ public class TeamService : Service
 
         ResetTeam:
         NextTeam = uint.MaxValue;
+        */
     }
 }

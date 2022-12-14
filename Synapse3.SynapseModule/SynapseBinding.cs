@@ -13,6 +13,7 @@ using Synapse3.SynapseModule.Map.Scp914;
 using Synapse3.SynapseModule.Permissions.RemoteAdmin;
 using Synapse3.SynapseModule.Role;
 using Synapse3.SynapseModule.Teams;
+using RoleAttribute = Synapse3.SynapseModule.Role.RoleAttribute;
 
 namespace Synapse3.SynapseModule;
 
@@ -46,8 +47,8 @@ public partial class Synapse
     private void OnGenerateDataBaseBinding(MetaGenerateBindingsEvent args)
     {
         if (!args.MetaType.TryGetAttribute<AutomaticAttribute>(out _)) return;
-        if (!args.MetaType.TryGetAttribute<DataBaseAttribute>(out var info)) return;
-        if (!args.MetaType.Is<IDataBase>()) return;
+        if (!args.MetaType.TryGetAttribute<DatabaseAttribute>(out var info)) return;
+        if (!args.MetaType.Is<IDatabase>()) return;
 
         info.DataBaseType = args.MetaType.Type;
         args.Outputs.Add(new SynapseDataBaseBinding()
@@ -193,7 +194,7 @@ public partial class Synapse
         
         args.Context.MetaBindings
             .OfType<SynapseDataBaseBinding>()
-            .ToList().ForEach(x => DataBaseService.LoadBinding(x));
+            .ToList().ForEach(x => DatabaseService.LoadBinding(x));
 
         args.Context.MetaBindings
             .OfType<SynapseListenerBinding>()

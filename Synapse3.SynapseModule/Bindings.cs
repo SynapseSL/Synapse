@@ -74,7 +74,7 @@ public class SynapseRaCategoryBinding : IMetaBinding
 
 public class SynapseDataBaseBinding : IMetaBinding
 {
-    public DataBaseAttribute Info { get; set; }
+    public DatabaseAttribute Info { get; set; }
     
     public IEnumerable<Type> PromisedServices => new Type[] { };
 }

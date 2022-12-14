@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CustomPlayerEffects;
+using PlayerRoles;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Rooms;
@@ -250,7 +251,7 @@ public class SerializedEffect
 {
     public SerializedEffect() { }
 
-    public SerializedEffect(PlayerEffect effect)
+    public SerializedEffect(StatusEffectBase effect)
     {
         Intensity = effect.Intensity;
         Duration = effect.Duration;
@@ -275,7 +276,7 @@ public class SerializedEffect
 
     public void Apply(SynapsePlayer player) => player.GiveEffect(Effect, Intensity, Duration);
 
-    public static implicit operator SerializedEffect(PlayerEffect effect) => new(effect);
+    public static implicit operator SerializedEffect(StatusEffectBase effect) => new(effect);
 }
 
 [Serializable]
@@ -289,13 +290,14 @@ public class SerializedPlayerState
             Scale = player.Scale;
             RoleType = player.RoleType;
             RoleID = player.RoleID;
-            UnitId = player.UnitId;
-            UnitName = player.Unit;
+            //TODO:
+            //UnitId = player.UnitId;
+            //UnitName = player.Unit;
             Health = player.Health;
             MaxHealth = player.MaxHealth;
             ArtificialHealth = player.ArtificialHealth;
             MaxArtificialHealth = player.MaxArtificialHealth;
-            Stamina = player.Stamina;
+            //Stamina = player.Stamina;
             GodMode = player.GodMode;
             NoClip = player.NoClip;
             Bypass = player.Bypass;
@@ -304,7 +306,7 @@ public class SerializedPlayerState
 
             Inventory = new SerializedPlayerInventory(player);
 
-            foreach (var effect in player.PlayerEffectsController._allEffects)
+            foreach (var effect in player.PlayerEffectsController.AllEffects)
             {
                 if (!effect.IsEnabled)
                     continue;
@@ -321,7 +323,7 @@ public class SerializedPlayerState
 
         public List<SerializedEffect> Effects { get; set; } = new();
 
-        public RoleType RoleType { get; set; }
+        public RoleTypeId RoleType { get; set; }
 
         public uint RoleID { get; set; }
 
@@ -360,8 +362,9 @@ public class SerializedPlayerState
                 player.Invisible = Invisible;
             }
 
-            player.UnitId = UnitId;
-            player.Unit = UnitName;
+            //TODO:
+            //player.UnitId = UnitId;
+            //player.Unit = UnitName;
             player.ChangeRoleLite(RoleType);
             if (RoleID > RoleService.HighestRole)
             {
@@ -378,14 +381,14 @@ public class SerializedPlayerState
             player.MaxHealth = MaxHealth;
             player.ArtificialHealth = ArtificialHealth;
             player.MaxArtificialHealth = MaxArtificialHealth;
-            player.Stamina = Stamina;
+            //player.Stamina = Stamina;
             player.Scale = Scale;
 
             Inventory.Apply(player);
 
-            foreach (var effect in player.PlayerEffectsController._allEffects)
+            foreach (var effect in player.PlayerEffectsController.AllEffects)
             {
-                effect.OnClassChanged(RoleType.None, RoleType);
+                effect.DisableEffect();
             }
             foreach (var effect in Effects)
                 effect.Apply(player);

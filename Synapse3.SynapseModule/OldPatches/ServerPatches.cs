@@ -6,6 +6,7 @@ using Synapse3.SynapseModule.Events;
 
 namespace Synapse3.SynapseModule.Patches;
 
+
 [Patches]
 [HarmonyPatch]
 internal static class ServerPatches

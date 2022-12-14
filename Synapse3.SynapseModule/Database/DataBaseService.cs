@@ -9,12 +9,12 @@ using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Database;
 
-public class DataBaseService : Service
+public class DatabaseService : Service
 {
     private readonly IKernel _kernel;
     private readonly Synapse _synapseModule;
 
-    public DataBaseService(IKernel kernel, Synapse synapseModule)
+    public DatabaseService(IKernel kernel, Synapse synapseModule)
     {
         _kernel = kernel;
         _synapseModule = synapseModule;
@@ -29,26 +29,26 @@ public class DataBaseService : Service
         }
     }
 
-    private List<IDataBase> _dataBases = new();
-    public ReadOnlyCollection<IDataBase> DataBases => _dataBases.AsReadOnly();
+    private List<IDatabase> _dataBases = new();
+    public ReadOnlyCollection<IDatabase> DataBases => _dataBases.AsReadOnly();
 
     public bool IsIdRegistered(uint id) => _dataBases.Any(x => x.Attribute.Id == id);
 
-    public void RegisterDataBase<TDatabase>() where TDatabase : IDataBase => RegisterDataBase(typeof(TDatabase));
+    public void RegisterDataBase<TDatabase>() where TDatabase : IDatabase => RegisterDataBase(typeof(TDatabase));
 
     public void RegisterDataBase(Type dataBaseType)
     {
-        var info = dataBaseType.GetCustomAttribute<DataBaseAttribute>();
+        var info = dataBaseType.GetCustomAttribute<DatabaseAttribute>();
         if (info == null) return;
         RegisterDataBase(info);
     }
 
-    public void RegisterDataBase(DataBaseAttribute info)
+    public void RegisterDataBase(DatabaseAttribute info)
     {
         if (info.DataBaseType == null) return;
         if (IsIdRegistered(info.Id)) return;
 
-        var dataBase = (IDataBase)_kernel.Get(info.DataBaseType);
+        var dataBase = (IDatabase)_kernel.Get(info.DataBaseType);
         _kernel.Bind(info.DataBaseType).ToConstant(dataBase).InSingletonScope();
 
         dataBase.Attribute = info;

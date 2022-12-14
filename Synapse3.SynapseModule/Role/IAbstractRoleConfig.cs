@@ -1,12 +1,13 @@
-﻿using Synapse3.SynapseModule.Config;
+﻿using PlayerRoles;
+using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Map.Rooms;
 
 namespace Synapse3.SynapseModule.Role;
 
 public interface IAbstractRoleConfig
 {
-    public RoleType Role { get; }
-    public RoleType VisibleRole { get; }
+    public RoleTypeId Role { get; }
+    public RoleTypeId VisibleRole { get; }
     public uint EscapeRole { get; }
     public float Health { get; }
     public float MaxHealth { get; }

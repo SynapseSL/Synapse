@@ -27,7 +27,7 @@ public class NukeService : Service
 
     private void SetController(RoundWaitingEvent ev)
     {
-        WarheadController = AlphaWarheadController.Host;
+        WarheadController = AlphaWarheadController.Singleton;
         InsidePanel.SetPanel();
         OutsidePanel.SetPanel();
     }
@@ -38,6 +38,9 @@ public class NukeService : Service
 
     public NukeOutsidePanel OutsidePanel { get; } = new();
 
+    
+    //TODO:
+    /*
     public float TimeUntilDetonation
     {
         get => WarheadController.NetworktimeToDetonation;
@@ -59,9 +62,11 @@ public class NukeService : Service
             return NukeState.Inactive;
         }
     }
+    
 
     public bool CanDetonate
         => WarheadController.CanDetonate;
+        */
     
     public void StartDetonation()
         => WarheadController.StartDetonation();
@@ -69,6 +74,8 @@ public class NukeService : Service
     public void CancelDetonation()
         => WarheadController.CancelDetonation();
 
+    //TODO:
+    /*
     public void Shake()
     {
         foreach (var synapsePlayer in Synapse.Get<PlayerService>().Players)
@@ -83,6 +90,7 @@ public class NukeService : Service
         WarheadController.StartDetonation(false, true);
         WarheadController.NetworktimeToDetonation = 0.1f;
     }
+    */
 
     public class NukeInsidePanel
     {

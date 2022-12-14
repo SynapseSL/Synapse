@@ -44,7 +44,8 @@ public class PlayerService : Service
     
     private void PlayerUpdate(UpdateEvent ev)
     {
-        if (Vector3.Distance(ev.Player.Position, ev.Player.Escape.worldPosition) < Escape.radius)
+        //TODO: fix this
+        if (Vector3.Distance(ev.Player.Position, Escape.WorldPos) < Escape.RadiusSqr)
             ev.Player.TriggerEscape();
     }
 
@@ -65,7 +66,7 @@ public class PlayerService : Service
     /// <summary>
     /// Returns the amount of players on the server
     /// </summary>
-    public int PlayersAmount => ServerConsole.PlayersAmount;
+    public int PlayersAmount => ServerConsole._playersAmount;
 
     /// <summary>
     /// Returns all Player objects even the Host and all Dummies
@@ -76,12 +77,11 @@ public class PlayerService : Service
     public List<SynapsePlayer> GetPlayers(params PlayerType[] playerTypes)
     {
         var result = new List<SynapsePlayer>();
-
         if (playerTypes.Contains(PlayerType.Player))
         {
             result.AddRange(Players);
         }
-
+        
         if (playerTypes.Contains(PlayerType.Server))
         {
             result.Add(Host);

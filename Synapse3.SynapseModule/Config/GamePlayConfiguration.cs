@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using PlayerRoles;
 using Syml;
 
 namespace Synapse3.SynapseModule.Config;
@@ -30,30 +31,31 @@ public class GamePlayConfiguration : IDocumentSection
     [Description("If Enabled the button inside the AlphaWarhead(outside) can be closed again with a keycard")]
     public bool CloseWarheadButton { get; set; } = false;
 
+    [Description("When enabled are Chaos and SCP's forced to kill each other since otherwise the Round won't end")]
+    public bool ChaosAndScpEnemy { get; set; } = false;
+
     [Description("Every Role in this List won't stop SCP-173 from moving when the player is looking at it")]
     public List<uint> CantObserve173 { get; set; } = new()
     {
-        (uint)RoleType.Scp173,
-        (uint)RoleType.Scp106,
-        (uint)RoleType.Scp049,
-        (uint)RoleType.Scp079,
-        (uint)RoleType.Scp096,
-        (uint)RoleType.Scp0492,
-        (uint)RoleType.Scp93953,
-        (uint)RoleType.Scp93989,
-        (uint)RoleType.Tutorial
+        (uint)RoleTypeId.Scp173,
+        (uint)RoleTypeId.Scp106,
+        (uint)RoleTypeId.Scp049,
+        (uint)RoleTypeId.Scp079,
+        (uint)RoleTypeId.Scp096,
+        (uint)RoleTypeId.Scp0492,
+        (uint)RoleTypeId.Scp939,
+        (uint)RoleTypeId.Tutorial
     };
 
     public List<uint> CantObserve096 { get; set; } = new()
     {
-        (uint)RoleType.Scp173,
-        (uint)RoleType.Scp106,
-        (uint)RoleType.Scp049,
-        (uint)RoleType.Scp079,
-        (uint)RoleType.Scp096,
-        (uint)RoleType.Scp0492,
-        (uint)RoleType.Scp93953,
-        (uint)RoleType.Scp93989,
-        (uint)RoleType.Tutorial
+        (uint)RoleTypeId.Scp173,
+        (uint)RoleTypeId.Scp106,
+        (uint)RoleTypeId.Scp049,
+        (uint)RoleTypeId.Scp079,
+        (uint)RoleTypeId.Scp096,
+        (uint)RoleTypeId.Scp0492,
+        (uint)RoleTypeId.Scp939,
+        (uint)RoleTypeId.Tutorial
     };
 }

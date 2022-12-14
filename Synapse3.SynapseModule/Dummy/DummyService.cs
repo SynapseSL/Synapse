@@ -31,7 +31,5 @@ public class DummyService : Service
     public ReadOnlyCollection<SynapseDummy> Dummies => _dummies.AsReadOnly();
 
     private void CreateDummyTransformParent(RoundWaitingEvent ev)
-    {
-        _dummyParent = new GameObject("DummyParent").transform;
-    }
+        => _dummyParent = new GameObject("DummyParent").transform;
 }

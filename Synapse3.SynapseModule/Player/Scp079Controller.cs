@@ -4,6 +4,8 @@ namespace Synapse3.SynapseModule.Player;
 
 public class Scp079Controller
 {
+    //TODO:
+    
     private readonly SynapsePlayer _player;
     
     internal Scp079Controller(SynapsePlayer player)
@@ -11,6 +13,7 @@ public class Scp079Controller
         _player = player;
     }
 
+    /*
     public Scp079PlayerScript Scp079Script => _player.ClassManager.Scp079;
     
     public byte Level
@@ -50,4 +53,5 @@ public class Scp079Controller
     public void UnlockDoors() => Scp079Script.CmdResetDoors();
     
     public bool Spawned { get; internal set; }
+    */
 }

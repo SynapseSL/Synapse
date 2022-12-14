@@ -87,7 +87,7 @@ public class SynapseSchematic : DefaultSynapseObject
     internal readonly List<SynapseWorkStation> _workStations = new();
     internal readonly List<SynapseDoor> _doors = new();
     internal readonly List<SynapseCustomObject> _custom = new();
-    internal readonly List<SynapseRagdoll> _ragdolls = new ();
+    internal readonly List<SynapseRagDoll> _ragdolls = new ();
     internal readonly List<SynapseGenerator> _generators = new();
     internal readonly List<SynapseLocker> _lockers = new();
     internal readonly List<SynapseItem> _items = new();
@@ -101,7 +101,7 @@ public class SynapseSchematic : DefaultSynapseObject
     public ReadOnlyCollection<SynapseWorkStation> WorkStations => _workStations.AsReadOnly();
     public ReadOnlyCollection<SynapseDoor> Doors => _doors.AsReadOnly();
     public ReadOnlyCollection<SynapseCustomObject> CustomObjects => _custom.AsReadOnly();
-    public ReadOnlyCollection<SynapseRagdoll> Ragdolls => _ragdolls.AsReadOnly();
+    public ReadOnlyCollection<SynapseRagDoll> Ragdolls => _ragdolls.AsReadOnly();
     public ReadOnlyCollection<SynapseGenerator> Generators => _generators.AsReadOnly();
     public ReadOnlyCollection<SynapseLocker> Lockers => _lockers.AsReadOnly();
     public ReadOnlyCollection<SynapseItem> Items => _items.AsReadOnly();
@@ -146,7 +146,8 @@ public class SynapseSchematic : DefaultSynapseObject
 
         foreach (var rag in configuration.Ragdolls)
         {
-            _children.Add(new SynapseRagdoll(rag, this));
+            //TODO:
+            //_children.Add(new SynapseRagDoll(rag, this));
         }
 
         foreach (var locker in configuration.Lockers)

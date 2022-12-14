@@ -1,14 +1,21 @@
-﻿using InventorySystem.Items.MicroHID;
+﻿using GameObjectPools;
+using InventorySystem.Items.MicroHID;
+using LiteNetLib.Utils;
 using MEC;
 using Mirror;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Neuron.Modules.Commands;
+using PlayerRoles;
+using PlayerRoles.FirstPersonControl;
 using PlayerStatsSystem;
+using RelativePositioning;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule;
@@ -55,8 +62,7 @@ public class DebugService : Service
 
         _scp.Revive.Subscribe(ev =>
         {
-            NeuronLogger.For<Synapse>()
-                .Warn($"Revive {ev.Scp049.NickName} {ev.HumanToRevive.NickName} {ev.Ragdoll.RoleType} Finish: {ev.FinishRevive}");
+           
         });
         
         _item.ThrowGrenade.Subscribe(ev =>
@@ -95,7 +101,7 @@ public class DebugService : Service
         
         _server.PreAuthentication.Subscribe(ev =>
         {
-            NeuronLogger.For<Synapse>().Warn($"Pre Auth {ev.UserId}");
+            NeuronLogger.For<Synapse>().Warn($"Pre Auth {ev.UserId} " + ev.Country);
         });
         
         _scp.Scp049Attack.Subscribe(ScpEvent);
@@ -106,12 +112,7 @@ public class DebugService : Service
         _scp.Scp106Attack.Subscribe(ScpEvent);
 
         _scp.ContainScp079.Subscribe(ev => NeuronLogger.For<Synapse>().Warn("Contain 079: " + ev.Status));
-        _scp.SwitchCamera.Subscribe(ev =>
-        {
-            NeuronLogger.For<Synapse>().Warn("Switch Cam " + ev.Scp079.NickName + " " + ev.Camera.CameraID);
-            ev.Allow = Random.Range(0, 2) == 1;
-        });
-        
+
         _scp.Scp079DoorInteract.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Warn("079 Door");
@@ -128,6 +129,12 @@ public class DebugService : Service
 
         _player.Kick.Subscribe(ev => Logger.Warn("KICK " + ev.Admin + " " + ev.Reason));
         _player.Ban.Subscribe(ev => Logger.Warn("Ban " + ev.Admin + " " + ev.Reason));
+        
+        _round.Decontamination.Subscribe(ev =>
+        {
+            Logger.Warn("Decontamination ");
+            ev.Allow = false;
+        });
     }
 
     private void ScpEvent(ScpAttackEvent ev)
@@ -165,49 +172,22 @@ public class DebugService : Service
     {
         switch (ev.KeyCode)
         {
-            case KeyCode.Alpha1:
-                ev.Player.SendNetworkMessage(Synapse.Get<MirrorService>()
-                    .GetCustomVarMessage(ev.Player.ClassManager, 8ul, RoleType.Scientist));
-                break;
-            
-            case KeyCode.Alpha2:
-                var rag = new SynapseRagdoll(ev.Player.RoleType, "3", ev.Player.Position, ev.Player.Rotation,
-                    Vector3.one, "Dimenzio the Second", ev.Player,false,uint.MaxValue,false);
-                Timing.CallDelayed(8f, () =>
-                {
-                    rag.VisibleInfoCondition[x => true] =
-                        new SynapseRagdoll.SynapseRagDollInfo(new WarheadDamageHandler(), "New Dimenzio the second",
-                            RoleType.Scp096);
-                    rag.UpdateInfo();
-                });
-                break;
-
-            case KeyCode.Alpha3:
-                ev.Player.SendNetworkMessage(Synapse.Get<MirrorService>().GetCustomVarMessage(
-                    ServerConfigSynchronizer.Singleton,
-                    writer =>
-                    {
-                        writer.WriteUInt64(4); //Which SyncObject will be updated in this case 1 2 or 4 or a combination of those
-                        
-                        //SyncList Specific
-                        writer.WriteUInt32(1); //The amount of changes
-                        writer.WriteByte((byte)SyncList<byte>.Operation.OP_ADD);
-                        writer.Write(new ServerConfigSynchronizer.PredefinedBanTemplate()
-                        {
-                            Duration = 1,
-                            Reason = "test",
-                            DurationNice = "test duration"
-                        });
-                    }, false));
-                break;
-            
-            case KeyCode.Alpha4:
-                foreach (var door in Synapse.Get<MapService>()._synapseDoors)
-                {
-                    ev.Player.SendNetworkMessage(Synapse.Get<MirrorService>()
-                        .GetCustomVarMessage(door.Variant, 1ul, true));
-                }
-                break;
+           case KeyCode.Alpha1:
+               ev.Player.ChangeRoleLite(RoleTypeId.Scientist);
+               break;
+           
+           case KeyCode.Alpha2:
+               ev.Player.ChangeRoleLite(RoleTypeId.NtfCaptain);
+               break;
+           
+           case KeyCode.Alpha3:
+               ev.Player.ChangeRoleLite(RoleTypeId.Scp0492);
+               break;
+           
+           case KeyCode.Alpha4:
+               ev.Player.MovementMultiplier = 1000;
+               ev.Player.MovementLimiter = 100;
+               break;
         }
     }
 }

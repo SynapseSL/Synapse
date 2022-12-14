@@ -1,5 +1,4 @@
-﻿using Assets._Scripts.Dissonance;
-using Synapse3.SynapseModule.Enums;
+﻿using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Permissions;
 
 namespace Synapse3.SynapseModule.Player;
@@ -234,6 +233,8 @@ public partial class SynapsePlayer
         set => ServerRoles.Permissions = value;
     }
 
+    //TODO:
+    /*
     /// <summary>
     /// True if the player is not allowed to use voice chat
     /// </summary>
@@ -252,6 +253,8 @@ public partial class SynapsePlayer
         get => ClassManager.NetworkIntercomMuted;
         set => ClassManager.NetworkIntercomMuted = value;
     }
+    
+    */
 
     public string CustomRemoteAdminBadge { get; set; } = "";
 }

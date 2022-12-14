@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Synapse3.SynapseModule.Config;
-using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Player;
-using Synapse3.SynapseModule.Teams.Unit;
-using UnityEngine;
-using Random = UnityEngine.Random;
+﻿namespace Synapse3.SynapseModule.Role;
 
-namespace Synapse3.SynapseModule.Role;
-
+//TODO:
+/*
 public abstract class SynapseAbstractRole : SynapseRole
 {
     private readonly UnitService _unit;
@@ -53,7 +45,7 @@ public abstract class SynapseAbstractRole : SynapseRole
         var config = GetConfig();
         if (config == null)
         {
-            Player.RoleID = (uint)RoleType.Spectator;
+            Player.RoleID = (uint)RoleTypeId.Spectator;
             return;
         }
 
@@ -229,3 +221,4 @@ public abstract class SynapseAbstractRole : SynapseRole
         Player.CustomInfo.UpdateInfo();
     }
 }
+*/

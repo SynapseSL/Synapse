@@ -22,10 +22,13 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
         var comp = identifier.gameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
         
+        //TODO:
+        /*
         foreach (var camera079 in identifier.GetComponentsInChildren<Camera079>())
         {
             _cameras.Add(new SynapseCamera(camera079, this));
         }
+        */
     }
 
     public RoomIdentifier Identifier { get; }

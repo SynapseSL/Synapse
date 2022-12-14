@@ -6,6 +6,8 @@ namespace Synapse3.SynapseModule.Player;
 
 public class Scp106Controller
 {
+    //TODO:
+    
     private readonly SynapsePlayer _player;
     
     internal Scp106Controller(SynapsePlayer player)
@@ -13,6 +15,7 @@ public class Scp106Controller
         _player = player;
     }
 
+    /*
     public Scp106PlayerScript Scp106PlayerScript => _player.ClassManager.Scp106;
     
     public Vector3 PortalPosition
@@ -36,4 +39,5 @@ public class Scp106Controller
 
     public void CapturePlayer(SynapsePlayer player) =>
         Scp106PlayerScript.UserCode_CmdMovePlayer(player.gameObject, ServerTime.time);
+        */
 }

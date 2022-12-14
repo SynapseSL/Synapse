@@ -4,6 +4,8 @@ using InventorySystem.Items;
 using MEC;
 using Mirror;
 using Neuron.Core.Logging;
+using PlayerRoles;
+using PlayerRoles.FirstPersonControl;
 using RemoteAdmin;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Objects;
@@ -42,6 +44,8 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         set => Player.Rotation = value;
     }
 
+    //TODO:
+    /*
     public Vector2 RotationVector2
     {
         get => Player.RotationVector2;
@@ -53,6 +57,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         get => Player.RotationFloat;
         set => Player.RotationFloat = value;
     }
+    */
 
     public override Vector3 Scale
     {
@@ -86,7 +91,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
     
     public bool PlayerUpdate { get; set; }
 
-    public SynapseDummy(Vector3 position, Quaternion rotation, RoleType role, string name, string badge = "",
+    public SynapseDummy(Vector3 position, Quaternion rotation, RoleTypeId role, string name, string badge = "",
         string badgeColor = ""): this(position, role, name, badge, badgeColor)
     {
         PlayerUpdate = false;
@@ -95,25 +100,26 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         NetworkServer.Spawn(GameObject);
     }
 
-    public SynapseDummy(Vector3 position, Vector2 rotation, RoleType role, string name, string badge = "",
+    public SynapseDummy(Vector3 position, Vector2 rotation, RoleTypeId role, string name, string badge = "",
         string badgeColor = "") : this(position, role, name, badge, badgeColor)
     {
         PlayerUpdate = true;
 
-        RotationVector2 = rotation;
+        //TODO:
+        //RotationVector2 = rotation;
         NetworkServer.Spawn(GameObject);
     }
     
-    public SynapseDummy(Vector3 position, float rotation, RoleType role, string name, string badge = "",
+    public SynapseDummy(Vector3 position, float rotation, RoleTypeId role, string name, string badge = "",
         string badgeColor = "") : this(position, role, name, badge, badgeColor)
     {
         PlayerUpdate = true;
 
-        RotationSimple = rotation;
+        //RotationSimple = rotation;
         NetworkServer.Spawn(GameObject);
     }
 
-    private SynapseDummy(Vector3 position, RoleType role, string name, string badge, string badgeColor)
+    private SynapseDummy(Vector3 position, RoleTypeId role, string name, string badge, string badgeColor)
     {
         _map = Synapse.Get<MapService>();
         _dummy = Synapse.Get<DummyService>();
@@ -128,19 +134,20 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         var transform = Player.transform;
         transform.localScale = Vector3.one;
         transform.position = position;
-        Player.PlayerMovementSync.RealModelPosition = position;
+        //Player.PlayerMovementSync.RealModelPosition = position;
         
-        Player.QueryProcessor.NetworkPlayerId = QueryProcessor._idIterator;
+        //TODO:
+        //Player.QueryProcessor.NetworkPlayerId = QueryProcessor._idIterator;
         Player.QueryProcessor._ipAddress = Synapse.Get<PlayerService>().Host.IpAddress;
-        Player.ClassManager.CurClass = role;
+        //Player.ClassManager.CurClass = role;
         Player.Health = Player.MaxHealth;
         Player.NicknameSync.Network_myNickSync = name;
         Player.RankName = badge;
         Player.RankColor = badgeColor;
 
-        Player.PlayerMovementSync.NetworkGrounded = true;
-        RunSpeed = CharacterClassManager._staticClasses[(int)role].runSpeed;
-        WalkSpeed = CharacterClassManager._staticClasses[(int)role].walkSpeed;
+        //Player.PlayerMovementSync.NetworkGrounded = true;
+        //RunSpeed = CharacterClassManager._staticClasses[(int)role].runSpeed;
+        //WalkSpeed = CharacterClassManager._staticClasses[(int)role].walkSpeed;
         _ = Timing.RunCoroutine(UpdateMovement());
         
         MoveInElevator = true;
@@ -203,6 +210,8 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
                         speed = SneakSpeed;
                         break;
 
+                    //TODO:
+                    /*
                     case PlayerMovementState.Sprinting:
                         speed = RunSpeed * _map.HumanSprintSpeed;
                         break;
@@ -210,10 +219,12 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
                     case PlayerMovementState.Walking:
                         speed = WalkSpeed * _map.HumanWalkSpeed;
                         break;
+                        */
                 }
 
                 switch (Direction)
                 {
+                    /*
                     case MovementDirection.Forward:
                         var pos = Position + Player.CameraReference.forward / 10 * speed;
 
@@ -247,6 +258,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
                             Player.PlayerMovementSync.OverridePosition(pos, null, true);
                         else wall = true;
                         break;
+                        */
                 }
 
                 if (wall)

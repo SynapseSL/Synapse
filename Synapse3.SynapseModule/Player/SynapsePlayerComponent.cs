@@ -14,7 +14,7 @@ public partial class SynapsePlayer
     public virtual void Awake()
     {
         if(_player.Players.Contains(this)) return;
-
+        
         _player.AddPlayer(this);
     }
 

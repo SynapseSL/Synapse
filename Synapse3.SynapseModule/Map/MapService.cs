@@ -52,7 +52,7 @@ public class MapService : Service
     internal readonly List<SynapsePrimitive> _synapsePrimitives = new();
     internal readonly List<SynapseTarget> _synapseTargets = new();
     internal readonly List<SynapseWorkStation> _synapseWorkStations = new();
-    internal readonly List<SynapseRagdoll> _synapseRagdolls = new();
+    internal readonly List<SynapseRagDoll> _synapseRagdolls = new();
     internal readonly List<SynapseSchematic> _synapseSchematics = new();
     internal readonly List<SynapseOldGrenade> _synapseOldGrenades = new();
 
@@ -69,7 +69,7 @@ public class MapService : Service
     public ReadOnlyCollection<SynapsePrimitive> SynapsePrimitives => _synapsePrimitives.AsReadOnly();
     public ReadOnlyCollection<SynapseTarget> SynapseTargets => _synapseTargets.AsReadOnly();
     public ReadOnlyCollection<SynapseWorkStation> SynapseWorkStations => _synapseWorkStations.AsReadOnly();
-    public ReadOnlyCollection<SynapseRagdoll> SynapseRagdolls => _synapseRagdolls.AsReadOnly();
+    public ReadOnlyCollection<SynapseRagDoll> SynapseRagdolls => _synapseRagdolls.AsReadOnly();
     public ReadOnlyCollection<SynapseSchematic> SynapseSchematics => _synapseSchematics.AsReadOnly();
     public ReadOnlyCollection<SynapseOldGrenade> SynapseOldGrenades => _synapseOldGrenades.AsReadOnly();
 
@@ -84,6 +84,8 @@ public class MapService : Service
         set => NonFacilityCompatibility.currentSceneSettings.constantRespawnPoint = value;
     }
 
+    //TODO:
+    /*
     public float HumanWalkSpeed
     {
         get => ServerConfigSynchronizer.Singleton.NetworkHumanWalkSpeedMultiplier;
@@ -95,6 +97,7 @@ public class MapService : Service
         get => ServerConfigSynchronizer.Singleton.NetworkHumanSprintSpeedMultiplier;
         set => ServerConfigSynchronizer.Singleton.NetworkHumanSprintSpeedMultiplier = value;
     }
+    */
     
     public int Seed => SeedSynchronizer.Seed;
 
@@ -117,8 +120,11 @@ public class MapService : Service
         return gameObject;
     }
     
+    //TODO:
+    /*
     public void PlaceBlood(Vector3 pos, int type = 0, float size = 2)
         => Synapse.Get<PlayerService>().Host.ClassManager.RpcPlaceBlood(pos, type, size);
+        */
 
     private void LoadObjects(RoundWaitingEvent ev)
     {

@@ -2,6 +2,8 @@
 
 namespace Synapse3.SynapseModule.Map.Elevators;
 
+//TODO:
+/*
 public class VanillaDestination : IElevatorDestination
 {
     public VanillaDestination(SynapseElevator elevator, Lift.Elevator dest, string name, uint id)
@@ -72,3 +74,4 @@ public class VanillaDestination : IElevatorDestination
     public Vector3 GetWorldPosition(Vector3 localPosition) => Transform.TransformPoint(localPosition);
     public Vector3 GetLocalPosition(Vector3 worldPosition) => Transform.InverseTransformPoint(worldPosition);
 }
+*/

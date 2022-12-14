@@ -2,11 +2,11 @@
 
 namespace Synapse3.SynapseModule.Database;
 
-public class DataBaseAttribute : Attribute
+public class DatabaseAttribute : Attribute
 {
-    public DataBaseAttribute() { }
+    public DatabaseAttribute() { }
     
-    public DataBaseAttribute(string name, uint id, uint priority, Type type)
+    public DatabaseAttribute(string name, uint id, uint priority, Type type)
     {
         Name = name;
         Id = id;

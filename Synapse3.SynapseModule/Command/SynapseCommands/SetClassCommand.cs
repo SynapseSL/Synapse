@@ -1,5 +1,6 @@
 ﻿using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Command;
+using PlayerRoles;
 using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
 
@@ -51,7 +52,7 @@ public class SetClassCommand : SynapseCommand
             player.RemoveCustomRole(DeSpawnReason.ForceClass);
 
             if (id is >= 0 and <= 17)
-                player.RoleType = (RoleType)id;
+                player.RoleType = (RoleTypeId)id;
             else
                 player.RoleID = id;   
         }

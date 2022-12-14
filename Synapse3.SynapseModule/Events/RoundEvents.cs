@@ -1,13 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Neuron.Core.Events;
 using Neuron.Core.Meta;
+using PluginAPI.Core.Attributes;
+using PluginAPI.Enums;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Events;
 
-public class RoundEvents : Service
+public partial class RoundEvents : Service
 {
     private readonly EventManager _eventManager;
+    private readonly Synapse _synapse;
 
     public readonly EventReactor<RoundStartEvent> Start = new();
     public readonly EventReactor<RoundEndEvent> End = new();
@@ -19,9 +23,10 @@ public class RoundEvents : Service
     public readonly EventReactor<FirstSpawnEvent> FirstSpawn = new();
     public readonly EventReactor<DecontaminationEvent> Decontamination = new();
 
-    public RoundEvents(EventManager eventManager)
+    public RoundEvents(EventManager eventManager, Synapse synapse)
     {
         _eventManager = eventManager;
+        _synapse = synapse;
     }
     
     public override void Enable()
@@ -35,6 +40,7 @@ public class RoundEvents : Service
         _eventManager.RegisterEvent(SpawnTeam);
         _eventManager.RegisterEvent(FirstSpawn);
         _eventManager.RegisterEvent(Decontamination);
+        PluginAPI.Events.EventManager.RegisterEvents(_synapse,this);
     }
 
     public override void Disable()
@@ -57,7 +63,12 @@ public class RoundEndEvent : IEvent { }
 
 public class RoundWaitingEvent : IEvent
 {
-    public bool FirstTime { get; set; }
+    public RoundWaitingEvent(bool firstTime)
+    {
+        FirstTime = firstTime;
+    }
+
+    public bool FirstTime { get; }
 }
 
 public class RoundRestartEvent : IEvent { }

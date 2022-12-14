@@ -3,7 +3,7 @@ using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Database;
 
-public abstract class DataBase : IDataBase
+public abstract class Database : IDatabase
 {
     public virtual string GetPlayerData(SynapsePlayer player, string key, out bool isHandled)
     {
@@ -27,7 +27,7 @@ public abstract class DataBase : IDataBase
         return new Dictionary<string, string>();
     }
 
-    public DataBaseAttribute Attribute { get; set; }
+    public DatabaseAttribute Attribute { get; set; }
     
     public virtual void Load() { }
 }

@@ -47,6 +47,8 @@ public abstract class DefaultElevator : IElevator
 
     public void MoveContent(uint destinationId)
     {
+        //TODO:
+        /*
         try
         {
             var destination = GetDestination(destinationId);
@@ -139,6 +141,7 @@ public abstract class DefaultElevator : IElevator
         {
             NeuronLogger.For<Synapse>().Error("Sy3 API: Elevator Move Content failed\n" + ex);
         }
+        */
     }
     
     public IElevatorDestination GetDestination(uint id) => Destinations.FirstOrDefault(x => x.ElevatorId == id);

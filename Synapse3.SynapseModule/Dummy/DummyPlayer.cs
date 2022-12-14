@@ -1,5 +1,6 @@
 ﻿using MEC;
 using Mirror;
+using PlayerRoles;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -8,14 +9,17 @@ namespace Synapse3.SynapseModule.Dummy;
 
 public class DummyPlayer : SynapsePlayer
 {
+    //TODO:
+    /*
     public override PlayerType PlayerType => PlayerType.Dummy;
 
-    public override RoleType RoleType
+    public override RoleTypeId RoleType
     {
         set
         {
+            //TODO: Set Dummy Role
             NetworkServer.UnSpawn(gameObject);
-            ClassManager.CurClass = value;
+            //ClassManager.CurClass = value;
             NetworkServer.Spawn(gameObject);
         }
     }
@@ -54,6 +58,7 @@ public class DummyPlayer : SynapsePlayer
         PlayerMovementSync.Rotations = rotation;
         transform.localRotation = Quaternion.Euler(0f, PlayerMovementSync.Rotations.y, 0f);
     }
+    */ 
 
     public override void Awake()
     {
@@ -72,7 +77,7 @@ public class DummyPlayer : SynapsePlayer
         var service = Synapse.Get<DummyService>();
         service._dummies.Remove(SynapseDummy);
     }
-    
+   
     public SynapseDummy SynapseDummy { get; internal set; }
 
     public override TTranslation GetTranslation<TTranslation>(TTranslation translation) => translation.Get();

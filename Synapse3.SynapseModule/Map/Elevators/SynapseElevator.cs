@@ -5,6 +5,8 @@ using Synapse3.SynapseModule.Enums;
 
 namespace Synapse3.SynapseModule.Map.Elevators;
 
+//TODO:
+/*
 public class SynapseElevator : DefaultElevator
 {
     public Lift Lift { get; }
@@ -108,3 +110,4 @@ public class SynapseElevator : DefaultElevator
 
     public override string ToString() => Name;
 }
+*/

@@ -4,6 +4,8 @@ namespace Synapse3.SynapseModule.Map.Objects;
 
 public class SynapseCamera
 {
+    //TODO:
+    /*
     internal SynapseCamera(Camera079 camera079, IRoom room)
     {
         Camera = camera079;
@@ -19,4 +21,5 @@ public class SynapseCamera
     public ushort CameraID => Camera.cameraId;
 
     public bool MainCamera => Camera.isMain;
+    */
 }
