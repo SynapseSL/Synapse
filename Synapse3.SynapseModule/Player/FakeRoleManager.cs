@@ -6,6 +6,7 @@ using PlayerRoles.FirstPersonControl;
 using PlayerRoles.PlayableScps.Scp049;
 using PlayerRoles.PlayableScps.Scp049.Zombies;
 using PlayerRoles.PlayableScps.Scp079;
+using PlayerRoles.PlayableScps.Scp096;
 using PlayerRoles.PlayableScps.Scp106;
 using PlayerRoles.PlayableScps.Scp173;
 using PlayerRoles.PlayableScps.Scp939;
@@ -142,8 +143,8 @@ public class FakeRoleManager
         { RoleTypeId.ChaosRifleman, typeof(HumanRole) },
         { RoleTypeId.ChaosRepressor, typeof(HumanRole) },
         { RoleTypeId.ChaosMarauder, typeof(HumanRole) },
+        { RoleTypeId.Scp096, typeof(Scp096Role) },
         //TODO:
-        { RoleTypeId.Scp096, typeof(NoneRole) },
         { RoleTypeId.CustomRole, typeof(NoneRole) },
         { RoleTypeId.Overwatch, typeof(NoneRole) }
     };

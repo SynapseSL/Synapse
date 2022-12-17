@@ -3,10 +3,13 @@ using GameCore;
 using Hints;
 using InventorySystem.Disarming;
 using InventorySystem.Items.Firearms.Attachments;
+using InventorySystem.Items.Firearms.BasicMessages;
 using Mirror;
 using Neuron.Core.Logging;
 using PlayerRoles;
 using PlayerStatsSystem;
+using PluginAPI.Enums;
+using PluginAPI.Events;
 using RemoteAdmin;
 using Respawning;
 using RoundRestarting;
@@ -27,7 +30,7 @@ public partial class SynapsePlayer
     /// <summary>
     /// Bans the Player
     /// </summary>
-    public void Ban(int duration, string reason, SynapsePlayer issuer = null) =>
+    public void Ban(long duration, string reason, SynapsePlayer issuer = null) =>
         BanPlayer.BanUser(Hub, issuer ?? _player.Host, reason, duration);
     
     /// <summary>
@@ -65,25 +68,28 @@ public partial class SynapsePlayer
     public Broadcast SendBroadcast(string message, ushort time, bool instant = false)
     {
         if (PlayerType == PlayerType.Server)
+        {
             NeuronLogger.For<Synapse>().Info($"Broadcast: {message}", ConsoleColor.White);
+            return null;
+        }
 
         Broadcast bc = new(message, time, this);
         ActiveBroadcasts.Add(bc, instant);
         return bc;
     }
-    
+
     /// <summary>
     /// Creates the broadcast
     /// </summary>
     /// <param name="time"></param>
     /// <param name="message"></param>
-    internal void Broadcast(ushort time, string message) => GetComponent<global::Broadcast>()
-        .TargetAddElement(Connection, message, time, new global::Broadcast.BroadcastFlags());
+    internal void Broadcast(ushort time, string message) =>
+        BroadcastController.TargetAddElement(Connection, message, time, new global::Broadcast.BroadcastFlags());
 
     /// <summary>
     /// Removes the currently displayed broadcast
     /// </summary>
-    internal void ClearBroadcasts() => GetComponent<global::Broadcast>().TargetClearElements(Connection);
+    internal void ClearBroadcasts() => BroadcastController.TargetClearElements(Connection);
 
     /// <summary>
     /// Shows instantly the new broadcast
@@ -104,13 +110,15 @@ public partial class SynapsePlayer
     /// <summary>
     /// Sends a Message to the Player in his (Text)RemoteAdmin
     /// </summary>
-    public void SendRaConsoleMessage(string message, bool success = true, RaCategory type = RaCategory.None) => CommandSender.RaMessage(message, success, type);
+    public void SendRaConsoleMessage(string message, bool success = true, RaCategory type = RaCategory.None,
+        string sender = "") =>
+        CommandSender.RaMessage(message, success, type, string.IsNullOrWhiteSpace(sender) ? "Synapse" : sender);
 
     /// <summary>
     /// Gives the Player an effect
     /// </summary>
-    public void GiveEffect(Effect effect, byte intensity = 1, float duration = -1f) =>
-        PlayerEffectsController.ChangeState(effect.ToString().ToLower(), intensity, duration);
+    public void GiveEffect(Effect effect, byte intensity = 1, float duration = -1f, bool addDuration = false) =>
+        PlayerEffectsController.AllEffects[(int)effect].ServerSetState(intensity, duration, addDuration);
 
     /// <summary>
     /// Heals the Player the specific amount without over healing him
@@ -130,7 +138,7 @@ public partial class SynapsePlayer
     /// <summary>
     /// Hurts and if enough kills the Player
     /// </summary>
-    public bool Hurt(DamageHandlerBase handlerbase) => PlayerStats.DealDamage(handlerbase);
+    public bool Hurt(DamageHandlerBase handlerBase) => PlayerStats.DealDamage(handlerBase);
 
     /// <summary>
     /// Kills the Player
@@ -167,9 +175,9 @@ public partial class SynapsePlayer
     /// <summary>
     /// Executes in the name of the Player a Command
     /// </summary>
-    public void ExecuteCommand(string command, bool RA = true)
+    public void ExecuteCommand(string command, bool remoteAdmin = true)
     {
-        if (RA) CommandProcessor.ProcessQuery(command, CommandSender);
+        if (remoteAdmin) CommandProcessor.ProcessQuery(command, CommandSender);
         else QueryProcessor.ProcessGameConsoleQuery(command);
     }
 
@@ -186,27 +194,15 @@ public partial class SynapsePlayer
         => Connection.Send(_mirror.GetCustomRpcMessage(RoundSummary.singleton, nameof(RoundSummary.RpcDimScreen),
             null));
 
-    //TODO:
-    /*
     /// <summary>
     /// Shakes the Screen of the Player like the Alpha Warhead
     /// </summary>
-    public void ShakeScreen(bool achieve = false)
-        => AlphaWarheadController.Singleton.TargetRpcShake(Connection, achieve, GodMode);
-
-    /// <summary>
-    /// Places Blood locally on the Map of the Player
-    /// </summary>
-    public void PlaceBlood(Vector3 pos, int type = 1, float size = 2f)
-        => Connection.Send(_mirror.GetCustomRpcMessage(ClassManager,
-            nameof(CharacterClassManager.RpcPlaceBlood),
-            writer =>
-            {
-                writer.WriteVector3(pos);
-                writer.WriteInt32(type);
-                writer.WriteSingle(size);
-            }));
-            */
+    public void ShakeScreen(bool achieve = false) => SendNetworkMessage(_mirror.GetCustomRpcMessage(
+        AlphaWarheadController.Singleton, nameof(AlphaWarheadController.RpcShake),
+        writer =>
+        {
+            writer.WriteBoolean(achieve);
+        }));
 
     /// <summary>
     /// Opens the Menu of the Player
@@ -239,123 +235,100 @@ public partial class SynapsePlayer
         });
     }
 
-    public void TriggerEscape()
+    private EscapeType GetEscapeType(bool ignoreEscapeDistance)
     {
-        //TODO:
-        /*
-        if (CustomRole != null)
-        {
-            CustomRole.TryEscape();
-            return;
-        }
-
-        var allow = true;
-        var escapeRole = RoleService.NoneRole;
-        var changeTeam = false;
-
-        foreach (var disarmedEntry in DisarmedPlayers.Entries)
-        {
-            if (disarmedEntry.DisarmedPlayer == NetworkIdentity.netId)
-            {
-                if (disarmedEntry.DisarmedPlayer == 0 && CharacterClassManager.ForceCuffedChangeTeam)
-                {
-                    changeTeam = true;
-                }
-
-                var disarmer = Disarmer;
-
-                switch (RoleType)
-                {
-                    case RoleType.Scientist when disarmer.Faction == Faction.FoundationEnemy:
-                        changeTeam = true;
-                        break;
-                    
-                    case RoleType.ClassD when disarmer.Faction == Faction.FoundationStaff:
-                        changeTeam = true;
-                        break;
-                }
-            }
-        }
-
+        var fpcRole = CurrentRole as HumanRole;
+        if (fpcRole == null && !ignoreEscapeDistance) return EscapeType.TooFarAway;
+        if (!ignoreEscapeDistance && (fpcRole.FpcModule.Position - Escape.WorldPos).sqrMagnitude > Escape.RadiusSqr) return EscapeType.TooFarAway;
+        
+        if (HasCustomRole) return EscapeType.CustomRole;
+        if (CurrentRole is not HumanRole human) return EscapeType.NotAssigned;
+        if (human.ActiveTime < 10f) return EscapeType.None;
+        
+        var disarmed = IsDisarmed;
+        if (IsDisarmed && !CharacterClassManager.CuffedChangeTeam) return EscapeType.NotAssigned;
         switch (RoleType)
         {
-            case RoleType.ClassD when changeTeam:
-                escapeRole = (int)RoleType.NtfPrivate;
-                break;
-
-            case RoleType.ClassD:
-            case RoleType.Scientist when changeTeam:
-                escapeRole = (int)RoleType.ChaosConscript;
-                break;
-
-            case RoleType.Scientist:
-                escapeRole = (int)RoleType.NtfSpecialist;
-                break;
+            case RoleTypeId.ClassD when disarmed:
+                return EscapeType.CuffedClassD;
+            
+            case RoleTypeId.ClassD:
+                return EscapeType.ClassD;
+            
+            case RoleTypeId.Scientist when disarmed:
+                return EscapeType.CuffedScientist;
+            
+            case RoleTypeId.Scientist:
+                return EscapeType.Scientist;
+            
+            default: return EscapeType.NotAssigned;
         }
-
-        if (escapeRole == RoleService.NoneRole) allow = false;
-
-        var ev = new EscapeEvent(this, allow, escapeRole, RoleID == (int)RoleType.ClassD, changeTeam);
-        _playerEvents.Escape.Raise(ev);
-        
-        if(!ev.Allow) return;
-
-        if (ev.NewRole is >= 0 and <= RoleService.HighestRole)
-        {
-            ClassManager.SetPlayersClass((RoleTypeId)ev.NewRole, gameObject, CharacterClassManager.SpawnReason.Escaped);
-        }
-        else
-        {
-            RoleID = ev.NewRole;
-        }
-
-        Escape.TargetShowEscapeMessage(Connection, ev.IsClassD, changeTeam);
-        
-        var tickets = RespawnTickets.Singleton;
-        //At this Point the Player already changed his role and therefore his Team as well
-        switch (TeamID)
-        {
-            case (int)Team.MTF when changeTeam:
-                RoundSummary.EscapedScientists++;
-                tickets.GrantTickets(SpawnableTeamType.NineTailedFox,
-                    ConfigFile.ServerConfig.GetInt("respawn_tickets_mtf_classd_cuffed_count", 1));
-                break;
-
-            case (int)Team.MTF when !changeTeam:
-                RoundSummary.EscapedScientists++;
-                tickets.GrantTickets(SpawnableTeamType.NineTailedFox,
-                    ConfigFile.ServerConfig.GetInt("respawn_tickets_mtf_scientist_count", 1));
-                break;
-
-            case (int)Team.CHI when changeTeam:
-                RoundSummary.EscapedClassD++;
-                tickets.GrantTickets(SpawnableTeamType.NineTailedFox,
-                    ConfigFile.ServerConfig.GetInt("respawn_tickets_ci_scientist_cuffed_count", 1));
-                break;
-
-            case (int)Team.CHI when !changeTeam:
-                RoundSummary.EscapedClassD++;
-                tickets.GrantTickets(SpawnableTeamType.NineTailedFox,
-                    ConfigFile.ServerConfig.GetInt("respawn_tickets_ci_classd_count", 1));
-                break;
-        }
-        */
     }
 
-    //TODO:
-    /*
-    public void SetPlayerRoleTypeAdvance(RoleTypeID role,Vector3 position,Vector2 rotation = default,byte unitId = 0, string unitName = "")
+    public void TriggerEscape(bool ignoreEscapeDistance = true)
     {
-        UnitId = unitId;
-        Unit = Unit;
-        foreach (var effect in PlayerEffectsController._allEffects)
+        var state = GetEscapeType(ignoreEscapeDistance);
+        var ev = new EscapeEvent(this, true, state);
+        _playerEvents.Escape.Raise(ev);
+
+        var vanillaRole = RoleTypeId.None;
+        switch (ev.EscapeType)
         {
-            effect.OnClassChanged(RoleType, role);
+            case EscapeType.NotAssigned:
+            case EscapeType.TooFarAway:
+            case EscapeType.None:
+                return;
+            
+            case EscapeType.CustomRole:
+                CustomRole?.TryEscape();
+                return;
+            
+            case EscapeType.PluginOverride:
+                SendNetworkMessage(new Escape.EscapeMessage()
+                {
+                    ScenarioId = (byte)Escape.EscapeScenarioType.ClassD,
+                    EscapeTime = (ushort)Mathf.CeilToInt(CurrentRole.ActiveTime)
+                });
+                RoleID = ev.OverrideRole;
+                return;
+            
+            case EscapeType.ClassD:
+            case EscapeType.CuffedScientist:
+                vanillaRole = RoleTypeId.ChaosConscript;
+                break;
+            
+            case EscapeType.CuffedClassD:
+                vanillaRole = RoleTypeId.NtfPrivate;
+                break;
+            
+            case EscapeType.Scientist:
+                vanillaRole = RoleTypeId.NtfSpecialist;
+                break;
         }
-        ChangeRoleLite(role);
-        PlayerMovementSync.OnPlayerClassChange(position, new PlayerMovementSync.PlayerRotation(rotation.x, rotation.y));
-        FirstPersonController.ResetStamina();
+
+        if (!EventManager.ExecuteEvent(ServerEventType.PlayerEscape, Hub, vanillaRole)) return;
+
+        switch (ev.EscapeType)
+        {
+            case EscapeType.ClassD:
+            case EscapeType.CuffedScientist:
+                RespawnTokensManager.GrantTokens(SpawnableTeamType.ChaosInsurgency, Escape.InsurgencyEscapeReward);
+                break;
+            
+            case EscapeType.CuffedClassD:
+                RespawnTokensManager.GrantTokens(SpawnableTeamType.NineTailedFox, Escape.FoundationEscapeReward);
+                break;
+            
+            case EscapeType.Scientist:
+                RespawnTokensManager.GrantTokens(SpawnableTeamType.NineTailedFox, Escape.FoundationEscapeReward);
+                break;
+        }
         
+        SendNetworkMessage(new Escape.EscapeMessage()
+        {
+            ScenarioId = (byte)ev.EscapeType,
+            EscapeTime = (ushort)Mathf.CeilToInt(CurrentRole.ActiveTime)
+        });
+        RoleManager.ServerSetRole(vanillaRole, RoleChangeReason.Escaped);
     }
-    */
 }

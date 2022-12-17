@@ -5,6 +5,7 @@ using Neuron.Modules.Commands.Command;
 using RemoteAdmin;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Player;
+using Utils.NonAllocLINQ;
 using Console = GameCore.Console;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
@@ -92,8 +93,20 @@ public static class RemoteAdminPatch
             var result = _commandService.RemoteAdmin
                 .Invoke(SynapseContext.Of(q, player, CommandPlatform.RemoteAdmin));
             if (result.StatusCodeInt == 0) return true;
-            
-            player.SendRaConsoleMessage(result.Response, result.StatusCodeInt == (int)CommandStatusCode.Ok);
+
+            var info = result.Attachments.FirstOrDefault(x => x is RemoteAdminAttachment, null);
+            SynapseLogger<Synapse>.Warn(info == null);
+
+            if (info != null)
+            {
+                var raInfo = (RemoteAdminAttachment)info;
+                player.SendRaConsoleMessage(result.Response, result.StatusCodeInt == (int)CommandStatusCode.Ok,
+                    raInfo.DisplayCategory, raInfo.DisplayName);
+            }
+            else
+            {
+                player.SendRaConsoleMessage(result.Response, result.StatusCodeInt == (int)CommandStatusCode.Ok);
+            }
             return false;
         }
         catch (Exception ex)

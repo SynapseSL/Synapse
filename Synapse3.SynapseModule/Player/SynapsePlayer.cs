@@ -35,6 +35,7 @@ public partial class SynapsePlayer : MonoBehaviour
     {
         Hub = GetComponent<ReferenceHub>();
         GameConsoleTransmission = GetComponent<GameConsoleTransmission>();
+        BroadcastController = GetComponent<global::Broadcast>();
 
         Inventory = new ItemInventory(this);
         ActiveBroadcasts = new BroadcastList(this);

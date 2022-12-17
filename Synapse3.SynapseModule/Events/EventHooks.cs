@@ -1,11 +1,19 @@
 ﻿using System;
 using LightContainmentZoneDecontamination;
 using LiteNetLib;
+using Neuron.Core.Logging;
+using PlayerRoles;
 using PluginAPI.Core.Attributes;
+using PluginAPI.Core.Interfaces;
 using PluginAPI.Enums;
 using PluginAPI.Events;
 
 namespace Synapse3.SynapseModule.Events;
+
+public partial class PlayerEvents
+{
+
+}
 
 public partial class RoundEvents
 {
@@ -67,15 +75,23 @@ public partial class RoundEvents
     [PluginEvent(ServerEventType.LczDecontaminationStart)]
     public bool DecontaminationHook()
     {
-        //TODO: Improve this Event
-        var ev = new DecontaminationEvent();
-        Decontamination.Raise(new DecontaminationEvent());
-        if (!ev.Allow)
+        try
         {
-            DecontaminationController.Singleton.NetworkDecontaminationOverride =
-                DecontaminationController.DecontaminationStatus.None;
+            //TODO: Improve this Event
+            var ev = new DecontaminationEvent();
+            Decontamination.Raise(new DecontaminationEvent());
+            if (!ev.Allow)
+            {
+                DecontaminationController.Singleton.NetworkDecontaminationOverride =
+                    DecontaminationController.DecontaminationStatus.None;
+            }
+            return ev.Allow;
         }
-        return ev.Allow;
+        catch (Exception ex)
+        {
+            SynapseLogger<Synapse>.Error("Sy3 Events: Decontamination Event failed:\n" + ex);
+            return true;
+        }
     }
 }
 

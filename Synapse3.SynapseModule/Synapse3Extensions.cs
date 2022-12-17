@@ -36,14 +36,16 @@ public static class Synapse3Extensions
     /// Sends a message to the sender in the RemoteAdmin
     /// </summary>
     public static void RaMessage(this CommandSender sender, string message, bool success = true,
-        RaCategory type = RaCategory.None)
+        RaCategory type = RaCategory.None, string name = "")
     {
         var category = "";
         if (type != RaCategory.None)
             category = type.ToString();
 
 
-        sender.RaReply($"{Assembly.GetCallingAssembly().GetName().Name}#" + message, success, true, category);
+        sender.RaReply(
+            $"{(string.IsNullOrWhiteSpace(name) ? Assembly.GetCallingAssembly().GetName().Name : name)}#" + message,
+            success, true, category);
     }
 
     

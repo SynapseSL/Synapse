@@ -3,11 +3,12 @@
 
         public enum Effect
     {
+        AmnesiaVision,
         /// <summary>
         /// The Player can't open their inventory and reload their weapons
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
-        Amnesia,
+        AmnesiaItems,
         /// <summary>
         /// Quickly drains stamina then health if there is none left
         /// </summary>
@@ -97,11 +98,6 @@
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Invisible,
         /// <summary>
-        /// The vision of SCP-939
-        /// </summary>
-        /// <remarks>0 = Disabled, 1 = OnlyMarker, 2 = Only Screen, 3 = Everything</remarks>
-        Visuals939,
-        /// <summary>
         /// Slows down player (No effect on SCPs)
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
@@ -111,11 +107,6 @@
         /// </summary>
         /// <remarks>0 = Disabled, 1 = Enabled</remarks>
         Stained,
-        /// <summary>
-        /// Turns the screen black.
-        /// </summary>
-        /// <remarks>0 = Disabled, 1 = Enabled</remarks>
-        Visuals173Blink,
         /// <summary>
         /// Removes the player's hands and ability to open inventory or interact; Slowly drains HP.
         /// </summary>
@@ -151,4 +142,9 @@
         /// </summary>
         /// <remarks>0 = Disabled, 1 = 1xScp1853, 2 = 2xScp1853...</remarks>
         Scp1853,
+        Traumatized,
+        CardiacArrest,
+        SoundtrackMute,
+        SpawnProtected,
+        InsufficientLighting
     }

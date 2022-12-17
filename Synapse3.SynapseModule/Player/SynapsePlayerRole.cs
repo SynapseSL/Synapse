@@ -1,4 +1,5 @@
-﻿using Mirror;
+﻿using System;
+using Mirror;
 using Neuron.Core.Events;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
@@ -15,6 +16,8 @@ namespace Synapse3.SynapseModule.Player;
 
 public partial class SynapsePlayer
 {
+    public FakeRoleManager FakeRoleManager { get; }
+    
     public PlayerRoleBase CurrentRole
     {
         get => Hub.roleManager.CurrentRole;
@@ -104,11 +107,11 @@ public partial class SynapsePlayer
             
             switch (newRole)
             {
-                case HumanRole { UsesUnitNames: true }:
-                    writer.WriteByte(0);
+                case HumanRole { UsesUnitNames: true } humanRole:
+                    writer.WriteByte(humanRole.UnitNameId);
                     break;
-                case ZombieRole:
-                    writer.WriteUInt16(600);
+                case ZombieRole zombieRole:
+                    writer.WriteUInt16(zombieRole._syncMaxHealth);
                     break;
             }
 
@@ -133,6 +136,104 @@ public partial class SynapsePlayer
         }
 
         RoleManager._sendNextFrame = true;
+    }
+
+    public void SetPlayerRoleTypeAdvance(RoleTypeId role, Vector3 position)
+    {
+        var newRole = SetUpNewRole(role, out var prevRole);
+
+        if (newRole is FpcStandardRoleBase fpc)
+        {
+            var writer = new NetworkWriter();
+            
+            switch (newRole)
+            {
+                case HumanRole { UsesUnitNames: true }:
+                    writer.WriteByte(0);
+                    break;
+                case ZombieRole:
+                    writer.WriteUInt16(600);
+                    break;
+            }
+
+            writer.WriteRelativePosition(new RelativePosition(position));
+            
+            if (prevRole is FpcStandardRoleBase prevFpcRole)
+            {
+                prevFpcRole.FpcModule.MouseLook.GetSyncValues(0, out var rotation, out _);
+                SynapseLogger<Synapse>.Warn(rotation);
+                writer.WriteUInt16(rotation);
+            }
+            else
+            {
+                writer.WriteUInt16(0);
+            }
+            
+            fpc.ReadSpawnData(new NetworkReader(writer.ToArray()));
+        }
+    }
+
+    public void SetPlayerRoleTypeAdvance(RoleTypeId role, Vector3 position, float horizontalRotation)
+    {
+        var newRole = SetUpNewRole(role, out _);
+
+        if (newRole is FpcStandardRoleBase fpc)
+        {
+            var writer = new NetworkWriter();
+            
+            switch (newRole)
+            {
+                case HumanRole { UsesUnitNames: true } humanRole:
+                    writer.WriteByte(0);
+                    break;
+                case ZombieRole:
+                    writer.WriteUInt16(600);
+                    break;
+            }
+
+            writer.WriteRelativePosition(new RelativePosition(position));
+            //ushort.MaxValue / 360 degree = 182
+            writer.WriteUInt16((ushort)Mathf.RoundToInt(182 * Mathf.Clamp(horizontalRotation,0f,360f)));
+            
+            fpc.ReadSpawnData(new NetworkReader(writer.ToArray()));
+        }
+    }
+
+    public void SetPlayerRoleTypeAdvance(RoleTypeId role, Vector3 position, ushort horizontalRotation,Action<NetworkWriter> customData)
+    {
+        var newRole = SetUpNewRole(role, out _);
+
+        if (newRole is FpcStandardRoleBase fpc)
+        {
+            var writer = new NetworkWriter();
+            
+            customData(writer);
+            writer.WriteRelativePosition(new RelativePosition(position));
+            writer.WriteUInt16(horizontalRotation);
+
+            fpc.ReadSpawnData(new NetworkReader(writer.ToArray()));
+        }
+    }
+
+    private PlayerRoleBase SetUpNewRole(RoleTypeId role,out PlayerRoleBase prevRole)
+    {
+        prevRole = null;
+        if (RoleManager._anySet)
+        {
+            prevRole = RoleManager.CurrentRole;
+            prevRole.DisableRole(role);
+        }
+        var newRole = RoleManager.GetRoleBase(role);
+        var newRoleTransform = newRole.transform;
+        newRoleTransform.parent = transform;
+        newRoleTransform.localPosition = Vector3.zero;
+        newRoleTransform.localRotation = Quaternion.identity;
+        RoleManager.CurrentRole = newRole;
+        newRole.Init(Hub, RoleChangeReason.RemoteAdmin);
+        newRole.SpawnPoolObject();
+        RoleManager._sendNextFrame = true;
+
+        return newRole;
     }
 
     /// <summary>

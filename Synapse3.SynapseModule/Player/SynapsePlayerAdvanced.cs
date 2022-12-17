@@ -13,15 +13,23 @@ namespace Synapse3.SynapseModule.Player;
 
 public partial class SynapsePlayer
 {
-    internal SetClassEvent setClassStored;
+    public ItemInventory Inventory { get; }
+
+    public BroadcastList ActiveBroadcasts { get; }
     
-    public FakeRoleManager FakeRoleManager { get; }
+    public ScpController ScpController { get; }
+
+    public Dictionary<string, object> Data { get; set; } = new();
     
     public SerializedPlayerState State
     {
         get => this;
         set => value.Apply(this, true);
     }
+    
+    public void SendNetworkMessage<TNetworkMessage>(TNetworkMessage msg, int channel = 0)
+        where TNetworkMessage : struct, NetworkMessage =>
+        Connection?.Send(msg, channel);
 
     public void SendFakeSyncVar<TNetworkBehaviour, TValue>(TNetworkBehaviour behaviour, ulong id,
         TValue value) where TNetworkBehaviour : NetworkBehaviour =>
@@ -59,18 +67,6 @@ public partial class SynapsePlayer
         so.GameObject.transform.parent = transform1;
     }
 
-    public ItemInventory Inventory { get; }
-
-    public BroadcastList ActiveBroadcasts { get; }
-    
-    public ScpController ScpController { get; }
-
-    public Dictionary<string, object> Data { get; set; } = new();
-
-    public void SendNetworkMessage<TNetworkMessage>(TNetworkMessage msg, int channel = 0)
-        where TNetworkMessage : struct, NetworkMessage =>
-        Connection?.Send(msg, channel);
-
     public virtual TTranslation GetTranslation<TTranslation>(TTranslation translation) where TTranslation : Translations<TTranslation>, new()
     {
         var language = new List<string>();
@@ -95,49 +91,4 @@ public partial class SynapsePlayer
         get => VanillaInventory._syncMovementLimiter;
         set => VanillaInventory.Network_syncMovementMultiplier = value;
     }
-    
-    //TODO:
-    /*
-    private float _walkSpeed;
-    private bool _customWalkSpeed;
-    public float WalkSpeed
-    {
-        get => _customWalkSpeed ? _walkSpeed : ServerConfigSynchronizer.Singleton.HumanWalkSpeedMultiplier;
-        set
-        {
-            if (Math.Abs(value - ServerConfigSynchronizer.Singleton.HumanWalkSpeedMultiplier) < 0.1f)
-            {
-                _customWalkSpeed = false;
-            }
-            else
-            {
-                _customWalkSpeed = true;
-                _walkSpeed = value;   
-            }
-
-            SendNetworkMessage(_mirror.GetCustomVarMessage(ServerConfigSynchronizer.Singleton, 2ul, value));
-        }
-    }
-    
-    private float _sprintSpeed;
-    private bool _customSprintSpeed;
-    public float SprintSpeed
-    {
-        get => _customSprintSpeed ? _sprintSpeed : ServerConfigSynchronizer.Singleton.HumanSprintSpeedMultiplier;
-        set
-        {
-            if (Math.Abs(value - ServerConfigSynchronizer.Singleton.HumanSprintSpeedMultiplier) < 0.1f)
-            {
-                _customSprintSpeed = false;
-            }
-            else
-            {
-                _customSprintSpeed = true;
-                _sprintSpeed = value;
-            }
-            
-            SendNetworkMessage(_mirror.GetCustomVarMessage(ServerConfigSynchronizer.Singleton, 4ul, value));
-        }
-    }
-    */
 }

@@ -28,26 +28,17 @@ public class PlayerService : Service
 
     public override void Enable()
     {
-        _player.Update.Subscribe(PlayerUpdate);
         _player.Join.Subscribe(Join);
         _round.Restart.Subscribe(ClearJoinUpdates);
     }
 
     public override void Disable()
     {
-        _player.Update.Unsubscribe(PlayerUpdate);
         _player.Join.Unsubscribe(Join);
         _round.Restart.Unsubscribe(ClearJoinUpdates);
     }
 
     private void ClearJoinUpdates(RoundRestartEvent _) => JoinUpdates.Clear();
-    
-    private void PlayerUpdate(UpdateEvent ev)
-    {
-        //TODO: fix this
-        if (Vector3.Distance(ev.Player.Position, Escape.WorldPos) < Escape.RadiusSqr)
-            ev.Player.TriggerEscape();
-    }
 
     /// <summary>
     /// Returns the Host Player

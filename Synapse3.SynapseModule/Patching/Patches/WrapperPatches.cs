@@ -71,6 +71,7 @@ public static class RedirectRoleWritePatch
     {
         var receiver = _playerService.GetPlayer(__instance._receiverNetId);
         var target = _playerService.GetPlayer(__instance._targetNetId);
+        if (target == null || receiver == null) return true;
         target.FakeRoleManager.WriteRoleSyncInfoFor(receiver, writer);
         return false;
     }

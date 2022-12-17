@@ -10,12 +10,14 @@ using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
+using Synapse3.SynapseModule.Role;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Events;
 
-public class PlayerEvents : Service
+public partial class PlayerEvents : Service
 {
+    private readonly Synapse _synapse;
     private readonly EventManager _eventManager;
 
     public readonly EventReactor<LoadComponentEvent> LoadComponent = new();
@@ -58,9 +60,10 @@ public class PlayerEvents : Service
     public readonly EventReactor<ChangeRoleEvent> ChangeRole = new();
     public readonly EventReactor<KickEvent> Kick = new();
 
-    public PlayerEvents(EventManager eventManager)
+    public PlayerEvents(EventManager eventManager, Synapse synapse)
     {
         _eventManager = eventManager;
+        _synapse = synapse;
     }
 
     public override void Enable()
@@ -103,6 +106,7 @@ public class PlayerEvents : Service
         WalkOnSinkhole.Subscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Subscribe(WalkOnHazard.Raise);
 
+        PluginAPI.Events.EventManager.RegisterEvents(_synapse,this);
         //TODO:
         //PlayerRoleManager.OnServerRoleSet += CallSimpleSetClass;
     }
@@ -408,18 +412,23 @@ public class DropAmmoEvent : PlayerInteractEvent
 
 public class EscapeEvent : PlayerInteractEvent
 {
-    public EscapeEvent(SynapsePlayer player, bool allow, uint newRole, bool isClassD, bool changeTeam) : base(player, allow)
+    public EscapeEvent(SynapsePlayer player, bool allow, EscapeType type) : base(player, allow)
     {
-        NewRole = newRole;
-        IsClassD = isClassD;
-        ChangeTeam = changeTeam;
+        EscapeType = type;
     }
+    
+    public EscapeType EscapeType { get; set; }
 
-    public uint NewRole { get; set; }
-
-    public bool IsClassD { get; }
-
-    public bool ChangeTeam { get; }
+    private uint _role;
+    public uint OverrideRole
+    {
+        get => _role;
+        set
+        {
+            EscapeType = EscapeType.PluginOverride;
+            _role = value;
+        }
+    }
 }
 
 public class DropItemEvent : PlayerInteractEvent

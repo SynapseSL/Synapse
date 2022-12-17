@@ -46,11 +46,11 @@ public partial class SynapsePlayer
 
     public CharacterClassManager ClassManager => Hub.characterClassManager;
 
-    public PlayableScpsController VanillaScpController => Hub.scpsController;
-
     public PlayerRoleManager RoleManager => Hub.roleManager;
 
     public GameConsoleTransmission GameConsoleTransmission { get; }
+    
+    public global::Broadcast BroadcastController { get; }
 
     public CommandSender CommandSender
     {

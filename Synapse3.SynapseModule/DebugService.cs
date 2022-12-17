@@ -1,8 +1,10 @@
-﻿using GameObjectPools;
+﻿using System.IO;
+using GameObjectPools;
 using InventorySystem.Items.MicroHID;
 using LiteNetLib.Utils;
 using MEC;
 using Mirror;
+using Neuron.Core;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Neuron.Modules.Commands;
@@ -11,6 +13,7 @@ using PlayerRoles.FirstPersonControl;
 using PlayerStatsSystem;
 using RelativePositioning;
 using Synapse3.SynapseModule.Command;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Objects;
@@ -135,6 +138,12 @@ public class DebugService : Service
             Logger.Warn("Decontamination ");
             ev.Allow = false;
         });
+        
+        _player.Escape.Subscribe(ev =>
+        {
+            if(ev.EscapeType == EscapeType.TooFarAway) return;
+            Logger.Warn("ESCAPE " + ev.Player.NickName + " " + ev.EscapeType);
+        });
     }
 
     private void ScpEvent(ScpAttackEvent ev)
@@ -177,16 +186,35 @@ public class DebugService : Service
                break;
            
            case KeyCode.Alpha2:
-               ev.Player.ChangeRoleLite(RoleTypeId.NtfCaptain);
+               ev.Player.SetPlayerRoleTypeAdvance(RoleTypeId.Scientist, ev.Player.Position);
                break;
-           
+
            case KeyCode.Alpha3:
-               ev.Player.ChangeRoleLite(RoleTypeId.Scp0492);
+               var angle = Random.Range(0, 5) switch
+               {
+                   0 => 0,
+                   1 => 90,
+                   2 => 180,
+                   3 => 270,
+                   4 => 360,
+                   _ => 0
+               };
+               Logger.Warn(angle);
+               ev.Player.SetPlayerRoleTypeAdvance(RoleTypeId.Scientist, ev.Player.Position, angle);
                break;
-           
-           case KeyCode.Alpha4:
-               ev.Player.MovementMultiplier = 1000;
-               ev.Player.MovementLimiter = 100;
+
+           case KeyCode.Alpha5:
+               angle = Random.Range(0, 5) switch
+               {
+                   0 => 0,
+                   1 => 90,
+                   2 => 180,
+                   3 => 270,
+                   4 => 360,
+                   _ => 0
+               };
+               (ev.Player.CurrentRole as FpcStandardRoleBase).FpcModule.MouseLook.CurrentHorizontal = angle;
+               ev.Player.FakeRoleManager.UpdatePlayer(ev.Player);
                break;
         }
     }
