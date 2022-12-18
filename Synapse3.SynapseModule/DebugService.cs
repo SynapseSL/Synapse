@@ -20,6 +20,9 @@ using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
+using Synapse3.SynapseModule.Dummy;
+using GameCore;
+using PluginAPI.Core;
 
 namespace Synapse3.SynapseModule;
 
@@ -54,7 +57,7 @@ public class DebugService : Service
         _player.KeyPress.Subscribe(OnKeyPress);
         _round.SelectTeam.Subscribe(SelectTeam);
         _round.SpawnTeam.Subscribe(SpawnTeam);
-        
+
         _item.KeyCardInteract.Subscribe(KeyCardItem);
         _item.BasicInteract.Subscribe(BasicItem);
         
@@ -176,14 +179,15 @@ public class DebugService : Service
     {
         NeuronLogger.For<Synapse>().Warn("SpawnTeam: " + ev.TeamId);
     }
-    
+
+    SynapseDummy testDummy;
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)
         {
-           case KeyCode.Alpha1:
-               ev.Player.ChangeRoleLite(RoleTypeId.Scientist);
-               break;
+            case KeyCode.Alpha1:
+                testDummy = new SynapseDummy(ev.Player.Position, ev.Player.Rotation, RoleTypeId.ClassD, "Test");
+                break;
            
            case KeyCode.Alpha2:
                ev.Player.SetPlayerRoleTypeAdvance(RoleTypeId.Scientist, ev.Player.Position);

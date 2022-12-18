@@ -4,6 +4,7 @@ using Mirror;
 using Mirror.LiteNetLib4Mirror;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
+using PlayerRoles.PlayableScps.Scp079;
 using PlayerRoles.Spectating;
 using PlayerStatsSystem;
 using RelativePositioning;
@@ -216,10 +217,10 @@ public partial class SynapsePlayer
         set => Hub.fpc.staminaController.StaminaUse = value / 100;
     }
 
-
+   
     public byte UnitId
     {
-        get => ClassManager.CurSpawnableTeamType;
+        get => ClassManager. CurSpawnableTeamType;
         set
         {
             ClassManager.CurSpawnableTeamType = value;
@@ -255,6 +256,39 @@ public partial class SynapsePlayer
         set => SpectatorManager.CurrentSpectatedPlayer = value;
     }
     */
+
+    public float SneakSpeed
+    {
+        get => FirstPersonMovement?.SneakSpeed ?? 0;
+        set
+        {
+            var firstperosn = FirstPersonMovement;
+            if (firstperosn != null)
+                firstperosn.SneakSpeed = value;
+        }
+    }
+
+    public float WalkSpeed
+    {
+        get => FirstPersonMovement?.WalkSpeed ?? 0;
+        set
+        {
+            var firstperosn = FirstPersonMovement;
+            if (firstperosn != null)
+                firstperosn.WalkSpeed = value;
+        }
+    }
+
+    public float RunSpeed
+    {
+        get => FirstPersonMovement?.SprintSpeed ?? 0;
+        set
+        {
+            var firstperosn = FirstPersonMovement;
+            if (firstperosn != null)
+                firstperosn.SprintSpeed = value;
+        }
+    }
 
     /// <summary>
     /// The player who disarmed the player

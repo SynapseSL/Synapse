@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using InventorySystem.Items;
 using MEC;
+using Microsoft.Extensions.Logging;
 using Mirror;
 using Neuron.Core.Logging;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
+using PlayerStatsSystem;
 using RemoteAdmin;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Objects;
@@ -20,14 +22,26 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
 {
     private readonly MapService _map;
     private readonly DummyService _dummy;
-
+    private readonly PlayerService _player;
     public MovementDirection Direction { get; set; }
 
-    public float SneakSpeed { get; set; } = 1.8f;
+    public float SneakSpeed 
+    { 
+        get => Player.SneakSpeed;
+        set => Player.SneakSpeed = value;
+    }
 
-    public float WalkSpeed { get; set; }
+    public float WalkSpeed 
+    {
+        get => Player.WalkSpeed;
+        set => Player.WalkSpeed = value;
+    }
 
-    public float RunSpeed { get; set; }
+    public float RunSpeed 
+    {
+        get => Player.RunSpeed;
+        set => Player.RunSpeed = value;
+    }
 
     public override GameObject GameObject { get; }
     public override ObjectType Type => ObjectType.Dummy;
@@ -44,20 +58,11 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         set => Player.Rotation = value;
     }
 
-    //TODO:
-    /*
     public Vector2 RotationVector2
     {
         get => Player.RotationVector2;
         set => Player.RotationVector2 = value;
     }
-
-    public float RotationSimple
-    {
-        get => Player.RotationFloat;
-        set => Player.RotationFloat = value;
-    }
-    */
 
     public override Vector3 Scale
     {
@@ -95,8 +100,8 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         string badgeColor = ""): this(position, role, name, badge, badgeColor)
     {
         PlayerUpdate = false;
-
-        Rotation = rotation;
+        //TODO:
+        //Rotation = rotation;
         NetworkServer.Spawn(GameObject);
     }
 
@@ -104,18 +109,8 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         string badgeColor = "") : this(position, role, name, badge, badgeColor)
     {
         PlayerUpdate = true;
-
         //TODO:
         //RotationVector2 = rotation;
-        NetworkServer.Spawn(GameObject);
-    }
-    
-    public SynapseDummy(Vector3 position, float rotation, RoleTypeId role, string name, string badge = "",
-        string badgeColor = "") : this(position, role, name, badge, badgeColor)
-    {
-        PlayerUpdate = true;
-
-        //RotationSimple = rotation;
         NetworkServer.Spawn(GameObject);
     }
 
@@ -123,32 +118,61 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
     {
         _map = Synapse.Get<MapService>();
         _dummy = Synapse.Get<DummyService>();
-        
+        _player = Synapse.Get<PlayerService>();
+
         Player = Object.Instantiate(NetworkManager.singleton.playerPrefab, _dummy._dummyParent)
             .GetComponent<DummyPlayer>();
         GameObject = Player.gameObject;
-        var comp = GameObject.AddComponent<SynapseObjectScript>();
-        comp.Object = this;
-        
-        Player.SynapseDummy = this;
-        var transform = Player.transform;
-        transform.localScale = Vector3.one;
-        transform.position = position;
-        //Player.PlayerMovementSync.RealModelPosition = position;
-        
-        //TODO:
-        //Player.QueryProcessor.NetworkPlayerId = QueryProcessor._idIterator;
-        Player.QueryProcessor._ipAddress = Synapse.Get<PlayerService>().Host.IpAddress;
-        //Player.ClassManager.CurClass = role;
-        Player.Health = Player.MaxHealth;
-        Player.NicknameSync.Network_myNickSync = name;
-        Player.RankName = badge;
-        Player.RankColor = badgeColor;
 
-        //Player.PlayerMovementSync.NetworkGrounded = true;
-        //RunSpeed = CharacterClassManager._staticClasses[(int)role].runSpeed;
-        //WalkSpeed = CharacterClassManager._staticClasses[(int)role].walkSpeed;
-        _ = Timing.RunCoroutine(UpdateMovement());
+        var hub = GameObject.GetComponent<ReferenceHub>();
+        hub.PlayerCameraReference = GameObject.AddComponent<Camera>().transform;//found better solution
+        hub.netIdentity.connectionToClient = new NetworkConnectionToClient(-1, false, 0);
+
+        var comp = GameObject.AddComponent<SynapseObjectScript>();//found other solution
+        comp.Object = this;
+
+        Player.SynapseDummy = this;
+        Player.transform.localScale = Vector3.one;
+        Player.QueryProcessor._ipAddress = Synapse.Get<PlayerService>().Host.IpAddress;
+        try
+        {
+            NeuronLogger.For<Synapse>().Info("PlayerCameraReference set: " + (hub.PlayerCameraReference != null));
+            NeuronLogger.For<Synapse>().Info("playerStats set: " + (hub.playerStats != null));
+            NeuronLogger.For<Synapse>().Info("playerStats set: " + (hub.playerStats != null));
+            NeuronLogger.For<Synapse>().Info("netIdentity set: " + (hub.netIdentity != null));
+            NeuronLogger.For<Synapse>().Info("isLocalPlayer: " + hub.isLocalPlayer);
+            NeuronLogger.For<Synapse>().Info("AllHubs:" + ReferenceHub.AllHubs.Contains(hub));
+            var OwnerHub = ReferenceHub.GetHub(Player.transform.root.gameObject);
+            NeuronLogger.For<Synapse>().Info("OwnerHub set: " + (OwnerHub != null));
+            NeuronLogger.For<Synapse>().Info("ConnectionToClient set: " + (hub.netIdentity.connectionToClient != null));
+            NeuronLogger.For<Synapse>().Info("Network_playerId set: " + hub.Network_playerId); 
+
+            /*
+            GroupMuteFlags flagsForUser;
+            if (!VoiceChatReceivePrefs.RememberedFlags.TryGetValue(hub.connectionToClient, out flagsForUser))
+                flagsForUser = GroupMuteFlags.None;
+            return flagsForUser;*/
+
+            Timing.CallDelayed(Timing.WaitForOneFrame,() =>
+            {
+                Player.RoleType = role;
+                Player.Health = Player.MaxHealth;
+                Player.NicknameSync.Network_myNickSync = name;
+                Player.RankName = badge;
+                Player.RankColor = badgeColor;
+                Player.Position = position;
+                if (Player.ExistsInSpace)
+                {
+                    Player.FirstPersonMovement.IsGrounded = true;
+                }
+                _ = Timing.RunCoroutine(UpdateMovement()); 
+            });
+
+        }
+        catch (Exception e)
+        {
+            NeuronLogger.For<Synapse>().Error("Test Error:" + e);
+        }
         
         MoveInElevator = true;
     }
@@ -220,7 +244,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
                         speed = WalkSpeed * _map.HumanWalkSpeed;
                         break;
                         */
-                }
+            }
 
                 switch (Direction)
                 {

@@ -40,6 +40,7 @@ public static class PlayerLoadComponentPatch
                 }
                 else if (__instance.transform.parent == DummyService._dummyParent)
                 {
+                    __instance.transform.parent = null;//remove parent to avoid bug when the game try to get the hub
                     player = __instance.gameObject.AddComponent<DummyPlayer>();
                 }
                 else
