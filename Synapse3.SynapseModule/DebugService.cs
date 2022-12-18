@@ -23,6 +23,7 @@ using UnityEngine;
 using Synapse3.SynapseModule.Dummy;
 using GameCore;
 using PluginAPI.Core;
+using System.Diagnostics;
 
 namespace Synapse3.SynapseModule;
 
@@ -187,39 +188,39 @@ public class DebugService : Service
         {
             case KeyCode.Alpha1:
                 testDummy = new SynapseDummy(ev.Player.Position, ev.Player.Rotation, RoleTypeId.ClassD, "Test");
-                break;
+                break;//When seconde spawn bug, seconde is like in the aire at 0 0 0 but corps is get good pos
+                      //When spawn shoot count like an error on the network and disconect client
            
-           case KeyCode.Alpha2:
-               ev.Player.SetPlayerRoleTypeAdvance(RoleTypeId.Scientist, ev.Player.Position);
+            case KeyCode.Alpha2:
+                ev.Player.Position = testDummy.Position;
+                break;
+
+            case KeyCode.Alpha3:
+                testDummy.Player.RoleType = RoleTypeId.NtfCaptain;
                break;
 
-           case KeyCode.Alpha3:
-               var angle = Random.Range(0, 5) switch
-               {
-                   0 => 0,
-                   1 => 90,
-                   2 => 180,
-                   3 => 270,
-                   4 => 360,
-                   _ => 0
-               };
-               Logger.Warn(angle);
-               ev.Player.SetPlayerRoleTypeAdvance(RoleTypeId.Scientist, ev.Player.Position, angle);
-               break;
+            case KeyCode.Alpha4:
+                testDummy.Position = ev.Player.Position;
+                break;
 
-           case KeyCode.Alpha5:
-               angle = Random.Range(0, 5) switch
-               {
-                   0 => 0,
-                   1 => 90,
-                   2 => 180,
-                   3 => 270,
-                   4 => 360,
-                   _ => 0
-               };
-               (ev.Player.CurrentRole as FpcStandardRoleBase).FpcModule.MouseLook.CurrentHorizontal = angle;
-               ev.Player.FakeRoleManager.UpdatePlayer(ev.Player);
-               break;
+            case KeyCode.Alpha5:
+                testDummy.Direction = MovementDirection.Forward;//DEBUG
+                break;
+
+            case KeyCode.Alpha6:
+                testDummy.Player.RotationHorizontal = ev.Player.RotationHorizontal;
+                testDummy.Player.RotationVectical = ev.Player.RotationVectical;
+                break;
+
+            case KeyCode.Alpha9:
+                Debugger.Launch();
+                break;
+
+            case KeyCode.Alpha0:
+                testDummy.Destroy();
+                break;
+
+
         }
     }
 }

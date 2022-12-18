@@ -1,6 +1,8 @@
 ﻿using MEC;
 using Mirror;
+using Neuron.Core.Logging;
 using PlayerRoles;
+using PlayerRoles.FirstPersonControl.NetworkMessages;
 using PlayerRoles.SpawnData;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Player;
@@ -10,35 +12,56 @@ namespace Synapse3.SynapseModule.Dummy;
 
 public class DummyPlayer : SynapsePlayer
 {
-    //TODO:
-    
+
     public override PlayerType PlayerType => PlayerType.Dummy;
+
+    public override Vector3 Position
+    {
+        set
+        {
+            var fps = FirstPersonMovement;
+            if (fps == null) return;
+
+            fps.Position = value;
+            fps.OnServerPositionOverwritten();
+        }
+    }
+
 
     public override RoleTypeId RoleType//TODO
     {
         set
         {
-            RoleManager.InitializeNewRole(value, RoleChangeReason.RemoteAdmin);//Try first like this
-            //RoleManager.InitializeNewRole(value, (byte)9);//Use 9 for Synapse API Reason
-
-            //SpawnPlayerModel()
-            //TODO: Set Dummy Role
-            //NetworkServer.UnSpawn(gameObject);
-            //ClassManager.CurClass = value;
-            //NetworkServer.Spawn(gameObject);
+            Hub.roleManager.ServerSetRole(value, RoleChangeReason.None);
+            var fps = FirstPersonMovement;
+            NeuronLogger.For<Synapse>().Debug("fps == null:" + (fps == null));
+            if (fps == null) return;
+            fps.Position = Position;
+            fps.OnServerPositionOverwritten();
         }
     }
 
-   /* public override Quaternion Rotation
+    public override float RotationHorizontal
     {
-        get => transform.localRotation;
         set
         {
-            var euler = value.eulerAngles;
-            PlayerMovementSync.Rotations = new Vector2(euler.x, euler.y);
-            transform.localRotation = value;
+            var fps = FirstPersonMovement;
+            if (fps == null) return;
+            fps.MouseLook.CurrentHorizontal = value;
+            fps.OnServerPositionOverwritten();
         }
-    }*/
+    }
+
+    public override float RotationVectical
+    {
+        set
+        {
+            var fps = FirstPersonMovement;
+            if (fps == null) return;
+            fps.MouseLook.CurrentVertical = value;
+            fps.OnServerPositionOverwritten();
+        }
+    }
 
     //TODO: Fist do the player Rotation
     /*    public override Vector2 RotationVector2
@@ -77,6 +100,18 @@ public class DummyPlayer : SynapsePlayer
             service._dummies.Add(SynapseDummy);
         });
     }
+
+    /*
+    [2022-12-18 15:46:30.194 +01:00] [Error] Synapse: Sy3 Command: PlayerKeyPress failed
+                                 System.NullReferenceException
+                                   at (wrapper managed-to-native) UnityEngine.Component.get_transform(UnityEngine.Component)
+                                   at PlayerRoles.PlayerRoleManager.InitializeNewRole (PlayerRoles.RoleTypeId targetId, PlayerRoles.RoleChangeReason reason, Mirror.NetworkReader data) [0x00039] in <bf179521d4cd490bbb453145064bf4e5>:0
+                                   at PlayerRoles.PlayerRoleManager.ServerSetRole (PlayerRoles.RoleTypeId newRole, PlayerRoles.RoleChangeReason reason) [0x0005f] in <bf179521d4cd490bbb453145064bf4e5>:0
+                                   at Synapse3.SynapseModule.Dummy.DummyPlayer.set_RoleType (PlayerRoles.RoleTypeId value) [0x00007] in <3885dead808c40f09b08e71eb052a0e8>:0
+                                   at Synapse3.SynapseModule.DebugService.OnKeyPress (Synapse3.SynapseModule.Events.KeyPressEvent ev) [0x00091] in <3885dead808c40f09b08e71eb052a0e8>:0
+                                   at Neuron.Core.Events.EventReactor`1[T].Raise (T evt) [0x0000b] in <1e0795032c2f42809e2854dedfdb3bae>:0
+                                   at Synapse3.SynapseModule.Command.SynapseCommands.KeyPressCommand.Execute (Synapse3.SynapseModule.Command.SynapseContext context, Neuron.Modules.Commands.CommandResult& result) [0x00165] in <3885dead808c40f09b08e71eb052a0e8>:0
+    */
 
     private void SpawnPlayerModel(RoleTypeId role, bool firstSpawn)
     {   //Note: No client probaly no whriter

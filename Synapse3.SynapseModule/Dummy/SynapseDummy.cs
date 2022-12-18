@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using InventorySystem.Items;
+using InventorySystem.Items.MicroHID;
 using MEC;
 using Microsoft.Extensions.Logging;
 using Mirror;
@@ -101,7 +102,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
     {
         PlayerUpdate = false;
         //TODO:
-        //Rotation = rotation;
+        Rotation = rotation;
         NetworkServer.Spawn(GameObject);
     }
 
@@ -110,7 +111,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
     {
         PlayerUpdate = true;
         //TODO:
-        //RotationVector2 = rotation;
+        RotationVector2 = rotation;
         NetworkServer.Spawn(GameObject);
     }
 
@@ -125,8 +126,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         GameObject = Player.gameObject;
 
         var hub = GameObject.GetComponent<ReferenceHub>();
-        hub.PlayerCameraReference = GameObject.AddComponent<Camera>().transform;//found better solution
-        hub.netIdentity.connectionToClient = new NetworkConnectionToClient(-1, false, 0);
+        //hub.PlayerCameraReference = GameObject.AddComponent<Camera>().transform;//found better solution
 
         var comp = GameObject.AddComponent<SynapseObjectScript>();//found other solution
         comp.Object = this;
@@ -134,45 +134,20 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         Player.SynapseDummy = this;
         Player.transform.localScale = Vector3.one;
         Player.QueryProcessor._ipAddress = Synapse.Get<PlayerService>().Host.IpAddress;
-        try
+        Player.RoleType = role;
+        Player.Health = Player.MaxHealth;
+        Player.NicknameSync.Network_myNickSync = name;
+        Player.RankName = badge;
+        Player.RankColor = badgeColor;
+        Player.Position = position;
+
+
+        if (Player.ExistsInSpace)
         {
-            NeuronLogger.For<Synapse>().Info("PlayerCameraReference set: " + (hub.PlayerCameraReference != null));
-            NeuronLogger.For<Synapse>().Info("playerStats set: " + (hub.playerStats != null));
-            NeuronLogger.For<Synapse>().Info("playerStats set: " + (hub.playerStats != null));
-            NeuronLogger.For<Synapse>().Info("netIdentity set: " + (hub.netIdentity != null));
-            NeuronLogger.For<Synapse>().Info("isLocalPlayer: " + hub.isLocalPlayer);
-            NeuronLogger.For<Synapse>().Info("AllHubs:" + ReferenceHub.AllHubs.Contains(hub));
-            var OwnerHub = ReferenceHub.GetHub(Player.transform.root.gameObject);
-            NeuronLogger.For<Synapse>().Info("OwnerHub set: " + (OwnerHub != null));
-            NeuronLogger.For<Synapse>().Info("ConnectionToClient set: " + (hub.netIdentity.connectionToClient != null));
-            NeuronLogger.For<Synapse>().Info("Network_playerId set: " + hub.Network_playerId); 
-
-            /*
-            GroupMuteFlags flagsForUser;
-            if (!VoiceChatReceivePrefs.RememberedFlags.TryGetValue(hub.connectionToClient, out flagsForUser))
-                flagsForUser = GroupMuteFlags.None;
-            return flagsForUser;*/
-
-            Timing.CallDelayed(Timing.WaitForOneFrame,() =>
-            {
-                Player.RoleType = role;
-                Player.Health = Player.MaxHealth;
-                Player.NicknameSync.Network_myNickSync = name;
-                Player.RankName = badge;
-                Player.RankColor = badgeColor;
-                Player.Position = position;
-                if (Player.ExistsInSpace)
-                {
-                    Player.FirstPersonMovement.IsGrounded = true;
-                }
-                _ = Timing.RunCoroutine(UpdateMovement()); 
-            });
-
+            Player.FirstPersonMovement.IsGrounded = true;
         }
-        catch (Exception e)
-        {
-            NeuronLogger.For<Synapse>().Error("Test Error:" + e);
-        }
+
+        _ = Timing.RunCoroutine(UpdateMovement()); 
         
         MoveInElevator = true;
     }
@@ -209,14 +184,35 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
 
     public void Spawn()
         => NetworkServer.Spawn(GameObject);
-    
-    
+
+    private Vector3 GetMoveVector() //TODO: use patch and the use the local player code
+    {
+        if (Player.ExistsInSpace)
+        {
+            float RgtLft = 0.0f;
+            float FwdBwk = 0.0f;
+            if ((Direction & MovementDirection.Forward) != 0)
+                ++FwdBwk;
+            if ((Direction & MovementDirection.BackWards) != 0)
+                --FwdBwk;
+            if ((Direction & MovementDirection.Right) != 0)
+                ++RgtLft;
+            if ((Direction & MovementDirection.Left) != 0)
+                --RgtLft;
+            return Player.FirstPersonMovement.Motor.CachedTransform.forward * FwdBwk + Player.FirstPersonMovement.Motor.CachedTransform.right * RgtLft;
+        }
+        return Vector3.zero;
+    }
+
+
+
     //Thanks to GameHunt.I used some of his code for the Dummy API https://github.com/gamehunt/CustomNPCs
     private IEnumerator<float> UpdateMovement()
     {
         for (;;)
         {
             yield return Timing.WaitForSeconds(0.1f);
+
             try
             {
                 if (GameObject == null) yield break;
@@ -234,34 +230,32 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
                         speed = SneakSpeed;
                         break;
 
-                    //TODO:
-                    /*
                     case PlayerMovementState.Sprinting:
-                        speed = RunSpeed * _map.HumanSprintSpeed;
+                        speed = RunSpeed;
                         break;
 
                     case PlayerMovementState.Walking:
-                        speed = WalkSpeed * _map.HumanWalkSpeed;
+                        speed = WalkSpeed;
                         break;
-                        */
-            }
+                        
+                }
 
                 switch (Direction)
                 {
-                    /*
+                    
                     case MovementDirection.Forward:
                         var pos = Position + Player.CameraReference.forward / 10 * speed;
 
-                        if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
-                            Player.PlayerMovementSync.OverridePosition(pos, null, true);
+                        if (!Physics.Linecast(Position, pos, MicroHIDItem.WallMask))
+                            Player.Position = pos;
                         else wall = true;
                         break;
 
                     case MovementDirection.BackWards:
                         pos = Position - Player.CameraReference.forward / 10 * speed;
 
-                        if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
-                            Player.PlayerMovementSync.OverridePosition(pos, null, true);
+                        if (!Physics.Linecast(Position, pos, MicroHIDItem.WallMask))
+                            Player.Position = pos;
                         else wall = true;
                         break;
 
@@ -269,8 +263,8 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
                         pos = Position + Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 *
                             speed;
 
-                        if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
-                            Player.PlayerMovementSync.OverridePosition(pos, null, true);
+                        if (!Physics.Linecast(Position, pos, MicroHIDItem.WallMask))
+                            Player.Position = pos;
                         else wall = true;
                         break;
 
@@ -278,11 +272,10 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
                         pos = Position - Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 *
                             speed;
 
-                        if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
-                            Player.PlayerMovementSync.OverridePosition(pos, null, true);
+                        if (!Physics.Linecast(Position, pos, MicroHIDItem.WallMask))
+                            Player.Position = pos;
                         else wall = true;
                         break;
-                        */
                 }
 
                 if (wall)

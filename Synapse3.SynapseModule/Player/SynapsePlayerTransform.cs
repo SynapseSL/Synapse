@@ -37,7 +37,7 @@ public partial class SynapsePlayer
     /// <summary>
     /// The current Position of the Player
     /// </summary>
-    public Vector3 Position
+    public virtual Vector3 Position
     {
         get => FirstPersonMovement?.Position ?? Vector3.zero;
         set => FirstPersonMovement.ServerOverridePosition(value, new Vector3(0f, 0f, 0f));
@@ -98,10 +98,10 @@ public partial class SynapsePlayer
         get => FirstPersonMovement?.MouseLook.CurrentHorizontal ?? 0;
         set
         {
-            var firstperson = FirstPersonMovement;  
+            var firstperson = FirstPersonMovement;
             if (firstperson == null) return;
-            firstperson.MouseLook.CurrentHorizontal = value;
-            UpdateRotation();
+            var delta = value - RotationHorizontal;
+            FirstPersonMovement.ServerOverridePosition(Position, new Vector3(delta, 0f, 0f));
         }
     }
 

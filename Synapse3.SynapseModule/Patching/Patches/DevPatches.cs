@@ -51,24 +51,12 @@ public static class TestPatches
 [SynapsePatch("Rotation Debug", PatchType.Dev)]
 public static class TestPatches2
 {
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(FpcSyncData), nameof(FpcSyncData.Write))]
-    public static bool GetRotForUser(FpcSyncData __instance, NetworkWriter writer)
+    
+    
+    public static void GetRotForUser()
     {
-        Misc.ByteToBools((byte)__instance._state, out var bool1, out var bool2, out var bool3, out var bool4, out var bool5, out var _, out var _, out var _);
-        writer.WriteByte(Misc.BoolsToByte(bool1, bool2, bool3, bool4, bool5, __instance._bitMouseLook, __instance._bitPosition, __instance._bitCustom));
-        if (__instance._bitPosition)
-        {
-            writer.WriteRelativePosition(__instance._position);
-        }
+        
 
-        ServerConsole.AddLog("_bitMouseLook: " + __instance._bitMouseLook);
-        if (__instance._bitMouseLook || true)
-        {
-            writer.WriteUInt16(__instance._rotH);
-            writer.WriteUInt16(__instance._rotV);
-        }
-        return false;
     }
 }
 #endif
