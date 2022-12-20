@@ -76,7 +76,7 @@ public static class RemoteAdminPatch
 {
     private static readonly SynapseCommandService _commandService;
     static RemoteAdminPatch() => _commandService = Synapse.Get<SynapseCommandService>();
-    
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(CommandProcessor), nameof(CommandProcessor.ProcessQuery))]
     public static bool OnRemoteAdminCommand(string q, CommandSender sender)

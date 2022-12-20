@@ -24,6 +24,11 @@ using Synapse3.SynapseModule.Dummy;
 using GameCore;
 using PluginAPI.Core;
 using System.Diagnostics;
+using PluginAPI.Events;
+using PluginAPI.Core.Interfaces;
+using InventorySystem.Items.Firearms;
+using PluginAPI.Core.Attributes;
+using Synapse3.SynapseModule.Permissions;
 
 namespace Synapse3.SynapseModule;
 
@@ -148,7 +153,24 @@ public class DebugService : Service
             if(ev.EscapeType == EscapeType.TooFarAway) return;
             Logger.Warn("ESCAPE " + ev.Player.NickName + " " + ev.EscapeType);
         });
+        
+
+        _player.Damage.Subscribe(ev =>
+        {
+            ev.Allow = false;
+        });
+
+        PluginAPI.Events.EventManager.RegisterEvents(typeof(DebugService), this);//Temp to attach event of NW
     }
+
+    //[PluginEvent(PluginAPI.Enums.ServerEventType.PlayerShotWeapon)]
+    /*
+    public bool PlayerShotWeapon(IPlayer player, Firearm firearm)
+    {
+        NeuronLogger.For<Synapse>().Warn($"PlayerShotWeapon");
+        return false;
+    }
+    */
 
     private void ScpEvent(ScpAttackEvent ev)
     {
@@ -187,39 +209,36 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
+                testDummy?.Destroy();
                 testDummy = new SynapseDummy(ev.Player.Position, ev.Player.Rotation, RoleTypeId.ClassD, "Test");
-                break;//When seconde spawn bug, seconde is like in the aire at 0 0 0 but corps is get good pos
-                      //When spawn shoot count like an error on the network and disconect client
+                testDummy.Player.RoleType = RoleTypeId.NtfSergeant;
+                testDummy.Player.Position = ev.Player.Position;
+                testDummy.Movement = PlayerMovementState.Crouching;
+                var service = Synapse.Get<PermissionService>();
+                var grouype = service.Groups["User"];
+                testDummy.Player.SynapseGroup = grouype;
+                break;
            
             case KeyCode.Alpha2:
-                ev.Player.Position = testDummy.Position;
+                testDummy.Player.RotationHorizontal = 50;
+                testDummy.Player.RotationVectical = 50; 
                 break;
 
             case KeyCode.Alpha3:
-                testDummy.Player.RoleType = RoleTypeId.NtfCaptain;
-               break;
+                testDummy.Direction = MovementDirection.Forward;
+            break;
 
             case KeyCode.Alpha4:
-                testDummy.Position = ev.Player.Position;
+                testDummy.RaVisible = !testDummy.RaVisible;
                 break;
 
             case KeyCode.Alpha5:
-                testDummy.Direction = MovementDirection.Forward;//DEBUG
+                testDummy.HideFromPlayer(ev.Player);
                 break;
 
             case KeyCode.Alpha6:
-                testDummy.Player.RotationHorizontal = ev.Player.RotationHorizontal;
-                testDummy.Player.RotationVectical = ev.Player.RotationVectical;
+                testDummy.ShowPlayer(ev.Player);
                 break;
-
-            case KeyCode.Alpha9:
-                Debugger.Launch();
-                break;
-
-            case KeyCode.Alpha0:
-                testDummy.Destroy();
-                break;
-
 
         }
     }

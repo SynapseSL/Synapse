@@ -289,6 +289,16 @@ public partial class SynapsePlayer
                 firstperosn.SprintSpeed = value;
         }
     }
+    public float CrouchingSpeed
+    {
+        get => FirstPersonMovement?.CrouchSpeed ?? 0;
+        set
+        {
+            var firstperosn = FirstPersonMovement;
+            if (firstperosn != null)
+                firstperosn.CrouchSpeed = value;
+        }
+    }
 
     /// <summary>
     /// The player who disarmed the player

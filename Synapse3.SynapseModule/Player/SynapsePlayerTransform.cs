@@ -10,11 +10,6 @@ namespace Synapse3.SynapseModule.Player;
 
 public partial class SynapsePlayer
 {
-    void UpdateRotation()
-    {
-        foreach (var player in _player.Players)
-            this.SendNetworkMessage(new FpcPositionMessage(player));
-    }
 
     /// <summary>
     /// If the player ave a postion in the game, not the case if the player ave no player model
@@ -60,9 +55,9 @@ public partial class SynapsePlayer
             var firstperson = FirstPersonMovement;
             if (firstperson == null) return;
             var euler = value.eulerAngles;
-            firstperson.MouseLook.CurrentHorizontal = -euler.x;
-            firstperson.MouseLook.CurrentVertical = euler.y;
-            UpdateRotation();
+            var deltaV  = value.x + euler.x;
+            var deltaH = value.y - euler.y;
+            FirstPersonMovement.ServerOverridePosition(Position, new Vector3(deltaV, deltaH, 0));//Maby work in futur update
         }
     }
 
@@ -82,10 +77,9 @@ public partial class SynapsePlayer
         {
             var firstperson = FirstPersonMovement;
             if (firstperson == null) return;
-
-            firstperson.MouseLook.CurrentHorizontal = value.x;
-            firstperson.MouseLook.CurrentVertical = value.y;
-            UpdateRotation();
+            var deltaV = value.x - firstperson.MouseLook.CurrentVertical;
+            var deltaH = value.y - firstperson.MouseLook.CurrentHorizontal;
+            FirstPersonMovement.ServerOverridePosition(Position, new Vector3(deltaV, deltaH, 0));//Maby work in futur update
         }
     }
 
@@ -100,8 +94,8 @@ public partial class SynapsePlayer
         {
             var firstperson = FirstPersonMovement;
             if (firstperson == null) return;
-            var delta = value - RotationHorizontal;
-            FirstPersonMovement.ServerOverridePosition(Position, new Vector3(delta, 0f, 0f));
+            var delta = value - firstperson.MouseLook.CurrentHorizontal;
+            firstperson.ServerOverridePosition(Position, new Vector3(0, delta, 0));
         }
     }
 
@@ -115,8 +109,8 @@ public partial class SynapsePlayer
         {
             var firstperson = FirstPersonMovement;
             if (firstperson == null) return;
-            firstperson.MouseLook.CurrentVertical = value;
-            UpdateRotation();
+            var delta = value - firstperson.MouseLook.CurrentVertical;
+            firstperson.ServerOverridePosition(Position, new Vector3(delta, 0, 0));//Maby work in futur update
         }
     }
 

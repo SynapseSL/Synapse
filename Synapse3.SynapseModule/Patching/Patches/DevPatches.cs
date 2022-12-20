@@ -21,8 +21,14 @@ public static class DevPatches
 
 #if DEBUG
 using System;
+using CustomPlayerEffects;
 using HarmonyLib;
+using InventorySystem.Items.Coin;
+using InventorySystem.Items.Firearms;
+using InventorySystem.Items.Firearms.BasicMessages;
+using InventorySystem.Items.Firearms.Modules;
 using Mirror;
+using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerRoles.FirstPersonControl.NetworkMessages;
 using PlayerRoles.Voice;
@@ -33,30 +39,6 @@ using Synapse3.SynapseModule.Dummy;
 [SynapsePatch("Debug", PatchType.Dev)]
 public static class TestPatches
 {
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(VoiceChatReceivePrefs), nameof(VoiceChatReceivePrefs.GetFlagsForUser))]
-    public static bool GetFlagsForUser(GroupMuteFlags __result, ReferenceHub hub)
-    {
-        var player = hub.GetSynapsePlayer();
-        if (player is DummyPlayer)
-        {
-            __result = GroupMuteFlags.None;
-            return false;
-        }
-        return true;
-    }
-}
 
-[Automatic]
-[SynapsePatch("Rotation Debug", PatchType.Dev)]
-public static class TestPatches2
-{
-    
-    
-    public static void GetRotForUser()
-    {
-        
-
-    }
 }
 #endif

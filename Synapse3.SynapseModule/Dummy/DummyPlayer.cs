@@ -12,82 +12,79 @@ namespace Synapse3.SynapseModule.Dummy;
 
 public class DummyPlayer : SynapsePlayer
 {
-
     public override PlayerType PlayerType => PlayerType.Dummy;
 
-    public override Vector3 Position
-    {
-        set
-        {
-            var fps = FirstPersonMovement;
-            if (fps == null) return;
-
-            fps.Position = value;
-            fps.OnServerPositionOverwritten();
-        }
+    private bool _raVisble = false;
+    public bool RaVisible 
+    { 
+        get => _raVisble; 
+        set => _raVisble = value; 
     }
 
+    public bool DestroyWhenDied { get; set; } = true;
 
-    public override RoleTypeId RoleType//TODO
+    public override Quaternion Rotation
     {
-        set
+        get
         {
-            Hub.roleManager.ServerSetRole(value, RoleChangeReason.None);
-            var fps = FirstPersonMovement;
-            NeuronLogger.For<Synapse>().Debug("fps == null:" + (fps == null));
-            if (fps == null) return;
-            fps.Position = Position;
-            fps.OnServerPositionOverwritten();
+            var mouseLook = FirstPersonMovement?.MouseLook;
+            if (mouseLook == null)
+                return new Quaternion(0, 0, 0, 0);
+            return Quaternion.Euler(mouseLook._syncHorizontal, mouseLook._curVertical, 0f);
         }
-    }
-
-    public override float RotationHorizontal
-    {
         set
         {
-            var fps = FirstPersonMovement;
-            if (fps == null) return;
-            fps.MouseLook.CurrentHorizontal = value;
-            fps.OnServerPositionOverwritten();
+            var firstperson = FirstPersonMovement;
+            if (firstperson == null) return;
+            var euler = value.eulerAngles;
+            firstperson.MouseLook._syncHorizontal = euler.y;
+            firstperson.MouseLook._curVertical = euler.x;
+            firstperson.OnServerPositionOverwritten();
         }
     }
 
     public override float RotationVectical
     {
+        get => FirstPersonMovement?.MouseLook._curVertical ?? 0;
         set
         {
-            var fps = FirstPersonMovement;
-            if (fps == null) return;
-            fps.MouseLook.CurrentVertical = value;
-            fps.OnServerPositionOverwritten();
+            var firstperson = FirstPersonMovement;
+            if (firstperson == null) return;
+            firstperson.MouseLook._curVertical = value;
+            firstperson.OnServerPositionOverwritten();
         }
     }
 
-    //TODO: Fist do the player Rotation
-    /*    public override Vector2 RotationVector2
+    public override float RotationHorizontal 
+    {
+        get => FirstPersonMovement?.MouseLook._syncHorizontal ?? 0;
+        set
         {
-            get => base.RotationVector2;
-            set => ReceiveRotation(value);
+            var firstperson = FirstPersonMovement;
+            if (firstperson == null) return;
+            firstperson.MouseLook._syncHorizontal = value;
+            firstperson.OnServerPositionOverwritten();
         }
+    }
 
-        public override float RotationFloat
+    public override Vector2 RotationVector2
+    {
+        get
         {
-            get => base.RotationFloat;
-            set => ReceiveRotation(new Vector2(0f, value));
+            var mouseLook = FirstPersonMovement?.MouseLook;
+            if (mouseLook == null)
+                return Vector2.zero;
+            return new Vector2(mouseLook._curHorizontal, mouseLook._curVertical);
         }
-
-        public override PlayerMovementSync.PlayerRotation PlayerRotation
+        set
         {
-            get => base.PlayerRotation;
-            set => ReceiveRotation(new Vector2(value.x ?? 0f, value.y ?? 0f));
+            var firstperson = FirstPersonMovement;
+            if (firstperson == null) return;
+            firstperson.MouseLook._curHorizontal = value.x;
+            firstperson.MouseLook._curVertical = value.y;
+            firstperson.OnServerPositionOverwritten();
         }
-
-        private void ReceiveRotation(Vector2 rotation)
-        {
-            PlayerMovementSync.Rotations = rotation;
-            transform.localRotation = Quaternion.Euler(0f, PlayerMovementSync.Rotations.y, 0f);
-        }*/
-
+    }
 
     public override void Awake()
     {
@@ -99,38 +96,6 @@ public class DummyPlayer : SynapsePlayer
 
             service._dummies.Add(SynapseDummy);
         });
-    }
-
-    /*
-    [2022-12-18 15:46:30.194 +01:00] [Error] Synapse: Sy3 Command: PlayerKeyPress failed
-                                 System.NullReferenceException
-                                   at (wrapper managed-to-native) UnityEngine.Component.get_transform(UnityEngine.Component)
-                                   at PlayerRoles.PlayerRoleManager.InitializeNewRole (PlayerRoles.RoleTypeId targetId, PlayerRoles.RoleChangeReason reason, Mirror.NetworkReader data) [0x00039] in <bf179521d4cd490bbb453145064bf4e5>:0
-                                   at PlayerRoles.PlayerRoleManager.ServerSetRole (PlayerRoles.RoleTypeId newRole, PlayerRoles.RoleChangeReason reason) [0x0005f] in <bf179521d4cd490bbb453145064bf4e5>:0
-                                   at Synapse3.SynapseModule.Dummy.DummyPlayer.set_RoleType (PlayerRoles.RoleTypeId value) [0x00007] in <3885dead808c40f09b08e71eb052a0e8>:0
-                                   at Synapse3.SynapseModule.DebugService.OnKeyPress (Synapse3.SynapseModule.Events.KeyPressEvent ev) [0x00091] in <3885dead808c40f09b08e71eb052a0e8>:0
-                                   at Neuron.Core.Events.EventReactor`1[T].Raise (T evt) [0x0000b] in <1e0795032c2f42809e2854dedfdb3bae>:0
-                                   at Synapse3.SynapseModule.Command.SynapseCommands.KeyPressCommand.Execute (Synapse3.SynapseModule.Command.SynapseContext context, Neuron.Modules.Commands.CommandResult& result) [0x00165] in <3885dead808c40f09b08e71eb052a0e8>:0
-    */
-
-    private void SpawnPlayerModel(RoleTypeId role, bool firstSpawn)
-    {   //Note: No client probaly no whriter
-        PlayerRoleBase roleBase = RoleManager.GetRoleBase(role);
-        Transform obj = roleBase.transform;
-        obj.parent = base.transform;
-        obj.localPosition = Vector3.zero;
-        obj.localRotation = Quaternion.identity;
-        CurrentRole = roleBase;
-        roleBase.Init(Hub, RoleChangeReason.RemoteAdmin);//IDK who choice and the impacte
-        roleBase.SpawnPoolObject();
-        //EventManager.ExecuteEvent(ServerEventType.PlayerSpawn, Hub, CurrentRole.RoleTypeId); TODO: Need to use it for NW API? Or not? Reflexion?
-
-        if (firstSpawn)
-        {
-            //PlayerRoleManager.OnRoleChanged?.Invoke(Hub, playerRoleBase, CurrentRole); TODO: use reflexion?
-        }
-
-        //SpawnProtected.TryGiveProtection(Hub); No spawn Protection for dummy (for me logic) 
     }
 
     public override void OnDestroy()

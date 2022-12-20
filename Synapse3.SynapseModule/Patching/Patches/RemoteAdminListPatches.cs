@@ -8,9 +8,12 @@ using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
 using PlayerRoles.Spectating;
 using PlayerStatsSystem;
+using PluginAPI.Core.Items;
 using RemoteAdmin;
 using RemoteAdmin.Communication;
 using Synapse3.SynapseModule.Config;
+using Synapse3.SynapseModule.Dummy;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Permissions;
 using Synapse3.SynapseModule.Permissions.RemoteAdmin;
 using Synapse3.SynapseModule.Player;
@@ -28,6 +31,7 @@ public static class RemoteAdminListPatch
     private static readonly RemoteAdminCategoryService CategoryService;
     private static readonly SynapseConfigService ConfigService;
     private static readonly ServerService ServerService;
+    private static readonly DummyService DummyService;
 
     static RemoteAdminListPatch()
     {
@@ -35,6 +39,7 @@ public static class RemoteAdminListPatch
         CategoryService = Synapse.Get<RemoteAdminCategoryService>();
         ConfigService = Synapse.Get<SynapseConfigService>();
         ServerService = Synapse.Get<ServerService>();
+        DummyService = Synapse.Get<DummyService>();
     }
     
     [HarmonyPrefix]
@@ -101,6 +106,8 @@ public static class RemoteAdminListPatch
 
     private static string GenerateList(List<RemoteAdminPlayer> players, CommandSender sender)
     {
+        players.RemoveAll(p => p.Player is DummyPlayer dummy);//Remove Tab dummy
+
         var remoteAdminGroups = PermissionService.Groups.Select(x => new RemoteAdminGroup
         {
             Name = x.Key,
@@ -180,12 +187,28 @@ public static class RemoteAdminListPatch
             }
         }
 
-        if (config.BetterRemoteAdminList && groupPlayers.Count > 0)
-            text += "<align=center><size=0>(0)</size> <size=20>[Default]</size></align>\n";
+        if (config.BetterRemoteAdminList && groupPlayers.Any())
+            text += "<align=center><size=0>(default)</size> <size=20>[Default Player]</size></align>\n";
 
         foreach (var player in groupPlayers)
         {
-            text += player.Text + "\n";
+            text += player. Text + "\n";
+        }
+
+        var dummys = DummyService.Dummies//Add the dummy
+            .Where(p => p.RaVisible)
+            .Select(d => new RemoteAdminPlayer()
+            {
+                Player = d.Player,
+                Text = $"({d.Player.PlayerId}) [Dummy] {d.Player.DisplayName}"
+            });
+
+        if (dummys.Any())
+            text += "<align=center><size=0>(dummy)</size> <size=20>[Dummy]</size></align>\n";
+
+        foreach (var dummy in dummys)
+        {
+            text += dummy.Text + "\n";
         }
 
         foreach (var category in categories)
@@ -526,7 +549,7 @@ public static class SelectPlayerPatch
 {
     private static readonly PlayerService PlayerService;
     static SelectPlayerPatch() => PlayerService = Synapse.Get<PlayerService>();
-    
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(RAUtils), nameof(RAUtils.ProcessPlayerIdOrNamesList))]
     public static bool OnGettingPlayers(ArraySegment<string> args, int startindex, out string[] newargs,

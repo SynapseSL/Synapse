@@ -1,4 +1,5 @@
-﻿using Synapse3.SynapseModule.Enums;
+﻿using Neuron.Core.Logging;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Permissions;
 
 namespace Synapse3.SynapseModule.Player;
@@ -141,7 +142,8 @@ public partial class SynapsePlayer
             PermissionsHandler.IsPermitted(group.Permissions, PlayerPermissions.Overwatch))
             ServerRoles.OverwatchPermitted = true;
 
-        ServerRoles.SendRealIds();
+        if (PlayerType == PlayerType.Player)
+            ServerRoles.SendRealIds();
 
         if (string.IsNullOrEmpty(group.BadgeText))
         {
