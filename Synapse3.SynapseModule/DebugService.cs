@@ -163,15 +163,6 @@ public class DebugService : Service
         PluginAPI.Events.EventManager.RegisterEvents(typeof(DebugService), this);//Temp to attach event of NW
     }
 
-    //[PluginEvent(PluginAPI.Enums.ServerEventType.PlayerShotWeapon)]
-    /*
-    public bool PlayerShotWeapon(IPlayer player, Firearm firearm)
-    {
-        NeuronLogger.For<Synapse>().Warn($"PlayerShotWeapon");
-        return false;
-    }
-    */
-
     private void ScpEvent(ScpAttackEvent ev)
     {
         NeuronLogger.For<Synapse>().Warn($"{ev.ScpAttackType} {ev.Damage} {ev.Scp.NickName} | {ev.Victim.NickName}");
