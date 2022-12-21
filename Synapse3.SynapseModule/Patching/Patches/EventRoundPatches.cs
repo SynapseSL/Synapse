@@ -6,6 +6,7 @@ using HarmonyLib;
 using MEC;
 using Neuron.Core.Meta;
 using PlayerRoles;
+using PlayerRoles.RoleAssign;
 using PluginAPI.Enums;
 using PluginAPI.Events;
 using RoundRestarting;
@@ -39,23 +40,73 @@ public static class RoundCheckEndPatch
     }
 }
 
-/*TODO: Use the new RoleAssign namespace
+[Automatic]
+[SynapsePatch("FirstSpawn", PatchType.RoundEvent)]
+public static class FirstSpawnPatch
+{
+    private static readonly RoundEvents _round;
+    static FirstSpawnPatch() => _round = Synapse.Get<RoundEvents>();
+    
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.))]
-    public static bool SetRandomRoles(CharacterClassManager __instance, bool first)
+    [HarmonyPatch(typeof(RoleAssigner), nameof(RoleAssigner.OnRoundStarted))]
+    public static bool OnRoundStarted()
     {
-        try
+        var queueString = ConfigFile.ServerConfig.GetString("team_respawn_queue", "4014314031441404134041434414");
+        var length = queueString.Length;
+        if (RoleAssigner._prevQueueSize < length)
         {
-            DecoratedRoundMethods.OnSetRandomRoles(__instance, first);
-            return false;
+            RoleAssigner._totalQueue = new Team[length];
+            RoleAssigner._humanQueue = new Team[length];
+            RoleAssigner._prevQueueSize = length;
         }
-        catch (Exception ex)
+
+        var humanQueueLength = 0;
+        var totalQueueLength = 0;
+        
+        foreach (var teamLetter in queueString)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 Events: First Spawn Event failed:\n" + ex);
-            return true;
+            var team = (Team)(teamLetter - '0');
+            if (!Enum.IsDefined(typeof(Team), team)) continue;
+            if (team != Team.SCPs)
+                RoleAssigner._humanQueue[humanQueueLength++] = team;
+            RoleAssigner._totalQueue[totalQueueLength++] = team;
         }
+
+        if (totalQueueLength == 0) return false;
+
+        var amountOfPlayers = ReferenceHub.AllHubs.Count(RoleAssigner.CheckPlayer);
+
+        var amountOfScp = 0;
+        for (var i = 0; i < amountOfPlayers; i++)
+        {
+            if (RoleAssigner._totalQueue[i % totalQueueLength] == Team.SCPs)
+                amountOfScp++;
+        }
+
+        //TODO: Check why the Player is kicked when EnableNormalSpawning is false during the late join period
+        var ev = new FirstSpawnEvent()
+        {
+            AmountOfScpSpawns = amountOfScp,
+            HumanQueue = RoleAssigner._humanQueue
+        };
+        _round.FirstSpawn.RaiseSafely(ev);
+        if (ev.EnableLateJoin)
+        {
+            RoleAssigner._spawned = true;
+            RoleAssigner.LateJoinTimer.Reset();
+        }
+
+        if (!ev.EnableNormalSpawning) return false;
+        
+        ScpSpawner.SpawnScps(ev.AmountOfScpSpawns);
+        HumanSpawner.SpawnHumans(ev.HumanQueue, ev.HumanQueue.Length);
+        foreach (var hub in ReferenceHub.AllHubs.Where(hub => hub.IsAlive()))
+        {
+            RoleAssigner.AlreadySpawnedPlayers.Add(hub.characterClassManager.UserId);
+        }
+        return false;
     }
-    */
+}
 
 public static class DecoratedRoundMethods
 {
@@ -207,7 +258,7 @@ public static class DecoratedRoundMethods
                     EndRound = summary._roundEnded,
                     WinningTeam = leadingTeam
                 };
-                RoundEvents.CheckEnd.Raise(ev);
+                RoundEvents.CheckEnd.RaiseSafely(ev);
                 summary._roundEnded = ev.EndRound;
                 
                 if(!summary._roundEnded) continue;

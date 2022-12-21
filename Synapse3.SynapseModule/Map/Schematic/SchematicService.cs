@@ -12,6 +12,7 @@ using Neuron.Core;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Neuron.Modules.Configs;
+using PlayerRoles;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Objects;
 using UnityEngine;
@@ -214,13 +215,48 @@ public class SchematicService : Service
                     SynapseLocker.Prefabs[SynapseLocker.LockerType.AdrenalineWallCabinet] = locker;
                     break;
             }
+            
+            if (!_ragDollNames.ContainsKey(prefab.Value.name)) continue;
+            var role = _ragDollNames[prefab.Value.name];
+            var prefabRagDoll = prefab.Value.GetComponent<BasicRagdoll>();
+            
+            
+            switch (role)
+            {
+                case RoleTypeId.NtfSpecialist:
+                    SynapseRagDoll.Prefabs[RoleTypeId.NtfCaptain] = prefabRagDoll;
+                    SynapseRagDoll.Prefabs[RoleTypeId.NtfSpecialist] = prefabRagDoll;
+                    SynapseRagDoll.Prefabs[RoleTypeId.NtfPrivate] = prefabRagDoll;
+                    SynapseRagDoll.Prefabs[RoleTypeId.NtfSergeant] = prefabRagDoll;
+                    break;
+                
+                case RoleTypeId.ChaosConscript:
+                    SynapseRagDoll.Prefabs[RoleTypeId.ChaosConscript] = prefabRagDoll;
+                    SynapseRagDoll.Prefabs[RoleTypeId.ChaosMarauder] = prefabRagDoll;
+                    SynapseRagDoll.Prefabs[RoleTypeId.ChaosRepressor] = prefabRagDoll;
+                    SynapseRagDoll.Prefabs[RoleTypeId.ChaosRifleman] = prefabRagDoll;
+                    break;
+                
+                default:
+                    SynapseRagDoll.Prefabs[role] = prefabRagDoll;
+                    break;
+            }
         }
-        
-        //TODO:
-        /*
-        foreach (var role in CharacterClassManager._staticClasses)
-            if (role != null)
-                SynapseRagdoll.Prefabs[role.roleId] = role.model_ragdoll?.GetComponent<Ragdoll>();
-                */
     }
+
+    public readonly Dictionary<string, RoleTypeId> _ragDollNames = new()
+    {
+        { "SCP-173_Ragdoll", RoleTypeId.Scp173 },
+        { "Ragdoll_1",RoleTypeId.ClassD },
+        { "SCP-106_Ragdoll",RoleTypeId.Scp106},
+        { "Ragdoll_4", RoleTypeId.NtfSpecialist},
+        {"Ragdoll_6",RoleTypeId.Scientist},
+        { "Ragdoll_7",RoleTypeId.Scp049},
+        { "Ragdoll_8", RoleTypeId.ChaosConscript},
+        { "SCP-096_Ragdoll", RoleTypeId.Scp096},
+        { "Ragdoll_10",RoleTypeId.Scp0492},
+        { "Ragdoll_Tut",RoleTypeId.Tutorial},
+        { "Ragdoll_12", RoleTypeId.FacilityGuard},
+        { "SCP-939_Ragdoll", RoleTypeId.Scp939}
+    };
 }

@@ -1,6 +1,7 @@
 ﻿using Neuron.Core.Logging;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Permissions;
+using VoiceChat;
 
 namespace Synapse3.SynapseModule.Player;
 
@@ -235,28 +236,14 @@ public partial class SynapsePlayer
         set => ServerRoles.Permissions = value;
     }
 
-    //TODO:
-    /*
     /// <summary>
     /// True if the player is not allowed to use voice chat
     /// </summary>
-    public bool IsMuted
+    public VcMuteFlags MuteFlags
     {
-        get => DissonanceUserSetup.Muted;
-        set => DissonanceUserSetup.NetworkmuteStatus =
-            value ? VoicechatMuteStatus.AdministrativelyMuted : 0;
+        get => VoiceChatMutes.GetFlags(Hub);
+        set => VoiceChatMutes.SetFlags(Hub, value);
     }
-
-    /// <summary>
-    /// True if the player is not allowed to use the intercom
-    /// </summary>
-    public bool IsIntercomMuted
-    {
-        get => ClassManager.NetworkIntercomMuted;
-        set => ClassManager.NetworkIntercomMuted = value;
-    }
-    
-    */
 
     public string CustomRemoteAdminBadge { get; set; } = "";
 }

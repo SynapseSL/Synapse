@@ -7,7 +7,9 @@ using MapGeneration;
 using MapGeneration.Distributors;
 using MEC;
 using Mirror;
+using Neuron.Core.Logging;
 using Neuron.Core.Meta;
+using PlayerRoles.Ragdolls;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
@@ -15,6 +17,7 @@ using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
+using Utils.NonAllocLINQ;
 using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule.Map;
@@ -34,12 +37,14 @@ public class MapService : Service
     {
         _round.Waiting.Subscribe(LoadObjects);
         _round.Restart.Subscribe(ClearObjects);
+        RagdollManager.OnRagdollSpawned += RagDollSpawned;
     }
 
     public override void Disable()
     {
         _round.Waiting.Unsubscribe(LoadObjects);
         _round.Restart.Unsubscribe(ClearObjects);
+        RagdollManager.OnRagdollSpawned -= RagDollSpawned;
     }
 
     //Schematic Objects
@@ -69,7 +74,7 @@ public class MapService : Service
     public ReadOnlyCollection<SynapsePrimitive> SynapsePrimitives => _synapsePrimitives.AsReadOnly();
     public ReadOnlyCollection<SynapseTarget> SynapseTargets => _synapseTargets.AsReadOnly();
     public ReadOnlyCollection<SynapseWorkStation> SynapseWorkStations => _synapseWorkStations.AsReadOnly();
-    public ReadOnlyCollection<SynapseRagDoll> SynapseRagdolls => _synapseRagdolls.AsReadOnly();
+    public ReadOnlyCollection<SynapseRagDoll> SynapseRagDolls => _synapseRagdolls.AsReadOnly();
     public ReadOnlyCollection<SynapseSchematic> SynapseSchematics => _synapseSchematics.AsReadOnly();
     public ReadOnlyCollection<SynapseOldGrenade> SynapseOldGrenades => _synapseOldGrenades.AsReadOnly();
 
@@ -84,21 +89,6 @@ public class MapService : Service
         set => NonFacilityCompatibility.currentSceneSettings.constantRespawnPoint = value;
     }
 
-    //TODO:
-    /*
-    public float HumanWalkSpeed
-    {
-        get => ServerConfigSynchronizer.Singleton.NetworkHumanWalkSpeedMultiplier;
-        set => ServerConfigSynchronizer.Singleton.NetworkHumanWalkSpeedMultiplier = value;
-    }
-
-    public float HumanSprintSpeed
-    {
-        get => ServerConfigSynchronizer.Singleton.NetworkHumanSprintSpeedMultiplier;
-        set => ServerConfigSynchronizer.Singleton.NetworkHumanSprintSpeedMultiplier = value;
-    }
-    */
-    
     public int Seed => SeedSynchronizer.Seed;
 
     public void Explode(Vector3 position, GrenadeType type, SynapsePlayer owner = null)
@@ -158,6 +148,12 @@ public class MapService : Service
     {
         _synapseTeslas.Clear();
         _synapseCameras.Clear();
+    }
+
+    private void RagDollSpawned(BasicRagdoll rag)
+    {
+        if(_synapseRagdolls.Any(x => x.BasicRagDoll == rag)) return;
+        _ = new SynapseRagDoll(rag);
     }
 
     public DoorType GetDoorByName(string doorName)

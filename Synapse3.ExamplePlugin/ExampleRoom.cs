@@ -35,6 +35,6 @@ public class RoomEventHandler
 
     private void OnStart(RoundStartEvent _)
     {
-        _roomService.SpawnCustomRoom(99, Vector3.up * 1100f);
+        //_roomService.SpawnCustomRoom(99, Vector3.up * 1100f);
     }
 }

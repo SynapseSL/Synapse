@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Neuron.Core.Events;
 using Neuron.Core.Meta;
+using PlayerRoles;
 using PluginAPI.Core.Attributes;
 using PluginAPI.Enums;
 using Synapse3.SynapseModule.Player;
@@ -103,7 +104,11 @@ public class SpawnTeamEvent : IEvent
 
 public class FirstSpawnEvent : IEvent
 {
-    public Dictionary<SynapsePlayer,uint> PlayerAndRoles { get; set; }
+    public int AmountOfScpSpawns { get; set; }
+    public Team[] HumanQueue { get; set; }
+    public bool EnableLateJoin { get; set; } = true;
+    public bool EnableNormalSpawning { get; set; } = true;
+    public bool CustomSpawning { get; set; } = false;
 }
 
 public class DecontaminationEvent : IEvent

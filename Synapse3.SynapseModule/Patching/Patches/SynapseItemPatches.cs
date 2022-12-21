@@ -39,6 +39,7 @@ public static class DestroyPickupPatch
             if (__instance.Info.Serial == 0) return true;
             
             var item = __instance.GetItem();
+            if (item == null) return true;
         
             //Whenever the Item should be transformed to a Inventory Item a ItemBase will be created before
             //so that when ItemBase null is the game wants to destroy it
