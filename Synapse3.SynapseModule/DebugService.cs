@@ -204,6 +204,7 @@ public class DebugService : Service
                 testDummy = new SynapseDummy(ev.Player.Position, ev.Player.Rotation, RoleTypeId.ClassD, "Test");
                 testDummy.Player.RoleType = RoleTypeId.NtfSergeant;
                 testDummy.Player.Position = ev.Player.Position;
+                testDummy.Player.Rotation = ev.Player.Rotation;
                 testDummy.Movement = PlayerMovementState.Crouching;
                 var service = Synapse.Get<PermissionService>();
                 var grouype = service.Groups["User"];
@@ -211,11 +212,12 @@ public class DebugService : Service
                 break;
            
             case KeyCode.Alpha2:
-                testDummy.Player.RotationHorizontal = 50;
-                testDummy.Player.RotationVectical = 50; 
+                testDummy.Player.RotationHorizontal = ev.Player.RotationHorizontal;
+                testDummy.Player.RotationVectical = ev.Player.RotationVectical; 
                 break;
 
             case KeyCode.Alpha3:
+                testDummy.Movement = PlayerMovementState.Walking;
                 testDummy.Direction = MovementDirection.Forward;
             break;
 

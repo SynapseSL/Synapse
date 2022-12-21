@@ -1,4 +1,5 @@
 ﻿using InventorySystem.Items;
+using InventorySystem.Items.Coin;
 using InventorySystem.Items.MicroHID;
 using MEC;
 using Mirror;
@@ -11,6 +12,7 @@ using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 using YamlDotNet.Core.Tokens;
 using Object = UnityEngine.Object;
@@ -149,7 +151,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         var hub = GameObject.GetComponent<ReferenceHub>();
         var comp = GameObject.AddComponent<SynapseObjectScript>();//found other solution
         comp.Object = this;
-        var fakeConnection = new FakeConnection(Player.Hub._playerId);
+        fakeConnection = new FakeConnection(Player.Hub._playerId);
         NetworkServer.AddPlayerForConnection(fakeConnection, GameObject);
 
         Player.SynapseDummy = this;
@@ -281,11 +283,16 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
 
     public override void ShowAll() => Spawn();
 
-    public override void HideFromPlayer(SynapsePlayer player) => Player.NetworkIdentity?.UnSpawnForOnePlayer(player);
+    public override void HideFromPlayer(SynapsePlayer player)
+    {
+        Player.NetworkIdentity?.UnSpawnForOnePlayer(player);
+    
+    }
+
+    FakeConnection fakeConnection;
 
     public override void ShowPlayer(SynapsePlayer player)
-    {    
+    {
         //TODO:
-        Player.NetworkIdentity?.SpawnForOnePlayer(player);
     }
 }
