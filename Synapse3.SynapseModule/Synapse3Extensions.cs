@@ -11,6 +11,7 @@ using InventorySystem.Items.Pickups;
 using MapGeneration;
 using MapGeneration.Distributors;
 using Mirror;
+using Neuron.Core.Events;
 using Neuron.Core.Logging;
 using Neuron.Modules.Configs.Localization;
 using PlayableScps;
@@ -354,5 +355,19 @@ public static class Synapse3Extensions
         }
 
         return msg;
+    }
+
+    public static void RaiseSafely<TEventReactor, TEvent>(this TEventReactor reactor, TEvent eventParameter)
+        where TEvent : IEvent
+        where TEventReactor : EventReactor<TEvent>
+    {
+        try
+        {
+            reactor.Raise(eventParameter);
+        }
+        catch (Exception ex)
+        {
+            SynapseLogger<Synapse>.Error($"{eventParameter.GetType().Name} failed\n" + ex);
+        }
     }
 }

@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using GameObjectPools;
 using InventorySystem.Items.MicroHID;
 using LiteNetLib.Utils;
@@ -10,6 +13,7 @@ using Neuron.Core.Meta;
 using Neuron.Modules.Commands;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
+using PlayerRoles.FirstPersonControl.NetworkMessages;
 using PlayerStatsSystem;
 using RelativePositioning;
 using Synapse3.SynapseModule.Command;
@@ -18,8 +22,10 @@ using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map;
+using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule;
 
@@ -144,6 +150,11 @@ public class DebugService : Service
             if(ev.EscapeType == EscapeType.TooFarAway) return;
             Logger.Warn("ESCAPE " + ev.Player.NickName + " " + ev.EscapeType);
         });
+        
+        _round.FirstSpawn.Subscribe(ev =>
+        {
+            Logger.Warn("First Spawn,SCPS: "+ ev.AmountOfScpSpawns);
+        });
     }
 
     private void ScpEvent(ScpAttackEvent ev)
@@ -181,41 +192,37 @@ public class DebugService : Service
     {
         switch (ev.KeyCode)
         {
-           case KeyCode.Alpha1:
-               ev.Player.ChangeRoleLite(RoleTypeId.Scientist);
-               break;
-           
-           case KeyCode.Alpha2:
-               ev.Player.SetPlayerRoleTypeAdvance(RoleTypeId.Scientist, ev.Player.Position);
-               break;
+            case KeyCode.Alpha1:
+                Timing.RunCoroutine(Rag(ev.Player));
+                break;
+            case KeyCode.Alpha2:
+                var rag = new SynapseRagDoll(ev.Player.RoleType, ev.Player.Position, ev.Player.Rotation, Vector3.one * 2, Synapse.Get<PlayerService>().Host,
+                    new WarheadDamageHandler(), "TestRag");
+                Timing.CallDelayed(3f,
+                    () =>
+                    {
+                        rag.SendFakeInfoToPlayer(ev.Player,
+                            new RagdollData(Synapse.Get<PlayerService>().Host,
+                                new CustomReasonDamageHandler("Hello There"), RoleTypeId.Scp096, ev.Player.Position,
+                                ev.Player.Rotation, "New Nick I guess", NetworkTime.time));
+                    });
+                break;
+        }
+    }
 
-           case KeyCode.Alpha3:
-               var angle = Random.Range(0, 5) switch
-               {
-                   0 => 0,
-                   1 => 90,
-                   2 => 180,
-                   3 => 270,
-                   4 => 360,
-                   _ => 0
-               };
-               Logger.Warn(angle);
-               ev.Player.SetPlayerRoleTypeAdvance(RoleTypeId.Scientist, ev.Player.Position, angle);
-               break;
+    private IEnumerator<float> Rag(SynapsePlayer player)
+    {
+        foreach (var names in Synapse.Get<SchematicService>()._ragDollNames)
+        {
+            var rag = NetworkClient.prefabs.FirstOrDefault(x => x.Value.name == names.Key);
+            Logger.Warn(names.Key + "assumed role " + names.Value);
+            var obj = Object.Instantiate(rag.Value, player.Position, Quaternion.identity);
+            obj.GetComponent<BasicRagdoll>().Info = new RagdollData(player, new UniversalDamageHandler(), Vector3.zero,
+                Quaternion.identity);
+            Logger.Warn("Created Scale: "+ obj.transform.localScale);
+            NetworkServer.Spawn(obj);
 
-           case KeyCode.Alpha5:
-               angle = Random.Range(0, 5) switch
-               {
-                   0 => 0,
-                   1 => 90,
-                   2 => 180,
-                   3 => 270,
-                   4 => 360,
-                   _ => 0
-               };
-               (ev.Player.CurrentRole as FpcStandardRoleBase).FpcModule.MouseLook.CurrentHorizontal = angle;
-               ev.Player.FakeRoleManager.UpdatePlayer(ev.Player);
-               break;
+            yield return Timing.WaitForSeconds(1);
         }
     }
 }

@@ -7,6 +7,7 @@ using PlayerRoles.FirstPersonControl;
 using PlayerRoles.Spectating;
 using PlayerStatsSystem;
 using RelativePositioning;
+using Respawning.NamingRules;
 using Synapse3.SynapseModule.Enums;
 using UnityEngine;
 
@@ -51,6 +52,8 @@ public partial class SynapsePlayer
         set => ClassManager.UserId = value;
     }
 
+    public uint NetId => NetworkIdentity.netId;
+
     /// <summary>
     /// A potentially second id of the User.It is most often used when a custom ID is present like 1234@patreon
     /// </summary>
@@ -65,8 +68,23 @@ public partial class SynapsePlayer
     /// </summary>
     public bool NoClip
     {
-        get => ServerRoles._noclipReady;
-        set => ServerRoles._noclipReady = value;
+        get => GetStatBase<AdminFlagsStat>().HasFlag(AdminFlags.Noclip);
+        set => GetStatBase<AdminFlagsStat>().SetFlag(AdminFlags.Noclip, value);
+    }
+
+    /// <summary>
+    /// If the Player is allowed to change NoClip Mode on his own
+    /// </summary>
+    public bool NoClipPermitted
+    {
+        get => FpcNoclip.IsPermitted(Hub);
+        set
+        {
+            if(value)
+                FpcNoclip.PermitPlayer(Hub);
+            else
+                FpcNoclip.UnpermitPlayer(Hub);
+        }
     }
 
     /// <summary>
@@ -113,23 +131,17 @@ public partial class SynapsePlayer
         }
     }
 
-    //TODO:
-    /*
     /// <summary>
     /// The Time the player died
     /// </summary>
-    public long DeathTime
-    {
-        get => ClassManager
-        set => ClassManager.DeathTime = value;
-    }
-    */
+    public float DeathTime => (CurrentRole as SpectatorRole)?.ActiveTime ?? 0;
 
     /// <summary>
     /// The current movement of the player
     /// </summary>
     public PlayerMovementState MovementState
     {
+        //TODO: Check if this works
         get => AnimationController.MoveState;
         set => AnimationController.UserCode_CmdChangeSpeedState((byte)value);
     }
@@ -196,52 +208,28 @@ public partial class SynapsePlayer
         }
     }
 
-    //TODO:
-    /*
+
     /// <summary>
     /// The current stamina of the player
     /// </summary>
     public float Stamina
     {
-        get => Hub.fpc.staminaController.RemainingStamina * 100;
-        set => Hub.fpc.staminaController.RemainingStamina = value / 100;
+        get => GetStatBase<StaminaStat>().CurValue * 100;
+        set => GetStatBase<StaminaStat>().CurValue = value / 100;
     }
 
-    /// <summary>
-    /// The stamina usage of the player
-    /// </summary>
-    public float StaminaUsage
-    {
-        get => Hub.fpc.staminaController.StaminaUse * 100;
-        set => Hub.fpc.staminaController.StaminaUse = value / 100;
-    }
+    //TODO: add Setter most likely patch needed
+    public float StaminaUseRate => (CurrentRole as FpcStandardRoleBase)?.FpcModule?.StateProcessor?._useRate ?? 0;
 
+    public string UnitName => (CurrentRole as HumanRole)?.UnitName ?? "";
 
-    public byte UnitId
+    public byte UnitNameId
     {
-        get => ClassManager.CurSpawnableTeamType;
+        get => (CurrentRole as HumanRole)?.UnitNameId ?? 0;
         set
         {
-            ClassManager.CurSpawnableTeamType = value;
-            SendNetworkMessage(_mirror.GetCustomVarMessage(ClassManager, writer =>
-            {
-                writer.WriteUInt64(16ul);
-                writer.WriteByte(value);
-            }));
-        }
-    }
-
-    public string Unit
-    {
-        get => ClassManager.CurUnitName;
-        set
-        {
-            ClassManager.CurUnitName = value;
-            SendNetworkMessage(_mirror.GetCustomVarMessage(ClassManager, writer =>
-            {
-                writer.WriteUInt64(32ul);
-                writer.WriteString(value);
-            }));
+            if(CurrentRole is not HumanRole role) return;
+            role.UnitNameId = value;
         }
     }
 
@@ -251,10 +239,13 @@ public partial class SynapsePlayer
     /// </summary>
     public SynapsePlayer CurrentlySpectating
     {
-        get => SpectatorManager.CurrentSpectatedPlayer != null ? SpectatorManager.CurrentSpectatedPlayer.GetSynapsePlayer() : null;
-        set => SpectatorManager.CurrentSpectatedPlayer = value;
+        get
+        {
+            if (CurrentRole is not SpectatorRole role) return null;
+            if (role.SyncedSpectatedNetId == 0) return null;
+            return _player.GetPlayer(role.SyncedSpectatedNetId);
+        }
     }
-    */
 
     /// <summary>
     /// The player who disarmed the player
@@ -277,15 +268,9 @@ public partial class SynapsePlayer
     /// <summary>
     /// The gameobject the player is looking at
     /// </summary>
-    public GameObject LookingAt
-    {
-        get
-        {
-            if (!Physics.Raycast(CameraReference.transform.position, CameraReference.transform.forward,
-                    out RaycastHit raycastHit, 100f)) return null;
-            return raycastHit.transform.gameObject;
-        }
-    }
+    public GameObject LookingAt =>
+        !Physics.Raycast(CameraReference.transform.position, CameraReference.transform.forward,
+            out RaycastHit raycastHit, 100f) ? null : raycastHit.transform.gameObject;
 
     /// <summary>
     /// True if the player has DoNotTrack enabled (https://scpslgame.com/Verified_server_rules.pdf [8.11])
@@ -297,13 +282,10 @@ public partial class SynapsePlayer
     /// </summary>
     public bool IsDisarmed => VanillaInventory.IsDisarmed();
 
-    //TODO:
-    /*
     /// <summary>
     /// The time a player is alive
     /// </summary>
-    public float AliveTime => ClassManager.alive
-    */
+    public float AliveTime => CurrentRole is SpectatorRole or NoneRole ? 0f : CurrentRole.ActiveTime;
 
     /// <summary>
     /// I don't need to explain this, right?
