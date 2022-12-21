@@ -95,7 +95,6 @@ public static class RemoteAdminPatch
             if (result.StatusCodeInt == 0) return true;
 
             var info = result.Attachments.FirstOrDefault(x => x is RemoteAdminAttachment, null);
-            SynapseLogger<Synapse>.Warn(info == null);
 
             if (info != null)
             {

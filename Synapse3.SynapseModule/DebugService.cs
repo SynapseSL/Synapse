@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using GameObjectPools;
 using InventorySystem.Items.MicroHID;
 using LiteNetLib.Utils;
@@ -10,6 +13,7 @@ using Neuron.Core.Meta;
 using Neuron.Modules.Commands;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
+using PlayerRoles.FirstPersonControl.NetworkMessages;
 using PlayerStatsSystem;
 using RelativePositioning;
 using Synapse3.SynapseModule.Command;
@@ -18,6 +22,7 @@ using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map;
+using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 using Synapse3.SynapseModule.Dummy;
@@ -29,6 +34,7 @@ using PluginAPI.Core.Interfaces;
 using InventorySystem.Items.Firearms;
 using PluginAPI.Core.Attributes;
 using Synapse3.SynapseModule.Permissions;
+using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule;
 
@@ -154,13 +160,10 @@ public class DebugService : Service
             Logger.Warn("ESCAPE " + ev.Player.NickName + " " + ev.EscapeType);
         });
         
-
-        _player.Damage.Subscribe(ev =>
+        _round.FirstSpawn.Subscribe(ev =>
         {
-            ev.Allow = false;
+            Logger.Warn("First Spawn,SCPS: "+ ev.AmountOfScpSpawns);
         });
-
-        PluginAPI.Events.EventManager.RegisterEvents(typeof(DebugService), this);//Temp to attach event of NW
     }
 
     private void ScpEvent(ScpAttackEvent ev)
@@ -200,6 +203,7 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
+
                 testDummy?.Destroy();
                 testDummy = new SynapseDummy(ev.Player.Position, ev.Player.Rotation, RoleTypeId.ClassD, "Test");
                 testDummy.Player.RoleType = RoleTypeId.NtfSergeant;
@@ -230,7 +234,6 @@ public class DebugService : Service
             case KeyCode.Alpha6:
                 testDummy.ShowPlayer(ev.Player);
                 break;
-
         }
     }
 }

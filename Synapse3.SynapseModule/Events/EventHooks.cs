@@ -21,77 +21,31 @@ public partial class RoundEvents
     [PluginEvent(ServerEventType.WaitingForPlayers)]
     public void RoundWaitingHook()
     {
-        try
-        {
-            Waiting.Raise(new RoundWaitingEvent(_firstTime));
-        }
-        catch (Exception ex)
-        {
-            SynapseLogger<Synapse>.Error("Sy3 Events: Round Waiting Event failed:\n" + ex);
-        }
+        Waiting.RaiseSafely(new RoundWaitingEvent(_firstTime));
 
         _firstTime = false;
     }
 
     [PluginEvent(ServerEventType.RoundStart)]
-    public void RoundStartHook()
-    {
-        try
-        {
-            Start.Raise(new RoundStartEvent());
-        }
-        catch (Exception ex)
-        {
-            SynapseLogger<Synapse>.Error("Sy3 Events: Round Start Event failed:\n" + ex);
-        }
-    }
-    
+    public void RoundStartHook() => Start.RaiseSafely(new RoundStartEvent());
+
     [PluginEvent(ServerEventType.RoundEnd)]
-    public void RoundEndHook()
-    {
-        try
-        {
-            End.Raise(new RoundEndEvent());
-        }
-        catch (Exception ex)
-        {
-            SynapseLogger<Synapse>.Error("Sy3 Events: Round End Event failed:\n" + ex);
-        }
-    }
+    public void RoundEndHook() => End.RaiseSafely(new RoundEndEvent());
     
     [PluginEvent(ServerEventType.RoundRestart)]
-    public void RoundRestartHook()
-    {
-        try
-        {
-            Restart.Raise(new RoundRestartEvent());
-        }
-        catch (Exception ex)
-        {
-            SynapseLogger<Synapse>.Error("Sy3 Events: Round Restart Event failed:\n" + ex);
-        }
-    }
+    public void RoundRestartHook() => Restart.RaiseSafely(new RoundRestartEvent());
 
     [PluginEvent(ServerEventType.LczDecontaminationStart)]
     public bool DecontaminationHook()
     {
-        try
+        var ev = new DecontaminationEvent();
+        Decontamination.RaiseSafely(new DecontaminationEvent());
+        if (!ev.Allow)
         {
-            //TODO: Improve this Event
-            var ev = new DecontaminationEvent();
-            Decontamination.Raise(new DecontaminationEvent());
-            if (!ev.Allow)
-            {
-                DecontaminationController.Singleton.NetworkDecontaminationOverride =
-                    DecontaminationController.DecontaminationStatus.None;
-            }
-            return ev.Allow;
+            DecontaminationController.Singleton.NetworkDecontaminationOverride =
+                DecontaminationController.DecontaminationStatus.None;
         }
-        catch (Exception ex)
-        {
-            SynapseLogger<Synapse>.Error("Sy3 Events: Decontamination Event failed:\n" + ex);
-            return true;
-        }
+        return ev.Allow;
     }
 }
 
@@ -101,16 +55,8 @@ public partial class ServerEvents
     public PreauthCancellationData PreAuth(string userId, string address, long number,
         CentralAuthPreauthFlags centralFlags, string countryCode, byte[] array, ConnectionRequest request, int position)
     {
-        try
-        {
-            var ev = new PreAuthenticationEvent(userId, address, countryCode, centralFlags);
-            PreAuthentication.Raise(ev);
-            return ev.ReturningData;
-        }
-        catch (Exception ex)
-        {
-            SynapseLogger<Synapse>.Error("Sy3 Events: Pre Authentication Event failed:\n" + ex);
-            return PreauthCancellationData.Accept();
-        }
+        var ev = new PreAuthenticationEvent(userId, address, countryCode, centralFlags);
+        PreAuthentication.RaiseSafely(ev);
+        return ev.ReturningData;
     }
 }

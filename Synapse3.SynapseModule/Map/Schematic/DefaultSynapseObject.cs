@@ -23,7 +23,7 @@ public abstract class DefaultSynapseObject : ISynapseObject
 
     public Vector3 OriginalScale { get; internal set; }
 
-    public bool MoveInElevator { get; set; } = false;
+    public virtual bool MoveInElevator { get; set; } = false;
 
     private ISynapseObject _parent;
     public ISynapseObject Parent

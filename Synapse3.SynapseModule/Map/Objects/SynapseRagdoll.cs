@@ -10,25 +10,145 @@ using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule.Map.Objects;
 
 //TODO:
-public class SynapseRagDoll //: NetworkSynapseObject, IJoinUpdate
+public class SynapseRagDoll : NetworkSynapseObject
 {
-    /*
-    public static Dictionary<RoleTypeId, Ragdoll> Prefabs = new ();
+    public static Dictionary<RoleTypeId, BasicRagdoll> Prefabs = new();
 
     private readonly PlayerService _player;
     private readonly MirrorService _mirror;
-    private readonly Dictionary<SynapsePlayer, SynapseRagDollInfo> _sendInfo = new();
 
-    #region SynapseObject
-    public override GameObject GameObject => Ragdoll.gameObject;
-    
+    private SynapseRagDoll()
+    {
+        _player = Synapse.Get<PlayerService>();
+        _mirror = Synapse.Get<MirrorService>();
+    }
+
+    public BasicRagdoll BasicRagDoll { get; }
+
+    public override GameObject GameObject => BasicRagDoll.gameObject;
+    public override NetworkIdentity NetworkIdentity => BasicRagDoll.netIdentity;
     public override ObjectType Type => ObjectType.Ragdoll;
+
+    public SynapsePlayer Owner { get; }
+    public Vector3 OriginalRagDollScale { get; private set; }
+
+    public override Vector3 Scale
+    {
+        get => RevertScale(base.Scale);
+        set => base.Scale = CreateScale(value);
+    }
+
+    public double CreationTime
+    {
+        get => BasicRagDoll.Info.CreationTime;
+        set => BasicRagDoll.NetworkInfo = new RagdollData(BasicRagDoll.Info.OwnerHub, BasicRagDoll.Info.Handler,
+            BasicRagDoll.Info.RoleType, BasicRagDoll.Info.StartPosition, BasicRagDoll.Info.StartRotation,
+            BasicRagDoll.Info.Nickname, value);
+    }
     
-    public override NetworkIdentity NetworkIdentity => Ragdoll.netIdentity;
+    public RoleTypeId Role { get; }
+
+    public RoleTypeId DisplayedRole
+    {
+        get => BasicRagDoll.Info.RoleType;
+        set => BasicRagDoll.NetworkInfo = new RagdollData(BasicRagDoll.Info.OwnerHub, BasicRagDoll.Info.Handler,
+            value, BasicRagDoll.Info.StartPosition, BasicRagDoll.Info.StartRotation,
+            BasicRagDoll.Info.Nickname, BasicRagDoll.Info.CreationTime);
+    }
+
+    public DamageType DamageType => Damage.GetDamageType();
+
+    public string DamageText
+    {
+        get => (Damage as CustomReasonDamageHandler)?._deathReason ?? Damage.GetType().Name;
+        set => Damage = new CustomReasonDamageHandler(value);
+    }
+    public DamageHandlerBase Damage
+    {
+        get => BasicRagDoll.Info.Handler;
+        set => BasicRagDoll.NetworkInfo = new RagdollData(BasicRagDoll.Info.OwnerHub, value,
+            BasicRagDoll.Info.RoleType, BasicRagDoll.Info.StartPosition, BasicRagDoll.Info.StartRotation,
+            BasicRagDoll.Info.Nickname, BasicRagDoll.Info.CreationTime);
+    }
+
+    public string NickName
+    {
+        get => BasicRagDoll.Info.Nickname;
+        set => BasicRagDoll.NetworkInfo = new RagdollData(BasicRagDoll.Info.OwnerHub, BasicRagDoll.Info.Handler,
+            BasicRagDoll.Info.RoleType, BasicRagDoll.Info.StartPosition, BasicRagDoll.Info.StartRotation,
+            value, BasicRagDoll.Info.CreationTime);
+    }
+
+    public float ExistenceTime => BasicRagDoll.Info.ExistenceTime;
+
+    public void SendFakeInfoToPlayer(SynapsePlayer player, RagdollData data) =>
+        player.SendFakeSyncVar(BasicRagDoll, 1u, data);
+
+    internal SynapseRagDoll(BasicRagdoll ragDoll) : this()
+    {
+        BasicRagDoll = ragDoll;
+        Owner = ragDoll.Info.OwnerHub?.GetSynapsePlayer();
+        Map._synapseRagdolls.Add(this);
+        SetUp();
+    }
+
+    public SynapseRagDoll(RoleTypeId role, Vector3 position, Quaternion rotation, Vector3 scale, SynapsePlayer owner,
+        DamageHandlerBase damage, string nick, bool disableFadeOut = true) : this()
+    {
+        BasicRagDoll = CreateRagDoll(role, position, rotation, scale,
+            disableFadeOut || owner == null ? owner : _player.Host, damage, nick);
+        Owner = owner;
+        SetUp();
+    }
+
+    public SynapseRagDoll(RoleTypeId role, Vector3 position, Quaternion rotation, Vector3 scale, SynapsePlayer owner,
+        DamageType damage, string nick, bool disableFadeOut = true) : this(role, position, rotation, scale, owner,
+        damage.GetUniversalDamageHandler(), nick, disableFadeOut) { }
+    
+    public SynapseRagDoll(RoleTypeId role, Vector3 position, Quaternion rotation, Vector3 scale, SynapsePlayer owner,
+        string damageText, string nick, bool disableFadeOut = true) : this(role, position, rotation, scale, owner,
+        new CustomReasonDamageHandler(damageText), nick, disableFadeOut) { }
+
+    internal SynapseRagDoll(SchematicConfiguration.RagdollConfiguration configuration,
+        SynapseSchematic schematic) :
+        this(configuration.RoleType, configuration.Position, configuration.Rotation,
+            configuration.Scale, null, configuration.DamageType, configuration.Nick)
+    {
+        Parent = schematic;
+        schematic._ragdolls.Add(this);
+
+        Scale = configuration.Scale;
+        CustomAttributes = configuration.CustomAttributes;
+    }
+
+    private BasicRagdoll CreateRagDoll(RoleTypeId role, Vector3 pos, Quaternion rotation, Vector3 scale,
+        ReferenceHub owner, DamageHandlerBase damageHandlerBase, string nick)
+    {
+        var rag = CreateNetworkObject(Prefabs[role], pos, rotation, scale);
+        rag.Info = new RagdollData(owner, damageHandlerBase, role, pos, rotation, nick, NetworkTime.time);
+        Map._synapseRagdolls.Add(this);
+        NetworkServer.Spawn(rag.gameObject);
+        return rag;
+    }
+    
+    protected override TComponent CreateNetworkObject<TComponent>(TComponent component, Vector3 pos, Quaternion rot, Vector3 scale)
+    {
+        var gameObject = Object.Instantiate(component, pos, rot);
+        OriginalRagDollScale = gameObject.transform.localScale;
+        gameObject.transform.localScale = CreateScale(scale);
+        return gameObject;
+    }
+
+    public override void Refresh()
+    {
+        base.Refresh();
+        BasicRagDoll.NetworkInfo = BasicRagDoll.NetworkInfo;
+    }
     
     public override void OnDestroy()
     {
@@ -37,209 +157,26 @@ public class SynapseRagDoll //: NetworkSynapseObject, IJoinUpdate
         
         if (Parent is SynapseSchematic schematic) schematic._ragdolls.Remove(this);
     }
-    
-    public override Vector3 Scale
-    {
-        get => RevertScale(base.Scale);
-        set => base.Scale = CreateScale(value);
-    }
-    #endregion
-
-    #region RagDollProperties
-    public Ragdoll Ragdoll { get; }
-    public Vector3 OriginalRagdollScale { get; private set; }
-    public DamageType DamageType { get; private set; }
-    public RoleTypeId RoleType { get; private set; }
-    public string Nick { get; private set; }
-    public string CustomReason => (Info?.DamageHandler as CustomReasonDamageHandler)?._deathReason ?? string.Empty;
-    public bool CanBeRevive { get; set; }
-    public bool CanBeReviveInTime => Ragdoll.Info.ExistenceTime <= Scp049.ReviveEligibilityDuration;
-    public uint RoleID { get; private set; }
-    public SynapsePlayer Owner { get; private set; }
-    #endregion
-
-    #region SyncVar
-    private SynapseRagDollInfo _synapseRagDollInfo;
-
-    public SynapseRagDollInfo Info
-    {
-        get => _synapseRagDollInfo;
-        set
-        {
-            Ragdoll.Info = new RagdollInfo(value.UseHostId ? _player.Host : Owner, value.DamageHandler,
-                value.DisplayedRole, Ragdoll.Info.StartPosition, Ragdoll.Info.StartRotation, value.NickName,
-                Ragdoll.Info.CreationTime);
-            _synapseRagDollInfo = value;
-            UpdateInfo();
-        }
-    }
-    public Dictionary<Func<SynapsePlayer, bool>, SynapseRagDollInfo> VisibleInfoCondition { get; set; } = new();
-
-    public bool NeedsJoinUpdate => VisibleInfoCondition.Count != 0;
-    
-    public void UpdateInfo()
-    {
-        foreach (var player in _player.Players)
-            UpdatePlayer(player);
-    }
-
-    public void UpdatePlayer(SynapsePlayer player)
-    {
-        var infoToSend = Info;
-
-        if (infoToSend == null)
-        {
-            NeuronLogger.For<SynapseRagDoll>().Debug("Info of RagDoll is null can't spawn RagDoll on Players Client");
-            return;
-        }
-
-        foreach (var condition in VisibleInfoCondition)
-        {
-            if (!condition.Key.Invoke(player)) continue;
-            infoToSend = condition.Value;
-            break;
-        }
-
-        //This will prevent to send unnecessary packages from being send
-        if (!_sendInfo.ContainsKey(player)) _sendInfo.Add(player, default);
-        else if (_sendInfo[player] == infoToSend) return;
-        _sendInfo[player] = infoToSend;
-
-        var ragdollInfo = new RagdollInfo(infoToSend.UseHostId ? _player.Host : Ragdoll.Info.OwnerHub, infoToSend.DamageHandler, infoToSend.DisplayedRole,
-            Ragdoll.Info.StartPosition, Ragdoll.Info.StartRotation, infoToSend.NickName, Ragdoll.Info.CreationTime);
-
-        player.SendNetworkMessage(_mirror.GetCustomVarMessage(Ragdoll, writer =>
-        {
-            writer.WriteUInt64(1ul);
-            writer.WriteRagdollInfo(ragdollInfo);
-        }));
-    }
-
-    public class SynapseRagDollInfo
-    {
-        public SynapseRagDollInfo(string reason, string nick, RoleTypeId displayedRole)
-        {
-            DamageHandler = new CustomReasonDamageHandler(reason);
-            NickName = nick;
-            DisplayedRole = displayedRole;
-        }
-
-        public SynapseRagDollInfo(DamageHandlerBase damageHandler, string nick, RoleTypeId displayedRole)
-        {
-            DamageHandler = damageHandler;
-            NickName = nick;
-            DisplayedRole = displayedRole;
-        }
-
-        public DamageHandlerBase DamageHandler { get; set; }
-        
-        public string NickName { get; set; }
-        
-        public RoleTypeId DisplayedRole { get; set; }
-        
-        public bool UseHostId { get; set; }
-
-        public SynapseRagDollInfo Copy() => new SynapseRagDollInfo(DamageHandler, NickName, DisplayedRole);
-
-        public static SynapseRagDollInfo Of(RagdollInfo info) =>
-            new SynapseRagDollInfo(info.Handler, info.Nickname, info.RoleType);
-    }
-    #endregion
-
-    #region Constructor
-    //Always called
-    private SynapseRagDoll()
-    {
-        _player = Synapse.Get<PlayerService>();
-        _mirror = Synapse.Get<MirrorService>();
-        _player.JoinUpdates.Add(this);
-    }
-    
-    //Public for Plugins
-    public SynapseRagDoll(RoleTypeId role, string reason, Vector3 pos, Quaternion rot, Vector3 scale,
-        string nick, SynapsePlayer player = null, bool canBeRevive = false, uint roleID = RoleService.NoneRole, bool enableFadeOut = true) : this()
-    {
-        Ragdoll = CreateRagdoll(role, pos, rot, scale);
-        SetUp(role, DamageType.CustomReason, nick, player ?? _player.Host, !enableFadeOut, canBeRevive, roleID,
-            new CustomReasonDamageHandler(reason));
-    }
-
-    public SynapseRagDoll(RoleTypeId role, DamageType damage, Vector3 pos, Quaternion rot, Vector3 scale, 
-        string nick, SynapsePlayer player = null, bool canBeRevive = false, uint roleID = RoleService.NoneRole, bool enableFadeOut = true) : this()
-    {
-        Ragdoll = CreateRagdoll(role, pos, rot, scale);
-        SetUp(role, damage, nick, player ?? _player.Host, !enableFadeOut, canBeRevive, roleID);
-    }
-    
-    //Only vanila Ragdoll
-    internal SynapseRagDoll(Ragdoll ragdoll) : this()
-    {
-        Ragdoll = ragdoll;
-        var owner = _player.GetPlayer(Ragdoll.Info.OwnerHub.PlayerId);
-        SetUp(ragdoll.Info.RoleType, ragdoll.Info.Handler.GetDamageType(), ragdoll.Info.Nickname, owner, false,
-            owner.TeamID != (uint)Team.SCPs, owner.RoleID, ragdoll.Info.Handler);
-    }
-
-    //Schematic
-    internal SynapseRagDoll(SchematicConfiguration.RagdollConfiguration configuration,
-        SynapseSchematic schematic) :
-        this(configuration.RoleType, configuration.DamageType, configuration.Position, configuration.Rotation,
-            configuration.Scale, configuration.Nick)
-    {
-        Parent = schematic;
-        schematic._ragdolls.Add(this);
-
-        OriginalScale = configuration.Scale;
-        CustomAttributes = configuration.CustomAttributes;
-    }
-
-    private void SetUp(RoleTypeId role, DamageType damage, string nick, SynapsePlayer owner, bool useHost,
-        bool canRevive, uint customRole, DamageHandlerBase handlerBase = null)
-    {
-        Map._synapseRagdolls.Add(this);
-        var comp = GameObject.AddComponent<SynapseObjectScript>();
-        comp.Object = this;
-
-        DamageType = damage;
-        RoleType = role;
-        Nick = nick;
-        Owner = owner;
-        CanBeRevive = canRevive;
-        RoleID = customRole;
-        MoveInElevator = true;
-        
-        Ragdoll.Info = new RagdollInfo(owner, handlerBase ?? damage.GetUniversalDamageHandler(), role, Position, Rotation,
-            nick, NetworkTime.time);
-        var info = SynapseRagDollInfo.Of(Ragdoll.Info);
-        info.UseHostId = useHost;
-        _synapseRagDollInfo = info;
-        UpdateInfo();
-    }
-
-    private Ragdoll CreateRagdoll(RoleTypeId role, Vector3 pos, Quaternion rot, Vector3 scale) =>
-        CreateNetworkObject(Prefabs[role], pos, rot, scale);
-
-    protected override TComponent CreateNetworkObject<TComponent>(TComponent component, Vector3 pos, Quaternion rot, Vector3 scale)
-    {
-        OriginalRagdollScale = component.transform.localScale;
-        return base.CreateNetworkObject(component, pos, rot, CreateScale(scale));
-    }
 
     private Vector3 CreateScale(Vector3 newScale)
     {
-        newScale.x *= OriginalRagdollScale.x;
-        newScale.y *= OriginalRagdollScale.y;
-        newScale.z *= OriginalRagdollScale.z;
+        newScale.x *= OriginalRagDollScale.x;
+        newScale.y *= OriginalRagDollScale.y;
+        newScale.z *= OriginalRagDollScale.z;
         return newScale;
     }
-
+    
     private Vector3 RevertScale(Vector3 currentScale)
     {
-        currentScale.x *= OriginalRagdollScale.x;
-        currentScale.y *= OriginalRagdollScale.y;
-        currentScale.z *= OriginalRagdollScale.z;
+        currentScale.x /= OriginalRagDollScale.x;
+        currentScale.y /= OriginalRagDollScale.y;
+        currentScale.z /= OriginalRagDollScale.z;
         return currentScale;
     }
-    #endregion
-    */
+    
+    private void SetUp()
+    {
+        GameObject.AddComponent<SynapseObjectScript>().Object = this;
+        MoveInElevator = true;
+    }
 }

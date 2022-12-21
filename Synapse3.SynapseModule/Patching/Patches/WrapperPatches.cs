@@ -50,7 +50,7 @@ public static class PlayerLoadComponentPatch
             }
             
             var ev = new LoadComponentEvent(__instance.gameObject, player);
-            Synapse.Get<PlayerEvents>().LoadComponent.Raise(ev);
+            Synapse.Get<PlayerEvents>().LoadComponent.RaiseSafely(ev);
         }
         catch (Exception ex)
         {

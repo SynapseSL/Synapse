@@ -107,11 +107,11 @@ public partial class SynapsePlayer
             
             switch (newRole)
             {
-                case HumanRole { UsesUnitNames: true } humanRole:
-                    writer.WriteByte(humanRole.UnitNameId);
+                case HumanRole { UsesUnitNames: true }:
+                    writer.WriteByte(prevRole is HumanRole prevHuman ? prevHuman.UnitNameId : (byte)0);
                     break;
-                case ZombieRole zombieRole:
-                    writer.WriteUInt16(zombieRole._syncMaxHealth);
+                case ZombieRole:
+                    writer.WriteUInt16(prevRole is ZombieRole prevZombie ? prevZombie._syncMaxHealth : (ushort)600);
                     break;
             }
 
@@ -161,7 +161,6 @@ public partial class SynapsePlayer
             if (prevRole is FpcStandardRoleBase prevFpcRole)
             {
                 prevFpcRole.FpcModule.MouseLook.GetSyncValues(0, out var rotation, out _);
-                SynapseLogger<Synapse>.Warn(rotation);
                 writer.WriteUInt16(rotation);
             }
             else
@@ -270,14 +269,7 @@ public partial class SynapsePlayer
     /// <summary>
     /// The Name of the Role the player currently has
     /// </summary>
-    public string RoleName
-    {
-        get
-        {
-            if (CustomRole == null) return CurrentRole.RoleName;
-            return CustomRole.Attribute.Name;
-        }
-    }
+    public string RoleName => CustomRole?.Attribute.Name ?? CurrentRole.RoleName;
 
     public string TeamName => _team.GetTeamName(TeamID);
 }
