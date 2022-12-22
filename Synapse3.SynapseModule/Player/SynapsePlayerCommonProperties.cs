@@ -143,8 +143,8 @@ public partial class SynapsePlayer
     public PlayerMovementState MovementState
     {
         //TODO: Check if this works
-        get => AnimationController.MoveState;
-        set => AnimationController.UserCode_CmdChangeSpeedState((byte)value);
+        get => FirstPersonMovement?.CurrentMovementState ?? PlayerMovementState.Crouching;
+        set => FirstPersonMovement.CurrentMovementState = value;
     }
 
     //TODO:
@@ -315,20 +315,20 @@ public partial class SynapsePlayer
     /// <summary>
     /// The sneak speed of the curent roleTypeID
     /// </summary>
-    public float SneakSpeed => FirstPersonMovement?.SneakSpeed ?? 0;
+    public virtual float SneakSpeed => FirstPersonMovement?.SneakSpeed ?? 0;
 
     /// <summary>
     /// The sneak warlk of the curent roleTypeID
     /// </summary>
-    public float WalkSpeed => FirstPersonMovement?.WalkSpeed ?? 0;
+    public virtual float WalkSpeed => FirstPersonMovement?.WalkSpeed ?? 0;
 
     /// <summary>
     /// The sneak run of the curent roleTypeID
     /// </summary>
-    public float RunSpeed => FirstPersonMovement?.SprintSpeed ?? 0;
+    public virtual float RunSpeed => FirstPersonMovement?.SprintSpeed ?? 0;
 
     /// <summary>
     /// The sneak crouching of the curent roleTypeID
     /// </summary>
-    public float CrouchingSpeed => FirstPersonMovement?.CrouchSpeed ?? 0;
+    public virtual float CrouchingSpeed => FirstPersonMovement?.CrouchSpeed ?? 0;
 }

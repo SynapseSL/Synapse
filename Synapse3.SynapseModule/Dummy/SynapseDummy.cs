@@ -32,9 +32,9 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         set => Player.RaVisible = value;
     }
 
-    public float WalkSpeed//Get default Speed of the role
+    public float WalkSpeed
     {
-        get => Player.FirstPersonMovement?.WalkSpeed ?? 0;
+        get => Player.WalkSpeed;
         set
         {
             var firstperosn = Player.FirstPersonMovement;
@@ -43,9 +43,20 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         }
     }
 
+    public float SneakSpeed
+    {
+        get => Player.SneakSpeed;
+        set
+        {
+            var firstperosn = Player.FirstPersonMovement;
+            if (firstperosn != null)
+                firstperosn.SneakSpeed = value;
+        }
+    }
+
     public float RunSpeed
     {
-        get => Player.FirstPersonMovement?.SprintSpeed ?? 0;
+        get => Player.RunSpeed;
         set
         {
             var firstperosn = Player.FirstPersonMovement;
@@ -56,7 +67,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
 
     public float CrouchingSpeed
     {
-        get => Player.FirstPersonMovement?.CrouchSpeed ?? 0;
+        get => Player.CrouchingSpeed;
         set
         {
             var firstperosn = Player.FirstPersonMovement;
@@ -123,12 +134,8 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
 
     public PlayerMovementState Movement
     {
-        get => Player.AnimationController.MoveState;
-        set
-        {
-            Player.AnimationController.MoveState = value;
-            Player.AnimationController.RpcReceiveState((byte)value);
-        }
+        get => Player.FirstPersonMovement.CurrentMovementState;
+        set => Player.FirstPersonMovement.CurrentMovementState = value;
     }
 
     public DummyPlayer Player { get; }

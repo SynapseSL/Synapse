@@ -45,7 +45,8 @@ public class FakeRoleManager
         }
     }
     
-    public void UpdatePlayer(SynapsePlayer player) => player.SendNetworkMessage(new RoleSyncInfo(_player, player));
+    public void UpdatePlayer(SynapsePlayer player) 
+        => player.SendNetworkMessage(new RoleSyncInfo(_player, RoleTypeId.None, player));
 
     private RoleInfo _ownVisibleRole = new(RoleTypeId.None, null, null);
     public RoleInfo OwnVisibleRole

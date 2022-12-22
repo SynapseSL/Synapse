@@ -198,6 +198,7 @@ public class DebugService : Service
     }
 
     SynapseDummy testDummy;
+    SynapseSchematic Schematic;
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)
@@ -235,6 +236,26 @@ public class DebugService : Service
 
             case KeyCode.Alpha6:
                 testDummy.ShowPlayer(ev.Player);
+                break;
+
+            case KeyCode.Alpha7:
+                Schematic?.Destroy();
+                Schematic = Synapse.Get<SchematicService>().SpawnSchematic(2000, ev.Player.Position);
+                break;
+
+            case KeyCode.Alpha8:
+                Schematic.HideFromPlayer(ev.Player);
+                break;
+
+            case KeyCode.Alpha9:
+                Schematic.ShowPlayer(ev.Player);
+                break;
+
+            case KeyCode.Alpha0:
+                ev.Player.FakeRoleManager.VisibleRoleCondition.Add(
+                    (SynapsePlayer player) => player.Faction == Faction.FoundationEnemy,
+                    new RoleInfo(RoleTypeId.ChaosConscript, ev.Player));
+                ev.Player.FakeRoleManager.OwnVisibleRole = new RoleInfo(RoleTypeId.NtfPrivate, ev.Player);
                 break;
         }
     }

@@ -14,7 +14,6 @@ using Mirror;
 using Neuron.Core.Events;
 using Neuron.Core.Logging;
 using Neuron.Modules.Configs.Localization;
-using PlayableScps;
 using PlayerRoles;
 using PlayerStatsSystem;
 using PluginAPI.Core.Items;
@@ -145,7 +144,6 @@ public static class Synapse3Extensions
     public static SynapsePlayer GetSynapsePlayer(this NetworkConnection connection) => connection?.identity?.GetSynapsePlayer();
     public static SynapsePlayer GetSynapsePlayer(this MonoBehaviour mono) => mono?.gameObject?.GetComponent<SynapsePlayer>();
     public static SynapsePlayer GetSynapsePlayer(this GameObject gameObject) => gameObject?.GetComponent<SynapsePlayer>();
-    public static SynapsePlayer GetSynapsePlayer(this PlayableScp scp) => scp?.Hub?.GetSynapsePlayer();
     public static SynapsePlayer GetSynapsePlayer(this CommandSender sender) => _player
         .GetPlayer(x => x.CommandSender == sender, PlayerType.Dummy, PlayerType.Player, PlayerType.Server);
     public static SynapsePlayer GetSynapsePlayer(this StatBase stat) => stat.Hub.GetSynapsePlayer();

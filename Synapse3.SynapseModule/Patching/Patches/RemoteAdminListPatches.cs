@@ -357,7 +357,7 @@ public static class RemoteAdminPlayerDataRequestPatch
             var connection = player.networkIdentity.connectionToClient;
 
             if (playerSender != null)
-                playerSender.Processor.GameplayData = seeGamePlayData;
+                playerSender.ReferenceHub.queryProcessor.GameplayData = seeGamePlayData;
 
             var message = "<color=white>";
             message += "Nickname: " + player.nicknameSync.CombinedName;

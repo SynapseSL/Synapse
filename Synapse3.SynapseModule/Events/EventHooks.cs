@@ -7,6 +7,7 @@ using PluginAPI.Core.Attributes;
 using PluginAPI.Core.Interfaces;
 using PluginAPI.Enums;
 using PluginAPI.Events;
+using static RoundSummary;
 
 namespace Synapse3.SynapseModule.Events;
 
@@ -30,7 +31,7 @@ public partial class RoundEvents
     public void RoundStartHook() => Start.RaiseSafely(new RoundStartEvent());
 
     [PluginEvent(ServerEventType.RoundEnd)]
-    public void RoundEndHook() => End.RaiseSafely(new RoundEndEvent());
+    public void RoundEndHook(LeadingTeam leadingTeam) => End.RaiseSafely(new RoundEndEvent());
     
     [PluginEvent(ServerEventType.RoundRestart)]
     public void RoundRestartHook() => Restart.RaiseSafely(new RoundRestartEvent());

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Mirror;
 using Neuron.Core.Logging;
-using PlayableScps;
 using PlayerRoles;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule.Enums;
