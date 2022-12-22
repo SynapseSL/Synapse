@@ -32,28 +32,37 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         set => Player.RaVisible = value;
     }
 
-    public float SneakSpeed
+    public float WalkSpeed//Get default Speed of the role
     {
-        get => Player.SneakSpeed;
-        set => Player.SneakSpeed = value;
-    }
-
-    public float WalkSpeed
-    {
-        get => Player.WalkSpeed;
-        set => Player.WalkSpeed = value;
+        get => Player.FirstPersonMovement?.WalkSpeed ?? 0;
+        set
+        {
+            var firstperosn = Player.FirstPersonMovement;
+            if (firstperosn != null)
+                firstperosn.WalkSpeed = value;
+        }
     }
 
     public float RunSpeed
     {
-        get => Player.RunSpeed;
-        set => Player.RunSpeed = value;
+        get => Player.FirstPersonMovement?.SprintSpeed ?? 0;
+        set
+        {
+            var firstperosn = Player.FirstPersonMovement;
+            if (firstperosn != null)
+                firstperosn.SprintSpeed = value;
+        }
     }
 
     public float CrouchingSpeed
     {
-        get => Player.CrouchingSpeed;
-        set => Player.CrouchingSpeed = value;
+        get => Player.FirstPersonMovement?.CrouchSpeed ?? 0;
+        set
+        {
+            var firstperosn = Player.FirstPersonMovement;
+            if (firstperosn != null)
+                firstperosn.CrouchSpeed = value;
+        }
     }
 
     public bool DestroyWhenDied

@@ -247,49 +247,6 @@ public partial class SynapsePlayer
         }
     }
 
-    public float SneakSpeed
-    {
-        get => FirstPersonMovement?.SneakSpeed ?? 0;
-        set
-        {
-            var firstperosn = FirstPersonMovement;
-            if (firstperosn != null)
-                firstperosn.SneakSpeed = value;
-        }
-    }
-
-    public float WalkSpeed
-    {
-        get => FirstPersonMovement?.WalkSpeed ?? 0;
-        set
-        {
-            var firstperosn = FirstPersonMovement;
-            if (firstperosn != null)
-                firstperosn.WalkSpeed = value;
-        }
-    }
-
-    public float RunSpeed
-    {
-        get => FirstPersonMovement?.SprintSpeed ?? 0;
-        set
-        {
-            var firstperosn = FirstPersonMovement;
-            if (firstperosn != null)
-                firstperosn.SprintSpeed = value;
-        }
-    }
-    public float CrouchingSpeed
-    {
-        get => FirstPersonMovement?.CrouchSpeed ?? 0;
-        set
-        {
-            var firstperosn = FirstPersonMovement;
-            if (firstperosn != null)
-                firstperosn.CrouchSpeed = value;
-        }
-    }
-
     /// <summary>
     /// The player who disarmed the player
     /// </summary>
@@ -354,4 +311,24 @@ public partial class SynapsePlayer
     /// The ip address of the player
     /// </summary>
     public string IpAddress => QueryProcessor._ipAddress;
+
+    /// <summary>
+    /// The sneak speed of the curent roleTypeID
+    /// </summary>
+    public float SneakSpeed => FirstPersonMovement?.SneakSpeed ?? 0;
+
+    /// <summary>
+    /// The sneak warlk of the curent roleTypeID
+    /// </summary>
+    public float WalkSpeed => FirstPersonMovement?.WalkSpeed ?? 0;
+
+    /// <summary>
+    /// The sneak run of the curent roleTypeID
+    /// </summary>
+    public float RunSpeed => FirstPersonMovement?.SprintSpeed ?? 0;
+
+    /// <summary>
+    /// The sneak crouching of the curent roleTypeID
+    /// </summary>
+    public float CrouchingSpeed => FirstPersonMovement?.CrouchSpeed ?? 0;
 }
