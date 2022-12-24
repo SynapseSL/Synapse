@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
 using HarmonyLib;
 using Interactables.Interobjects;
-using InventorySystem;
 using Mirror;
 using Neuron.Core.Meta;
-using Ninject.Infrastructure.Language;
 using PlayerRoles;
-using PlayerRoles.FirstPersonControl.Spawnpoints;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
@@ -33,17 +26,16 @@ public static class PlayerLoadComponentPatch
             var player = __instance.GetComponent<SynapsePlayer>();
             if (player == null)
             {
-                //At this point nothing is initiated inside the GameObject therefore is this the only solution I found
                 if (ReferenceHub.AllHubs.Count == 0)
                 {
                     player = __instance.gameObject.AddComponent<SynapseServerPlayer>();
                 }
                 else if (__instance.transform.parent == DummyService._dummyParent)
                 {
-                    __instance.transform.parent = null;//remove parent to avoid bug when the game try to get the hub by root
+                    __instance.transform.parent = null;
                     player = __instance.gameObject.AddComponent<DummyPlayer>();
                 }
-                else //Found other solution to not confound whit NW plugin dummy
+                else
                 {
                     player = __instance.gameObject.AddComponent<SynapsePlayer>();
                 }

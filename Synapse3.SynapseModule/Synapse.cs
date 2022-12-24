@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using CommandSystem.Commands.Shared;
 using GameCore;
-using HarmonyLib;
 using Neuron.Core;
 using Neuron.Core.Events;
 using Neuron.Core.Meta;
@@ -18,7 +17,6 @@ using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic.CustomAttributes;
 using Synapse3.SynapseModule.Map.Scp914;
-using Synapse3.SynapseModule.Patching;
 using Synapse3.SynapseModule.Permissions.RemoteAdmin;
 using Synapse3.SynapseModule.Role;
 using Synapse3.SynapseModule.Teams;

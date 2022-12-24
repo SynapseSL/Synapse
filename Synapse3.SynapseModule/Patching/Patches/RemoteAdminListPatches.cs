@@ -6,9 +6,7 @@ using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
-using PlayerRoles.Spectating;
 using PlayerStatsSystem;
-using PluginAPI.Core.Items;
 using RemoteAdmin;
 using RemoteAdmin.Communication;
 using Synapse3.SynapseModule.Config;
@@ -73,6 +71,7 @@ public static class RemoteAdminListPatch
                          : __instance.SortPlayers(sortingType))
             {
                 var player = hub.GetSynapsePlayer();
+                if (player.PlayerType == PlayerType.Dummy) continue;
                 if (player.Hub.Mode != ClientInstanceMode.ReadyClient &&
                     player.Hub.Mode != ClientInstanceMode.Host) continue;
 
@@ -106,8 +105,6 @@ public static class RemoteAdminListPatch
 
     private static string GenerateList(List<RemoteAdminPlayer> players, CommandSender sender)
     {
-        players.RemoveAll(p => p.Player is DummyPlayer dummy);//Remove Tab dummy
-
         var remoteAdminGroups = PermissionService.Groups.Select(x => new RemoteAdminGroup
         {
             Name = x.Key,
@@ -200,7 +197,7 @@ public static class RemoteAdminListPatch
             .Select(d => new RemoteAdminPlayer()
             {
                 Player = d.Player,
-                Text = $"({d.Player.PlayerId}) [Dummy] {d.Player.DisplayName}"
+                Text = $"<color={{RA_ClassColor}}>({d.Player.PlayerId}) {d.Player.DisplayName}</color>"
             });
 
         if (dummys.Any())

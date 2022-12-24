@@ -1,5 +1,4 @@
-﻿using Neuron.Core.Logging;
-using Synapse3.SynapseModule.Enums;
+﻿using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Permissions;
 using VoiceChat;
 

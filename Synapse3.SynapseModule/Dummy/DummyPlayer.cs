@@ -28,43 +28,55 @@ public class DummyPlayer : SynapsePlayer
         get
         {
             var mouseLook = FirstPersonMovement?.MouseLook;
-            if (mouseLook == null)
-                return new Quaternion(0, 0, 0, 0);
-            return Quaternion.Euler(mouseLook._syncHorizontal, mouseLook._curVertical, 0f);
-        }
-        set
-        {
-            var firstperson = FirstPersonMovement;
-            if (firstperson == null) return;
-            var euler = value.eulerAngles;
-            firstperson.MouseLook._syncHorizontal = euler.y;
-            firstperson.MouseLook._curVertical = euler.x;
-            firstperson.OnServerPositionOverwritten();
+            return mouseLook == null
+                ? new Quaternion(0, 0, 0, 0)
+                : Quaternion.Euler(mouseLook._syncHorizontal, mouseLook._curVertical, 0f);
         }
     }
 
-    public override float RotationVectical
+    public override float RotationVertical
     {
         get => FirstPersonMovement?.MouseLook._curVertical ?? 0;
-        set
-        {
-            var firstperson = FirstPersonMovement;
-            if (firstperson == null) return;
-            firstperson.MouseLook._curVertical = value;
-            firstperson.OnServerPositionOverwritten();
-        }
+    }
+    
+    public void SetRotation(Quaternion rotation)
+    {
+        var firstPerson = FirstPersonMovement;
+        if (firstPerson == null) return;
+        var euler = rotation.eulerAngles;
+        firstPerson.MouseLook._syncHorizontal = euler.y;
+        firstPerson.MouseLook._curVertical = euler.x;
+        firstPerson.OnServerPositionOverwritten();
+    }
+
+    public void SetRotation(Vector2 rotation)
+    {
+        var firstPerson = FirstPersonMovement;
+        if (firstPerson == null) return;
+        firstPerson.MouseLook._curHorizontal = rotation.x;
+        firstPerson.MouseLook._curVertical = rotation.y;
+        firstPerson.OnServerPositionOverwritten();
+    }
+
+    public void SetRotationVertical(float rotation)
+    {
+        var firstPerson = FirstPersonMovement;
+        if (firstPerson == null) return;
+        firstPerson.MouseLook._curVertical = rotation;
+        firstPerson.OnServerPositionOverwritten();
+    }
+
+    public void SetRotationHorizontal(float rotation)
+    {
+        var firstPerson = FirstPersonMovement;
+        if (firstPerson == null) return;
+        firstPerson.MouseLook._syncHorizontal = rotation;
+        firstPerson.OnServerPositionOverwritten();
     }
 
     public override float RotationHorizontal 
     {
         get => FirstPersonMovement?.MouseLook._syncHorizontal ?? 0;
-        set
-        {
-            var firstperson = FirstPersonMovement;
-            if (firstperson == null) return;
-            firstperson.MouseLook._syncHorizontal = value;
-            firstperson.OnServerPositionOverwritten();
-        }
     }
 
     public override Vector2 RotationVector2
@@ -72,17 +84,7 @@ public class DummyPlayer : SynapsePlayer
         get
         {
             var mouseLook = FirstPersonMovement?.MouseLook;
-            if (mouseLook == null)
-                return Vector2.zero;
-            return new Vector2(mouseLook._curHorizontal, mouseLook._curVertical);
-        }
-        set
-        {
-            var firstperson = FirstPersonMovement;
-            if (firstperson == null) return;
-            firstperson.MouseLook._curHorizontal = value.x;
-            firstperson.MouseLook._curVertical = value.y;
-            firstperson.OnServerPositionOverwritten();
+            return mouseLook == null ? Vector2.zero : new Vector2(mouseLook._curHorizontal, mouseLook._curVertical);
         }
     }
 

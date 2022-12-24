@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Synapse3.SynapseModule.Dummy;
+﻿namespace Synapse3.SynapseModule.Dummy;
 
 public enum MovementDirection
 {

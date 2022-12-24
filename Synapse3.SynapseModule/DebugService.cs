@@ -207,27 +207,35 @@ public class DebugService : Service
 
                 testDummy?.Destroy();
                 testDummy = new SynapseDummy(ev.Player.Position, ev.Player.Rotation, RoleTypeId.ClassD, "Test");
-                testDummy.Player.RoleType = RoleTypeId.NtfSergeant;
-                testDummy.Player.Position = ev.Player.Position;
-                testDummy.Player.Rotation = ev.Player.Rotation;
-                testDummy.Movement = PlayerMovementState.Crouching;
-                var service = Synapse.Get<PermissionService>();
-                var grouype = service.Groups["User"];
-                testDummy.Player.SynapseGroup = grouype;
+
+                Timing.CallDelayed(5f, () =>
+                {
+                    testDummy.Player.RoleType = RoleTypeId.NtfSergeant;
+                    testDummy.Player.Position = ev.Player.Position;
+                    testDummy.Player.SetRotation(ev.Player.Rotation);
+                    testDummy.Movement = PlayerMovementState.Crouching;
+                    var service = Synapse.Get<PermissionService>();
+                    var group = service.Groups["User"];
+                    testDummy.Player.SynapseGroup = group;
+                    testDummy.Name = "sadghas";
+                    testDummy.HeldItem = ItemType.GunLogicer;
+                });
                 break;
            
             case KeyCode.Alpha2:
-                testDummy.Player.RotationHorizontal = ev.Player.RotationHorizontal;
-                testDummy.Player.RotationVectical = ev.Player.RotationVectical; 
+                testDummy.RotationHorizontal = ev.Player.RotationHorizontal;
+                testDummy.RotationVertical = ev.Player.RotationVertical; 
+                testDummy.Movement = PlayerMovementState.Walking;
+                testDummy.Direction = MovementDirection.Forward;
+                testDummy.RaVisible = !testDummy.RaVisible;
                 break;
 
             case KeyCode.Alpha3:
-                testDummy.Movement = PlayerMovementState.Walking;
-                testDummy.Direction = MovementDirection.Forward;
+                Logger.Warn(ev.Player.Rotation.eulerAngles);
             break;
 
             case KeyCode.Alpha4:
-                testDummy.RaVisible = !testDummy.RaVisible;
+
                 break;
 
             case KeyCode.Alpha5:

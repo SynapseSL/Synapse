@@ -147,14 +147,6 @@ public partial class SynapsePlayer
         set => FirstPersonMovement.CurrentMovementState = value;
     }
 
-    //TODO:
-    /*
-    /// <summary>
-    /// Freezes the Player in his current location
-    /// </summary>
-    public bool StopInput { get => Hub.fpc.NetworkforceStopInputs; set => Hub.fpc.NetworkforceStopInputs = value; }
-    */
-
     /// <summary>
     /// The current health of the player
     /// </summary>

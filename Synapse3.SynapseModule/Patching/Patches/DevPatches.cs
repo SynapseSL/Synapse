@@ -18,27 +18,3 @@ public static class DevPatches
     }
 }
 #endif
-
-#if DEBUG
-using System;
-using CustomPlayerEffects;
-using HarmonyLib;
-using InventorySystem.Items.Coin;
-using InventorySystem.Items.Firearms;
-using InventorySystem.Items.Firearms.BasicMessages;
-using InventorySystem.Items.Firearms.Modules;
-using Mirror;
-using Neuron.Core.Logging;
-using Neuron.Core.Meta;
-using PlayerRoles.FirstPersonControl.NetworkMessages;
-using PlayerRoles.Voice;
-using RelativePositioning;
-using Synapse3.SynapseModule.Dummy;
-
-[Automatic]
-[SynapsePatch("Debug", PatchType.Dev)]
-public static class TestPatches
-{
-
-}
-#endif

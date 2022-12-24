@@ -21,11 +21,13 @@ namespace Synapse3.SynapseModule.Dummy;
 
 public class SynapseDummy : DefaultSynapseObject, IRefreshable
 {
-    private readonly MapService _map;
     private readonly DummyService _dummy;
     private readonly PlayerService _player;
+    
     public MovementDirection Direction { get; set; }
 
+    public FakeConnection FakeConnection { get; }
+    
     public bool RaVisible
     {
         get => Player.RaVisible;
@@ -37,9 +39,9 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         get => Player.WalkSpeed;
         set
         {
-            var firstperosn = Player.FirstPersonMovement;
-            if (firstperosn != null)
-                firstperosn.WalkSpeed = value;
+            var firstPerson = Player.FirstPersonMovement;
+            if (firstPerson != null)
+                firstPerson.WalkSpeed = value;
         }
     }
 
@@ -48,9 +50,9 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         get => Player.SneakSpeed;
         set
         {
-            var firstperosn = Player.FirstPersonMovement;
-            if (firstperosn != null)
-                firstperosn.SneakSpeed = value;
+            var firstPerson = Player.FirstPersonMovement;
+            if (firstPerson != null)
+                firstPerson.SneakSpeed = value;
         }
     }
 
@@ -59,9 +61,9 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         get => Player.RunSpeed;
         set
         {
-            var firstperosn = Player.FirstPersonMovement;
-            if (firstperosn != null)
-                firstperosn.SprintSpeed = value;
+            var firstPerson = Player.FirstPersonMovement;
+            if (firstPerson != null)
+                firstPerson.SprintSpeed = value;
         }
     }
 
@@ -70,9 +72,9 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         get => Player.CrouchingSpeed;
         set
         {
-            var firstperosn = Player.FirstPersonMovement;
-            if (firstperosn != null)
-                firstperosn.CrouchSpeed = value;
+            var firstPerson = Player.FirstPersonMovement;
+            if (firstPerson != null)
+                firstPerson.CrouchSpeed = value;
         }
     }
 
@@ -94,24 +96,24 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
     public override Quaternion Rotation
     {
         get => Player.Rotation;
-        set => Player.Rotation = value;
+        set => Player.SetRotation(value);
     }
 
     public Vector2 RotationVector2
     {
         get => Player.RotationVector2;
-        set => Player.RotationVector2 = value;
+        set => Player.SetRotation(value);
     }
-    public float RotationVectical
+    public float RotationVertical
     {
-        get => Player.RotationVectical;
-        set => Player.RotationVectical = value;
+        get => Player.RotationVertical;
+        set => Player.SetRotationVertical(value);
     }
 
     public float RotationHorizontal
     {
         get => Player.RotationHorizontal;
-        set => Player.RotationHorizontal = value;
+        set => Player.SetRotationHorizontal(value);
     }
 
     public override Vector3 Scale
@@ -123,7 +125,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
     public string Name
     {
         get => Player.NickName;
-        set => Player.NicknameSync.Network_myNickSync = value;
+        set => Player.DisplayName = value;
     }
 
     public ItemType HeldItem
@@ -158,17 +160,17 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
 
     private SynapseDummy(Vector3 position, RoleTypeId role, string name, string badge, string badgeColor)
     {
-        _map = Synapse.Get<MapService>();
         _dummy = Synapse.Get<DummyService>();
         _player = Synapse.Get<PlayerService>();
 
         GameObject = Object.Instantiate(NetworkManager.singleton.playerPrefab, _dummy._dummyParent);
         Player = GameObject.GetComponent<DummyPlayer>();
-        var hub = GameObject.GetComponent<ReferenceHub>();
-        var comp = GameObject.AddComponent<SynapseObjectScript>();//found other solution
+
+        var comp = GameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
-        fakeConnection = new FakeConnection(Player.Hub._playerId);
-        NetworkServer.AddPlayerForConnection(fakeConnection, GameObject);
+        
+        FakeConnection = new FakeConnection(Player.Hub._playerId);
+        NetworkServer.AddPlayerForConnection(FakeConnection, GameObject);
 
         Player.SynapseDummy = this;
         Player.RoleType = role;
@@ -290,7 +292,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
             }
             catch (Exception e)
             {
-                NeuronLogger.For<Synapse>().Error($"Sy3 Dummy: Update Failed:\n{e}");
+                SynapseLogger<Synapse>.Error($"Sy3 Dummy: Update Failed:\n{e}");
             }
         }
     }
@@ -299,16 +301,9 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
 
     public override void ShowAll() => Spawn();
 
-    public override void HideFromPlayer(SynapsePlayer player)
-    {
-        Player.NetworkIdentity?.UnSpawnForOnePlayer(player);
-    
-    }
+    public override void HideFromPlayer(SynapsePlayer player) => Player.NetworkIdentity?.UnSpawnForOnePlayer(player);
 
-    FakeConnection fakeConnection;
-
-    public override void ShowPlayer(SynapsePlayer player)
-    {
-        //TODO:
-    }
+    public override void ShowPlayer(SynapsePlayer player) =>
+        SynapseLogger<SynapseDummy>.Warn(
+            "Plugin tried to show Dummy to a specific Player. This Feature is currently not implemented");
 }

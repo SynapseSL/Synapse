@@ -2,15 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Neuron.Core.Logging;
 using Neuron.Core.Meta;
-using PluginAPI.Core;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Permissions;
 using Synapse3.SynapseModule.Permissions.RemoteAdmin;
-using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
 
@@ -241,28 +238,31 @@ public class PlayerService : Service
                 case "ADMIN":
                 case "STAFF":
                     foreach (var player in all)
+                    {
                         if (player.ServerRoles.RemoteAdmin)
                             players.Add(player);
+                    }
                     continue;
 
                 case "NW":
                 case "NORTHWOOD":
                 case "GLOBALSTAFF":
                     foreach (var player in all)
+                    {
                         if (player.ServerRoles.Staff)
                             players.Add(player);
+                    }
                     break;
-
-                case "DM":
+                
                 case "NPC":
                 case "DUMMY":
-                    NeuronLogger.For<Synapse>().Warn("parameter: " + parameter.ToUpper());
                     foreach (var player in all)
-                        if (player is DummyPlayer dummy && dummy.RaVisible)
+                    {
+                        if (player is DummyPlayer { RaVisible: true })
                             players.Add(player);
+                    }
                     break;
-
-                case "DE":
+                
                 case "DEFAULT":
                     foreach (var player in Players)
                     {

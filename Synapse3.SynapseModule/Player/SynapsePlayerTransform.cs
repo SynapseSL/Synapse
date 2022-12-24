@@ -46,18 +46,9 @@ public partial class SynapsePlayer
         get
         {
             var mouseLook = FirstPersonMovement?.MouseLook;
-            if (mouseLook == null)
-                return new Quaternion(0, 0, 0, 0);
-            return Quaternion.Euler(mouseLook.CurrentHorizontal, mouseLook.CurrentVertical, 0f);
-        }
-        set
-        {
-            var firstperson = FirstPersonMovement;
-            if (firstperson == null) return;
-            var euler = value.eulerAngles;
-            var deltaV  = value.x + euler.x;
-            var deltaH = value.y - euler.y;
-            FirstPersonMovement.ServerOverridePosition(Position, new Vector3(deltaV, deltaH, 0));//Maby work in futur update
+            return mouseLook == null
+                ? new Quaternion(0, 0, 0, 0)
+                : Quaternion.Euler(mouseLook.CurrentHorizontal, mouseLook.CurrentVertical, 0f);
         }
     }
 
@@ -69,17 +60,9 @@ public partial class SynapsePlayer
         get
         {
             var mouseLook = FirstPersonMovement?.MouseLook;
-            if (mouseLook == null)
-                return Vector2.zero;
-            return new Vector2(mouseLook.CurrentHorizontal, mouseLook.CurrentVertical);
-        } 
-        set
-        {
-            var firstperson = FirstPersonMovement;
-            if (firstperson == null) return;
-            var deltaV = value.x - firstperson.MouseLook.CurrentVertical;
-            var deltaH = value.y - firstperson.MouseLook.CurrentHorizontal;
-            FirstPersonMovement.ServerOverridePosition(Position, new Vector3(deltaV, deltaH, 0));//Maby work in futur update
+            return mouseLook == null
+                ? Vector2.zero
+                : new Vector2(mouseLook.CurrentHorizontal, mouseLook.CurrentVertical);
         }
     }
 
@@ -87,32 +70,12 @@ public partial class SynapsePlayer
     /// <summary>
     /// The Rotation of the Player on the X axe (min 0, max 360)
     /// </summary>
-    public virtual float RotationHorizontal
-    {
-        get => FirstPersonMovement?.MouseLook.CurrentHorizontal ?? 0;
-        set
-        {
-            var firstperson = FirstPersonMovement;
-            if (firstperson == null) return;
-            var delta = value - firstperson.MouseLook.CurrentHorizontal;
-            firstperson.ServerOverridePosition(Position, new Vector3(0, delta, 0));
-        }
-    }
+    public virtual float RotationHorizontal => FirstPersonMovement?.MouseLook.CurrentHorizontal ?? 0;
 
     /// <summary>
     /// The Rotation of the Player on the Y axe (min -88, max 88)
     /// </summary>
-    public virtual float RotationVectical
-    {
-        get => FirstPersonMovement?.MouseLook.CurrentVertical ?? 0;
-        set
-        {
-            var firstperson = FirstPersonMovement;
-            if (firstperson == null) return;
-            var delta = value - firstperson.MouseLook.CurrentVertical;
-            firstperson.ServerOverridePosition(Position, new Vector3(delta, 0, 0));//Maby work in futur update
-        }
-    }
+    public virtual float RotationVertical => FirstPersonMovement?.MouseLook.CurrentVertical ?? 0;
 
     public Vector3 Scale
     {
@@ -144,7 +107,8 @@ public partial class SynapsePlayer
         set
         {
             Position = value.GetMapPosition();
-            Rotation = value.GetMapRotation();
+            //Not possible currently
+            //Rotation = value.GetMapRotation();
         }
     }
 

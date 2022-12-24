@@ -34,7 +34,7 @@ public static class Synapse3Extensions
 {
     private static readonly PlayerService _player;
     private static readonly ItemService _item;
-    private static readonly MirrorService _miror;
+    private static readonly MirrorService _mirror;
     private static readonly SynapseConfigService _config;
     private static readonly RoomService _room;
     private static readonly MapService _map;
@@ -45,7 +45,7 @@ public static class Synapse3Extensions
     {
         _player = Synapse.Get<PlayerService>();
         _item = Synapse.Get<ItemService>();
-        _miror = Synapse.Get<MirrorService>();
+        _mirror = Synapse.Get<MirrorService>();
         _config = Synapse.Get<SynapseConfigService>();
         _room = Synapse.Get<RoomService>();
         _map = Synapse.Get<MapService>();
@@ -75,7 +75,7 @@ public static class Synapse3Extensions
     /// Updates Position Rotation and Scale of an NetworkObject for all players
     /// </summary>
     public static void UpdatePositionRotationScale(this NetworkIdentity identity)
-        => NetworkServer.SendToAll(_miror.GetSpawnMessage(identity));
+        => NetworkServer.SendToAll(_mirror.GetSpawnMessage(identity));
     
     
 
