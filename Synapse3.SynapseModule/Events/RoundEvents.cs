@@ -60,7 +60,15 @@ public partial class RoundEvents : Service
 
 public class RoundStartEvent : IEvent { }
 
-public class RoundEndEvent : IEvent { }
+public class RoundEndEvent : IEvent
+{
+    public RoundEndEvent(RoundSummary.LeadingTeam winningTeam)
+    {
+        WinningTeam = winningTeam;
+    }
+
+    public RoundSummary.LeadingTeam WinningTeam { get; }
+}
 
 public class RoundWaitingEvent : IEvent
 {

@@ -1,6 +1,9 @@
 ﻿using MEC;
 using Mirror;
+using Neuron.Core.Logging;
 using PlayerRoles;
+using PlayerRoles.FirstPersonControl.NetworkMessages;
+using PlayerRoles.SpawnData;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -9,56 +12,81 @@ namespace Synapse3.SynapseModule.Dummy;
 
 public class DummyPlayer : SynapsePlayer
 {
-    //TODO:
-    /*
     public override PlayerType PlayerType => PlayerType.Dummy;
 
-    public override RoleTypeId RoleType
-    {
-        set
-        {
-            //TODO: Set Dummy Role
-            NetworkServer.UnSpawn(gameObject);
-            //ClassManager.CurClass = value;
-            NetworkServer.Spawn(gameObject);
-        }
+    private bool _raVisble = false;
+    public bool RaVisible 
+    { 
+        get => _raVisble; 
+        set => _raVisble = value; 
     }
+
+    public bool DestroyWhenDied { get; set; } = true;
 
     public override Quaternion Rotation
     {
-        get => transform.localRotation;
-        set
+        get
         {
-            var euler = value.eulerAngles;
-            PlayerMovementSync.Rotations = new Vector2(euler.x, euler.y);
-            transform.localRotation = value;
+            var mouseLook = FirstPersonMovement?.MouseLook;
+            return mouseLook == null
+                ? new Quaternion(0, 0, 0, 0)
+                : Quaternion.Euler(mouseLook._syncHorizontal, mouseLook._curVertical, 0f);
         }
+    }
+
+    public override float RotationVertical
+    {
+        get => FirstPersonMovement?.MouseLook._curVertical ?? 0;
+    }
+    
+    public void SetRotation(Quaternion rotation)
+    {
+        var firstPerson = FirstPersonMovement;
+        if (firstPerson == null) return;
+        var euler = rotation.eulerAngles;
+        firstPerson.MouseLook._syncHorizontal = euler.y;
+        firstPerson.MouseLook._curVertical = euler.x;
+        firstPerson.OnServerPositionOverwritten();
+    }
+
+    public void SetRotation(Vector2 rotation)
+    {
+        var firstPerson = FirstPersonMovement;
+        if (firstPerson == null) return;
+        firstPerson.MouseLook._curHorizontal = rotation.x;
+        firstPerson.MouseLook._curVertical = rotation.y;
+        firstPerson.OnServerPositionOverwritten();
+    }
+
+    public void SetRotationVertical(float rotation)
+    {
+        var firstPerson = FirstPersonMovement;
+        if (firstPerson == null) return;
+        firstPerson.MouseLook._curVertical = rotation;
+        firstPerson.OnServerPositionOverwritten();
+    }
+
+    public void SetRotationHorizontal(float rotation)
+    {
+        var firstPerson = FirstPersonMovement;
+        if (firstPerson == null) return;
+        firstPerson.MouseLook._syncHorizontal = rotation;
+        firstPerson.OnServerPositionOverwritten();
+    }
+
+    public override float RotationHorizontal 
+    {
+        get => FirstPersonMovement?.MouseLook._syncHorizontal ?? 0;
     }
 
     public override Vector2 RotationVector2
     {
-        get => base.RotationVector2;
-        set => ReceiveRotation(value);
+        get
+        {
+            var mouseLook = FirstPersonMovement?.MouseLook;
+            return mouseLook == null ? Vector2.zero : new Vector2(mouseLook._curHorizontal, mouseLook._curVertical);
+        }
     }
-
-    public override float RotationFloat
-    {
-        get => base.RotationFloat;
-        set => ReceiveRotation(new Vector2(0f, value));
-    }
-
-    public override PlayerMovementSync.PlayerRotation PlayerRotation
-    {
-        get => base.PlayerRotation;
-        set => ReceiveRotation(new Vector2(value.x ?? 0f, value.y ?? 0f));
-    }
-
-    private void ReceiveRotation(Vector2 rotation)
-    {
-        PlayerMovementSync.Rotations = rotation;
-        transform.localRotation = Quaternion.Euler(0f, PlayerMovementSync.Rotations.y, 0f);
-    }
-    */ 
 
     public override void Awake()
     {

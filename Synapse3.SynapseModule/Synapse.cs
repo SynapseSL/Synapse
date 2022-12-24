@@ -76,13 +76,14 @@ public partial class Synapse : Module
         BuildInfoCommand.ModDescription = "Plugin Framework: Synapse\n" +
                                           $"Synapse Version: {GetVersion()}\n" +
                                           "Description: Synapse is a heavily modded server software using extensive runtime patching to make development faster and the usage more accessible to end-users";
-        
-        if(BasedGameVersion != Version.VersionString)
+
+        if (BasedGameVersion != Version.VersionString)
             Logger.Warn($"Sy3 Version: This Version of Synapse3 is build for SCPSL Version {BasedGameVersion} Currently installed: {Version.VersionString}\nBugs may occurs");
     }
 
     public override void Enable()
     {
+
         SynapseCommandService = _kernel.GetSafe<SynapseCommandService>();
         RoleService = _kernel.GetSafe<RoleService>();
         TeamService = _kernel.GetSafe<TeamService>();
@@ -92,7 +93,7 @@ public partial class Synapse : Module
         RoomService = _kernel.GetSafe<RoomService>();
         RemoteAdminCategoryService = _kernel.GetSafe<RemoteAdminCategoryService>();
         DatabaseService = _kernel.GetSafe<DatabaseService>();
-        
+
         //EventHandlers are the only Bindings that are loaded during the Enable Method of Synapse to ensure that the EventServices are all enabled
         while (ModuleListenerBindingQueue.Count > 0)
         {

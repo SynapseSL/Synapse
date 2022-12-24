@@ -32,8 +32,6 @@ public partial class SynapsePlayer
 
     public PlayerInteract PlayerInteract => Hub.playerInteract;
 
-    public AnimationController AnimationController => Hub.animationController;
-
     public NicknameSync NicknameSync => Hub.nicknameSync;
 
     public QueryProcessor QueryProcessor => Hub.queryProcessor;

@@ -1,9 +1,9 @@
-﻿#if DEV
+﻿namespace Synapse3.SynapseModule.Patching.Patches;
+
+#if DEV
 using System;
 using HarmonyLib;
 using Neuron.Core.Meta;
-
-namespace Synapse3.SynapseModule.Patching.Patches;
 
 [Automatic]
 [SynapsePatch("No ServerList",PatchType.Dev)]

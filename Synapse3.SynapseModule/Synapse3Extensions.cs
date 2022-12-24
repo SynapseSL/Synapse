@@ -14,9 +14,9 @@ using Mirror;
 using Neuron.Core.Events;
 using Neuron.Core.Logging;
 using Neuron.Modules.Configs.Localization;
-using PlayableScps;
 using PlayerRoles;
 using PlayerStatsSystem;
+using PluginAPI.Core.Items;
 using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
@@ -32,6 +32,27 @@ using UnityEngine;
 
 public static class Synapse3Extensions
 {
+    private static readonly PlayerService _player;
+    private static readonly ItemService _item;
+    private static readonly MirrorService _mirror;
+    private static readonly SynapseConfigService _config;
+    private static readonly RoomService _room;
+    private static readonly MapService _map;
+    private static readonly RoundService _round;
+    private static readonly ServerService _server;
+
+    static Synapse3Extensions()
+    {
+        _player = Synapse.Get<PlayerService>();
+        _item = Synapse.Get<ItemService>();
+        _mirror = Synapse.Get<MirrorService>();
+        _config = Synapse.Get<SynapseConfigService>();
+        _room = Synapse.Get<RoomService>();
+        _map = Synapse.Get<MapService>();
+        _round = Synapse.Get<RoundService>();
+        _server = Synapse.Get<ServerService>();
+    }
+
     // FunFact: This method is the oldest method in Synapse and was originally created even before Synapse for an Exiled 1.0 Plugin
     /// <summary>
     /// Sends a message to the sender in the RemoteAdmin
@@ -54,7 +75,7 @@ public static class Synapse3Extensions
     /// Updates Position Rotation and Scale of an NetworkObject for all players
     /// </summary>
     public static void UpdatePositionRotationScale(this NetworkIdentity identity)
-        => NetworkServer.SendToAll(Synapse.Get<MirrorService>().GetSpawnMessage(identity));
+        => NetworkServer.SendToAll(_mirror.GetSpawnMessage(identity));
     
     
 
@@ -93,7 +114,7 @@ public static class Synapse3Extensions
 
         if (!ev2.Allow)
         {
-            var items = Synapse.Get<SynapseConfigService>().GamePlayConfiguration.RemoteKeyCard
+            var items = _config.GamePlayConfiguration.RemoteKeyCard
                 ? player.Inventory.Items.ToList()
                 : new List<SynapseItem> { player.Inventory.ItemInHand };
 
@@ -123,17 +144,14 @@ public static class Synapse3Extensions
     public static SynapsePlayer GetSynapsePlayer(this NetworkConnection connection) => connection?.identity?.GetSynapsePlayer();
     public static SynapsePlayer GetSynapsePlayer(this MonoBehaviour mono) => mono?.gameObject?.GetComponent<SynapsePlayer>();
     public static SynapsePlayer GetSynapsePlayer(this GameObject gameObject) => gameObject?.GetComponent<SynapsePlayer>();
-    public static SynapsePlayer GetSynapsePlayer(this PlayableScp scp) => scp?.Hub?.GetSynapsePlayer();
-    public static SynapsePlayer GetSynapsePlayer(this CommandSender sender) => Synapse.Get<PlayerService>()
+    public static SynapsePlayer GetSynapsePlayer(this CommandSender sender) => _player
         .GetPlayer(x => x.CommandSender == sender, PlayerType.Dummy, PlayerType.Player, PlayerType.Server);
     public static SynapsePlayer GetSynapsePlayer(this StatBase stat) => stat.Hub.GetSynapsePlayer();
     public static SynapsePlayer GetSynapsePlayer(this Footprint footprint) => footprint.Hub?.GetSynapsePlayer();
 
     
-    public static SynapseItem GetItem(this ItemPickupBase pickupBase) =>
-        Synapse.Get<ItemService>().GetSynapseItem(pickupBase.Info.Serial);
-    public static SynapseItem GetItem(this ItemBase itemBase) =>
-        Synapse.Get<ItemService>().GetSynapseItem(itemBase.ItemSerial);
+    public static SynapseItem GetItem(this ItemPickupBase pickupBase) => _item.GetSynapseItem(pickupBase.Info.Serial);
+    public static SynapseItem GetItem(this ItemBase itemBase) => _item.GetSynapseItem(itemBase.ItemSerial);
 
     
     /// <summary>
@@ -165,8 +183,7 @@ public static class Synapse3Extensions
 
         return DamageType.Unknown;
     }
-    public static IRoom GetRoom(this RoomType type) =>
-        Synapse.Get<RoomService>()._rooms.FirstOrDefault(x => x.Id == (int)type);
+    public static IRoom GetRoom(this RoomType type) => _room._rooms.FirstOrDefault(x => x.Id == (int)type);
 
     //TODO:
     /*
@@ -175,7 +192,7 @@ public static class Synapse3Extensions
         */
 
 
-    public static IVanillaRoom GetVanillaRoom(this RoomIdentifier identifier) => (IVanillaRoom)Synapse.Get<RoomService>()._rooms
+    public static IVanillaRoom GetVanillaRoom(this RoomIdentifier identifier) => (IVanillaRoom)_room._rooms
         .FirstOrDefault(x => x.GameObject == identifier.gameObject);
     
     public static SynapseDoor GetSynapseDoor(this DoorVariant variant)
@@ -251,16 +268,16 @@ public static class Synapse3Extensions
     */
 
     
-    public static SynapseTesla GetSynapseTesla(this TeslaGate gate) =>
-        Synapse.Get<MapService>()._synapseTeslas.FirstOrDefault(x => x.Gate == gate);
+    public static SynapseTesla GetSynapseTesla(this TeslaGate gate) => _map
+        ._synapseTeslas.FirstOrDefault(x => x.Gate == gate);
 
     //TODO:
     /*
     public static IElevator GetSynapseElevator(this Lift lift) =>
         Synapse.Get<ElevatorService>().Elevators
             .FirstOrDefault(x => x is SynapseElevator elevator && elevator.Lift == lift);
-    public static SynapseCamera GetCamera(this Camera079 cam) =>
-        Synapse.Get<MapService>()._synapseCameras.FirstOrDefault(x => x.Camera == cam);
+    public static SynapseCamera GetCamera(this Camera079 cam) => _map
+            ._synapseCameras.FirstOrDefault(x => x.Camera == cam);
         */
 
     
@@ -270,7 +287,7 @@ public static class Synapse3Extensions
             player.CustomRole?.GetFriendsID().Any(x => x == (int)Team.SCPs) != true) return true;
         
         if (message)
-            player.SendHint(Synapse.Get<SynapseConfigService>().Translation.Get(player).ScpTeam);
+            player.SendHint(_config.Translation.Get(player).ScpTeam);
         return false;
 
     }
@@ -280,8 +297,7 @@ public static class Synapse3Extensions
         {
             bool allow;
 
-            if (Synapse.Get<RoundService>().RoundEnded &&
-                Synapse.Get<SynapseConfigService>().GamePlayConfiguration.AutoFriendlyFire)
+            if (_round.RoundEnded && _config.GamePlayConfiguration.AutoFriendlyFire)
             {
                 allow = true;
             }
@@ -301,7 +317,7 @@ public static class Synapse3Extensions
             {
                 if (attacker.Team == Team.SCPs && victim.Team == Team.SCPs) allow = false;
 
-                var ff = ignoreFFConfig || Synapse.Get<ServerService>().FF;
+                var ff = ignoreFFConfig || _server.FF;
 
                 if (ff)
                 {
@@ -318,13 +334,13 @@ public static class Synapse3Extensions
                 if (attacker.CustomRole != null && attacker.CustomRole.GetFriendsID().Any(x => x == victim.TeamID))
                 {
                     allow = false;
-                    attacker.SendHint(Synapse.Get<SynapseConfigService>().Translation.Get(attacker).SameTeam);
+                    attacker.SendHint(_config.Translation.Get(attacker).SameTeam);
                 }
 
                 if (victim.CustomRole != null && victim.CustomRole.GetFriendsID().Any(x => x == attacker.TeamID))
                 {
                     allow = false;
-                    attacker.SendHint(Synapse.Get<SynapseConfigService>().Translation.Get(attacker).SameTeam);
+                    attacker.SendHint(_config.Translation.Get(attacker).SameTeam);
                 }
             }
 
@@ -341,7 +357,7 @@ public static class Synapse3Extensions
 
     public static TTranslation Get<TTranslation>(this TTranslation translation)
         where TTranslation : Translations<TTranslation>, new()
-        => translation.WithLocale(Synapse.Get<SynapseConfigService>().HostingConfiguration.Language);
+        => translation.WithLocale(_config.HostingConfiguration.Language);
 
     public static TTranslation Get<TTranslation>(this TTranslation translation, SynapsePlayer player)
         where TTranslation : Translations<TTranslation>, new()

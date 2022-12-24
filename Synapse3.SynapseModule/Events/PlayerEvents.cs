@@ -315,20 +315,14 @@ public class WarheadPanelInteractEvent : PlayerInteractEvent
     }
 }
 
-public class BanEvent : PlayerInteractEvent
+public class BanEvent : KickEvent
 {
     public BanEvent(SynapsePlayer player, bool allow, SynapsePlayer admin, string reason, long duration,
-        bool global) : base(player, allow)
+        bool global) : base(player, admin, reason, allow)
     {
-        Admin = admin;
-        Reason = reason;
         Duration = duration;
         GlobalBan = global;
     }
-
-    public SynapsePlayer Admin { get; }
-
-    public string Reason { get; set; }
 
     public long Duration { get; set; }
 

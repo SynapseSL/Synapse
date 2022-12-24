@@ -25,6 +25,15 @@ using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
+using Synapse3.SynapseModule.Dummy;
+using GameCore;
+using PluginAPI.Core;
+using System.Diagnostics;
+using PluginAPI.Events;
+using PluginAPI.Core.Interfaces;
+using InventorySystem.Items.Firearms;
+using PluginAPI.Core.Attributes;
+using Synapse3.SynapseModule.Permissions;
 using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule;
@@ -60,7 +69,7 @@ public class DebugService : Service
         _player.KeyPress.Subscribe(OnKeyPress);
         _round.SelectTeam.Subscribe(SelectTeam);
         _round.SpawnTeam.Subscribe(SpawnTeam);
-        
+
         _item.KeyCardInteract.Subscribe(KeyCardItem);
         _item.BasicInteract.Subscribe(BasicItem);
         
@@ -187,42 +196,75 @@ public class DebugService : Service
     {
         NeuronLogger.For<Synapse>().Warn("SpawnTeam: " + ev.TeamId);
     }
-    
+
+    SynapseDummy testDummy;
+    SynapseSchematic Schematic;
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                Timing.RunCoroutine(Rag(ev.Player));
+
+                testDummy?.Destroy();
+                testDummy = new SynapseDummy(ev.Player.Position, ev.Player.Rotation, RoleTypeId.ClassD, "Test");
+
+                Timing.CallDelayed(5f, () =>
+                {
+                    testDummy.Player.RoleType = RoleTypeId.NtfSergeant;
+                    testDummy.Player.Position = ev.Player.Position;
+                    testDummy.Player.SetRotation(ev.Player.Rotation);
+                    testDummy.Movement = PlayerMovementState.Crouching;
+                    var service = Synapse.Get<PermissionService>();
+                    var group = service.Groups["User"];
+                    testDummy.Player.SynapseGroup = group;
+                    testDummy.Name = "sadghas";
+                    testDummy.HeldItem = ItemType.GunLogicer;
+                });
                 break;
+           
             case KeyCode.Alpha2:
-                var rag = new SynapseRagDoll(ev.Player.RoleType, ev.Player.Position, ev.Player.Rotation, Vector3.one * 2, Synapse.Get<PlayerService>().Host,
-                    new WarheadDamageHandler(), "TestRag");
-                Timing.CallDelayed(3f,
-                    () =>
-                    {
-                        rag.SendFakeInfoToPlayer(ev.Player,
-                            new RagdollData(Synapse.Get<PlayerService>().Host,
-                                new CustomReasonDamageHandler("Hello There"), RoleTypeId.Scp096, ev.Player.Position,
-                                ev.Player.Rotation, "New Nick I guess", NetworkTime.time));
-                    });
+                testDummy.RotationHorizontal = ev.Player.RotationHorizontal;
+                testDummy.RotationVertical = ev.Player.RotationVertical; 
+                testDummy.Movement = PlayerMovementState.Walking;
+                testDummy.Direction = MovementDirection.Forward;
+                testDummy.RaVisible = !testDummy.RaVisible;
                 break;
-        }
-    }
 
-    private IEnumerator<float> Rag(SynapsePlayer player)
-    {
-        foreach (var names in Synapse.Get<SchematicService>()._ragDollNames)
-        {
-            var rag = NetworkClient.prefabs.FirstOrDefault(x => x.Value.name == names.Key);
-            Logger.Warn(names.Key + "assumed role " + names.Value);
-            var obj = Object.Instantiate(rag.Value, player.Position, Quaternion.identity);
-            obj.GetComponent<BasicRagdoll>().Info = new RagdollData(player, new UniversalDamageHandler(), Vector3.zero,
-                Quaternion.identity);
-            Logger.Warn("Created Scale: "+ obj.transform.localScale);
-            NetworkServer.Spawn(obj);
+            case KeyCode.Alpha3:
+                Logger.Warn(ev.Player.Rotation.eulerAngles);
+            break;
 
-            yield return Timing.WaitForSeconds(1);
+            case KeyCode.Alpha4:
+
+                break;
+
+            case KeyCode.Alpha5:
+                testDummy.HideFromPlayer(ev.Player);
+                break;
+
+            case KeyCode.Alpha6:
+                testDummy.ShowPlayer(ev.Player);
+                break;
+
+            case KeyCode.Alpha7:
+                Schematic?.Destroy();
+                Schematic = Synapse.Get<SchematicService>().SpawnSchematic(2000, ev.Player.Position);
+                break;
+
+            case KeyCode.Alpha8:
+                Schematic.HideFromPlayer(ev.Player);
+                break;
+
+            case KeyCode.Alpha9:
+                Schematic.ShowPlayer(ev.Player);
+                break;
+
+            case KeyCode.Alpha0:
+                ev.Player.FakeRoleManager.VisibleRoleCondition.Add(
+                    (SynapsePlayer player) => player.Faction == Faction.FoundationEnemy,
+                    new RoleInfo(RoleTypeId.ChaosConscript, ev.Player));
+                ev.Player.FakeRoleManager.OwnVisibleRole = new RoleInfo(RoleTypeId.NtfPrivate, ev.Player);
+                break;
         }
     }
 }

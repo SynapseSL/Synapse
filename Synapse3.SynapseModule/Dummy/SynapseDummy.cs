@@ -1,33 +1,88 @@
-﻿using System;
-using System.Collections.Generic;
-using InventorySystem.Items;
+﻿using InventorySystem.Items;
+using InventorySystem.Items.Coin;
+using InventorySystem.Items.MicroHID;
 using MEC;
 using Mirror;
 using Neuron.Core.Logging;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
-using RemoteAdmin;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
+using YamlDotNet.Core.Tokens;
 using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule.Dummy;
 
 public class SynapseDummy : DefaultSynapseObject, IRefreshable
 {
-    private readonly MapService _map;
     private readonly DummyService _dummy;
-
+    private readonly PlayerService _player;
+    
     public MovementDirection Direction { get; set; }
 
-    public float SneakSpeed { get; set; } = 1.8f;
+    public FakeConnection FakeConnection { get; }
+    
+    public bool RaVisible
+    {
+        get => Player.RaVisible;
+        set => Player.RaVisible = value;
+    }
 
-    public float WalkSpeed { get; set; }
+    public float WalkSpeed
+    {
+        get => Player.WalkSpeed;
+        set
+        {
+            var firstPerson = Player.FirstPersonMovement;
+            if (firstPerson != null)
+                firstPerson.WalkSpeed = value;
+        }
+    }
 
-    public float RunSpeed { get; set; }
+    public float SneakSpeed
+    {
+        get => Player.SneakSpeed;
+        set
+        {
+            var firstPerson = Player.FirstPersonMovement;
+            if (firstPerson != null)
+                firstPerson.SneakSpeed = value;
+        }
+    }
+
+    public float RunSpeed
+    {
+        get => Player.RunSpeed;
+        set
+        {
+            var firstPerson = Player.FirstPersonMovement;
+            if (firstPerson != null)
+                firstPerson.SprintSpeed = value;
+        }
+    }
+
+    public float CrouchingSpeed
+    {
+        get => Player.CrouchingSpeed;
+        set
+        {
+            var firstPerson = Player.FirstPersonMovement;
+            if (firstPerson != null)
+                firstPerson.CrouchSpeed = value;
+        }
+    }
+
+    public bool DestroyWhenDied
+    {
+        get => Player.DestroyWhenDied;
+        set => Player.DestroyWhenDied = value;
+    }
 
     public override GameObject GameObject { get; }
     public override ObjectType Type => ObjectType.Dummy;
@@ -41,23 +96,25 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
     public override Quaternion Rotation
     {
         get => Player.Rotation;
-        set => Player.Rotation = value;
+        set => Player.SetRotation(value);
     }
 
-    //TODO:
-    /*
     public Vector2 RotationVector2
     {
         get => Player.RotationVector2;
-        set => Player.RotationVector2 = value;
+        set => Player.SetRotation(value);
+    }
+    public float RotationVertical
+    {
+        get => Player.RotationVertical;
+        set => Player.SetRotationVertical(value);
     }
 
-    public float RotationSimple
+    public float RotationHorizontal
     {
-        get => Player.RotationFloat;
-        set => Player.RotationFloat = value;
+        get => Player.RotationHorizontal;
+        set => Player.SetRotationHorizontal(value);
     }
-    */
 
     public override Vector3 Scale
     {
@@ -68,7 +125,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
     public string Name
     {
         get => Player.NickName;
-        set => Player.NicknameSync.Network_myNickSync = value;
+        set => Player.DisplayName = value;
     }
 
     public ItemType HeldItem
@@ -76,80 +133,61 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         get => Player.VanillaInventory.NetworkCurItem.TypeId;
         set => Player.VanillaInventory.NetworkCurItem = new ItemIdentifier(value, 0);
     }
-    
+
     public PlayerMovementState Movement
     {
-        get => Player.AnimationController.MoveState;
-        set
-        {
-            Player.AnimationController.MoveState = value;
-            Player.AnimationController.RpcReceiveState((byte)value);
-        }
+        get => Player.FirstPersonMovement.CurrentMovementState;
+        set => Player.FirstPersonMovement.CurrentMovementState = value;
     }
 
     public DummyPlayer Player { get; }
-    
+
     public bool PlayerUpdate { get; set; }
 
     public SynapseDummy(Vector3 position, Quaternion rotation, RoleTypeId role, string name, string badge = "",
-        string badgeColor = ""): this(position, role, name, badge, badgeColor)
+        string badgeColor = "") : this(position, role, name, badge, badgeColor)
     {
         PlayerUpdate = false;
-
         Rotation = rotation;
-        NetworkServer.Spawn(GameObject);
     }
 
     public SynapseDummy(Vector3 position, Vector2 rotation, RoleTypeId role, string name, string badge = "",
         string badgeColor = "") : this(position, role, name, badge, badgeColor)
     {
         PlayerUpdate = true;
-
-        //TODO:
-        //RotationVector2 = rotation;
-        NetworkServer.Spawn(GameObject);
-    }
-    
-    public SynapseDummy(Vector3 position, float rotation, RoleTypeId role, string name, string badge = "",
-        string badgeColor = "") : this(position, role, name, badge, badgeColor)
-    {
-        PlayerUpdate = true;
-
-        //RotationSimple = rotation;
-        NetworkServer.Spawn(GameObject);
+        RotationVector2 = rotation;
     }
 
     private SynapseDummy(Vector3 position, RoleTypeId role, string name, string badge, string badgeColor)
     {
-        _map = Synapse.Get<MapService>();
         _dummy = Synapse.Get<DummyService>();
-        
-        Player = Object.Instantiate(NetworkManager.singleton.playerPrefab, _dummy._dummyParent)
-            .GetComponent<DummyPlayer>();
-        GameObject = Player.gameObject;
+        _player = Synapse.Get<PlayerService>();
+
+        GameObject = Object.Instantiate(NetworkManager.singleton.playerPrefab, _dummy._dummyParent);
+        Player = GameObject.GetComponent<DummyPlayer>();
+
         var comp = GameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
         
+        FakeConnection = new FakeConnection(Player.Hub._playerId);
+        NetworkServer.AddPlayerForConnection(FakeConnection, GameObject);
+
         Player.SynapseDummy = this;
-        var transform = Player.transform;
-        transform.localScale = Vector3.one;
-        transform.position = position;
-        //Player.PlayerMovementSync.RealModelPosition = position;
-        
-        //TODO:
-        //Player.QueryProcessor.NetworkPlayerId = QueryProcessor._idIterator;
-        Player.QueryProcessor._ipAddress = Synapse.Get<PlayerService>().Host.IpAddress;
-        //Player.ClassManager.CurClass = role;
+        Player.RoleType = role;
         Player.Health = Player.MaxHealth;
         Player.NicknameSync.Network_myNickSync = name;
         Player.RankName = badge;
         Player.RankColor = badgeColor;
+        Player.Position = position;
+        Player.Hub.characterClassManager.InstanceMode = ClientInstanceMode.Unverified;
 
-        //Player.PlayerMovementSync.NetworkGrounded = true;
-        //RunSpeed = CharacterClassManager._staticClasses[(int)role].runSpeed;
-        //WalkSpeed = CharacterClassManager._staticClasses[(int)role].walkSpeed;
+        if (Player.ExistsInSpace)
+        {
+            Player.FirstPersonMovement.IsGrounded = true;
+        }
+
         _ = Timing.RunCoroutine(UpdateMovement());
-        
+
         MoveInElevator = true;
     }
 
@@ -185,23 +223,21 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
 
     public void Spawn()
         => NetworkServer.Spawn(GameObject);
-    
-    
+
     //Thanks to GameHunt.I used some of his code for the Dummy API https://github.com/gamehunt/CustomNPCs
     private IEnumerator<float> UpdateMovement()
     {
-        for (;;)
+        Vector3 lastPos = Vector3.zero;
+
+        while (true)
         {
             yield return Timing.WaitForSeconds(0.1f);
+
             try
             {
                 if (GameObject == null) yield break;
-                if (Direction == MovementDirection.None)
-                {
-                    continue;
-                }
+                if (Direction == MovementDirection.None || !Player.ExistsInSpace) continue;
 
-                var wall = false;
                 var speed = 0f;
 
                 switch (Movement)
@@ -210,75 +246,64 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
                         speed = SneakSpeed;
                         break;
 
-                    //TODO:
-                    /*
                     case PlayerMovementState.Sprinting:
-                        speed = RunSpeed * _map.HumanSprintSpeed;
+                        speed = RunSpeed;
                         break;
 
                     case PlayerMovementState.Walking:
-                        speed = WalkSpeed * _map.HumanWalkSpeed;
+                        speed = WalkSpeed;
                         break;
-                        */
+
+                    case PlayerMovementState.Crouching:
+                        speed = CrouchingSpeed;
+                        break;
                 }
+
 
                 switch (Direction)
                 {
-                    /*
+
                     case MovementDirection.Forward:
                         var pos = Position + Player.CameraReference.forward / 10 * speed;
-
-                        if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
-                            Player.PlayerMovementSync.OverridePosition(pos, null, true);
-                        else wall = true;
+                        Player.Position = pos;
                         break;
 
                     case MovementDirection.BackWards:
                         pos = Position - Player.CameraReference.forward / 10 * speed;
-
-                        if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
-                            Player.PlayerMovementSync.OverridePosition(pos, null, true);
-                        else wall = true;
+                        Player.Position = pos;
                         break;
 
                     case MovementDirection.Right:
-                        pos = Position + Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 *
-                            speed;
-
-                        if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
-                            Player.PlayerMovementSync.OverridePosition(pos, null, true);
-                        else wall = true;
+                        pos = Position + Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed;
+                        Player.Position = pos;
                         break;
 
                     case MovementDirection.Left:
-                        pos = Position - Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 *
-                            speed;
-
-                        if (!Physics.Linecast(Position, pos, Player.PlayerMovementSync.CollidableSurfaces))
-                            Player.PlayerMovementSync.OverridePosition(pos, null, true);
-                        else wall = true;
+                        pos = Position - Quaternion.AngleAxis(90, Vector3.up) * Player.CameraReference.forward / 10 * speed;
+                        Player.Position = pos;
                         break;
-                        */
                 }
 
-                if (wall)
+                if (lastPos.normalized == Player.Position.normalized)
                 {
                     Direction = MovementDirection.None;
                 }
+                lastPos = Player.Position;
             }
             catch (Exception e)
             {
-                NeuronLogger.For<Synapse>().Error($"Sy3 Dummy: Update Failed:\n{e}");
+                SynapseLogger<Synapse>.Error($"Sy3 Dummy: Update Failed:\n{e}");
             }
         }
     }
-    
+
     public override void HideFromAll() => DeSpawn();
 
     public override void ShowAll() => Spawn();
 
-    //TODO:
-    public override void HideFromPlayer(SynapsePlayer player) { }
+    public override void HideFromPlayer(SynapsePlayer player) => Player.NetworkIdentity?.UnSpawnForOnePlayer(player);
 
-    public override void ShowPlayer(SynapsePlayer player) { }
+    public override void ShowPlayer(SynapsePlayer player) =>
+        SynapseLogger<SynapseDummy>.Warn(
+            "Plugin tried to show Dummy to a specific Player. This Feature is currently not implemented");
 }

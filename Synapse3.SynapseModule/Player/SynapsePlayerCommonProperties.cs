@@ -4,6 +4,7 @@ using Mirror;
 using Mirror.LiteNetLib4Mirror;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
+using PlayerRoles.PlayableScps.Scp079;
 using PlayerRoles.Spectating;
 using PlayerStatsSystem;
 using RelativePositioning;
@@ -142,17 +143,9 @@ public partial class SynapsePlayer
     public PlayerMovementState MovementState
     {
         //TODO: Check if this works
-        get => AnimationController.MoveState;
-        set => AnimationController.UserCode_CmdChangeSpeedState((byte)value);
+        get => FirstPersonMovement?.CurrentMovementState ?? PlayerMovementState.Crouching;
+        set => FirstPersonMovement.CurrentMovementState = value;
     }
-
-    //TODO:
-    /*
-    /// <summary>
-    /// Freezes the Player in his current location
-    /// </summary>
-    public bool StopInput { get => Hub.fpc.NetworkforceStopInputs; set => Hub.fpc.NetworkforceStopInputs = value; }
-    */
 
     /// <summary>
     /// The current health of the player
@@ -233,7 +226,6 @@ public partial class SynapsePlayer
         }
     }
 
-
     /// <summary>
     /// The player who is spectated by the player
     /// </summary>
@@ -311,4 +303,24 @@ public partial class SynapsePlayer
     /// The ip address of the player
     /// </summary>
     public string IpAddress => QueryProcessor._ipAddress;
+
+    /// <summary>
+    /// The sneak speed of the curent roleTypeID
+    /// </summary>
+    public virtual float SneakSpeed => FirstPersonMovement?.SneakSpeed ?? 0;
+
+    /// <summary>
+    /// The sneak warlk of the curent roleTypeID
+    /// </summary>
+    public virtual float WalkSpeed => FirstPersonMovement?.WalkSpeed ?? 0;
+
+    /// <summary>
+    /// The sneak run of the curent roleTypeID
+    /// </summary>
+    public virtual float RunSpeed => FirstPersonMovement?.SprintSpeed ?? 0;
+
+    /// <summary>
+    /// The sneak crouching of the curent roleTypeID
+    /// </summary>
+    public virtual float CrouchingSpeed => FirstPersonMovement?.CrouchSpeed ?? 0;
 }

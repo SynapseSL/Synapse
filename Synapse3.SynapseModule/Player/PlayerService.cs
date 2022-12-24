@@ -6,8 +6,8 @@ using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Permissions;
 using Synapse3.SynapseModule.Permissions.RemoteAdmin;
-using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
 
@@ -16,14 +16,16 @@ public class PlayerService : Service
     private readonly DummyService _dummy;
     private readonly PlayerEvents _player;
     private readonly RoundEvents _round;
+    private readonly PermissionService _permission;
 
     public List<IJoinUpdate> JoinUpdates { get; } = new();
 
-    public PlayerService(DummyService dummy, PlayerEvents player, RoundEvents round)
+    public PlayerService(DummyService dummy, PlayerEvents player, RoundEvents round, PermissionService permission)
     {
         _dummy = dummy;
         _player = player;
         _round = round;
+        _permission = permission;
     }
 
     public override void Enable()
@@ -203,7 +205,7 @@ public class PlayerService : Service
     /// <param name="me">The Player which should be returned for Me and Self</param>
     /// <param name="playerTypes">The Player Types which can be returned</param>
     public bool TryGetPlayers(string arg, out HashSet<SynapsePlayer> players, SynapsePlayer me = null) =>
-        TryGetPlayers(arg, out players, me, PlayerType.Player);
+        TryGetPlayers(arg, out players, me, PlayerType.Player, PlayerType.Dummy);
     
     /// <summary>
     /// Returns multiple Player that are parsed from a string.
@@ -223,7 +225,6 @@ public class PlayerService : Service
         foreach (var parameter in args)
         {
             if(string.IsNullOrWhiteSpace(parameter)) continue;
-            
             switch (parameter.ToUpper())
             {
                 case "SELF":
@@ -237,35 +238,58 @@ public class PlayerService : Service
                 case "ADMIN":
                 case "STAFF":
                     foreach (var player in all)
+                    {
                         if (player.ServerRoles.RemoteAdmin)
                             players.Add(player);
+                    }
                     continue;
 
                 case "NW":
                 case "NORTHWOOD":
                 case "GLOBALSTAFF":
                     foreach (var player in all)
+                    {
                         if (player.ServerRoles.Staff)
                             players.Add(player);
+                    }
+                    break;
+                
+                case "NPC":
+                case "DUMMY":
+                    foreach (var player in all)
+                    {
+                        if (player is DummyPlayer { RaVisible: true })
+                            players.Add(player);
+                    }
+                    break;
+                
+                case "DEFAULT":
+                    foreach (var player in Players)
+                    {
+                        if (!_permission.Groups.Values.Contains(player.SynapseGroup))
+                            players.Add(player);
+                    }
                     break;
 
                 case "*":
                 case "ALL":
                 case "EVERYONE":
-                    foreach (var player2 in all)
-                        players.Add(player2);
+                    foreach (var player in all)
+                        players.Add(player);
                     continue;
 
                 default:
                     var player3 = GetPlayer(parameter);
-                    
+
                     if (player3 == null)
                     {
                         if (int.TryParse(parameter, out var id))
                         {
                             //Check For SynapseGroupID
-                            foreach (var player in GetPlayers(id))
+                            foreach (var player in GetPlayers(id, playerTypes))
+                            {
                                 players.Add(player);
+                            }
 
                             //Check for RemoteAdmin Category
                             var category = service.GetCategory(id);

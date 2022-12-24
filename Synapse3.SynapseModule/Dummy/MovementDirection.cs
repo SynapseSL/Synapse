@@ -6,5 +6,5 @@ public enum MovementDirection
     Forward,
     BackWards,
     Right,
-    Left
+    Left,
 }

@@ -142,7 +142,8 @@ public partial class SynapsePlayer
             PermissionsHandler.IsPermitted(group.Permissions, PlayerPermissions.Overwatch))
             ServerRoles.OverwatchPermitted = true;
 
-        ServerRoles.SendRealIds();
+        if (PlayerType == PlayerType.Player)
+            ServerRoles.SendRealIds();
 
         if (string.IsNullOrEmpty(group.BadgeText))
         {
