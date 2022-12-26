@@ -66,7 +66,6 @@ public partial class PlayerEvents : Service
         _eventManager = eventManager;
         _synapse = synapse;
         _item = item;
-        _scpEvent = 
     }
 
     public override void Enable()

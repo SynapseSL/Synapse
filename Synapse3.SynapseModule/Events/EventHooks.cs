@@ -20,6 +20,7 @@ using PluginAPI.Enums;
 using PluginAPI.Events;
 using RemoteAdmin;
 using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
 using UnityEngine;
 using static RoundSummary;
@@ -336,7 +337,6 @@ public partial class ScpEvents
         return ev.Allow;
     }
 }
-}
 
 public partial class ItemEvents
 {
@@ -356,12 +356,14 @@ public partial class ItemEvents
 public partial class MapEvents
 {
     [PluginEvent(ServerEventType.GeneratorActivated)]
-    public void PlayerActiveGeneratorHook(Scp079Generator generator)
+    public bool PlayerActiveGeneratorHook(Scp079Generator generator)
     {
         var synapseGenerator = generator.GetSynapseGenerator();
         var ev = new GeneratorEngageEvent(synapseGenerator);
 
-        // todo GeneratorEngage.
+        GeneratorEngage.RaiseSafely(ev);
+
+        return ev.Allow;
     }
 
     [PluginEvent(ServerEventType.WarheadStop)]
@@ -370,9 +372,8 @@ public partial class MapEvents
         var synapsePlayer = player.GetSynapsePlayer();
         var ev = new CancelWarheadEvent(synapsePlayer, true);
 
-        // todo CancelWarheadEvent.
+        CancelWarhead.RaiseSafely(ev);
 
         return ev.Allow;
     }
-
-}}
+}

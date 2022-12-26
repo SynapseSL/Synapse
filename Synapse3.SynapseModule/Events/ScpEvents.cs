@@ -26,8 +26,6 @@ public partial class ScpEvents : Service
     public readonly EventReactor<Scp096ObserveEvent> Scp096Observe = new();
 
     public readonly EventReactor<Scp106AttackEvent> Scp106Attack = new();
-    public readonly EventReactor<Scp106ContainEvent> Scp106Contain = new();
-    public readonly EventReactor<Scp106CreatePortalEvent> Scp106CreatePortal = new();
     public readonly EventReactor<Scp106LeavePocketEvent> Scp106LeavePocket = new();
 
     public readonly EventReactor<Scp173AttackEvent> Scp173Attack = new();
@@ -59,8 +57,6 @@ public partial class ScpEvents : Service
         _eventManager.RegisterEvent(Scp096Observe);
 
         _eventManager.RegisterEvent(Scp106Attack);
-        _eventManager.RegisterEvent(Scp106Contain);
-        _eventManager.RegisterEvent(Scp106CreatePortal);
         _eventManager.RegisterEvent(Scp106LeavePocket);
 
         _eventManager.RegisterEvent(Scp173Attack);
@@ -88,8 +84,6 @@ public partial class ScpEvents : Service
         _eventManager.UnregisterEvent(Scp096Observe);
 
         _eventManager.UnregisterEvent(Scp106Attack);
-        _eventManager.UnregisterEvent(Scp106Contain);
-        _eventManager.UnregisterEvent(Scp106CreatePortal);
         _eventManager.UnregisterEvent(Scp106LeavePocket);
 
         _eventManager.UnregisterEvent(Scp173Attack);

@@ -19,6 +19,7 @@ public partial class MapEvents : Service
     public readonly EventReactor<TriggerTeslaEvent> TriggerTesla = new();
     public readonly EventReactor<DetonateWarheadEvent> DetonateWarhead = new();
     public readonly EventReactor<CancelWarheadEvent> CancelWarhead = new();
+    public readonly EventReactor<GeneratorEngageEvent> GeneratorEngage = new();
 
     public MapEvents(EventManager eventManager)
     {
@@ -32,6 +33,7 @@ public partial class MapEvents : Service
         _eventManager.RegisterEvent(TriggerTesla);
         _eventManager.RegisterEvent(DetonateWarhead);
         _eventManager.RegisterEvent(CancelWarhead);
+        _eventManager.RegisterEvent(GeneratorEngage);
     }
 
     public override void Disable()
@@ -41,6 +43,7 @@ public partial class MapEvents : Service
         _eventManager.UnregisterEvent(TriggerTesla);
         _eventManager.UnregisterEvent(DetonateWarhead);
         _eventManager.UnregisterEvent(CancelWarhead);
+        _eventManager.UnregisterEvent(GeneratorEngage);
     }
 }
 
