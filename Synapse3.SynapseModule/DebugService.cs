@@ -78,7 +78,7 @@ public class DebugService : Service
             NeuronLogger.For<Synapse>().Warn($"Shoot {ev.Player.NickName} {ev.Target?.NickName} {ev.Item.ItemType}");
         });
 
-        _scp.Revive.Subscribe(ev =>
+        _scp.Scp049Revive.Subscribe(ev =>
         {
            
         });
@@ -129,14 +129,14 @@ public class DebugService : Service
         _scp.Scp939Attack.Subscribe(ScpEvent);
         _scp.Scp106Attack.Subscribe(ScpEvent);
 
-        _scp.ContainScp079.Subscribe(ev => NeuronLogger.For<Synapse>().Warn("Contain 079: " + ev.Status));
+        _scp.Scp079Contain.Subscribe(ev => NeuronLogger.For<Synapse>().Warn("Contain 079: " + ev.Status));
 
         _scp.Scp079DoorInteract.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Warn("079 Door");
         });
 
-        _scp.Revive.Subscribe(ev => ev.Allow = false);
+        _scp.Scp049Revive.Subscribe(ev => ev.Allow = false);
 
         Synapse.Get<SynapseObjectEvents>().ButtonPressed
             .Subscribe(ev =>
