@@ -1,12 +1,24 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection.Emit;
+using CommandSystem;
+using Interactables.Interobjects.DoorUtils;
+using InventorySystem.Items;
+using InventorySystem.Items.Pickups;
 using LightContainmentZoneDecontamination;
 using LiteNetLib;
+using MapGeneration.Distributors;
 using Neuron.Core.Logging;
 using PlayerRoles;
+using PlayerStatsSystem;
 using PluginAPI.Core.Attributes;
 using PluginAPI.Core.Interfaces;
+using PluginAPI.Core.Zones.Heavy;
 using PluginAPI.Enums;
 using PluginAPI.Events;
+using RemoteAdmin;
+using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Item;
 using static RoundSummary;
 
 namespace Synapse3.SynapseModule.Events;
@@ -14,6 +26,229 @@ namespace Synapse3.SynapseModule.Events;
 public partial class PlayerEvents
 {
 
+    //TODO
+    //ShootEvent NW add to Synapse
+    //AimWeapon add to synapse
+    //PlayerInteractShootingTarget Add to Synapse
+
+    //PlayerDeath do Patch
+    //WarHeadInteract do Patch
+    //DropItem do Patch
+    //Heal do Patch
+    //Join do Patch
+    //BulletHole Patch
+    //Speak Patch
+    //WarHead Button Patch
+    //WalkOnHazardEvent Patch WalkOnSinkholeEvent..WalkOnTantrumEvent
+    //StartWorkStationEvent Patch
+    //UpdateDisplayNameEvent Patch
+
+
+    [PluginEvent(ServerEventType.PlayerChangeRole)]
+    public bool PlayerChangeRoleHook(IPlayer player, PlayerRoleBase oldRole, RoleTypeId newRole, RoleChangeReason changeReason)
+    {
+        var ev = new SetClassEvent(player.GetSynapsePlayer(), newRole, changeReason);
+
+        SetClass.RaiseSafely(ev);
+
+        return ev.Allow;
+    }
+
+    [PluginEvent(ServerEventType.PlayerInteractDoor)]
+    public bool PlayerInteractDoorHook(IPlayer player, DoorVariant door, bool canOpen)
+    {
+        var synapsePlayer = player.GetSynapsePlayer();
+        var synapseDoor = door.GetSynapseDoor();
+        var useByPass = synapseDoor.Locked ? synapsePlayer.Bypass : false;
+
+        var ev = new DoorInteractEvent(synapsePlayer, canOpen, synapseDoor, useByPass);
+
+        DoorInteract.RaiseSafely(ev);
+
+        return ev.Allow;
+    }
+
+    [PluginEvent(ServerEventType.PlayerInteractLocker)]
+    public bool PlayerInteractLockerHook(IPlayer player, Locker locker, byte colliderId, bool canOpen)
+    {
+        var synapseLocker =  locker.GetSynapseLocker();
+        var chamber = synapseLocker.Chambers.FirstOrDefault(p => p.ByteID == colliderId);
+
+        var ev = new LockerUseEvent(player.GetSynapsePlayer(), canOpen, synapseLocker, chamber );
+
+        LockerUse.RaiseSafely(ev);
+
+        return ev.Allow;
+    }
+
+    [PluginEvent(ServerEventType.WarheadStart)]
+    public bool WarheadStartHook(bool isAutomatic, IPlayer player)
+    {
+        var ev = new StartWarheadEvent(player?.GetSynapsePlayer(), true);
+
+        StartWarhead.RaiseSafely(ev);
+
+        return ev.Allow;
+    }
+
+    [PluginEvent(ServerEventType.PlayerChangeItem)]
+    public bool PlayerChangeItemHook(IPlayer player, ushort oldItem, ushort newItem)
+    {
+        var synapseNewItem = _item.GetSynapseItem(newItem);
+        var ev = new ChangeItemEvent(player.GetSynapsePlayer(), true, synapseNewItem);
+
+        ChangeItem.RaiseSafely(ev);
+
+        return ev.Allow;
+    }
+
+    [PluginEvent(ServerEventType.PlayerDamage)]
+    public bool PlayerDamageHook(IPlayer player, IPlayer target, DamageHandlerBase damageHandler)
+    {
+        var dommageType = damageHandler.GetDamageType();
+        var dommageAmount = damageHandler is StandardDamageHandler standard ? standard.Damage : -1;
+
+        var ev = new DamageEvent(player.GetSynapsePlayer(), true, target?.GetSynapsePlayer(), dommageType, dommageAmount);
+
+        Damage.RaiseSafely(ev);
+
+        return ev.Allow;
+    }
+
+    [PluginEvent(ServerEventType.PlayerRemoveHandcuffs)]
+    public bool PlayerInteractShootingTargetHook(IPlayer player, IPlayer target)
+    {
+        var ev = new FreePlayerEvent(player.GetSynapsePlayer(), true, target.GetSynapsePlayer());
+
+        FreePlayer.RaiseSafely(ev);
+
+        return ev.Allow;
+    }
+
+    [PluginEvent(ServerEventType.PlayerDropAmmo)]
+    public bool PlayerDropAmmoHook(IPlayer player, ItemType item, int amount)
+    {
+        var ev = new DropAmmoEvent(player.GetSynapsePlayer(), true, (AmmoType)item, (ushort)amount);
+
+        DropAmmo.RaiseSafely(ev);
+
+        return ev.Allow;
+    }
+
+    [PluginEvent(ServerEventType.PlayerUnlockGenerator)]
+    public bool PlayerUnlockGeneratorHook(IPlayer player, Scp079Generator generator)
+    {
+        var ev = new GeneratorInteractEvent(player.GetSynapsePlayer(), true, 
+            generator.GetSynapseGenerator(), Enums.GeneratorInteract.UnlockDoor);
+
+        GeneratorInteract.RaiseSafely(ev);
+
+        return ev.Allow;
+    }
+
+    [PluginEvent(ServerEventType.PlayerOpenGenerator)]
+    public bool PlayerOpenGeneratorHook(IPlayer player, Scp079Generator generator)
+    {
+        var ev = new GeneratorInteractEvent(player.GetSynapsePlayer(), true,
+            generator.GetSynapseGenerator(), Enums.GeneratorInteract.OpenDoor);
+
+        GeneratorInteract.RaiseSafely(ev);
+
+        return ev.Allow;
+    }
+
+    [PluginEvent(ServerEventType.PlayerDeactivatedGenerator)]
+    public bool PlayerDeactivatedGeneratorHook(IPlayer player, Scp079Generator generator)
+    {
+        var ev = new GeneratorInteractEvent(player.GetSynapsePlayer(), true,
+            generator.GetSynapseGenerator(), Enums.GeneratorInteract.Cancel);
+
+        GeneratorInteract.RaiseSafely(ev);
+
+        return ev.Allow;
+    }
+
+    [PluginEvent(ServerEventType.PlayerCloseGenerator)]
+    public bool PlayerCloseGeneratorHook(IPlayer player, Scp079Generator generator)
+    {
+        var ev = new GeneratorInteractEvent(player.GetSynapsePlayer(), true,
+            generator.GetSynapseGenerator(), Enums.GeneratorInteract.CloseDoor);
+
+        GeneratorInteract.RaiseSafely(ev);
+
+        return ev.Allow;
+    }
+
+    [PluginEvent(ServerEventType.PlayerActivateGenerator)]
+    public bool PlayerActivateGeneratorHook(IPlayer player, Scp079Generator generator)
+    {
+        var ev = new GeneratorInteractEvent(player.GetSynapsePlayer(), true,
+            generator.GetSynapseGenerator(), Enums.GeneratorInteract.Activate);
+
+        GeneratorInteract.RaiseSafely(ev);
+
+        return ev.Allow;
+    }
+
+    [PluginEvent(ServerEventType.PlayerLeft)]
+    public void PlayerLeftHook(IPlayer player)
+    {
+        var ev = new LeaveEvent(player.GetSynapsePlayer());
+
+        Leave.RaiseSafely(ev);
+    }
+
+    [PluginEvent(ServerEventType.PlayerSearchedPickup)]//TODO: Test if that do the Ammo
+    public bool PlayerSearchedPickupHook(IPlayer player, ItemPickupBase item)
+    {
+        var ev = new PickupEvent(player.GetSynapsePlayer(), true, item.GetItem());
+
+        Pickup.RaiseSafely(ev);
+
+        return ev.Allow;
+    }
+
+    [PluginEvent(ServerEventType.PlayerReport)]
+    public bool PlayerReportHook(IPlayer player, IPlayer target, string reason)
+    {
+        var ev = new ReportEvent(player.GetSynapsePlayer(), true, target.GetSynapsePlayer(), reason, false);
+
+        Report.RaiseSafely(ev);
+
+        return ev.Allow;
+    }
+
+    [PluginEvent(ServerEventType.PlayerCheaterReport)]
+    public bool PlayerCheaterReportHook(IPlayer player, IPlayer target, string reason)
+    {
+        var ev = new ReportEvent(player.GetSynapsePlayer(), true, target.GetSynapsePlayer(), reason, false);
+
+        Report.RaiseSafely(ev);
+
+        return ev.Allow;
+    }
+
+
+    [PluginEvent(ServerEventType.PlayerKicked)]
+    public bool PlayerKickedHook(IPlayer player, IPlayer issuer, string reason)
+    {
+        var ev = new KickEvent(player.GetSynapsePlayer(), issuer.GetSynapsePlayer(), reason, true);
+
+        Kick.RaiseSafely(ev);
+        return ev.Allow;
+    }
+
+
+    [PluginEvent(ServerEventType.PlayerBanned)]
+    public bool PlayerKickedHook(IPlayer player, ICommandSender issuer, string reason, long duration)
+    {
+        var playerIssuer = (issuer as PlayerCommandSender)?.GetSynapsePlayer();
+        
+        var ev = new BanEvent(player.GetSynapsePlayer(),  true, playerIssuer, reason, duration, false);
+
+        Ban.RaiseSafely(ev);
+        return ev.Allow;
+    }
 }
 
 public partial class RoundEvents

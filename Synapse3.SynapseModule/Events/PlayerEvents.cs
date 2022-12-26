@@ -19,6 +19,7 @@ public partial class PlayerEvents : Service
 {
     private readonly Synapse _synapse;
     private readonly EventManager _eventManager;
+    private readonly ItemService _item;
 
     public readonly EventReactor<LoadComponentEvent> LoadComponent = new();
     public readonly EventReactor<KeyPressEvent> KeyPress = new();
@@ -60,10 +61,11 @@ public partial class PlayerEvents : Service
     public readonly EventReactor<ChangeRoleEvent> ChangeRole = new();
     public readonly EventReactor<KickEvent> Kick = new();
 
-    public PlayerEvents(EventManager eventManager, Synapse synapse)
+    public PlayerEvents(EventManager eventManager, Synapse synapse, ItemService item)
     {
         _eventManager = eventManager;
         _synapse = synapse;
+        _item = item;
     }
 
     public override void Enable()
@@ -440,7 +442,7 @@ public class DropItemEvent : PlayerInteractEvent
 
 public class EnterFemurEvent : PlayerInteractEvent
 {
-    public EnterFemurEvent(SynapsePlayer player, bool allow, bool closeFemur) : base(player, allow)
+    public EnterFemurEvent(SynapsePlayer player, bool allow, bool closeFemur) : base(player, allow)//Redo it whit prefabe ?
     {
         CloseFemur = closeFemur;
     }
@@ -588,7 +590,7 @@ public class StartWorkStationEvent : PlayerInteractEvent
     public SynapseWorkStation WorkStation { get; }
 }
 
-public class FallingIntoAbyssEvent : PlayerInteractEvent
+public class FallingIntoAbyssEvent : PlayerInteractEvent//TODO Understand that
 {
     public FallingIntoAbyssEvent(SynapsePlayer player, bool allow) : base(player, allow) { }
 }

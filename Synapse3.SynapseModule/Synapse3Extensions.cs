@@ -16,6 +16,7 @@ using Neuron.Core.Logging;
 using Neuron.Modules.Configs.Localization;
 using PlayerRoles;
 using PlayerStatsSystem;
+using PluginAPI.Core.Interfaces;
 using PluginAPI.Core.Items;
 using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Config;
@@ -148,11 +149,10 @@ public static class Synapse3Extensions
         .GetPlayer(x => x.CommandSender == sender, PlayerType.Dummy, PlayerType.Player, PlayerType.Server);
     public static SynapsePlayer GetSynapsePlayer(this StatBase stat) => stat.Hub.GetSynapsePlayer();
     public static SynapsePlayer GetSynapsePlayer(this Footprint footprint) => footprint.Hub?.GetSynapsePlayer();
+    public static SynapsePlayer GetSynapsePlayer(this IPlayer player) => player?.GameObject?.GetSynapsePlayer();
 
-    
     public static SynapseItem GetItem(this ItemPickupBase pickupBase) => _item.GetSynapseItem(pickupBase.Info.Serial);
     public static SynapseItem GetItem(this ItemBase itemBase) => _item.GetSynapseItem(itemBase.ItemSerial);
-
     
     /// <summary>
     /// Returns a UniversalDamageHandler based upon the given DamageType
@@ -280,7 +280,7 @@ public static class Synapse3Extensions
             ._synapseCameras.FirstOrDefault(x => x.Camera == cam);
         */
 
-    
+
     public static bool CanHarmScp(SynapsePlayer player, bool message)
     {
         if (player.TeamID != (int)Team.SCPs &&
@@ -291,6 +291,7 @@ public static class Synapse3Extensions
         return false;
 
     }
+
     public static bool GetHarmPermission(SynapsePlayer attacker, SynapsePlayer victim, bool ignoreFFConfig = false)
     {
         try

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Footprinting;
+using PlayerRoles.PlayableScps.Scp106;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
@@ -15,19 +16,13 @@ public class Scp106Controller
         _player = player;
     }
 
-    /*
-    public Scp106PlayerScript Scp106PlayerScript => _player.ClassManager.Scp106;
-    
-    public Vector3 PortalPosition
-    {
-        get => Scp106PlayerScript.portalPosition;
-        set => Scp106PlayerScript.SetPortalPosition(Vector3.zero, value);
-    }
+    public Scp106Role Scp106PlayerScript => _player.CurrentRole as Scp106Role;
 
-    public bool IsUsingPortal => Scp106PlayerScript.goingViaThePortal;
+    public bool IsUsingPortal => Scp106PlayerScript.Sinkhole.IsDuringAnimation;
+    public bool IsInGround => Scp106PlayerScript.IsSubmerged;
 
     public HashSet<SynapsePlayer> PlayersInPocket { get; } = new();
-
+/*
     public void UsePortal() => Scp106PlayerScript.UserCode_CmdUsePortal();
 
     public void DeletePortal() => Scp106PlayerScript.DeletePortal();
@@ -38,6 +33,6 @@ public class Scp106Controller
         Scp106PlayerScript.Contain(new Footprint(recontainer ?? _player));
 
     public void CapturePlayer(SynapsePlayer player) =>
-        Scp106PlayerScript.UserCode_CmdMovePlayer(player.gameObject, ServerTime.time);
-        */
+        Scp106PlayerScript.UserCode_CmdMovePlayer(player.gameObject, ServerTime.time);*/
+        
 }

@@ -22,11 +22,17 @@ public class GamePlayConfiguration : IDocumentSection
     [Description("If enabled a Player don't need to equip his keycard to use it")]
     public bool RemoteKeyCard{ get; set; } = false;
 
+    [Description("If enabled the WarHead button can be close again ")]
+    public bool WarheadButtonClosable { get; set; } = false;
+
     [Description("The amount of persons that need to be sacrificed for SCP-106's recontainment")]
     public ushort RequiredForFemur { get; set; } = 1;
     
     [Description("All Scp's in this list are able to Speak to Humans")]
-    public List<uint> SpeakingScp { get; set; } = new List<uint> { 16, 17 };
+    public List<uint> SpeakingScp { get; set; } = new List<uint> //TODO
+    { 
+        (int)RoleTypeId.Scp939 
+    };
 
     [Description("If Enabled the button inside the AlphaWarhead(outside) can be closed again with a keycard")]
     public bool CloseWarheadButton { get; set; } = false;
