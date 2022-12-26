@@ -4,6 +4,7 @@ using System.Reflection.Emit;
 using CommandSystem;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items;
+using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Pickups;
 using LightContainmentZoneDecontamination;
 using LiteNetLib;
@@ -19,6 +20,7 @@ using PluginAPI.Events;
 using RemoteAdmin;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
+using UnityEngine;
 using static RoundSummary;
 
 namespace Synapse3.SynapseModule.Events;
@@ -71,10 +73,10 @@ public partial class PlayerEvents
     [PluginEvent(ServerEventType.PlayerInteractLocker)]
     public bool PlayerInteractLockerHook(IPlayer player, Locker locker, byte colliderId, bool canOpen)
     {
-        var synapseLocker =  locker.GetSynapseLocker();
+        var synapseLocker = locker.GetSynapseLocker();
         var chamber = synapseLocker.Chambers.FirstOrDefault(p => p.ByteID == colliderId);
 
-        var ev = new LockerUseEvent(player.GetSynapsePlayer(), canOpen, synapseLocker, chamber );
+        var ev = new LockerUseEvent(player.GetSynapsePlayer(), canOpen, synapseLocker, chamber);
 
         LockerUse.RaiseSafely(ev);
 
@@ -138,7 +140,7 @@ public partial class PlayerEvents
     [PluginEvent(ServerEventType.PlayerUnlockGenerator)]
     public bool PlayerUnlockGeneratorHook(IPlayer player, Scp079Generator generator)
     {
-        var ev = new GeneratorInteractEvent(player.GetSynapsePlayer(), true, 
+        var ev = new GeneratorInteractEvent(player.GetSynapsePlayer(), true,
             generator.GetSynapseGenerator(), Enums.GeneratorInteract.UnlockDoor);
 
         GeneratorInteract.RaiseSafely(ev);
@@ -243,8 +245,8 @@ public partial class PlayerEvents
     public bool PlayerKickedHook(IPlayer player, ICommandSender issuer, string reason, long duration)
     {
         var playerIssuer = (issuer as PlayerCommandSender)?.GetSynapsePlayer();
-        
-        var ev = new BanEvent(player.GetSynapsePlayer(),  true, playerIssuer, reason, duration, false);
+
+        var ev = new BanEvent(player.GetSynapsePlayer(), true, playerIssuer, reason, duration, false);
 
         Ban.RaiseSafely(ev);
         return ev.Allow;
@@ -267,7 +269,7 @@ public partial class RoundEvents
 
     [PluginEvent(ServerEventType.RoundEnd)]
     public void RoundEndHook(LeadingTeam leadingTeam) => End.RaiseSafely(new RoundEndEvent(leadingTeam));
-    
+
     [PluginEvent(ServerEventType.RoundRestart)]
     public void RoundRestartHook() => Restart.RaiseSafely(new RoundRestartEvent());
 
@@ -296,3 +298,42 @@ public partial class ServerEvents
         return ev.ReturningData;
     }
 }
+
+public partial class ItemEvents
+{
+    [PluginEvent(ServerEventType.PlayerHandcuff)]
+    public bool PlayerCuffHook(IPlayer player, IPlayer target)
+    {
+        var synapsePlayer = player.GetSynapsePlayer();
+        var synapseTarget = target.GetSynapsePlayer();
+        var ev = new DisarmEvent(synapsePlayer.Inventory.ItemInHand, ItemInteractState.Finalize, synapsePlayer, synapseTarget);
+
+        Disarm.RaiseSafely(ev);
+
+        return ev.Allow;
+    }
+}
+
+public partial class MapEvents
+{
+    [PluginEvent(ServerEventType.GeneratorActivated)]
+    public void PlayerActiveGeneratorHook(Scp079Generator generator)
+    {
+        var synapseGenerator = generator.GetSynapseGenerator();
+        var ev = new GeneratorEngageEvent(synapseGenerator);
+
+        // todo GeneratorEngage.
+    }
+
+    [PluginEvent(ServerEventType.WarheadStop)]
+    public bool PlayerCancelWarHead(IPlayer player)
+    {
+        var synapsePlayer = player.GetSynapsePlayer();
+        var ev = new CancelWarheadEvent(synapsePlayer, true);
+
+        // todo CancelWarheadEvent.
+
+        return ev.Allow;
+    }
+
+}}

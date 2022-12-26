@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Synapse3.SynapseModule.Events;
 
-public class MapEvents : Service
+public partial class MapEvents : Service
 {
     private readonly EventManager _eventManager;
 
