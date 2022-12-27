@@ -362,14 +362,13 @@ public partial class ItemEvents
         var synapseItem = synapsePlayer.Inventory.ItemInHand;
         var ev = new FlipCoinEvent(synapseItem, synapsePlayer, IsTails);
         FlipCoin.RaiseSafely(ev);
+        
         if (!ev.Allow)
-            return PlayerPreCoinFlipCancellationData.CoinFlipCancellation.None;
+            return PlayerPreCoinFlipCancellationData.CoinFlipCancellation.PreventFlip;
         if(ev.Tails)
             return PlayerPreCoinFlipCancellationData.CoinFlipCancellation.Tails;
-        if (!ev.Tails)
+        else
             return PlayerPreCoinFlipCancellationData.CoinFlipCancellation.Heads;
-
-        return PlayerPreCoinFlipCancellationData.CoinFlipCancellation.PreventFlip;
     }
 }
 

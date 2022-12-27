@@ -178,36 +178,41 @@ public class DebugService : Service
             NeuronLogger.For<Synapse>().Warn($"Scp049Revive {ev.Scp.NickName}");
         });
 
-        _scp.Scp0492Attack.Subscribe(ev =>
+        _scp.Scp0492Attack.Subscribe(ev =>//To Fix
         {
             NeuronLogger.For<Synapse>().Error($"Scp0492Attack {ev.Scp.NickName}");
         });
 
-        _scp.Scp049Attack.Subscribe(ev =>//Error for red to see better
+        _scp.Scp049Attack.Subscribe(ev =>//To Fix
         {
             NeuronLogger.For<Synapse>().Error($"Scp049Attack {ev.Scp.NickName}");
         });
 
-        _scp.Scp096Attack.Subscribe(ev =>
+        _scp.Scp096Attack.Subscribe(ev =>//To Fix
         {
             NeuronLogger.For<Synapse>().Error($"Scp096Attack {ev.Scp.NickName}");
         });
 
-        _scp.Scp106Attack.Subscribe(ev =>//FIX
+        _scp.Scp106Attack.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Error($"Scp106Attack {ev.Scp.NickName}");
         });
 
-        _scp.Scp173Attack.Subscribe(ev =>//FIX
+        _scp.Scp173Attack.Subscribe(ev =>//To FIX
         {
             NeuronLogger.For<Synapse>().Error($"Scp173Attack {ev.Scp.NickName}");
         });
 
-        _scp.Scp939Attack.Subscribe(ev =>//FIX
+        _scp.Scp939Attack.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Error($"Scp939Attack {ev.Scp.NickName}");
         });
 
+        _item.FlipCoin.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Error($"Scp939Attack {ev.Player.NickName}");
+            ev.Tails = true;
+        });
         //Debug--
 
         _player.StartWorkStation.Subscribe(ev =>
