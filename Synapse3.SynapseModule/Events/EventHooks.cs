@@ -11,6 +11,7 @@ using LiteNetLib;
 using MapGeneration.Distributors;
 using Neuron.Core.Logging;
 using PlayerRoles;
+using PlayerRoles.PlayableScps.Scp049;
 using PlayerStatsSystem;
 using PluginAPI.Core.Attributes;
 using PluginAPI.Core.Interfaces;
@@ -19,6 +20,7 @@ using PluginAPI.Enums;
 using PluginAPI.Events;
 using RemoteAdmin;
 using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
 using UnityEngine;
 using static RoundSummary;
@@ -27,24 +29,6 @@ namespace Synapse3.SynapseModule.Events;
 
 public partial class PlayerEvents
 {
-
-    //TODO
-    //ShootEvent NW add to Synapse
-    //AimWeapon add to synapse
-    //PlayerInteractShootingTarget Add to Synapse
-
-    //PlayerDeath do Patch
-    //WarHeadInteract do Patch
-    //DropItem do Patch
-    //Heal do Patch
-    //Join do Patch
-    //BulletHole Patch
-    //Speak Patch
-    //WarHead Button Patch
-    //WalkOnHazardEvent Patch WalkOnSinkholeEvent..WalkOnTantrumEvent
-    //StartWorkStationEvent Patch
-    //UpdateDisplayNameEvent Patch
-
 
     [PluginEvent(ServerEventType.PlayerChangeRole)]
     public bool PlayerChangeRoleHook(IPlayer player, PlayerRoleBase oldRole, RoleTypeId newRole, RoleChangeReason changeReason)
@@ -277,7 +261,7 @@ public partial class RoundEvents
     public bool DecontaminationHook()
     {
         var ev = new DecontaminationEvent();
-        Decontamination.RaiseSafely(new DecontaminationEvent());
+        Decontamination.RaiseSafely(ev);
         if (!ev.Allow)
         {
             DecontaminationController.Singleton.NetworkDecontaminationOverride =
@@ -296,6 +280,61 @@ public partial class ServerEvents
         var ev = new PreAuthenticationEvent(userId, address, countryCode, centralFlags);
         PreAuthentication.RaiseSafely(ev);
         return ev.ReturningData;
+    }
+}
+
+public partial class ScpEvents
+{
+    [PluginEvent(ServerEventType.Scp049ResurrectBody)]
+    public bool Scp049ResurrectBodyHook(IPlayer player, IPlayer target, BasicRagdoll body)
+    {
+        var synapse049 = player.GetSynapsePlayer();
+        var synapsetargert = target.GetSynapsePlayer();
+        var ragdoll = body.GetSynapseRagdoll();
+
+        var ev = new Scp049ReviveEvent(synapse049, synapsetargert, ragdoll, true);
+
+        Scp049Revive.RaiseSafely(ev);
+
+        return ev.Allow;
+    }
+
+    [PluginEvent(ServerEventType.Scp049StartResurrectingBody)]
+    public bool Scp049StartResurrectingBodyHook(IPlayer player, IPlayer target, BasicRagdoll body, bool canResurrct)
+    {
+        var synapse049 = player.GetSynapsePlayer();
+        var synapsetargert = target.GetSynapsePlayer();
+        var ragdoll = body.GetSynapseRagdoll();
+
+        var ev = new Scp049ReviveEvent(synapse049, synapsetargert, ragdoll, false);
+
+        Scp049Revive.RaiseSafely(ev);
+
+        return ev.Allow;
+    }
+
+    [PluginEvent(ServerEventType.Scp173CreateTantrum)]
+    public bool Scp173CreateTantrumHook(IPlayer player)
+    {
+        var synapse173 = player.GetSynapsePlayer();
+
+        var ev = new Scp173PlaceTantrumEvent(synapse173);
+
+        Scp173PlaceTantrum.RaiseSafely(ev);
+
+        return ev.Allow;
+    }
+
+    [PluginEvent(ServerEventType.Scp173BreakneckSpeeds)]
+    public bool Scp173BreakneckSpeedsHook(IPlayer player, bool activate)
+    {
+        var synapse173 = player.GetSynapsePlayer();
+
+        var ev = new Scp173ActivateBreakneckSpeedEvent(synapse173, activate);
+
+        Scp173ActivateBreakneckSpeed.RaiseSafely(ev);
+
+        return ev.Allow;
     }
 }
 
@@ -333,12 +372,14 @@ public partial class ItemEvents
 public partial class MapEvents
 {
     [PluginEvent(ServerEventType.GeneratorActivated)]
-    public void PlayerActiveGeneratorHook(Scp079Generator generator)
+    public bool PlayerActiveGeneratorHook(Scp079Generator generator)
     {
         var synapseGenerator = generator.GetSynapseGenerator();
         var ev = new GeneratorEngageEvent(synapseGenerator);
 
-        // todo GeneratorEngage.
+        GeneratorEngage.RaiseSafely(ev);
+
+        return ev.Allow;
     }
 
     [PluginEvent(ServerEventType.WarheadStop)]
@@ -347,9 +388,9 @@ public partial class MapEvents
         var synapsePlayer = player.GetSynapsePlayer();
         var ev = new CancelWarheadEvent(synapsePlayer, true);
 
-        // todo CancelWarheadEvent.
+        CancelWarhead.RaiseSafely(ev);
 
         return ev.Allow;
     }
 
-}
+}}

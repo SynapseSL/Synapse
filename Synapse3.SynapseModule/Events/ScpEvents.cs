@@ -7,30 +7,33 @@ using UnityEngine;
 
 namespace Synapse3.SynapseModule.Events;
 
-public class ScpEvents : Service
+public partial class ScpEvents : Service
 {
     private readonly EventManager _eventManager;
     
     public readonly EventReactor<Scp0492AttackEvent> Scp0492Attack = new();
     public readonly EventReactor<Scp049AttackEvent> Scp049Attack = new();
-    public readonly EventReactor<Scp096AttackEvent> Scp096Attack = new();
-    public readonly EventReactor<Scp173AttackEvent> Scp173Attack = new();
-    public readonly EventReactor<Scp939AttackEvent> Scp939Attack = new();
-    public readonly EventReactor<Scp106AttackEvent> Scp106Attack = new();
-    public readonly EventReactor<ObserveScp173Event> ObserveScp173 = new();
-    public readonly EventReactor<PlaceTantrumEvent> PlaceTantrum = new();
-    public readonly EventReactor<ActivateBreakneckSpeedEvent> ActivateBreakneckSpeed = new();
-    public readonly EventReactor<ReviveEvent> Revive = new();
-    public readonly EventReactor<ContainScp106Event> ContainScp106 = new();
-    public readonly EventReactor<CreatePortalEvent> CreatePortal = new();
-    public readonly EventReactor<LeavePocketEvent> LeavePocket = new();
-    public readonly EventReactor<ObserveScp096Event> ObserveScp096 = new();
-    public readonly EventReactor<ContainScp079Event> ContainScp079 = new();
-    public readonly EventReactor<SwitchCameraEvent> SwitchCamera = new();
+    public readonly EventReactor<Scp049ReviveEvent> Scp049Revive = new();
+
+    public readonly EventReactor<Scp079ContainEvent> Scp079Contain = new();
+    public readonly EventReactor<scp079SwitchCameraEvent> Scp079SwitchCamera = new();
     public readonly EventReactor<Scp079DoorInteractEvent> Scp079DoorInteract = new();
     public readonly EventReactor<Scp079LockDoorEvent> Scp079LockDoor = new();
     public readonly EventReactor<Scp079StartSpeakerEvent> Scp079StartSpeaker = new();
     public readonly EventReactor<Scp079StopSpeakerEvent> Scp079StopSpeaker = new();
+
+    public readonly EventReactor<Scp096AttackEvent> Scp096Attack = new();
+    public readonly EventReactor<Scp096ObserveEvent> Scp096Observe = new();
+
+    public readonly EventReactor<Scp106AttackEvent> Scp106Attack = new();
+    public readonly EventReactor<Scp106LeavePocketEvent> Scp106LeavePocket = new();
+
+    public readonly EventReactor<Scp173AttackEvent> Scp173Attack = new();
+    public readonly EventReactor<Scp173ObserveEvent> Scp173Observe = new();
+    public readonly EventReactor<Scp173PlaceTantrumEvent> Scp173PlaceTantrum = new();
+    public readonly EventReactor<Scp173ActivateBreakneckSpeedEvent> Scp173ActivateBreakneckSpeed = new();
+
+    public readonly EventReactor<Scp939AttackEvent> Scp939Attack = new();
 
     public ScpEvents(EventManager eventManager)
     {
@@ -41,46 +44,53 @@ public class ScpEvents : Service
     {
         _eventManager.RegisterEvent(Scp0492Attack);
         _eventManager.RegisterEvent(Scp049Attack);
-        _eventManager.RegisterEvent(Scp096Attack);
-        _eventManager.RegisterEvent(Scp173Attack);
-        _eventManager.RegisterEvent(Scp939Attack);
-        _eventManager.RegisterEvent(Scp106Attack);
-        _eventManager.RegisterEvent(ObserveScp173);
-        _eventManager.RegisterEvent(PlaceTantrum);
-        _eventManager.RegisterEvent(ActivateBreakneckSpeed);
-        _eventManager.RegisterEvent(Revive);
-        _eventManager.RegisterEvent(ContainScp106);
-        _eventManager.RegisterEvent(CreatePortal);
-        _eventManager.RegisterEvent(LeavePocket);
-        _eventManager.RegisterEvent(ObserveScp096);
-        _eventManager.RegisterEvent(ContainScp079);
-        _eventManager.RegisterEvent(SwitchCamera);
+        _eventManager.RegisterEvent(Scp049Revive);
+
+        _eventManager.RegisterEvent(Scp079Contain);
+        _eventManager.RegisterEvent(Scp079SwitchCamera);
         _eventManager.RegisterEvent(Scp079DoorInteract);
         _eventManager.RegisterEvent(Scp079LockDoor);
         _eventManager.RegisterEvent(Scp079StartSpeaker);
         _eventManager.RegisterEvent(Scp079StopSpeaker);
+
+        _eventManager.RegisterEvent(Scp096Attack);
+        _eventManager.RegisterEvent(Scp096Observe);
+
+        _eventManager.RegisterEvent(Scp106Attack);
+        _eventManager.RegisterEvent(Scp106LeavePocket);
+
+        _eventManager.RegisterEvent(Scp173Attack);
+        _eventManager.RegisterEvent(Scp173Observe);
+        _eventManager.RegisterEvent(Scp173PlaceTantrum);
+        _eventManager.RegisterEvent(Scp173ActivateBreakneckSpeed);
+
+        _eventManager.RegisterEvent(Scp939Attack);
     }
 
     public override void Disable()
     {
         _eventManager.UnregisterEvent(Scp0492Attack);
         _eventManager.UnregisterEvent(Scp049Attack);
-        _eventManager.UnregisterEvent(Scp096Attack);
-        _eventManager.UnregisterEvent(Scp173Attack);
-        _eventManager.UnregisterEvent(Scp939Attack);
-        _eventManager.UnregisterEvent(Scp106Attack);
-        _eventManager.UnregisterEvent(ObserveScp173);
-        _eventManager.UnregisterEvent(Revive);
-        _eventManager.UnregisterEvent(ContainScp106);
-        _eventManager.UnregisterEvent(CreatePortal);
-        _eventManager.UnregisterEvent(LeavePocket);
-        _eventManager.UnregisterEvent(ObserveScp096);
-        _eventManager.UnregisterEvent(ContainScp079);
-        _eventManager.UnregisterEvent(SwitchCamera);
+        _eventManager.UnregisterEvent(Scp049Revive);
+
+        _eventManager.UnregisterEvent(Scp079Contain);
+        _eventManager.UnregisterEvent(Scp079SwitchCamera);
         _eventManager.UnregisterEvent(Scp079DoorInteract);
         _eventManager.UnregisterEvent(Scp079LockDoor);
         _eventManager.UnregisterEvent(Scp079StartSpeaker);
         _eventManager.UnregisterEvent(Scp079StopSpeaker);
+
+        _eventManager.UnregisterEvent(Scp096Attack);
+        _eventManager.UnregisterEvent(Scp096Observe);
+
+        _eventManager.UnregisterEvent(Scp106Attack);
+        _eventManager.UnregisterEvent(Scp106LeavePocket);
+
+        _eventManager.UnregisterEvent(Scp173Attack);
+        _eventManager.UnregisterEvent(Scp173Observe);
+        _eventManager.UnregisterEvent(Scp173PlaceTantrum);
+        
+        _eventManager.UnregisterEvent(Scp939Attack);
     }
 }
 
@@ -160,9 +170,9 @@ public class Scp106AttackEvent : ScpAttackEvent
     public bool TakeToPocket { get; set; }
 }
 
-public class ObserveScp173Event : PlayerInteractEvent
+public class Scp173ObserveEvent : PlayerInteractEvent
 {
-    public ObserveScp173Event(SynapsePlayer player, bool allow, SynapsePlayer scp173) : base(player, allow)
+    public Scp173ObserveEvent(SynapsePlayer player, bool allow, SynapsePlayer scp173) : base(player, allow)
     {
         Scp173 = scp173;
     }
@@ -170,21 +180,9 @@ public class ObserveScp173Event : PlayerInteractEvent
     public SynapsePlayer Scp173 { get; }
 }
 
-public class PlaceTantrumEvent : IEvent
+public class Scp173PlaceTantrumEvent : IEvent
 {
-    public PlaceTantrumEvent(SynapsePlayer scp173)
-    {
-        Scp173 = scp173;
-    }
-
-    public SynapsePlayer Scp173 { get; }
-
-    public bool Allow { get; set; } = true;
-}
-
-public class ActivateBreakneckSpeedEvent : IEvent
-{
-    public ActivateBreakneckSpeedEvent(SynapsePlayer scp173)
+    public Scp173PlaceTantrumEvent(SynapsePlayer scp173)
     {
         Scp173 = scp173;
     }
@@ -194,9 +192,24 @@ public class ActivateBreakneckSpeedEvent : IEvent
     public bool Allow { get; set; } = true;
 }
 
-public class ReviveEvent : IEvent
+public class Scp173ActivateBreakneckSpeedEvent : IEvent
 {
-    public ReviveEvent(SynapsePlayer scp049, SynapsePlayer humanToRevive, SynapseRagDoll ragDoll, bool finishRevive)
+    public Scp173ActivateBreakneckSpeedEvent(SynapsePlayer scp173, bool activate)
+    {
+        Scp173 = scp173;
+        Activate = activate;
+    }
+
+    public bool Activate { get; }
+
+    public SynapsePlayer Scp173 { get; }
+
+    public bool Allow { get; set; } = true;
+}
+
+public class Scp049ReviveEvent : IEvent
+{
+    public Scp049ReviveEvent(SynapsePlayer scp049, SynapsePlayer humanToRevive, SynapseRagDoll ragDoll, bool finishRevive)
     {
         Scp049 = scp049;
         HumanToRevive = humanToRevive;
@@ -215,29 +228,9 @@ public class ReviveEvent : IEvent
     public bool Allow { get; set; } = true;
 }
 
-public class ContainScp106Event : PlayerInteractEvent
+public class Scp106LeavePocketEvent : PlayerEvent
 {
-    public ContainScp106Event(SynapsePlayer player) : base(player, true) { }
-}
-
-public class CreatePortalEvent : IEvent
-{
-    public CreatePortalEvent(SynapsePlayer scp106, Vector3 position)
-    {
-        Scp106 = scp106;
-        Position = position;
-    }
-
-    public SynapsePlayer Scp106 { get; }
-    
-    public Vector3 Position { get; set; }
-
-    public bool Allow { get; set; } = true;
-}
-
-public class LeavePocketEvent : PlayerEvent
-{
-    public LeavePocketEvent(SynapsePlayer player, bool escapePocket, Vector3 enteredPosition) : base(player)
+    public Scp106LeavePocketEvent(SynapsePlayer player, bool escapePocket, Vector3 enteredPosition) : base(player)
     {
         EscapePocket = escapePocket;
         EnteredPosition = enteredPosition;
@@ -248,9 +241,9 @@ public class LeavePocketEvent : PlayerEvent
     public Vector3 EnteredPosition { get; set; }
 }
 
-public class ObserveScp096Event : PlayerInteractEvent
+public class Scp096ObserveEvent : PlayerInteractEvent
 {
-    public ObserveScp096Event(SynapsePlayer player, bool allow, SynapsePlayer scp096) : base(player, allow)
+    public Scp096ObserveEvent(SynapsePlayer player, bool allow, SynapsePlayer scp096) : base(player, allow)
     {
         Scp096 = scp096;
     }
@@ -258,9 +251,9 @@ public class ObserveScp096Event : PlayerInteractEvent
     public SynapsePlayer Scp096 { get; }
 }
 
-public class ContainScp079Event : IEvent
+public class Scp079ContainEvent : IEvent
 {
-    public ContainScp079Event(Scp079ContainmentStatus status)
+    public Scp079ContainEvent(Scp079ContainmentStatus status)
     {
         Status = status;
     }
@@ -270,9 +263,9 @@ public class ContainScp079Event : IEvent
     public bool Allow { get; set; } = true;
 }
 
-public class SwitchCameraEvent : IEvent
+public class scp079SwitchCameraEvent : IEvent
 {
-    public SwitchCameraEvent(bool spawning, SynapsePlayer scp079, SynapseCamera camera)
+    public scp079SwitchCameraEvent(bool spawning, SynapsePlayer scp079, SynapseCamera camera)
     {
         Spawning = spawning;
         Scp079 = scp079;

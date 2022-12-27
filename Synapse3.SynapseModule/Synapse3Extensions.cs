@@ -249,10 +249,8 @@ public static class Synapse3Extensions
             .Debug("Found Locker without SynapseObjectScript ... creating new SynapseLocker");
         return new SynapseLocker(locker);
     }
-
-    //TODO:
-    /*
-    public static SynapseRagDoll GetSynapseRagdoll(this Ragdoll rag)
+    
+    public static SynapseRagDoll GetSynapseRagdoll(this BasicRagdoll rag)
     {
         var script = rag.GetComponent<SynapseObjectScript>();
 
@@ -265,7 +263,7 @@ public static class Synapse3Extensions
             .Debug("Found Ragdoll without SynapseObjectScript ... creating new SynapseRagdoll");
         return new SynapseRagDoll(rag);
     }
-    */
+    
 
     
     public static SynapseTesla GetSynapseTesla(this TeslaGate gate) => _map

@@ -95,11 +95,11 @@ public static class PlayerHealPatch
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(HealthStat), nameof(HealthStat.ServerHeal))]
-    public static bool OnServerHeal(HealthStat __instant, float healAmount)
+    public static bool OnServerHeal(HealthStat __instance, float healAmount)
     {
         try
         {
-            var player = __instant.Hub.GetSynapsePlayer();
+            var player = __instance.Hub.GetSynapsePlayer();
             var ev = new HealEvent(player, true, healAmount);
             _player.Heal.RaiseSafely(ev);
             return ev.Allow;

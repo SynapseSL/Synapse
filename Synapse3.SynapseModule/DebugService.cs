@@ -78,7 +78,7 @@ public class DebugService : Service
             NeuronLogger.For<Synapse>().Warn($"Shoot {ev.Player.NickName} {ev.Target?.NickName} {ev.Item.ItemType}");
         });
 
-        _scp.Revive.Subscribe(ev =>
+        _scp.Scp049Revive.Subscribe(ev =>
         {
            
         });
@@ -106,7 +106,79 @@ public class DebugService : Service
         {
             NeuronLogger.For<Synapse>().Warn($"HAZARD {ev.Player.NickName}");
         });
-        
+
+        //--Debug
+        _player.WarheadPanelInteract.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"WarheadPanelInteract {ev.Player.NickName}");
+        });
+
+        _player.DropItem.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"DropItem {ev.Player.NickName}");
+        });
+
+        _player.Heal.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"Heal {ev.Player.NickName}");
+        });
+
+        _player.Join.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"Join {ev.NickName}");
+        });
+
+        _player.PlaceBulletHole.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"PlaceBulletHole {ev.Player.NickName}");
+        });
+
+        _player.OpenWarheadButton.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"OpenWarheadButton {ev.Player.NickName}");
+        });
+
+        _player.UpdateDisplayName.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"UpdateDisplayName {ev.Player.NickName}");
+        });
+
+        _player.Ban.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"Ban {ev.Player.NickName} {ev.Duration}");
+        });
+
+        _map.GeneratorEngage.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"GeneratorEngage {ev.Generator.Name}");
+        });
+
+        _map.CancelWarhead.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"CancelWarhead");
+        });
+
+        _scp.Scp106Attack.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"Scp106Attack {ev.Scp.NickName}");
+        });
+
+        _scp.Scp173PlaceTantrum.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"Scp173PlaceTantrum {ev.Scp173.NickName}");
+        });
+
+        _scp.Scp173ActivateBreakneckSpeed.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"Scp173ActivateBreakneckSpeed {ev.Scp173.NickName}");
+        });
+
+        _scp.Scp049Revive.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Warn($"Scp049Revive {ev.Scp049.NickName}");
+        });
+        //Debug--
+
         _player.StartWorkStation.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Warn($"WorkStation {ev.Player.NickName}");
@@ -129,14 +201,14 @@ public class DebugService : Service
         _scp.Scp939Attack.Subscribe(ScpEvent);
         _scp.Scp106Attack.Subscribe(ScpEvent);
 
-        _scp.ContainScp079.Subscribe(ev => NeuronLogger.For<Synapse>().Warn("Contain 079: " + ev.Status));
+        _scp.Scp079Contain.Subscribe(ev => NeuronLogger.For<Synapse>().Warn("Contain 079: " + ev.Status));
 
         _scp.Scp079DoorInteract.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Warn("079 Door");
         });
 
-        _scp.Revive.Subscribe(ev => ev.Allow = false);
+        _scp.Scp049Revive.Subscribe(ev => ev.Allow = false);
 
         Synapse.Get<SynapseObjectEvents>().ButtonPressed
             .Subscribe(ev =>
