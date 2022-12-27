@@ -6,6 +6,7 @@ using InventorySystem.Items;
 using InventorySystem.Items.Firearms.Attachments;
 using InventorySystem.Items.Firearms.Modules;
 using MEC;
+using Mirror;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerRoles;
@@ -25,6 +26,17 @@ using System.Linq;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
+
+[Automatic]
+[SynapsePatch("SendPlayerData", PatchType.PlayerEvent)]
+public static class SendPlayerDataPatch
+{
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(FlickerableLightController), nameof(FlickerableLightController.ServerSendDataToClient))]
+    public static void OnSendData(NetworkConnection conn)
+    {
+        
+    }
 
 [Automatic]
 [SynapsePatch("PlayerEscape", PatchType.PlayerEvent)]
@@ -432,102 +444,103 @@ public static class PlayerDropItemPatch
     }
 }
 
-[Automatic]
-[SynapsePatch("PlayerDeath", PatchType.PlayerEvent)]
-public static class PlayerDeathPatch
-{
-    static SynapseTranslation _translation;
-    static PlayerService _player;
-    static PlayerEvents _playerEvent;
-
-    static PlayerDeathPatch()
+    [Automatic]
+    [SynapsePatch("PlayerDeath", PatchType.PlayerEvent)]
+    public static class PlayerDeathPatch
     {
-        _translation = Synapse.Get<SynapseConfigService>().Translation;
-        _playerEvent = Synapse.Get<PlayerEvents>();
-        _player = Synapse.Get<PlayerService>();
-    }
+        static SynapseTranslation _translation;
+        static PlayerService _player;
+        static PlayerEvents _playerEvent;
 
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.KillPlayer))]
-    public static bool OnKill(PlayerStats __instance, DamageHandlerBase handler)
-    {
-        try
+        static PlayerDeathPatch()
         {
-            var damage = (handler as StandardDamageHandler)?.Damage ?? 0;
-            var victim = __instance.GetSynapsePlayer();
-            var attacker = (handler as AttackerDamageHandler)?.Attacker.GetSynapsePlayer();
-            var damageType = handler.GetDamageType();
+            _translation = Synapse.Get<SynapseConfigService>().Translation;
+            _playerEvent = Synapse.Get<PlayerEvents>();
+            _player = Synapse.Get<PlayerService>();
+        }
 
-            if (damageType == DamageType.PocketDecay)
-                attacker = _player.Players.FirstOrDefault(x => x.ScpController.Scp106.PlayersInPocket.Contains(victim));
 
-            string playerMsg = null;
-
-            if (attacker?.CustomRole != null)
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.KillPlayer))]
+        public static bool OnKill(PlayerStats __instance, DamageHandlerBase handler)
+        {
+            try
             {
-                var translation = victim.GetTranslation(_translation).DeathMessage.Replace("\\n", "\n");
-                playerMsg = string.Format(translation, attacker.DisplayName, attacker.RoleName);
-            }
+                var damage = (handler as StandardDamageHandler)?.Damage ?? 0;
+                var victim = __instance.GetSynapsePlayer();
+                var attacker = (handler as AttackerDamageHandler)?.Attacker.GetSynapsePlayer();
+                var damageType = handler.GetDamageType();
 
-            var ev = new DeathEvent(victim, true, attacker, damageType, damage, playerMsg, null);
-            _playerEvent.Death.Raise(ev);
+                if (damageType == DamageType.PocketDecay)
+                    attacker = _player.Players.FirstOrDefault(x => x.ScpController.Scp106.PlayersInPocket.Contains(victim));
 
-            if (!ev.Allow)
-            {
-                victim.Health = 1;
+                string playerMsg = null;
+
+                if (attacker?.CustomRole != null)
+                {
+                    var translation = victim.GetTranslation(_translation).DeathMessage.Replace("\\n", "\n");
+                    playerMsg = string.Format(translation, attacker.DisplayName, attacker.RoleName);
+                }
+
+                var ev = new DeathEvent(victim, true, attacker, damageType, damage, playerMsg, null);
+                _playerEvent.Death.Raise(ev);
+
+                if (!ev.Allow)
+                {
+                    victim.Health = 1;
+                    return false;
+                }
+
+                victim.DeathPosition = victim.Position;
+
+                playerMsg = ev.DeathMessage;
+                var ragdollInfo = ev.RagdollInfo;
+
+                //--Vanila Stuff rework--
+                if (ragdollInfo != null)
+                    RagdollManager.ServerSpawnRagdoll(victim, new CustomReasonDamageHandler(ragdollInfo));
+                else
+                    RagdollManager.ServerSpawnRagdoll(victim, handler);
+
+                victim.Inventory.DropEverything();
+
+                var classManager = victim.ClassManager;
+                victim.RoleManager.ServerSetRole(RoleTypeId.Spectator, RoleChangeReason.Died);
+                if (playerMsg != null)
+                    handler = new CustomReasonDamageHandler(playerMsg);
+                if (__instance._hub.roleManager.CurrentRole is SpectatorRole spectatorRole)
+                {
+                    spectatorRole.ServerSetData(handler);
+                }
+                victim.GameConsoleTransmission.SendToClient("You died. Reason: " + handler.ServerLogsText, "yellow");
+
+                //--Synapse API--
+                foreach (var larry in _player.Players)
+                {
+                    var playerPocket = larry.ScpController.Scp106.PlayersInPocket;
+                    if (playerPocket.Contains(victim))
+                        playerPocket.Remove(victim);
+                }
+
+                if (victim.PlayerType == PlayerType.Dummy)
+                {
+                    Timing.CallDelayed(Timing.WaitForOneFrame, () =>
+                    {
+                        var dummy = victim as DummyPlayer;
+                        if (dummy != null && dummy.DestroyWhenDied)
+                            dummy.SynapseDummy.Destroy();
+                    });
+                }
+
+                victim.RemoveCustomRole(DeSpawnReason.Death);
                 return false;
             }
-
-            victim.DeathPosition = victim.Position;
-
-            playerMsg = ev.DeathMessage;
-            var ragdollInfo = ev.RagdollInfo;
-
-            //--Vanila Stuff rework--
-            if (ragdollInfo != null)
-                RagdollManager.ServerSpawnRagdoll(victim, new CustomReasonDamageHandler(ragdollInfo));
-            else
-                RagdollManager.ServerSpawnRagdoll(victim, handler);
-
-            victim.Inventory.DropEverything();
-
-            var classManager = victim.ClassManager;
-            victim.RoleManager.ServerSetRole(RoleTypeId.Spectator, RoleChangeReason.Died);
-            if (playerMsg != null)
-                handler = new CustomReasonDamageHandler(playerMsg);
-            if (__instance._hub.roleManager.CurrentRole is SpectatorRole spectatorRole)
+            catch (Exception e)
             {
-                spectatorRole.ServerSetData(handler);
+                SynapseLogger<Synapse>.Error($"Sy3 Event: PlayerDeathPatch failed!!\n{e}");
+
+                return true;
             }
-            victim.GameConsoleTransmission.SendToClient("You died. Reason: " + handler.ServerLogsText, "yellow");
-
-            //--Synapse API--
-            foreach (var larry in _player.Players)
-            {
-                var playerPocket = larry.ScpController.Scp106.PlayersInPocket;
-                if (playerPocket.Contains(victim))
-                    playerPocket.Remove(victim);
-            }
-
-            if (victim.PlayerType == PlayerType.Dummy)
-            {
-                Timing.CallDelayed(Timing.WaitForOneFrame, () =>
-                {
-                    var dummy = victim as DummyPlayer;
-                    if (dummy != null && dummy.DestroyWhenDied)
-                        dummy.SynapseDummy.Destroy();
-                });
-            }
-
-            victim.RemoveCustomRole(DeSpawnReason.Death);
-            return false;
-        }
-        catch (Exception e)
-        {
-            SynapseLogger<Synapse>.Error($"Sy3 Event: PlayerDeathPatch failed!!\n{e}");
-
-            return true;
         }
     }
 }

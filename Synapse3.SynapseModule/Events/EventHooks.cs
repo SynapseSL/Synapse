@@ -312,6 +312,22 @@ public partial class ItemEvents
 
         return ev.Allow;
     }
+    [PluginEvent(ServerEventType.PlayerCoinFlip)]
+    public PlayerPreCoinFlipCancellationData.CoinFlipCancellation PlayerFlipCoinHook(IPlayer player, bool IsTails)
+    {
+        var synapsePlayer = player.GetSynapsePlayer();
+        var synapseItem = synapsePlayer.Inventory.ItemInHand;
+        var ev = new FlipCoinEvent(synapseItem, synapsePlayer, IsTails);
+        FlipCoin.RaiseSafely(ev);
+        if (!ev.Allow)
+            return PlayerPreCoinFlipCancellationData.CoinFlipCancellation.None;
+        if(ev.Tails)
+            return PlayerPreCoinFlipCancellationData.CoinFlipCancellation.Tails;
+        if (!ev.Tails)
+            return PlayerPreCoinFlipCancellationData.CoinFlipCancellation.Heads;
+
+        return PlayerPreCoinFlipCancellationData.CoinFlipCancellation.PreventFlip;
+    }
 }
 
 public partial class MapEvents
@@ -336,4 +352,4 @@ public partial class MapEvents
         return ev.Allow;
     }
 
-}}
+}
