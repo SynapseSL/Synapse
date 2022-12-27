@@ -351,6 +351,7 @@ public partial class ItemEvents
 
         return ev.Allow;
     }
+
     [PluginEvent(ServerEventType.PlayerCoinFlip)]
     public PlayerPreCoinFlipCancellationData.CoinFlipCancellation PlayerFlipCoinHook(IPlayer player, bool IsTails)
     {
@@ -393,4 +394,4 @@ public partial class MapEvents
         return ev.Allow;
     }
 
-}}
+}
