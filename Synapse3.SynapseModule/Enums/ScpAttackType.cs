@@ -5,7 +5,12 @@ public enum ScpAttackType
     Scp173Snap = 0,
     Scp106Grab = 3,
     Scp049Touch = 5,
-    Scp096Tear = 9,
+    Scp096Charge = 8,
+    Scp096Tear = 9, 
     Scp0492Scratch = 10,
+    Scp939None = 12,
+    Scp939Claw = 13,
+    Scp939LungeSeconde = 14,
+    Scp939Lunge = 15,
     Scp939Bite = 16,
 }

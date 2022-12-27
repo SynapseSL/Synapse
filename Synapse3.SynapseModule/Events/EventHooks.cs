@@ -33,6 +33,8 @@ public partial class PlayerEvents
     [PluginEvent(ServerEventType.PlayerChangeRole)]
     public bool PlayerChangeRoleHook(IPlayer player, PlayerRoleBase oldRole, RoleTypeId newRole, RoleChangeReason changeReason)
     {
+        NeuronLogger.For<Synapse>().Warn("PlayerChangeRoleHook");
+
         var ev = new SetClassEvent(player.GetSynapsePlayer(), newRole, changeReason);
 
         SetClass.RaiseSafely(ev);
@@ -218,7 +220,7 @@ public partial class PlayerEvents
     [PluginEvent(ServerEventType.PlayerKicked)]
     public bool PlayerKickedHook(IPlayer player, IPlayer issuer, string reason)
     {
-        var ev = new KickEvent(player.GetSynapsePlayer(), issuer.GetSynapsePlayer(), reason, true);
+        var ev = new KickEvent(player?.GetSynapsePlayer(), issuer?.GetSynapsePlayer(), reason, true);
 
         Kick.RaiseSafely(ev);
         return ev.Allow;
@@ -226,11 +228,11 @@ public partial class PlayerEvents
 
 
     [PluginEvent(ServerEventType.PlayerBanned)]
-    public bool PlayerKickedHook(IPlayer player, ICommandSender issuer, string reason, long duration)
+    public bool PlayerBandHook(IPlayer player, ICommandSender issuer, string reason, long duration)
     {
         var playerIssuer = (issuer as PlayerCommandSender)?.GetSynapsePlayer();
 
-        var ev = new BanEvent(player.GetSynapsePlayer(), true, playerIssuer, reason, duration, false);
+        var ev = new BanEvent(player?.GetSynapsePlayer(), true, playerIssuer, reason, duration, false);
 
         Ban.RaiseSafely(ev);
         return ev.Allow;
@@ -243,6 +245,7 @@ public partial class RoundEvents
     [PluginEvent(ServerEventType.WaitingForPlayers)]
     public void RoundWaitingHook()
     {
+        NeuronLogger.For<Synapse>().Warn("RoundWaitingHook");
         Waiting.RaiseSafely(new RoundWaitingEvent(_firstTime));
 
         _firstTime = false;

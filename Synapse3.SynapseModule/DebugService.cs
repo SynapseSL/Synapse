@@ -165,18 +165,49 @@ public class DebugService : Service
 
         _scp.Scp173PlaceTantrum.Subscribe(ev =>
         {
-            NeuronLogger.For<Synapse>().Warn($"Scp173PlaceTantrum {ev.Scp173.NickName}");
+            NeuronLogger.For<Synapse>().Warn($"Scp173PlaceTantrum {ev.Scp.NickName}");
         });
 
         _scp.Scp173ActivateBreakneckSpeed.Subscribe(ev =>
         {
-            NeuronLogger.For<Synapse>().Warn($"Scp173ActivateBreakneckSpeed {ev.Scp173.NickName}");
+            NeuronLogger.For<Synapse>().Warn($"Scp173ActivateBreakneckSpeed {ev.Scp.NickName}");
         });
 
         _scp.Scp049Revive.Subscribe(ev =>
         {
-            NeuronLogger.For<Synapse>().Warn($"Scp049Revive {ev.Scp049.NickName}");
+            NeuronLogger.For<Synapse>().Warn($"Scp049Revive {ev.Scp.NickName}");
         });
+
+        _scp.Scp0492Attack.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Error($"Scp0492Attack {ev.Scp.NickName}");
+        });
+
+        _scp.Scp049Attack.Subscribe(ev =>//Error for red to see better
+        {
+            NeuronLogger.For<Synapse>().Error($"Scp049Attack {ev.Scp.NickName}");
+        });
+
+        _scp.Scp096Attack.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Error($"Scp096Attack {ev.Scp.NickName}");
+        });
+
+        _scp.Scp106Attack.Subscribe(ev =>//FIX
+        {
+            NeuronLogger.For<Synapse>().Error($"Scp106Attack {ev.Scp.NickName}");
+        });
+
+        _scp.Scp173Attack.Subscribe(ev =>//FIX
+        {
+            NeuronLogger.For<Synapse>().Error($"Scp173Attack {ev.Scp.NickName}");
+        });
+
+        _scp.Scp939Attack.Subscribe(ev =>//FIX
+        {
+            NeuronLogger.For<Synapse>().Error($"Scp939Attack {ev.Scp.NickName}");
+        });
+
         //Debug--
 
         _player.StartWorkStation.Subscribe(ev =>
@@ -235,6 +266,21 @@ public class DebugService : Service
         _round.FirstSpawn.Subscribe(ev =>
         {
             Logger.Warn("First Spawn,SCPS: "+ ev.AmountOfScpSpawns);
+        });
+
+        _round.Start.Subscribe(ev =>
+        {
+            Logger.Warn("Round Start");
+
+            foreach (var @event in PluginAPI.Events.EventManager.Events)
+            {
+                Logger.Warn($"{@event.Key}");
+                foreach (var method in @event.Value.Invokers)
+                {
+                    Logger.Warn($"{method.Key.FullName} {method.Value.Count}");
+
+                }
+            }
         });
     }
 

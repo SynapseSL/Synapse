@@ -136,7 +136,7 @@ public static class PlayerOpenWarHeadButtonPatch
             var player = __instance.GetSynapsePlayer();
 
             var componentInParent = gameObject.GetComponentInParent<AlphaWarheadOutsitePanel>();
-            if (componentInParent == null || (componentInParent.keycardEntered && !_config.GamePlayConfiguration.WarheadButtonClosable))
+            if (componentInParent == null || (componentInParent.keycardEntered && false /*!_config.GamePlayConfiguration.WarheadButtonClosable*/))
                 return false;
 
             var allow = KeycardPermissions.AlphaWarhead.CheckPermission(player);

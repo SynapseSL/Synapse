@@ -1,5 +1,6 @@
 ﻿using Neuron.Core.Events;
 using Neuron.Core.Meta;
+using PlayerRoles.PlayableScps.Scp939;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
@@ -94,38 +95,51 @@ public partial class ScpEvents : Service
     }
 }
 
-public abstract class ScpAttackEvent : IEvent
+public abstract class ScpAttackEvent : ScpActionEvent
 {
-    protected ScpAttackEvent(SynapsePlayer scp, SynapsePlayer victim,float damage, bool allow)
+    protected ScpAttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage, bool allow) : base(scp, allow)
     {
-        Scp = scp;
         Victim = victim;
         Damage = damage;
-        Allow = allow;
     }
     
     public abstract ScpAttackType ScpAttackType { get; }
-    
-    public SynapsePlayer Scp { get; }
     
     public SynapsePlayer Victim { get; }
     
     public float Damage { get; set; }
     
+}
+
+public abstract class ScpActionEvent : IEvent
+{
+    public ScpActionEvent(SynapsePlayer scp, bool allow)
+    {
+        Scp = scp;
+        Allow = allow;
+    }
+
+    public SynapsePlayer Scp { get; }
+
     public bool Allow { get; set; }
+
 }
 
 public class Scp049AttackEvent : ScpAttackEvent
 {
-    public Scp049AttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage, float cooldown, bool allow) : base(
+    public Scp049AttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage, 
+        float cooldown, bool cardiacArrest, bool allow) : base(
         scp, victim, damage, allow)
     {
         Cooldown = cooldown;
+        CardiacArrestEffect = cardiacArrest;
     }
 
     public override ScpAttackType ScpAttackType => ScpAttackType.Scp049Touch;
     
-    public float Cooldown { get; }
+    public bool CardiacArrestEffect { get; set; }
+
+    public float Cooldown { get; set; }
 }
 
 public class Scp0492AttackEvent : ScpAttackEvent
@@ -137,10 +151,14 @@ public class Scp0492AttackEvent : ScpAttackEvent
 
 public class Scp096AttackEvent : ScpAttackEvent
 {
-    public Scp096AttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage) : base(scp, victim, damage, true) { }
+    public Scp096AttackEvent(SynapsePlayer scp, SynapsePlayer victim, bool charge, float damage) : base(scp, victim, damage, true) 
+    {
+        ScpAttackType = charge ? ScpAttackType.Scp096Charge : ScpAttackType.Scp096Tear;
+    }
 
-    public override ScpAttackType ScpAttackType => ScpAttackType.Scp096Tear;
+    public override ScpAttackType ScpAttackType { get; }
 
+    //TODO:
     public bool RemoveTarget { get; set; } = true;
 }
 
@@ -153,9 +171,29 @@ public class Scp173AttackEvent : ScpAttackEvent
 
 public class Scp939AttackEvent : ScpAttackEvent
 {
-    public Scp939AttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage, bool allow) : base(scp, victim, damage, allow) { }
+    public Scp939AttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage, Scp939DamageType type) : base(scp, victim, damage, true) 
+    {
+        switch (type)
+        {
+            case Scp939DamageType.None:
+                ScpAttackType = ScpAttackType.Scp939None;
+                    break;
+            case Scp939DamageType.Claw:
+                ScpAttackType = ScpAttackType.Scp939Claw;
+                    break;
+            case Scp939DamageType.LungeTarget:
+                ScpAttackType = ScpAttackType.Scp939Lunge;
+                    break;
+            case Scp939DamageType.LungeSecondary:
+                ScpAttackType = ScpAttackType.Scp939LungeSeconde;
+                break;
+            default:
+                ScpAttackType = ScpAttackType.Scp939None;
+                break;
+        }
+    }
     
-    public override ScpAttackType ScpAttackType => ScpAttackType.Scp939Bite;
+    public override ScpAttackType ScpAttackType { get; }
 }
 
 public class Scp106AttackEvent : ScpAttackEvent
@@ -172,52 +210,39 @@ public class Scp106AttackEvent : ScpAttackEvent
 
 public class Scp173ObserveEvent : PlayerInteractEvent
 {
-    public Scp173ObserveEvent(SynapsePlayer player, bool allow, SynapsePlayer scp173) : base(player, allow)
+    public Scp173ObserveEvent(SynapsePlayer player, bool allow, SynapsePlayer scp) : base(player, allow)
     {
-        Scp173 = scp173;
+        Scp = scp;
     }
 
-    public SynapsePlayer Scp173 { get; }
+    public SynapsePlayer Scp { get; }
 }
 
-public class Scp173PlaceTantrumEvent : IEvent
+public class Scp173PlaceTantrumEvent : ScpActionEvent
 {
-    public Scp173PlaceTantrumEvent(SynapsePlayer scp173)
-    {
-        Scp173 = scp173;
-    }
+    public Scp173PlaceTantrumEvent(SynapsePlayer scp) : base (scp , true) { }
 
-    public SynapsePlayer Scp173 { get; }
-
-    public bool Allow { get; set; } = true;
 }
 
-public class Scp173ActivateBreakneckSpeedEvent : IEvent
+public class Scp173ActivateBreakneckSpeedEvent : ScpActionEvent
 {
-    public Scp173ActivateBreakneckSpeedEvent(SynapsePlayer scp173, bool activate)
+    public Scp173ActivateBreakneckSpeedEvent(SynapsePlayer scp, bool activate) : base(scp, true)
     {
-        Scp173 = scp173;
         Activate = activate;
     }
 
     public bool Activate { get; }
 
-    public SynapsePlayer Scp173 { get; }
-
-    public bool Allow { get; set; } = true;
 }
 
-public class Scp049ReviveEvent : IEvent
+public class Scp049ReviveEvent : ScpActionEvent
 {
-    public Scp049ReviveEvent(SynapsePlayer scp049, SynapsePlayer humanToRevive, SynapseRagDoll ragDoll, bool finishRevive)
+    public Scp049ReviveEvent(SynapsePlayer scp, SynapsePlayer humanToRevive, SynapseRagDoll ragDoll, bool finishRevive) : base(scp, true)
     {
-        Scp049 = scp049;
         HumanToRevive = humanToRevive;
         RagDoll = ragDoll;
         FinishRevive = finishRevive;
     }
-    
-    public SynapsePlayer Scp049 { get; }
     
     public SynapsePlayer HumanToRevive { get; }
     
@@ -225,7 +250,6 @@ public class Scp049ReviveEvent : IEvent
     
     public bool FinishRevive { get; }
 
-    public bool Allow { get; set; } = true;
 }
 
 public class Scp106LeavePocketEvent : PlayerEvent
@@ -243,12 +267,12 @@ public class Scp106LeavePocketEvent : PlayerEvent
 
 public class Scp096ObserveEvent : PlayerInteractEvent
 {
-    public Scp096ObserveEvent(SynapsePlayer player, bool allow, SynapsePlayer scp096) : base(player, allow)
+    public Scp096ObserveEvent(SynapsePlayer player, bool allow, SynapsePlayer scp) : base(player, allow)
     {
-        Scp096 = scp096;
+        Scp = scp;
     }
     
-    public SynapsePlayer Scp096 { get; }
+    public SynapsePlayer Scp { get; }
 }
 
 public class Scp079ContainEvent : IEvent
@@ -263,92 +287,71 @@ public class Scp079ContainEvent : IEvent
     public bool Allow { get; set; } = true;
 }
 
-public class scp079SwitchCameraEvent : IEvent
+public class scp079SwitchCameraEvent : ScpActionEvent
 {
-    public scp079SwitchCameraEvent(bool spawning, SynapsePlayer scp079, SynapseCamera camera)
+    public scp079SwitchCameraEvent(bool spawning, SynapsePlayer scp, SynapseCamera camera) : base(scp, true)
     {
         Spawning = spawning;
-        Scp079 = scp079;
         Camera = camera;
     }
 
     public SynapseCamera Camera { get; set; }
     
-    public SynapsePlayer Scp079 { get; }
-
-    public bool Allow { get; set; } = true;
-    
     public bool Spawning { get; }
 }
 
-public class Scp079DoorInteractEvent : IEvent
+public class Scp079DoorInteractEvent : ScpActionEvent
 {
-    public Scp079DoorInteractEvent(SynapsePlayer scp079, SynapseDoor door, float energy)
+    public Scp079DoorInteractEvent(SynapsePlayer scp, SynapseDoor door, float energy) : base(scp, true)
     {
-        Scp079 = scp079;
         Door = door;
         Energy = energy;
     }
 
-    public SynapsePlayer Scp079 { get; }
-    
     public SynapseDoor Door { get; }
     
     public float Energy { get; set; }
 
-    public bool Allow { get; set; } = true;
 }
 
-public class Scp079LockDoorEvent : IEvent
+public class Scp079LockDoorEvent : ScpActionEvent
 {
-    public Scp079LockDoorEvent(SynapsePlayer scp079, SynapseDoor door, bool unlock, float energy)
+    public Scp079LockDoorEvent(SynapsePlayer scp, SynapseDoor door, bool unlock, float energy) : base(scp, true)
     {
-        Scp079 = scp079;
         Door = door;
         Unlock = unlock;
         Energy = energy;
     }
 
-    public SynapsePlayer Scp079 { get; }
-    
     public SynapseDoor Door { get; }
 
     public bool Unlock { get; }
     
     public float Energy { get; set; }
 
-    public bool Allow { get; set; } = true;
 }
 
-public class Scp079StartSpeakerEvent : IEvent
+public class Scp079StartSpeakerEvent : ScpActionEvent
 {
-    public Scp079StartSpeakerEvent(SynapsePlayer scp079, float energy, string speakerName)
+    public Scp079StartSpeakerEvent(SynapsePlayer scp, float energy, string speakerName) : base(scp, true)
     {
-        Scp079 = scp079;
         Energy = energy;
         SpeakerName = speakerName;
     }
 
-    public SynapsePlayer Scp079 { get; }
-    
     public string SpeakerName { get; }
 
     public float Energy { get; set; }
 
-    public bool Allow { get; set; } = true;
 }
 
-public class Scp079StopSpeakerEvent : IEvent
+public class Scp079StopSpeakerEvent : ScpActionEvent
 {
-    public Scp079StopSpeakerEvent(SynapsePlayer scp079, string speakerName)
+    public Scp079StopSpeakerEvent(SynapsePlayer scp, string speakerName) : base(scp, true)
     {
-        Scp079 = scp079;
         SpeakerName = speakerName;
     }
 
-    public SynapsePlayer Scp079 { get; }
-
     public string SpeakerName { get; }
     
-    public bool Allow { get; set; } = true;
 }
