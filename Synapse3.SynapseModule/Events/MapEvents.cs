@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Neuron.Core.Events;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Item;
@@ -46,9 +45,9 @@ public class MapEvents : Service
 
 public class Scp914UpgradeEvent : IEvent
 {
-    public ReadOnlyCollection<SynapsePlayer> Players { get; }
+    public List<SynapsePlayer> Players { get; }
     
-    public ReadOnlyCollection<SynapseItem> Items { get; }
+    public List<SynapseItem> Items { get; }
 
     public bool Allow { get; set; } = true;
 
@@ -60,8 +59,8 @@ public class Scp914UpgradeEvent : IEvent
 
     public Scp914UpgradeEvent(List<SynapsePlayer> players, List<SynapseItem> items)
     {
-        Players = new ReadOnlyCollection<SynapsePlayer>(players);
-        Items = new ReadOnlyCollection<SynapseItem>(items);
+        Players = players;
+        Items = items;
     }
 }
 

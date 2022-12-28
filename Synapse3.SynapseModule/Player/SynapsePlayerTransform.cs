@@ -1,9 +1,6 @@
 ﻿using Mirror;
 using PlayerRoles.FirstPersonControl;
-using PlayerRoles.FirstPersonControl.NetworkMessages;
-using PluginAPI.Core;
 using Synapse3.SynapseModule.Map.Rooms;
-using System;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;

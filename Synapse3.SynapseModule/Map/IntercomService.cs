@@ -8,9 +8,10 @@ namespace Synapse3.SynapseModule.Map;
 
 public class IntercomService : Service
 {
-    private RoundEvents _round;
-    private PlayerService _player;
+    private readonly RoundEvents _round;
+    private readonly PlayerService _player;
     public Intercom Intercom { get; private set; }
+    public IntercomDisplay Display { get; private set; }
 
     public IntercomService(RoundEvents round, PlayerService player)
     {
@@ -28,26 +29,23 @@ public class IntercomService : Service
         _round.Waiting.Unsubscribe(GetIntercom);
     }
 
+    public IntercomState State
+    {
+        get => Intercom.State;
+        set => Intercom.Network_state = (byte)value;
+    }
+
     public SynapsePlayer Speaker
     {
-        get
-        {
-            if (Intercom._curSpeaker == null) return null;
-
-            return Intercom._curSpeaker.GetSynapsePlayer();
-        }
-        set { }
-        //TODO:
-        //Intercom.RequestTransmission(value.gameObject);
+        get => Intercom._curSpeaker == null ? null : Intercom._curSpeaker.GetSynapsePlayer();
+        set => Intercom._curSpeaker = value?.Hub;
     }
-
-    /*
+    
     public string DisplayText
     {
-        get => Intercom.CustomContent;
-        set => Intercom.CustomContent = string.IsNullOrWhiteSpace(value) ? null : value;
+        get => Display.Network_overrideText;
+        set => Display.Network_overrideText = string.IsNullOrWhiteSpace(value) ? null : value;
     }
-    */
 
     public float RemainingTime
     {
@@ -57,6 +55,7 @@ public class IntercomService : Service
 
     private void GetIntercom(RoundWaitingEvent ev)
     {
-        Intercom = _player.Host.GetComponent<Intercom>();
+        Intercom = Intercom._singleton;
+        Display = IntercomDisplay._singleton;
     }
 }

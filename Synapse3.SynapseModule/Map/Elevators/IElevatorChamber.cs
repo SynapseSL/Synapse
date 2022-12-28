@@ -2,11 +2,11 @@
 
 namespace Synapse3.SynapseModule.Map.Elevators;
 
-public interface IElevatorDestination
+public interface IElevatorChamber
 {
     public Vector3 Position { get; }
     
-    public bool Open { get; set; }
+    public bool IsMoving { get; set; }
     
     public IElevator MainElevator { get; }
 }

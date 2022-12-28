@@ -1,8 +1,4 @@
 ﻿using Neuron.Core.Meta;
-using Subtitles;
-using Synapse3.SynapseModule.Enums;
-using Synapse3.SynapseModule.Map.Rooms;
-using Utils.Networking;
 
 namespace Synapse3.SynapseModule.Map;
 

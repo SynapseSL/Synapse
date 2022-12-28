@@ -1,6 +1,5 @@
 ﻿using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Command;
-using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;

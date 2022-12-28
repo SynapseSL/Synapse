@@ -9,6 +9,7 @@ using Synapse3.SynapseModule.Events;
 
 namespace Synapse3.ExamplePlugin;
 
+[HeavyModded]
 [Plugin(
     Name = "Example Plugin",
     Description = "Example Description",

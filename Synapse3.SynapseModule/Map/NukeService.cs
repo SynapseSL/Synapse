@@ -1,7 +1,5 @@
 ﻿using Neuron.Core.Meta;
-using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map;

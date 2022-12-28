@@ -1,9 +1,4 @@
 ﻿using MEC;
-using Mirror;
-using Neuron.Core.Logging;
-using PlayerRoles;
-using PlayerRoles.FirstPersonControl.NetworkMessages;
-using PlayerRoles.SpawnData;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -14,12 +9,7 @@ public class DummyPlayer : SynapsePlayer
 {
     public override PlayerType PlayerType => PlayerType.Dummy;
 
-    private bool _raVisble = false;
-    public bool RaVisible 
-    { 
-        get => _raVisble; 
-        set => _raVisble = value; 
-    }
+    public bool RaVisible { get; set; } = true;
 
     public bool DestroyWhenDied { get; set; } = true;
 

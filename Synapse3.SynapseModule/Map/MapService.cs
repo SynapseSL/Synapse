@@ -7,7 +7,6 @@ using MapGeneration;
 using MapGeneration.Distributors;
 using MEC;
 using Mirror;
-using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerRoles.Ragdolls;
 using Synapse3.SynapseModule.Enums;

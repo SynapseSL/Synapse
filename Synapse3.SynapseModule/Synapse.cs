@@ -83,7 +83,6 @@ public partial class Synapse : Module
 
     public override void Enable()
     {
-
         SynapseCommandService = _kernel.GetSafe<SynapseCommandService>();
         RoleService = _kernel.GetSafe<RoleService>();
         TeamService = _kernel.GetSafe<TeamService>();

@@ -1,16 +1,13 @@
 ﻿using System;
 using Mirror;
-using Neuron.Core.Events;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
 using PlayerRoles.PlayableScps.Scp049.Zombies;
 using PlayerRoles.SpawnData;
-using PluginAPI.Enums;
 using RelativePositioning;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Role;
 using UnityEngine;
-using EventManager = PluginAPI.Events.EventManager;
 
 namespace Synapse3.SynapseModule.Player;
 

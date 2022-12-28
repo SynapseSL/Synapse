@@ -6,10 +6,7 @@ using Neuron.Core.Meta;
 using Ninject;
 using PlayerRoles;
 using Respawning;
-using Respawning.NamingRules;
-using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
-using Synapse3.SynapseModule.Role;
 
 namespace Synapse3.SynapseModule.Teams;
 

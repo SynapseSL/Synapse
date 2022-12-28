@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using Footprinting;
-using UnityEngine;
-
-namespace Synapse3.SynapseModule.Player;
+﻿namespace Synapse3.SynapseModule.Player;
 
 public class Scp106Controller
 {

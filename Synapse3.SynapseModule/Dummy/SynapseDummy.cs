@@ -1,20 +1,14 @@
 ﻿using InventorySystem.Items;
-using InventorySystem.Items.Coin;
-using InventorySystem.Items.MicroHID;
 using MEC;
 using Mirror;
-using Neuron.Core.Logging;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
-using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
-using YamlDotNet.Core.Tokens;
 using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule.Dummy;

@@ -1,6 +1,4 @@
-﻿using Synapse3.SynapseModule.Map.Objects;
-
-namespace Synapse3.SynapseModule.Player;
+﻿namespace Synapse3.SynapseModule.Player;
 
 public class Scp079Controller
 {

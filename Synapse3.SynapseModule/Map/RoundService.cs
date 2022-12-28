@@ -33,7 +33,6 @@ public class RoundService : Service
     {
         CurrentRound++;
         ForceEnd = false;
-        FemurSacrifices = 0;
     }
 
 
@@ -41,8 +40,6 @@ public class RoundService : Service
     /// The number of the round sciece the last server restart
     /// </summary>
     public int CurrentRound { get; private set; }
-
-    public int FemurSacrifices { get; set; }
 
     /// <summary>
     /// The time until the next wave spawns
