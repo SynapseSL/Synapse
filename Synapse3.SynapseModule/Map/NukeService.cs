@@ -1,4 +1,5 @@
-﻿using Neuron.Core.Meta;
+﻿using Mirror;
+using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
@@ -37,25 +38,34 @@ public class NukeService : Service
     public NukeInsidePanel InsidePanel { get; } = new();
 
     public NukeOutsidePanel OutsidePanel { get; } = new();
-
     
-    //TODO:
-    /*
-    public float TimeUntilDetonation
+    /// <summary>
+    /// Change the Time until the detonantion, start the count down if not started
+    /// </summary>
+    public double TimeUntilDetonation
     {
-        get => WarheadController.NetworktimeToDetonation;
-        set => WarheadController.NetworktimeToDetonation = value;
+        get
+        {
+            var info = AlphaWarheadController.Singleton.NetworkInfo;
+            return info.StartTime - NetworkTime.time;
+        }
+        set
+        {
+            var info = AlphaWarheadController.Singleton.NetworkInfo;
+            info.StartTime = value;
+            AlphaWarheadController.Singleton.NetworkInfo = info;
+        }
     }
 
-    public int DeathsByNuke => WarheadController.warheadKills;
+    public int DeathsByNuke => WarheadController.WarheadKills;
 
     public NukeState State
     {
         get
         {
-            if (WarheadController.detonated) return NukeState.Detonated;
+            if (AlphaWarheadController.Detonated) return NukeState.Detonated;
 
-            if (WarheadController.NetworkinProgress) return NukeState.Active;
+            if (AlphaWarheadController.InProgress) return NukeState.Active;
 
             if (InsidePanel.Enabled) return NukeState.Prepared;
             
@@ -65,8 +75,8 @@ public class NukeService : Service
     
 
     public bool CanDetonate
-        => WarheadController.CanDetonate;
-        */
+        => AlphaWarheadController.Detonated;
+        
     
     public void StartDetonation()
         => WarheadController.StartDetonation();
@@ -74,23 +84,18 @@ public class NukeService : Service
     public void CancelDetonation()
         => WarheadController.CancelDetonation();
 
-    //TODO:
-    /*
     public void Shake()
     {
-        foreach (var synapsePlayer in Synapse.Get<PlayerService>().Players)
-        {
-            WarheadController.TargetRpcShake(synapsePlayer.Connection, true, false);
-        }
+        WarheadController.RpcShake(false);
     }
 
     public void InstantDetonation()
     {
         WarheadController.InstantPrepare();
         WarheadController.StartDetonation(false, true);
-        WarheadController.NetworktimeToDetonation = 0.1f;
+        TimeUntilDetonation = 0.1f;
     }
-    */
+
 
     public class NukeInsidePanel
     {

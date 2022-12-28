@@ -4,9 +4,14 @@ using Interactables.Interobjects;
 using Mirror;
 using Neuron.Core.Meta;
 using PlayerRoles;
+using PlayerRoles.FirstPersonControl;
+using PlayerRoles.PlayableScps.HumeShield;
+using PlayerRoles.PlayableScps.Scp079;
+using PlayerRoles.PlayableScps.Scp096;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
+using UnityEngine;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
 
@@ -50,6 +55,81 @@ public static class PlayerLoadComponentPatch
         }
     }
 }
+
+[Automatic]
+[SynapsePatch("PlayerStaminaUse", PatchType.Wrapper)]
+public static class PlayerStaminaUsePatch
+{
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(FpcStateProcessor), nameof(FpcStateProcessor.ServerUseRate), MethodType.Getter)]
+    public static bool PlayerLoadComponent(FpcStateProcessor __instance, ref float __result)
+    {
+        
+        var player = __instance._hub.GetSynapsePlayer();
+
+        if (player.RoleManager.CurrentRole.ActiveTime <= __instance._respawnImmunity)
+        {
+            __result = 0;
+            return false;
+        }
+
+        var staminaUse = player.StaminaUseRate == -1 ? __instance._useRate : player.StaminaUseRate;
+        staminaUse *= player.Hub.inventory.StaminaUsageMultiplier;
+        foreach (var effect in player.Hub.playerEffectsController.AllEffects)
+        {
+            if (effect is IStaminaModifier staminaModifier && staminaModifier.StaminaModifierActive)
+            {
+                staminaUse *= staminaModifier.StaminaUsageMultiplier;
+            }
+        }
+
+        __result = staminaUse;
+        return false;
+    }
+}
+/*
+[Automatic]
+[SynapsePatch("Scp096SheldMax", PatchType.Wrapper)]
+public static class Scp096SheldMaxPatch
+{
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(DynamicHumeShieldController), nameof(DynamicHumeShieldController.HsMax), MethodType.Getter)]
+    public static bool MaxAux(Scp096RageManager __instance, ref float __result)
+    {
+        __result = __instance.Owner.GetSynapsePlayer().ScpController.Scp096.MaxShield;
+        return false;
+    }
+}*/
+
+[Automatic]
+[SynapsePatch("Scp079MaxAuxiliary", PatchType.Wrapper)]
+public static class Scp079MaxAuxiliaryPatch
+{
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp079AuxManager), nameof(Scp079AuxManager.MaxAux), MethodType.Getter)]
+    public static bool MaxAux(Scp079AuxManager __instance, ref float __result)
+    {
+        __result = __instance.Owner.GetSynapsePlayer().ScpController.Scp079.MaxEnergy;
+        return false;
+    }
+}
+/*
+[Automatic]
+[SynapsePatch("Scp096SheldRegeneration", PatchType.Wrapper)]
+public static class Scp096RegenerationPatch
+{
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(DynamicHumeShieldController), nameof(DynamicHumeShieldController.HsRegeneration), MethodType.Getter)]
+    public static bool OnRageUpdate(Scp096RageManager __instance, ref float __result)
+    {
+        __result = __instance.Owner.GetSynapsePlayer().ScpController.Scp096.MaxShield;
+        return false;
+    }
+}*/
 
 [Automatic]
 [SynapsePatch("RedirectRoleWrite", PatchType.Wrapper)]

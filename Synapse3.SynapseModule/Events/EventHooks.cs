@@ -33,7 +33,6 @@ public partial class PlayerEvents
     [PluginEvent(ServerEventType.PlayerChangeRole)]
     public bool PlayerChangeRoleHook(IPlayer player, PlayerRoleBase oldRole, RoleTypeId newRole, RoleChangeReason changeReason)
     {
-        NeuronLogger.For<Synapse>().Warn("PlayerChangeRoleHook");
 
         var ev = new SetClassEvent(player.GetSynapsePlayer(), newRole, changeReason);
 
@@ -217,7 +216,7 @@ public partial class PlayerEvents
     }
 
 
-    [PluginEvent(ServerEventType.PlayerKicked)]
+    [PluginEvent(ServerEventType.PlayerKicked)]//TODO: Found why some time an error pop
     public bool PlayerKickedHook(IPlayer player, IPlayer issuer, string reason)
     {
         var ev = new KickEvent(player?.GetSynapsePlayer(), issuer?.GetSynapsePlayer(), reason, true);
@@ -254,8 +253,8 @@ public partial class RoundEvents
     [PluginEvent(ServerEventType.RoundStart)]
     public void RoundStartHook() => Start.RaiseSafely(new RoundStartEvent());
 
-    [PluginEvent(ServerEventType.RoundEnd)]
-    public void RoundEndHook(LeadingTeam leadingTeam) => End.RaiseSafely(new RoundEndEvent(leadingTeam));
+    [PluginEvent(ServerEventType.RoundEnd)]//TODO: Found why parameters invalide
+    public void RoundEndHook(LeadingTeam leadingTeam) => End.RaiseSafely(new RoundEndEvent(LeadingTeam.Draw));
 
     [PluginEvent(ServerEventType.RoundRestart)]
     public void RoundRestartHook() => Restart.RaiseSafely(new RoundRestartEvent());

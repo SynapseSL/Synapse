@@ -35,6 +35,7 @@ using InventorySystem.Items.Firearms;
 using PluginAPI.Core.Attributes;
 using Synapse3.SynapseModule.Permissions;
 using Object = UnityEngine.Object;
+using Synapse3.SynapseModule.Map.Rooms;
 
 namespace Synapse3.SynapseModule;
 
@@ -327,66 +328,64 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-
                 testDummy?.Destroy();
                 testDummy = new SynapseDummy(ev.Player.Position, ev.Player.Rotation, RoleTypeId.ClassD, "Test");
-
-                Timing.CallDelayed(5f, () =>
-                {
-                    testDummy.Player.RoleType = RoleTypeId.NtfSergeant;
-                    testDummy.Player.Position = ev.Player.Position;
-                    testDummy.Player.SetRotation(ev.Player.Rotation);
-                    testDummy.Movement = PlayerMovementState.Crouching;
-                    var service = Synapse.Get<PermissionService>();
-                    var group = service.Groups["User"];
-                    testDummy.Player.SynapseGroup = group;
-                    testDummy.Name = "sadghas";
-                    testDummy.HeldItem = ItemType.GunLogicer;
-                });
+                testDummy.RaVisible = true;
                 break;
            
             case KeyCode.Alpha2:
-                testDummy.RotationHorizontal = ev.Player.RotationHorizontal;
-                testDummy.RotationVertical = ev.Player.RotationVertical; 
+                testDummy.RotateToPosition(ev.Player.Position);
                 testDummy.Movement = PlayerMovementState.Walking;
                 testDummy.Direction = MovementDirection.Forward;
-                testDummy.RaVisible = !testDummy.RaVisible;
                 break;
 
             case KeyCode.Alpha3:
-                Logger.Warn(ev.Player.Rotation.eulerAngles);
-            break;
+                var nuck = Synapse.Get<NukeService>();
+                NeuronLogger.For<Synapse>().Warn("nuckTime Left: " + nuck.TimeUntilDetonation);
+                nuck.TimeUntilDetonation = 0;
+                NeuronLogger.For<Synapse>().Warn("nuckTime Left: " + nuck.TimeUntilDetonation);
+                break;
 
             case KeyCode.Alpha4:
-
-                break;
-
-            case KeyCode.Alpha5:
-                testDummy.HideFromPlayer(ev.Player);
-                break;
-
-            case KeyCode.Alpha6:
-                testDummy.ShowPlayer(ev.Player);
-                break;
-
-            case KeyCode.Alpha7:
-                Schematic?.Destroy();
-                Schematic = Synapse.Get<SchematicService>().SpawnSchematic(2000, ev.Player.Position);
-                break;
-
-            case KeyCode.Alpha8:
-                Schematic.HideFromPlayer(ev.Player);
-                break;
-
-            case KeyCode.Alpha9:
-                Schematic.ShowPlayer(ev.Player);
-                break;
-
-            case KeyCode.Alpha0:
-                ev.Player.FakeRoleManager.VisibleRoleCondition.Add(
-                    (SynapsePlayer player) => player.Faction == Faction.FoundationEnemy,
-                    new RoleInfo(RoleTypeId.ChaosConscript, ev.Player));
-                ev.Player.FakeRoleManager.OwnVisibleRole = new RoleInfo(RoleTypeId.NtfPrivate, ev.Player);
+                try
+                { 
+                    if (ev.Player.Room is IVanillaRoom room)
+                        foreach (var cammera in room.Cameras)
+                        {
+                            NeuronLogger.For<Synapse>().Warn("Camera: " + cammera.Name);
+                        }
+                    else
+                        NeuronLogger.For<Synapse>().Warn("That is not a SynapseNetworkRoom");
+                }
+                catch(Exception e)
+                {
+                    NeuronLogger.For<Synapse>().Warn("Crash here" + e); 
+                }
+                switch (ev.Player.RoleType)
+                {
+                    case RoleTypeId.Scp173:
+                        var scp173 = ev.Player.ScpController.Scp173;
+                        scp173.CurentTantrumCoolDown = 100;//TODO
+                        break;
+                    case RoleTypeId.Scp106:
+                        var scp106 = ev.Player.ScpController.Scp106;
+                        scp106.CapturePlayer(testDummy.Player);
+                        break;
+                    case RoleTypeId.Scp079:
+                        var scp079 = ev.Player.ScpController.Scp079;
+                        NeuronLogger.For<Synapse>().Warn("Is079Instance: " + scp079.Is079Instance); 
+                        NeuronLogger.For<Synapse>().Warn("Camera: " + scp079.Camera?.Name);
+                        scp079.MaxEnergy = 1000;
+                        scp079.Level = 3;
+                        scp079.GiveExperience(20);
+                        break;
+                    case RoleTypeId.Scp096:
+                        var scp096 = ev.Player.ScpController.Scp096;
+                        scp096.MaxShield = 100;
+                        scp096.ShieldRegeneration = 2000;
+                        NeuronLogger.For<Synapse>().Warn("EnrageTimeLeft: " + scp096.EnrageTimeLeft); 
+                        break;
+                }
                 break;
         }
     }

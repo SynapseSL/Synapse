@@ -1,25 +1,43 @@
-﻿using Synapse3.SynapseModule.Map.Rooms;
+﻿using PlayerRoles.PlayableScps.Scp079.Cameras;
+using Synapse3.SynapseModule.Map.Rooms;
+using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Objects;
 
 public class SynapseCamera
 {
-    //TODO:
-    /*
-    internal SynapseCamera(Camera079 camera079, IRoom room)
+    
+    internal SynapseCamera(Scp079Camera camera079, IRoom room)
     {
         Camera = camera079;
         Room = room;
     }
     
-    public Camera079 Camera { get; }
+    public Scp079Camera Camera { get; }
     
     public IRoom Room { get; }
 
-    public string Name => Camera.cameraName;
+    public Vector3 Position
+    {
+        get => Camera.Position;
+        set => Camera.Position = value;
+    }
 
-    public ushort CameraID => Camera.cameraId;
+    public float HorizontalRotation
+    {
+        get => Camera.HorizontalRotation;
+        set => Camera.HorizontalRotation = value;
+    }
 
-    public bool MainCamera => Camera.isMain;
-    */
+    public float VerticalRotation
+    {
+        get => Camera.VerticalRotation;
+        set => Camera.VerticalRotation = value;
+    }
+
+    public string Name => Camera.name;
+
+    public ushort CameraID => Camera.SyncId;
+
+    public bool MainCamera => Camera.IsMain;
 }

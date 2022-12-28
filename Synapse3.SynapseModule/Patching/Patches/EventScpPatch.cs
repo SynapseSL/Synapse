@@ -2,6 +2,7 @@
 using HarmonyLib;
 using InventorySystem.Items.MicroHID;
 using Mirror;
+using Mono.Cecil;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerRoles;
@@ -19,13 +20,14 @@ using PluginAPI.Events;
 using RelativePositioning;
 using Synapse3.SynapseModule.Events;
 using System;
+using System.Diagnostics.Tracing;
 using System.Reflection;
 using UnityEngine;
 using Utils.Networking;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
 
-/*TODO: FIX it, error null reference and maby the event are not call, see the reflexion
+//TODO: FIX it, error null reference and maby the event are not call, see the reflexion
 [Automatic]
 [SynapsePatch("Scp0492Attack", PatchType.ScpEvent)]
 public static class Scp0492AttackPatch
@@ -43,26 +45,34 @@ public static class Scp0492AttackPatch
     {
         try
         {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: OnServerPerformAttack 1");
             var num = Physics.OverlapSphereNonAlloc(__instance.OverlapSphereOrigin, __instance._detectionRadius, ZombieAttackAbility.DetectionsNonAlloc, ZombieAttackAbility.DetectionMask);
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: OnServerPerformAttack 2"); 
             __instance._syncAttack = AttackResult.None;
-
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: OnServerPerformAttack 3");
             foreach (var gameObject in ZombieAttackAbility.DetectionsNonAlloc)
             {
+                NeuronLogger.For<Synapse>().Error("Sy3 Event: OnServerPerformAttack other"); 
                 if (!gameObject.TryGetComponent<IDestructible>(out var component)
                     || Physics.Linecast(__instance.PlyCam.position, component.CenterOfMass, ZombieAttackAbility.BlockerMask)) 
                     continue;
+                NeuronLogger.For<Synapse>().Error("Sy3 Event: OnServerPerformAttack other 2");
 
                 var hitboxIdentity = component as HitboxIdentity;
-                var victime = hitboxIdentity?.TargetHub?.GetSynapsePlayer(); ;
+                var victime = hitboxIdentity?.TargetHub.GetSynapsePlayer();
                 var isPlayer = victime != null;
+                NeuronLogger.For<Synapse>().Error("Sy3 Event: OnServerPerformAttack other 3");
 
                 if (isPlayer && !ZombieAttackAbility.TargettedPlayers.Remove(hitboxIdentity.TargetHub)) 
                     continue;
+                NeuronLogger.For<Synapse>().Error("Sy3 Event: OnServerPerformAttack other 4");
 
                 var damageHandler = (Scp049DamageHandler)__instance.DamageHandler;
+                NeuronLogger.For<Synapse>().Error($"Sy3 Event: OnServerPerformAttack {isPlayer}");
 
                 if (isPlayer)
                 {
+                    NeuronLogger.For<Synapse>().Error($"Sy3 Event: OnServerPerformAttack Raise");
                     var scp = __instance.GetSynapsePlayer();
                     
                     var damage = __instance.DamageAmount;
@@ -73,6 +83,7 @@ public static class Scp0492AttackPatch
                     if (!ev.Allow) continue;
 
                     damageHandler.Damage = ev.Damage;
+                    NeuronLogger.For<Synapse>().Error($"Sy3 Event: OnServerPerformAttack Raised");
                 }
 
                 if (!component.Damage(damageHandler.Damage, damageHandler, component.CenterOfMass))
@@ -101,7 +112,7 @@ public static class Scp0492AttackPatch
         }
     }
 }
-*//*
+
 [Automatic]
 [SynapsePatch("Scp096Attack", PatchType.ScpEvent)]
 public static class Scp096AttackPatch
@@ -119,6 +130,8 @@ public static class Scp096AttackPatch
     {
         try
         {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp096AttackPatch");
+
             var scp096HitResult = Scp096HitResult.None;
             for (int i = 0; i < count; i++)
             {
@@ -145,6 +158,7 @@ public static class Scp096AttackPatch
                     if (component is not HitboxIdentity hitboxIdentity || !__instance.IsHumanHitbox(hitboxIdentity))
                         continue;
 
+                    NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp096AttackPatch raise");
                     var target = hitboxIdentity.TargetHub?.GetSynapsePlayer();
                     NeuronLogger.For<Synapse>().Error(__instance._scpRole == null);
                     var scp = __instance._scpRole.GetSynapsePlayer(); 
@@ -153,6 +167,7 @@ public static class Scp096AttackPatch
                     var charge = __instance._damageType  == Scp096DamageHandler.AttackType.Charge;
 
                     var ev = new Scp096AttackEvent(scp, target, charge, damage);
+                    NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp096AttackPatch raised");
 
                     _scp.Scp096Attack.RaiseSafely(ev);
 
@@ -183,29 +198,33 @@ public static class Scp096AttackPatch
 
     private static void CallOnPlayerHit(Scp096HitHandler instance, BreakableWindow window)
     {
-        var eventFieldWindow = typeof(Scp096HitHandler)
-            .GetField(nameof(Scp096HitHandler.OnWindowHit), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-        if (eventFieldWindow == null) return; 
-        var eventHandlerList = eventFieldWindow.GetValue(instance);
-        if (eventHandlerList == null) return;
-        var event_invoke = eventHandlerList.GetType().GetMethod("Invoke");
-        if (event_invoke == null) return;
-        event_invoke.Invoke(eventHandlerList, new object[1] { window });
+        var eventDelegate = (MulticastDelegate)typeof(Scp096HitHandler)
+            .GetField(nameof(Scp096HitHandler.OnWindowHit), BindingFlags.Instance | BindingFlags.NonPublic)
+            .GetValue(instance);
+        if (eventDelegate != null)
+        {
+            foreach (var handler in eventDelegate.GetInvocationList())
+            {
+                handler.Method.Invoke(handler.Target, new object[] { instance, window });
+            }
+        }
     }
 
     private static void CallOnWindowHit(Scp096HitHandler instance, ReferenceHub hub)
     {
-        var eventFieldPlayer = typeof(Scp096HitHandler)
-            .GetField(nameof(Scp096HitHandler.OnPlayerHit), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-        if (eventFieldPlayer == null) return; 
-        var eventHandlerList = eventFieldPlayer.GetValue(instance);
-        if (eventHandlerList == null) return;
-        var event_invoke = eventHandlerList.GetType().GetMethod("Invoke");
-        if (event_invoke == null) return;
-        event_invoke.Invoke(eventHandlerList, new object[1] { hub });
+        var eventDelegate = (MulticastDelegate)typeof(Scp096HitHandler)
+            .GetField(nameof(Scp096HitHandler.OnPlayerHit), BindingFlags.Instance | BindingFlags.NonPublic)
+            .GetValue(instance);
+        if (eventDelegate != null)
+        {
+            foreach (var handler in eventDelegate.GetInvocationList())
+            {
+                handler.Method.Invoke(handler.Target, new object[] { instance, hub });
+            }
+        }
     }
 }
-*/
+
 [Automatic]
 [SynapsePatch("Scp106Attack", PatchType.ScpEvent)]
 public static class Scp106AttackPatch
@@ -292,17 +311,19 @@ public static class Scp106AttackPatch
 
     private static void CallOnPlayerTeleported(ReferenceHub hub)
     {
-        var eventField = typeof(Scp106AttackPatch)
-            .GetField(nameof(Scp106Attack.OnPlayerTeleported), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-        if (eventField == null) return;
-        var eventHandlerList = eventField.GetValue(null);
-        if (eventHandlerList == null) return; 
-        var event_invoke = eventHandlerList.GetType().GetMethod("Invoke");
-        if (event_invoke == null) return;
-        event_invoke.Invoke(eventHandlerList, new object[1] { hub });
+        var eventDelegate = (MulticastDelegate)typeof(Scp106AttackPatch)
+            .GetField(nameof(Scp106Attack.OnPlayerTeleported), BindingFlags.Instance | BindingFlags.NonPublic)
+            .GetValue(null);
+        if (eventDelegate != null)
+        {
+            foreach (var handler in eventDelegate.GetInvocationList())
+            {
+                handler.Method.Invoke(handler.Target, new object[] { null, hub });
+            }
+        }
     }
 }
-/*
+
 [Automatic]
 [SynapsePatch("Scp173Attack", PatchType.ScpEvent)]
 public static class Scp173AttackPatch
@@ -381,7 +402,7 @@ public static class Scp173AttackPatch
         }
     }
 }
-*/
+
 [Automatic]
 [SynapsePatch("Scp939Lunge", PatchType.ScpEvent)]
 public static class Scp939LunchPatch

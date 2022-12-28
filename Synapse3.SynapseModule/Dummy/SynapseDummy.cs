@@ -297,6 +297,11 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         }
     }
 
+    public override void Destroy()
+    {
+        FakeConnection.Disconnect();
+    }
+
     public override void HideFromAll() => DeSpawn();
 
     public override void ShowAll() => Spawn();

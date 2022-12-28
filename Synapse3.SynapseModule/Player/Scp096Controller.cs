@@ -1,6 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using Discord;
+using PlayerRoles.PlayableScps.HumeShield;
+using PlayerRoles.PlayableScps.Scp096;
+using PluginAPI.Core;
 using Synapse3.SynapseModule.Map.Objects;
+using YamlDotNet.Core.Tokens;
 
 namespace Synapse3.SynapseModule.Player;
 
@@ -13,38 +19,77 @@ public class Scp096Controller
     {
         _player = player;
     }
-    /*
     
-    public Scp096 Scp096 => _player.Hub.scpsController.CurrentScp as Scp096;
-    public bool Is096Instance => Scp096 != null;
     
+    public Scp096Role Role => _player.CurrentRole as Scp096Role;
+    public Scp096RageManager RageManager => Role?.GetSubroutine<Scp096RageManager>();
+    public Scp096ChargeAbility ChargeAbility => Role?.GetSubroutine<Scp096ChargeAbility>();
+    public DynamicHumeShieldController Shield => Role.HumeShieldModule as DynamicHumeShieldController;
+
+    public bool Is096Instance => Role != null;
+
     public float ShieldAmount
     {
         get
         {
-            if (Is096Instance) return Scp096.ShieldAmount;
+            if (Is096Instance) return Shield.HsCurrent;
             return 0;
         }
         set
         {
             if (!Is096Instance) return;
-            Scp096.ShieldAmount = value;
+            Shield.HsCurrent = value;
         }
     }
-    
-    public float MaxShield { get; set; } = 350f;
 
-    public float CurMaxShield
+    private float _maxShield = -1;
+
+    /// <summary>
+    /// The max shiled of 096 when he start is rage (set to -1 to use the default one)
+    /// </summary>
+    public float MaxShield
     {
         get
         {
-            if (Is096Instance) return Scp096.CurMaxShield;
+            if (Is096Instance)
+            {
+                if (_maxShield == -1)
+                    return DefaultMaxShield;
+                else
+                    return _maxShield;
+            }
+            return 0f;
+        }
+        set
+        {
+            _maxShield = value;
+        }
+    }
+
+    public float DefaultMaxShield
+    {
+        get
+        {
+            if (Is096Instance) 
+                return Shield.ShieldOverHealth.Evaluate(Shield._hp.NormalizedValue);
+            return 0f;
+        }
+    }
+
+    /// <summary>
+    /// The regeneration shiled of 096 when he start is rage (set to -1 to use the default one)
+    /// </summary>
+    public float ShieldRegeneration
+    {
+        get
+        {
+            if (Is096Instance) return Shield.RegenerationRate;
             return 0f;
         }
         set
         {
             if (!Is096Instance) return;
-            Scp096.CurMaxShield = value;
+            Shield.RegenerationRate = value;
         }
     }
 
@@ -52,83 +97,37 @@ public class Scp096Controller
     {
         get
         {
-            if (Is096Instance) return Scp096.EnrageTimeLeft;
+            if (Is096Instance) return RageManager.EnragedTimeLeft;
             return 0f;
         }
         set
         {
             if (!Is096Instance) return;
-            Scp096.EnrageTimeLeft = value;
+            RageManager.EnragedTimeLeft = value;
         }
     }
 
-    public Scp096PlayerState RageState
+    public Scp096RageState RageState
     {
         get
         {
-            if (Is096Instance) return Scp096.PlayerState;
-            return Scp096PlayerState.Docile;
+            if (Is096Instance) return Role.StateController.RageState;
+            return Scp096RageState.Docile;
         }
         set
         {
             if (!Is096Instance) return;
-             switch (value)
-                {
-                    case Scp096PlayerState.Charging:
-                        if (RageState != Scp096PlayerState.Enraged)
-                            RageState = Scp096PlayerState.Enraged;
-                        Scp096.Charge();
-                        break;
-
-                    case Scp096PlayerState.Calming:
-                        Scp096.EndEnrage();
-                        break;
-
-                    case Scp096PlayerState.Enraged when RageState != Scp096PlayerState.Attacking:
-                        if (RageState == Scp096PlayerState.Docile
-                            || RageState == Scp096PlayerState.TryNotToCry
-                            || RageState == Scp096PlayerState.Calming)
-                            RageState = Scp096PlayerState.Enraging;
-                        Scp096.Enrage();
-                        break;
-
-                    case Scp096PlayerState.Enraged when RageState == Scp096PlayerState.Attacking:
-                        Scp096.EndAttack();
-                        break;
-
-                    case Scp096PlayerState.TryNotToCry:
-                        if (RageState != Scp096PlayerState.Docile)
-                            RageState = Scp096PlayerState.Docile;
-                        Scp096.TryNotToCry();
-                        break;
-
-                    case Scp096PlayerState.Attacking:
-                        if (RageState != Scp096PlayerState.Enraged)
-                            RageState = Scp096PlayerState.Enraged;
-                        Scp096.ServerDoAttack(_player.Connection, default);
-                        break;
-
-                    case Scp096PlayerState.Enraging:
-                        if (RageState != Scp096PlayerState.Docile)
-                            RageState = Scp096PlayerState.Docile;
-                        Scp096.Windup();
-                        break;
-
-                    case Scp096PlayerState.Docile:
-                        Scp096.ResetEnrage();
-                        break;
-
-                        //Since you also need a Door for PryGate is it not supported by this and you have to use ChargeDoor()
-                }
+            Role.StateController.RageState = value;
         }
     }
 
-    public List<SynapsePlayer> Targets
+    public ReadOnlyCollection<SynapsePlayer> Targets
     {
         get
         {
-            if (!Is096Instance) return new List<SynapsePlayer>();
-            return Scp096._targets.Select(x => x.GetSynapsePlayer()).ToList();
+            if (!Is096Instance) return new ReadOnlyCollection<SynapsePlayer>(new List<SynapsePlayer>());
+            return new ReadOnlyCollection<SynapsePlayer>(RageManager
+                ._targetsTracker.Targets.Select(x => x.GetSynapsePlayer()).ToList());
         }
     }
 
@@ -136,7 +135,7 @@ public class Scp096Controller
     {
         get
         {
-            if (Is096Instance) return Scp096.CanAttack;
+            if (Is096Instance) return RageManager.IsEnraged;
             return false;
         }
     }
@@ -145,28 +144,31 @@ public class Scp096Controller
     {
         get
         {
-            if (Is096Instance) return Scp096.CanCharge;
+            if (Is096Instance) return ChargeAbility.CanCharge;
             return false;
         }
     }
 
     public void AddTarget(SynapsePlayer player)
     {
-        if (!Is096Instance || !Scp096.CanReceiveTargets) return;
+        var rageManager = RageManager;
+        if (rageManager != null) return;
 
-        Scp096.AddTarget(player.gameObject);
+        rageManager._targetsTracker.AddTarget(player);
     }
 
     public void RemoveTarget(SynapsePlayer player)
     {
-        if (!Is096Instance) return;
+        var rageManager = RageManager;
+        if (rageManager != null) return;
 
-        Scp096._targets.Remove(player.Hub);
+        RageManager._targetsTracker.RemoveTarget(player);
     }
-
+    /*TODO:
     public void ChargeDoor(SynapseDoor door)
     {
-        if (!Is096Instance) return;
+        if (Is096Instance) return;
+
         Scp096.ChargeDoor(door.Variant);
     }
     */

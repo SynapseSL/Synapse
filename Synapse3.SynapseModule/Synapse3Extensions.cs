@@ -15,6 +15,8 @@ using Neuron.Core.Events;
 using Neuron.Core.Logging;
 using Neuron.Modules.Configs.Localization;
 using PlayerRoles;
+using PlayerRoles.PlayableScps.Scp079.Cameras;
+using PlayerRoles.PlayableScps.Subroutines;
 using PlayerStatsSystem;
 using PluginAPI.Core.Interfaces;
 using PluginAPI.Core.Items;
@@ -23,6 +25,7 @@ using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.Item.SubAPI;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Map.Objects;
@@ -149,7 +152,7 @@ public static class Synapse3Extensions
         .GetPlayer(x => x.CommandSender == sender, PlayerType.Dummy, PlayerType.Player, PlayerType.Server);
     public static SynapsePlayer GetSynapsePlayer(this StatBase stat) => stat.Hub.GetSynapsePlayer();
     public static SynapsePlayer GetSynapsePlayer(this Footprint footprint) => footprint.Hub?.GetSynapsePlayer();
-    public static SynapsePlayer GetSynapsePlayer(this IPlayer player) => player?.GameObject?.GetSynapsePlayer();
+    public static SynapsePlayer GetSynapsePlayer(this IPlayer player) => player.ReferenceHub.GetSynapsePlayer();
 
     public static SynapseItem GetItem(this ItemPickupBase pickupBase) => _item.GetSynapseItem(pickupBase.Info.Serial);
     public static SynapseItem GetItem(this ItemBase itemBase) => _item.GetSynapseItem(itemBase.ItemSerial);
@@ -273,10 +276,11 @@ public static class Synapse3Extensions
     /*
     public static IElevator GetSynapseElevator(this Lift lift) =>
         Synapse.Get<ElevatorService>().Elevators
-            .FirstOrDefault(x => x is SynapseElevator elevator && elevator.Lift == lift);
-    public static SynapseCamera GetCamera(this Camera079 cam) => _map
+            .FirstOrDefault(x => x is SynapseElevator elevator && elevator.Lift == lift); */
+
+    public static SynapseCamera GetCamera(this Scp079Camera cam) => _map
             ._synapseCameras.FirstOrDefault(x => x.Camera == cam);
-        */
+       
 
 
     public static bool CanHarmScp(SynapsePlayer player, bool message)
@@ -385,4 +389,8 @@ public static class Synapse3Extensions
             SynapseLogger<Synapse>.Error($"{eventParameter.GetType().Name} failed\n" + ex);
         }
     }
+
+    public static T GetSubroutine<T>(this ISubroutinedScpRole role) where T : ScpSubroutineBase
+        => role.SubroutineModule.AllSubroutines
+        .FirstOrDefault(p => p is T) as T;
 }

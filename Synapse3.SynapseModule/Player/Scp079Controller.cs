@@ -1,4 +1,7 @@
-﻿using Synapse3.SynapseModule.Map.Objects;
+﻿using PlayerRoles.PlayableScps.Scp079;
+using PlayerRoles.PlayableScps.Scp079.Cameras;
+using PlayerRoles.PlayableScps.Scp173;
+using Synapse3.SynapseModule.Map.Objects;
 
 namespace Synapse3.SynapseModule.Player;
 
@@ -13,45 +16,103 @@ public class Scp079Controller
         _player = player;
     }
 
-    /*
-    public Scp079PlayerScript Scp079Script => _player.ClassManager.Scp079;
     
-    public byte Level
+    public Scp079Role Role => _player.CurrentRole as Scp079Role;
+    public bool Is079Instance => Role != null;
+    public Scp079TierManager TierManager => Role?.GetSubroutine<Scp079TierManager>();
+    public Scp079AuxManager PowerManager => Role?.GetSubroutine<Scp079AuxManager>();
+    public Scp079CurrentCameraSync CurrentCameraSync => Role?.GetSubroutine<Scp079CurrentCameraSync>();
+    public Scp079DoorLockChanger DoorLockChanger => Role?.GetSubroutine<Scp079DoorLockChanger>();
+
+    public int Level
     {
-        get => (byte)(Scp079Script.Lvl + 1);
-        set => Scp079Script.Lvl = (byte)(value - 1);
+        get
+        {
+            if (TierManager != null) return TierManager.AccessTierIndex + 1;
+            return 0;
+        }
+        set
+        {
+            if (TierManager == null) return;
+            TierManager.AccessTierIndex = value - 1;
+        }
     }
 
-    public float Exp
+    public int Exp
     {
-        get => Scp079Script.Exp;
-        set => Scp079Script.Exp = value;
+        get
+        {
+            if (TierManager != null) return TierManager.TotalExp;
+            return 0;
+        }
+        set
+        {
+            if (TierManager == null) return;
+            TierManager.TotalExp = value;
+        }
     }
 
     public float Energy
     {
-        get => Scp079Script.Mana;
-        set => Scp079Script.Mana = value;
+        get
+        {
+            if (PowerManager != null) return PowerManager.CurrentAux;
+            return 0f;
+        }
+        set
+        {
+            if (PowerManager == null) return; 
+            PowerManager.CurrentAux = value;
+        }
     }
 
+    private float _maxEnergy = -1;
     public float MaxEnergy
     {
-        get => Scp079Script.maxMana;
-        set => Scp079Script.NetworkmaxMana = value;
+        get
+        {
+            if (PowerManager != null)
+            {
+                if (_maxEnergy == -1)
+                    return PowerManager._maxPerTier[PowerManager._tierManager.AccessTierIndex];
+                return _maxEnergy;
+            }
+            return 0f;
+        }
+        set
+        {
+            if (PowerManager == null) return;
+            _maxEnergy = value;
+        }
     }
 
     public SynapseCamera Camera
     {
-        get => Scp079Script.currentCamera.GetCamera();
-        set => Scp079Script.RpcSwitchCamera(value.CameraID, false);
+        get
+        {
+            if (CurrentCameraSync != null)
+                return CurrentCameraSync.CurrentCamera.GetCamera();
+            return null;
+        }
+        set
+        {
+
+            if (CurrentCameraSync == null) return;
+            CurrentCameraSync.CurrentCamera = value.Camera;
+        }
     }
 
-    public void GiveExperience(float amount) => Scp079Script.AddExperience(amount);
+    public void GiveExperience(int amount)
+    {
+        if (!Is079Instance) return;
 
-    public void ForceLevel(byte level) => Scp079Script.ForceLevel(level, true);
+        TierManager.ServerGrantExperience(amount, Scp079HudTranslation.ExpGainAdminCommand);
+    }
 
-    public void UnlockDoors() => Scp079Script.CmdResetDoors();
-    
-    public bool Spawned { get; internal set; }
-    */
+    public void UnlockDoors()
+    {
+        if (!Is079Instance) return;
+
+        DoorLockChanger.ServerUnlockAll();
+    }
 }

@@ -211,8 +211,29 @@ public partial class SynapsePlayer
         set => GetStatBase<StaminaStat>().CurValue = value / 100;
     }
 
-    //TODO: add Setter most likely patch needed
-    public float StaminaUseRate => (CurrentRole as FpcStandardRoleBase)?.FpcModule?.StateProcessor?._useRate ?? 0;
+    private float _staminaUseRate = -1;
+    /// <summary>
+    /// The curent stamina use by the player (set to -1 to use the default one)
+    /// </summary>
+    public float StaminaUseRate
+    {
+        get
+        {
+            if (_staminaUseRate == -1)
+                return DefaultStaminaUseRate;
+            else 
+                return _staminaUseRate;
+        }
+        set => _staminaUseRate = value;
+    }
+
+    /// <summary>
+    /// The default stamina use of the player
+    /// </summary>
+    public float DefaultStaminaUseRate
+    {
+        get => FirstPersonMovement?.StateProcessor?._useRate ?? 0;
+    }
 
     public string UnitName => (CurrentRole as HumanRole)?.UnitName ?? "";
 
