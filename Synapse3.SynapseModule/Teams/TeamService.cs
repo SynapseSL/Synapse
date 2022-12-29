@@ -96,10 +96,9 @@ public class TeamService : Service
         {
             case 0: return 0;
             case 1:
-            case 2:
-                //TODO:
-                //if (RespawnWaveGenerator.SpawnableTeams.TryGetValue((SpawnableTeamType)id, out var handler))
-                //    return handler.EffectTime;
+            case 2: 
+                if (RespawnManager.SpawnableTeams.TryGetValue((SpawnableTeamType)id, out var handler))
+                    return handler.EffectTime;
                 return 0;
 
             default:
@@ -117,24 +116,7 @@ public class TeamService : Service
             
             case 1:
             case 2:
-                //TODO:
-                /*
-                var maxSize = RespawnTickets.Singleton.GetAvailableTickets((SpawnableTeamType)id);
-                if (maxSize == 0 && addTickets)
-                {
-                    maxSize = 5;
-                    //I don't know why Chaos gets 5 Tickets but I assume this is for the case Chaos spawns first
-                    RespawnTickets.Singleton.GrantTickets(SpawnableTeamType.ChaosInsurgency, 5, true);
-                }
-
-                if (RespawnWaveGenerator.SpawnableTeams.TryGetValue((SpawnableTeamType)id, out var handlerBase))
-                {
-                    maxSize = Math.Min(maxSize, handlerBase.MaxWaveSize);
-                }
-
-                return maxSize;
-                */
-                return 0;
+                return RespawnManager.SpawnableTeams.TryGetValue((SpawnableTeamType)id, out var handler) ? handler.MaxWaveSize : 0;
 
             default:
                 if (!IsIdRegistered(id)) return 0;

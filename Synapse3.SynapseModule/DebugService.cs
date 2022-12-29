@@ -5,6 +5,7 @@ using Neuron.Core.Meta;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
 using Synapse3.SynapseModule.Command;
+using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Objects;
@@ -12,6 +13,7 @@ using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 using Synapse3.SynapseModule.Dummy;
+using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Permissions;
@@ -184,6 +186,7 @@ public class DebugService : Service
 
     SynapseDummy testDummy;
     SynapseSchematic Schematic;
+    private SerializedPlayerState _state;
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)
@@ -216,18 +219,15 @@ public class DebugService : Service
                 break;
 
             case KeyCode.Alpha3:
-                Logger.Warn(ev.Player.Rotation.eulerAngles);
+                Synapse.Get<RoundService>().MtfTickets = 50;
             break;
 
             case KeyCode.Alpha4:
-                foreach (var elevator in Synapse.Get<ElevatorService>().Elevators)
-                {
-                    elevator.MoveToNext();
-                }
+                Logger.Warn(Synapse.Get<RoundService>().MtfTickets);
                 break;
 
             case KeyCode.Alpha5:
-                testDummy.HideFromPlayer(ev.Player);
+                Logger.Warn("Horizontal: " + ev.Player.RotationHorizontal + " Vertical: " + ev.Player.RotationVertical + " Euler" + ev.Player.Rotation.eulerAngles + " Point: " + _state.Position.GetMapRotation().eulerAngles.y);
                 break;
 
             case KeyCode.Alpha6:

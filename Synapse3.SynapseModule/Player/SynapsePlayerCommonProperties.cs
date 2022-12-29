@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Reflection;
 using InventorySystem.Disarming;
 using Mirror.LiteNetLib4Mirror;
 using PlayerRoles;
@@ -137,12 +138,8 @@ public partial class SynapsePlayer
     /// <summary>
     /// The current movement of the player
     /// </summary>
-    public PlayerMovementState MovementState
-    {
-        //TODO: Check if this works
-        get => FirstPersonMovement?.CurrentMovementState ?? PlayerMovementState.Crouching;
-        set => FirstPersonMovement.CurrentMovementState = value;
-    }
+    public PlayerMovementState MovementState =>
+        FirstPersonMovement?.CurrentMovementState ?? PlayerMovementState.Walking;
 
     /// <summary>
     /// The current health of the player
@@ -207,9 +204,18 @@ public partial class SynapsePlayer
         get => GetStatBase<StaminaStat>().CurValue * 100;
         set => GetStatBase<StaminaStat>().CurValue = value / 100;
     }
-
-    //TODO: add Setter most likely patch needed
-    public float StaminaUseRate => (CurrentRole as FpcStandardRoleBase)?.FpcModule?.StateProcessor?._useRate ?? 0;
+    
+    public float StaminaUseRate
+    {
+        get => (CurrentRole as FpcStandardRoleBase)?.FpcModule?.StateProcessor?._useRate ?? 0;
+        set
+        {
+            if(CurrentRole is not FpcStandardRoleBase fpcRole) return;
+            typeof(FpcStateProcessor)
+                .GetField(nameof(FpcStateProcessor._useRate), BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.SetValue(fpcRole.FpcModule.StateProcessor, value);
+        }
+    }
 
     public string UnitName => (CurrentRole as HumanRole)?.UnitName ?? "";
 

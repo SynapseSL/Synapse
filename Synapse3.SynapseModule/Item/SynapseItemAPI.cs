@@ -114,7 +114,6 @@ public partial class SynapseItem
             Weight = Weight,
             Locked = !CanBePickedUp,
         };
-        //TODO: Test this
         info.ServerSetPositionAndRotation(position, rot);
         Pickup.Info = info;
         Pickup.NetworkInfo = info;

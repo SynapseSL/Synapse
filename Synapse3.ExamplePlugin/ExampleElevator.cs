@@ -9,6 +9,7 @@ using UnityEngine;
 
 namespace Synapse3.ExamplePlugin;
 
+/*
 public class ExampleElevator : CustomElevator
 {
     public ExampleElevator()
@@ -74,3 +75,4 @@ public class ElevatorEventHandler
         new ExampleElevator();
     }
 }
+*/

@@ -1,6 +1,4 @@
-﻿using Interactables.Interobjects;
-
-namespace Synapse3.SynapseModule.Map.Elevators;
+﻿namespace Synapse3.SynapseModule.Map.Elevators;
 
 public interface IElevator
 {

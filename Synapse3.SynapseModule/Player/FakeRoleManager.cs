@@ -117,9 +117,16 @@ public class FakeRoleManager
         var publicWriter = _player.CurrentRole as IPublicSpawnDataWriter;
         var privateWriter = _player.CurrentRole as IPrivateSpawnDataWriter;
 
-        return new RoleInfo(_player.CurrentRole.RoleTypeId,
+        var defaultInfo = new RoleInfo(_player.CurrentRole.RoleTypeId,
             publicWriter == null ? null : publicWriter.WritePublicSpawnData,
             privateWriter == null ? null : privateWriter.WritePrivateSpawnData);
+
+        if (_player.CurrentRole is not IObfuscatedRole obfuscatedRole) return defaultInfo;
+        
+        defaultInfo.RoleObfuscation = true;
+        defaultInfo.ObfuscationRole = new Converter() { Func = obfuscatedRole.GetRoleForUser }.GetRole;
+
+        return defaultInfo;
     }
 
     public static readonly Dictionary<RoleTypeId, Type> EnumToType = new()
@@ -149,6 +156,13 @@ public class FakeRoleManager
         
         { RoleTypeId.CustomRole, typeof(NoneRole) },
     };
+    
+    private class Converter
+    {
+        public Func<ReferenceHub, RoleTypeId> Func { get; set; }
+
+        public RoleTypeId GetRole(SynapsePlayer player) => Func(player.Hub);
+    }
 }
 
 public class RoleInfo

@@ -108,12 +108,6 @@ public class MapService : Service
 
         return gameObject;
     }
-    
-    //TODO:
-    /*
-    public void PlaceBlood(Vector3 pos, int type = 0, float size = 2)
-        => Synapse.Get<PlayerService>().Host.ClassManager.RpcPlaceBlood(pos, type, size);
-        */
 
     private void LoadObjects(RoundWaitingEvent ev)
     {

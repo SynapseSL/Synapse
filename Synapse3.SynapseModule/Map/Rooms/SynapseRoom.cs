@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using MapGeneration;
+using PlayerRoles.PlayableScps.Scp079;
+using PlayerRoles.PlayableScps.Scp079.Cameras;
 using Synapse3.SynapseModule.Map.Objects;
 using UnityEngine;
 
@@ -14,13 +16,12 @@ public class SynapseRoom : IVanillaRoom
         RoomType = type;
         LightController = Identifier.GetComponentInChildren<FlickerableLightController>();
 
-        //TODO:
-        /*
-        foreach (var camera079 in identifier.GetComponentsInChildren<Camera079>())
+        foreach (var interactable in Scp079InteractableBase.AllInstances)
         {
-            _cameras.Add(new SynapseCamera(camera079, this));
+            if (interactable is not Scp079Camera cam) continue;
+            if (interactable.Room != identifier) continue;
+            _cameras.Add(new SynapseCamera(cam, this));
         }
-        */
     }
     
     public RoomIdentifier Identifier { get; }

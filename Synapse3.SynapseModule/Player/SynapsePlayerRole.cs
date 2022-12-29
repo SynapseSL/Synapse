@@ -188,27 +188,32 @@ public partial class SynapsePlayer
             }
 
             writer.WriteRelativePosition(new RelativePosition(position));
-            //ushort.MaxValue / 360 degree = 182
-            writer.WriteUInt16((ushort)Mathf.RoundToInt(182 * Mathf.Clamp(horizontalRotation,0f,360f)));
+            var relRot =
+                (ushort)Mathf.RoundToInt(
+                    Mathf.InverseLerp(0f, 360f, Quaternion.Euler(Vector3.up * horizontalRotation).eulerAngles.y) *
+                    ushort.MaxValue);
+            writer.WriteUInt16(relRot);
             
             fpc.ReadSpawnData(new NetworkReader(writer.ToArray()));
         }
     }
 
-    public void SetPlayerRoleTypeAdvance(RoleTypeId role, Vector3 position, ushort horizontalRotation,Action<NetworkWriter> customData)
+    public void SetPlayerRoleTypeAdvance(RoleTypeId role, Vector3 position, float horizontalRotation,Action<NetworkWriter> customData)
     {
         var newRole = SetUpNewRole(role, out _);
+        if (newRole is not FpcStandardRoleBase fpc) return;
+        
+        var writer = new NetworkWriter();
+        customData(writer);
+        
+        writer.WriteRelativePosition(new RelativePosition(position));
+        var relRot =
+            (ushort)Mathf.RoundToInt(
+                Mathf.InverseLerp(0f, 360f, Quaternion.Euler(Vector3.up * horizontalRotation).eulerAngles.y) *
+                ushort.MaxValue);
+        writer.WriteUInt16(relRot);
 
-        if (newRole is FpcStandardRoleBase fpc)
-        {
-            var writer = new NetworkWriter();
-            
-            customData(writer);
-            writer.WriteRelativePosition(new RelativePosition(position));
-            writer.WriteUInt16(horizontalRotation);
-
-            fpc.ReadSpawnData(new NetworkReader(writer.ToArray()));
-        }
+        fpc.ReadSpawnData(new NetworkReader(writer.ToArray()));
     }
 
     private PlayerRoleBase SetUpNewRole(RoleTypeId role,out PlayerRoleBase prevRole)

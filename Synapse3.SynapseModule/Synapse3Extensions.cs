@@ -16,6 +16,7 @@ using Neuron.Core.Events;
 using Neuron.Core.Logging;
 using Neuron.Modules.Configs.Localization;
 using PlayerRoles;
+using PlayerRoles.PlayableScps.Scp079.Cameras;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Config;
@@ -273,11 +274,9 @@ public static class Synapse3Extensions
 
     public static IElevator GetSynapseElevator(this ElevatorChamber chamber) => _elevator.Elevators.FirstOrDefault(x =>
         x.Chamber is SynapseElevatorChamber synapseChamber && synapseChamber.Chamber == chamber);
-    //TODO:
-        /*
-    public static SynapseCamera GetCamera(this Camera079 cam) => _map
+    
+    public static SynapseCamera GetCamera(this Scp079Camera cam) => _map
             ._synapseCameras.FirstOrDefault(x => x.Camera == cam);
-        */
 
     
     public static bool CanHarmScp(SynapsePlayer player, bool message)
