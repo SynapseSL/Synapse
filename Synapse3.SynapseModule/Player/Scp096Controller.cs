@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Discord;
@@ -10,6 +10,7 @@ using Synapse3.SynapseModule.Map.Objects;
 using YamlDotNet.Core.Tokens;
 
 namespace Synapse3.SynapseModule.Player;
+
 
 public class Scp096Controller : ScpShieldControler<Scp096Role>
 {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -16,6 +16,7 @@ using Synapse3.SynapseModule.Patching.Patches;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
+
 
 public class Scp106Controller : ScpShieldControler<Scp106Role>
 {

@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Mirror;
-using Neuron.Core.Logging;
 using PlayerRoles;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
-using Synapse3.SynapseModule.Role;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule.Map.Objects;
 
-//TODO:
 public class SynapseRagDoll : NetworkSynapseObject
 {
     public static Dictionary<RoleTypeId, BasicRagdoll> Prefabs = new();

@@ -1,14 +1,12 @@
 ﻿using System.Linq;
+using System.Reflection;
 using InventorySystem.Disarming;
-using Mirror;
 using Mirror.LiteNetLib4Mirror;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
-using PlayerRoles.PlayableScps.Scp079;
 using PlayerRoles.Spectating;
 using PlayerStatsSystem;
 using RelativePositioning;
-using Respawning.NamingRules;
 using Synapse3.SynapseModule.Enums;
 using UnityEngine;
 
@@ -140,12 +138,8 @@ public partial class SynapsePlayer
     /// <summary>
     /// The current movement of the player
     /// </summary>
-    public PlayerMovementState MovementState
-    {
-        //TODO: Check if this works
-        get => FirstPersonMovement?.CurrentMovementState ?? PlayerMovementState.Crouching;
-        set => FirstPersonMovement.CurrentMovementState = value;
-    }
+    public PlayerMovementState MovementState =>
+        FirstPersonMovement?.CurrentMovementState ?? PlayerMovementState.Walking;
 
     /// <summary>
     /// The current health of the player

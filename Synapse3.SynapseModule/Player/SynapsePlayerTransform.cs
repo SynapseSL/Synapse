@@ -1,9 +1,6 @@
 ﻿using Mirror;
 using PlayerRoles.FirstPersonControl;
-using PlayerRoles.FirstPersonControl.NetworkMessages;
-using PluginAPI.Core;
 using Synapse3.SynapseModule.Map.Rooms;
-using System;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
@@ -48,7 +45,7 @@ public partial class SynapsePlayer
             var mouseLook = FirstPersonMovement?.MouseLook;
             return mouseLook == null
                 ? new Quaternion(0, 0, 0, 0)
-                : Quaternion.Euler(mouseLook.CurrentHorizontal, mouseLook.CurrentVertical, 0f);
+                : Quaternion.Euler(mouseLook.CurrentVertical,mouseLook.CurrentHorizontal, 0f);
         }
     }
 
@@ -62,18 +59,18 @@ public partial class SynapsePlayer
             var mouseLook = FirstPersonMovement?.MouseLook;
             return mouseLook == null
                 ? Vector2.zero
-                : new Vector2(mouseLook.CurrentHorizontal, mouseLook.CurrentVertical);
+                : new Vector2(mouseLook.CurrentVertical,mouseLook.CurrentHorizontal);
         }
     }
 
 
     /// <summary>
-    /// The Rotation of the Player on the X axe (min 0, max 360)
+    /// The Rotation of the Player on the y axe (min 0, max 360)
     /// </summary>
     public virtual float RotationHorizontal => FirstPersonMovement?.MouseLook.CurrentHorizontal ?? 0;
 
     /// <summary>
-    /// The Rotation of the Player on the Y axe (min -88, max 88)
+    /// The Rotation of the Player on the x axe (min -88, max 88)
     /// </summary>
     public virtual float RotationVertical => FirstPersonMovement?.MouseLook.CurrentVertical ?? 0;
 

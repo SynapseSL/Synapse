@@ -1,4 +1,5 @@
 ﻿using Neuron.Core.Meta;
+using PlayerRoles.PlayableScps.Scp079;
 using Subtitles;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Rooms;
@@ -8,8 +9,6 @@ namespace Synapse3.SynapseModule.Map;
 
 public class HeavyZoneService : Service
 {
-    //TODO:
-    /*
     private readonly RoomService _room;
     private readonly NukeService _nuke;
 
@@ -20,7 +19,7 @@ public class HeavyZoneService : Service
     }
 
     
-    private Recontainer079 ReContainer => Synapse.GetObject<Recontainer079>();
+    private Scp079Recontainer ReContainer => Synapse.GetObject<Scp079Recontainer>();
 
     public byte ActiveGenerators => (byte)ReContainer._prevEngaged;
 
@@ -32,7 +31,6 @@ public class HeavyZoneService : Service
         get
         {
             var reContainer = ReContainer;
-            //TODO: Rework this when the 079 Soft Rework was released
             return (reContainer._alreadyRecontained &&
                     reContainer._delayStopwatch.Elapsed.TotalSeconds > reContainer._activationDelay) ||
                    _nuke.State == NukeState.Detonated;
@@ -74,5 +72,4 @@ public class HeavyZoneService : Service
             }
         }
     }
-    */
 }

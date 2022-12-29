@@ -2,7 +2,6 @@
 using InventorySystem.Items.Pickups;
 using InventorySystem.Items.ThrowableProjectiles;
 using Mirror;
-using Respawning;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -90,10 +89,6 @@ public class Throwable : ISubSynapseItem
 
         throwableItem._destroyTime = Time.timeSinceLevelLoad + throwableItem._postThrownAnimationTime;
         throwableItem._alreadyFired = true;
-        
-        //TODO:
-        //GameplayTickets.Singleton.HandleItemTickets(throwableItem);
-
         Projectile = Object.Instantiate(throwableItem.Projectile, throwableItem.Owner.PlayerCameraReference.position,
             throwableItem.Owner.PlayerCameraReference.rotation);
         var transform = Projectile.transform;
@@ -104,7 +99,6 @@ public class Throwable : ISubSynapseItem
             Serial = _item.Serial,
             Weight = _item.Weight,
         };
-        //TODO: Test this
         info.ServerSetPositionAndRotation(transform.position, transform.rotation);
         Projectile.NetworkInfo = info;
         Projectile.PreviousOwner = _item.ItemOwner;

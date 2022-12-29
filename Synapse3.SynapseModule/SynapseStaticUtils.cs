@@ -108,8 +108,7 @@ public const VersionType Type = VersionType.Dev;
     /// </summary>
     public static string GetVersion()
     {
-        var version = $"{Major}.{Minor}.{Patch}" + (Type == VersionType.None ? "" :
-            (SubVersion == "" ? "-" + Type : "-" + Type + "-" + SubVersion));
+        var version = $"{Major}.{Minor}.{Patch}";
         
 #if CUSTOM_VERSION
         if (Type != VersionType.None)

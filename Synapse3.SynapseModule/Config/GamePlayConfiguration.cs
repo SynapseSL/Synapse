@@ -24,9 +24,6 @@ public class GamePlayConfiguration : IDocumentSection
 
     [Description("If enabled the WarHead button can be close again ")]
     public bool WarheadButtonClosable { get; set; } = false;
-
-    [Description("The amount of persons that need to be sacrificed for SCP-106's recontainment")]
-    public ushort RequiredForFemur { get; set; } = 1;
     
     [Description("All Scp's in this list are able to Speak to Humans")]
     public List<uint> SpeakingScp { get; set; } = new List<uint> //TODO

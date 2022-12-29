@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Interactables.Interobjects;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Events;
 
@@ -31,13 +32,10 @@ public class ElevatorService : Service
 
     private void GetVanillaElevators(RoundWaitingEvent _)
     {
-        //TODO:
-        /*
-        foreach (var lift in Synapse.GetObjects<Lift>())
+        foreach (var elevator in ElevatorManager.SpawnedChambers)
         {
-            _elevators.Add(new SynapseElevator(lift));
+            _elevators.Add(new SynapseElevator(elevator.Value));
         }
-        */
     }
 
     private void Clear(RoundRestartEvent _)

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Neuron.Core.Events;
 using Neuron.Core.Meta;
 using PlayerRoles;
-using PluginAPI.Core.Attributes;
-using PluginAPI.Enums;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Events;
