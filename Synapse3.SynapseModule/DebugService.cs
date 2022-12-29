@@ -367,6 +367,8 @@ public class DebugService : Service
                         break;
                     case RoleTypeId.Scp079:
                         var scp079 = ev.Player.ScpController.Scp079;
+                        scp079.RegenEnergy = 200;
+
                         scp079.Level = 3;//TODO
                         break;
                     case RoleTypeId.Scp096:

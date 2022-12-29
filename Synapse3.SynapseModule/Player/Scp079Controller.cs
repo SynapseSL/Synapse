@@ -98,6 +98,7 @@ public class Scp079Controller : ScpControllerBase<Scp079Role>
                     {
                         num *= PowerManager._abilities[i].AuxRegenMultiplier;
                     }
+                    return num;
                 }
                 return _regenEnergy;
             }
