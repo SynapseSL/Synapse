@@ -10,7 +10,6 @@ public class DummyService : Service
 {
     private RoundEvents _round;
     private PlayerEvents _player;
-    private ushort _hiestDummyId;
 
     internal Transform _dummyParent;
     internal readonly List<SynapseDummy> _dummies = new();

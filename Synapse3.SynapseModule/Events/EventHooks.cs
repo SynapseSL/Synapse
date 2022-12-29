@@ -16,9 +16,6 @@ using PlayerStatsSystem;
 using PluginAPI.Core.Attributes;
 using PluginAPI.Core.Interfaces;
 using PluginAPI.Core.Zones.Heavy;
-﻿using LightContainmentZoneDecontamination;
-using LiteNetLib;
-using PluginAPI.Core.Attributes;
 using PluginAPI.Enums;
 using PluginAPI.Events;
 using RemoteAdmin;
@@ -40,20 +37,6 @@ public partial class PlayerEvents
         var ev = new SetClassEvent(player.GetSynapsePlayer(), newRole, changeReason);
 
         SetClass.RaiseSafely(ev);
-
-        return ev.Allow;
-    }
-
-    [PluginEvent(ServerEventType.PlayerInteractDoor)]
-    public bool PlayerInteractDoorHook(IPlayer player, DoorVariant door, bool canOpen)
-    {
-        var synapsePlayer = player.GetSynapsePlayer();
-        var synapseDoor = door.GetSynapseDoor();
-        var useByPass = synapseDoor.Locked ? synapsePlayer.Bypass : false;
-
-        var ev = new DoorInteractEvent(synapsePlayer, canOpen, synapseDoor, useByPass);
-
-        DoorInteract.RaiseSafely(ev);
 
         return ev.Allow;
     }
@@ -190,9 +173,16 @@ public partial class PlayerEvents
     [PluginEvent(ServerEventType.PlayerLeft)]
     public void PlayerLeftHook(IPlayer player)
     {
-        var ev = new LeaveEvent(player.GetSynapsePlayer());
+        try//When round restart and a player left the gameobject property return an error
+        {
+            var ev = new LeaveEvent(player.GetSynapsePlayer());
 
-        Leave.RaiseSafely(ev);
+            Leave.RaiseSafely(ev);
+        }
+        catch (Exception)
+        {
+
+        }
     }
 
     [PluginEvent(ServerEventType.PlayerSearchPickup)]
@@ -266,8 +256,8 @@ public partial class RoundEvents
     [PluginEvent(ServerEventType.RoundStart)]
     public void RoundStartHook() => Start.RaiseSafely(new RoundStartEvent());
 
-    [PluginEvent(ServerEventType.RoundEnd)]//TODO: Found why parameters invalide
-    public void RoundEndHook(LeadingTeam leadingTeam) => End.RaiseSafely(new RoundEndEvent(LeadingTeam.Draw));
+/*    [PluginEvent(ServerEventType.RoundEnd)]//TODO: Found why parameters invalide
+    public void RoundEndHook(LeadingTeam leadingTeam) => End.RaiseSafely(new RoundEndEvent(LeadingTeam.Draw));*/
 
     [PluginEvent(ServerEventType.RoundRestart)]
     public void RoundRestartHook() => Restart.RaiseSafely(new RoundRestartEvent());
@@ -305,7 +295,7 @@ public partial class ScpEvents
     {
         var synapse049 = player.GetSynapsePlayer();
         var synapsetargert = target.GetSynapsePlayer();
-        var ragdoll = body.GetSynapseRagdoll();
+        var ragdoll = body.GetSynapseRagDoll();
 
         var ev = new Scp049ReviveEvent(synapse049, synapsetargert, ragdoll, true);
 
@@ -319,7 +309,7 @@ public partial class ScpEvents
     {
         var synapse049 = player.GetSynapsePlayer();
         var synapsetargert = target.GetSynapsePlayer();
-        var ragdoll = body.GetSynapseRagdoll();
+        var ragdoll = body.GetSynapseRagDoll();
 
         var ev = new Scp049ReviveEvent(synapse049, synapsetargert, ragdoll, false);
 

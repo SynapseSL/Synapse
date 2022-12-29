@@ -10,8 +10,6 @@ public class Scp079Controller : ScpControllerBase<Scp079Role>
 {
     //TODO:
     
-    private readonly SynapsePlayer _player;
-    
     internal Scp079Controller(SynapsePlayer player) : base(player) { }
 
 

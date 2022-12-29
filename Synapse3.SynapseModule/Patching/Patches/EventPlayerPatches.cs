@@ -27,18 +27,79 @@ using Synapse3.SynapseModule.Role;
 using System;
 using System.Linq;
 using UnityEngine;
+using static PlayerList;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
 
 [Automatic]
-[SynapsePatch("SendPlayerData", PatchType.PlayerEvent)]
+[SynapsePatch("PlayerDoorInteract", PatchType.PlayerEvent)]
 public static class SendPlayerDataPatch
 {
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(FlickerableLightController), nameof(FlickerableLightController.ServerSendDataToClient))]
-    public static void OnSendData(NetworkConnection conn)
-    {
 
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(DoorVariant), nameof(DoorVariant.ServerInteract))]
+    public static bool OnDoorInteract(DoorVariant __instance, ReferenceHub ply, byte colliderId)
+    {
+        try
+        {
+            var player = ply.GetSynapsePlayer();
+            var allow = false;
+            var bypassDenied = false;
+            var door = __instance;
+            if (__instance.ActiveLocks > 0)
+            {
+                var mode = DoorLockUtils.GetMode((DoorLockReason)__instance.ActiveLocks);
+
+                var canInteractGeneral = mode.HasFlagFast(DoorLockMode.CanClose) || mode.HasFlagFast(DoorLockMode.CanOpen);
+                var scpOverride = mode.HasFlagFast(DoorLockMode.ScpOverride) && player.Team == Team.SCPs;
+                var canChangeCurrently = mode != DoorLockMode.FullLock 
+                    && (__instance.TargetState && mode.HasFlagFast(DoorLockMode.CanClose) 
+                    || !__instance.TargetState && mode.HasFlagFast(DoorLockMode.CanOpen));
+
+                if (!canInteractGeneral && !scpOverride && !canChangeCurrently)
+                {
+                    bypassDenied = true;
+                }
+            }
+
+            //This is most often false when the Animation is still playing
+            if (!door.AllowInteracting(player, colliderId)) return false;
+
+            if (!bypassDenied)
+            {
+                if (player.RoleType == RoleTypeId.Scp079 
+                    || door.RequiredPermissions.CheckPermission(player))
+                {
+                    allow = true;
+                }
+            }
+
+            var ev = new DoorInteractEvent(player, allow, door.GetSynapseDoor(), bypassDenied);
+            Synapse.Get<PlayerEvents>().DoorInteract.Raise(ev);
+
+            if (ev.Allow)
+            {
+                door.NetworkTargetState = !door.TargetState;
+                door._triggerPlayer = player;
+                return false;
+            }
+
+            if (ev.LockBypassRejected)
+            {
+                door.LockBypassDenied(player, colliderId);
+                return false;
+            }
+
+            if (ev.PlayDeniedSound)
+                door.PermissionsDenied(player, colliderId);
+            DoorEvents.TriggerAction(door, DoorAction.AccessDenied, player);
+            return false;
+        }
+        catch (Exception e)
+        {
+            SynapseLogger<Synapse>.Error($"Sy3 Event: PlayerDoorInteract failed!!\n{e}");
+            return true;
+        }
     }
 }
 

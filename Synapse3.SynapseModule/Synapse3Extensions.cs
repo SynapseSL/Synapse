@@ -21,7 +21,6 @@ using PlayerRoles.PlayableScps.Subroutines;
 using PlayerStatsSystem;
 using PluginAPI.Core.Interfaces;
 using PluginAPI.Core.Items;
-using PlayerStatsSystem;
 using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
@@ -400,7 +399,7 @@ public static class Synapse3Extensions
         return FindField(baseType, name);
     }
 
-    public static void RaiseEvent(this object source, string eventName, params object?[]? args)
+    public static void RaiseEvent(this object source, string eventName, params object [] args)
     {
         // Find the delegate and invoke it.
         var delegateField = FindField(source.GetType(), eventName);
@@ -409,7 +408,7 @@ public static class Synapse3Extensions
 
     }
 
-    public static void RaiseEvent(this Type source, string eventName, params object?[]? args)
+    public static void RaiseEvent(this Type source, string eventName, params object [] args)
     {
         // Find the delegate and invoke it.
         var delegateField = FindField(source, eventName);

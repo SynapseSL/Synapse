@@ -336,10 +336,10 @@ public class DebugService : Service
                 break;
 
             case KeyCode.Alpha3:
-                var nuck = Synapse.Get<NukeService>();
-                NeuronLogger.For<Synapse>().Warn("nuckTime Left: " + nuck.TimeUntilDetonation);
-                nuck.TimeUntilDetonation = 0;
-                NeuronLogger.For<Synapse>().Warn("nuckTime Left: " + nuck.TimeUntilDetonation);
+
+                Synapse.Get<SchematicService>().SpawnSchematic(2000, ev.Player.Position);
+
+
                 break;
 
             case KeyCode.Alpha4:
