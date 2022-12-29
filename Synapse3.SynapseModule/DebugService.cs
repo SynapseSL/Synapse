@@ -365,10 +365,8 @@ public class DebugService : Service
                         scp096.CurentShield = 10;
                         scp096.MaxShield = 100;
                         scp096.ShieldRegeneration = 2000;
-            break;
-
-            case KeyCode.Alpha4:
-                Logger.Warn(Synapse.Get<RoundService>().MtfTickets);
+                        break;
+                }
                 break;
 
             case KeyCode.Alpha5:
@@ -390,12 +388,6 @@ public class DebugService : Service
 
             case KeyCode.Alpha9:
                 Schematic.ShowPlayer(ev.Player);
-                break;
-
-                        NeuronLogger.For<Synapse>().Warn("EnrageTimeLeft: " + scp096.EnrageTimeLeft);
-                        scp096.EnrageTimeLeft = 1;
-                        break;
-                }
                 break;
         }
     }
