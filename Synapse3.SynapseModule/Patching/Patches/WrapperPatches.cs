@@ -113,8 +113,6 @@ public static class Scp079RegenAuxiliaryPatch
     [HarmonyPatch(typeof(Scp079AuxManager), nameof(Scp079AuxManager.RegenSpeed), MethodType.Getter)]
     public static bool MaxAux(Scp079AuxManager __instance, ref float __result)
     {
-        NeuronLogger.For<Synapse>().Warn(__instance.Owner.GetSynapsePlayer().ScpController.Scp079.RegenEnergy);
-
         __result = __instance.Owner.GetSynapsePlayer().ScpController.Scp079.RegenEnergy;
         return false;
     }
