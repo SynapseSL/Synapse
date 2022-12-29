@@ -12,6 +12,7 @@ public class DummyService : Service
 {
     private RoundEvents _round;
     private PlayerEvents _player;
+    private ushort _hiestDummyId;
 
     internal Transform _dummyParent;
     internal readonly List<SynapseDummy> _dummies = new();
@@ -26,16 +27,16 @@ public class DummyService : Service
     {
         _round.Waiting.Subscribe(CreateDummyTransformParent);
         _player.Ban.Subscribe(DespawnDummyKick);
-        _player.Kick.Unsubscribe(DespawnDummyKick);
+        _player.Kick.Subscribe(DespawnDummyKick);
         _player.Death.Subscribe(DespawnDummyDeath);
     }
 
     public override void Disable()
     {
-        _round.Waiting.Subscribe(CreateDummyTransformParent);
-        _player.Ban.Subscribe(DespawnDummyKick);
+        _round.Waiting.Unsubscribe(CreateDummyTransformParent);
+        _player.Ban.Unsubscribe(DespawnDummyKick);
         _player.Kick.Unsubscribe(DespawnDummyKick);
-        _player.Death.Subscribe(DespawnDummyDeath);
+        _player.Death.Unsubscribe(DespawnDummyDeath);
     }
 
     private void DespawnDummyDeath(DeathEvent ev)

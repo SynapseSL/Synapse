@@ -19,11 +19,16 @@ using PluginAPI.Enums;
 using PluginAPI.Events;
 using RelativePositioning;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Player;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.Tracing;
 using System.Reflection;
+using System.Runtime.Remoting.Messaging;
 using UnityEngine;
 using Utils.Networking;
+using static PlayerRoles.PlayableScps.Scp173.Scp173TeleportAbility;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
 
@@ -45,46 +50,51 @@ public static class Scp0492AttackPatch
     {
         try
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: OnServerPerformAttack 1");
+            List<SynapsePlayer> ParsedPlayer = new List<SynapsePlayer>();
+
             var num = Physics.OverlapSphereNonAlloc(__instance.OverlapSphereOrigin, __instance._detectionRadius, ZombieAttackAbility.DetectionsNonAlloc, ZombieAttackAbility.DetectionMask);
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: OnServerPerformAttack 2"); 
             __instance._syncAttack = AttackResult.None;
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: OnServerPerformAttack 3");
-            foreach (var gameObject in ZombieAttackAbility.DetectionsNonAlloc)
+            for (int i = 0; i < num; i++)
             {
-                NeuronLogger.For<Synapse>().Error("Sy3 Event: OnServerPerformAttack other"); 
+                var gameObject = ZombieAttackAbility.DetectionsNonAlloc[i];
                 if (!gameObject.TryGetComponent<IDestructible>(out var component)
                     || Physics.Linecast(__instance.PlyCam.position, component.CenterOfMass, ZombieAttackAbility.BlockerMask)) 
                     continue;
-                NeuronLogger.For<Synapse>().Error("Sy3 Event: OnServerPerformAttack other 2");
 
                 var hitboxIdentity = component as HitboxIdentity;
                 var victime = hitboxIdentity?.TargetHub.GetSynapsePlayer();
                 var isPlayer = victime != null;
-                NeuronLogger.For<Synapse>().Error("Sy3 Event: OnServerPerformAttack other 3");
 
-                if (isPlayer && !ZombieAttackAbility.TargettedPlayers.Remove(hitboxIdentity.TargetHub)) 
-                    continue;
-                NeuronLogger.For<Synapse>().Error("Sy3 Event: OnServerPerformAttack other 4");
+                if (!isPlayer || ParsedPlayer.Contains(victime)) continue;
 
-                var damageHandler = (Scp049DamageHandler)__instance.DamageHandler;
-                NeuronLogger.For<Synapse>().Error($"Sy3 Event: OnServerPerformAttack {isPlayer}");
+                ParsedPlayer.Add(victime);
 
-                if (isPlayer)
-                {
-                    NeuronLogger.For<Synapse>().Error($"Sy3 Event: OnServerPerformAttack Raise");
-                    var scp = __instance.GetSynapsePlayer();
+                var damageHandler = __instance.DamageHandler as AttackerDamageHandler;
+
+                var scp = __instance.Owner.GetSynapsePlayer();
                     
-                    var damage = __instance.DamageAmount;
+                var damage = __instance.DamageAmount;
+                if (scp.RoleType == RoleTypeId.Scp939)
+                {
+                    var ev = new Scp939AttackEvent(scp, victime, damage, Scp939DamageType.Claw);
+
+                    _scp.Scp939Attack.RaiseSafely(ev);
+
+                    damage = ev.Damage;
+                }
+                else
+                {
                     var ev = new Scp0492AttackEvent(scp, victime, damage, true);
 
                     _scp.Scp0492Attack.RaiseSafely(ev);
 
                     if (!ev.Allow) continue;
 
-                    damageHandler.Damage = ev.Damage;
-                    NeuronLogger.For<Synapse>().Error($"Sy3 Event: OnServerPerformAttack Raised");
+                    damage = ev.Damage;
                 }
+
+
+                damageHandler.Damage = damage;
 
                 if (!component.Damage(damageHandler.Damage, damageHandler, component.CenterOfMass))
                     continue;
@@ -126,12 +136,10 @@ public static class Scp096AttackPatch
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(Scp096HitHandler), nameof(Scp096HitHandler.ProcessHits))]
-    public static bool ServerProcessCmd(Scp096HitHandler __instance, ref Scp096HitResult __result, int count)
+    public static bool ProcessHits(Scp096HitHandler __instance, ref Scp096HitResult __result, int count)
     {
         try
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp096AttackPatch");
-
             var scp096HitResult = Scp096HitResult.None;
             for (int i = 0; i < count; i++)
             {
@@ -140,17 +148,19 @@ public static class Scp096AttackPatch
                 if (!collider.TryGetComponent<IDestructible>(out var component))
                     continue;
 
-                var layerMask = Scp096HitHandler.SolidObjectMask & ~(1 << collider.gameObject.layer);
-                if (Physics.Linecast(__instance._scpRole.CameraPosition, component.CenterOfMass, layerMask) 
-                    || !__instance._hitNetIDs.Add(component.NetworkId))
+                int layerMask = (int)Scp096HitHandler.SolidObjectMask & ~(1 << collider.gameObject.layer);
+                if (Physics.Linecast(__instance._scpRole.CameraPosition, component.CenterOfMass, layerMask) || !__instance._hitNetIDs.Add(component.NetworkId))
+                {
                     continue;
+                }
 
                 if (component is BreakableWindow breakableWindow)
                 {
                     if (__instance.DealDamage(breakableWindow, __instance._windowDamage))
                     {
                         scp096HitResult |= Scp096HitResult.Window;
-                        CallOnPlayerHit(__instance, breakableWindow);
+
+                        Synapse3Extensions.RaiseEvent(__instance, nameof(Scp096HitHandler.OnWindowHit), breakableWindow);
                     }
                 }
                 else
@@ -158,16 +168,13 @@ public static class Scp096AttackPatch
                     if (component is not HitboxIdentity hitboxIdentity || !__instance.IsHumanHitbox(hitboxIdentity))
                         continue;
 
-                    NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp096AttackPatch raise");
                     var target = hitboxIdentity.TargetHub?.GetSynapsePlayer();
-                    NeuronLogger.For<Synapse>().Error(__instance._scpRole == null);
-                    var scp = __instance._scpRole.GetSynapsePlayer(); 
-                    var flag = __instance._targetCounter.HasTarget(target);
-                    var damage = flag ? __instance._humanTargetDamage : __instance._humanNontargetDamage;
+                    var scp = __instance._scpRole._lastOwner.GetSynapsePlayer(); 
+                    var isTarget = __instance._targetCounter.HasTarget(target);
+                    var damage = isTarget ? __instance._humanTargetDamage : __instance._humanNontargetDamage;
                     var charge = __instance._damageType  == Scp096DamageHandler.AttackType.Charge;
 
                     var ev = new Scp096AttackEvent(scp, target, charge, damage);
-                    NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp096AttackPatch raised");
 
                     _scp.Scp096Attack.RaiseSafely(ev);
 
@@ -176,7 +183,7 @@ public static class Scp096AttackPatch
                     if (__instance.DealDamage(hitboxIdentity, ev.Damage))
                     {
                         scp096HitResult |= Scp096HitResult.Human;
-                        CallOnWindowHit(__instance, target);
+                        Synapse3Extensions.RaiseEvent(__instance, nameof(Scp096HitHandler.OnPlayerHit), target.Hub);
                         if (!target.Hub.IsAlive())
                         {
                             scp096HitResult |= Scp096HitResult.Lethal;
@@ -195,32 +202,64 @@ public static class Scp096AttackPatch
             return true;
         }
     }
+}
 
-    private static void CallOnPlayerHit(Scp096HitHandler instance, BreakableWindow window)
+
+[Automatic]
+[SynapsePatch("Scp049Attack", PatchType.ScpEvent)]
+public static class Scp049AttackPatch
+{
+    static ScpEvents _scp;
+
+    static Scp049AttackPatch()
     {
-        var eventDelegate = (MulticastDelegate)typeof(Scp096HitHandler)
-            .GetField(nameof(Scp096HitHandler.OnWindowHit), BindingFlags.Instance | BindingFlags.NonPublic)
-            .GetValue(instance);
-        if (eventDelegate != null)
-        {
-            foreach (var handler in eventDelegate.GetInvocationList())
-            {
-                handler.Method.Invoke(handler.Target, new object[] { instance, window });
-            }
-        }
+        _scp = Synapse.Get<ScpEvents>();
     }
 
-    private static void CallOnWindowHit(Scp096HitHandler instance, ReferenceHub hub)
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp049AttackAbility), nameof(Scp049AttackAbility.ServerProcessCmd))]
+    public static bool ServerProcessCmd(Scp049AttackAbility __instance,NetworkReader reader)
     {
-        var eventDelegate = (MulticastDelegate)typeof(Scp096HitHandler)
-            .GetField(nameof(Scp096HitHandler.OnPlayerHit), BindingFlags.Instance | BindingFlags.NonPublic)
-            .GetValue(instance);
-        if (eventDelegate != null)
+        try
         {
-            foreach (var handler in eventDelegate.GetInvocationList())
+            if (!__instance.Cooldown.IsReady || __instance._resurrect.IsInProgress)
             {
-                handler.Method.Invoke(handler.Target, new object[] { instance, hub });
+                return false;
             }
+
+            __instance._target = ReferenceHubReaderWriter.ReadReferenceHub(reader);
+            if (__instance._target != null && __instance.IsTargetValid(__instance._target))
+            {
+                CardiacArrest effect = __instance._target.playerEffectsController.GetEffect<CardiacArrest>();
+
+                var scp = __instance.Owner.GetSynapsePlayer();
+                var victime = __instance._target.GetSynapsePlayer();
+                var damage = effect.IsEnabled ? -1 : 0;
+                var ev = new Scp049AttackEvent(scp, victime, damage, 1.5f, !effect.IsEnabled);
+
+                __instance.Cooldown.Trigger(ev.Cooldown);
+                if (ev.Damage != 0)
+                {
+                    __instance._target.playerStats.DealDamage(new Scp049DamageHandler(__instance.Owner, ev.Damage, Scp049DamageHandler.AttackType.Instakill));
+                }
+                
+                if (ev.CardiacArrestEffect)
+                {
+                    effect.SetAttacker(__instance.Owner);
+                    effect.Intensity = 1;
+                    effect.ServerChangeDuration(__instance._statusEffectDuration);
+                }
+
+                Synapse3Extensions.RaiseEvent(__instance, nameof(Scp049AttackAbility.OnServerHit), __instance._target);
+                __instance.ServerSendRpc(toAll: true);
+                Hitmarker.SendHitmarker(__instance.Owner, 1f);
+            }
+            return false;
+        }
+        catch (Exception e)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp049Attack failed\n" + e);
+            return true;
         }
     }
 }
@@ -294,7 +333,7 @@ public static class Scp106AttackPatch
             __instance.Vigor.VigorAmount += 0.3f;
             __instance.ReduceSinkholeCooldown();
             Hitmarker.SendHitmarker(__instance.Owner, 1f);
-            CallOnPlayerTeleported(__instance._targetHub);
+            Synapse3Extensions.RaiseEvent(typeof(Scp106Attack), nameof(Scp106Attack.OnPlayerTeleported), __instance._targetHub);
             PlayerEffectsController playerEffectsController = __instance._targetHub.playerEffectsController;
             playerEffectsController.EnableEffect<Traumatized>(180f);
             if (ev.TakeToPocket)
@@ -308,29 +347,15 @@ public static class Scp106AttackPatch
             return true;
         }
     }
-
-    private static void CallOnPlayerTeleported(ReferenceHub hub)
-    {
-        var eventDelegate = (MulticastDelegate)typeof(Scp106AttackPatch)
-            .GetField(nameof(Scp106Attack.OnPlayerTeleported), BindingFlags.Instance | BindingFlags.NonPublic)
-            .GetValue(null);
-        if (eventDelegate != null)
-        {
-            foreach (var handler in eventDelegate.GetInvocationList())
-            {
-                handler.Method.Invoke(handler.Target, new object[] { null, hub });
-            }
-        }
-    }
 }
 
 [Automatic]
-[SynapsePatch("Scp173Attack", PatchType.ScpEvent)]
-public static class Scp173AttackPatch
+[SynapsePatch("Scp173AttackSnap", PatchType.ScpEvent)]
+public static class Scp173AttackSnapPatch
 {
     static ScpEvents _scp;
 
-    static Scp173AttackPatch()
+    static Scp173AttackSnapPatch()
     {
         _scp = Synapse.Get<ScpEvents>();
     }
@@ -344,16 +369,15 @@ public static class Scp173AttackPatch
         {
             __instance._targetHub = ReferenceHubReaderWriter.ReadReferenceHub(reader);
             if (__instance._observersTracker.IsObserved 
-                || __instance._targetHub == null
-                || __instance._targetHub.roleManager.CurrentRole is not IFpcRole fpcRole
-                || __instance.IsSpeeding 
-                || !EventManager.ExecuteEvent(ServerEventType.Scp173SnapPlayer, __instance.Owner, __instance._targetHub))
+                || __instance._targetHub == null 
+                || __instance._targetHub.roleManager.CurrentRole is not IFpcRole currentRole 
+                || __instance.IsSpeeding)
             {
                 return false;
             }
 
             var fpcModule = __instance.ScpRole.FpcModule;
-            var fpcModule2 = fpcRole.FpcModule;
+            var fpcModule2 = currentRole.FpcModule;
             var playerCameraReference = __instance.Owner.PlayerCameraReference;
             var position = fpcModule2.Position;
             var position2 = fpcModule.Position;
@@ -364,10 +388,10 @@ public static class Scp173AttackPatch
             fpcModule.Position = bounds.ClosestPoint(RelativePositionSerialization.ReadRelativePosition(reader).Position);
             playerCameraReference.rotation = LowPrecisionQuaternionSerializer.ReadLowPrecisionQuaternion(reader).Value;
 
-            if (Scp173SnapAbility.TryHitTarget(playerCameraReference, out var target))
+            if (!Scp173SnapAbility.TryHitTarget(playerCameraReference, out var target))
                 goto changePose;
 
-            var scp = __instance.GetSynapsePlayer();
+            var scp = __instance.Owner.GetSynapsePlayer();
             var victime = target.GetSynapsePlayer();
             var damageHandler = __instance.ScpRole.DamageHandler;
             var damamge = damageHandler.Damage;
@@ -389,6 +413,7 @@ public static class Scp173AttackPatch
             }
 
             changePose:
+
             fpcModule2.Position = position;
             fpcModule.Position = position2;
             playerCameraReference.rotation = rotation;
@@ -397,7 +422,110 @@ public static class Scp173AttackPatch
         }
         catch (Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp173Attack failed\n" + ex);
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp173AttackSnap failed\n" + ex);
+            return true;
+        }
+    }
+}
+
+
+[Automatic]
+[SynapsePatch("Scp173AttackTp", PatchType.ScpEvent)]
+public static class Scp173AttackTpPatch
+{
+    static ScpEvents _scp;
+
+    static Scp173AttackTpPatch()
+    {
+        _scp = Synapse.Get<ScpEvents>();
+    }
+
+    //I Can't patch, i just copy the method whith you edit and the server crash
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp173TeleportAbility), nameof(Scp173TeleportAbility.ServerProcessCmd))]
+    public static bool OnServerProcessCmd(Scp173TeleportAbility __instance, NetworkReader reader)
+    {
+        try
+        {
+            __instance._cmdData = (CmdTeleportData)reader.ReadByte();
+            if (!__instance.HasDataFlag(CmdTeleportData.WantsToTeleport))
+            {
+                __instance.ServerSendRpc(toAll: true);
+            }
+            else
+            {
+                if (!__instance._blinkTimer.AbilityReady)
+                {
+                    return false;
+                }
+
+                Transform playerCameraReference = __instance.Owner.PlayerCameraReference;
+                HashSet<ReferenceHub> prevObservers = new HashSet<ReferenceHub>(__instance._observersTracker.Observers);
+                CmdTeleportData cmdData = __instance._cmdData;
+                __instance._cmdData = (CmdTeleportData)0;
+                __instance.ServerSendRpc(toAll: true);
+                __instance._cmdData = cmdData;
+                Quaternion rotation = playerCameraReference.rotation;
+                playerCameraReference.rotation = reader.ReadQuaternion();
+                bool num = __instance.TryBlink(reader.ReadSingle());
+                playerCameraReference.rotation = rotation;
+                if (!num)
+                {
+                    return false;
+                }
+
+                prevObservers.UnionWith(__instance._observersTracker.Observers);
+                __instance.ServerSendRpc((ReferenceHub x) => prevObservers.Contains(x));
+                __instance._audioSubroutine.ServerSendSound(Scp173AudioPlayer.Scp173SoundId.Teleport);
+                if (__instance._breakneckSpeedsAbility.IsActive)
+                {
+                    return false;
+                }
+
+                int num2 = Physics.OverlapSphereNonAlloc(__instance._fpcModule.Position, 0.8f, DetectedColliders, 16384);
+                for (int i = 0; i < num2; i++)
+                {
+                    if (DetectedColliders[i].TryGetComponent<BreakableWindow>(out var component))
+                    {
+                        component.Damage(component.health, __instance.ScpRole.DamageHandler, Vector3.zero);
+                    }
+                }
+
+                ReferenceHub targetHub = ReferenceHubReaderWriter.ReadReferenceHub(reader);
+                if (targetHub != null 
+                    && targetHub.roleManager.CurrentRole is HumanRole humanRole 
+                    && EventManager.ExecuteEvent(ServerEventType.Scp173SnapPlayer, __instance.Owner, targetHub))
+                {
+                    var bounds = humanRole.FpcModule.Tracer.GenerateBounds(0.4f, ignoreTeleports: true);
+                    bounds.Encapsulate(new Bounds(humanRole.FpcModule.Position, Vector3.up * 2.2f));
+                    if (bounds.SqrDistance(__instance._fpcModule.Position) > 1.66f)
+                        return false;
+
+                    var scp = __instance.Owner.GetSynapsePlayer();
+                    var victime = targetHub.GetSynapsePlayer();
+                    var damageHandler = __instance.ScpRole.DamageHandler;
+                    var damamge = damageHandler.Damage;
+                    var ev = new Scp173AttackEvent(scp, victime, damamge, true);
+
+                    _scp.Scp173Attack.RaiseSafely(ev);
+
+                    if (!ev.Allow) return false;
+
+                    damageHandler.Damage = ev.Damage;
+
+                    if (targetHub.playerStats.DealDamage(__instance.ScpRole.DamageHandler) && __instance.ScpRole.SubroutineModule.TryGetSubroutine<Scp173AudioPlayer>(out var subroutine))
+                    {
+                        Hitmarker.SendHitmarker(__instance.Owner, 1f);
+                        subroutine.ServerSendSound(Scp173AudioPlayer.Scp173SoundId.Snap);
+                    }
+                }
+            }
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp173AttackTp failed\n" + ex);
             return true;
         }
     }
@@ -417,7 +545,7 @@ public static class Scp939LunchPatch
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(Scp939DamageHandler), nameof(Scp939DamageHandler.ProcessDamage))]
-    public static void OnServerProcessCmd(Scp939DamageHandler __instance, ReferenceHub ply)
+    public static void OnProcessDamage(Scp939DamageHandler __instance, ReferenceHub ply)
     {
         try
         {

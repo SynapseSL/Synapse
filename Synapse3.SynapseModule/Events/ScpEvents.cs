@@ -128,8 +128,8 @@ public abstract class ScpActionEvent : IEvent
 public class Scp049AttackEvent : ScpAttackEvent
 {
     public Scp049AttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage, 
-        float cooldown, bool cardiacArrest, bool allow) : base(
-        scp, victim, damage, allow)
+        float cooldown, bool cardiacArrest) : base(
+        scp, victim, damage, true)
     {
         Cooldown = cooldown;
         CardiacArrestEffect = cardiacArrest;

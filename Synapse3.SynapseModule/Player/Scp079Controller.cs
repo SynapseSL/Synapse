@@ -5,26 +5,21 @@ using Synapse3.SynapseModule.Map.Objects;
 
 namespace Synapse3.SynapseModule.Player;
 
-public class Scp079Controller
+public class Scp079Controller : ScpControllerBase<Scp079Role>
 {
     //TODO:
     
     private readonly SynapsePlayer _player;
     
-    internal Scp079Controller(SynapsePlayer player)
-    {
-        _player = player;
-    }
+    internal Scp079Controller(SynapsePlayer player) : base(player) { }
 
-    
-    public Scp079Role Role => _player.CurrentRole as Scp079Role;
-    public bool Is079Instance => Role != null;
+
     public Scp079TierManager TierManager => Role?.GetSubroutine<Scp079TierManager>();
     public Scp079AuxManager PowerManager => Role?.GetSubroutine<Scp079AuxManager>();
     public Scp079CurrentCameraSync CurrentCameraSync => Role?.GetSubroutine<Scp079CurrentCameraSync>();
     public Scp079DoorLockChanger DoorLockChanger => Role?.GetSubroutine<Scp079DoorLockChanger>();
 
-    public int Level
+    public int Level//TODO: Fix It
     {
         get
         {
@@ -35,6 +30,7 @@ public class Scp079Controller
         {
             if (TierManager == null) return;
             TierManager.AccessTierIndex = value - 1;
+            TierManager.ServerSendRpc(toAll: true);
         }
     }
 
@@ -49,6 +45,7 @@ public class Scp079Controller
         {
             if (TierManager == null) return;
             TierManager.TotalExp = value;
+            TierManager.ServerSendRpc(toAll: true);
         }
     }
 
@@ -63,11 +60,12 @@ public class Scp079Controller
         {
             if (PowerManager == null) return; 
             PowerManager.CurrentAux = value;
+            TierManager.ServerSendRpc(toAll: true);
         }
     }
 
     private float _maxEnergy = -1;
-    public float MaxEnergy
+    public float MaxEnergy//Work but not display for the player
     {
         get
         {
@@ -83,6 +81,32 @@ public class Scp079Controller
         {
             if (PowerManager == null) return;
             _maxEnergy = value;
+        }
+    }
+
+    private float _regenEnergy = -1;
+    public float RegenEnergy
+    {
+        get
+        {
+            if (PowerManager != null)
+            {
+                if (_regenEnergy == -1)
+                {
+                    float num = PowerManager._regenerationPerTier[PowerManager._tierManager.AccessTierIndex];
+                    for (int i = 0; i < PowerManager._abilitiesCount; i++)
+                    {
+                        num *= PowerManager._abilities[i].AuxRegenMultiplier;
+                    }
+                }
+                return _regenEnergy;
+            }
+            return 0f;
+        }
+        set
+        {
+            if (PowerManager == null) return;
+            _regenEnergy = value;
         }
     }
 
@@ -102,16 +126,16 @@ public class Scp079Controller
         }
     }
 
-    public void GiveExperience(int amount)
+    public void GiveExperience(int amount, Scp079HudTranslation reason = Scp079HudTranslation.ExpGainAdminCommand)
     {
-        if (!Is079Instance) return;
+        if (!IsInstance) return;
 
-        TierManager.ServerGrantExperience(amount, Scp079HudTranslation.ExpGainAdminCommand);
+        TierManager.ServerGrantExperience(amount, reason);
     }
 
     public void UnlockDoors()
     {
-        if (!Is079Instance) return;
+        if (!IsInstance) return;
 
         DoorLockChanger.ServerUnlockAll();
     }

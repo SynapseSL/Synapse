@@ -88,20 +88,6 @@ public static class PlayerStaminaUsePatch
         return false;
     }
 }
-/*
-[Automatic]
-[SynapsePatch("Scp096SheldMax", PatchType.Wrapper)]
-public static class Scp096SheldMaxPatch
-{
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(DynamicHumeShieldController), nameof(DynamicHumeShieldController.HsMax), MethodType.Getter)]
-    public static bool MaxAux(Scp096RageManager __instance, ref float __result)
-    {
-        __result = __instance.Owner.GetSynapsePlayer().ScpController.Scp096.MaxShield;
-        return false;
-    }
-}*/
 
 [Automatic]
 [SynapsePatch("Scp079MaxAuxiliary", PatchType.Wrapper)]
@@ -116,20 +102,135 @@ public static class Scp079MaxAuxiliaryPatch
         return false;
     }
 }
-/*
+
 [Automatic]
-[SynapsePatch("Scp096SheldRegeneration", PatchType.Wrapper)]
+[SynapsePatch("Scp079RegenAuxiliary", PatchType.Wrapper)]
+public static class Scp079RegenAuxiliaryPatch
+{
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp079AuxManager), nameof(Scp079AuxManager.RegenSpeed), MethodType.Getter)]
+    public static bool MaxAux(Scp079AuxManager __instance, ref float __result)
+    {
+        __result = __instance.Owner.GetSynapsePlayer().ScpController.Scp079.RegenEnergy;
+        return false;
+    }
+}
+
+[Automatic]
+[SynapsePatch("DynamicShieldRegen", PatchType.Wrapper)]
 public static class Scp096RegenerationPatch
 {
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(DynamicHumeShieldController), nameof(DynamicHumeShieldController.HsRegeneration), MethodType.Getter)]
-    public static bool OnRageUpdate(Scp096RageManager __instance, ref float __result)
+    public static bool MaxAux(Scp079AuxManager __instance, ref float __result)
     {
-        __result = __instance.Owner.GetSynapsePlayer().ScpController.Scp096.MaxShield;
-        return false;
+        var player = __instance.Owner.GetSynapsePlayer();
+        switch (player.RoleType)
+        {
+            case RoleTypeId.Scp173:
+                if (player.ScpController.Scp173._shieldRegeneration == -1)
+                {
+                    return true;
+                }
+                else
+                {
+                    __result = player.ScpController.Scp173._shieldRegeneration;
+                    return false;
+                }
+            case RoleTypeId.Scp106:
+                if (player.ScpController.Scp106._shieldRegeneration == -1)
+                {
+                    return true;
+                }
+                else
+                {
+                    __result = player.ScpController.Scp106._shieldRegeneration;
+                    return false;
+                }
+            case RoleTypeId.Scp096:
+                if (player.ScpController.Scp096._shieldRegeneration == -1)
+                {
+                    return true;
+                }
+                else
+                {
+                    __result = player.ScpController.Scp096._shieldRegeneration;
+                    return false;
+                }
+            case RoleTypeId.Scp939:
+                if (player.ScpController.Scp939._shieldRegeneration == -1)
+                {
+                    return true;
+                }
+                else
+                {
+                    __result = player.ScpController.Scp939._shieldRegeneration;
+                    return false;
+                }
+        }
+        return true;
     }
-}*/
+}
+
+
+[Automatic]
+[SynapsePatch("Scp096SheldMax", PatchType.Wrapper)]
+public static class Scp096SheldMaxPatch
+{
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(DynamicHumeShieldController), nameof(DynamicHumeShieldController.HsMax), MethodType.Getter)]
+    public static bool MaxAux(Scp096RageManager __instance, ref float __result)
+    {
+        var player = __instance.Owner.GetSynapsePlayer();
+        switch (player.RoleType)
+        {
+            case RoleTypeId.Scp173:
+                if (player.ScpController.Scp173._maxShield == -1)
+                {
+                    return true;
+                }
+                else
+                {
+                    __result = player.ScpController.Scp173._maxShield;
+                    return false;
+                }
+            case RoleTypeId.Scp106:
+                if (player.ScpController.Scp106._maxShield == -1)
+                {
+                    return true;
+                }
+                else
+                {
+                    __result = player.ScpController.Scp106._maxShield;
+                    return false;
+                }
+            case RoleTypeId.Scp096:
+                if (player.ScpController.Scp096._maxShield == -1)
+                {
+                    return true;
+                }
+                else
+                {
+                    __result = player.ScpController.Scp096._maxShield;
+                    return false;
+                }
+            case RoleTypeId.Scp939:
+                if (player.ScpController.Scp939._maxShield == -1)
+                {
+                    return true;
+                }
+                else
+                {
+                    __result = player.ScpController.Scp939._maxShield;
+                    return false;
+                }
+        }
+        return true;
+    }
+}
 
 [Automatic]
 [SynapsePatch("RedirectRoleWrite", PatchType.Wrapper)]

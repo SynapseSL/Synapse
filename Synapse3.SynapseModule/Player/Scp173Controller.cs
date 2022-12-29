@@ -1,24 +1,19 @@
 ﻿using Hazards;
 using Mirror;
+using PlayerRoles.PlayableScps.HumeShield;
 using PlayerRoles.PlayableScps.Scp173;
+using PluginAPI.Core;
 using RelativePositioning;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
 
-public class Scp173Controller
+public class Scp173Controller : ScpShieldControler<Scp173Role> 
 {
     
-    private SynapsePlayer _player;
+    public Scp173Controller(SynapsePlayer player) : base(player) { }
     
-    public Scp173Controller(SynapsePlayer player)
-    {
-        _player = player;
-    }
-    
-    
-    public Scp173Role Role => _player.CurrentRole as Scp173Role;
     //TODO : set to cache the subrootine when player spawn
     public Scp173ObserversTracker ObserverTraker => Role?.GetSubroutine<Scp173ObserversTracker>();
     public Scp173BlinkTimer BlinkTimer => Role?.GetSubroutine<Scp173BlinkTimer>();
@@ -27,6 +22,8 @@ public class Scp173Controller
     public Scp173SnapAbility SnapAbility => Role?.GetSubroutine<Scp173SnapAbility>();
     public Scp173TantrumAbility TantrumAbility => Role?.GetSubroutine<Scp173TantrumAbility>();
     public Scp173TeleportAbility TeleportAbility => Role?.GetSubroutine<Scp173TeleportAbility>();
+    public override HumeShieldModuleBase SheildModule => Role?.HumeShieldModule;
+
 
     public bool Is173Instance => Role != null;
 
@@ -38,27 +35,35 @@ public class Scp173Controller
 
     public float CurentTantrumCoolDown
     {
-        get => TantrumAbility.Cooldown.Remaining;
+        get
+        {
+            var ability = TantrumAbility;
+            if (ability == null) return 0;
+
+            return ability.Cooldown.Remaining;
+        }
         set
         {
-            TantrumAbility.ServerSendRpc(toAll: true);
-            TantrumAbility.Cooldown.Trigger(value);
+            var ability = TantrumAbility;
+            if (ability == null) return;
+
+            ability.Cooldown.Trigger(value);
+            ability.ServerSendRpc(toAll: true);
         }
     }
 
-/*    public float TantrumCoolDown// TODO: Patch
+    public float TantrumCoolDown// TODO: Patch
     {
         get;
         set;
-    }*/
+    }
 
 
-    /*    public float CurentBlinkCooldown//TODO: Patch
-        {
-            get;
-            set;
-
-        }*/
+    public float CurentBlinkCooldown//TODO: Patch
+    {
+        get;
+        set;
+    }
 
     public float BlinkCooldown
     {
@@ -68,30 +73,54 @@ public class Scp173Controller
             var blinkTimer = BlinkTimer;
             if (blinkTimer == null)
                 return;
-            blinkTimer._totalCooldown = value * (BlinkTimer._breakneckSpeedsAbility.IsActive ? 1f : 2f);
+            blinkTimer._totalCooldown = value / 2;
+            blinkTimer.ServerSendRpc(toAll: true);
         }
     }
 
     public float BreakneckCoolDown
     {
-        get => BreakneckSpeedsAbility.Cooldown.Remaining;
-        set => BreakneckSpeedsAbility.Cooldown.Remaining = value;
+        get
+        {
+            var ability = BreakneckSpeedsAbility;
+            if (ability == null) return 0;
+
+            return ability.Cooldown.Remaining;
+        }
+        set
+        {
+            var ability = BreakneckSpeedsAbility;
+            if (ability == null) return;
+
+            ability.Cooldown.Remaining = value;
+            ability.ServerSendRpc(toAll: true);
+        }
     }
 
     public bool IsSpeeding
     {
-        get => BreakneckSpeedsAbility.IsActive;
-        set => BreakneckSpeedsAbility.IsActive = value;
+        get
+        {
+            var ability = BreakneckSpeedsAbility;
+            if (ability == null) return false;
+
+            return ability.IsActive;
+        }
+        set
+        {
+            var ability = BreakneckSpeedsAbility;
+            if (ability == null) return;
+
+            BreakneckSpeedsAbility.IsActive = value;
+            ability.ServerSendRpc(toAll: true);
+        }
     }
 
-
-    public void CreateTrantrum(Vector3 postion)
+    public void CreateTantrum(Vector3 postion, float coolDown = 30)
     {
-        TantrumAbility.Cooldown.Trigger(30f);
-        TantrumAbility.ServerSendRpc(toAll: true);
-        TantrumEnvironmentalHazard tantrumEnvironmentalHazard = Object.Instantiate(TantrumAbility._tantrumPrefab);
-        tantrumEnvironmentalHazard.SynchronizedPosition = new RelativePosition(postion);
-        NetworkServer.Spawn(tantrumEnvironmentalHazard.gameObject);
+        CurentTantrumCoolDown = coolDown;
+        var tantrum = Object.Instantiate(TantrumAbility._tantrumPrefab);
+        tantrum.SynchronizedPosition = new RelativePosition(postion);
+        NetworkServer.Spawn(tantrum.gameObject);
     }
-    
 }

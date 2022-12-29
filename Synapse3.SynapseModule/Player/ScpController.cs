@@ -1,4 +1,6 @@
-﻿namespace Synapse3.SynapseModule.Player;
+﻿using System.Collections.Generic;
+
+namespace Synapse3.SynapseModule.Player;
 
 public class ScpController
 {
@@ -11,6 +13,7 @@ public class ScpController
         Scp096 = new Scp096Controller(player);
         Scp106 = new Scp106Controller(player);
         Scp173 = new Scp173Controller(player);
+        Scp939 = new Scp939Controller(player);
     }
 
     public readonly Scp106Controller Scp106;
@@ -20,4 +23,8 @@ public class ScpController
     public readonly Scp096Controller Scp096;
 
     public readonly Scp173Controller Scp173;
+
+    public readonly Scp939Controller Scp939;
+
+
 }

@@ -81,12 +81,19 @@ public partial class PlayerEvents
     [PluginEvent(ServerEventType.PlayerChangeItem)]
     public bool PlayerChangeItemHook(IPlayer player, ushort oldItem, ushort newItem)
     {
-        var synapseNewItem = _item.GetSynapseItem(newItem);
-        var ev = new ChangeItemEvent(player.GetSynapsePlayer(), true, synapseNewItem);
+        //When round end the event is call but no gameobject for player and crash
+        try
+        {
+            var synapseNewItem = _item?.GetSynapseItem(newItem) ?? SynapseItem.None;
+            var ev = new ChangeItemEvent(player?.GetSynapsePlayer(), true, synapseNewItem);
 
-        ChangeItem.RaiseSafely(ev);
-
-        return ev.Allow;
+            ChangeItem.RaiseSafely(ev);
+            return ev.Allow;
+        }
+        catch (Exception)
+        {
+            return true;
+        }
     }
 
     [PluginEvent(ServerEventType.PlayerDamage)]
@@ -185,7 +192,7 @@ public partial class PlayerEvents
         Leave.RaiseSafely(ev);
     }
 
-    [PluginEvent(ServerEventType.PlayerSearchedPickup)]//TODO: Test if that do the Ammo
+    [PluginEvent(ServerEventType.PlayerSearchPickup)]
     public bool PlayerSearchedPickupHook(IPlayer player, ItemPickupBase item)
     {
         var ev = new PickupEvent(player.GetSynapsePlayer(), true, item.GetItem());
@@ -216,14 +223,17 @@ public partial class PlayerEvents
     }
 
 
-    [PluginEvent(ServerEventType.PlayerKicked)]//TODO: Found why some time an error pop
-    public bool PlayerKickedHook(IPlayer player, IPlayer issuer, string reason)
-    {
-        var ev = new KickEvent(player?.GetSynapsePlayer(), issuer?.GetSynapsePlayer(), reason, true);
+    //Error in the Assembly-CSharp Code... try to cast an ICommandSender to a IPlayer 
+    /*    [PluginEvent(ServerEventType.PlayerKicked)]
+        public bool PlayerKickedHook(IPlayer player, ICommandSender issuer, string reason)
+        {
+            var playerIssuer = (issuer as PlayerCommandSender)?.GetSynapsePlayer();
 
-        Kick.RaiseSafely(ev);
-        return ev.Allow;
-    }
+            var ev = new KickEvent(player?.GetSynapsePlayer(), playerIssuer, reason, true);
+
+            Kick.RaiseSafely(ev);
+            return ev.Allow;
+        }*/
 
 
     [PluginEvent(ServerEventType.PlayerBanned)]
@@ -287,7 +297,7 @@ public partial class ServerEvents
 
 public partial class ScpEvents
 {
-    [PluginEvent(ServerEventType.Scp049ResurrectBody)]
+    [PluginEvent(ServerEventType.Scp049ResurrectBody)]//TODO: Hook it to the NW Api
     public bool Scp049ResurrectBodyHook(IPlayer player, IPlayer target, BasicRagdoll body)
     {
         var synapse049 = player.GetSynapsePlayer();

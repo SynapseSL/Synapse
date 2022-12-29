@@ -36,6 +36,8 @@ using PluginAPI.Core.Attributes;
 using Synapse3.SynapseModule.Permissions;
 using Object = UnityEngine.Object;
 using Synapse3.SynapseModule.Map.Rooms;
+using PlayerRoles.PlayableScps.Scp106;
+using System.Reflection;
 
 namespace Synapse3.SynapseModule;
 
@@ -81,7 +83,7 @@ public class DebugService : Service
 
         _scp.Scp049Revive.Subscribe(ev =>
         {
-           
+            NeuronLogger.For<Synapse>().Warn($"Scp049Revive {ev.Scp.NickName} -> {ev.HumanToRevive.NickName}");
         });
         
         _item.ThrowGrenade.Subscribe(ev =>
@@ -213,6 +215,11 @@ public class DebugService : Service
         {
             NeuronLogger.For<Synapse>().Error($"Scp939Attack {ev.Player.NickName}");
             ev.Tails = true;
+        });
+
+        _player.Pickup.Subscribe(ev =>
+        {
+            NeuronLogger.For<Synapse>().Error($"Pickup {ev.Player.NickName}, {ev.Item.Name}");
         });
         //Debug--
 
@@ -347,25 +354,12 @@ public class DebugService : Service
                 break;
 
             case KeyCode.Alpha4:
-                try
-                { 
-                    if (ev.Player.Room is IVanillaRoom room)
-                        foreach (var cammera in room.Cameras)
-                        {
-                            NeuronLogger.For<Synapse>().Warn("Camera: " + cammera.Name);
-                        }
-                    else
-                        NeuronLogger.For<Synapse>().Warn("That is not a SynapseNetworkRoom");
-                }
-                catch(Exception e)
-                {
-                    NeuronLogger.For<Synapse>().Warn("Crash here" + e); 
-                }
                 switch (ev.Player.RoleType)
                 {
                     case RoleTypeId.Scp173:
                         var scp173 = ev.Player.ScpController.Scp173;
-                        scp173.CurentTantrumCoolDown = 100;//TODO
+                        scp173.CurentBlinkCooldown = 5;//TODO
+                        scp173.TantrumCoolDown = 2;//TODO
                         break;
                     case RoleTypeId.Scp106:
                         var scp106 = ev.Player.ScpController.Scp106;
@@ -373,17 +367,16 @@ public class DebugService : Service
                         break;
                     case RoleTypeId.Scp079:
                         var scp079 = ev.Player.ScpController.Scp079;
-                        NeuronLogger.For<Synapse>().Warn("Is079Instance: " + scp079.Is079Instance); 
-                        NeuronLogger.For<Synapse>().Warn("Camera: " + scp079.Camera?.Name);
-                        scp079.MaxEnergy = 1000;
-                        scp079.Level = 3;
-                        scp079.GiveExperience(20);
+                        scp079.Level = 3;//TODO
                         break;
                     case RoleTypeId.Scp096:
                         var scp096 = ev.Player.ScpController.Scp096;
+                        scp096.CurentShield = 10;
                         scp096.MaxShield = 100;
                         scp096.ShieldRegeneration = 2000;
-                        NeuronLogger.For<Synapse>().Warn("EnrageTimeLeft: " + scp096.EnrageTimeLeft); 
+
+                        NeuronLogger.For<Synapse>().Warn("EnrageTimeLeft: " + scp096.EnrageTimeLeft);
+                        scp096.EnrageTimeLeft = 1;
                         break;
                 }
                 break;

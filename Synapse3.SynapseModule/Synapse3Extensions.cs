@@ -152,7 +152,7 @@ public static class Synapse3Extensions
         .GetPlayer(x => x.CommandSender == sender, PlayerType.Dummy, PlayerType.Player, PlayerType.Server);
     public static SynapsePlayer GetSynapsePlayer(this StatBase stat) => stat.Hub.GetSynapsePlayer();
     public static SynapsePlayer GetSynapsePlayer(this Footprint footprint) => footprint.Hub?.GetSynapsePlayer();
-    public static SynapsePlayer GetSynapsePlayer(this IPlayer player) => player.ReferenceHub.GetSynapsePlayer();
+    public static SynapsePlayer GetSynapsePlayer(this IPlayer player) => player.ReferenceHub?.GetSynapsePlayer();
 
     public static SynapseItem GetItem(this ItemPickupBase pickupBase) => _item.GetSynapseItem(pickupBase.Info.Serial);
     public static SynapseItem GetItem(this ItemBase itemBase) => _item.GetSynapseItem(itemBase.ItemSerial);
@@ -388,6 +388,38 @@ public static class Synapse3Extensions
         {
             SynapseLogger<Synapse>.Error($"{eventParameter.GetType().Name} failed\n" + ex);
         }
+    }
+
+    private static FieldInfo FindField(Type type, string name)
+    {
+        var field = type.GetField(name, BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic);
+        if (field != null)
+        {
+            return field;
+        }
+        var baseType = type.BaseType;
+        if (baseType == null)
+        {
+            return null;
+        }
+        return FindField(baseType, name);
+    }
+
+    public static void RaiseEvent(this object source, string eventName, params object?[]? args)
+    {
+        // Find the delegate and invoke it.
+        var delegateField = FindField(source.GetType(), eventName);
+        var eventDelegate = delegateField?.GetValue(source) as Delegate;
+        eventDelegate?.DynamicInvoke(args);
+
+    }
+
+    public static void RaiseEvent(this Type source, string eventName, params object?[]? args)
+    {
+        // Find the delegate and invoke it.
+        var delegateField = FindField(source, eventName);
+        var eventDelegate = delegateField?.GetValue(null) as Delegate;
+        eventDelegate?.DynamicInvoke(args);
     }
 
     public static T GetSubroutine<T>(this ISubroutinedScpRole role) where T : ScpSubroutineBase
