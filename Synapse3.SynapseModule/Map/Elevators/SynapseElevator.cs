@@ -1,113 +1,40 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using MEC;
-using Synapse3.SynapseModule.Enums;
+using Interactables.Interobjects;
 
 namespace Synapse3.SynapseModule.Map.Elevators;
 
-//TODO:
-/*
-public class SynapseElevator : DefaultElevator
+public class SynapseElevator : IElevator
 {
-    public Lift Lift { get; }
-    
-    public SynapseElevator(Lift lift)
+    public SynapseElevator(ElevatorChamber chamber)
     {
-        Lift = lift;
-        var list = new List<IElevatorDestination>();
-        for (uint i = 0; i < lift.elevators.Length; i++)
+        Chamber = new SynapseElevatorChamber(chamber, this);
+        ElevatorId = (uint)chamber._assignedGroup;
+
+        if (!ElevatorDoor.AllElevatorDoors.TryGetValue(chamber._assignedGroup, out var doors)) return;
+        var doorList = new List<IElevatorDestination>();
+        foreach (var door in doors)
         {
-            list.Add(new VanillaDestination(this, lift.elevators[i], lift.elevatorName + "-" + i, i));
+            doorList.Add(new SynapseElevatorDestination(door, this));
         }
 
-        Destinations = list.AsReadOnly();
-        CurrentDestination = list[0];
+        Destinations = doorList.ToArray();
     }
-    
-    public override string Name => Lift.elevatorName;
-    public override uint Id => (uint)ElevatorType;
-    
-    public override bool Locked 
+
+    public uint ElevatorId { get; }
+    public IElevatorChamber Chamber { get; }
+    public IElevatorDestination[] Destinations { get; }
+
+    public IElevatorDestination CurrentDestination =>
+        Destinations[(Chamber as SynapseElevatorChamber)?.Chamber.CurrentLevel ?? 0];
+
+    public void MoveToDestination(uint destinationId) =>
+        ElevatorManager.TrySetDestination((ElevatorManager.ElevatorGroup)ElevatorId, (int)destinationId);
+
+    public void MoveToNext()
     {
-        get => Lift._locked;
-        set => Lift.SetLock(Locked, value);
+        if(Chamber is not SynapseElevatorChamber chamber) return;
+        var nextLevel = chamber.Chamber.CurrentLevel + 1;
+        if (nextLevel >= Destinations.Length) nextLevel = 0;
+        ElevatorManager.TrySetDestination((ElevatorManager.ElevatorGroup)ElevatorId, (int)nextLevel);
     }
-
-    public override bool IsMoving => Lift.status == Lift.Status.Moving;
-
-    public override ReadOnlyCollection<IElevatorDestination> Destinations { get; }
-    
-    public Lift.Status Status
-    {
-        get => Lift.status;
-        set => Lift.SetStatus((byte)value);
-    }
-    
-    public bool Operative => Lift.operative;
-
-    public override void MoveToDestination(uint destinationId)
-    {
-        if (destinationId is 0 or 1 && destinationId != CurrentDestination.ElevatorId)
-            Timing.RunCoroutine(_MoveTo(destinationId));
-    }
-
-    private IEnumerator<float> _MoveTo(uint destinationId)
-    {
-        var previous = Lift.status;
-        Lift.SetStatus(2);
-
-        for (int i = 0; i < 35; i++)
-        {
-            yield return Timing.WaitForOneFrame;
-        }
-        
-        Lift.RpcPlayMusic();
-
-        for (int i = 0; i < 100; i++)
-        {
-            yield return Timing.WaitForOneFrame;
-        }
-        
-        MoveContent(destinationId);
-
-        for (int i = 0; i < (Lift.movingSpeed - 2f) * 50f; i++)
-        {
-            yield return Timing.WaitForOneFrame;
-        }
-        
-        Lift.SetStatus((byte)(previous == Lift.Status.Down ? 0 : 1));
-
-        for (int i = 0; i < 150; i++)
-        {
-            yield return Timing.WaitForOneFrame;
-        }
-
-        Lift.operative = true;
-        CurrentDestination = GetDestination(destinationId);
-    }
-
-
-    /// <summary>
-    /// The type of the elevator
-    /// </summary>
-    public ElevatorType ElevatorType
-    {
-        get
-        {
-            return Name switch
-            {
-                "GateB" => ElevatorType.GateB,
-                "GateA" => ElevatorType.GateA,
-                "SCP-049" => ElevatorType.Scp049,
-                "ElA" => ElevatorType.ElALeft,
-                "ElA2" => ElevatorType.ElARight,
-                "ElB" => ElevatorType.ElBLeft,
-                "ElB2" => ElevatorType.ElBRight,
-                _ => ElevatorType.None,
-            };
-        }
-    }
-
-    public override string ToString() => Name;
 }
-*/

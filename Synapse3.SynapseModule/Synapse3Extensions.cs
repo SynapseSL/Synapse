@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Footprinting;
+using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items;
 using InventorySystem.Items.Firearms.Attachments;
@@ -20,6 +21,7 @@ using PlayerRoles.PlayableScps.Subroutines;
 using PlayerStatsSystem;
 using PluginAPI.Core.Interfaces;
 using PluginAPI.Core.Items;
+using PlayerStatsSystem;
 using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
@@ -44,6 +46,9 @@ public static class Synapse3Extensions
     private static readonly MapService _map;
     private static readonly RoundService _round;
     private static readonly ServerService _server;
+    private static readonly ElevatorService _elevator;
+    private static readonly PlayerEvents _playerEvents;
+    private static readonly ItemEvents _itemEvents;
 
     static Synapse3Extensions()
     {
@@ -55,6 +60,9 @@ public static class Synapse3Extensions
         _map = Synapse.Get<MapService>();
         _round = Synapse.Get<RoundService>();
         _server = Synapse.Get<ServerService>();
+        _elevator = Synapse.Get<ElevatorService>();
+        _playerEvents = Synapse.Get<PlayerEvents>();
+        _itemEvents = Synapse.Get<ItemEvents>();
     }
 
     // FunFact: This method is the oldest method in Synapse and was originally created even before Synapse for an Exiled 1.0 Plugin
@@ -93,7 +101,7 @@ public static class Synapse3Extensions
     }
 
     public static void SpawnForOnePlayer(this NetworkIdentity identity, SynapsePlayer player)
-        => player.Connection.Send(Synapse.Get<MirrorService>().GetSpawnMessage(identity));
+        => player.Connection.Send(_mirror.GetSpawnMessage(identity));
 
     /// <summary>
     /// Hides an NetworkObject for all Players on the Server that are currently connected
@@ -132,14 +140,14 @@ public static class Synapse3Extensions
                     Allow = needIdentical ? overlappingPerms == permissions : overlappingPerms > KeycardPermissions.None,
                 };
             
-                Synapse.Get<ItemEvents>().KeyCardInteract.Raise(ev);
+                _itemEvents.KeyCardInteract.Raise(ev);
                 if (!ev.Allow) continue;
                 ev2.Allow = true;
                 break;
             }   
         }
 
-        Synapse.Get<PlayerEvents>().CheckKeyCardPermission.Raise(ev2);
+        _playerEvents.CheckKeyCardPermission.Raise(ev2);
         return ev2.Allow;
     }
     
@@ -188,11 +196,8 @@ public static class Synapse3Extensions
     }
     public static IRoom GetRoom(this RoomType type) => _room._rooms.FirstOrDefault(x => x.Id == (int)type);
 
-    //TODO:
-    /*
-    public static IElevator GetSynapseElevator(this ElevatorType type) => Synapse.Get<ElevatorService>().Elevators
-        .FirstOrDefault(x => x is SynapseElevator elevator && elevator.ElevatorType == type);
-        */
+    public static IElevator GetSynapseElevator(this ElevatorManager.ElevatorGroup type) =>
+        _elevator.Elevators.FirstOrDefault(x => x.ElevatorId == (uint)type);
 
 
     public static IVanillaRoom GetVanillaRoom(this RoomIdentifier identifier) => (IVanillaRoom)_room._rooms
@@ -253,35 +258,29 @@ public static class Synapse3Extensions
         return new SynapseLocker(locker);
     }
     
-    public static SynapseRagDoll GetSynapseRagdoll(this BasicRagdoll rag)
+    public static SynapseRagDoll GetSynapseRagDoll(this BasicRagdoll rag)
     {
         var script = rag.GetComponent<SynapseObjectScript>();
 
-        if (script != null && script.Object is SynapseRagDoll ragdoll)
+        if (script != null && script.Object is SynapseRagDoll ragDoll)
         {
-            return ragdoll;
+            return ragDoll;
         }
 
         NeuronLogger.For<Synapse>()
-            .Debug("Found Ragdoll without SynapseObjectScript ... creating new SynapseRagdoll");
+            .Debug("Found RagDoll without SynapseObjectScript ... creating new SynapseRagDoll");
         return new SynapseRagDoll(rag);
     }
-    
 
     
     public static SynapseTesla GetSynapseTesla(this TeslaGate gate) => _map
         ._synapseTeslas.FirstOrDefault(x => x.Gate == gate);
-
-    //TODO:
-    /*
-    public static IElevator GetSynapseElevator(this Lift lift) =>
-        Synapse.Get<ElevatorService>().Elevators
-            .FirstOrDefault(x => x is SynapseElevator elevator && elevator.Lift == lift); */
-
+  
+    public static IElevator GetSynapseElevator(this ElevatorChamber chamber) => _elevator.Elevators.FirstOrDefault(x =>
+        x.Chamber is SynapseElevatorChamber synapseChamber && synapseChamber.Chamber == chamber);
+    
     public static SynapseCamera GetCamera(this Scp079Camera cam) => _map
             ._synapseCameras.FirstOrDefault(x => x.Camera == cam);
-       
-
 
     public static bool CanHarmScp(SynapsePlayer player, bool message)
     {
@@ -303,10 +302,6 @@ public static class Synapse3Extensions
             if (_round.RoundEnded && _config.GamePlayConfiguration.AutoFriendlyFire)
             {
                 allow = true;
-            }
-            else if (victim.PlayerType == PlayerType.Dummy)
-            {
-                allow = false;
             }
             else if (attacker == victim)
             {
@@ -346,9 +341,9 @@ public static class Synapse3Extensions
                     attacker.SendHint(_config.Translation.Get(attacker).SameTeam);
                 }
             }
-
+            
             var ev = new HarmPermissionEvent(attacker, victim, allow);
-            Synapse.Get<PlayerEvents>().HarmPermission.Raise(ev);
+            _playerEvents.HarmPermission.Raise(ev);
             return ev.Allow;
         }
         catch (Exception ex)

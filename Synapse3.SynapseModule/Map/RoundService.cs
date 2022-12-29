@@ -1,18 +1,20 @@
 ﻿using System;
+using System.Linq;
 using GameCore;
 using Neuron.Core.Meta;
 using Respawning;
 using RoundRestarting;
 using Synapse3.SynapseModule.Events;
 using UnityEngine;
+using Utils.NonAllocLINQ;
 
-namespace Synapse3.SynapseModule;
+namespace Synapse3.SynapseModule.Map;
 
 public class RoundService : Service
 {
     private RoundSummary Rs => RoundSummary.singleton;
     private RespawnManager Rm => RespawnManager.Singleton;
-    private RoundEvents _round;
+    private readonly RoundEvents _round;
 
     public RoundService(RoundEvents round)
     {
@@ -33,7 +35,6 @@ public class RoundService : Service
     {
         CurrentRound++;
         ForceEnd = false;
-        FemurSacrifices = 0;
     }
 
 
@@ -41,8 +42,6 @@ public class RoundService : Service
     /// The number of the round sciece the last server restart
     /// </summary>
     public int CurrentRound { get; private set; }
-
-    public int FemurSacrifices { get; set; }
 
     /// <summary>
     /// The time until the next wave spawns
@@ -126,15 +125,14 @@ public class RoundService : Service
     }
     
     
-    //TODO:
-    /*
     /// <summary>
     /// The number of respawn tickets for mtf
     /// </summary>
     public int MtfTickets
     {
-        get => RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox);
-        set => RespawnTickets.Singleton._tickets[SpawnableTeamType.NineTailedFox] = value;
+        get => (int)(RespawnTokensManager.Counters.FirstOrDefault(x => x.Team == SpawnableTeamType.NineTailedFox)?.Amount ?? 0);
+        set => RespawnTokensManager.Counters.FirstOrDefault(x => x.Team == SpawnableTeamType.NineTailedFox)!.Amount =
+            value;
     }
     
     /// <summary>
@@ -142,10 +140,10 @@ public class RoundService : Service
     /// </summary>
     public int ChaosTickets
     {
-        get => RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.ChaosInsurgency);
-        set => RespawnTickets.Singleton._tickets[SpawnableTeamType.ChaosInsurgency] = value;
+        get => (int)(RespawnTokensManager.Counters.FirstOrDefault(x => x.Team == SpawnableTeamType.ChaosInsurgency)?.Amount ?? 0);
+        set => RespawnTokensManager.Counters.FirstOrDefault(x => x.Team == SpawnableTeamType.ChaosInsurgency)!.Amount =
+            value;
     }
-    */
 
     /// <summary>
     /// The length of the round
@@ -207,9 +205,8 @@ public class RoundService : Service
     public void ShowRoundSummary(RoundSummary.SumInfo_ClassList remainingPlayers, RoundSummary.LeadingTeam leadingTeam)
     {
         var timeToRoundRestart = Mathf.Clamp(ConfigFile.ServerConfig.GetInt("auto_round_restart_time", 10), 5, 1000);
-        
-        //TODO:
-        //Rs.RpcShowRoundSummary(Rs.classlistStart, remainingPlayers, leadingTeam, EscapedDPersonnel, EscapedScientists, ScpKills, timeToRoundRestart);
+        Rs.RpcShowRoundSummary(Rs.classlistStart, remainingPlayers, leadingTeam, EscapedDPersonnel, EscapedScientists,
+            ScpKills, timeToRoundRestart, (int)RoundStart.RoundLength.TotalSeconds);
     }
 
     /// <summary>

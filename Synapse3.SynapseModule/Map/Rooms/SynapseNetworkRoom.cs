@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using MapGeneration;
 using Mirror;
+using PlayerRoles.PlayableScps.Scp079;
 using PlayerRoles.PlayableScps.Scp079.Cameras;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
@@ -23,11 +24,12 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
         var comp = identifier.gameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
         
-        foreach (var camera079 in identifier.GetComponentsInChildren<Scp079Camera>())
+        foreach (var interactable in Scp079InteractableBase.AllInstances)
         {
-            _cameras.Add(new SynapseCamera(camera079, this));
+            if (interactable is not Scp079Camera cam) continue;
+            if (interactable.Room != identifier) continue;
+            _cameras.Add(new SynapseCamera(cam, this));
         }
-        
     }
 
     public RoomIdentifier Identifier { get; }

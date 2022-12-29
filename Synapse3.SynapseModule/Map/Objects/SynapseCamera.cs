@@ -6,7 +6,6 @@ namespace Synapse3.SynapseModule.Map.Objects;
 
 public class SynapseCamera
 {
-    
     internal SynapseCamera(Scp079Camera camera079, IRoom room)
     {
         Camera = camera079;
@@ -17,25 +16,35 @@ public class SynapseCamera
     
     public IRoom Room { get; }
 
-    public Vector3 Position
+    public bool IsActive
     {
-        get => Camera.Position;
-        set => Camera.Position = value;
+        get => Camera.IsActive;
+        set => Camera.IsActive = value;
+    }
+
+    public Vector3 Position => Camera.CameraPosition;
+
+    public float VerticalRotation
+    {
+        get => Camera.VerticalRotation;
+        set => Camera.VerticalAxis.TargetValue = value;
     }
 
     public float HorizontalRotation
     {
         get => Camera.HorizontalRotation;
-        set => Camera.HorizontalRotation = value;
+        set => Camera.HorizontalAxis.TargetValue = value;
     }
 
-    public float VerticalRotation
+    public float Zoom
     {
-        get => Camera.VerticalRotation;
-        set => Camera.VerticalRotation = value;
+        get => Camera.RollRotation;
+        set => Camera.ZoomAxis.TargetValue = value;
     }
 
-    public string Name => Camera.name;
+    public ushort SyncId => Camera.SyncId;
+
+     public string Name => Camera.name;
 
     public ushort CameraID => Camera.SyncId;
 

@@ -9,6 +9,7 @@ using Synapse3.SynapseModule.Events;
 
 namespace Synapse3.ExamplePlugin;
 
+[HeavyModded]
 [Plugin(
     Name = "Example Plugin",
     Description = "Example Description",
@@ -17,7 +18,7 @@ namespace Synapse3.ExamplePlugin;
 )]
 public class ExamplePlugin : ReloadablePlugin<ExampleConfig, ExampleTranslations>
 {
-    public ElevatorEventHandler ElevatorHandler { get; set; }
+    //public ElevatorEventHandler ElevatorHandler { get; set; }
     public RoomEventHandler RoomHandler { get; set; }
 
     public override void EnablePlugin()
@@ -26,7 +27,7 @@ public class ExamplePlugin : ReloadablePlugin<ExampleConfig, ExampleTranslations
         Logger.Info(Translation.Get().EnableMessage);
             
         //Get and Bind ensures that you can always get the same instance everywhere, although it is not used and Synapse.Get would be enough for this case
-        ElevatorHandler = Synapse.GetAndBind<ElevatorEventHandler>();
+        //ElevatorHandler = Synapse.GetAndBind<ElevatorEventHandler>();
         RoomHandler = Synapse.GetAndBind<RoomEventHandler>();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Neuron.Core.Events;
 using Neuron.Core.Meta;
 using Neuron.Core.Modules;
@@ -160,6 +161,9 @@ public partial class Synapse
 
     private void OnPluginLoadLate(PluginLoadEvent args)
     {
+        if (args.Context.PluginType.GetCustomAttribute<HeavyModded>() != null)
+            CustomNetworkManager.HeavilyModded = true;
+        
         args.Context.MetaBindings
             .OfType<SynapseCommandBinding>()
             .ToList().ForEach(x=> SynapseCommandService.LoadBinding(x));
@@ -214,6 +218,9 @@ public partial class Synapse
 
     private void LoadModuleLate(ModuleLoadEvent args)
     {
+        if (args.Context.ModuleType.GetCustomAttribute<HeavyModded>() != null)
+            CustomNetworkManager.HeavilyModded = true;
+        
         args.Context.MetaBindings
             .OfType<SynapseCommandBinding>()
             .ToList().ForEach(binding =>

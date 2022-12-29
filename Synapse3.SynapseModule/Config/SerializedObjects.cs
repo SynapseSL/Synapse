@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using CustomPlayerEffects;
+using Mirror;
 using PlayerRoles;
+using PlayerRoles.FirstPersonControl;
+using PlayerRoles.PlayableScps.Scp049.Zombies;
+using RelativePositioning;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Rooms;
@@ -290,14 +294,13 @@ public class SerializedPlayerState
             Scale = player.Scale;
             RoleType = player.RoleType;
             RoleID = player.RoleID;
-            //TODO:
-            //UnitId = player.UnitId;
-            //UnitName = player.Unit;
+            ZombieMaxHealth = (player.CurrentRole as ZombieRole)?._syncMaxHealth ?? 0;
+            UnitId = player.UnitNameId;
             Health = player.Health;
             MaxHealth = player.MaxHealth;
             ArtificialHealth = player.ArtificialHealth;
             MaxArtificialHealth = player.MaxArtificialHealth;
-            //Stamina = player.Stamina;
+            Stamina = player.Stamina;
             GodMode = player.GodMode;
             NoClip = player.NoClip;
             Bypass = player.Bypass;
@@ -327,9 +330,9 @@ public class SerializedPlayerState
 
         public uint RoleID { get; set; }
 
-        public byte UnitId { get; set; } = 0;
+        public ushort ZombieMaxHealth { get; set; } = 600;
 
-        public string UnitName { get; set; } = "";
+        public byte UnitId { get; set; } = 0;
 
         public float Health { get; set; } = 100f;
 
@@ -361,11 +364,24 @@ public class SerializedPlayerState
                 player.OverWatch = OverWatch;
                 player.Invisible = Invisible;
             }
+            
+            player.SetPlayerRoleTypeAdvance(RoleType, Position.GetMapPosition(),Position.GetMapRotation().eulerAngles.y,
+                writer =>
+                {
+                    if (!typeof(FpcStandardRoleBase).IsAssignableFrom(FakeRoleManager.EnumToType[RoleType])) return;
+                    
+                    if (RoleType.IsHuman())
+                    {
+                        writer.WriteByte(UnitId);
+                    }
 
-            //TODO:
-            //player.UnitId = UnitId;
-            //player.Unit = UnitName;
-            player.ChangeRoleLite(RoleType);
+                    if (RoleType == RoleTypeId.Scp0492)
+                    {
+                        writer.WriteUInt16(ZombieMaxHealth);
+                    }
+                });
+            
+            
             if (RoleID > RoleService.HighestRole)
             {
                 player.SpawnCustomRole(RoleID, true);
@@ -381,7 +397,7 @@ public class SerializedPlayerState
             player.MaxHealth = MaxHealth;
             player.ArtificialHealth = ArtificialHealth;
             player.MaxArtificialHealth = MaxArtificialHealth;
-            //player.Stamina = Stamina;
+            player.Stamina = Stamina;
             player.Scale = Scale;
 
             Inventory.Apply(player);

@@ -1,9 +1,10 @@
-﻿using PlayerRoles.PlayableScps.Scp079;
+using PlayerRoles.PlayableScps.Scp079;
 using PlayerRoles.PlayableScps.Scp079.Cameras;
 using PlayerRoles.PlayableScps.Scp173;
 using Synapse3.SynapseModule.Map.Objects;
 
 namespace Synapse3.SynapseModule.Player;
+
 
 public class Scp079Controller : ScpControllerBase<Scp079Role>
 {

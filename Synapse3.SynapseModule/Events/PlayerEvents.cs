@@ -7,10 +7,8 @@ using Neuron.Core.Meta;
 using PlayerRoles;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
-using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
-using Synapse3.SynapseModule.Role;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Events;

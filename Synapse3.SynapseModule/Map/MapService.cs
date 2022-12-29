@@ -7,7 +7,6 @@ using MapGeneration;
 using MapGeneration.Distributors;
 using MEC;
 using Mirror;
-using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerRoles.Ragdolls;
 using Synapse3.SynapseModule.Enums;
@@ -109,12 +108,6 @@ public class MapService : Service
 
         return gameObject;
     }
-    
-    //TODO:
-    /*
-    public void PlaceBlood(Vector3 pos, int type = 0, float size = 2)
-        => Synapse.Get<PlayerService>().Host.ClassManager.RpcPlaceBlood(pos, type, size);
-        */
 
     private void LoadObjects(RoundWaitingEvent ev)
     {

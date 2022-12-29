@@ -1,9 +1,6 @@
 ﻿using System;
-using GameCore;
 using Hints;
-using InventorySystem.Disarming;
 using InventorySystem.Items.Firearms.Attachments;
-using InventorySystem.Items.Firearms.BasicMessages;
 using Mirror;
 using Neuron.Core.Logging;
 using PlayerRoles;
@@ -15,7 +12,6 @@ using Respawning;
 using RoundRestarting;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Role;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;

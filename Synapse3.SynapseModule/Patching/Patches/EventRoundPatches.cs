@@ -12,6 +12,7 @@ using PluginAPI.Events;
 using RoundRestarting;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
 using UnityEngine;
@@ -111,12 +112,14 @@ public static class FirstSpawnPatch
 public static class DecoratedRoundMethods
 {
     private static readonly PlayerService PlayerService;
+    private static readonly RoundService RoundService;
     private static readonly RoundEvents RoundEvents;
     private static readonly SynapseConfigService ConfigService;
 
     static DecoratedRoundMethods()
     {
         PlayerService = Synapse.Get<PlayerService>();
+        RoundService = Synapse.Get<RoundService>();
         RoundEvents = Synapse.Get<RoundEvents>();
         ConfigService = Synapse.Get<SynapseConfigService>();
     }
@@ -261,7 +264,7 @@ public static class DecoratedRoundMethods
                 RoundEvents.CheckEnd.RaiseSafely(ev);
                 summary._roundEnded = ev.EndRound;
                 
-                if(!summary._roundEnded) continue;
+                if(!RoundService.ForceEnd && !summary._roundEnded) continue;
 
                 EventManager.ExecuteEvent(ServerEventType.RoundEnd, Array.Empty<object>());
                 FriendlyFireConfig.PauseDetector = true;

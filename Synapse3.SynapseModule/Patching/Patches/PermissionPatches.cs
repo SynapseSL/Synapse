@@ -6,7 +6,7 @@ namespace Synapse3.SynapseModule.Patching.Patches;
 
 [Automatic]
 [SynapsePatch("RefreshPermission", PatchType.Permission)]
-public static class RefreshPermissionPatche
+public static class RefreshPermissionPatch
 {
     [HarmonyPatch(typeof(ServerRoles), nameof(ServerRoles.RefreshPermissions)), HarmonyPrefix]
     public static bool RefreshPermission(ServerRoles __instance, bool disp = false)
@@ -26,7 +26,7 @@ public static class RefreshPermissionPatche
 
 [Automatic]
 [SynapsePatch("SetPermissionGroup", PatchType.Permission)]
-public static class PermissionPatches
+public static class SetPermissionPatch
 {
     [HarmonyPatch(typeof(ServerRoles), nameof(ServerRoles.SetGroup)), HarmonyPrefix]
     public static bool SetGroup() => false;

@@ -1,43 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using GameObjectPools;
-using InventorySystem.Items.MicroHID;
-using LiteNetLib.Utils;
+﻿using InventorySystem.Items.MicroHID;
 using MEC;
-using Mirror;
-using Neuron.Core;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
-using Neuron.Modules.Commands;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
-using PlayerRoles.FirstPersonControl.NetworkMessages;
-using PlayerStatsSystem;
-using RelativePositioning;
 using Synapse3.SynapseModule.Command;
+using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Objects;
-using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 using Synapse3.SynapseModule.Dummy;
-using GameCore;
-using PluginAPI.Core;
-using System.Diagnostics;
-using PluginAPI.Events;
-using PluginAPI.Core.Interfaces;
-using InventorySystem.Items.Firearms;
-using PluginAPI.Core.Attributes;
+using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.Map;
+using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Permissions;
 using Object = UnityEngine.Object;
 using Synapse3.SynapseModule.Map.Rooms;
 using PlayerRoles.PlayableScps.Scp106;
 using System.Reflection;
+
 
 namespace Synapse3.SynapseModule;
 
@@ -75,6 +59,11 @@ public class DebugService : Service
 
         _item.KeyCardInteract.Subscribe(KeyCardItem);
         _item.BasicInteract.Subscribe(BasicItem);
+        
+        _map.Scp914Upgrade.Subscribe(ev =>
+        {
+            ev.MoveVector = Vector3.up * 5;
+        });
         
         _item.Shoot.Subscribe(ev =>
         {
@@ -330,6 +319,7 @@ public class DebugService : Service
 
     SynapseDummy testDummy;
     SynapseSchematic Schematic;
+    private SerializedPlayerState _state;
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)
@@ -343,7 +333,6 @@ public class DebugService : Service
             case KeyCode.Alpha2:
                 testDummy.RotateToPosition(ev.Player.Position);
                 testDummy.Movement = PlayerMovementState.Walking;
-                testDummy.Direction = MovementDirection.Forward;
                 break;
 
             case KeyCode.Alpha3:
@@ -374,6 +363,32 @@ public class DebugService : Service
                         scp096.CurentShield = 10;
                         scp096.MaxShield = 100;
                         scp096.ShieldRegeneration = 2000;
+            break;
+
+            case KeyCode.Alpha4:
+                Logger.Warn(Synapse.Get<RoundService>().MtfTickets);
+                break;
+
+            case KeyCode.Alpha5:
+                Logger.Warn("Horizontal: " + ev.Player.RotationHorizontal + " Vertical: " + ev.Player.RotationVertical + " Euler" + ev.Player.Rotation.eulerAngles + " Point: " + _state.Position.GetMapRotation().eulerAngles.y);
+                break;
+
+            case KeyCode.Alpha6:
+                testDummy.ShowPlayer(ev.Player);
+                break;
+
+            case KeyCode.Alpha7:
+                Schematic?.Destroy();
+                Schematic = Synapse.Get<SchematicService>().SpawnSchematic(2000, ev.Player.Position);
+                break;
+
+            case KeyCode.Alpha8:
+                Schematic.HideFromPlayer(ev.Player);
+                break;
+
+            case KeyCode.Alpha9:
+                Schematic.ShowPlayer(ev.Player);
+                break;
 
                         NeuronLogger.For<Synapse>().Warn("EnrageTimeLeft: " + scp096.EnrageTimeLeft);
                         scp096.EnrageTimeLeft = 1;

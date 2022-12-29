@@ -80,7 +80,7 @@ public class FakeRoleManager
     {
         writer.WriteUInt32(_player.NetworkIdentity.netId);
         var roleInfo = GetRoleInfo(receiver);
-        writer.WriteRoleType(roleInfo.RoleTypeId);
+        writer.WriteRoleType(roleInfo.RoleObfuscation ? roleInfo.ObfuscationRole(receiver) : roleInfo.RoleTypeId);
 
         if (typeof(IPublicSpawnDataWriter).IsAssignableFrom(EnumToType[roleInfo.RoleTypeId]) &&
             roleInfo.WritePublicSpawnData != null)
@@ -117,9 +117,16 @@ public class FakeRoleManager
         var publicWriter = _player.CurrentRole as IPublicSpawnDataWriter;
         var privateWriter = _player.CurrentRole as IPrivateSpawnDataWriter;
 
-        return new RoleInfo(_player.CurrentRole.RoleTypeId,
+        var defaultInfo = new RoleInfo(_player.CurrentRole.RoleTypeId,
             publicWriter == null ? null : publicWriter.WritePublicSpawnData,
             privateWriter == null ? null : privateWriter.WritePrivateSpawnData);
+
+        if (_player.CurrentRole is not IObfuscatedRole obfuscatedRole) return defaultInfo;
+        
+        defaultInfo.RoleObfuscation = true;
+        defaultInfo.ObfuscationRole = new Converter() { Func = obfuscatedRole.GetRoleForUser }.GetRole;
+
+        return defaultInfo;
     }
 
     public static readonly Dictionary<RoleTypeId, Type> EnumToType = new()
@@ -145,14 +152,23 @@ public class FakeRoleManager
         { RoleTypeId.ChaosRepressor, typeof(HumanRole) },
         { RoleTypeId.ChaosMarauder, typeof(HumanRole) },
         { RoleTypeId.Scp096, typeof(Scp096Role) },
-        //TODO:
+        { RoleTypeId.Overwatch, typeof(OverwatchRole) },
+        
         { RoleTypeId.CustomRole, typeof(NoneRole) },
-        { RoleTypeId.Overwatch, typeof(NoneRole) }
     };
+    
+    private class Converter
+    {
+        public Func<ReferenceHub, RoleTypeId> Func { get; set; }
+
+        public RoleTypeId GetRole(SynapsePlayer player) => Func(player.Hub);
+    }
 }
 
 public class RoleInfo
 {
+    public RoleInfo() { }
+    
     public RoleInfo(RoleTypeId role, Action<NetworkWriter> writePublicSpawnData,
         Action<NetworkWriter> writePrivateSpawnData)
     {
@@ -167,6 +183,7 @@ public class RoleInfo
         switch (role)
         {
             case RoleTypeId.Spectator: PrepareSpectator(); break;
+            case RoleTypeId.Overwatch: PrepareOverWatch(); break;
             case RoleTypeId.Scp0492:
                 PrepareZombieRole(600, player);
                 break;
@@ -253,8 +270,28 @@ public class RoleInfo
                 damageHandler.WriteDeathScreen(writer);
         };
     }
+
+    public void PrepareOverWatch(DamageHandlerBase damageHandler = null,Func<SynapsePlayer,RoleTypeId> roleObfuscation = null)
+    {
+        RoleTypeId = RoleTypeId.Spectator;
+        WritePrivateSpawnData = writer =>
+        {
+            if (damageHandler == null)
+                writer.WriteSpawnReason(SpectatorSpawnReason.None);
+            else 
+                damageHandler.WriteDeathScreen(writer);
+        };
+        if (roleObfuscation == null) return;
+        
+        RoleObfuscation = true;
+        ObfuscationRole = roleObfuscation;
+    }
     
     public RoleTypeId RoleTypeId { get; set; }
+
+    public bool RoleObfuscation { get; set; } = false;
+
+    public Func<SynapsePlayer,RoleTypeId> ObfuscationRole { get; set; }
     
     public Action<NetworkWriter> WritePublicSpawnData { get; set; }
     public Action<NetworkWriter> WritePrivateSpawnData { get; set; }
