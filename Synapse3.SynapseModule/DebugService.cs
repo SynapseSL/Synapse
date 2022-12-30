@@ -170,45 +170,45 @@ public class DebugService : Service
             NeuronLogger.For<Synapse>().Warn($"Scp049Revive {ev.Scp.NickName}");
         });
 
-        _scp.Scp0492Attack.Subscribe(ev =>//To Fix
+        _scp.Scp0492Attack.Subscribe(ev =>
         {
-            NeuronLogger.For<Synapse>().Error($"Scp0492Attack {ev.Scp.NickName}");
+            NeuronLogger.For<Synapse>().Warn($"Scp0492Attack {ev.Scp.NickName}");
         });
 
-        _scp.Scp049Attack.Subscribe(ev =>//To Fix
+        _scp.Scp049Attack.Subscribe(ev =>
         {
-            NeuronLogger.For<Synapse>().Error($"Scp049Attack {ev.Scp.NickName}");
+            NeuronLogger.For<Synapse>().Warn($"Scp049Attack {ev.Scp.NickName}");
         });
 
-        _scp.Scp096Attack.Subscribe(ev =>//To Fix
+        _scp.Scp096Attack.Subscribe(ev =>
         {
-            NeuronLogger.For<Synapse>().Error($"Scp096Attack {ev.Scp.NickName}");
+            NeuronLogger.For<Synapse>().Warn($"Scp096Attack {ev.Scp.NickName}");
         });
 
         _scp.Scp106Attack.Subscribe(ev =>
         {
-            NeuronLogger.For<Synapse>().Error($"Scp106Attack {ev.Scp.NickName}");
+            NeuronLogger.For<Synapse>().Warn($"Scp106Attack {ev.Scp.NickName}");
         });
 
-        _scp.Scp173Attack.Subscribe(ev =>//To FIX
+        _scp.Scp173Attack.Subscribe(ev =>
         {
-            NeuronLogger.For<Synapse>().Error($"Scp173Attack {ev.Scp.NickName}");
+            NeuronLogger.For<Synapse>().Warn($"Scp173Attack {ev.Scp.NickName}");
         });
 
         _scp.Scp939Attack.Subscribe(ev =>
         {
-            NeuronLogger.For<Synapse>().Error($"Scp939Attack {ev.Scp.NickName}");
+            NeuronLogger.For<Synapse>().Warn($"Scp939Attack {ev.Scp.NickName}");
         });
 
         _item.FlipCoin.Subscribe(ev =>
         {
-            NeuronLogger.For<Synapse>().Error($"Scp939Attack {ev.Player.NickName}");
+            NeuronLogger.For<Synapse>().Warn($"Scp939Attack {ev.Player.NickName}");
             ev.Tails = true;
         });
 
         _player.Pickup.Subscribe(ev =>
         {
-            NeuronLogger.For<Synapse>().Error($"Pickup {ev.Player.NickName}, {ev.Item.Name}");
+            NeuronLogger.For<Synapse>().Warn($"Pickup {ev.Player.NickName}, {ev.Item.Name}");
         });
         //Debug--
 

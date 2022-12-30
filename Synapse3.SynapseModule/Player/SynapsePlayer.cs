@@ -37,10 +37,6 @@ public partial class SynapsePlayer : MonoBehaviour
         GameConsoleTransmission = GetComponent<GameConsoleTransmission>();
         BroadcastController = GetComponent<global::Broadcast>();
 
-        Inventory = new ItemInventory(this);
-        ActiveBroadcasts = new BroadcastList(this);
-        ScpController = new ScpController(this);
-
         _player = Synapse.Get<PlayerService>();
         _server = Synapse.Get<ServerService>();
         _cassie = Synapse.Get<CassieService>();
@@ -53,6 +49,9 @@ public partial class SynapsePlayer : MonoBehaviour
         _database = Synapse.Get<DatabaseService>();
         _mirror = Synapse.Get<MirrorService>();
 
+        Inventory = new ItemInventory(this);
+        ActiveBroadcasts = new BroadcastList(this);
+        ScpController = new ScpController(this, _config);
         CustomInfo = new CustomInfoList(this, _player, _mirror, _playerEvents);
         FakeRoleManager = new(this, _mirror, _player);
     }

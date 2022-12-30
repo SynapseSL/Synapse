@@ -5,6 +5,7 @@ namespace Synapse3.SynapseModule.Command;
 /// <summary>
 /// The Attribute that must have all types that should be registered as Synapse Command
 /// </summary>
+[System.AttributeUsage(System.AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 public class SynapseCommandAttribute : CommandAttribute
 {
     /// <summary>
@@ -21,6 +22,7 @@ public class SynapseCommandAttribute : CommandAttribute
 /// <summary>
 /// An Extension of the default <see cref="SynapseCommandAttribute"/> that also Contains Remote Admin Parameters that can be displayed in the RemoteAdmin
 /// </summary>
+[System.AttributeUsage(System.AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 public class SynapseRaCommandAttribute : SynapseCommandAttribute
 {
     /// <summary>

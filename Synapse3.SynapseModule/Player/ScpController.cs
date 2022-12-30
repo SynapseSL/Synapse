@@ -1,12 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using Synapse3.SynapseModule.Config;
+using System.Collections.Generic;
 
 namespace Synapse3.SynapseModule.Player;
 
 public class ScpController
 {
     private readonly SynapsePlayer _player;
-    
-    internal ScpController(SynapsePlayer player)
+    private readonly SynapseConfigService _config;
+
+    internal ScpController(SynapsePlayer player, SynapseConfigService config)
     {
         _player = player;
         Scp079 = new(player);
@@ -14,6 +16,7 @@ public class ScpController
         Scp106 = new Scp106Controller(player);
         Scp173 = new Scp173Controller(player);
         Scp939 = new Scp939Controller(player);
+        _config = config;
     }
 
     public readonly Scp106Controller Scp106;
@@ -26,5 +29,12 @@ public class ScpController
 
     public readonly Scp939Controller Scp939;
 
+    public bool CanTalk => _config.GamePlayConfiguration.SpeakingScp.Contains(_player.RoleID);
 
+    private bool _proximityChat;
+    public bool ProximityChat 
+    {
+        get => CanTalk && _proximityChat;
+        set => _proximityChat = value;
+    } 
 }

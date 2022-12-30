@@ -9,10 +9,13 @@ using PlayerRoles.FirstPersonControl;
 using PlayerRoles.PlayableScps.HumeShield;
 using PlayerRoles.PlayableScps.Scp079;
 using PlayerRoles.PlayableScps.Scp096;
+using PlayerRoles.Voice;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
+using VoiceChat;
+using VoiceChat.Networking;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
 
@@ -64,9 +67,9 @@ public static class PlayerStaminaUsePatch
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(FpcStateProcessor), nameof(FpcStateProcessor.ServerUseRate), MethodType.Getter)]
-    public static bool PlayerLoadComponent(FpcStateProcessor __instance, ref float __result)
+    public static bool OnServerUseRate(FpcStateProcessor __instance, ref float __result)
     {
-        
+
         var player = __instance._hub.GetSynapsePlayer();
 
         if (player.RoleManager.CurrentRole.ActiveTime <= __instance._respawnImmunity)
@@ -111,7 +114,7 @@ public static class Scp079RegenAuxiliaryPatch
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(Scp079AuxManager), nameof(Scp079AuxManager.RegenSpeed), MethodType.Getter)]
-    public static bool MaxAux(Scp079AuxManager __instance, ref float __result)
+    public static bool RegenSpeed(Scp079AuxManager __instance, ref float __result)
     {
         __result = __instance.Owner.GetSynapsePlayer().ScpController.Scp079.RegenEnergy;
         return false;
@@ -125,7 +128,7 @@ public static class Scp096RegenerationPatch
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(DynamicHumeShieldController), nameof(DynamicHumeShieldController.HsRegeneration), MethodType.Getter)]
-    public static bool MaxAux(Scp079AuxManager __instance, ref float __result)
+    public static bool HsRegeneration(Scp079AuxManager __instance, ref float __result)
     {
         var player = __instance.Owner.GetSynapsePlayer();
         switch (player.RoleType)
@@ -183,7 +186,7 @@ public static class Scp096SheldMaxPatch
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(DynamicHumeShieldController), nameof(DynamicHumeShieldController.HsMax), MethodType.Getter)]
-    public static bool MaxAux(Scp096RageManager __instance, ref float __result)
+    public static bool HsMax(Scp096RageManager __instance, ref float __result)
     {
         var player = __instance.Owner.GetSynapsePlayer();
         switch (player.RoleType)

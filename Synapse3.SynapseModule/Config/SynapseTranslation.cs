@@ -29,6 +29,11 @@ public class SynapseTranslation : Translations<SynapseTranslation>
     public string TranslationCommandGetTranslation { get; set; } = "Your current Translation is: {0}";
     public string TranslationCommandSetTranslation { get; set; } = "Your Translation is set to: {0}";
 
+    public string KeyBindCommandGetCommand { get; set; } = "Select a command whose bind you want to change, curent bind:{0}";
+    public string KeyBindCommandSelectKey { get; set; } = "Please press the new key";
+    public string KeyBindCommandInvalidKey { get; set; } = "Invalide slected command";
+    public string KeyBindCommandUndo { get; set; } = "Key restet to default value";
+
     public string LowerRank { get; set; } = "FOLLOW ORDERS";
     public string SameRank { get; set; } = "SAME RANK";
     public string HigherRank { get; set; } = "GIVE ORDERS";

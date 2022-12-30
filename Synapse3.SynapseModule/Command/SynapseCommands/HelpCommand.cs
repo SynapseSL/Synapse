@@ -56,33 +56,33 @@ public class HelpCommand : SynapseCommand
         }
         
 
-            if (context.Arguments.Length > 0 && !string.IsNullOrWhiteSpace(context.Arguments.First()))
+        if (context.Arguments.Length > 0 && !string.IsNullOrWhiteSpace(context.Arguments.First()))
+        {
+            foreach (var command in commandlist)
             {
-                foreach (var command in commandlist)
-                {
-                    if (!string.Equals(command.Meta.CommandName, context.Arguments[0],
-                            StringComparison.OrdinalIgnoreCase)) continue;
+                if (!string.Equals(command.Meta.CommandName, context.Arguments[0],
+                        StringComparison.OrdinalIgnoreCase)) continue;
 
-                    result.Response = GenerateCustomCommandInfo(command, context.Platform, context.Player);
-                    return;
-                }
-
-                foreach (var command in vanilla)
-                {
-                    if (!string.Equals(command.Command, context.Arguments[0],
-                            StringComparison.OrdinalIgnoreCase)) continue;
-
-                    result.Response = GenerateVanillaCommandInfo(command, context.Platform);
-                    return;
-                }
-
-                result.StatusCode = CommandStatusCode.NotFound;
-                result.Response = _configService.Translation.Get(context.Player).CommandNotFound;
+                result.Response = GenerateCustomCommandInfo(command, context.Platform, context.Player);
                 return;
             }
 
-            result.Response = GenerateCommandList(commandlist, vanilla, context.Player, context.Platform);
-            result.StatusCode = CommandStatusCode.Ok;
+            foreach (var command in vanilla)
+            {
+                if (!string.Equals(command.Command, context.Arguments[0],
+                        StringComparison.OrdinalIgnoreCase)) continue;
+
+                result.Response = GenerateVanillaCommandInfo(command, context.Platform);
+                return;
+            }
+
+            result.StatusCode = CommandStatusCode.NotFound;
+            result.Response = _configService.Translation.Get(context.Player).CommandNotFound;
+            return;
+        }
+
+        result.Response = GenerateCommandList(commandlist, vanilla, context.Player, context.Platform);
+        result.StatusCode = CommandStatusCode.Ok;
     }
 
     public string GenerateCommandList(List<ICommand> customCommands,

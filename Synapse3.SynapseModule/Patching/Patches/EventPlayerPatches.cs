@@ -13,6 +13,7 @@ using Neuron.Core.Meta;
 using PlayerRoles;
 using PlayerRoles.Ragdolls;
 using PlayerRoles.Spectating;
+using PlayerRoles.Voice;
 using PlayerStatsSystem;
 using PluginAPI.Core;
 using RemoteAdmin;
@@ -27,9 +28,82 @@ using Synapse3.SynapseModule.Role;
 using System;
 using System.Linq;
 using UnityEngine;
+using VoiceChat.Networking;
+using VoiceChat;
 using static PlayerList;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
+
+[Automatic]
+[SynapsePatch("ScpVoice", PatchType.PlayerEvent)]
+public static class ScpVoicePatch
+{
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(VoiceTransceiver), nameof(VoiceTransceiver.ServerReceiveMessage))]
+    public static bool OnServerReceiveMessage(NetworkConnection conn, VoiceMessage msg)
+    {
+        if (msg.SpeakerNull) return false;
+
+        var player = msg.Speaker.GetSynapsePlayer();
+
+        if (msg.SpeakerNull
+            || player.NetId != conn.identity.netId
+            || player.CurrentRole is not IVoiceRole voiceRoleSpeaker
+            || !voiceRoleSpeaker.VoiceModule.CheckRateLimit())
+        {
+            return false;
+        }
+
+        var flags = VoiceChatMutes.GetFlags(msg.Speaker);
+        if (flags == VcMuteFlags.GlobalRegular || flags == VcMuteFlags.LocalRegular)
+        {
+            return false;
+        }
+
+        var voiceChatChannel = voiceRoleSpeaker.VoiceModule.ValidateSend(msg.Channel);
+        if (voiceChatChannel == VoiceChatChannel.None)
+        {
+            return false;
+        }
+
+        voiceRoleSpeaker.VoiceModule.CurrentChannel = voiceChatChannel;
+
+        if (player.ScpController.ProximityChat && voiceChatChannel == VoiceChatChannel.ScpChat)
+        {
+            voiceChatChannel = VoiceChatChannel.Proximity;
+
+            foreach (ReferenceHub hub in ReferenceHub.AllHubs)
+            {
+                if (hub.roleManager.CurrentRole is IVoiceRole voiceRoleRecever 
+                    && Vector3.Distance(player.Position, hub.transform.position) < 7)//Change this to a decreases the voice
+                {
+                    var voiceChatChannel2 = voiceRoleRecever.VoiceModule.ValidateReceive(msg.Speaker, voiceChatChannel);
+                    if (voiceChatChannel2 != 0)
+                    {
+                        msg.Channel = voiceChatChannel2;
+                        hub.connectionToClient.Send(msg);
+                    }
+                }
+            }
+            return false;
+        }
+
+        foreach (ReferenceHub hub in ReferenceHub.AllHubs)
+        {
+            if (hub.roleManager.CurrentRole is IVoiceRole voiceRoleRecever)
+            {
+                var voiceChatChannel2 = voiceRoleRecever.VoiceModule.ValidateReceive(msg.Speaker, voiceChatChannel);
+                if (voiceChatChannel2 != 0)
+                {
+                    msg.Channel = voiceChatChannel2;
+                    hub.connectionToClient.Send(msg);
+                }
+            }
+        }
+        return false;
+    }
+}
 
 [Automatic]
 [SynapsePatch("PlayerDoorInteract", PatchType.PlayerEvent)]

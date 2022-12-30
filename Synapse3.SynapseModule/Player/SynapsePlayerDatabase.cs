@@ -7,4 +7,5 @@ public partial class SynapsePlayer
     public string GetData(string key) => _database.GetPlayerData(this, key);
 
     public void SetData(string key, string value) => _database.SetPlayerData(this, key, value);
+
 }

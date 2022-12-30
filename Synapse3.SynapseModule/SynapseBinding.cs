@@ -8,6 +8,7 @@ using Neuron.Core.Plugins;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Database;
 using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.KeyBind;
 using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic.CustomAttributes;
 using Synapse3.SynapseModule.Map.Scp914;
@@ -32,6 +33,7 @@ public partial class Synapse
         OnGenerateRemoteAdminBindings(args);
         OnGenerateDataBaseBinding(args);
         OnGenerateListenerBinding(args);
+        OnGenerateKeyBindBinding(args);
     }
 
     private void OnGenerateListenerBinding(MetaGenerateBindingsEvent args)
@@ -159,6 +161,19 @@ public partial class Synapse
         });
     }
 
+    private void OnGenerateKeyBindBinding(MetaGenerateBindingsEvent args)
+    {
+        if (!args.MetaType.TryGetAttribute<AutomaticAttribute>(out _)) return;
+        if (!args.MetaType.TryGetAttribute<KeyBindAttribute>(out var info)) return;
+        if (!args.MetaType.Is<IKeyBind>()) return;
+
+        args.Outputs.Add(new SynapseKeyBindBinding
+        {
+            Info = info,
+            Type = args.MetaType.Type
+        });
+    }
+
     private void OnPluginLoadLate(PluginLoadEvent args)
     {
         if (args.Context.PluginType.GetCustomAttribute<HeavyModded>() != null)
@@ -203,6 +218,10 @@ public partial class Synapse
         args.Context.MetaBindings
             .OfType<SynapseListenerBinding>()
             .ToList().ForEach(x => _listeners.Add(GetEventHandler(x.ListenerType)));
+
+        args.Context.MetaBindings
+            .OfType<SynapseKeyBindBinding>()
+            .ToList().ForEach(x => KeyBindService.LoadBinding(x));
     }
     
     internal readonly Queue<SynapseCommandBinding> ModuleCommandBindingQueue = new();
@@ -215,6 +234,7 @@ public partial class Synapse
     internal readonly Queue<SynapseRaCategoryBinding> ModuleRaCategoryBindingQueue = new();
     internal readonly Queue<SynapseDataBaseBinding> ModuleDataBaseBindingQueue = new();
     private readonly Queue<SynapseListenerBinding> ModuleListenerBindingQueue = new();
+    internal readonly Queue<SynapseKeyBindBinding> ModuleKeyBindBindingQueue = new();
 
     private void LoadModuleLate(ModuleLoadEvent args)
     {
@@ -291,6 +311,13 @@ public partial class Synapse
             .ToList().ForEach(binding =>
             {
                 ModuleListenerBindingQueue.Enqueue(binding);
+            });
+
+        args.Context.MetaBindings
+            .OfType<SynapseKeyBindBinding>()
+            .ToList().ForEach(binding =>
+            {
+                ModuleKeyBindBindingQueue.Enqueue(binding);
             });
     }
 }
