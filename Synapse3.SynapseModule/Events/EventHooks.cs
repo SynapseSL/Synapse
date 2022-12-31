@@ -1,5 +1,8 @@
-﻿using LightContainmentZoneDecontamination;
+﻿using System;
+using System.Reflection;
+using LightContainmentZoneDecontamination;
 using LiteNetLib;
+using PlayerRoles;
 using PluginAPI.Core.Attributes;
 using PluginAPI.Enums;
 using PluginAPI.Events;
@@ -9,7 +12,6 @@ namespace Synapse3.SynapseModule.Events;
 
 public partial class PlayerEvents
 {
-
 }
 
 public partial class RoundEvents

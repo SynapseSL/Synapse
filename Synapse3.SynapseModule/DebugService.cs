@@ -1,4 +1,6 @@
-﻿using InventorySystem.Items.MicroHID;
+﻿using System;
+using System.Reflection;
+using InventorySystem.Items.MicroHID;
 using MEC;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
@@ -151,6 +153,12 @@ public class DebugService : Service
         {
             Logger.Warn("First Spawn,SCPS: "+ ev.AmountOfScpSpawns);
         });
+        
+        _player.SetClass.Subscribe(ev =>
+        {
+            ev.Position = new Vector3(41f, 1014f,-33f);
+            ev.HorizontalRotation = 270f;
+        });
     }
 
     private void ScpEvent(ScpAttackEvent ev)
@@ -219,8 +227,8 @@ public class DebugService : Service
                 break;
 
             case KeyCode.Alpha3:
-                Synapse.Get<RoundService>().MtfTickets = 50;
-            break;
+
+                break;
 
             case KeyCode.Alpha4:
                 Logger.Warn(Synapse.Get<RoundService>().MtfTickets);

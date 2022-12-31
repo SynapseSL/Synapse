@@ -29,13 +29,7 @@ public class SynapseTranslation : Translations<SynapseTranslation>
     public string TranslationCommandGetTranslation { get; set; } = "Your current Translation is: {0}";
     public string TranslationCommandSetTranslation { get; set; } = "Your Translation is set to: {0}";
 
-    public string LowerRank { get; set; } = "FOLLOW ORDERS";
-    public string SameRank { get; set; } = "SAME RANK";
-    public string HigherRank { get; set; } = "GIVE ORDERS";
-
     public string CommandHelp { get; set; } = "All Available Vanilla Commands:";
     public string CommandHelpSecond { get; set; } = "All Available Synapse Commands:";
     public string CommandNotFound { get; set; } = "No command with that name was found";
-
-    public string DeathMessage { get; set; } = "You were killed by\\n{0}\\nas\\n{1}";
 }
