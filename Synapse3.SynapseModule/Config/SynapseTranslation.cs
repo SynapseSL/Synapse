@@ -34,13 +34,7 @@ public class SynapseTranslation : Translations<SynapseTranslation>
     public string KeyBindCommandInvalidKey { get; set; } = "Invalide slected command";
     public string KeyBindCommandUndo { get; set; } = "Key restet to default value";
 
-    public string LowerRank { get; set; } = "FOLLOW ORDERS";
-    public string SameRank { get; set; } = "SAME RANK";
-    public string HigherRank { get; set; } = "GIVE ORDERS";
-
     public string CommandHelp { get; set; } = "All Available Vanilla Commands:";
     public string CommandHelpSecond { get; set; } = "All Available Synapse Commands:";
     public string CommandNotFound { get; set; } = "No command with that name was found";
-
-    public string DeathMessage { get; set; } = "You were killed by\\n{0}\\nas\\n{1}";
 }

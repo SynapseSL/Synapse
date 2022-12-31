@@ -1,4 +1,6 @@
-﻿using InventorySystem.Items.MicroHID;
+﻿using System;
+using System.Reflection;
+using InventorySystem.Items.MicroHID;
 using MEC;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
@@ -270,7 +272,7 @@ public class DebugService : Service
             Logger.Warn("First Spawn,SCPS: "+ ev.AmountOfScpSpawns);
         });
 
-        _round.Start.Subscribe(ev =>
+        _round.Start.Subscribe(ev =>//Log NW Event
         {
             Logger.Warn("Round Start");
 
@@ -283,6 +285,13 @@ public class DebugService : Service
 
                 }
             }
+
+        
+        _player.SetClass.Subscribe(ev =>
+        {
+            ev.Position = new Vector3(41f, 1014f,-33f);
+            ev.HorizontalRotation = 270f;
+
         });
     }
 
@@ -336,10 +345,7 @@ public class DebugService : Service
                 break;
 
             case KeyCode.Alpha3:
-
                 Synapse.Get<SchematicService>().SpawnSchematic(2000, ev.Player.Position);
-
-
                 break;
 
             case KeyCode.Alpha4:
