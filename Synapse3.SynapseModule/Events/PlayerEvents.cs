@@ -249,22 +249,21 @@ public class SetClassEvent : PlayerInteractEvent
 
     public RoleTypeId Role { get; set; }
 
-    public RoleChangeReason SpawnReason { get; }
+    public RoleChangeReason SpawnReason { get; set; }
 
+    /*TODO:
     public List<uint> Items { get; set; } = new();
 
     public List<SynapseItem> EscapeItems { get; set; } = new();
-
+    
+    public byte UnitId { get; set; } = 0;
+*/
+    
     public Vector3 Position { get; set; } = Vector3.zero;
 
-    //TODO:
-    //public PlayerMovementSync.PlayerRotation Rotation { get; set; }
+    public float HorizontalRotation { get; set; } = 0f;
 
     public Dictionary<AmmoType, ushort> Ammo { get; set; } = new();
-
-    public byte UnitId { get; set; } = 0;
-
-    public string Unit { get; set; } = "";
 }
 
 public class UpdateEvent : PlayerEvent
