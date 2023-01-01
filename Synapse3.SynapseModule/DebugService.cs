@@ -44,7 +44,7 @@ public class DebugService : Service
     public override void Enable()
     {
         Synapse.Get<SynapseCommandService>().ServerConsole.Subscribe(ev => Logger.Warn(ev.Context.FullCommand));
-        
+
         _player.DoorInteract.Subscribe(OnDoor);
         _player.KeyPress.Subscribe(OnKeyPress);
         _round.SelectTeam.Subscribe(SelectTeam);
@@ -52,12 +52,12 @@ public class DebugService : Service
 
         _item.KeyCardInteract.Subscribe(KeyCardItem);
         _item.BasicInteract.Subscribe(BasicItem);
-        
+
         _map.Scp914Upgrade.Subscribe(ev =>
         {
             ev.MoveVector = Vector3.up * 5;
         });
-        
+
         _item.Shoot.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Warn($"Shoot {ev.Player.NickName} {ev.Target?.NickName} {ev.Item.ItemType}");
@@ -67,12 +67,12 @@ public class DebugService : Service
         {
             NeuronLogger.For<Synapse>().Warn($"Scp049Revive {ev.Scp.NickName} -> {ev.HumanToRevive.NickName}");
         });
-        
+
         _item.ThrowGrenade.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Warn($"Throw {ev.State}");
         });
-        
+
         _item.MicroUse.Subscribe(ev =>
         {
             if (ev.MicroState == HidState.PoweringUp)
@@ -86,7 +86,7 @@ public class DebugService : Service
         {
             NeuronLogger.For<Synapse>().Warn($"{ev.Player.NickName} {ev.DamageType} {ev.LastTakenDamage} Message: {ev.DeathMessage ?? "NONE"} RagdollInfo: {ev.RagdollInfo ?? "NONE"}");
         });
-        
+
         _player.WalkOnHazard.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Warn($"HAZARD {ev.Player.NickName}");
@@ -211,15 +211,15 @@ public class DebugService : Service
         });
         _player.Damage.Subscribe(ev =>
             NeuronLogger.For<Synapse>().Warn($"Damage: {ev.Player.NickName} {ev.Damage} {ev.DamageType}"));
-            
+
         _player.FallingIntoAbyss.Subscribe(ev =>
                 NeuronLogger.For<Synapse>().Warn($"{ev.Player.NickName} falled into an abyss"));
-        
+
         _server.PreAuthentication.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Warn($"Pre Auth {ev.UserId} " + ev.Country);
         });
-        
+
         _scp.Scp049Attack.Subscribe(ScpEvent);
         _scp.Scp0492Attack.Subscribe(ScpEvent);
         _scp.Scp173Attack.Subscribe(ScpEvent);
@@ -245,22 +245,22 @@ public class DebugService : Service
 
         _player.Kick.Subscribe(ev => Logger.Warn("KICK " + ev.Admin + " " + ev.Reason));
         _player.Ban.Subscribe(ev => Logger.Warn("Ban " + ev.Admin + " " + ev.Reason));
-        
+
         _round.Decontamination.Subscribe(ev =>
         {
             Logger.Warn("Decontamination ");
             ev.Allow = false;
         });
-        
+
         _player.Escape.Subscribe(ev =>
         {
-            if(ev.EscapeType == EscapeType.TooFarAway) return;
+            if (ev.EscapeType == EscapeType.TooFarAway) return;
             Logger.Warn("ESCAPE " + ev.Player.NickName + " " + ev.EscapeType);
         });
-        
+
         _round.FirstSpawn.Subscribe(ev =>
         {
-            Logger.Warn("First Spawn,SCPS: "+ ev.AmountOfScpSpawns);
+            Logger.Warn("First Spawn,SCPS: " + ev.AmountOfScpSpawns);
         });
 
         _round.Start.Subscribe(ev =>//Log NW Event
@@ -276,13 +276,11 @@ public class DebugService : Service
 
                 }
             }
+        });
 
-        
         _player.SetClass.Subscribe(ev =>
         {
-            ev.Position = new Vector3(41f, 1014f,-33f);
-            ev.HorizontalRotation = 270f;
-
+            ev.Position = new Vector3(41f, 1014f, -33f);
         });
     }
 
@@ -318,8 +316,6 @@ public class DebugService : Service
     }
 
     SynapseDummy testDummy;
-    SynapseSchematic Schematic;
-    private SerializedPlayerState _state;
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)
@@ -371,27 +367,6 @@ public class DebugService : Service
                         NeuronLogger.For<Synapse>().Warn("MinicryPointPositioned: " + scp939.MinicryPointPositioned);
                         break;
                 }
-                break;
-
-            case KeyCode.Alpha5:
-                Logger.Warn("Horizontal: " + ev.Player.RotationHorizontal + " Vertical: " + ev.Player.RotationVertical + " Euler" + ev.Player.Rotation.eulerAngles + " Point: " + _state.Position.GetMapRotation().eulerAngles.y);
-                break;
-
-            case KeyCode.Alpha6:
-                testDummy.ShowPlayer(ev.Player);
-                break;
-
-            case KeyCode.Alpha7:
-                Schematic?.Destroy();
-                Schematic = Synapse.Get<SchematicService>().SpawnSchematic(2000, ev.Player.Position);
-                break;
-
-            case KeyCode.Alpha8:
-                Schematic.HideFromPlayer(ev.Player);
-                break;
-
-            case KeyCode.Alpha9:
-                Schematic.ShowPlayer(ev.Player);
                 break;
         }
     }

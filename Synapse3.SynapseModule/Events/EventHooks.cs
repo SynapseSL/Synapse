@@ -1,34 +1,20 @@
-using System;
-using System.Linq;
-using System.Reflection.Emit;
 using CommandSystem;
-using Interactables.Interobjects.DoorUtils;
-using InventorySystem.Items;
-using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Pickups;
 using LightContainmentZoneDecontamination;
 using LiteNetLib;
 using MapGeneration.Distributors;
 using Neuron.Core.Logging;
 using PlayerRoles;
-using PlayerRoles.PlayableScps.Scp049;
 using PlayerStatsSystem;
-﻿using System;
-using System.Reflection;
-using LightContainmentZoneDecontamination;
-using LiteNetLib;
-using PlayerRoles;
 using PluginAPI.Core.Attributes;
 using PluginAPI.Core.Interfaces;
-using PluginAPI.Core.Zones.Heavy;
 using PluginAPI.Enums;
 using PluginAPI.Events;
 using RemoteAdmin;
 using Synapse3.SynapseModule.Enums;
-using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
-using UnityEngine;
-using static RoundSummary;
+using System;
+using System.Linq;
 
 namespace Synapse3.SynapseModule.Events;
 
