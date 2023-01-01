@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using GameCore;
+﻿using GameCore;
 using HarmonyLib;
 using MEC;
 using Neuron.Core.Meta;
@@ -15,8 +12,10 @@ using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using static RoundSummary;
 using Console = GameCore.Console;
 
 namespace Synapse3.SynapseModule.Patching.Patches;

@@ -399,7 +399,7 @@ public static class Synapse3Extensions
         return FindField(baseType, name);
     }
 
-    public static void RaiseEvent(this object source, string eventName, params object [] args)
+    public static void RaiseEvent(object source, string eventName, params object [] args)
     {
         // Find the delegate and invoke it.
         var delegateField = FindField(source.GetType(), eventName);
@@ -408,7 +408,7 @@ public static class Synapse3Extensions
 
     }
 
-    public static void RaiseEvent(this Type source, string eventName, params object [] args)
+    public static void RaiseEvent(Type source, string eventName, params object [] args)
     {
         // Find the delegate and invoke it.
         var delegateField = FindField(source, eventName);

@@ -1,26 +1,17 @@
 ﻿using InventorySystem.Items.MicroHID;
-using MEC;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
+using PluginAPI.Core;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Config;
+using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
-using Synapse3.SynapseModule.Player;
 using UnityEngine;
-using Synapse3.SynapseModule.Dummy;
-using Synapse3.SynapseModule.Item;
-using Synapse3.SynapseModule.Map;
-using Synapse3.SynapseModule.Map.Elevators;
-using Synapse3.SynapseModule.Permissions;
-using Object = UnityEngine.Object;
-using Synapse3.SynapseModule.Map.Rooms;
-using PlayerRoles.PlayableScps.Scp106;
-using System.Reflection;
 
 
 namespace Synapse3.SynapseModule;
@@ -333,13 +324,10 @@ public class DebugService : Service
             case KeyCode.Alpha2:
                 testDummy.RotateToPosition(ev.Player.Position);
                 testDummy.Movement = PlayerMovementState.Walking;
+                testDummy.Direction = MovementDirection.Forward;
                 break;
 
             case KeyCode.Alpha3:
-
-                Synapse.Get<SchematicService>().SpawnSchematic(2000, ev.Player.Position);
-
-
                 break;
 
             case KeyCode.Alpha4:
@@ -347,24 +335,31 @@ public class DebugService : Service
                 {
                     case RoleTypeId.Scp173:
                         var scp173 = ev.Player.ScpController.Scp173;
-                        scp173.CurentBlinkCooldown = 5;//TODO
-                        scp173.TantrumCoolDown = 2;//TODO
+                        scp173.BlinkCooldownPerPlayer = 5;
+                        scp173.BlinkCooldownBase = 10;
+                        NeuronLogger.For<Synapse>().Warn("Observer: " + scp173.Observer.Count);
                         break;
                     case RoleTypeId.Scp106:
                         var scp106 = ev.Player.ScpController.Scp106;
-                        scp106.CapturePlayer(testDummy.Player);
+                        NeuronLogger.For<Synapse>().Warn("PoketPlayer: " + scp106.PlayersInPocket.Count);
                         break;
                     case RoleTypeId.Scp079:
                         var scp079 = ev.Player.ScpController.Scp079;
                         scp079.RegenEnergy = 200;
-
-                        scp079.Level = 3;//TODO
+                        scp079.Exp = 3;
                         break;
                     case RoleTypeId.Scp096:
                         var scp096 = ev.Player.ScpController.Scp096;
                         scp096.CurentShield = 10;
                         scp096.MaxShield = 100;
                         scp096.ShieldRegeneration = 2000;
+                        break;
+                    case RoleTypeId.Scp939:
+                        var scp939 = ev.Player.ScpController.Scp939;
+                        scp939.Sound(testDummy.Position, 2);//TODO
+                        scp939.AmnesticCloudCooldown = 4;
+                        scp939.MimicryCloudCooldown = 4;
+                        NeuronLogger.For<Synapse>().Warn("MinicryPointPositioned: " + scp939.MinicryPointPositioned);
                         break;
                 }
                 break;

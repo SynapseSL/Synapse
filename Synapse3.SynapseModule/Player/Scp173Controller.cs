@@ -1,4 +1,4 @@
-﻿using Hazards;
+﻿ using Hazards;
 using Mirror;
 using PlayerRoles.PlayableScps.HumeShield;
 using PlayerRoles.PlayableScps.Scp173;
@@ -14,7 +14,6 @@ public class Scp173Controller : ScpShieldControler<Scp173Role>
     
     public Scp173Controller(SynapsePlayer player) : base(player) { }
     
-    //TODO : set to cache the subrootine when player spawn
     public Scp173ObserversTracker ObserverTraker => Role?.GetSubroutine<Scp173ObserversTracker>();
     public Scp173BlinkTimer BlinkTimer => Role?.GetSubroutine<Scp173BlinkTimer>();
     public Scp173AudioPlayer AudioPlayer => Role?.GetSubroutine<Scp173AudioPlayer>();
@@ -52,33 +51,27 @@ public class Scp173Controller : ScpShieldControler<Scp173Role>
         }
     }
 
-    public float TantrumCoolDown// TODO: Patch
-    {
-        get;
-        set;
-    }
+    public float TantrumCoolDown { get; set; } = Scp173TantrumAbility.CooldownTime;
 
 
-    public float CurentBlinkCooldown//TODO: Patch
+    public float CurentBlinkCooldown
     {
-        get;
-        set;
-    }
-
-    public float BlinkCooldown
-    {
-        get => BlinkTimer?.TotalCooldownServer ?? 0f;
+        get => BlinkTimer?.RemainingBlinkCooldown ?? 0f;
         set
         {
             var blinkTimer = BlinkTimer;
             if (blinkTimer == null)
                 return;
-            blinkTimer._totalCooldown = value / 2;
+            blinkTimer._initialStopTime = value + NetworkTime.time;
             blinkTimer.ServerSendRpc(toAll: true);
         }
     }
 
-    public float BreakneckCoolDown
+    public float BlinkCooldownBase { get; set; } = Scp173BlinkTimer.CooldownBaseline;
+
+    public float BlinkCooldownPerPlayer { get; set; } = Scp173BlinkTimer.CooldownPerObserver;
+
+    public float SpeedBoostCoolDown
     {
         get
         {
@@ -97,7 +90,7 @@ public class Scp173Controller : ScpShieldControler<Scp173Role>
         }
     }
 
-    public bool IsSpeeding
+    public bool Speeding
     {
         get
         {
@@ -122,5 +115,12 @@ public class Scp173Controller : ScpShieldControler<Scp173Role>
         var tantrum = Object.Instantiate(TantrumAbility._tantrumPrefab);
         tantrum.SynchronizedPosition = new RelativePosition(postion);
         NetworkServer.Spawn(tantrum.gameObject);
+    }
+
+    internal void ResetDefault()
+    {
+        BlinkCooldownBase = Scp173BlinkTimer.CooldownBaseline;
+        BlinkCooldownPerPlayer = Scp173BlinkTimer.CooldownPerObserver;
+        Observer.Clear();
     }
 }

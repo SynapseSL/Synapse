@@ -41,6 +41,7 @@ public class Scp106Controller : ScpShieldControler<Scp106Role>
             Attack.ReduceSinkholeCooldown();
             Hitmarker.SendHitmarker(Attack.Owner, 1f);
             Synapse3Extensions.RaiseEvent(typeof(Scp106Attack), nameof(Scp106Attack.OnPlayerTeleported), player.Hub);
+            PlayersInPocket.Add(player);
             var effectsController = player.Hub.playerEffectsController;
             effectsController.EnableEffect<Traumatized>(180f);
             effectsController.EnableEffect<Corroding>();
@@ -49,5 +50,10 @@ public class Scp106Controller : ScpShieldControler<Scp106Role>
     }
 
     public HashSet<SynapsePlayer> PlayersInPocket { get; } = new();
+
+    internal void ResetDefault()
+    {
+        PlayersInPocket.Clear();
+    }
 
 }

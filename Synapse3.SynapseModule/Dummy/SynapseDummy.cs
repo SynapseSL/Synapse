@@ -130,8 +130,12 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
 
     public PlayerMovementState Movement
     {
-        get => Player.FirstPersonMovement.CurrentMovementState;
-        set => Player.FirstPersonMovement.CurrentMovementState = value;
+        get => Player.FirstPersonMovement?.CurrentMovementState ?? PlayerMovementState.Crouching;
+        set
+        {
+            if (Player.FirstPersonMovement != null)
+                Player.FirstPersonMovement.CurrentMovementState = value;
+        }
     }
 
     public DummyPlayer Player { get; }

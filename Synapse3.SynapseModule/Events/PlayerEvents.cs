@@ -151,20 +151,25 @@ public partial class PlayerEvents : Service
         WalkOnSinkhole.Unsubscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Unsubscribe(WalkOnHazard.Raise);
 
-        //TODO:
-        //CharacterClassManager.OnClassChanged -= CallSimpleSetClass;
+        PlayerRoleManager.OnServerRoleSet -= CallSimpleSetClass;
     }
 
-    private void CallSimpleSetClass(ReferenceHub hub, RoleTypeId previous, RoleTypeId next)
+    private void CallSimpleSetClass(ReferenceHub hub, RoleTypeId newRole, RoleChangeReason reason)
     {
         var player = hub.GetSynapsePlayer();
         if (player == null) return;
-        var ev = new SimpleSetClassEvent(player, previous, next);
+        var curentRole = player.RoleType;
+        var ev = new SimpleSetClassEvent(player, curentRole, newRole);
         SimpleSetClass.Raise(ev);
+        
+        if (curentRole == RoleTypeId.Scp106)
+            player.ScpController.Scp106.ResetDefault();
+        if (curentRole == RoleTypeId.Scp173)
+            player.ScpController.Scp173.ResetDefault();
 
         if (player.CustomRole == null)
             Timing.CallDelayed(Timing.WaitForOneFrame,
-                () => ChangeRole.Raise(new ChangeRoleEvent(player) { RoleId = (uint)next }));
+                () => ChangeRole.Raise(new ChangeRoleEvent(player) { RoleId = (uint)newRole }));
     }
 }
 

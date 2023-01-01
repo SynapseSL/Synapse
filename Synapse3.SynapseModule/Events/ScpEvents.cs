@@ -220,7 +220,12 @@ public class Scp173ObserveEvent : PlayerInteractEvent
 
 public class Scp173PlaceTantrumEvent : ScpActionEvent
 {
-    public Scp173PlaceTantrumEvent(SynapsePlayer scp) : base (scp , true) { }
+    public Scp173PlaceTantrumEvent(SynapsePlayer scp, float coolDown) : base (scp , true) 
+    {
+        CoolDown = coolDown;
+    }
+
+    public float CoolDown { get; set; }
 
 }
 
@@ -254,15 +259,22 @@ public class Scp049ReviveEvent : ScpActionEvent
 
 public class Scp106LeavePocketEvent : PlayerEvent
 {
-    public Scp106LeavePocketEvent(SynapsePlayer player, bool escapePocket, Vector3 enteredPosition) : base(player)
+    public Scp106LeavePocketEvent(SynapsePlayer player, bool escapePocket, 
+        Vector3 enteredPosition, Vector3 exitPosition) : base(player)
     {
         EscapePocket = escapePocket;
         EnteredPosition = enteredPosition;
+        EscapePosition = exitPosition;
+        Allow = true;
     }
     
     public bool EscapePocket { get; set; }
     
     public Vector3 EnteredPosition { get; set; }
+
+    public Vector3 EscapePosition { get; set; }
+
+    public bool Allow { get; set; }//Strange but the NW API allow to do nothing
 }
 
 public class Scp096ObserveEvent : PlayerInteractEvent

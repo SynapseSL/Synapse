@@ -1,6 +1,9 @@
-﻿using CustomPlayerEffects;
+﻿using Achievements;
+using CustomPlayerEffects;
 using HarmonyLib;
+using Hazards;
 using InventorySystem.Items.MicroHID;
+using MapGeneration;
 using Mirror;
 using Mono.Cecil;
 using Neuron.Core.Logging;
@@ -18,6 +21,7 @@ using PlayerStatsSystem;
 using PluginAPI.Enums;
 using PluginAPI.Events;
 using RelativePositioning;
+using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
 using System;
@@ -29,6 +33,7 @@ using System.Runtime.Remoting.Messaging;
 using UnityEngine;
 using Utils.Networking;
 using static PlayerRoles.PlayableScps.Scp173.Scp173TeleportAbility;
+using static PocketDimensionTeleport;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
 
@@ -283,8 +288,10 @@ public static class Scp106AttackPatch
         try
         {
             Scp106AttackEvent ev;
+            var player = __instance.Owner.GetSynapsePlayer();
+            var victime =__instance._targetHub.GetSynapsePlayer();
 
-            using (new FpcBacktracker(__instance._targetHub, __instance._targetPosition, 0.35f))
+            using (new FpcBacktracker(player, __instance._targetPosition, 0.35f))
             {
                 var vector = __instance._targetPosition - __instance._ownerPosition;
                 float sqrMagnitude = vector.sqrMagnitude;
@@ -307,9 +314,6 @@ public static class Scp106AttackPatch
                     return false;
                 }
 
-                var player = __instance.Owner.GetSynapsePlayer();
-                var victime =__instance._targetHub.GetSynapsePlayer();
-
                 ev = new Scp106AttackEvent(player, victime, __instance._damage, true, true);
                 _scp.Scp106Attack.RaiseSafely(ev);
 
@@ -325,19 +329,20 @@ public static class Scp106AttackPatch
                 {
                     return false;
                 }
-
-                player.ScpController.Scp106.PlayersInPocket.Add(victime);
             }
 
             __instance.SendCooldown(__instance._hitCooldown);
             __instance.Vigor.VigorAmount += 0.3f;
             __instance.ReduceSinkholeCooldown();
-            Hitmarker.SendHitmarker(__instance.Owner, 1f);
-            Synapse3Extensions.RaiseEvent(typeof(Scp106Attack), nameof(Scp106Attack.OnPlayerTeleported), __instance._targetHub);
-            PlayerEffectsController playerEffectsController = __instance._targetHub.playerEffectsController;
+            Hitmarker.SendHitmarker(player, 1f);
+            Synapse3Extensions.RaiseEvent(typeof(Scp106Attack), nameof(Scp106Attack.OnPlayerTeleported), victime.Hub);
+            PlayerEffectsController playerEffectsController = victime.PlayerEffectsController;
             playerEffectsController.EnableEffect<Traumatized>(180f);
             if (ev.TakeToPocket)
+            {
                 playerEffectsController.EnableEffect<Corroding>();
+                player.ScpController.Scp106.PlayersInPocket.Add(ev.Victim);
+            }
 
             return false;
         }
@@ -561,7 +566,215 @@ public static class Scp939LunchPatch
         }
         catch (Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: 939Attack failed\n" + ex);
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp939Lunge failed\n" + ex);
         }
+    }
+}
+
+[Automatic]
+[SynapsePatch("PlayerEscapePocketDimension", PatchType.ScpEvent)]
+public static class PlayerEscapePocketDimensionPatch
+{
+    static ScpEvents _scp;
+
+    static PlayerEscapePocketDimensionPatch()
+    {
+        _scp = Synapse.Get<ScpEvents>();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(PocketDimensionTeleport), nameof(PocketDimensionTeleport.OnTriggerEnter))]
+    public static bool OnTriggerEnter(PocketDimensionTeleport __instance, Collider other)
+    {
+        try
+        {
+            var component = other.GetComponent<NetworkIdentity>();
+            if (component == null 
+                || !ReferenceHub.TryGetHubNetID(component.netId, out var hub) 
+                || hub.roleManager.CurrentRole.ActiveTime < 1f)
+                return false;
+
+            var player = hub.GetSynapsePlayer();
+            var fpcRole = player.CurrentRole as IFpcRole;
+            if (fpcRole == null) return false;
+            var escapePostion = Scp106PocketExitFinder.GetBestExitPosition(fpcRole);
+            var entredPostion = __instance.transform.position;
+
+            var escape = __instance._type == PDTeleportType.Exit || AlphaWarheadController.Detonated;
+            var ev = new Scp106LeavePocketEvent(player, escape, entredPostion, escapePostion);
+
+            _scp.Scp106LeavePocket.RaiseSafely(ev);
+
+            if (!ev.Allow) return false;
+
+            if (!ev.EscapePocket)
+            {
+                if (!EventManager.ExecuteEvent(ServerEventType.PlayerExitPocketDimension, hub, false))
+                    return false;
+                hub.playerStats.DealDamage(new UniversalDamageHandler(-1f, DeathTranslations.PocketDecay));
+            }
+            else
+            {
+                if (!EventManager.ExecuteEvent(ServerEventType.PlayerExitPocketDimension, hub, true))
+                    return false;
+                fpcRole.FpcModule.ServerOverridePosition(ev.EscapePosition, Vector3.zero);
+                hub.playerEffectsController.EnableEffect<Disabled>(10f, addDuration: true);
+                hub.playerEffectsController.DisableEffect<Corroding>();
+                AchievementHandlerBase.ServerAchieve(component.connectionToClient, AchievementName.LarryFriend);
+                ImageGenerator.pocketDimensionGenerator.GenerateRandom();
+            }
+
+            return false;
+        }
+        catch (Exception e)
+        {
+            SynapseLogger<Synapse>.Error($"Sy3 Event: PlayerEscapePocketDimension failed!!\n{e}");
+            return true;
+        }
+    }
+}
+
+[Automatic]
+[SynapsePatch("Scp173Tantrum", PatchType.ScpEvent)]
+public static class Scp173TantrumPatch
+{
+    static ScpEvents _scp;
+
+    static Scp173TantrumPatch()
+    {
+        _scp = Synapse.Get<ScpEvents>();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp173TantrumAbility), nameof(Scp173TantrumAbility.ServerProcessCmd))]
+    public static bool OnServerProcessCmd(Scp173TantrumAbility __instance, NetworkReader reader)
+    {
+        try
+        {
+            if (!__instance.Cooldown.IsReady
+                || __instance._observersTracker.IsObserved
+                || !Physics.Raycast(__instance.ScpRole.FpcModule.Position, Vector3.down, out var hitInfo, 3f, __instance._tantrumMask)
+                || !EventManager.ExecuteEvent(ServerEventType.Scp173CreateTantrum, __instance.Owner))
+            {
+                return false;
+            }
+
+            var player = __instance.ScpRole._owner.GetSynapsePlayer();
+
+            var ev = new Scp173PlaceTantrumEvent(player, player.ScpController.Scp173.TantrumCoolDown);
+
+            _scp.Scp173PlaceTantrum.RaiseSafely(ev);
+
+            if (!ev.Allow) return false;
+            
+            __instance.Cooldown.Trigger(ev.CoolDown);
+            __instance.ServerSendRpc(toAll: true);
+            var tantrumEnvironmentalHazard = UnityEngine.Object.Instantiate(__instance._tantrumPrefab);
+            var targetPos = hitInfo.point + Vector3.up * 1.25f;
+            tantrumEnvironmentalHazard.SynchronizedPosition = new RelativePosition(targetPos);
+            NetworkServer.Spawn(tantrumEnvironmentalHazard.gameObject);
+            foreach (TeslaGate teslaGate in TeslaGateController.Singleton.TeslaGates)
+            {
+                if (teslaGate.PlayerInIdleRange(__instance.Owner))
+                {
+                    teslaGate.TantrumsToBeDestroyed.Add(tantrumEnvironmentalHazard);
+                }
+            }
+            return false;
+        }
+        catch (Exception e)
+        {
+            SynapseLogger<Synapse>.Error($"Sy3 Event: Scp173Tantrum failed!!\n{e}");
+            throw;
+        }
+    }
+}
+
+
+[Automatic]
+[SynapsePatch("Scp173Observe", PatchType.ScpEvent)]
+public static class Scp173ObservePatch
+{
+    static ScpEvents _scp;
+
+    static Scp173ObservePatch()
+    {
+        _scp = Synapse.Get<ScpEvents>();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp173TantrumAbility), nameof(Scp173TantrumAbility.ServerProcessCmd))]
+    public static bool OnServerProcessCmd(Scp173TantrumAbility __instance, NetworkReader reader)
+    {
+        try
+        {
+            if (!__instance.Cooldown.IsReady
+                || __instance._observersTracker.IsObserved
+                || !Physics.Raycast(__instance.ScpRole.FpcModule.Position, Vector3.down, out var hitInfo, 3f, __instance._tantrumMask)
+                || !EventManager.ExecuteEvent(ServerEventType.Scp173CreateTantrum, __instance.Owner))
+            {
+                return false;
+            }
+
+            var player = __instance.ScpRole._owner.GetSynapsePlayer();
+
+            var ev = new Scp173PlaceTantrumEvent(player, player.ScpController.Scp173.TantrumCoolDown);
+
+            _scp.Scp173PlaceTantrum.RaiseSafely(ev);
+
+            if (!ev.Allow) return false;
+
+            __instance.Cooldown.Trigger(ev.CoolDown);
+            __instance.ServerSendRpc(toAll: true);
+            var tantrumEnvironmentalHazard = UnityEngine.Object.Instantiate(__instance._tantrumPrefab);
+            var targetPos = hitInfo.point + Vector3.up * 1.25f;
+            tantrumEnvironmentalHazard.SynchronizedPosition = new RelativePosition(targetPos);
+            NetworkServer.Spawn(tantrumEnvironmentalHazard.gameObject);
+            foreach (TeslaGate teslaGate in TeslaGateController.Singleton.TeslaGates)
+            {
+                if (teslaGate.PlayerInIdleRange(__instance.Owner))
+                {
+                    teslaGate.TantrumsToBeDestroyed.Add(tantrumEnvironmentalHazard);
+                }
+            }
+            return false;
+        }
+        catch (Exception e)
+        {
+            SynapseLogger<Synapse>.Error($"Sy3 Event: Scp173Observe failed!!\n{e}");
+            throw;
+        }
+    }
+}
+
+[Automatic]
+[SynapsePatch("Scp173ObserversTracker", PatchType.Wrapper)]
+public static class Scp173ObserversTrackerPatch
+{
+    static SynapseConfigService _config;
+    static ScpEvents _scp;
+
+    static Scp173ObserversTrackerPatch()
+    {
+        _config = Synapse.Get<SynapseConfigService>();
+        _scp = Synapse.Get<ScpEvents>();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp173ObserversTracker), nameof(Scp173ObserversTracker.IsObservedBy))]
+    public static bool IsObservedBy(Scp173ObserversTracker __instance, ref bool __result, ReferenceHub target)
+    {
+        var player = target.GetSynapsePlayer();
+        var scp = __instance.Owner.GetSynapsePlayer();
+        var ev = new Scp173ObserveEvent(player, true, scp);
+
+        _scp.Scp173Observe.RaiseSafely(ev);
+
+        if (!ev.Allow || _config.GamePlayConfiguration.CantObserve173.Contains(player.RoleID))
+        {
+            __result = false;
+            return false;
+        }
+        return true;
     }
 }

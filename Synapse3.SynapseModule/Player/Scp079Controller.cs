@@ -18,18 +18,12 @@ public class Scp079Controller : ScpControllerBase<Scp079Role>
     public Scp079CurrentCameraSync CurrentCameraSync => Role?.GetSubroutine<Scp079CurrentCameraSync>();
     public Scp079DoorLockChanger DoorLockChanger => Role?.GetSubroutine<Scp079DoorLockChanger>();
 
-    public int Level//TODO: Fix It
+    public int Level
     {
         get
         {
             if (TierManager != null) return TierManager.AccessTierIndex + 1;
             return 0;
-        }
-        set
-        {
-            if (TierManager == null) return;
-            TierManager.AccessTierIndex = value - 1;
-            TierManager.ServerSendRpc(toAll: true);
         }
     }
 

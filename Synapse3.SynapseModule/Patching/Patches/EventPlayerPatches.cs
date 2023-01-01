@@ -31,6 +31,8 @@ using UnityEngine;
 using VoiceChat.Networking;
 using VoiceChat;
 using static PlayerList;
+using PlayerRoles.FirstPersonControl;
+using PluginAPI.Events;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
 
@@ -180,7 +182,7 @@ public static class SendPlayerDataPatch
 
 [Automatic]
 [SynapsePatch("PlayerEscape", PatchType.PlayerEvent)]
-public static class PlayerEscapePatch
+public static class PlayerEscapeFacilityPatch
 {
     [HarmonyPrefix]
     [HarmonyPatch(typeof(Escape), nameof(Escape.ServerHandlePlayer))]

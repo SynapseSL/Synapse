@@ -318,18 +318,6 @@ public partial class ScpEvents
         return ev.Allow;
     }
 
-    [PluginEvent(ServerEventType.Scp173CreateTantrum)]
-    public bool Scp173CreateTantrumHook(IPlayer player)
-    {
-        var synapse173 = player.GetSynapsePlayer();
-
-        var ev = new Scp173PlaceTantrumEvent(synapse173);
-
-        Scp173PlaceTantrum.RaiseSafely(ev);
-
-        return ev.Allow;
-    }
-
     [PluginEvent(ServerEventType.Scp173BreakneckSpeeds)]
     public bool Scp173BreakneckSpeedsHook(IPlayer player, bool activate)
     {

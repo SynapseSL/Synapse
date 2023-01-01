@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using HarmonyLib;
+using Hazards;
 using Interactables.Interobjects;
 using Mirror;
 using Neuron.Core.Logging;
@@ -9,7 +11,12 @@ using PlayerRoles.FirstPersonControl;
 using PlayerRoles.PlayableScps.HumeShield;
 using PlayerRoles.PlayableScps.Scp079;
 using PlayerRoles.PlayableScps.Scp096;
+using PlayerRoles.PlayableScps.Scp173;
 using PlayerRoles.Voice;
+using PluginAPI.Core;
+using PluginAPI.Enums;
+using RelativePositioning;
+using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
@@ -272,6 +279,85 @@ public static class UnDestroyableDoorPatch
             SynapseLogger<Synapse>.Error("Sy3 API: Damage Door failed\n" + ex);
             return true;
         }
+    }
+}
+
+[Automatic]
+[SynapsePatch("Scp173BlinkCooldDown", PatchType.Wrapper)]
+public static class Scp173BlinkCooldDownPatch
+{
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp173BlinkTimer), nameof(Scp173BlinkTimer.OnObserversChanged))]
+    public static void OnObserversChanged(Scp173BlinkTimer __instance, int prev, int current)
+    {
+        var player = __instance.Role._lastOwner.GetSynapsePlayer();
+
+        if (prev == 0 && __instance.RemainingSustainPercent == 0f)
+        {
+            __instance._initialStopTime = NetworkTime.time;
+            __instance._totalCooldown = player.ScpController.Scp173.BlinkCooldownBase;
+        }
+
+        __instance._totalCooldown += player.ScpController.Scp173.BlinkCooldownPerPlayer * (current - prev);
+        __instance._endSustainTime = ((current > 0) ? (-1.0) : (NetworkTime.time + 3.0));
+        __instance.ServerSendRpc(toAll: true);
+    }
+}
+
+[Automatic]
+[SynapsePatch("Scp173ObserversList", PatchType.Wrapper)]
+public static class Scp173ObserversListPatch
+{
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp173ObserversTracker), nameof(Scp173ObserversTracker.CheckRemovedPlayer))]
+    public static bool CheckRemovedPlayer(Scp173ObserversTracker __instance, ReferenceHub ply)
+    {
+        var player = __instance.Owner.GetSynapsePlayer();
+        var controler = player.ScpController.Scp173;
+
+        if (__instance.Observers.Remove(ply) | controler.Observer.Remove(player))
+        {
+            __instance.CurrentObservers--;
+        }
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp173ObserversTracker), nameof(Scp173ObserversTracker.UpdateObservers))]
+    public static bool UpdateObserver(Scp173ObserversTracker __instance)
+    {
+        var observers = 0;
+
+        foreach (ReferenceHub hub in ReferenceHub.AllHubs)
+        {
+            var player = hub.GetSynapsePlayer();
+            var scp = __instance.Owner.GetSynapsePlayer();
+            var controler = scp.ScpController.Scp173;
+
+            if (scp == player || player.RoleType is RoleTypeId.Spectator or RoleTypeId.None) continue;
+
+            if (__instance.IsObservedBy(hub, 0.2f))
+            {
+                observers += 1;
+                __instance.Observers.Add(hub);
+                controler.Observer.Add(scp);
+            }
+            else
+            {
+                controler.Observer.Remove(scp);
+                __instance.Observers.Remove(hub);
+            }
+        }
+
+        __instance.CurrentObservers = observers;
+
+        if (!__instance.Owner.isLocalPlayer)
+        {
+            __instance.ServerSendRpc(toAll: true);
+        }
+        return false;
     }
 }
 
