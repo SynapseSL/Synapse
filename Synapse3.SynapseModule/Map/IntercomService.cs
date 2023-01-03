@@ -1,32 +1,14 @@
-﻿using MEC;
-using Mirror;
+﻿using Mirror;
 using Neuron.Core.Meta;
 using PlayerRoles.Voice;
-using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Map;
 
 public class IntercomService : Service
 {
-    private readonly RoundEvents _round;
-    private readonly PlayerService _player;
-    public Intercom Intercom { get; private set; }
-    public IntercomDisplay Display { get; private set; }
-
-    public IntercomService(RoundEvents round, PlayerService player)
-    {
-        _round = round;
-        _player = player;
-    }
-
-    public override void Enable()
-    {
-    }
-
-    public override void Disable()
-    {
-    }
+    public Intercom Intercom => Intercom._singleton;
+    public IntercomDisplay Display => IntercomDisplay._singleton;
 
     public IntercomState State
     {
@@ -50,11 +32,5 @@ public class IntercomService : Service
     {
         get => Intercom.RemainingTime;
         set => Intercom._nextTime = value + NetworkTime.time;
-    }
-
-    private void GetIntercom(RoundWaitingEvent ev)
-    {
-        Intercom = Intercom._singleton;
-        Display = IntercomDisplay._singleton;
     }
 }

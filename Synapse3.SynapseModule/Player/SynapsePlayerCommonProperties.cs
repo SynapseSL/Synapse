@@ -211,22 +211,14 @@ public partial class SynapsePlayer
     /// </summary>
     public float StaminaUseRate
     {
-        get
+        get => (CurrentRole as FpcStandardRoleBase)?.FpcModule?.StateProcessor?._useRate ?? 0;
+        set
         {
-            if (_staminaUseRate == -1)
-                return DefaultStaminaUseRate;
-            else 
-                return _staminaUseRate;
+            if(CurrentRole is not FpcStandardRoleBase fpcRole) return;
+            typeof(FpcStateProcessor)
+                .GetField(nameof(FpcStateProcessor._useRate), BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.SetValue(fpcRole.FpcModule.StateProcessor, value);
         }
-        set => _staminaUseRate = value;
-    }
-
-    /// <summary>
-    /// The default stamina use of the player
-    /// </summary>
-    public float DefaultStaminaUseRate
-    {
-        get => FirstPersonMovement?.StateProcessor?._useRate ?? 0;
     }
 
     public string UnitName => (CurrentRole as HumanRole)?.UnitName ?? "";

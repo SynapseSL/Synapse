@@ -82,11 +82,6 @@
       <None Remove="OldPatches\**" />
     </ItemGroup>
 
-
-    <ItemGroup>
-      <None Remove="KeyBind\IKeyBind.cs~RF28777f.TMP" />
-    </ItemGroup>
-
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
 
     </PropertyGroup>

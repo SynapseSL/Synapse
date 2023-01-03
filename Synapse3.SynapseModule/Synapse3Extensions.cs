@@ -20,13 +20,11 @@ using PlayerRoles.PlayableScps.Scp079.Cameras;
 using PlayerRoles.PlayableScps.Subroutines;
 using PlayerStatsSystem;
 using PluginAPI.Core.Interfaces;
-using PluginAPI.Core.Items;
 using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
-using Synapse3.SynapseModule.Item.SubAPI;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Map.Objects;
@@ -405,7 +403,6 @@ public static class Synapse3Extensions
         var delegateField = FindField(source.GetType(), eventName);
         var eventDelegate = delegateField?.GetValue(source) as Delegate;
         eventDelegate?.DynamicInvoke(args);
-
     }
 
     public static void RaiseEvent(Type source, string eventName, params object [] args)

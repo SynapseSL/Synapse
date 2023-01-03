@@ -91,8 +91,7 @@ public class DebugService : Service
         {
             NeuronLogger.For<Synapse>().Warn($"HAZARD {ev.Player.NickName}");
         });
-
-        //--Debug
+        
         _player.WarheadPanelInteract.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Warn($"WarheadPanelInteract {ev.Player.NickName}");
@@ -136,6 +135,7 @@ public class DebugService : Service
         _map.GeneratorEngage.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Warn($"GeneratorEngage {ev.Generator.Name}");
+            //ev.Deactivate();
         });
 
         _map.CancelWarhead.Subscribe(ev =>
@@ -263,24 +263,10 @@ public class DebugService : Service
             Logger.Warn("First Spawn,SCPS: " + ev.AmountOfScpSpawns);
         });
 
-        _round.Start.Subscribe(ev =>//Log NW Event
-        {
-            Logger.Warn("Round Start");
-
-            foreach (var @event in PluginAPI.Events.EventManager.Events)
-            {
-                Logger.Warn($"{@event.Key}");
-                foreach (var method in @event.Value.Invokers)
-                {
-                    Logger.Warn($"{method.Key.FullName} {method.Value.Count}");
-
-                }
-            }
-        });
-
         _player.SetClass.Subscribe(ev =>
         {
-            ev.Position = new Vector3(41f, 1014f, -33f);
+            if (ev.Role == RoleTypeId.Tutorial)
+                ev.Position = new Vector3(41f, 1014f, -33f);
         });
     }
 

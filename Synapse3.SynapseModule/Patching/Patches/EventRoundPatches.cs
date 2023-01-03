@@ -220,17 +220,15 @@ public static class DecoratedRoundMethods
                 summary._roundEnded = amountOfFactions <= 1;
             }
 
-            SynapseLogger<Synapse>.Error(summary._roundEnded);
-
             if (summary._roundEnded)
             {
                 foreach (var customRole in customRoles)
                 {
-                    if (customRole.GetEnemiesID().Any(x => livingTeams.Contains(customRole.Attribute.TeamId)))
-                    {
-                        summary._roundEnded = false;
-                        break;
-                    }
+                    if (!customRole.GetEnemiesID().Any(x => livingTeams.Contains(x)))
+                        continue;
+                    
+                    summary._roundEnded = false;
+                    break;
                 }
             }
                 

@@ -10,223 +10,221 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace Synapse3.SynapseModule.KeyBind
+namespace Synapse3.SynapseModule.KeyBind;
+
+public class KeyBindService : Service
 {
-    public class KeyBindService : Service
+    public const string DataBaseKey = "KeyBindSave";
+
+    private readonly IKernel _kernel;
+    private readonly Synapse _synapseModule;
+    private readonly PlayerService _player;
+    private readonly PlayerEvents _playerEvents;
+
+    private Dictionary<string, IKeyBind> _binds = new();
+
+    public KeyBindService(IKernel kernel, Synapse synapseModule, PlayerService player, PlayerEvents playerEvents)
     {
-        public const string DataBaseKey = "KeyBindSave";
+        _kernel = kernel;
+        _synapseModule = synapseModule;
+        _player = player;
+    }
+    
+    public override void Enable()
+    {
+        _playerEvents.Join.Subscribe(LoadData);
+        _playerEvents.Leave.Subscribe(SaveData);
+        _playerEvents.KeyPress.Subscribe(KeyPress);
 
-        private readonly IKernel _kernel;
-        private readonly Synapse _synapseModule;
-        private readonly PlayerService _player;
+        RegisterKey<ScpSwitchChat>();
 
-        private Dictionary<string, IKeyBind> _bind = new Dictionary<string, IKeyBind>();
-
-        public KeyBindService(IKernel kernel, Synapse synapseModule, PlayerService player)
+        while (_synapseModule.ModuleKeyBindBindingQueue.Count != 0)
         {
-            _kernel = kernel;
-            _synapseModule = synapseModule;
-            _player = player;
+            var binding = _synapseModule.ModuleKeyBindBindingQueue.Dequeue();
+            LoadBinding(binding);
         }
-            
+    }
 
-        public override void Enable()
+    public override void Disable()
+    {
+        _playerEvents.Join.Unsubscribe(LoadData);
+        _playerEvents.Leave.Unsubscribe(SaveData);
+        _playerEvents.KeyPress.Unsubscribe(KeyPress);
+    }
+
+    internal void LoadBinding(SynapseKeyBindBinding binding) => RegisterKey(binding.Type, binding.Info);
+
+    public void RegisterKey<TKeyBind>() where TKeyBind : IKeyBind
+    {
+        var info = typeof(TKeyBind).GetCustomAttribute<KeyBindAttribute>();
+        if (info == null) return;
+
+        RegisterKey(typeof(TKeyBind), info);
+    }
+
+    public void RegisterKey(Type keyBindType, KeyBindAttribute info)
+    {
+        if (IsRegistered(info.CommandName)) return;
+        if (!typeof(IKeyBind).IsAssignableFrom(keyBindType)) return;
+
+        var keyBind = (IKeyBind)_kernel.Get(keyBindType);
+        _kernel.Bind(keyBindType).ToConstant(keyBind).InSingletonScope();
+
+        keyBind.Attribute = info;
+        keyBind.Load();
+
+        _binds[info.CommandName.ToLower()] = keyBind;
+        CheckForPlayers();
+    }
+
+    public void RegisterKey(IKeyBind keyBind, KeyBindAttribute info)
+    {
+        if (IsRegistered(info.CommandName)) return;
+
+        keyBind.Attribute = info;
+
+        _binds[info.CommandName.ToLower()] = keyBind;
+        CheckForPlayers();
+    }
+
+    private void CheckForPlayers()
+    {
+        if (!_player.Players.Any()) return;
+
+        foreach (var player in _player.Players)
         {
-            var player = Synapse.Get<PlayerEvents>();
-            player.Join.Subscribe(LoadData);
-            player.Leave.Subscribe(SaveData);
-            player.KeyPress.Subscribe(KeyPress);
+            CheckKey(player);
+        }
+    }
 
-            RegisterKey<ScpSwitchChat>();
 
-            while (_synapseModule.ModuleKeyBindBindingQueue.Count != 0)
+    public bool IsRegistered(string name)
+        => _binds.ContainsKey(name.ToLower());
+
+    public IKeyBind GetBind(string name)
+        => _binds[name.ToLower()];
+
+    private void LoadData(JoinEvent join)
+    {
+        var data = join.Player.GetData(DataBaseKey);
+
+        if (!TryParseData(data, out var commandKey))
+            commandKey = GenerateDefaultBind();
+
+        join.Player._commandKey = commandKey;
+
+        CheckKey(join.Player);
+    }
+
+    private void KeyPress(KeyPressEvent keyPress)
+    {
+        if (!keyPress.Player.CommandKey.TryGetValue(keyPress.KeyCode, out var commands))
+            return;
+
+        foreach (var command in commands)
+        {
+            command.Execute(keyPress.Player);
+        }
+    }
+
+    private void SaveData(LeaveEvent leave)
+    {
+        string data = "";
+        foreach (var keyBinds in leave.Player.CommandKey)
+        {
+            foreach (var bind in keyBinds.Value)
             {
-                var binding = _synapseModule.ModuleKeyBindBindingQueue.Dequeue();
-                LoadBinding(binding);
+                data += $"^^{keyBinds.Key}^^-^^{bind.Attribute.CommandName}^^";
             }
         }
 
-        public override void Disable()
+        leave.Player.SetData(DataBaseKey, data);
+    }
+
+    //^^Command^^-^^Bind^^
+    static Regex Regex = new Regex("(\\^\\^(.*?)\\^\\^-\\^\\^(.*?)\\^\\^)*");
+
+    private bool TryParseData(string data, out Dictionary<KeyCode, List<IKeyBind>> commandKey)
+    {
+        if (string.IsNullOrWhiteSpace(data))
         {
-            var player = Synapse.Get<PlayerEvents>();
-            player.Join.Unsubscribe(LoadData);
-            player.Leave.Unsubscribe(SaveData);
-            player.KeyPress.Unsubscribe(KeyPress);
+            commandKey = null;
+            return false;
         }
 
-        internal void LoadBinding(SynapseKeyBindBinding binding) => RegisterKey(binding.Type, binding.Info);
-
-        public void RegisterKey<TKeyBind>() where TKeyBind : IKeyBind
+        var math = Regex.Match(data);
+        if (!math.Success)
         {
-            var info = typeof(TKeyBind).GetCustomAttribute<KeyBindAttribute>();
-            if (info == null) return;
-
-            RegisterKey(typeof(TKeyBind), info);
+            commandKey = null;
+            return false;
         }
 
-        public void RegisterKey(Type keyBindType, KeyBindAttribute info)
+        commandKey = new Dictionary<KeyCode, List<IKeyBind>>();
+
+        var length = math.Groups.Count;
+        var commadName = "";
+        for (int i = 0; i < length; i++)
         {
-            if (IsRegistered(info.CommandName)) return;
-            if (!typeof(IKeyBind).IsAssignableFrom(keyBindType)) return;
-
-            var keyBind = (IKeyBind)_kernel.Get(keyBindType);
-            _kernel.Bind(keyBindType).ToConstant(keyBind).InSingletonScope();
-
-            keyBind.Attribute = info;
-            keyBind.Load();
-
-            _bind[info.CommandName.ToLower()] = keyBind;
-            CheckForPlayrs();
-        }
-
-        public void RegisterKey(IKeyBind keyBind, KeyBindAttribute info) 
-        {
-            if (IsRegistered(info.CommandName)) return;
-
-            keyBind.Attribute = info;
-
-            _bind[info.CommandName.ToLower()] = keyBind;
-            CheckForPlayrs();
-        }
-
-        private void CheckForPlayrs()
-        {
-            if (!_player.Players.Any()) return;
-
-            foreach (var player in _player.Players) 
+            var group = math.Groups[i];
+            var value = group.Value;
+            if (i % 2 == 0)
             {
-                CheckKey(player);
+                commadName = value;
             }
-        }
-
-
-        public bool IsRegistered(string name)
-            => _bind.ContainsKey(name.ToLower());
-
-        public IKeyBind GetBind(string name)
-             => _bind[name.ToLower()];
-
-        private void LoadData(JoinEvent join)
-        {
-            var data = join.Player.GetData(DataBaseKey);
-            
-            if (!TryParseData(data, out var commandKey))
-                commandKey = GenerateDefaultBiend();
-
-            join.Player._commandKey = commandKey;
-
-            CheckKey(join.Player);
-        }
-
-        private void KeyPress(KeyPressEvent keyPress)
-        {
-            if (!keyPress.Player.CommandKey.TryGetValue(keyPress.KeyCode, out var commands))
-                return;
-
-            foreach (var command in commands)
+            else
             {
-                command.Execute(keyPress.Player);
-            }
-        }
-
-        private void SaveData(LeaveEvent leave)
-        {
-            string data = "";
-            foreach (var keyBinds in leave.Player.CommandKey)
-            {
-                foreach (var bind in keyBinds.Value)
-                {
-                    data += $"^^{keyBinds.Key}^^-^^{bind.Attribute.CommandName}^^";
-                }
-            }
-
-            leave.Player.SetData(DataBaseKey, data);
-        }
-
-        //^^Command^^-^^Bind^^
-        static Regex Regex = new Regex("(\\^\\^(.*?)\\^\\^-\\^\\^(.*?)\\^\\^)*");
-        private bool TryParseData(string data, out Dictionary<KeyCode, List<IKeyBind>> commandKey)
-        {
-            if (string.IsNullOrWhiteSpace(data))
-            {
-                commandKey = null;
-                return false;
-            }
-
-            var math = Regex.Match(data);
-            if (!math.Success)
-            {
-                commandKey = null;
-                return false;
-            }
-
-            commandKey = new Dictionary<KeyCode, List<IKeyBind>>();
-
-            var length = math.Groups.Count;
-            var commadName = "";
-            for (int i = 0; i < length; i++)
-            {
-                var group = math.Groups[i];
-                var value = group.Value;
-                if (i % 2 == 0)
-                {
-                    commadName = value;
-                }
-                else
-                {
-                    var key = (KeyCode)Enum.Parse(typeof(KeyCode), value);
-                    var bind = GetBind(commadName);
-                    if (!commandKey.TryGetValue(key, out var commands))
-                        commandKey[key] = commands = new List<IKeyBind>();
-
-                    commands.Add(bind);
-                }
-            }
-
-            return true;
-        }
-
-        private Dictionary<KeyCode, List<IKeyBind>> GenerateDefaultBiend()
-        {
-            var commandKey = new Dictionary<KeyCode, List<IKeyBind>>();
-
-            foreach (var bind in _bind.Values)
-            {
-                var commadName = bind.Attribute.CommandName;
-                var key = bind.Attribute.Bind;
+                var key = (KeyCode)Enum.Parse(typeof(KeyCode), value);
+                var bind = GetBind(commadName);
                 if (!commandKey.TryGetValue(key, out var commands))
                     commandKey[key] = commands = new List<IKeyBind>();
 
                 commands.Add(bind);
             }
-
-            return commandKey;
         }
 
-        private void CheckKey(SynapsePlayer player)
+        return true;
+    }
+
+    private Dictionary<KeyCode, List<IKeyBind>> GenerateDefaultBind()
+    {
+        var commandKey = new Dictionary<KeyCode, List<IKeyBind>>();
+
+        foreach (var bind in _binds.Values)
         {
+            var commadName = bind.Attribute.CommandName;
+            var key = bind.Attribute.Bind;
+            if (!commandKey.TryGetValue(key, out var commands))
+                commandKey[key] = commands = new List<IKeyBind>();
 
-            var playerBinds = player._commandKey.Values.SelectMany(p => p).ToList();
-            var bindsToAdd = new List<IKeyBind>();
-            
-            foreach (var bind in _bind.Values)
-            {
-                if (playerBinds.Contains(bind))
-                    playerBinds.Remove(bind);
-                else
-                    bindsToAdd.Add(bind);
-            }
+            commands.Add(bind);
+        }
 
-            foreach (var bind in bindsToAdd)
-            {
-                var key = bind.Attribute.Bind;
-                if (!player._commandKey.TryGetValue(key, out var commands))
-                    player._commandKey[key] = commands = new List<IKeyBind>();
+        return commandKey;
+    }
 
-                commands.Add(bind);
-            }
+    private void CheckKey(SynapsePlayer player)
+    {
 
+        var playerBinds = player._commandKey.Values.SelectMany(p => p).ToList();
+        var bindsToAdd = new List<IKeyBind>();
+
+        foreach (var bind in _binds.Values)
+        {
+            if (playerBinds.Contains(bind))
+                playerBinds.Remove(bind);
+            else
+                bindsToAdd.Add(bind);
+        }
+
+        foreach (var bind in bindsToAdd)
+        {
+            var key = bind.Attribute.Bind;
+            if (!player._commandKey.TryGetValue(key, out var commands))
+                player._commandKey[key] = commands = new List<IKeyBind>();
+
+            commands.Add(bind);
         }
 
     }
+
 }

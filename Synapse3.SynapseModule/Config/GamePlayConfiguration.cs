@@ -22,17 +22,14 @@ public class GamePlayConfiguration : IDocumentSection
     [Description("If enabled a Player don't need to equip his keycard to use it")]
     public bool RemoteKeyCard{ get; set; } = false;
 
-    [Description("If enabled the WarHead button can be close again ")]
+    [Description("If enabled the Warhead button can be closed again ")]
     public bool WarheadButtonClosable { get; set; } = false;
     
     [Description("All Scp's in this list are able to Speak to Humans")]
     public List<uint> SpeakingScp { get; set; } = new List<uint> //TODO
     { 
-        (int)RoleTypeId.Scp939 
+        (uint)RoleTypeId.Scp939 
     };
-
-    [Description("If Enabled the button inside the AlphaWarhead(outside) can be closed again with a keycard")]
-    public bool CloseWarheadButton { get; set; } = false;
 
     [Description("When enabled are Chaos and SCP's forced to kill each other since otherwise the Round won't end")]
     public bool ChaosAndScpEnemy { get; set; } = false;

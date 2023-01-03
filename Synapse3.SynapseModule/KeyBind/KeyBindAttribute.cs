@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Synapse3.SynapseModule.KeyBind;
 
-[System.AttributeUsage(System.AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+[AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public class KeyBindAttribute : Attribute
 {
     public KeyCode Bind { get; set; }

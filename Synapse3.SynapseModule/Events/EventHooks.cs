@@ -238,7 +238,6 @@ public partial class RoundEvents
     [PluginEvent(ServerEventType.WaitingForPlayers)]
     public void RoundWaitingHook()
     {
-        NeuronLogger.For<Synapse>().Warn("RoundWaitingHook");
         Waiting.RaiseSafely(new RoundWaitingEvent(_firstTime));
 
         _firstTime = false;
@@ -355,17 +354,6 @@ public partial class ItemEvents
 
 public partial class MapEvents
 {
-    [PluginEvent(ServerEventType.GeneratorActivated)]
-    public bool PlayerActiveGeneratorHook(Scp079Generator generator)
-    {
-        var synapseGenerator = generator.GetSynapseGenerator();
-        var ev = new GeneratorEngageEvent(synapseGenerator);
-
-        GeneratorEngage.RaiseSafely(ev);
-
-        return ev.Allow;
-    }
-
     [PluginEvent(ServerEventType.WarheadStop)]
     public bool PlayerCancelWarHead(IPlayer player)
     {

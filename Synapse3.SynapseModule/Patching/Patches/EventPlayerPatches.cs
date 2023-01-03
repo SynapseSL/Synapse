@@ -34,6 +34,32 @@ using VoiceChat.Networking;
 namespace Synapse3.SynapseModule.Patching.Patches;
 
 [Automatic]
+[SynapsePatch("FallingIntoAbyss", PatchType.PlayerEvent)]
+public static class FallingIntoAbyssPatch
+{
+    private static readonly PlayerEvents _playerEvents;
+    static FallingIntoAbyssPatch() => _playerEvents = Synapse.Get<PlayerEvents>();
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(CheckpointKiller), nameof(CheckpointKiller.OnTriggerEnter))]
+    public static bool FallingIntoAbyss(Collider other)
+    {
+        OnFallingIntoAbyss(other);
+        return false;
+    }
+    
+    private static void OnFallingIntoAbyss(Collider other)
+    {
+        var player = other.GetComponentInParent<SynapsePlayer>();
+        var ev = new FallingIntoAbyssEvent(player, true);
+        _playerEvents.FallingIntoAbyss.RaiseSafely(ev);
+        if (!ev.Allow) return;
+
+        player.Hub.playerStats.DealDamage(new UniversalDamageHandler(-1f, DeathTranslations.Crushed));
+    }
+}
+
+[Automatic]
 [SynapsePatch("ScpVoice", PatchType.PlayerEvent)]
 public static class ScpVoicePatch
 {

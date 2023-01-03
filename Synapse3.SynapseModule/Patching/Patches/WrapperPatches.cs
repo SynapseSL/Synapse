@@ -68,39 +68,6 @@ public static class PlayerLoadComponentPatch
 }
 
 [Automatic]
-[SynapsePatch("PlayerStaminaUse", PatchType.Wrapper)]
-public static class PlayerStaminaUsePatch
-{
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(FpcStateProcessor), nameof(FpcStateProcessor.ServerUseRate), MethodType.Getter)]
-    public static bool OnServerUseRate(FpcStateProcessor __instance, ref float __result)
-    {
-
-        var player = __instance._hub.GetSynapsePlayer();
-
-        if (player.RoleManager.CurrentRole.ActiveTime <= __instance._respawnImmunity)
-        {
-            __result = 0;
-            return false;
-        }
-
-        var staminaUse = player.StaminaUseRate == -1 ? __instance._useRate : player.StaminaUseRate;
-        staminaUse *= player.Hub.inventory.StaminaUsageMultiplier;
-        foreach (var effect in player.Hub.playerEffectsController.AllEffects)
-        {
-            if (effect is IStaminaModifier staminaModifier && staminaModifier.StaminaModifierActive)
-            {
-                staminaUse *= staminaModifier.StaminaUsageMultiplier;
-            }
-        }
-
-        __result = staminaUse;
-        return false;
-    }
-}
-
-[Automatic]
 [SynapsePatch("Scp079MaxAuxiliary", PatchType.Wrapper)]
 public static class Scp079MaxAuxiliaryPatch
 {

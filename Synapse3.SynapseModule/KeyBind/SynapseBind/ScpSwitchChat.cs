@@ -1,12 +1,5 @@
-﻿using Neuron.Core.Logging;
-using Neuron.Core.Meta;
+﻿using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Player;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static CmdBinding;
 
 namespace Synapse3.SynapseModule.KeyBind.SynapseBind;
 
@@ -14,9 +7,9 @@ namespace Synapse3.SynapseModule.KeyBind.SynapseBind;
 [KeyBind(
     Bind = UnityEngine.KeyCode.V,
     CommandName = "ScpChat",
-    CommandDescription = "Changes between scp and proximity chat when you are a talking scp"
+    CommandDescription = "Changes between scp and proximity chat when you are talking as scp"
     )]
-internal class ScpSwitchChat : SynapseAbstractKeyBind
+public class ScpSwitchChat : SynapseAbstractKeyBind
 {
     public override void Execute(SynapsePlayer player)
     {

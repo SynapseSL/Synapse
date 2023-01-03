@@ -23,29 +23,28 @@ public class DummyService : Service
     public override void Enable()
     {
         _round.Waiting.Subscribe(CreateDummyTransformParent);
-        _player.Ban.Subscribe(DespawnDummyKick);
-        _player.Kick.Subscribe(DespawnDummyKick);
-        _player.Death.Subscribe(DespawnDummyDeath);
+        _player.Ban.Subscribe(DeSpawnDummyKick);
+        _player.Kick.Subscribe(DeSpawnDummyKick);
+        _player.Death.Subscribe(DeSpawnDummyDeath);
     }
 
     public override void Disable()
     {
         _round.Waiting.Unsubscribe(CreateDummyTransformParent);
-        _player.Ban.Unsubscribe(DespawnDummyKick);
-        _player.Kick.Unsubscribe(DespawnDummyKick);
-        _player.Death.Unsubscribe(DespawnDummyDeath);
+        _player.Ban.Unsubscribe(DeSpawnDummyKick);
+        _player.Kick.Unsubscribe(DeSpawnDummyKick);
+        _player.Death.Unsubscribe(DeSpawnDummyDeath);
     }
 
-    private void DespawnDummyDeath(DeathEvent ev)
+    private void DeSpawnDummyDeath(DeathEvent ev)
     {
-        if (ev.Allow && ev.Player is DummyPlayer dummy
-            && dummy.DestroyWhenDied)
+        if (ev.Allow && ev.Player is DummyPlayer { DestroyWhenDied: true } dummy)
         {
             dummy.SynapseDummy.Destroy();
         }
     }
 
-    private void DespawnDummyKick(KickEvent ev)
+    private void DeSpawnDummyKick(KickEvent ev)
     {
         if (ev.Allow && ev.Player is DummyPlayer dummy)
         {

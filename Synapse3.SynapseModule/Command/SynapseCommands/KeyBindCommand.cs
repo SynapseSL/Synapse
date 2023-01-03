@@ -24,11 +24,11 @@ namespace Synapse3.SynapseModule.Command.SynapseCommands;
 )]
 internal class KeyBindCommand : SynapseCommand
 {
-    private PlayerEvents _player;
-    private KeyBindService _keyBind;
-    private SynapseConfigService _config;
+    private readonly PlayerEvents _player;
+    private readonly KeyBindService _keyBind;
+    private readonly SynapseConfigService _config;
 
-    private Dictionary<SynapsePlayer, string> _bindingPlayer = new Dictionary<SynapsePlayer, string>();
+    private Dictionary<SynapsePlayer, string> _bindingPlayer = new();
 
 
     public KeyBindCommand(SynapseConfigService config, KeyBindService keyBind, PlayerEvents player)
@@ -56,7 +56,6 @@ internal class KeyBindCommand : SynapseCommand
 
         if (context.Arguments.Length == 0)
         {
-           
             var message = player.GetTranslation(_config.Translation).KeyBindCommandGetCommand;
             var commands = "";
 
@@ -112,13 +111,13 @@ internal class KeyBindCommand : SynapseCommand
 
         if (!_bindingPlayer.ContainsKey(player)) return;
 
-        var commadName = _bindingPlayer[player];
+        var commandName = _bindingPlayer[player];
         var key = keyPress.KeyCode;
         if (!player._commandKey.TryGetValue(key, out var commands))
             player._commandKey[key] = commands = new List<IKeyBind>();
 
-        commands.Add(_keyBind.GetBind(commadName));
-        player.SendConsoleMessage($"Command: \"{commadName}\" bind to \"{key}\"");
+        commands.Add(_keyBind.GetBind(commandName));
+        player.SendConsoleMessage($"Command: \"{commandName}\" bind to \"{key}\"");
 
         _player.KeyPress.Unsubscribe(OnSelectKey);
     }

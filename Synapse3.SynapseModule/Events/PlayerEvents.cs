@@ -37,7 +37,6 @@ public partial class PlayerEvents : Service
     public readonly EventReactor<ChangeItemEvent> ChangeItem = new();
     public readonly EventReactor<PickupEvent> Pickup = new();
     public readonly EventReactor<DropItemEvent> DropItem = new();
-    public readonly EventReactor<EnterFemurEvent> EnterFemur = new();
     public readonly EventReactor<GeneratorInteractEvent> GeneratorInteract = new();
     public readonly EventReactor<HealEvent> Heal = new();
     public readonly EventReactor<JoinEvent> Join = new();
@@ -83,7 +82,6 @@ public partial class PlayerEvents : Service
         _eventManager.RegisterEvent(DropAmmo);
         _eventManager.RegisterEvent(Escape);
         _eventManager.RegisterEvent(DropItem);
-        _eventManager.RegisterEvent(EnterFemur);
         _eventManager.RegisterEvent(GeneratorInteract);
         _eventManager.RegisterEvent(Heal);
         _eventManager.RegisterEvent(Join);
@@ -107,8 +105,7 @@ public partial class PlayerEvents : Service
         WalkOnTantrum.Subscribe(WalkOnHazard.Raise);
 
         PluginAPI.Events.EventManager.RegisterEvents(_synapse,this);
-        //TODO:
-        //PlayerRoleManager.OnServerRoleSet += CallSimpleSetClass;
+        PlayerRoleManager.OnServerRoleSet += CallSimpleSetClass;
     }
 
     public override void Disable()
@@ -128,7 +125,6 @@ public partial class PlayerEvents : Service
         _eventManager.UnregisterEvent(DropAmmo);
         _eventManager.UnregisterEvent(Escape);
         _eventManager.UnregisterEvent(DropItem);
-        _eventManager.UnregisterEvent(EnterFemur);
         _eventManager.UnregisterEvent(GeneratorInteract);
         _eventManager.UnregisterEvent(Heal);
         _eventManager.UnregisterEvent(Join);
@@ -158,14 +154,19 @@ public partial class PlayerEvents : Service
     {
         var player = hub.GetSynapsePlayer();
         if (player == null) return;
-        var curentRole = player.RoleType;
-        var ev = new SimpleSetClassEvent(player, curentRole, newRole);
+        var currentRole = player.RoleType;
+        var ev = new SimpleSetClassEvent(player, currentRole, newRole);
         SimpleSetClass.Raise(ev);
         
-        if (curentRole == RoleTypeId.Scp106)
-            player.ScpController.Scp106.ResetDefault();
-        if (curentRole == RoleTypeId.Scp173)
-            player.ScpController.Scp173.ResetDefault();
+        switch (currentRole)
+        {
+            case RoleTypeId.Scp106:
+                player.ScpController.Scp106.ResetDefault();
+                break;
+            case RoleTypeId.Scp173:
+                player.ScpController.Scp173.ResetDefault();
+                break;
+        }
 
         if (player.CustomRole == null)
             Timing.CallDelayed(Timing.WaitForOneFrame,
@@ -442,16 +443,6 @@ public class DropItemEvent : PlayerInteractEvent
     public bool Throw { get; set; }
 }
 
-public class EnterFemurEvent : PlayerInteractEvent
-{
-    public EnterFemurEvent(SynapsePlayer player, bool allow, bool closeFemur) : base(player, allow)//Redo it whit prefabe ?
-    {
-        CloseFemur = closeFemur;
-    }
-
-    public bool CloseFemur { get; set; }
-}
-
 public class GeneratorInteractEvent : PlayerInteractEvent
 {
     public GeneratorInteractEvent(SynapsePlayer player, bool allow, SynapseGenerator generator, GeneratorInteract interactionType) : base(player, allow)
@@ -592,7 +583,7 @@ public class StartWorkStationEvent : PlayerInteractEvent
     public SynapseWorkStation WorkStation { get; }
 }
 
-public class FallingIntoAbyssEvent : PlayerInteractEvent//TODO Understand that
+public class FallingIntoAbyssEvent : PlayerInteractEvent
 {
     public FallingIntoAbyssEvent(SynapsePlayer player, bool allow) : base(player, allow) { }
 }

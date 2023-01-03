@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using FMOD;
 using Mirror;
 using Neuron.Modules.Configs.Localization;
 using Synapse3.SynapseModule.Config;
@@ -21,11 +20,9 @@ public partial class SynapsePlayer
     public ScpController ScpController { get; }
 
     public Dictionary<string, object> Data { get; set; } = new();
-
-
+    
     internal Dictionary<KeyCode , List<IKeyBind>> _commandKey = new();
     public ReadOnlyDictionary<KeyCode, List<IKeyBind>> CommandKey => new(_commandKey);
-
 
     public SerializedPlayerState State
     {

@@ -10,7 +10,6 @@ public enum ScpAttackType
     Scp0492Scratch = 10,
     Scp939None = 12,
     Scp939Claw = 13,
-    Scp939LungeSeconde = 14,
     Scp939Lunge = 15,
-    Scp939Bite = 16,
+    Scp939LungeSecondary = 14,
 }

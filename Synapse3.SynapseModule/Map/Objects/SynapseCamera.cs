@@ -44,9 +44,5 @@ public class SynapseCamera
 
     public ushort SyncId => Camera.SyncId;
 
-     public string Name => Camera.name;
-
-    public ushort CameraID => Camera.SyncId;
-
-    public bool MainCamera => Camera.IsMain;
+    public string Name => Camera.name;
 }

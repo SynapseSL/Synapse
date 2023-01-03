@@ -90,9 +90,24 @@ public partial class ScpEvents : Service
         _eventManager.UnregisterEvent(Scp173Attack);
         _eventManager.UnregisterEvent(Scp173Observe);
         _eventManager.UnregisterEvent(Scp173PlaceTantrum);
+        _eventManager.UnregisterEvent(Scp173ActivateBreakneckSpeed);
         
         _eventManager.UnregisterEvent(Scp939Attack);
     }
+}
+
+public abstract class ScpActionEvent : IEvent
+{
+    public ScpActionEvent(SynapsePlayer scp, bool allow)
+    {
+        Scp = scp;
+        Allow = allow;
+    }
+
+    public SynapsePlayer Scp { get; }
+
+    public bool Allow { get; set; }
+
 }
 
 public abstract class ScpAttackEvent : ScpActionEvent
@@ -109,20 +124,6 @@ public abstract class ScpAttackEvent : ScpActionEvent
     
     public float Damage { get; set; }
     
-}
-
-public abstract class ScpActionEvent : IEvent
-{
-    public ScpActionEvent(SynapsePlayer scp, bool allow)
-    {
-        Scp = scp;
-        Allow = allow;
-    }
-
-    public SynapsePlayer Scp { get; }
-
-    public bool Allow { get; set; }
-
 }
 
 public class Scp049AttackEvent : ScpAttackEvent
@@ -185,7 +186,7 @@ public class Scp939AttackEvent : ScpAttackEvent
                 ScpAttackType = ScpAttackType.Scp939Lunge;
                     break;
             case Scp939DamageType.LungeSecondary:
-                ScpAttackType = ScpAttackType.Scp939LungeSeconde;
+                ScpAttackType = ScpAttackType.Scp939LungeSecondary;
                 break;
             default:
                 ScpAttackType = ScpAttackType.Scp939None;
