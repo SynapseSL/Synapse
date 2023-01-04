@@ -442,38 +442,6 @@ public static class PlayerSinkHoleHazardPatch
 }
 
 [Automatic]
-[SynapsePatch("PlayerNickname", PatchType.PlayerEvent)]
-public static class PlayerNicknamePatch
-{
-    static PlayerEvents _player;
-
-    static PlayerNicknamePatch()
-    {
-        _player = Synapse.Get<PlayerEvents>();
-    }
-
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(NicknameSync), nameof(NicknameSync.SetNick))]
-    public static void OnSetNick(NicknameSync __instance, ref string nick)
-    {
-        try
-        {
-            var player = __instance.GetSynapsePlayer();
-            if (player == null || player.PlayerType == PlayerType.Server) return;
-            var ev = new JoinEvent(__instance.GetSynapsePlayer(), nick);
-            _player.Join.RaiseSafely(ev);
-            nick = ev.NickName;
-        }
-        catch (Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: PlayerNickname failed\n" + ex);
-            return;
-        }
-    }
-}
-
-[Automatic]
 [SynapsePatch("PlayerWorkstation", PatchType.PlayerEvent)]
 public static class PlayerWorkstationPatch
 {
@@ -584,29 +552,18 @@ public static class PlayerKickPatch
 public static class PlayerJoinPatch
 {
     static PlayerEvents _player;
-
-    static PlayerJoinPatch()
-    {
-        _player = Synapse.Get<PlayerEvents>();
-    }
+    static PlayerJoinPatch() => _player = Synapse.Get<PlayerEvents>();
 
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(NicknameSync), nameof(NicknameSync.SetNick))]
     public static void OnJoin(NicknameSync __instance, ref string nick)
     {
-        try
-        {
-            var player = __instance.GetSynapsePlayer();
-            if (player.PlayerType == PlayerType.Server) return;
-            var ev = new JoinEvent(__instance.GetSynapsePlayer(), nick);
-            _player.Join.Raise(ev);
-            nick = ev.NickName;
-        }
-        catch (Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: PlayerJoin failed\n" + ex);
-        }
+        var player = __instance.GetSynapsePlayer();
+        if (player.PlayerType == PlayerType.Server) return;
+        var ev = new JoinEvent(__instance.GetSynapsePlayer(), nick);
+        _player.Join.RaiseSafely(ev);
+        nick = ev.NickName;
     }
 }
 

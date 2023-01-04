@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Reflection;
+using GameCore;
 using InventorySystem.Disarming;
 using Mirror.LiteNetLib4Mirror;
 using PlayerRoles;
@@ -204,8 +205,7 @@ public partial class SynapsePlayer
         get => GetStatBase<StaminaStat>().CurValue * 100;
         set => GetStatBase<StaminaStat>().CurValue = value / 100;
     }
-
-    private float _staminaUseRate = -1;
+    
     /// <summary>
     /// The curent stamina use by the player (set to -1 to use the default one)
     /// </summary>
@@ -215,6 +215,7 @@ public partial class SynapsePlayer
         set
         {
             if(CurrentRole is not FpcStandardRoleBase fpcRole) return;
+            if (value < 0) value = ConfigFile.ServerConfig.GetFloat("stamina_balance_use", 0.05f);
             typeof(FpcStateProcessor)
                 .GetField(nameof(FpcStateProcessor._useRate), BindingFlags.NonPublic | BindingFlags.Instance)
                 ?.SetValue(fpcRole.FpcModule.StateProcessor, value);

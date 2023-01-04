@@ -29,11 +29,15 @@ public class SynapseTranslation : Translations<SynapseTranslation>
     public string TranslationCommandGetTranslation { get; set; } = "Your current Translation is: {0}";
     public string TranslationCommandSetTranslation { get; set; } = "Your Translation is set to: {0}";
 
+    public string DnT { get; set; } =
+        "You have enabled Do Not Track in your settings therefore can we not store your language";
+
     public string DeathMessage { get; set; } = "You were killed by\n{0}\nas\n{1}";
 
     public string KeyBindCommandGetCommand { get; set; } = "Select a command whose bind you want to change, current bind:{0}";
     public string KeyBindCommandSelectKey { get; set; } = "Please press the new key";
-    public string KeyBindCommandInvalidKey { get; set; } = "No Keybind with that name was found";
+    public string KeyBindSet { get; set; } = "{0} was binded to {1}";
+    public string KeyBindCommandInvalidKey { get; set; } = "No Bind with that name was found";
     public string KeyBindCommandUndo { get; set; } = "Key reset to default value";
 
     public string CommandHelp { get; set; } = "All Available Vanilla Commands:";

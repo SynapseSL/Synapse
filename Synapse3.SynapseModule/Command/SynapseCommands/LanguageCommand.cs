@@ -1,5 +1,6 @@
 ﻿using Neuron.Core.Dev;
 using Neuron.Modules.Commands;
+using Neuron.Modules.Commands.Command;
 using Synapse3.SynapseModule.Config;
 
 namespace Synapse3.SynapseModule.Command.SynapseCommands;
@@ -32,6 +33,13 @@ public class LanguageCommand : SynapseCommand
 
             result.Response = context.Player.GetTranslation(_config.Translation).TranslationCommandGetTranslation
                 .Format(language);
+            return;
+        }
+
+        if (context.Player.DoNotTrack)
+        {
+            result.StatusCode = CommandStatusCode.Error;
+            result.Response = context.Player.GetTranslation(_config.Translation).DnT;
             return;
         }
         

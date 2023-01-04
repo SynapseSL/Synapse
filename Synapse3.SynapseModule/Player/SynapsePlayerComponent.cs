@@ -24,16 +24,8 @@ public partial class SynapsePlayer
 
         _player.RemovePlayer(this);
         
-        try
-        {
-            RemoveCustomRole(DeSpawnReason.Leave);
-            var ev = new LeaveEvent(this);
-            _playerEvents.Leave.Raise(ev);
-        }
-        catch (Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Leave Event failed\n" + ex);
-        }
+        RemoveCustomRole(DeSpawnReason.Leave);
+        _playerEvents.Leave.RaiseSafely(new LeaveEvent(this));
     }
 
     private float _updateTime;

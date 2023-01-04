@@ -21,8 +21,8 @@ public partial class SynapsePlayer
 
     public Dictionary<string, object> Data { get; set; } = new();
     
-    internal Dictionary<KeyCode , List<IKeyBind>> _commandKey = new();
-    public ReadOnlyDictionary<KeyCode, List<IKeyBind>> CommandKey => new(_commandKey);
+    internal Dictionary<KeyCode , List<IKeyBind>> _binds = new();
+    public ReadOnlyDictionary<KeyCode, List<IKeyBind>> Binds => new(_binds);
 
     public SerializedPlayerState State
     {

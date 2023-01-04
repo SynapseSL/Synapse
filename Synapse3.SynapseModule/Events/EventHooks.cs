@@ -161,21 +161,6 @@ public partial class PlayerEvents
         return ev.Allow;
     }
 
-    [PluginEvent(ServerEventType.PlayerLeft)]
-    public void PlayerLeftHook(IPlayer player)
-    {
-        try//When round restart and a player left the gameobject property return an error
-        {
-            var ev = new LeaveEvent(player.GetSynapsePlayer());
-
-            Leave.RaiseSafely(ev);
-        }
-        catch (Exception)
-        {
-
-        }
-    }
-
     [PluginEvent(ServerEventType.PlayerSearchPickup)]
     public bool PlayerSearchedPickupHook(IPlayer player, ItemPickupBase item)
     {
