@@ -8,6 +8,7 @@ using PlayerRoles.Spectating;
 using PlayerStatsSystem;
 using RelativePositioning;
 using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Events;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;

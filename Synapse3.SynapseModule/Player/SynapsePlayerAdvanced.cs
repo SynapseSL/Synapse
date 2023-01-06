@@ -17,6 +17,8 @@ public partial class SynapsePlayer
     public ItemInventory Inventory { get; }
 
     public BroadcastList ActiveBroadcasts { get; }
+
+    public TextHintList ActiveHint { get; }
     
     public ScpController ScpController { get; }
 
