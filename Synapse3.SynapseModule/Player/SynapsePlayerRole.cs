@@ -95,7 +95,7 @@ public partial class SynapsePlayer
         newRoleTransform.localPosition = Vector3.zero;
         newRoleTransform.localRotation = Quaternion.identity;
         RoleManager.CurrentRole = newRole;
-        newRole.Init(Hub,RoleChangeReason.RoundStart);
+        newRole.Init(Hub, RoleChangeReason.RoundStart, RoleSpawnFlags.All);
         newRole.SpawnPoolObject();
 
         if (data == null && newRole is FpcStandardRoleBase)
@@ -198,7 +198,7 @@ public partial class SynapsePlayer
         }
     }
 
-    public void SetPlayerRoleTypeAdvance(RoleTypeId role, Vector3 position, float horizontalRotation,Action<NetworkWriter> customData)
+    public void SetPlayerRoleTypeAdvance(RoleTypeId role, Vector3 position, float horizontalRotation, Action<NetworkWriter> customData)
     {
         var newRole = SetUpNewRole(role, out _);
         if (newRole is not FpcStandardRoleBase fpc) return;
@@ -216,7 +216,7 @@ public partial class SynapsePlayer
         fpc.ReadSpawnData(new NetworkReader(writer.ToArray()));
     }
 
-    private PlayerRoleBase SetUpNewRole(RoleTypeId role,out PlayerRoleBase prevRole)
+    private PlayerRoleBase SetUpNewRole(RoleTypeId role, out PlayerRoleBase prevRole)
     {
         prevRole = null;
         if (RoleManager._anySet)
@@ -230,7 +230,7 @@ public partial class SynapsePlayer
         newRoleTransform.localPosition = Vector3.zero;
         newRoleTransform.localRotation = Quaternion.identity;
         RoleManager.CurrentRole = newRole;
-        newRole.Init(Hub, RoleChangeReason.RemoteAdmin);
+        newRole.Init(Hub, RoleChangeReason.RemoteAdmin, RoleSpawnFlags.None);
         newRole.SpawnPoolObject();
         RoleManager._sendNextFrame = true;
 

@@ -44,7 +44,7 @@ public partial class SynapseItem
         Throwable.DestroyProjectile();
 
 
-        Item = player.VanillaInventory.CreateItemInstance(ItemType, player.VanillaInventory.isLocalPlayer);
+        Item = player.VanillaInventory.CreateItemInstance(new ItemIdentifier(ItemType, Serial), player.VanillaInventory.isLocalPlayer);
         if(Item == null) return;
         
         player.VanillaInventory.UserInventory.Items[Serial] = Item;

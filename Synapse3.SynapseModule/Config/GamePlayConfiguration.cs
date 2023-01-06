@@ -28,7 +28,7 @@ public class GamePlayConfiguration : IDocumentSection
     [Description("All Scp's in this list are able to Speak to Humans")]
     public List<uint> SpeakingScp { get; set; } = new List<uint> //TODO
     { 
-        (uint)RoleTypeId.Scp939 
+        
     };
 
     [Description("When enabled are Chaos and SCP's forced to kill each other since otherwise the Round won't end")]

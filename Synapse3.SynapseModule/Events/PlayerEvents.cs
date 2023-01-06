@@ -10,6 +10,7 @@ using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
+using VoiceChat;
 
 namespace Synapse3.SynapseModule.Events;
 
@@ -57,6 +58,7 @@ public partial class PlayerEvents : Service
     public readonly EventReactor<SendPlayerDataEvent> SendPlayerData = new();
     public readonly EventReactor<ChangeRoleEvent> ChangeRole = new();
     public readonly EventReactor<KickEvent> Kick = new();
+    public readonly EventReactor<SpeakEvent> Speak = new();
 
     public PlayerEvents(EventManager eventManager, Synapse synapse, ItemService item)
     {
@@ -100,6 +102,7 @@ public partial class PlayerEvents : Service
         _eventManager.RegisterEvent(SendPlayerData);
         _eventManager.RegisterEvent(ChangeRole);
         _eventManager.RegisterEvent(Kick);
+        _eventManager.RegisterEvent(Speak);
 
         WalkOnSinkhole.Subscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Subscribe(WalkOnHazard.Raise);
@@ -143,6 +146,7 @@ public partial class PlayerEvents : Service
         _eventManager.UnregisterEvent(SendPlayerData);
         _eventManager.UnregisterEvent(ChangeRole);
         _eventManager.UnregisterEvent(Kick);
+        _eventManager.UnregisterEvent(Speak);
 
         WalkOnSinkhole.Unsubscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Unsubscribe(WalkOnHazard.Raise);
@@ -672,4 +676,22 @@ public class KickEvent : PlayerInteractEvent
     public SynapsePlayer Admin { get; }
 
     public string Reason { get; set; }
+}
+
+public class SpeakEvent : PlayerInteractEvent
+{
+    public SpeakEvent(SynapsePlayer recever, SynapsePlayer player, bool synapseScpProximity, VoiceChatChannel channel) 
+        : base(player, true)
+    {
+        Recever = recever;
+        Channel = channel;
+        SynapseScpProximity = synapseScpProximity;
+    }
+    
+    public bool SynapseScpProximity { get; }
+
+    public VoiceChatChannel Channel { get; set; }
+
+    public SynapsePlayer Recever { get; }
+
 }

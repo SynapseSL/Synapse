@@ -319,6 +319,7 @@ public class DebugService : Service
                 break;
 
             case KeyCode.Alpha3:
+                ev.Player.SetPlayerRoleTypeAdvance(RoleTypeId.Tutorial, ev.Player.Position + Vector3.up);
                 break;
 
             case KeyCode.Alpha4:

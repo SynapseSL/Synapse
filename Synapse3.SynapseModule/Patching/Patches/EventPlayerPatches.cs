@@ -28,6 +28,7 @@ using Synapse3.SynapseModule.Role;
 using System;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Profiling;
 using VoiceChat;
 using VoiceChat.Networking;
 
@@ -63,6 +64,13 @@ public static class FallingIntoAbyssPatch
 [SynapsePatch("ScpVoice", PatchType.PlayerEvent)]
 public static class ScpVoicePatch
 {
+    readonly static PlayerEvents _player;
+
+    static ScpVoicePatch()
+    {
+        _player = Synapse.Get<PlayerEvents>();
+    }
+
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(VoiceTransceiver), nameof(VoiceTransceiver.ServerReceiveMessage))]
@@ -96,36 +104,57 @@ public static class ScpVoicePatch
 
         if (player.ScpController.ProximityChat && voiceChatChannel == VoiceChatChannel.ScpChat)
         {
-            voiceChatChannel = VoiceChatChannel.Proximity;
+            var voiceChanel = VoiceChatChannel.Proximity;
 
             foreach (ReferenceHub hub in ReferenceHub.AllHubs)
             {
-                if (hub.roleManager.CurrentRole is IVoiceRole voiceRoleRecever 
-                    && Vector3.Distance(player.Position, hub.transform.position) < 7)//Change this to a decreases the voice
+                var recerver = hub.GetSynapsePlayer();
+                if (recerver.CurrentRole is IVoiceRole voiceRoleRecever 
+                    && ((recerver is { RoleType: RoleTypeId.Spectator or RoleTypeId.Overwatch } 
+                    && Vector3.Distance(player.Position, recerver.CurrentlySpectating.Position) < 7)
+                    || Vector3.Distance(player.Position, recerver.Position) < 7))//Change this to a decreases voice
                 {
-                    var voiceChatChannel2 = voiceRoleRecever.VoiceModule.ValidateReceive(msg.Speaker, voiceChatChannel);
-                    if (voiceChatChannel2 != 0)
+
+                    var ev = new SpeakEvent(recerver, player, true, voiceChanel);
+                    _player.Speak.RaiseSafely(ev);
+
+                    if (!ev.Allow) return false;
+                    voiceChanel = ev.Channel;
+
+                    var validateChanel = voiceRoleRecever.VoiceModule.ValidateReceive(msg.Speaker, voiceChanel);
+                    if (validateChanel != 0)
                     {
-                        msg.Channel = voiceChatChannel2;
+                        msg.Channel = validateChanel;
                         hub.connectionToClient.Send(msg);
                     }
                 }
             }
             return false;
         }
-
-        foreach (ReferenceHub hub in ReferenceHub.AllHubs)
+        else
         {
-            if (hub.roleManager.CurrentRole is IVoiceRole voiceRoleRecever)
+            foreach (ReferenceHub hub in ReferenceHub.AllHubs)
             {
-                var voiceChatChannel2 = voiceRoleRecever.VoiceModule.ValidateReceive(msg.Speaker, voiceChatChannel);
-                if (voiceChatChannel2 != 0)
+                var recerver = hub.GetSynapsePlayer();
+
+                if (recerver.CurrentRole is IVoiceRole voiceRoleRecever)
                 {
-                    msg.Channel = voiceChatChannel2;
-                    hub.connectionToClient.Send(msg);
+                    var ev = new SpeakEvent(recerver, player, false, voiceChatChannel);
+                    _player.Speak.RaiseSafely(ev);
+
+                    if (!ev.Allow) return false;
+                    voiceChatChannel = ev.Channel;
+
+                    var validateChanel = voiceRoleRecever.VoiceModule.ValidateReceive(msg.Speaker, voiceChatChannel);
+                    if (validateChanel != 0)
+                    {
+                        msg.Channel = validateChanel;
+                        hub.connectionToClient.Send(msg);
+                    }
                 }
             }
         }
+        
         return false;
     }
 }

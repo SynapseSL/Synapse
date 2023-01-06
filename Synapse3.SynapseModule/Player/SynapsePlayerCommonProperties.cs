@@ -92,8 +92,8 @@ public partial class SynapsePlayer
     /// </summary>
     public bool OverWatch
     {
-        get => ServerRoles.OverwatchEnabled;
-        set => ServerRoles.OverwatchEnabled = value;
+        get => ServerRoles.IsInOverwatch;
+        set => ServerRoles.IsInOverwatch = value;
     }
 
     /// <summary>

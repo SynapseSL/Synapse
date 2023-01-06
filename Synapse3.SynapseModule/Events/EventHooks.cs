@@ -33,10 +33,10 @@ public partial class PlayerEvents
     }
 
     [PluginEvent(ServerEventType.PlayerInteractLocker)]
-    public bool PlayerInteractLockerHook(IPlayer player, Locker locker, byte colliderId, bool canOpen)
+    public bool PlayerInteractLockerHook(IPlayer player, Locker locker, LockerChamber collider, bool canOpen)
     {
         var synapseLocker = locker.GetSynapseLocker();
-        var chamber = synapseLocker.Chambers.FirstOrDefault(p => p.ByteID == colliderId);
+        var chamber = synapseLocker.Chambers.FirstOrDefault(p => p.LockerChamber == collider);
 
         var ev = new LockerUseEvent(player.GetSynapsePlayer(), canOpen, synapseLocker, chamber);
 
@@ -46,7 +46,7 @@ public partial class PlayerEvents
     }
 
     [PluginEvent(ServerEventType.WarheadStart)]
-    public bool WarheadStartHook(bool isAutomatic, IPlayer player)
+    public bool WarheadStartHook(bool isAutomatic, IPlayer player, bool isResumed)
     {
         var ev = new StartWarheadEvent(player?.GetSynapsePlayer(), true);
 

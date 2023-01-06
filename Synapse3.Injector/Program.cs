@@ -11,6 +11,8 @@ namespace Synapse3.Injector
             var injector = new SynapseInjector();
             try
             {
+                args = new string[1] { "E:\\Games\\SteamLibrary\\steamapps\\common\\SCP Secret Laboratory Dedicated Server\\SCPSL_Data\\Managed\\Assembly-CSharp.dll" };
+
                 if (args.Length == 0)
                     return;
 
