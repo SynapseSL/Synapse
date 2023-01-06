@@ -1,14 +1,24 @@
 ﻿using System;
 using Neuron.Core.Events;
+using System.Data;
+using System.Reflection;
+using InventorySystem.Items.MicroHID;
+using Mirror;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
+using PluginAPI.Core;
+using Respawning;
+using Respawning.NamingRules;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map;
+using Synapse3.SynapseModule.Map.Objects;
+using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 
@@ -61,64 +71,25 @@ public class DebugService : Service
     }
 
     SynapseDummy testDummy;
+
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                testDummy?.Destroy();
-                testDummy = new SynapseDummy(ev.Player.Position, ev.Player.Rotation, RoleTypeId.ClassD, "Test");
-                testDummy.RaVisible = true;
-                testDummy.DestroyWhenDied = false;
-                break;
-           
-            case KeyCode.Alpha2:
-                testDummy.RotateToPosition(ev.Player.Position);
-                testDummy.Movement = PlayerMovementState.Walking;
-                testDummy.Direction = MovementDirection.Forward;
-                break;
+                ev.Player.ActiveHint.Clear();
+                ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(0, "I like trians", 15, HintSide.Left));
+                ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(10, "Yea Trains", 10, HintSide.Left));
+                ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(1, "LOOK ME !", 7, HintSide.Right));
+                ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(20, "I AME A long string to long to be display in one part! so the other parte is under me, real look that is amazing !", 17, HintSide.Right));
 
-            case KeyCode.Alpha3:
-                foreach (var rag in Synapse.Get<MapService>()._synapseRagdolls)
-                {
-                    rag.SendFakeInfoToPlayer(ev.Player,
-                        new RagdollData(rag.Owner.Hub, rag.Damage, RoleTypeId.ClassD, rag.Position, rag.Rotation,
-                            rag.NickName, rag.CreationTime));
-                }
                 break;
 
             case KeyCode.Alpha4:
-                switch (ev.Player.RoleType)
-                {
-                    case RoleTypeId.Scp173:
-                        var scp173 = ev.Player.MainScpController.Scp173;
-                        scp173.BlinkCooldownPerPlayer = 5;
-                        scp173.BlinkCooldownBase = 10;
-                        NeuronLogger.For<Synapse>().Warn("Observer: " + scp173.Observer.Count);
-                        break;
-                    case RoleTypeId.Scp106:
-                        var scp106 = ev.Player.MainScpController.Scp106;
-                        NeuronLogger.For<Synapse>().Warn("PoketPlayer: " + scp106.PlayersInPocket.Count);
-                        break;
-                    case RoleTypeId.Scp079:
-                        var scp079 = ev.Player.MainScpController.Scp079;
-                        scp079.RegenEnergy = 200;
-                        scp079.Exp = 3;
-                        break;
-                    case RoleTypeId.Scp096:
-                        var scp096 = ev.Player.MainScpController.Scp096;
-                        scp096.CurrentShield = 10;
-                        scp096.MaxShield = 100;
-                        scp096.ShieldRegeneration = 2000;
-                        break;
-                    case RoleTypeId.Scp939:
-                        var scp939 = ev.Player.MainScpController.Scp939;
-                        scp939.Sound(testDummy.Position, 2);//TODO
-                        scp939.AmnesticCloudCooldown = 4;
-                        scp939.MimicryCloudCooldown = 4;
-                        NeuronLogger.For<Synapse>().Warn("MinicryPointPositioned: " + scp939.MinicryPointPositioned);
-                        break;
-                }
+                ev.Player.ActiveHint.Clear();
+                space += 0.01f;
+                ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(20, "OOOO<<>>", 5, HintSide.Left));
+                ev.Player.ActiveHint.Add(new SynapseTextHint(21, $"<mspace={space}em><size={size}%>O|</size></mspace>{space} {size}", 5, HintSide.Left));
                 break;
         }
     }
