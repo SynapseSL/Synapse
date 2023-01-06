@@ -307,7 +307,6 @@ public class DebugService : Service
     }
 
     SynapseDummy testDummy;
-
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)
@@ -322,10 +321,6 @@ public class DebugService : Service
                 break;
 
             case KeyCode.Alpha4:
-                ev.Player.ActiveHint.Clear();
-                space += 0.01f;
-                ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(20, "OOOO<<>>", 5, HintSide.Left));
-                ev.Player.ActiveHint.Add(new SynapseTextHint(21, $"<mspace={space}em><size={size}%>O|</size></mspace>{space} {size}", 5, HintSide.Left));
                 break;
         }
     }
