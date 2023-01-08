@@ -82,8 +82,17 @@ public class DebugService : Service
                 ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(10, "Yea Trains", 10, HintSide.Left));
                 ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(1, "LOOK ME !", 7, HintSide.Right));
                 ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(20, "I AME A long string to long to be display in one part! so the other parte is under me, real look that is amazing !", 17, HintSide.Right));
+                ev.Player.ActiveHint.Clear();
+                space -= 0.01f;
+                ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(20, "OOOO<<>>", 5, HintSide.Left));
+                ev.Player.ActiveHint.Add(new SynapseTextHint(21, $"<mspace={space}em><size={size}%>O|</size></mspace>{space} {size}", 5, HintSide.Left));
 
-                break;
+                //ev.Player.ActiveHint.Clear();
+                //ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(0, "I like trians", 15, HintSide.Left));
+                //ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(10, "Yea Trains", 10, HintSide.Left));
+                //ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(1, "LOOK ME !", 7, HintSide.Right));
+                //ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(20, "I AME A long string to long to be display in one part! so the other parte is under me, real look that is amazing !", 17, HintSide.Right));
+
 
             case KeyCode.Alpha4:
                 ev.Player.ActiveHint.Clear();
