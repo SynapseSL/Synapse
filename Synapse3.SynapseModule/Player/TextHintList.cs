@@ -1,10 +1,12 @@
 ﻿using Hints;
 using MEC;
+using Neuron.Core.Logging;
 using Synapse3.SynapseModule.Enums;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -17,11 +19,22 @@ public class TextHintList
     : ICollection<SynapseTextHint>
 {
     #region Properties & Variables
-    public const int CharPerSide = 50;//real total is 101 per ligne
+    static Dictionary<int, int> SizeMaxSide = new Dictionary<int, int>()
+    {
+        { 1, 40 },//Total per ligne is 81 
+        { 2, 21 },//Total per ligne is 43
+        { 3, 15 },//Total per ligne is 31
+    };
+
+    static Dictionary<int, float> SizeMspace = new Dictionary<int, float>()
+    {
+        { 1, 0.85f },
+        { 2, 1.60f },
+        { 3, 2.20f }
+    };
+
     public const int MaxLigne = 54;
     public const int GosthLigne = 15;
-    public const float DefaultCharSize = 0.34f;
-    public const float DefaultTextSize = 50;
 
     readonly SynapsePlayer _player;
     readonly List<SynapseTextHint> _textHints = new List<SynapseTextHint>();
@@ -51,6 +64,8 @@ public class TextHintList
         if (count == 0) return;
         
         var ligne = new Line[MaxLigne];
+        for (int i = 0; i < MaxLigne; i++)
+            ligne[i] = new Line();
 
         foreach (var hint in _textHints.OrderBy(p => p.Priority))
             ProcessHint(ligne, hint);
@@ -60,6 +75,7 @@ public class TextHintList
         {
             new StringHintParameter("")
         }, null, displayTime);
+
         if (count == 1)
         { 
             playerHint._effects = HintEffectPresets.FadeInAndOut(displayTime);
@@ -72,6 +88,7 @@ public class TextHintList
     private void RemoveExpierd()
     {
         var length = _textHints.Count;
+
         for (int i = length - 1; i >= 0; i--)
         {
             var hint = _textHints[i];
@@ -79,7 +96,6 @@ public class TextHintList
             _textHints.RemoveAt(i);
             hint.EndDisplay();
         }
-
     }
 
 
@@ -96,76 +112,120 @@ public class TextHintList
                 ProcesseRight(lignes, hint);
                 break;
             case HintSide.Midle:
+                ProcesseMidht(lignes, hint);
                 //TODO:
                 break;
         }
     }
 
-    private void ProcesseLeft(Line[] lignes, SynapseTextHint hint)
+    private void ProcesseMidht(Line[] lignes, SynapseTextHint hint)
     {
-        var textToInsert = TextSpliter.Splite(hint.Text, CharPerSide, hint.Size);
+        var textToInsert = TextSpliter.Splite(hint.Text, SizeMaxSide[hint.Size], 1/*hint.Size*/);
         var ligneCount = textToInsert.Count;
-        var startLigne = ligneCount - 1 + hint.Ligne * hint.Size;
-        if (startLigne >= MaxLigne) return;
-
-        for (int ligneIndex = startLigne; ligneIndex >= 0; ligneIndex--)
+        var ligne = hint.Ligne;
+        var size = hint.Size;
+        if (ligneCount * hint.Size >= MaxLigne) return;
+        if (ligne - hint.Size + 1 < 0) return;
+        for (int i = 0; i < ligneCount; i++)
         {
-            var ligne = lignes[ligneIndex + 1];
-            if (!ligne.Gosht && ligne.Left != null ) return; 
+            var dest = ligne + i * size;
+            if (!lignes[dest].MidleFree) return;
+            for (int j = 1; j < size; j++)
+            {
+                if (lignes[dest - j].Left != null 
+                    || lignes[dest - j].Right != null 
+                    || lignes[dest - j].Midle != null)
+                    return;
+            }
         }
 
-        for (int ligneIndex = startLigne; ligneIndex >= 0; ligneIndex--)
+        for (int i = 0; i < ligneCount; i++)
         {
-            if (ligneIndex % hint.Size == 0)
+            var dest = ligne + i * size;
+            textToInsert[i].SizeMult = hint.Size;
+            lignes[dest].Midle = textToInsert[i];
+            for (int j = 1; j < size; j++)
             {
-                lignes[ligneIndex + 1].Left = textToInsert[ligneIndex];
+                lignes[dest - j].Gosht = true;
             }
-            else
+
+        }
+    }
+    
+    private void ProcesseLeft(Line[] lignes, SynapseTextHint hint)
+    {
+        var textToInsert = TextSpliter.Splite(hint.Text, SizeMaxSide[hint.Size], 1/*hint.Size*/);
+        var ligneCount = textToInsert.Count;
+        var ligne = hint.Ligne;
+        var size = hint.Size;
+        if (ligneCount * hint.Size >= MaxLigne) return;
+        if (ligne - hint.Size + 1 < 0) return;
+        for (int i = 0; i < ligneCount; i++)
+        {
+            var dest = ligne + i * size;
+            if (!lignes[dest].LeftFree) return;
+            for (int j = 1; j < size; j++)
             {
-                lignes[ligneIndex + 1].Gosht = true;
+                if (lignes[dest - j].Left != null)
+                    return;
             }
+        }
+
+        for (int i = 0; i < ligneCount; i++)
+        {
+            var dest = ligne + i * size;
+            textToInsert[i].SizeMult = hint.Size; 
+            lignes[dest].Left = textToInsert[i];
+            for (int j = 1; j < size; j++)
+            {
+                lignes[dest - j].Gosht = true;
+            }
+
         }
     }
 
     private void ProcesseRight(Line[] lignes, SynapseTextHint hint)
     {
-        var textToInsert = TextSpliter.Splite(hint.Text, CharPerSide, hint.Size);
+        var textToInsert = TextSpliter.Splite(hint.Text, SizeMaxSide[hint.Size], 1/*hint.Size*/);
         var ligneCount = textToInsert.Count;
-        var startLigne = ligneCount - 1 + hint.Ligne * hint.Size;
-        if (startLigne >= MaxLigne) return;
+        var ligne = hint.Ligne;
+        var size = hint.Size;
+        if (ligneCount * hint.Size >= MaxLigne) return;
+        if (ligne - hint.Size + 1 < 0) return;
 
-        for (int ligneIndex = startLigne; ligneIndex >= 0; ligneIndex--)
+        for (int i = 0; i < ligneCount; i++)
         {
-            var ligne = lignes[ligneIndex + 1];
-            if (!ligne.Gosht && ligne.Right != null) return;
+            var dest = ligne + i * size;
+            if (!lignes[dest].RightFree) return;
+            for (int j = 1; j < size; j++)
+            {
+                if (lignes[dest - j].Right != null) 
+                    return;
+            }
         }
 
-        for (int ligneIndex = startLigne; ligneIndex >= 0; ligneIndex--)
+        for (int i = 0; i < ligneCount; i++)
         {
-            if (ligneIndex % hint.Size == 0)
+            var dest = ligne + i * size;
+            textToInsert[i].SizeMult = hint.Size;
+            lignes[dest].Right = textToInsert[i];
+            for (int j = 1; j < size; j++)
             {
-                lignes[ligneIndex + 1].Right = textToInsert[ligneIndex];
+                lignes[dest - j].Gosht = true;
             }
-            else
-            {
-                lignes[ligneIndex + 1].Gosht = true;
-            }
+
         }
     }
+
 
     private string GetMessage(Line[] Lignes)
     {
         //<mspace> allow to get char at same size
         //<size>   is the win space for more txt
-        var message = "";
-        for (int ligne = 0; ligne < MaxLigne; ligne++)
+        var message = "\n";
+        for (int i = 0; i < MaxLigne; i++)
         {
-#if DEBUG
-            message += "<align=\"left\">" + (ligne % 10);
-#else
-            message += "<align="left"> "; //the Space is Bc 101 char per ligne and not 100
-#endif
-            message += ligne;
+            message += Lignes[i];
         }
         message += new string('\n', GosthLigne);
 
@@ -175,8 +235,8 @@ public class TextHintList
     #region List Methods
     private IEnumerator<float> CallBackUpdateText(float time)
     {
-        yield return Timing.WaitForSeconds(time);
-        UpdateText();
+        yield return Timing.WaitForSeconds(Math.Min(time, 2));
+        UpdateText();//A can't catch the hint of the client 
         yield break;
     }
 
@@ -203,8 +263,14 @@ public class TextHintList
 
     public void Clear()
     {
-        _textHints.Clear();
-        UpdateText();
+        if (_textHints.Any())
+        {
+            _textHints.Clear();
+            _player.Hub.hints.Show(new Hints.TextHint("", new HintParameter[]
+            {
+                new StringHintParameter("")
+            }, null, 0.1f));
+        }
     }
 
     public bool Contains(SynapseTextHint hint)
@@ -228,42 +294,59 @@ public class TextHintList
     {
         public AnalysedSide Left { get; set; }
         public AnalysedSide Right { get; set; }
+        public AnalysedSide Midle { get; set; }
+        public bool LeftFree => Left == null && Midle == null && !Gosht;
+        public bool RightFree => Right == null && Midle == null && !Gosht;
+        public bool MidleFree => Left == null && Right == null && Midle == null && !Gosht;
+
         public bool Gosht { get; set; } = false;
 
         public override string ToString()
         {
             if (Gosht) return "";
-
-            var text = "";
-            var leftText = Left;
-            var rightText = Right;
-            if (leftText != null)
+            string text = "";
+            if (Midle == null)
             {
-                text += leftText;
+                text += "<align=\"left\">";
+                var leftText = Left;
+                var rightText = Right;
+                if (leftText != null)
+                {
+                    var charSpace = SizeMspace[(int)Left.SizeMult];
+                    text += $"<mspace={charSpace}em><size={Left.SizeMult * 50}%>" + leftText;
+                }
+                if (rightText != null)
+                {
+                    var charSpace = SizeMspace[(int)rightText.SizeMult];
+                    var space = new string(' ', SizeMaxSide[(int)rightText.SizeMult] - rightText.TextWithoutTag.Length);
+                    text += $"<pos=50%><mspace=0.65em><size=50%> <mspace={charSpace}em><size={rightText.SizeMult * 50}%>";
+                    //                                          ^
+                    // this space is to sperate the left and right and get a max of 81 char (for the base unite of 1) per line
+                    text += space + rightText;
+                }
             }
-
-            if (rightText != null)
+            else
             {
-                var space = new string(' ', CharPerSide - Right.TextWithoutTag.Length);
-                text += "<pos=50%>" + space + rightText;
+                text += "<align=\"center\">";
+                var midleText = Midle;
+                var charSpace = SizeMspace[(int)midleText.SizeMult];
+                text += $"<mspace={charSpace}em><size={midleText.SizeMult * 50}%> " + midleText;
             }
-            text += "\n";
+            text += "<size=50%>\n";
             return text;
         }
     }
 
-
-
     public class AnalysedSide
     { 
-        public string FullText { get; private set; }
-        public string TextWithoutTag { get; private set; }
-        public List<string> Tags { get; private set; }
-        public List<string> NotClosedTags { get; private set; }
-        public float SizeMult { get; private set; }
+        public string FullText { get; internal set; }
+        public string TextWithoutTag { get; internal set; }
+        public List<string> Tags { get; internal set; }
+        public List<string> NotClosedTags { get; internal set; }
+        public float SizeMult { get; internal set; }
         public int LengthWithoutTag => TextWithoutTag.Length;
         public int LengthWithTag => FullText.Length;
-        public float Size => TextWithoutTag.Length * SizeMult;
+        public float Lenght => TextWithoutTag.Length * SizeMult;
 
         public AnalysedSide(string word, float charSizeMult) : this(word, charSizeMult, new List<string>())
         {
@@ -396,14 +479,15 @@ public class TextHintList
             }
             // on recree les chaines 
             var basestring = text;
-            float curSize = analysedList[0].Size;
+            float curSize = analysedList[0].Lenght;
             int curChar = analysedList[0].FullText.Length;
 
             List<string> notClosed = new List<string>();
-            for (int i = 1; i < analysedList.Count; i++)
+            var count = analysedList.Count;
+            for (int i = 1; i < count; i++)
             {
                 var element = analysedList[i];
-                if ((curSize + charSizeMult + element.Size) > lineLength - 1)
+                if ((curSize + charSizeMult + element.Lenght) > lineLength - 1)
                 {
                     int pos = basestring.IndexOf(analysedList[i - 1].FullText, curChar - analysedList[i - 1].FullText.Length);
                     string ligne = basestring.Substring(0, pos + analysedList[i - 1].FullText.Length);
@@ -417,17 +501,19 @@ public class TextHintList
                         ligne += String.Join("", closingTags);
                     }
                     result.Add(new AnalysedSide(ligne, charSizeMult));
-                    curSize = element.Size;
+                    curSize = element.Lenght;
                     curChar = element.FullText.Length;
 
                     continue;
                 }
-                curSize += element.Size + charSizeMult;
+                curSize += element.Lenght + charSizeMult;
                 curChar += element.FullText.Length + 1;
             }
             if (!String.IsNullOrEmpty(basestring))
             {
-                result.Add(new AnalysedSide(String.Join("", notClosed) + basestring, charSizeMult));
+                var closingTags = GetClosingTags(notClosed);
+                NeuronLogger.For<Synapse>().Warn("closingTags: " + closingTags);
+                result.Add(new AnalysedSide(String.Join("", notClosed) + basestring + String.Join("", closingTags), charSizeMult));
             }
             return result;
         }

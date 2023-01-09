@@ -10,6 +10,9 @@ namespace Synapse3.SynapseModule.Enums
     {
         Left, 
         Right,
+        /// <summary>
+        /// Display on the both side Left anr Right
+        /// </summary>
         Midle,
     }
 }

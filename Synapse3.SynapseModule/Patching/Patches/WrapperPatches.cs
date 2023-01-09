@@ -2,8 +2,11 @@
 using System.Collections.ObjectModel;
 using HarmonyLib;
 using Hazards;
+using Hints;
 using Interactables.Interobjects;
+using InventorySystem.Searching;
 using Mirror;
+using Neuron.Core.Dev;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerRoles;
@@ -18,11 +21,13 @@ using PluginAPI.Enums;
 using RelativePositioning;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Dummy;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 using VoiceChat;
 using VoiceChat.Networking;
+using static PlayerList;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
 

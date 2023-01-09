@@ -43,4 +43,11 @@ public class SynapseTranslation : Translations<SynapseTranslation>
     public string CommandHelp { get; set; } = "All Available Vanilla Commands:";
     public string CommandHelpSecond { get; set; } = "All Available Synapse Commands:";
     public string CommandNotFound { get; set; } = "No command with that name was found";
+
+    public string WarheadDetonateCoverDenied { get; set; } = "<color=red>Access denied</color>";
+    public string MaxAmmoReached { get; set; } = "Reached the limit of <color=yellow>{0} ammo</color> (<color=yellow>{1} rounds</color>).";
+    public string MaxAmmoAlreadyReached { get; set; } = "<b>Already</b> reached the limit of <color=yellow>{0} ammo</color> (<color=yellow>{1} rounds</color>).";
+    public string MaxItemCategoryReached { get; set; } = "Reached the limit of <color=yellow>{0}</color> (<color=yellow>{1} items</color>).";
+    public string MaxItemCategoryAlreadyReached { get; set; } = "<b>Already</b> reached the limit of <color=yellow>{0}</color> (<color=yellow>{1} items</color>).";
+    public string MaxItemsAlreadyReached { get; set; } = "Only <color=yellow>{0} items</color> can be carried.";
 }

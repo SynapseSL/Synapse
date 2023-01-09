@@ -8,20 +8,6 @@ namespace Synapse3.SynapseModule.Player;
 
 public class SynapseTextHint
 {
-    //Size
-    /* Text Char 
-     * 50%  0.34f
-     * 100% 1.34f
-     * 150% 2.7f
-     */
-
-    static Dictionary<int, float> SizeMspace = new Dictionary<int, float>()
-    {
-        { 1, 0.34f },
-        { 2, 1.34f },
-        { 3, 2.70f }
-    };
-
     public HintSide Side { get; }
     public int Size { get; }
     public int Priority { get; }
@@ -49,9 +35,7 @@ public class SynapseTextHint
         Ligne = Math.Max(Math.Min(ligne, TextHintList.MaxLigne - 1), 0);
         Side = side;
         Priority = priority;
-        var charSpace = SizeMspace[Size];
-        var charSize = 0.50f * Size;
-        Text = $"<mspace={charSpace}em><size={charSize}%>" + text.Replace("\n", "");
+        Text = text.Replace("\n", "");
 
     }
 
