@@ -512,7 +512,6 @@ public class TextHintList
             if (!String.IsNullOrEmpty(basestring))
             {
                 var closingTags = GetClosingTags(notClosed);
-                NeuronLogger.For<Synapse>().Warn("closingTags: " + closingTags);
                 result.Add(new AnalysedSide(String.Join("", notClosed) + basestring + String.Join("", closingTags), charSizeMult));
             }
             return result;
