@@ -2,8 +2,11 @@
 using System.Collections.ObjectModel;
 using HarmonyLib;
 using Hazards;
+using Hints;
 using Interactables.Interobjects;
+using InventorySystem.Searching;
 using Mirror;
+using Neuron.Core.Dev;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerRoles;
@@ -25,6 +28,7 @@ using Synapse3.SynapseModule.Player.ScpController;
 using UnityEngine;
 using VoiceChat;
 using VoiceChat.Networking;
+using static PlayerList;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
 

@@ -49,7 +49,7 @@ public partial class SynapsePlayer
     public void SendWindowMessage(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
     
     /// <summary>
-    /// Displays a hint on the Player's screen
+    /// Displays a hint on the Player's screen, that override the hint list!
     /// </summary>
     public void SendHint(string message, float duration = 5f)
     {

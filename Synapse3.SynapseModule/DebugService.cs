@@ -2,6 +2,8 @@
 using Neuron.Core.Events;
 using System.Data;
 using System.Reflection;
+using Discord;
+using System.Security.Policy;
 using InventorySystem.Items.MicroHID;
 using Mirror;
 using Neuron.Core.Logging;
@@ -70,36 +72,27 @@ public class DebugService : Service
         Logger.Warn("Event triggered: " + ev.GetType().Name);
     }
 
-    SynapseDummy testDummy;
 
     private void OnKeyPress(KeyPressEvent ev)
     {
+
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
+
                 ev.Player.ActiveHint.Clear();
                 ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(0, "I like trians", 15, HintSide.Left));
                 ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(10, "Yea Trains", 10, HintSide.Left));
                 ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(1, "LOOK ME !", 7, HintSide.Right));
                 ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(20, "I AME A long string to long to be display in one part! so the other parte is under me, real look that is amazing !", 17, HintSide.Right));
-                ev.Player.ActiveHint.Clear();
-                space -= 0.01f;
-                ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(20, "OOOO<<>>", 5, HintSide.Left));
-                ev.Player.ActiveHint.Add(new SynapseTextHint(21, $"<mspace={space}em><size={size}%>O|</size></mspace>{space} {size}", 5, HintSide.Left));
-
-                //ev.Player.ActiveHint.Clear();
-                //ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(0, "I like trians", 15, HintSide.Left));
-                //ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(10, "Yea Trains", 10, HintSide.Left));
-                //ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(1, "LOOK ME !", 7, HintSide.Right));
-                //ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(20, "I AME A long string to long to be display in one part! so the other parte is under me, real look that is amazing !", 17, HintSide.Right));
-
-
-            case KeyCode.Alpha4:
-                ev.Player.ActiveHint.Clear();
-                space += 0.01f;
-                ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(20, "OOOO<<>>", 5, HintSide.Left));
-                ev.Player.ActiveHint.Add(new SynapseTextHint(21, $"<mspace={space}em><size={size}%>O|</size></mspace>{space} {size}", 5, HintSide.Left));
+                ev.Player.ActiveHint.Clear();                
                 break;
+            case KeyCode.Alpha2:
+                break;
+            case KeyCode.Alpha3:
+                ev.Player.ActiveHint.Clear();
+                break;
+
         }
     }
 }
