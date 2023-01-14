@@ -1,4 +1,5 @@
-﻿using Synapse3.SynapseModule.Player;
+﻿using Synapse3.SynapseModule.Config;
+using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.KeyBind.SynapseBind;
 
@@ -9,11 +10,23 @@ namespace Synapse3.SynapseModule.KeyBind.SynapseBind;
     )]
 public class ScpSwitchChat : SynapseAbstractKeyBind
 {
+    readonly SynapseConfigService _config;
+
+    public ScpSwitchChat()
+    {
+        _config = Synapse.Get<SynapseConfigService>();
+    }
+
     public override void Execute(SynapsePlayer player)
     {
         if (!player.ScpController.CanTalk) return;
 
         player.ScpController.ProximityChat = !player.ScpController.ProximityChat;
+
+        if (player.ScpController.ProximityChat)
+            player.SendHint(player.GetTranslation(_config.Translation).TalkingScpSwitchProximity);
+        else
+            player.SendHint(player.GetTranslation(_config.Translation).TalkingScpSwitchScp);
     }
 }
 

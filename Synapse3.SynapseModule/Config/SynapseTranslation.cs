@@ -43,4 +43,8 @@ public class SynapseTranslation : Translations<SynapseTranslation>
     public string CommandHelp { get; set; } = "All Available Vanilla Commands:";
     public string CommandHelpSecond { get; set; } = "All Available Synapse Commands:";
     public string CommandNotFound { get; set; } = "No command with that name was found";
+
+
+    public string TalkingScpSwitchScp { get; set; } = "You speak on the scp chat";
+    public string TalkingScpSwitchProximity { get; set; } = "You speak on the proximity chat";
 }
