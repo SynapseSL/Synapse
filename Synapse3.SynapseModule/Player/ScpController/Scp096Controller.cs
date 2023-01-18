@@ -71,12 +71,12 @@ public class Scp096Controller : ScpShieldController<Scp096Role>
         }
     }
 
-    public void AddTarget(SynapsePlayer player)
+    public void AddTarget(SynapsePlayer player, bool isForLook = false)
     {
         var rageManager = RageManager;
         if (rageManager != null) return;
 
-        rageManager._targetsTracker.AddTarget(player, false);
+        rageManager._targetsTracker.AddTarget(player, isForLook);
     }
 
     public void RemoveTarget(SynapsePlayer player)
