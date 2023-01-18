@@ -11,6 +11,7 @@ namespace Synapse3.Injector
             var injector = new SynapseInjector();
             try
             {
+
                 if (args.Length == 0)
                     return;
 

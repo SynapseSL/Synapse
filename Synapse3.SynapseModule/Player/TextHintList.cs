@@ -112,15 +112,17 @@ public class TextHintList
                 ProcesseRight(lignes, hint);
                 break;
             case HintSide.Midle:
-                ProcesseMidht(lignes, hint);
+                ProcesseMidle(lignes, hint);
                 //TODO:
                 break;
         }
     }
 
-    private void ProcesseMidht(Line[] lignes, SynapseTextHint hint)
+    private void ProcesseMidle(Line[] lignes, SynapseTextHint hint)
     {
-        var textToInsert = TextSpliter.Splite(hint.Text, SizeMaxSide[hint.Size], 1/*hint.Size*/);
+        var textToInsert = hint.IgnoreParsing ?
+            new List<AnalysedSide>() { new AnalysedSide(hint.Text, 0, true) } :
+            TextSpliter.Splite(hint.Text, SizeMaxSide[hint.Size], 1);
         var ligneCount = textToInsert.Count;
         var ligne = hint.Ligne;
         var size = hint.Size;
@@ -154,7 +156,9 @@ public class TextHintList
     
     private void ProcesseLeft(Line[] lignes, SynapseTextHint hint)
     {
-        var textToInsert = TextSpliter.Splite(hint.Text, SizeMaxSide[hint.Size], 1/*hint.Size*/);
+        var textToInsert = hint.IgnoreParsing ?
+            new List<AnalysedSide>() { new AnalysedSide(hint.Text, 0, true) } :
+            TextSpliter.Splite(hint.Text, SizeMaxSide[hint.Size], 1);
         var ligneCount = textToInsert.Count;
         var ligne = hint.Ligne;
         var size = hint.Size;
@@ -186,7 +190,9 @@ public class TextHintList
 
     private void ProcesseRight(Line[] lignes, SynapseTextHint hint)
     {
-        var textToInsert = TextSpliter.Splite(hint.Text, SizeMaxSide[hint.Size], 1/*hint.Size*/);
+        var textToInsert = hint.IgnoreParsing ?
+            new List<AnalysedSide>() { new AnalysedSide(hint.Text, 0, true) } :
+            TextSpliter.Splite(hint.Text, SizeMaxSide[hint.Size], 1);
         var ligneCount = textToInsert.Count;
         var ligne = hint.Ligne;
         var size = hint.Size;
@@ -313,24 +319,47 @@ public class TextHintList
                 if (leftText != null)
                 {
                     var charSpace = SizeMspace[(int)Left.SizeMult];
-                    text += $"<mspace={charSpace}em><size={Left.SizeMult * 50}%>" + leftText;
+                    if (!leftText.IgnoreReformatage)
+                    {
+                        text += $"<mspace={charSpace}em><size={Left.SizeMult * 50}%>" + leftText;
+                    }
+                    else
+                    {
+                        text += leftText;
+                    }
                 }
                 if (rightText != null)
                 {
                     var charSpace = SizeMspace[(int)rightText.SizeMult];
                     var space = new string(' ', SizeMaxSide[(int)rightText.SizeMult] - rightText.TextWithoutTag.Length);
-                    text += $"<pos=50%><mspace=0.65em><size=50%> <mspace={charSpace}em><size={rightText.SizeMult * 50}%>";
-                    //                                          ^
-                    // this space is to sperate the left and right and get a max of 81 char (for the base unite of 1) per line
-                    text += space + rightText;
+
+                    if (rightText.IgnoreReformatage)
+                    {
+                        text += $"<pos=50%><mspace=0.65em><size=50%> <mspace={charSpace}em><size={rightText.SizeMult * 50}%>";
+                        //                                          ^
+                        // this space is to sperate the left and right and get a max of 81 char (for the base unite of 1) per line
+                        text += space + rightText;
+                    }
+                    else
+                    {
+                        text += $"<mspace=0.65em><size=50%> </mspace></size>" + rightText;
+                    }
                 }
             }
             else
             {
-                text += "<align=\"center\">";
                 var midleText = Midle;
-                var charSpace = SizeMspace[(int)midleText.SizeMult];
-                text += $"<mspace={charSpace}em><size={midleText.SizeMult * 50}%> " + midleText;
+                if (!midleText.IgnoreReformatage)
+                {
+                    text += "<align=\"center\">";
+                    var charSpace = SizeMspace[(int)midleText.SizeMult];
+                    text += $"<mspace={charSpace}em><size={midleText.SizeMult * 50}%> " + midleText;
+                }
+                else
+                {
+                    text += "<align=\"center\">";
+                    text += $" " + midleText;
+                }
             }
             text += "<size=50%>\n";
             return text;
@@ -339,6 +368,7 @@ public class TextHintList
 
     public class AnalysedSide
     { 
+        public bool IgnoreReformatage { get; set; }
         public string FullText { get; internal set; }
         public string TextWithoutTag { get; internal set; }
         public List<string> Tags { get; internal set; }
@@ -348,9 +378,9 @@ public class TextHintList
         public int LengthWithTag => FullText.Length;
         public float Lenght => TextWithoutTag.Length * SizeMult;
 
-        public AnalysedSide(string word, float charSizeMult) : this(word, charSizeMult, new List<string>())
+        public AnalysedSide(string word, float charSizeMult, bool ignoreReformatage = false) : this(word, charSizeMult, new List<string>())
         {
-
+            IgnoreReformatage = ignoreReformatage;
         }
 
         public AnalysedSide(string word, float charSizeMult, List<string> notClosedTags)

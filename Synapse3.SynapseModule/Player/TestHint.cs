@@ -19,7 +19,7 @@ public class SynapseTextHint
     public float DisplayTime { get; set; }
     public string Text { get; set; }
     public int Ligne { get; set; }
-
+    public bool IgnoreParsing { get; set; }
 
 
     private float _displayRemoveTime;
@@ -38,8 +38,6 @@ public class SynapseTextHint
         Text = text.Replace("\n", "");
 
     }
-
-    public int Lenght(int ligne) => Text.Length;
 
     public void EndDisplay()
     {
