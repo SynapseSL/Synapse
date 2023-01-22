@@ -1,17 +1,15 @@
-﻿ using Hazards;
+﻿using System.Collections.Generic;
 using Mirror;
+using PlayerRoles;
 using PlayerRoles.PlayableScps.HumeShield;
 using PlayerRoles.PlayableScps.Scp173;
-using PluginAPI.Core;
 using RelativePositioning;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace Synapse3.SynapseModule.Player;
+namespace Synapse3.SynapseModule.Player.ScpController;
 
-public class Scp173Controller : ScpShieldControler<Scp173Role> 
+public class Scp173Controller : ScpShieldController<Scp173Role> 
 {
-    
     public Scp173Controller(SynapsePlayer player) : base(player) { }
     
     public Scp173ObserversTracker ObserverTraker => Role?.GetSubroutine<Scp173ObserversTracker>();
@@ -21,16 +19,14 @@ public class Scp173Controller : ScpShieldControler<Scp173Role>
     public Scp173SnapAbility SnapAbility => Role?.GetSubroutine<Scp173SnapAbility>();
     public Scp173TantrumAbility TantrumAbility => Role?.GetSubroutine<Scp173TantrumAbility>();
     public Scp173TeleportAbility TeleportAbility => Role?.GetSubroutine<Scp173TeleportAbility>();
-    public override HumeShieldModuleBase SheildModule => Role?.HumeShieldModule;
 
 
     public bool Is173Instance => Role != null;
 
     public bool IsObserved => ObserverTraker?.IsObserved ?? false;
-
-    //TODO: Patch
-    private HashSet<SynapsePlayer> _observer = new HashSet<SynapsePlayer>();
-    public HashSet<SynapsePlayer> Observer => _observer;
+    
+    internal HashSet<SynapsePlayer> _observer = new();
+    public IReadOnlyCollection<SynapsePlayer> Observer => _observer;
 
     public float CurentTantrumCoolDown
     {
@@ -121,6 +117,8 @@ public class Scp173Controller : ScpShieldControler<Scp173Role>
     {
         BlinkCooldownBase = Scp173BlinkTimer.CooldownBaseline;
         BlinkCooldownPerPlayer = Scp173BlinkTimer.CooldownPerObserver;
-        Observer.Clear();
+        _observer.Clear();
     }
+
+    public override RoleTypeId ScpRole => RoleTypeId.Scp173;
 }

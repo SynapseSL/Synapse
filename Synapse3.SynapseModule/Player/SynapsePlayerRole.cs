@@ -78,6 +78,8 @@ public partial class SynapsePlayer
         }
     }
 
+    //TODO: Rework this since NW decided to make this easier
+    
     /// <summary>
     /// Changes the role of the player without changing other values
     /// </summary>

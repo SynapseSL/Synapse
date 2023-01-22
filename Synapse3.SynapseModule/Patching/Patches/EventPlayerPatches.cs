@@ -27,8 +27,10 @@ using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
 using System;
 using System.Linq;
+using MapGeneration.Distributors;
+using PluginAPI.Enums;
+using PluginAPI.Events;
 using UnityEngine;
-using UnityEngine.Profiling;
 using VoiceChat;
 using VoiceChat.Networking;
 
@@ -51,7 +53,8 @@ public static class FallingIntoAbyssPatch
     
     private static void OnFallingIntoAbyss(Collider other)
     {
-        var player = other.GetComponentInParent<SynapsePlayer>();
+        var player = other?.GetComponentInParent<SynapsePlayer>();
+        if (player == null) return;
         var ev = new FallingIntoAbyssEvent(player, true);
         _playerEvents.FallingIntoAbyss.RaiseSafely(ev);
         if (!ev.Allow) return;
@@ -61,14 +64,18 @@ public static class FallingIntoAbyssPatch
 }
 
 [Automatic]
-[SynapsePatch("ScpVoice", PatchType.PlayerEvent)]
-public static class ScpVoicePatch
+[SynapsePatch("Speak", PatchType.PlayerEvent)]
+public static class SpeakPatch
 {
-    readonly static PlayerEvents _player;
+    public const int ProximityRange = 100; //Take the root of this so the range is 10
+    
+    private static readonly PlayerEvents Player;
+    private static readonly SynapseConfigService Config;
 
-    static ScpVoicePatch()
+    static SpeakPatch()
     {
-        _player = Synapse.Get<PlayerEvents>();
+        Player = Synapse.Get<PlayerEvents>();
+        Config = Synapse.Get<SynapseConfigService>();
     }
 
 
@@ -76,85 +83,67 @@ public static class ScpVoicePatch
     [HarmonyPatch(typeof(VoiceTransceiver), nameof(VoiceTransceiver.ServerReceiveMessage))]
     public static bool OnServerReceiveMessage(NetworkConnection conn, VoiceMessage msg)
     {
-        if (msg.SpeakerNull) return false;
-
-        var player = msg.Speaker.GetSynapsePlayer();
-
-        if (msg.SpeakerNull
-            || player.NetId != conn.identity.netId
-            || player.CurrentRole is not IVoiceRole voiceRoleSpeaker
-            || !voiceRoleSpeaker.VoiceModule.CheckRateLimit())
+        try
         {
-            return false;
-        }
+            if (msg.SpeakerNull || msg.Speaker.netId != conn.identity.netId) return false;
+            var player = msg.Speaker.GetSynapsePlayer();
 
-        var flags = VoiceChatMutes.GetFlags(msg.Speaker);
-        if (flags == VcMuteFlags.GlobalRegular || flags == VcMuteFlags.LocalRegular)
-        {
-            return false;
-        }
+            if (player.CurrentRole is not IVoiceRole voiceRoleSpeaker
+                || !voiceRoleSpeaker.VoiceModule.CheckRateLimit()) return false;
 
-        var voiceChatChannel = voiceRoleSpeaker.VoiceModule.ValidateSend(msg.Channel);
-        if (voiceChatChannel == VoiceChatChannel.None)
-        {
-            return false;
-        }
+            var flags = VoiceChatMutes.GetFlags(msg.Speaker);
+            if (flags is VcMuteFlags.GlobalRegular or VcMuteFlags.LocalRegular) return false;
 
-        voiceRoleSpeaker.VoiceModule.CurrentChannel = voiceChatChannel;
+            var voiceChatChannel = voiceRoleSpeaker.VoiceModule.ValidateSend(msg.Channel);
+            var ev = new SpeakEvent(player, true, voiceChatChannel);
+            Player.Speak.RaiseSafely(ev);
+            if (ev.Channel == VoiceChatChannel.None || !ev.Allow) return false;
+            voiceRoleSpeaker.VoiceModule.CurrentChannel = ev.Channel;
+            var checkForScpProximity = player.Team == Team.SCPs && player.MainScpController.ProximityChat;
 
-        if (player.ScpController.ProximityChat && voiceChatChannel == VoiceChatChannel.ScpChat)
-        {
-            var voiceChanel = VoiceChatChannel.Proximity;
-
-            foreach (ReferenceHub hub in ReferenceHub.AllHubs)
+            foreach (var hub in ReferenceHub.AllHubs)
             {
-                var recerver = hub.GetSynapsePlayer();
-                if (recerver.CurrentRole is IVoiceRole voiceRoleRecever 
-                    && ((recerver is { RoleType: RoleTypeId.Spectator or RoleTypeId.Overwatch } 
-                    && Vector3.Distance(player.Position, recerver.CurrentlySpectating.Position) < 7)
-                    || Vector3.Distance(player.Position, recerver.Position) < 7))//Change this to a decreases voice
+                if (hub == player.Hub) continue;
+                if (hub.roleManager.CurrentRole is not IVoiceRole voiceRole) continue;
+                var receiver = hub.GetSynapsePlayer();
+                var validatedChannel = voiceRole.VoiceModule.ValidateReceive(msg.Speaker, ev.Channel);
+                var isSpectator = receiver.RoleType is RoleTypeId.Spectator or RoleTypeId.Overwatch;
+
+                if (Config.GamePlayConfiguration.SpectatorListenOnSCPs && isSpectator && player.Team == Team.SCPs)
                 {
-
-                    var ev = new SpeakEvent(recerver, player, true, voiceChanel);
-                    _player.Speak.RaiseSafely(ev);
-
-                    if (!ev.Allow) return false;
-                    voiceChanel = ev.Channel;
-
-                    var validateChanel = voiceRoleRecever.VoiceModule.ValidateReceive(msg.Speaker, voiceChanel);
-                    if (validateChanel != 0)
-                    {
-                        msg.Channel = validateChanel;
-                        hub.connectionToClient.Send(msg);
-                    }
+                    if (receiver.CurrentlySpectating?.Team == Team.SCPs)
+                        validatedChannel = VoiceChatChannel.Proximity;
                 }
-            }
-            return false;
-        }
-        else
-        {
-            foreach (ReferenceHub hub in ReferenceHub.AllHubs)
-            {
-                var recerver = hub.GetSynapsePlayer();
-
-                if (recerver.CurrentRole is IVoiceRole voiceRoleRecever)
+                
+                if (checkForScpProximity)
                 {
-                    var ev = new SpeakEvent(recerver, player, false, voiceChatChannel);
-                    _player.Speak.RaiseSafely(ev);
-
-                    if (!ev.Allow) return false;
-                    voiceChatChannel = ev.Channel;
-
-                    var validateChanel = voiceRoleRecever.VoiceModule.ValidateReceive(msg.Speaker, voiceChatChannel);
-                    if (validateChanel != 0)
+                    if (isSpectator)
                     {
-                        msg.Channel = validateChanel;
-                        hub.connectionToClient.Send(msg);
+                        var spectating = receiver.CurrentlySpectating;
+                        if (receiver.CurrentlySpectating == player)
+                            validatedChannel = VoiceChatChannel.Proximity;
+                        else if (spectating != null &&
+                                 (spectating.Position - player.Position).sqrMagnitude < ProximityRange)
+                            validatedChannel = VoiceChatChannel.Proximity;
                     }
+                    else if ((receiver.Position - player.Position).sqrMagnitude < ProximityRange)
+                        validatedChannel = VoiceChatChannel.Proximity;
+                    else
+                        validatedChannel = VoiceChatChannel.None;
                 }
+
+                var ev2 = new SpeakToPlayerEvent(player, receiver, true, validatedChannel);
+                Player.SpeakToPlayer.RaiseSafely(ev2);
+                if (ev2.Channel == VoiceChatChannel.None || !ev2.Allow) continue;
+                msg.Channel = ev2.Channel;
+                hub.connectionToClient.Send(msg);
             }
         }
-        
+        catch (Exception ex)
+        {
+            SynapseLogger<Synapse>.Error("Speak Patch Failed:\n" + ex);
+        }
+
         return false;
     }
 }
@@ -174,7 +163,7 @@ public static class SendPlayerDataPatch
             var allow = false;
             var bypassDenied = false;
             var door = __instance;
-            if (__instance.ActiveLocks > 0)
+            if (__instance.ActiveLocks > 0 && !ply.serverRoles.BypassMode)
             {
                 var mode = DoorLockUtils.GetMode((DoorLockReason)__instance.ActiveLocks);
 
@@ -190,7 +179,7 @@ public static class SendPlayerDataPatch
                 }
             }
 
-            //This is most often false when the Animation is still playing
+            //This is false when the Animation is still playing
             if (!door.AllowInteracting(player, colliderId)) return false;
 
             if (!bypassDenied)
@@ -202,24 +191,23 @@ public static class SendPlayerDataPatch
                 }
             }
 
-            var ev = new DoorInteractEvent(player, allow, door.GetSynapseDoor(), bypassDenied);
+            var nwAllow = EventManager.ExecuteEvent(ServerEventType.PlayerInteractDoor, ply, __instance, allow);
+            var ev = new DoorInteractEvent(player, allow && nwAllow, door.GetSynapseDoor(), bypassDenied);
             Synapse.Get<PlayerEvents>().DoorInteract.Raise(ev);
 
             if (ev.Allow)
             {
                 door.NetworkTargetState = !door.TargetState;
-                door._triggerPlayer = player;
+                door._triggerPlayer = player.Hub;
                 return false;
             }
 
             if (ev.LockBypassRejected)
-            {
                 door.LockBypassDenied(player, colliderId);
-                return false;
-            }
 
             if (ev.PlayDeniedSound)
                 door.PermissionsDenied(player, colliderId);
+            
             DoorEvents.TriggerAction(door, DoorAction.AccessDenied, player);
             return false;
         }
@@ -251,23 +239,21 @@ public static class PlayerEscapeFacilityPatch
 [SynapsePatch("PlayerNameChange", PatchType.PlayerEvent)]
 public static class PlayerNameChangePatch
 {
-    static PlayerEvents _player;
-
-    static PlayerNameChangePatch()
-    {
-        _player = Synapse.Get<PlayerEvents>();
-    }
+    private static readonly PlayerEvents Player;
+    static PlayerNameChangePatch() => Player = Synapse.Get<PlayerEvents>();
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(NicknameSync), nameof(NicknameSync.DisplayName), MethodType.Setter)]
-    public static void SetDisplayName(NicknameSync __instance)
+    public static void SetDisplayName(NicknameSync __instance, ref string value)
+
     {
         try
         {
             var player = __instance.GetSynapsePlayer();
             if (player == null) return;
-            var ev = new UpdateDisplayNameEvent(player, __instance.DisplayName);
-            Synapse.Get<PlayerEvents>().UpdateDisplayName.Raise(ev);
+            var ev = new UpdateDisplayNameEvent(player, value);
+            Player.UpdateDisplayName.RaiseSafely(ev);
+            value = ev.NewDisplayName;
         }
         catch (Exception e)
         {
@@ -280,22 +266,21 @@ public static class PlayerNameChangePatch
 [SynapsePatch("PlayerHeal", PatchType.PlayerEvent)]
 public static class PlayerHealPatch
 {
-    static PlayerEvents _player;
-
-    static PlayerHealPatch()
-    {
-        _player = Synapse.Get<PlayerEvents>();
-    }
+    private static readonly PlayerEvents Player;
+    static PlayerHealPatch() => Player = Synapse.Get<PlayerEvents>();
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(HealthStat), nameof(HealthStat.ServerHeal))]
-    public static bool OnServerHeal(HealthStat __instance, float healAmount)
+    public static bool OnServerHeal(HealthStat __instance, ref float healAmount)
     {
         try
         {
             var player = __instance.Hub.GetSynapsePlayer();
+            if (player == null) return true;
+            
             var ev = new HealEvent(player, true, healAmount);
-            _player.Heal.RaiseSafely(ev);
+            Player.Heal.RaiseSafely(ev);
+            healAmount = ev.Amount;
             return ev.Allow;
         }
         catch (Exception e)
@@ -307,45 +292,46 @@ public static class PlayerHealPatch
 }
 
 [Automatic]
-[SynapsePatch("PlayerOpenWarHeadButton", PatchType.PlayerEvent)]
+[SynapsePatch("PlayerOpenWarheadButton", PatchType.PlayerEvent)]
 public static class PlayerOpenWarHeadButtonPatch
 {
-    private static readonly SynapseConfigService _config;
-    static PlayerEvents _player;
+    private static readonly SynapseConfigService Config;
+    private static readonly PlayerEvents Player;
 
     static PlayerOpenWarHeadButtonPatch()
     {
-        _config = Synapse.Get<SynapseConfigService>();
-        _player = Synapse.Get<PlayerEvents>();
+        Config = Synapse.Get<SynapseConfigService>();
+        Player = Synapse.Get<PlayerEvents>();
     }
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.UserCode_CmdSwitchAWButton))]
-    public static bool OnWarHeadButton(PlayerInteract __instance)
+    public static bool OnWarheadButton(PlayerInteract __instance)
     {
         try
         {
             if (!__instance.CanInteract) return false;
             var gameObject = GameObject.Find("OutsitePanelScript");
+            if (!__instance.ChckDis(gameObject.transform.position)) return false;
+            
             var player = __instance.GetSynapsePlayer();
 
             var componentInParent = gameObject.GetComponentInParent<AlphaWarheadOutsitePanel>();
-            if (componentInParent == null || (componentInParent.keycardEntered && !_config.GamePlayConfiguration.WarheadButtonClosable))
+            if (componentInParent == null)
+                return false;
+            if (componentInParent.keycardEntered && !Config.GamePlayConfiguration.WarheadButtonClosable)
                 return false;
 
             var allow = KeycardPermissions.AlphaWarhead.CheckPermission(player);
 
-            var ev = new OpenWarheadButtonEvent(player, allow, componentInParent.NetworkkeycardEntered);
-            Synapse.Get<PlayerEvents>().OpenWarheadButton.Raise(ev);
-
+            var ev = new OpenWarheadButtonEvent(player, allow, !componentInParent.NetworkkeycardEntered);
+            Player.OpenWarheadButton.RaiseSafely(ev);
             if (!ev.Allow) return false;
 
             __instance.OnInteract();
-            componentInParent.NetworkkeycardEntered = !componentInParent.NetworkkeycardEntered;
-            SpawnableTeamType stt;
-            if (!__instance._hub.TryGetAssignedSpawnableTeam(out stt))
-                return false;
-            RespawnTokensManager.GrantTokens(stt, 1f);
+            componentInParent.NetworkkeycardEntered = ev.OpenButton;
+            if (__instance._hub.TryGetAssignedSpawnableTeam(out var team))
+                RespawnTokensManager.GrantTokens(team, 1f);
             return false;
         }
         catch (Exception e)
@@ -357,58 +343,72 @@ public static class PlayerOpenWarHeadButtonPatch
 }
 
 [Automatic]
-[SynapsePatch("PlayerWarHeadInteract", PatchType.PlayerEvent)]
-public static class WarHeadInteractPatch
+[SynapsePatch("PlayerWarheadInteract", PatchType.PlayerEvent)]
+public static class WarheadInteractPatch
 {
-    static PlayerEvents _player;
-    static NukeService _nuck;
+    private static readonly PlayerEvents Player;
+    private static readonly NukeService Nuke;
 
-    static WarHeadInteractPatch()
+    static WarheadInteractPatch()
     {
-        _player = Synapse.Get<PlayerEvents>();
-        _nuck = Synapse.Get<NukeService>();
+        Player = Synapse.Get<PlayerEvents>();
+        Nuke = Synapse.Get<NukeService>();
     }
 
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.UserCode_CmdUsePanel))]
-    public static bool OnPanelInteract(PlayerInteract __instance, ref PlayerInteract.AlphaPanelOperations n)
+    public static bool OnPanelInteract(PlayerInteract __instance, PlayerInteract.AlphaPanelOperations n)
     {
         try
         {
             if (!__instance.CanInteract) return false;
 
             var player = __instance.GetSynapsePlayer();
-            var nukeside = AlphaWarheadOutsitePanel.nukeside;
-
-            if (!__instance.ChckDis(player.Position))
+            var nukeSide = AlphaWarheadOutsitePanel.nukeside;
+            if (!__instance.ChckDis(nukeSide.transform.position))
                 return false;
 
-            var ev = new WarheadPanelInteractEvent(player, !_nuck.InsidePanel.Locked, n);
+            var ev = new WarheadPanelInteractEvent(player, !Nuke.InsidePanel.Locked, n);
+            Player.WarheadPanelInteract.RaiseSafely(ev);
+            if (!ev.Allow) return false;
 
-            _player.WarheadPanelInteract.Raise(ev);
-            n = ev.Operation;
+            __instance.OnInteract();
+            switch (ev.Operation)
+            {
+                case PlayerInteract.AlphaPanelOperations.Cancel:
+                    AlphaWarheadController.Singleton.CancelDetonation(__instance._hub);
+                    ServerLogs.AddLog(ServerLogs.Modules.Warhead,
+                        player.Hub.LoggedNameFromRefHub() + " cancelled the Alpha Warhead detonation.",
+                        ServerLogs.ServerLogType.GameEvent);
+                    return false;
+                
+                case PlayerInteract.AlphaPanelOperations.Lever:
+                    if (!nukeSide.AllowChangeLevelState()) return false;
+                    nukeSide.Networkenabled = !nukeSide.enabled;
+                    __instance.RpcLeverSound();
+                    ServerLogs.AddLog(ServerLogs.Modules.Warhead,
+                        player.Hub.LoggedNameFromRefHub() + " set the Alpha Warhead status to " + nukeSide.enabled +
+                        ".", ServerLogs.ServerLogType.GameEvent);
+                    return false;
+            }
 
-            return ev.Allow;
+            return false;
         }
         catch (Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: PlaceWarHeadInteract failed\n" + ex);
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Player WarheadInteract failed\n" + ex);
             return true;
         }
     }
 }
 
 [Automatic]
-[SynapsePatch("PlayerTrantumHazard", PatchType.PlayerEvent)]
-public static class PlayerTrantumHazardPatch
+[SynapsePatch("PlayerTantrumHazard", PatchType.PlayerEvent)]
+public static class PlayerTantrumHazardPatch
 {
-    static PlayerEvents _player;
-
-    static PlayerTrantumHazardPatch()
-    {
-        _player = Synapse.Get<PlayerEvents>();
-    }
+    private static readonly PlayerEvents Player;
+    static PlayerTantrumHazardPatch() => Player = Synapse.Get<PlayerEvents>();
 
 
     [HarmonyPrefix]
@@ -423,13 +423,13 @@ public static class PlayerTrantumHazardPatch
             var allow = !(!Synapse3Extensions.CanHarmScp(sPlayer, false) || sPlayer.GodMode);
 
             var ev = new WalkOnTantrumEvent(sPlayer, allow, __instance);
-            Synapse.Get<PlayerEvents>().WalkOnTantrum.Raise(ev);
+            Player.WalkOnTantrum.RaiseSafely(ev);
 
             return ev.Allow;
         }
         catch (Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: PlayerTrantumHazard failed\n" + ex);
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: PlayerTantrumHazard failed\n" + ex);
             return true;
         }
     }
@@ -439,12 +439,8 @@ public static class PlayerTrantumHazardPatch
 [SynapsePatch("PlayerSinkHoleHazard", PatchType.PlayerEvent)]
 public static class PlayerSinkHoleHazardPatch
 {
-    static PlayerEvents _player;
-
-    static PlayerSinkHoleHazardPatch()
-    {
-        _player = Synapse.Get<PlayerEvents>();
-    }
+    private static readonly PlayerEvents Player;
+    static PlayerSinkHoleHazardPatch() => Player = Synapse.Get<PlayerEvents>();
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(SinkholeEnvironmentalHazard), nameof(SinkholeEnvironmentalHazard.OnEnter))]
@@ -458,7 +454,7 @@ public static class PlayerSinkHoleHazardPatch
             var allow = !(!Synapse3Extensions.CanHarmScp(sPlayer, false) || sPlayer.GodMode);
 
             var ev = new WalkOnSinkholeEvent(sPlayer, allow, __instance);
-            _player.WalkOnSinkhole.Raise(ev);
+            Player.WalkOnSinkhole.Raise(ev);
 
             return ev.Allow;
         }
@@ -492,7 +488,6 @@ public static class PlayerWorkstationPatch
                 return false;
 
             var ev = new StartWorkStationEvent(ply, true, __instance.GetSynapseWorkStation());
-
             if (ev.Player == null || ev.WorkStation == null) return false;
             _player.StartWorkStation.Raise(ev);
 
@@ -541,42 +536,6 @@ public static class PlaceBulletHolePatch
 }
 
 [Automatic]
-[SynapsePatch("PlayerKick", PatchType.PlayerEvent)]
-public static class PlayerKickPatch
-{
-    static PlayerEvents _player;
-
-    static PlayerKickPatch()
-    {
-        _player = Synapse.Get<PlayerEvents>();
-    }
-
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(BanPlayer), nameof(BanPlayer.KickUser), 
-        typeof(ReferenceHub), typeof(ICommandSender), typeof(string))]
-    public static bool OnJoin(ReferenceHub target, ICommandSender issuer, string reason)
-    {
-        try
-        {
-            var playerIssuer = (issuer as PlayerCommandSender)?.GetSynapsePlayer();
-
-            var ev = new KickEvent(target?.GetSynapsePlayer(), playerIssuer, reason, true);
-
-            _player.Kick.RaiseSafely(ev);
-
-            if (!ev.Allow) return false;
-            return true;
-        }
-        catch (Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: PlayerKick failed\n" + ex);
-            return true;
-        }
-    }
-}
-
-[Automatic]
 [SynapsePatch("PlayerJoin", PatchType.PlayerEvent)]
 public static class PlayerJoinPatch
 {
@@ -614,14 +573,14 @@ public static class PlayerDropItemPatch
     {
         try
         {
-            if (!__instance.UserInventory.Items.TryGetValue(itemSerial, out var itembase) || !itembase.CanHolster())
+            if (!__instance.UserInventory.Items.TryGetValue(itemSerial, out var itemBase) || !itemBase.CanHolster())
                 return false;
 
-            var ev = new DropItemEvent(__instance.GetSynapsePlayer(), true, itembase.GetItem(), tryThrow);
+            var ev = new DropItemEvent(__instance.GetSynapsePlayer(), true, itemBase.GetItem(), tryThrow);
             _player.DropItem.Raise(ev);
             tryThrow = ev.Throw;
             itemSerial = ev.ItemToDrop.Serial;
-            return ev.Allow;
+            return ev.Allow && ev.Player.Inventory.Items.Contains(ev.ItemToDrop);
         }
         catch (Exception ex)
         {
@@ -635,15 +594,15 @@ public static class PlayerDropItemPatch
 [SynapsePatch("PlayerDeath", PatchType.PlayerEvent)]
 public static class PlayerDeathPatch
 {
-    static SynapseTranslation _translation;
-    static PlayerService _player;
-    static PlayerEvents _playerEvent;
+    private static readonly SynapseTranslation Translation;
+    private static readonly PlayerService Player;
+    private static readonly PlayerEvents PlayerEvent;
 
     static PlayerDeathPatch()
     {
-        _translation = Synapse.Get<SynapseConfigService>().Translation;
-        _playerEvent = Synapse.Get<PlayerEvents>();
-        _player = Synapse.Get<PlayerService>();
+        Translation = Synapse.Get<SynapseConfigService>().Translation;
+        PlayerEvent = Synapse.Get<PlayerEvents>();
+        Player = Synapse.Get<PlayerService>();
     }
 
 
@@ -659,67 +618,53 @@ public static class PlayerDeathPatch
             var damageType = handler.GetDamageType();
 
             if (damageType == DamageType.PocketDecay)
-                attacker = _player.Players.FirstOrDefault(x => x.ScpController.Scp106.PlayersInPocket.Contains(victim));
+                attacker = Player.Players.FirstOrDefault(x => x.MainScpController.Scp106.PlayersInPocket.Contains(victim));
 
-            string playerMsg = null;
+            var playerMsg = "";
 
             if (attacker?.CustomRole != null)
             {
-                var translation = victim.GetTranslation(_translation).DeathMessage.Replace("\\n", "\n");
+                var translation = victim.GetTranslation(Translation).DeathMessage.Replace("\\n", "\n");
                 playerMsg = string.Format(translation, attacker.DisplayName, attacker.RoleName);
             }
 
             var ev = new DeathEvent(victim, true, attacker, damageType, damage, playerMsg, null);
-            _playerEvent.Death.Raise(ev);
+            PlayerEvent.Death.Raise(ev);
 
             if (!ev.Allow)
             {
                 victim.Health = 1;
                 return false;
             }
-
-            victim.DeathPosition = victim.Position;
-
             playerMsg = ev.DeathMessage;
-            var ragdollInfo = ev.RagdollInfo;
 
-            //--Vanila Stuff rework--
-            if (ragdollInfo != null)
-                RagdollManager.ServerSpawnRagdoll(victim, new CustomReasonDamageHandler(ragdollInfo));
-            else
-                RagdollManager.ServerSpawnRagdoll(victim, handler);
+            RagdollManager.ServerSpawnRagdoll(victim.Hub,
+                !string.IsNullOrWhiteSpace(ev.RagDollInfo) ? new CustomReasonDamageHandler(ev.RagDollInfo) : handler);
 
             victim.Inventory.DropEverything();
-
-            var classManager = victim.ClassManager;
             victim.RoleManager.ServerSetRole(RoleTypeId.Spectator, RoleChangeReason.Died);
-            if (playerMsg != null)
+            
+            if (!string.IsNullOrWhiteSpace(ev.DeathMessage))
                 handler = new CustomReasonDamageHandler(playerMsg);
-            if (__instance._hub.roleManager.CurrentRole is SpectatorRole spectatorRole)
+
+            if (victim.CurrentRole is SpectatorRole spectatorRole)
             {
                 spectatorRole.ServerSetData(handler);
             }
             victim.GameConsoleTransmission.SendToClient("You died. Reason: " + handler.ServerLogsText, "yellow");
-
-            //--Synapse API--
-            foreach (var larry in _player.Players)
+            
+            foreach (var larry in Player.Players)
             {
-                var playerPocket = larry.ScpController.Scp106.PlayersInPocket;
+                var playerPocket = larry.MainScpController.Scp106.PlayersInPocket;
                 if (playerPocket.Contains(victim))
                     playerPocket.Remove(victim);
             }
-
-            if (victim.PlayerType == PlayerType.Dummy)
-            {
-                Timing.CallDelayed(Timing.WaitForOneFrame, () =>
-                {
-                    var dummy = victim as DummyPlayer;
-                    if (dummy != null && dummy.DestroyWhenDied)
-                        dummy.SynapseDummy.Destroy();
-                });
-            }
-
+            
             victim.RemoveCustomRole(DeSpawnReason.Death);
+            if (victim.PlayerType != PlayerType.Dummy) return false;
+
+            if (victim is DummyPlayer { DestroyWhenDied: true } dummy)
+                dummy.SynapseDummy?.Destroy();
             return false;
         }
         catch (Exception e)
@@ -741,31 +686,49 @@ public static class SetClassPatch
     [HarmonyPrefix]
     [HarmonyPatch(typeof(PlayerRoleManager), nameof(PlayerRoleManager.ServerSetRole))]
     public static bool SetClass(PlayerRoleManager __instance, out SetClassEvent __state, ref RoleTypeId newRole,
-        ref RoleChangeReason reason)
-
+        ref RoleChangeReason reason,ref RoleSpawnFlags spawnFlags)
     {
-        __state = new SetClassEvent(__instance.Hub.GetSynapsePlayer(), newRole, reason);
-        if (PlayerRoleLoader.TryGetRoleTemplate<FpcStandardRoleBase>(newRole, out var rolePrefab) &&
-            rolePrefab.SpawnpointHandler != null &&
-            rolePrefab.SpawnpointHandler.TryGetSpawnpoint(out var pos, out var rot))
-        {
-            __state.Position = pos;
-            __state.HorizontalRotation = rot;
-        }
-
+        __state = new SetClassEvent(__instance.Hub.GetSynapsePlayer(), newRole, reason, spawnFlags);
         PlayerEvents.SetClass.RaiseSafely(__state);
         newRole = __state.Role;
         reason = __state.SpawnReason;
+        spawnFlags = __state.SpawnFlags;
         return __state.Allow;
     }
+}
 
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(PlayerRoleManager), nameof(PlayerRoleManager.ServerSetRole))]
-    public static void PostSetClass(SetClassEvent __state)
+[Automatic]
+[SynapsePatch("LockerInteract", PatchType.PlayerEvent)]
+public static class LockerInteractPatch
+{
+    private static readonly PlayerEvents Player;
+    static LockerInteractPatch() => Player = Synapse.Get<PlayerEvents>();
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Locker), nameof(Locker.ServerInteract))]
+    public static bool LockerInteract(Locker __instance,ReferenceHub ply, byte colliderId)
     {
-        if (!typeof(FpcStandardRoleBase).IsAssignableFrom(FakeRoleManager.EnumToType[__state.Role])) return;
-        
-        __state.Player.Hub.transform.position = __state.Position;
-        __state.Player.FirstPersonMovement.MouseLook.CurrentHorizontal = __state.HorizontalRotation;
+        if (colliderId >= __instance.Chambers.Length || !__instance.Chambers[colliderId].CanInteract) return false;
+        var player = ply.GetSynapsePlayer();
+        var hasPerms = __instance.Chambers[colliderId].RequiredPermissions.CheckPermission(player);
+        var locker = __instance.GetSynapseLocker();
+        var ev = new LockerUseEvent(player, hasPerms, locker, locker.Chambers[colliderId])
+        {
+            Allow = EventManager.ExecuteEvent(ServerEventType.PlayerInteractLocker, ply, __instance,
+                __instance.Chambers[colliderId], hasPerms)
+        };
+        Player.LockerUse.RaiseSafely(ev);
+
+        if (!ev.Allow) return false;
+
+        if (!ev.IsAllowedToOpen)
+        {
+            __instance.RpcPlayDenied(colliderId);
+            return false;
+        }
+
+        __instance.Chambers[colliderId].SetDoor(!__instance.Chambers[colliderId].IsOpen, __instance._grantedBeep);
+        __instance.RefreshOpenedSyncvar();
+        return false;
     }
 }

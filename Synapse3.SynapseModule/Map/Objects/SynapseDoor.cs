@@ -117,7 +117,7 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
     public bool TryPry()
     {
         if (Variant is PryableDoor door)
-            return door.TryPryGate();
+            return door.TryPryGate(null);
 
         return false;
     }

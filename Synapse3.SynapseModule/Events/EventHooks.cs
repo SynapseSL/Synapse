@@ -3,7 +3,6 @@ using InventorySystem.Items.Pickups;
 using LightContainmentZoneDecontamination;
 using LiteNetLib;
 using MapGeneration.Distributors;
-using Neuron.Core.Logging;
 using PlayerRoles;
 using PlayerStatsSystem;
 using PluginAPI.Core.Attributes;
@@ -13,38 +12,11 @@ using PluginAPI.Events;
 using RemoteAdmin;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
-using System;
-using System.Linq;
 
 namespace Synapse3.SynapseModule.Events;
 
 public partial class PlayerEvents
 {
-
-    [PluginEvent(ServerEventType.PlayerChangeRole)]
-    public bool PlayerChangeRoleHook(IPlayer player, PlayerRoleBase oldRole, RoleTypeId newRole, RoleChangeReason changeReason)
-    {
-
-        var ev = new SetClassEvent(player.GetSynapsePlayer(), newRole, changeReason);
-
-        SetClass.RaiseSafely(ev);
-
-        return ev.Allow;
-    }
-
-    [PluginEvent(ServerEventType.PlayerInteractLocker)]
-    public bool PlayerInteractLockerHook(IPlayer player, Locker locker, LockerChamber collider, bool canOpen)
-    {
-        var synapseLocker = locker.GetSynapseLocker();
-        var chamber = synapseLocker.Chambers.FirstOrDefault(p => p.LockerChamber == collider);
-
-        var ev = new LockerUseEvent(player.GetSynapsePlayer(), canOpen, synapseLocker, chamber);
-
-        LockerUse.RaiseSafely(ev);
-
-        return ev.Allow;
-    }
-
     [PluginEvent(ServerEventType.WarheadStart)]
     public bool WarheadStartHook(bool isAutomatic, IPlayer player, bool isResumed)
     {
@@ -58,28 +30,22 @@ public partial class PlayerEvents
     [PluginEvent(ServerEventType.PlayerChangeItem)]
     public bool PlayerChangeItemHook(IPlayer player, ushort oldItem, ushort newItem)
     {
-        //When round end the event is call but no gameobject for player and crash
-        try
-        {
-            var synapseNewItem = _item?.GetSynapseItem(newItem) ?? SynapseItem.None;
-            var ev = new ChangeItemEvent(player?.GetSynapsePlayer(), true, synapseNewItem);
+        var sPlayer = player?.GetSynapsePlayer();
+        if (sPlayer == null || sPlayer.RoleType == RoleTypeId.None) return false;
+        var item = _item?.GetSynapseItem(newItem) ?? SynapseItem.None;
+        var ev = new ChangeItemEvent(player?.GetSynapsePlayer(), true, item);
 
-            ChangeItem.RaiseSafely(ev);
-            return ev.Allow;
-        }
-        catch (Exception)
-        {
-            return true;
-        }
+        ChangeItem.RaiseSafely(ev);
+        return ev.Allow;
     }
 
     [PluginEvent(ServerEventType.PlayerDamage)]
     public bool PlayerDamageHook(IPlayer player, IPlayer target, DamageHandlerBase damageHandler)
     {
-        var dommageType = damageHandler.GetDamageType();
-        var dommageAmount = damageHandler is StandardDamageHandler standard ? standard.Damage : -1;
+        var damageType = damageHandler.GetDamageType();
+        var damageAmount = damageHandler is StandardDamageHandler standard ? standard.Damage : -1;
 
-        var ev = new DamageEvent(player.GetSynapsePlayer(), true, target?.GetSynapsePlayer(), dommageType, dommageAmount);
+        var ev = new DamageEvent(player.GetSynapsePlayer(), true, target?.GetSynapsePlayer(), damageType, damageAmount);
 
         Damage.RaiseSafely(ev);
 
@@ -191,18 +157,18 @@ public partial class PlayerEvents
         return ev.Allow;
     }
 
-
-    //Error in the Assembly-CSharp Code... try to cast an ICommandSender to a IPlayer 
-    /*    [PluginEvent(ServerEventType.PlayerKicked)]
-        public bool PlayerKickedHook(IPlayer player, ICommandSender issuer, string reason)
-        {
-            var playerIssuer = (issuer as PlayerCommandSender)?.GetSynapsePlayer();
-
-            var ev = new KickEvent(player?.GetSynapsePlayer(), playerIssuer, reason, true);
-
-            Kick.RaiseSafely(ev);
-            return ev.Allow;
-        }*/
+    
+    [PluginEvent(ServerEventType.PlayerKicked)]
+    public bool PlayerKickedHook(IPlayer player, ICommandSender issuer, string reason)
+    {
+        var playerIssuer = (issuer as PlayerCommandSender)?.GetSynapsePlayer();
+        var sPlayer = player.GetSynapsePlayer();
+        if (playerIssuer == null || sPlayer == null) return true;
+        
+        var ev = new KickEvent(player?.GetSynapsePlayer(), playerIssuer, reason, true);
+        Kick.RaiseSafely(ev);
+        return ev.Allow;
+    }
 
 
     [PluginEvent(ServerEventType.PlayerBanned)]

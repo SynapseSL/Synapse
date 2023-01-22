@@ -214,7 +214,7 @@ public partial class SynapsePlayer
         get => (CurrentRole as FpcStandardRoleBase)?.FpcModule?.StateProcessor?._useRate ?? 0;
         set
         {
-            if(CurrentRole is not FpcStandardRoleBase fpcRole) return;
+            if (CurrentRole is not FpcStandardRoleBase fpcRole) return;
             if (value < 0) value = ConfigFile.ServerConfig.GetFloat("stamina_balance_use", 0.05f);
             typeof(FpcStateProcessor)
                 .GetField(nameof(FpcStateProcessor._useRate), BindingFlags.NonPublic | BindingFlags.Instance)

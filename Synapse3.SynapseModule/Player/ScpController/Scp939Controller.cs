@@ -1,19 +1,16 @@
-﻿using PlayerRoles.FirstPersonControl.Thirdperson;
+﻿using System.Collections.Generic;
+using PlayerRoles;
 using PlayerRoles.PlayableScps.HumeShield;
 using PlayerRoles.PlayableScps.Scp939;
 using PlayerRoles.PlayableScps.Scp939.Mimicry;
-using PlayerRoles.PlayableScps.Scp939.Ripples;
-using System.Collections.Generic;
 using UnityEngine;
 using static PlayerRoles.PlayableScps.Scp939.Mimicry.MimicryRecorder;
 
-namespace Synapse3.SynapseModule.Player;
+namespace Synapse3.SynapseModule.Player.ScpController;
 
-public class Scp939Controller : ScpShieldControler<Scp939Role>
+public class Scp939Controller : ScpShieldController<Scp939Role>
 {
     public Scp939Controller(SynapsePlayer player) : base(player) { }
-
-    public override HumeShieldModuleBase SheildModule => Role?.HumeShieldModule;
 
     public Scp939AmnesticCloudAbility AmnesticCloudAbility => Role?.GetSubroutine<Scp939AmnesticCloudAbility>();
     public Scp939LungeAbility LungeAbility => Role?.GetSubroutine<Scp939LungeAbility>();
@@ -60,4 +57,6 @@ public class Scp939Controller : ScpShieldControler<Scp939Role>
 
         //Fake player movement
     }
+
+    public override RoleTypeId ScpRole => RoleTypeId.Scp939;
 }

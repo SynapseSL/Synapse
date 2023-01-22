@@ -53,12 +53,8 @@ public partial class SynapseItem
         
         Item.ItemSerial = Serial;
         Item.OnAdded(Pickup);
-        //Normally it will call a event but we can't call it from here
-        try
-        {
-            ItemPickupHandler.OnItemAdded(player, Item, Pickup);
-        }
-        catch { }
+        Synapse3Extensions.RaiseEvent(typeof(InventoryExtensions), nameof(InventoryExtensions.OnItemAdded), player.Hub,
+            Item, Pickup);
 
         if (player.VanillaInventory.isLocalPlayer && Item is IAcquisitionConfirmationTrigger trigger)
         {
@@ -152,6 +148,8 @@ public partial class SynapseItem
             holder.VanillaInventory.UserInventory.Items.Remove(Serial);
             holder.VanillaInventory.SendItemsNextFrame = true;
             holder.Inventory._items.Remove(this);
+            Synapse3Extensions.RaiseEvent(typeof(InventoryExtensions), nameof(InventoryExtensions.OnItemRemoved),
+                holder.Hub, Item, Pickup);
         }
         
         if(Item == null) return;

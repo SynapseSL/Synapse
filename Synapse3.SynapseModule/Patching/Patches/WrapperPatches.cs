@@ -18,8 +18,10 @@ using PluginAPI.Enums;
 using RelativePositioning;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Dummy;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
+using Synapse3.SynapseModule.Player.ScpController;
 using UnityEngine;
 using VoiceChat;
 using VoiceChat.Networking;
@@ -71,12 +73,11 @@ public static class PlayerLoadComponentPatch
 [SynapsePatch("Scp079MaxAuxiliary", PatchType.Wrapper)]
 public static class Scp079MaxAuxiliaryPatch
 {
-
     [HarmonyPrefix]
     [HarmonyPatch(typeof(Scp079AuxManager), nameof(Scp079AuxManager.MaxAux), MethodType.Getter)]
     public static bool MaxAux(Scp079AuxManager __instance, ref float __result)
     {
-        __result = __instance.Owner.GetSynapsePlayer().ScpController.Scp079.MaxEnergy;
+        __result = __instance.Owner.GetSynapsePlayer().MainScpController.Scp079.MaxEnergy;
         return false;
     }
 }
@@ -85,12 +86,11 @@ public static class Scp079MaxAuxiliaryPatch
 [SynapsePatch("Scp079RegenAuxiliary", PatchType.Wrapper)]
 public static class Scp079RegenAuxiliaryPatch
 {
-
     [HarmonyPrefix]
     [HarmonyPatch(typeof(Scp079AuxManager), nameof(Scp079AuxManager.RegenSpeed), MethodType.Getter)]
     public static bool RegenSpeed(Scp079AuxManager __instance, ref float __result)
     {
-        __result = __instance.Owner.GetSynapsePlayer().ScpController.Scp079.RegenEnergy;
+        __result = __instance.Owner.GetSynapsePlayer().MainScpController.Scp079.RegenEnergy;
         return false;
     }
 }
@@ -99,114 +99,39 @@ public static class Scp079RegenAuxiliaryPatch
 [SynapsePatch("DynamicShieldRegen", PatchType.Wrapper)]
 public static class Scp096RegenerationPatch
 {
-
     [HarmonyPrefix]
     [HarmonyPatch(typeof(DynamicHumeShieldController), nameof(DynamicHumeShieldController.HsRegeneration), MethodType.Getter)]
     public static bool HsRegeneration(Scp079AuxManager __instance, ref float __result)
     {
         var player = __instance.Owner.GetSynapsePlayer();
-        switch (player.RoleType)
+        if (player.MainScpController.CurrentController is not IScpShieldController shieldController) return true;
+        
+        if (shieldController.UseDefaultShieldRegeneration) return true;
+        else
         {
-            case RoleTypeId.Scp173:
-                if (player.ScpController.Scp173._shieldRegeneration == -1)
-                {
-                    return true;
-                }
-                else
-                {
-                    __result = player.ScpController.Scp173._shieldRegeneration;
-                    return false;
-                }
-            case RoleTypeId.Scp106:
-                if (player.ScpController.Scp106._shieldRegeneration == -1)
-                {
-                    return true;
-                }
-                else
-                {
-                    __result = player.ScpController.Scp106._shieldRegeneration;
-                    return false;
-                }
-            case RoleTypeId.Scp096:
-                if (player.ScpController.Scp096._shieldRegeneration == -1)
-                {
-                    return true;
-                }
-                else
-                {
-                    __result = player.ScpController.Scp096._shieldRegeneration;
-                    return false;
-                }
-            case RoleTypeId.Scp939:
-                if (player.ScpController.Scp939._shieldRegeneration == -1)
-                {
-                    return true;
-                }
-                else
-                {
-                    __result = player.ScpController.Scp939._shieldRegeneration;
-                    return false;
-                }
+            __result = shieldController.ShieldRegeneration;
+            return false;
         }
-        return true;
     }
 }
 
-
 [Automatic]
-[SynapsePatch("Scp096SheldMax", PatchType.Wrapper)]
-public static class Scp096SheldMaxPatch
+[SynapsePatch("Scp096ShieldMax", PatchType.Wrapper)]
+public static class Scp096ShieldMaxPatch
 {
-
     [HarmonyPrefix]
     [HarmonyPatch(typeof(DynamicHumeShieldController), nameof(DynamicHumeShieldController.HsMax), MethodType.Getter)]
     public static bool HsMax(Scp096RageManager __instance, ref float __result)
     {
         var player = __instance.Owner.GetSynapsePlayer();
-        switch (player.RoleType)
+        if (player.MainScpController.CurrentController is not IScpShieldController shieldController) return true;
+        
+        if (shieldController.UseDefaultMaxShield) return true;
+        else
         {
-            case RoleTypeId.Scp173:
-                if (player.ScpController.Scp173._maxShield == -1)
-                {
-                    return true;
-                }
-                else
-                {
-                    __result = player.ScpController.Scp173._maxShield;
-                    return false;
-                }
-            case RoleTypeId.Scp106:
-                if (player.ScpController.Scp106._maxShield == -1)
-                {
-                    return true;
-                }
-                else
-                {
-                    __result = player.ScpController.Scp106._maxShield;
-                    return false;
-                }
-            case RoleTypeId.Scp096:
-                if (player.ScpController.Scp096._maxShield == -1)
-                {
-                    return true;
-                }
-                else
-                {
-                    __result = player.ScpController.Scp096._maxShield;
-                    return false;
-                }
-            case RoleTypeId.Scp939:
-                if (player.ScpController.Scp939._maxShield == -1)
-                {
-                    return true;
-                }
-                else
-                {
-                    __result = player.ScpController.Scp939._maxShield;
-                    return false;
-                }
+            __result = shieldController.MaxShield;
+            return false;
         }
-        return true;
     }
 }
 
@@ -251,9 +176,8 @@ public static class UnDestroyableDoorPatch
 
 [Automatic]
 [SynapsePatch("Scp173BlinkCooldDown", PatchType.Wrapper)]
-public static class Scp173BlinkCooldDownPatch
+public static class Scp173BlinkCoolDownPatch
 {
-
     [HarmonyPrefix]
     [HarmonyPatch(typeof(Scp173BlinkTimer), nameof(Scp173BlinkTimer.OnObserversChanged))]
     public static void OnObserversChanged(Scp173BlinkTimer __instance, int prev, int current)
@@ -263,12 +187,12 @@ public static class Scp173BlinkCooldDownPatch
         if (prev == 0 && __instance.RemainingSustainPercent == 0f)
         {
             __instance._initialStopTime = NetworkTime.time;
-            __instance._totalCooldown = player.ScpController.Scp173.BlinkCooldownBase;
+            __instance._totalCooldown = player.MainScpController.Scp173.BlinkCooldownBase;
         }
 
-        __instance._totalCooldown += player.ScpController.Scp173.BlinkCooldownPerPlayer * (current - prev);
+        __instance._totalCooldown += player.MainScpController.Scp173.BlinkCooldownPerPlayer * (current - prev);
         __instance._endSustainTime = ((current > 0) ? (-1.0) : (NetworkTime.time + 3.0));
-        __instance.ServerSendRpc(toAll: true);
+        __instance.ServerSendRpc(true);
     }
 }
 
@@ -276,83 +200,92 @@ public static class Scp173BlinkCooldDownPatch
 [SynapsePatch("Scp173ObserversList", PatchType.Wrapper)]
 public static class Scp173ObserversListPatch
 {
+    private static readonly ScpEvents _scp;
+    private static readonly SynapseConfigService _config;
 
+    static Scp173ObserversListPatch()
+    {
+        _scp = Synapse.Get<ScpEvents>();
+        _config = Synapse.Get<SynapseConfigService>();
+    }
+    
     [HarmonyPrefix]
     [HarmonyPatch(typeof(Scp173ObserversTracker), nameof(Scp173ObserversTracker.CheckRemovedPlayer))]
     public static bool CheckRemovedPlayer(Scp173ObserversTracker __instance, ReferenceHub ply)
     {
         var player = __instance.Owner.GetSynapsePlayer();
-        var controler = player.ScpController.Scp173;
+        var controller = player.MainScpController.Scp173;
 
-        if (__instance.Observers.Remove(ply) | controler.Observer.Remove(player))
+        if (__instance.Observers.Remove(ply) | controller._observer.Remove(player))
         {
             __instance.CurrentObservers--;
         }
         return false;
     }
-
+    
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(Scp173ObserversTracker), nameof(Scp173ObserversTracker.UpdateObservers))]
-    public static bool UpdateObserver(Scp173ObserversTracker __instance)
+    [HarmonyPatch(typeof(Scp173ObserversTracker), nameof(Scp173ObserversTracker.UpdateObserver))]
+    public static bool UpdateObserver(Scp173ObserversTracker __instance, out int __result, ReferenceHub targetHub)
     {
-        var observers = 0;
-
-        foreach (ReferenceHub hub in ReferenceHub.AllHubs)
-        {
-            var player = hub.GetSynapsePlayer();
-            var scp = __instance.Owner.GetSynapsePlayer();
-            var controler = scp.ScpController.Scp173;
-
-            if (scp == player || player.RoleType is RoleTypeId.Spectator or RoleTypeId.None) continue;
-
-            if (__instance.IsObservedBy(hub, 0.2f))
-            {
-                observers += 1;
-                __instance.Observers.Add(hub);
-                controler.Observer.Add(scp);
-            }
-            else
-            {
-                controler.Observer.Remove(scp);
-                __instance.Observers.Remove(hub);
-            }
-        }
-
-        __instance.CurrentObservers = observers;
-
-        if (!__instance.Owner.isLocalPlayer)
-        {
-            __instance.ServerSendRpc(toAll: true);
-        }
-        return false;
-    }
-}
-
-/*
-[Patches]
-[HarmonyPatch]
-internal static class WrapperPatches
-{    
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(Lift), nameof(Lift.UseLift))]
-    public static bool OnUseLift(Lift __instance, out bool __result)
-    {
-        __result = false;
         try
         {
-            if (!__instance.operative || AlphaWarheadController.Host.timeToDetonation == 0f ||
-                __instance._locked) return false;
+            if (targetHub == null || __instance.Owner == targetHub)
+            {
+                __result = 0;
+                return false;
+            }
+            
+            var player = targetHub.GetSynapsePlayer();
+            var scp = __instance.GetSynapsePlayer();
+            var controller = scp.MainScpController.Scp173;
 
-            __instance.operative = false;
-            __instance.GetSynapseElevator().MoveToNext();
-            __result = true;
+            if (!_config.GamePlayConfiguration.CantObserve173.Contains(player.RoleID) && player.PlayerType != PlayerType.Server)
+            {
+                if (__instance.IsObservedBy(targetHub, 0.2f))
+                {
+                    if (__instance.Observers.Contains(targetHub))
+                    {
+                        var ev = new Scp173ObserveEvent(player, true, scp);
+                        _scp.Scp173Observe.RaiseSafely(ev);
+                        if (!ev.Allow)
+                        {
+                            __result = 0;
+                            return false;
+                        }
+                    }
+                    
+                    if (__instance.Observers.Add(targetHub))
+                    {
+                        controller._observer.Add(player);
+                        __result = 1;
+                        return false;
+                    }
+                }
+                else if (__instance.Observers.Remove(targetHub))
+                {
+                    controller._observer.Remove(player);
+                    __result = -1;
+                    return false;
+                }
+
+                __result = 0;
+                return false;
+            }
+
+            if (!__instance.Observers.Remove(targetHub))
+            {
+                __result = 0;
+                return false;
+            }
+            controller._observer.Remove(player);
+            __result = -1;
             return false;
         }
         catch (Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 API: Use Lift failed\n" + ex);
+            SynapseLogger<Synapse>.Error(ex);
+            __result = 0;
             return true;
         }
     }
 }
-*/

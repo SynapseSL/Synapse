@@ -298,6 +298,7 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
     public override void Destroy()
     {
         FakeConnection.Disconnect();
+        NetworkServer.Destroy(GameObject);
     }
 
     public override void HideFromAll() => DeSpawn();

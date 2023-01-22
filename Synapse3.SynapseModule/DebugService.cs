@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Reflection;
 using InventorySystem.Items.MicroHID;
+using Neuron.Core.Events;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
-using PluginAPI.Core;
 using Synapse3.SynapseModule.Command;
-using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Map.Objects;
-using Synapse3.SynapseModule.Map.Schematic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 
 namespace Synapse3.SynapseModule;
@@ -27,24 +24,34 @@ public class DebugService : Service
     private ItemEvents _item;
     private ScpEvents _scp;
     private ServerEvents _server;
-    private SynapseCommandService _commandService;
+    private EventManager _event;
 
     public DebugService(PlayerEvents player, MapEvents map, RoundEvents round, ItemEvents item, ScpEvents scp,
-        SynapseCommandService commandService, ServerEvents server)
+        ServerEvents server, EventManager eventManager)
     {
         _player = player;
         _map = map;
         _round = round;
         _item = item;
         _server = server;
-        _commandService = commandService;
         _scp = scp;
+        _event = eventManager;
     }
 
     public override void Enable()
     {
         Synapse.Get<SynapseCommandService>().ServerConsole.Subscribe(ev => Logger.Warn(ev.Context.FullCommand));
 
+        var method = ((Action<IEvent>)Event).Method;
+        foreach (var reactor in _event.Reactors)
+        {
+            if (reactor.Key == typeof(UpdateObjectEvent)) continue;
+            if (reactor.Key == typeof(EscapeEvent)) continue;
+            if (reactor.Key == typeof(Scp173ObserveEvent)) continue;
+            if (reactor.Key == typeof(KeyPressEvent)) continue;
+            reactor.Value.SubscribeUnsafe(this, method);
+        }
+        
         _player.DoorInteract.Subscribe(OnDoor);
         _player.KeyPress.Subscribe(OnKeyPress);
         _round.SelectTeam.Subscribe(SelectTeam);
@@ -66,6 +73,7 @@ public class DebugService : Service
         _scp.Scp049Revive.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Warn($"Scp049Revive {ev.Scp.NickName} -> {ev.HumanToRevive.NickName}");
+            
         });
 
         _item.ThrowGrenade.Subscribe(ev =>
@@ -84,7 +92,8 @@ public class DebugService : Service
 
         _player.Death.Subscribe(ev =>
         {
-            NeuronLogger.For<Synapse>().Warn($"{ev.Player.NickName} {ev.DamageType} {ev.LastTakenDamage} Message: {ev.DeathMessage ?? "NONE"} RagdollInfo: {ev.RagdollInfo ?? "NONE"}");
+            ev.RagDollInfo = "He's dead men";
+            ev.DeathMessage = "Your dead";
         });
 
         _player.WalkOnHazard.Subscribe(ev =>
@@ -94,37 +103,8 @@ public class DebugService : Service
         
         _player.WarheadPanelInteract.Subscribe(ev =>
         {
-            NeuronLogger.For<Synapse>().Warn($"WarheadPanelInteract {ev.Player.NickName}");
-        });
-
-        _player.DropItem.Subscribe(ev =>
-        {
-            NeuronLogger.For<Synapse>().Warn($"DropItem {ev.Player.NickName}");
-        });
-
-        _player.Heal.Subscribe(ev =>
-        {
-            NeuronLogger.For<Synapse>().Warn($"Heal {ev.Player.NickName}");
-        });
-
-        _player.Join.Subscribe(ev =>
-        {
-            NeuronLogger.For<Synapse>().Warn($"Join {ev.NickName}");
-        });
-
-        _player.PlaceBulletHole.Subscribe(ev =>
-        {
-            NeuronLogger.For<Synapse>().Warn($"PlaceBulletHole {ev.Player.NickName}");
-        });
-
-        _player.OpenWarheadButton.Subscribe(ev =>
-        {
-            NeuronLogger.For<Synapse>().Warn($"OpenWarheadButton {ev.Player.NickName}");
-        });
-
-        _player.UpdateDisplayName.Subscribe(ev =>
-        {
-            NeuronLogger.For<Synapse>().Warn($"UpdateDisplayName {ev.Player.NickName}");
+            NeuronLogger.For<Synapse>().Warn($"WarheadPanelInteract {ev.Player.NickName} {ev.Operation}");
+            ev.Operation = PlayerInteract.AlphaPanelOperations.Lever;
         });
 
         _player.Ban.Subscribe(ev =>
@@ -181,11 +161,15 @@ public class DebugService : Service
         _scp.Scp106Attack.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Warn($"Scp106Attack {ev.Scp.NickName}");
+            ev.TakeToPocket = false;
+            ev.Cooldown = 100f;
+            ev.Damage = -1;
         });
 
         _scp.Scp173Attack.Subscribe(ev =>
         {
             NeuronLogger.For<Synapse>().Warn($"Scp173Attack {ev.Scp.NickName}");
+            ev.Damage = 10;
         });
 
         _scp.Scp939Attack.Subscribe(ev =>
@@ -195,7 +179,6 @@ public class DebugService : Service
 
         _item.FlipCoin.Subscribe(ev =>
         {
-            NeuronLogger.For<Synapse>().Warn($"Scp939Attack {ev.Player.NickName}");
             ev.Tails = true;
         });
 
@@ -234,8 +217,6 @@ public class DebugService : Service
             NeuronLogger.For<Synapse>().Warn("079 Door");
         });
 
-        _scp.Scp049Revive.Subscribe(ev => ev.Allow = false);
-
         Synapse.Get<SynapseObjectEvents>().ButtonPressed
             .Subscribe(ev =>
             {
@@ -243,42 +224,37 @@ public class DebugService : Service
                 ev.Player.SendBroadcast("You pressed me!", 5);
             });
 
-        _player.Kick.Subscribe(ev => Logger.Warn("KICK " + ev.Admin + " " + ev.Reason));
-        _player.Ban.Subscribe(ev => Logger.Warn("Ban " + ev.Admin + " " + ev.Reason));
-
-        _round.Decontamination.Subscribe(ev =>
-        {
-            Logger.Warn("Decontamination ");
-            ev.Allow = false;
-        });
-
         _player.Escape.Subscribe(ev =>
         {
             if (ev.EscapeType == EscapeType.TooFarAway) return;
             Logger.Warn("ESCAPE " + ev.Player.NickName + " " + ev.EscapeType);
         });
 
-        _round.FirstSpawn.Subscribe(ev =>
-        {
-            Logger.Warn("First Spawn,SCPS: " + ev.AmountOfScpSpawns);
-        });
-
         _player.SetClass.Subscribe(ev =>
         {
-            if (ev.Role == RoleTypeId.Tutorial)
-                ev.Position = new Vector3(41f, 1014f, -33f);
+            if (ev.Role is RoleTypeId.Tutorial or RoleTypeId.Scientist)
+            {
+                ev.SpawnFlags = RoleSpawnFlags.None;
+                ev.Player.Position = new Vector3(41f, 1014f, -33f);
+                ev.Player.Inventory.ClearAllItems();
+                ev.Player.Inventory.GiveItem(ItemType.Coin);
+            }
         });
+    }
+
+    public void Event(IEvent ev)
+    {
+        Logger.Warn("Event triggered: " + ev.GetType().Name);
     }
 
     private void ScpEvent(ScpAttackEvent ev)
     {
-        NeuronLogger.For<Synapse>().Warn($"{ev.ScpAttackType} {ev.Damage} {ev.Scp.NickName} | {ev.Victim.NickName}");
-        //ev.Allow = false;
+        NeuronLogger.For<Synapse>().Warn($"{ev.ScpAttackType} {ev.Damage} {ev.Scp?.NickName} | {ev.Victim?.NickName}");
     }
     
     private void OnDoor(DoorInteractEvent ev)
     {
-        NeuronLogger.For<Synapse>().Warn("Door Interact");
+        
     }
 
     private void KeyCardItem(KeyCardInteractEvent ev)
@@ -319,35 +295,39 @@ public class DebugService : Service
                 break;
 
             case KeyCode.Alpha3:
-                ev.Player.SetPlayerRoleTypeAdvance(RoleTypeId.Tutorial, ev.Player.Position + Vector3.up);
+                Logger.Warn("All Player that observes 173:");
+                foreach (var observer in ev.Player.MainScpController.Scp173.Observer)
+                {
+                    Logger.Warn(observer.NickName);
+                }
                 break;
 
             case KeyCode.Alpha4:
                 switch (ev.Player.RoleType)
                 {
                     case RoleTypeId.Scp173:
-                        var scp173 = ev.Player.ScpController.Scp173;
+                        var scp173 = ev.Player.MainScpController.Scp173;
                         scp173.BlinkCooldownPerPlayer = 5;
                         scp173.BlinkCooldownBase = 10;
                         NeuronLogger.For<Synapse>().Warn("Observer: " + scp173.Observer.Count);
                         break;
                     case RoleTypeId.Scp106:
-                        var scp106 = ev.Player.ScpController.Scp106;
+                        var scp106 = ev.Player.MainScpController.Scp106;
                         NeuronLogger.For<Synapse>().Warn("PoketPlayer: " + scp106.PlayersInPocket.Count);
                         break;
                     case RoleTypeId.Scp079:
-                        var scp079 = ev.Player.ScpController.Scp079;
+                        var scp079 = ev.Player.MainScpController.Scp079;
                         scp079.RegenEnergy = 200;
                         scp079.Exp = 3;
                         break;
                     case RoleTypeId.Scp096:
-                        var scp096 = ev.Player.ScpController.Scp096;
-                        scp096.CurentShield = 10;
+                        var scp096 = ev.Player.MainScpController.Scp096;
+                        scp096.CurrentShield = 10;
                         scp096.MaxShield = 100;
                         scp096.ShieldRegeneration = 2000;
                         break;
                     case RoleTypeId.Scp939:
-                        var scp939 = ev.Player.ScpController.Scp939;
+                        var scp939 = ev.Player.MainScpController.Scp939;
                         scp939.Sound(testDummy.Position, 2);//TODO
                         scp939.AmnesticCloudCooldown = 4;
                         scp939.MimicryCloudCooldown = 4;

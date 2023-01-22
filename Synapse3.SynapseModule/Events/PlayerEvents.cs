@@ -44,7 +44,6 @@ public partial class PlayerEvents : Service
     public readonly EventReactor<LeaveEvent> Leave = new();
     public readonly EventReactor<PlaceBulletHoleEvent> PlaceBulletHole = new();
     public readonly EventReactor<ReportEvent> Report = new();
-    public readonly EventReactor<SpeakSecondaryEvent> SpeakSecondary = new();
     public readonly EventReactor<OpenWarheadButtonEvent> OpenWarheadButton = new();
     public readonly EventReactor<WalkOnHazardEvent> WalkOnHazard = new();
     public readonly EventReactor<WalkOnSinkholeEvent> WalkOnSinkhole = new();
@@ -59,6 +58,7 @@ public partial class PlayerEvents : Service
     public readonly EventReactor<ChangeRoleEvent> ChangeRole = new();
     public readonly EventReactor<KickEvent> Kick = new();
     public readonly EventReactor<SpeakEvent> Speak = new();
+    public readonly EventReactor<SpeakToPlayerEvent> SpeakToPlayer = new();
 
     public PlayerEvents(EventManager eventManager, Synapse synapse, ItemService item)
     {
@@ -91,7 +91,6 @@ public partial class PlayerEvents : Service
         _eventManager.RegisterEvent(Pickup);
         _eventManager.RegisterEvent(PlaceBulletHole);
         _eventManager.RegisterEvent(Report);
-        _eventManager.RegisterEvent(SpeakSecondary);
         _eventManager.RegisterEvent(OpenWarheadButton);
         _eventManager.RegisterEvent(StartWorkStation);
         _eventManager.RegisterEvent(FallingIntoAbyss);
@@ -103,6 +102,7 @@ public partial class PlayerEvents : Service
         _eventManager.RegisterEvent(ChangeRole);
         _eventManager.RegisterEvent(Kick);
         _eventManager.RegisterEvent(Speak);
+        _eventManager.RegisterEvent(SpeakToPlayer);
 
         WalkOnSinkhole.Subscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Subscribe(WalkOnHazard.Raise);
@@ -135,7 +135,6 @@ public partial class PlayerEvents : Service
         _eventManager.UnregisterEvent(Pickup);
         _eventManager.UnregisterEvent(PlaceBulletHole);
         _eventManager.UnregisterEvent(Report);
-        _eventManager.UnregisterEvent(SpeakSecondary);
         _eventManager.UnregisterEvent(OpenWarheadButton);
         _eventManager.UnregisterEvent(StartWorkStation);
         _eventManager.UnregisterEvent(FallingIntoAbyss);
@@ -147,6 +146,7 @@ public partial class PlayerEvents : Service
         _eventManager.UnregisterEvent(ChangeRole);
         _eventManager.UnregisterEvent(Kick);
         _eventManager.UnregisterEvent(Speak);
+        _eventManager.UnregisterEvent(SpeakToPlayer);
 
         WalkOnSinkhole.Unsubscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Unsubscribe(WalkOnHazard.Raise);
@@ -165,10 +165,10 @@ public partial class PlayerEvents : Service
         switch (currentRole)
         {
             case RoleTypeId.Scp106:
-                player.ScpController.Scp106.ResetDefault();
+                player.MainScpController.Scp106.ResetDefault();
                 break;
             case RoleTypeId.Scp173:
-                player.ScpController.Scp173.ResetDefault();
+                player.MainScpController.Scp173.ResetDefault();
                 break;
         }
 
@@ -245,30 +245,19 @@ public class HarmPermissionEvent : IEvent
 
 public class SetClassEvent : PlayerInteractEvent
 {
-    public SetClassEvent(SynapsePlayer player, RoleTypeId role, RoleChangeReason reason) : base(player,
-        true)
+    public SetClassEvent(SynapsePlayer player, RoleTypeId role, RoleChangeReason reason, RoleSpawnFlags spawnFlags) :
+        base(player,true)
     {
         Role = role;
         SpawnReason = reason;
+        SpawnFlags = spawnFlags;
     }
 
     public RoleTypeId Role { get; set; }
 
     public RoleChangeReason SpawnReason { get; set; }
-
-    /*TODO:
-    public List<uint> Items { get; set; } = new();
-
-    public List<SynapseItem> EscapeItems { get; set; } = new();
     
-    public byte UnitId { get; set; } = 0;
-*/
-    
-    public Vector3 Position { get; set; } = Vector3.zero;
-
-    public float HorizontalRotation { get; set; } = 0f;
-
-    public Dictionary<AmmoType, ushort> Ammo { get; set; } = new();
+    public RoleSpawnFlags SpawnFlags { get; set; }
 }
 
 public class UpdateEvent : PlayerEvent
@@ -296,12 +285,15 @@ public class DoorInteractEvent : PlayerInteractEvent
 
 public class LockerUseEvent : PlayerInteractEvent
 {
-    public LockerUseEvent(SynapsePlayer player, bool allow, SynapseLocker locker,
-        SynapseLocker.SynapseLockerChamber chamber) : base(player, allow)
+    public LockerUseEvent(SynapsePlayer player, bool hasPerm, SynapseLocker locker,
+        SynapseLocker.SynapseLockerChamber chamber) : base(player, true)
     {
         Locker = locker;
         Chamber = chamber;
+        IsAllowedToOpen = hasPerm;
     }
+    
+    public bool IsAllowedToOpen { get; set; }
 
     public SynapseLocker Locker { get; }
 
@@ -370,13 +362,13 @@ public class DamageEvent : PlayerInteractEvent
 public class DeathEvent : PlayerInteractEvent
 {
     public DeathEvent(SynapsePlayer player, bool allow, SynapsePlayer attacker, DamageType damageType,
-        float lastTakenDamage, string playerMessage, string ragdollMessage) : base(player, allow)
+        float lastTakenDamage, string playerMessage, string ragDollMessage) : base(player, allow)
     {
         Attacker = attacker;
         DamageType = damageType;
         LastTakenDamage = lastTakenDamage;
         DeathMessage = playerMessage;
-        RagdollInfo = ragdollMessage;
+        RagDollInfo = ragDollMessage;
     }
 
     public SynapsePlayer Attacker { get; }
@@ -387,7 +379,7 @@ public class DeathEvent : PlayerInteractEvent
 
     public string DeathMessage { get; set; }
 
-    public string RagdollInfo { get; set; }
+    public string RagDollInfo { get; set; }
 }
 
 public class FreePlayerEvent : PlayerInteractEvent
@@ -442,7 +434,7 @@ public class DropItemEvent : PlayerInteractEvent
         Throw = @throw;
     }
 
-    public SynapseItem ItemToDrop { get; }
+    public SynapseItem ItemToDrop { get; set; }
 
     public bool Throw { get; set; }
 }
@@ -521,29 +513,14 @@ public class ReportEvent : PlayerInteractEvent
     public bool SendToNorthWood { get; set; }
 }
 
-public class SpeakSecondaryEvent : PlayerInteractEvent
-{
-    public SpeakSecondaryEvent(SynapsePlayer player, bool allow, bool radioChat, bool scp939Chat, bool startSpeaking) : base(player, allow)
-    {
-        RadioChat = radioChat;
-        Scp939Chat = scp939Chat;
-        StartSpeaking = startSpeaking;
-    }
-
-    public bool RadioChat { get; set; }
-    public bool Scp939Chat { get; set; }
-
-    public bool StartSpeaking { get; }
-}
-
 public class OpenWarheadButtonEvent : PlayerInteractEvent
 {
-    public OpenWarheadButtonEvent(SynapsePlayer player, bool allow, bool open) : base(player, allow)
+    public OpenWarheadButtonEvent(SynapsePlayer player, bool allow, bool openButton) : base(player, allow)
     {
-        Open = open;
+        OpenButton = openButton;
     }
 
-    public bool Open { get; set; }
+    public bool OpenButton { get; set; }
 }
 
 public abstract class WalkOnHazardEvent : PlayerInteractEvent
@@ -612,7 +589,7 @@ public class UpdateDisplayNameEvent : PlayerEvent
         NewDisplayName = newDisplayName;
     }
 
-    public string NewDisplayName { get; }
+    public string NewDisplayName { get; set; }
 }
 
 public class CheckKeyCardPermissionEvent : PlayerInteractEvent
@@ -680,18 +657,19 @@ public class KickEvent : PlayerInteractEvent
 
 public class SpeakEvent : PlayerInteractEvent
 {
-    public SpeakEvent(SynapsePlayer recever, SynapsePlayer player, bool synapseScpProximity, VoiceChatChannel channel) 
-        : base(player, true)
+    public SpeakEvent(SynapsePlayer player, bool allow, VoiceChatChannel channel) : base(player, allow)
     {
-        Recever = recever;
         Channel = channel;
-        SynapseScpProximity = synapseScpProximity;
     }
     
-    public bool SynapseScpProximity { get; }
-
     public VoiceChatChannel Channel { get; set; }
+}
 
-    public SynapsePlayer Recever { get; }
+public class SpeakToPlayerEvent : SpeakEvent
+{
+    public SynapsePlayer Receiver { get; }
 
+    public SpeakToPlayerEvent(SynapsePlayer player, SynapsePlayer receiver, bool allow, VoiceChatChannel channel) :
+        base(player, allow, channel)
+        => Receiver = receiver;
 }

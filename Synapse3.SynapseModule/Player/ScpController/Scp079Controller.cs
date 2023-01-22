@@ -1,9 +1,9 @@
+using PlayerRoles;
 using PlayerRoles.PlayableScps.Scp079;
 using PlayerRoles.PlayableScps.Scp079.Cameras;
-using PlayerRoles.PlayableScps.Scp173;
 using Synapse3.SynapseModule.Map.Objects;
 
-namespace Synapse3.SynapseModule.Player;
+namespace Synapse3.SynapseModule.Player.ScpController;
 
 
 public class Scp079Controller : ScpControllerBase<Scp079Role>
@@ -58,15 +58,13 @@ public class Scp079Controller : ScpControllerBase<Scp079Role>
     }
 
     private float _maxEnergy = -1;
-    public float MaxEnergy//Work but not display for the player
+    public float MaxEnergy
     {
         get
         {
             if (PowerManager != null)
             {
-                if (_maxEnergy == -1)
-                    return PowerManager._maxPerTier[PowerManager._tierManager.AccessTierIndex];
-                return _maxEnergy;
+                return _maxEnergy < 0 ? PowerManager._maxPerTier[PowerManager._tierManager.AccessTierIndex] : _maxEnergy;
             }
             return 0f;
         }
@@ -82,20 +80,15 @@ public class Scp079Controller : ScpControllerBase<Scp079Role>
     {
         get
         {
-            if (PowerManager != null)
+            if (PowerManager == null) return 0f;
+            if (_regenEnergy >= 0) return _regenEnergy;
+            
+            var num = PowerManager._regenerationPerTier[PowerManager._tierManager.AccessTierIndex];
+            for (var i = 0; i < PowerManager._abilitiesCount; i++)
             {
-                if (_regenEnergy == -1)
-                {
-                    float num = PowerManager._regenerationPerTier[PowerManager._tierManager.AccessTierIndex];
-                    for (int i = 0; i < PowerManager._abilitiesCount; i++)
-                    {
-                        num *= PowerManager._abilities[i].AuxRegenMultiplier;
-                    }
-                    return num;
-                }
-                return _regenEnergy;
+                num *= PowerManager._abilities[i].AuxRegenMultiplier;
             }
-            return 0f;
+            return num;
         }
         set
         {
@@ -133,4 +126,6 @@ public class Scp079Controller : ScpControllerBase<Scp079Role>
 
         DoorLockChanger.ServerUnlockAll();
     }
+
+    public override RoleTypeId ScpRole => RoleTypeId.Scp079;
 }

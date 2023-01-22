@@ -44,10 +44,6 @@ public class KeyBindService : Service
         _playerEvents.KeyPress.Subscribe(KeyPress);
 
         RegisterKey<ScpSwitchChat>();
-        RegisterKey<Test>();
-        RegisterKey<Test2>();
-        RegisterKey<Test3>();
-        RegisterKey<Test4>();
 
         while (_synapseModule.ModuleKeyBindBindingQueue.Count != 0)
         {
@@ -108,6 +104,11 @@ public class KeyBindService : Service
 
     private void LoadData(JoinEvent ev)
     {
+        if (ev.Player.DoNotTrack)
+        {
+            return;
+        }
+        
         var data = ev.Player.GetData(DataBaseKey);
 
         if (!TryParseData(data, out var commandKey))
@@ -256,8 +257,6 @@ public class KeyBindService : Service
     private void CheckKey(SynapsePlayer player)
     {
         var playerBinds = player._binds.Values.SelectMany(p => p).ToList();
-        var bindsToAdd = new List<IKeyBind>();
-
         foreach (var bind in _binds)
         {
             if (!playerBinds.Contains(bind))

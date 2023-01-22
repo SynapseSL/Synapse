@@ -17,7 +17,7 @@ public partial class SynapsePlayer
 
     public BroadcastList ActiveBroadcasts { get; }
     
-    public ScpController ScpController { get; }
+    public ScpController.MainScpController MainScpController { get; }
 
     public Dictionary<string, object> Data { get; set; } = new();
     

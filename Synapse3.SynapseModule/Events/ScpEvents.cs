@@ -1,6 +1,7 @@
 ﻿using Neuron.Core.Events;
 using Neuron.Core.Meta;
 using PlayerRoles.PlayableScps.Scp939;
+using PlayerStatsSystem;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
@@ -17,7 +18,7 @@ public partial class ScpEvents : Service
     public readonly EventReactor<Scp049ReviveEvent> Scp049Revive = new();
 
     public readonly EventReactor<Scp079ContainEvent> Scp079Contain = new();
-    public readonly EventReactor<scp079SwitchCameraEvent> Scp079SwitchCamera = new();
+    public readonly EventReactor<Scp079SwitchCameraEvent> Scp079SwitchCamera = new();
     public readonly EventReactor<Scp079DoorInteractEvent> Scp079DoorInteract = new();
     public readonly EventReactor<Scp079LockDoorEvent> Scp079LockDoor = new();
     public readonly EventReactor<Scp079StartSpeakerEvent> Scp079StartSpeaker = new();
@@ -112,7 +113,8 @@ public abstract class ScpActionEvent : IEvent
 
 public abstract class ScpAttackEvent : ScpActionEvent
 {
-    protected ScpAttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage, bool allow) : base(scp, allow)
+    protected ScpAttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage) : base(scp,
+        Synapse3Extensions.GetHarmPermission(scp, victim))
     {
         Victim = victim;
         Damage = damage;
@@ -129,50 +131,59 @@ public abstract class ScpAttackEvent : ScpActionEvent
 public class Scp049AttackEvent : ScpAttackEvent
 {
     public Scp049AttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage, 
-        float cooldown, bool cardiacArrest) : base(
-        scp, victim, damage, true)
+        float cooldown, bool enableCardiac) : base(
+        scp, victim, damage)
     {
         Cooldown = cooldown;
-        CardiacArrestEffect = cardiacArrest;
+        EnableCardiacEffect = enableCardiac;
     }
 
     public override ScpAttackType ScpAttackType => ScpAttackType.Scp049Touch;
     
-    public bool CardiacArrestEffect { get; set; }
+    public bool EnableCardiacEffect { get; set; }
 
     public float Cooldown { get; set; }
 }
 
 public class Scp0492AttackEvent : ScpAttackEvent
 {
-    public Scp0492AttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage, bool allow) : base(scp, victim, damage, allow) { }
+    public Scp0492AttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage) : base(scp, victim, damage) { }
 
     public override ScpAttackType ScpAttackType => ScpAttackType.Scp0492Scratch;
 }
 
 public class Scp096AttackEvent : ScpAttackEvent
 {
-    public Scp096AttackEvent(SynapsePlayer scp, SynapsePlayer victim, bool charge, float damage) : base(scp, victim, damage, true) 
+    public Scp096AttackEvent(SynapsePlayer scp, SynapsePlayer victim, Scp096DamageHandler.AttackType attackType,
+        float damage) : base(scp, victim, damage)
     {
-        ScpAttackType = charge ? ScpAttackType.Scp096Charge : ScpAttackType.Scp096Tear;
+        ScpAttackType = attackType switch
+        {
+            Scp096DamageHandler.AttackType.SlapLeft => ScpAttackType.Scp096Slap,
+            Scp096DamageHandler.AttackType.SlapRight => ScpAttackType.Scp096Slap,
+            Scp096DamageHandler.AttackType.Charge => ScpAttackType.Scp096Charge,
+            Scp096DamageHandler.AttackType.GateKill => ScpAttackType.Scp096TearGate,
+            _ => ScpAttackType.Scp096Slap,
+        };
     }
 
     public override ScpAttackType ScpAttackType { get; }
-
-    //TODO:
-    public bool RemoveTarget { get; set; } = true;
 }
 
 public class Scp173AttackEvent : ScpAttackEvent
 {
-    public Scp173AttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage, bool allow) : base(scp, victim, damage, allow) { }
+    public Scp173AttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage, bool tp) :
+        base(scp, victim, damage)
+    {
+        ScpAttackType = tp ? ScpAttackType.Scp173Tp : ScpAttackType.Scp173Snap;
+    }
 
-    public override ScpAttackType ScpAttackType => ScpAttackType.Scp173Snap;
+    public override ScpAttackType ScpAttackType { get; }
 }
 
 public class Scp939AttackEvent : ScpAttackEvent
 {
-    public Scp939AttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage, Scp939DamageType type) : base(scp, victim, damage, true) 
+    public Scp939AttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage, Scp939DamageType type) : base(scp, victim, damage) 
     {
         switch (type)
         {
@@ -199,14 +210,17 @@ public class Scp939AttackEvent : ScpAttackEvent
 
 public class Scp106AttackEvent : ScpAttackEvent
 {
-    public Scp106AttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage, bool allow, bool takeToPocket) : base(scp, victim, damage, allow)
+    public Scp106AttackEvent(SynapsePlayer scp, SynapsePlayer victim, float damage, bool takeToPocket, float cooldown) : base(scp, victim, damage)
     {
         TakeToPocket = takeToPocket;
+        Cooldown = cooldown;
     }
 
     public override ScpAttackType ScpAttackType => ScpAttackType.Scp106Grab;
     
     public bool TakeToPocket { get; set; }
+    
+    public float Cooldown { get; set; }
 }
 
 public class Scp173ObserveEvent : PlayerInteractEvent
@@ -227,7 +241,6 @@ public class Scp173PlaceTantrumEvent : ScpActionEvent
     }
 
     public float CoolDown { get; set; }
-
 }
 
 public class Scp173ActivateBreakneckSpeedEvent : ScpActionEvent
@@ -238,7 +251,6 @@ public class Scp173ActivateBreakneckSpeedEvent : ScpActionEvent
     }
 
     public bool Activate { get; }
-
 }
 
 public class Scp049ReviveEvent : ScpActionEvent
@@ -300,9 +312,9 @@ public class Scp079ContainEvent : IEvent
     public bool Allow { get; set; } = true;
 }
 
-public class scp079SwitchCameraEvent : ScpActionEvent
+public class Scp079SwitchCameraEvent : ScpActionEvent
 {
-    public scp079SwitchCameraEvent(bool spawning, SynapsePlayer scp, SynapseCamera camera) : base(scp, true)
+    public Scp079SwitchCameraEvent(bool spawning, SynapsePlayer scp, SynapseCamera camera) : base(scp, true)
     {
         Spawning = spawning;
         Camera = camera;

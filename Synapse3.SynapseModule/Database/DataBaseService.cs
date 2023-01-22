@@ -78,6 +78,15 @@ public class DatabaseService : Service
             if (handled) return;
         }
     }
+    
+    public void DeletePlayerData(SynapsePlayer player, string key)
+    {
+        foreach (var dataBase in DataBases)
+        {
+            dataBase.DeletePlayerData(player, key, out var handled);
+            if (handled) return;
+        }
+    }
 
     public string GetData(string key)
     {
@@ -96,6 +105,15 @@ public class DatabaseService : Service
         foreach (var dataBase in DataBases)
         {
             dataBase.SetData(key, value, out var handled);
+            if (handled) return;
+        }
+    }
+    
+    public void DeleteData(string key, string value)
+    {
+        foreach (var dataBase in DataBases)
+        {
+            dataBase.DeleteData(key, out var handled);
             if (handled) return;
         }
     }

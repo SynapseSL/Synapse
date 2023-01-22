@@ -1,24 +1,18 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Discord;
-using Mirror;
-using PlayerRoles.PlayableScps.HumeShield;
+using PlayerRoles;
 using PlayerRoles.PlayableScps.Scp096;
-using PluginAPI.Core;
-using Synapse3.SynapseModule.Map.Objects;
-using YamlDotNet.Core.Tokens;
 
-namespace Synapse3.SynapseModule.Player;
+namespace Synapse3.SynapseModule.Player.ScpController;
 
 
-public class Scp096Controller : ScpShieldControler<Scp096Role>
+public class Scp096Controller : ScpShieldController<Scp096Role>
 {
     public Scp096Controller(SynapsePlayer player) : base(player) { }
 
     public Scp096RageManager RageManager => Role?.GetSubroutine<Scp096RageManager>();
     public Scp096ChargeAbility ChargeAbility => Role?.GetSubroutine<Scp096ChargeAbility>();
-    public override HumeShieldModuleBase SheildModule => Role?.HumeShieldModule;
 
     public float EnrageTimeLeft
     {
@@ -82,7 +76,7 @@ public class Scp096Controller : ScpShieldControler<Scp096Role>
         var rageManager = RageManager;
         if (rageManager != null) return;
 
-        rageManager._targetsTracker.AddTarget(player);
+        rageManager._targetsTracker.AddTarget(player, false);
     }
 
     public void RemoveTarget(SynapsePlayer player)
@@ -100,4 +94,5 @@ public class Scp096Controller : ScpShieldControler<Scp096Role>
         Scp096.ChargeDoor(door.Variant);
     }
     */
+    public override RoleTypeId ScpRole => RoleTypeId.Scp096;
 }

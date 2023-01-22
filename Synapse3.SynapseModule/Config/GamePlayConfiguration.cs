@@ -26,10 +26,13 @@ public class GamePlayConfiguration : IDocumentSection
     public bool WarheadButtonClosable { get; set; } = false;
     
     [Description("All Scp's in this list are able to Speak to Humans")]
-    public List<uint> SpeakingScp { get; set; } = new List<uint> //TODO
+    public List<uint> SpeakingScp { get; set; } = new List<uint>
     { 
         
     };
+
+    [Description("When enabled Spectators will hear the SCP Voice chat upon selecting a SCP")]
+    public bool SpectatorListenOnSCPs { get; set; } = true;
 
     [Description("When enabled are Chaos and SCP's forced to kill each other since otherwise the Round won't end")]
     public bool ChaosAndScpEnemy { get; set; } = false;

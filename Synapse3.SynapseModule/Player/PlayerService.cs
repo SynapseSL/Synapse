@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using MEC;
 using Neuron.Core.Meta;
+using PlayerRoles;
+using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
@@ -17,30 +20,33 @@ public class PlayerService : Service
     private readonly PlayerEvents _player;
     private readonly RoundEvents _round;
     private readonly PermissionService _permission;
+    private readonly SynapseConfigService _config;
 
     public List<IJoinUpdate> JoinUpdates { get; } = new();
 
-    public PlayerService(DummyService dummy, PlayerEvents player, RoundEvents round, PermissionService permission)
+    public PlayerService(DummyService dummy, PlayerEvents player, RoundEvents round, PermissionService permission,
+        SynapseConfigService config)
     {
         _dummy = dummy;
         _player = player;
         _round = round;
         _permission = permission;
+        _config = config;
     }
 
     public override void Enable()
     {
         _player.Join.Subscribe(Join);
         _round.Restart.Subscribe(ClearJoinUpdates);
+        _player.SimpleSetClass.Subscribe(ChangeClass);
     }
 
     public override void Disable()
     {
         _player.Join.Unsubscribe(Join);
         _round.Restart.Unsubscribe(ClearJoinUpdates);
+        _player.SimpleSetClass.Unsubscribe(ChangeClass);
     }
-
-    private void ClearJoinUpdates(RoundRestartEvent _) => JoinUpdates.Clear();
 
     /// <summary>
     /// Returns the Host Player
@@ -322,4 +328,8 @@ public class PlayerService : Service
                 joinUpdate.UpdatePlayer(ev.Player);
         }
     }
+    
+    private void ClearJoinUpdates(RoundRestartEvent _) => JoinUpdates.Clear();
+
+    private void ChangeClass(SimpleSetClassEvent ev) => ev.Player.MainScpController.ProximityChat = false;
 }

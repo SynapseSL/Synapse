@@ -38,9 +38,13 @@ public class SynapseTranslation : Translations<SynapseTranslation>
     public string KeyBindCommandSelectKey { get; set; } = "Please press the new key";
     public string KeyBindSet { get; set; } = "{0} was binded to {1}";
     public string KeyBindCommandInvalidKey { get; set; } = "No Bind with that name was found";
-    public string KeyBindCommandUndo { get; set; } = "Key reset to default value";
 
     public string CommandHelp { get; set; } = "All Available Vanilla Commands:";
     public string CommandHelpSecond { get; set; } = "All Available Synapse Commands:";
     public string CommandNotFound { get; set; } = "No command with that name was found";
+
+    public string DisableProximity { get; set; } = "Proximity Voice Chat has been disabled";
+    public string EnableProximity { get; set; } = "Proximity Voice Chat has been enabled";
+    public string NotScpProximity { get; set; } = "You are not an SCP and therefore can't use the SCP Proximity Chat";
+    public string NotAllowedProximity { get; set; } = "You are not allowed to use the Proximity Chat";
 }
