@@ -333,7 +333,7 @@ public class TextHintList
                     var charSpace = SizeMspace[(int)rightText.SizeMult];
                     var space = new string(' ', SizeMaxSide[(int)rightText.SizeMult] - rightText.TextWithoutTag.Length);
 
-                    if (rightText.IgnoreReformatage)
+                    if (!rightText.IgnoreReformatage)
                     {
                         text += $"<pos=50%><mspace=0.65em><size=50%> <mspace={charSpace}em><size={rightText.SizeMult * 50}%>";
                         //                                          ^
