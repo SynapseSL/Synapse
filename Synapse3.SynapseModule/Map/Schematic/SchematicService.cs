@@ -7,6 +7,7 @@ using AdminToys;
 using Interactables.Interobjects;
 using InventorySystem.Items.Firearms.Attachments;
 using MapGeneration.Distributors;
+using MEC;
 using Mirror;
 using Neuron.Core;
 using Neuron.Core.Logging;
@@ -101,8 +102,8 @@ public class SchematicService : Service
 
     public void RegisterSchematic(SchematicConfiguration configuration)
     {
-        if(IsIDRegistered(configuration.Id)) return;
-        
+        if (IsIDRegistered(configuration.Id)) return;
+
         _schematicConfigurations.Add(configuration);
     }
 
@@ -162,10 +163,6 @@ public class SchematicService : Service
                 case "binaryTargetPrefab" when prefab.TryGetComponent<ShootingTarget>(out var target):
                     SynapseTarget.Prefabs[SynapseTarget.TargetType.Binary] = target;
                     break;
-                
-                case "Work Station" when prefab.TryGetComponent<WorkstationController>(out var station):
-                    SynapseWorkStation.Prefab = station;
-                    break;
             }
         }
         
@@ -214,8 +211,11 @@ public class SchematicService : Service
                 case "db602577-8d4f-97b4-890b-8c893bfcd553" when prefab.Value.TryGetComponent<Locker>(out var locker):
                     SynapseLocker.Prefabs[SynapseLocker.LockerType.AdrenalineWallCabinet] = locker;
                     break;
+                case "ad8a455f-062d-dea4-5b47-ac9217d4c58b" when prefab.Value.TryGetComponent<WorkstationController>(out var workstation):
+                    SynapseWorkStation.Prefab = workstation;
+                    break;
             }
-            
+
             if (!_ragDollNames.ContainsKey(prefab.Value.name)) continue;
             var role = _ragDollNames[prefab.Value.name];
             var prefabRagDoll = prefab.Value.GetComponent<BasicRagdoll>();
