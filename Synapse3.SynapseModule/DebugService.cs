@@ -1,26 +1,10 @@
-﻿using System;
-using Neuron.Core.Events;
-using System.Data;
-using System.Reflection;
-using Discord;
-using System.Security.Policy;
-using InventorySystem.Items.MicroHID;
-using Mirror;
-using Neuron.Core.Logging;
+﻿using Neuron.Core.Events;
 using Neuron.Core.Meta;
-using PlayerRoles;
-using PlayerRoles.FirstPersonControl;
-using PluginAPI.Core;
-using Respawning;
-using Respawning.NamingRules;
 using Synapse3.SynapseModule.Command;
-using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Map;
-using Synapse3.SynapseModule.Map.Objects;
-using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
+using System;
 using UnityEngine;
 
 
@@ -72,22 +56,21 @@ public class DebugService : Service
         Logger.Warn("Event triggered: " + ev.GetType().Name);
     }
 
-
     private void OnKeyPress(KeyPressEvent ev)
     {
 
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-
-                ev.Player.ActiveHint.Clear();
-                ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(0, "I like trians", 15, HintSide.Left));
-                ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(10, "Yea Trains", 10, HintSide.Left));
-                ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(1, "LOOK ME !", 7, HintSide.Right));
-                ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(20, "I AME A long string to long to be display in one part! so the other parte is under me, real look that is amazing !", 17, HintSide.Right));
-                ev.Player.ActiveHint.Clear();                
+                ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(0, "I like trains, \\<Wagon\\>", 15, HintSide.Left));
+                ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(10, "Yes I like trains", 10, HintSide.Left));
+                ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(33, "Text here...", 10, HintSide.Midle));
+                ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(20, "<color=red>Can you see me?</color> Yes you can!", 7, HintSide.Right));
+                ev.Player.ActiveHint.AddWithoutUpdate(new SynapseTextHint(20, "I ame on the other sied that is amazing", 7, HintSide.Left));
+                ev.Player.ActiveHint.UpdateText();
                 break;
             case KeyCode.Alpha2:
+                ev.Player.ActiveHint.Add(new SynapseTextHint(20, "<b><color=blue>I ame a string of size 2, <color=red>and to long to be display</color></b> in one part!", 17, HintSide.Right, 2, 200));
                 break;
             case KeyCode.Alpha3:
                 ev.Player.ActiveHint.Clear();

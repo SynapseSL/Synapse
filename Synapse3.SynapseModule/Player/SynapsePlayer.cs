@@ -53,7 +53,6 @@ public partial class SynapsePlayer : MonoBehaviour
         ActiveBroadcasts = new BroadcastList(this);
         MainScpController = new ScpController.MainScpController(this, _config);
         ActiveHint = new TextHintList(this);
-        ScpController = new ScpController(this, _config);
         CustomInfo = new CustomInfoList(this, _player, _mirror, _playerEvents);
         FakeRoleManager = new(this, _mirror, _player);
     }
