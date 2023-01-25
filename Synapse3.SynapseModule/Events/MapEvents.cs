@@ -12,6 +12,7 @@ namespace Synapse3.SynapseModule.Events;
 public partial class MapEvents : Service
 {
     private readonly EventManager _eventManager;
+    private readonly Synapse _synapse;
 
     public readonly EventReactor<Scp914UpgradeEvent> Scp914Upgrade = new();
     public readonly EventReactor<ElevatorMoveContentEvent> ElevatorMoveContent = new();
@@ -20,9 +21,10 @@ public partial class MapEvents : Service
     public readonly EventReactor<CancelWarheadEvent> CancelWarhead = new();
     public readonly EventReactor<GeneratorEngageEvent> GeneratorEngage = new();
 
-    public MapEvents(EventManager eventManager)
+    public MapEvents(EventManager eventManager, Synapse synapse)
     {
         _eventManager = eventManager;
+        _synapse = synapse;
     }
 
     public override void Enable()
@@ -33,6 +35,8 @@ public partial class MapEvents : Service
         _eventManager.RegisterEvent(DetonateWarhead);
         _eventManager.RegisterEvent(CancelWarhead);
         _eventManager.RegisterEvent(GeneratorEngage);
+        
+        PluginAPI.Events.EventManager.RegisterEvents(_synapse,this);
     }
 
     public override void Disable()

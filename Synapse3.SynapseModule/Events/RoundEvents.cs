@@ -19,6 +19,7 @@ public partial class RoundEvents : Service
     public readonly EventReactor<SelectTeamEvent> SelectTeam = new();
     public readonly EventReactor<SpawnTeamEvent> SpawnTeam = new();
     public readonly EventReactor<FirstSpawnEvent> FirstSpawn = new();
+    public readonly EventReactor<WarheadStartEvent> WarheadStart = new();
     public readonly EventReactor<DecontaminationEvent> Decontamination = new();
 
     public RoundEvents(EventManager eventManager, Synapse synapse)
@@ -37,7 +38,9 @@ public partial class RoundEvents : Service
         _eventManager.RegisterEvent(SelectTeam);
         _eventManager.RegisterEvent(SpawnTeam);
         _eventManager.RegisterEvent(FirstSpawn);
+        _eventManager.RegisterEvent(WarheadStart);
         _eventManager.RegisterEvent(Decontamination);
+        
         PluginAPI.Events.EventManager.RegisterEvents(_synapse,this);
     }
 
@@ -51,6 +54,7 @@ public partial class RoundEvents : Service
         _eventManager.UnregisterEvent(SelectTeam);
         _eventManager.UnregisterEvent(SpawnTeam);
         _eventManager.UnregisterEvent(FirstSpawn);
+        _eventManager.UnregisterEvent(Decontamination);
         _eventManager.UnregisterEvent(Decontamination);
     }
 }
@@ -119,4 +123,19 @@ public class FirstSpawnEvent : IEvent
 public class DecontaminationEvent : IEvent
 {
     public bool Allow { get; set; } = true;
+}
+
+public class WarheadStartEvent : IEvent
+{
+    public WarheadStartEvent(bool isResumed, bool isAutomatic)
+    {
+        IsResumed = isResumed;
+        IsAutomatic = isAutomatic;
+    }
+
+    public bool Allow { get; set; } = true;
+    
+    public bool IsResumed { get; }
+    
+    public bool IsAutomatic { get; }
 }

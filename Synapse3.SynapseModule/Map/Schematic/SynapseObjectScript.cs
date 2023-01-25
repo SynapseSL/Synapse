@@ -1,4 +1,5 @@
 ﻿using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Item;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Schematic;
@@ -45,7 +46,8 @@ public class SynapseObjectScript : MonoBehaviour
 
     public void OnDestroy()
     {
-        _events.Destroy.Raise(new DestroyObjectEvent(Object));
+        if (Object is not SynapseItem)
+            _events.Destroy.Raise(new DestroyObjectEvent(Object));
         Object.OnDestroy();
     }
 }

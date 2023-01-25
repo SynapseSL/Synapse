@@ -23,6 +23,8 @@ using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Events;
 using System;
 using System.Collections.Generic;
+using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 using Utils.Networking;
 using static PlayerRoles.PlayableScps.Scp173.Scp173TeleportAbility;
@@ -34,58 +36,111 @@ namespace Synapse3.SynapseModule.Patching.Patches;
 [SynapsePatch("Scp0492Attack", PatchType.ScpEvent)]
 public static class Scp0492AttackPatch
 {
-    private static readonly ScpEvents _scp;
-    static Scp0492AttackPatch() => _scp = Synapse.Get<ScpEvents>();
-
+    private static readonly ScpEvents Scp;
+    static Scp0492AttackPatch() => Scp = Synapse.Get<ScpEvents>();
+    
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ScpAttackAbilityBase<ZombieRole>), nameof(ScpAttackAbilityBase<ZombieRole>.ServerPerformAttack))]
-    public static bool OnServerPerformAttack(ZombieAttackAbility __instance)
+    public static bool OnServerPerformAttack(ScpAttackAbilityBase<ZombieRole> __instance)
     {
         try
         {
-            var scp = __instance.GetSynapsePlayer();
-            var num = Physics.OverlapSphereNonAlloc(__instance.OverlapSphereOrigin, __instance._detectionRadius, ZombieAttackAbility.DetectionsNonAlloc, ZombieAttackAbility.DetectionMask);
-            __instance._syncAttack = AttackResult.None;
-            
-            for (var i = 0; i < num; i++)
-            {
-                var gameObject = ZombieAttackAbility.DetectionsNonAlloc[i];
-                if (!gameObject.TryGetComponent<IDestructible>(out var destructible)
-                    || Physics.Linecast(__instance.PlyCam.position, destructible.CenterOfMass, ZombieAttackAbility.BlockerMask)) 
-                    continue;
-                var hitBox = destructible as HitboxIdentity;
-                
-                if(hitBox != null && !ZombieAttackAbility.TargettedPlayers.Remove(hitBox.TargetHub)) continue;
+            if(__instance.GetType() == typeof(ZombieAttackAbility))
+                return ZombiePerformAttack(__instance as ZombieAttackAbility);
+            else if (__instance.GetType() == typeof(Scp939ClawAbility))
+                return Scp939PerformAttack(((object)__instance) as Scp939ClawAbility);
 
-                var damage = __instance.DamageAmount;
-                if (hitBox != null)
-                {
-                    var ev = new Scp0492AttackEvent(scp, hitBox.GetSynapsePlayer(), __instance.DamageAmount);
-                    _scp.Scp0492Attack.RaiseSafely(ev);
-                    if (!ev.Allow) continue;
-                    damage = ev.Damage;
-                }
-
-                if (!destructible.Damage(damage,
-                        new Scp049DamageHandler(scp.Hub, damage, Scp049DamageHandler.AttackType.Scp0492),
-                        destructible.CenterOfMass)) continue;
-                
-                //OnDamage
-                __instance.OnDestructibleDamaged(destructible);
-                __instance._syncAttack |= AttackResult.AttackedObject;
-                if (hitBox == null) continue;
-                __instance._syncAttack |= AttackResult.AttackedHuman;
-                if (hitBox.TargetHub.playerStats.GetModule<HealthStat>().CurValue <= 0f)
-                    __instance._syncAttack |= AttackResult.KilledHuman;
-            }
-            __instance.ServerSendRpc(toAll: true);
-            return false;
+            SynapseLogger<Synapse>.Warn("Not Registered SCP Attack. Please show this to a Synapse Dev File: EventScpPatch.cs");
+            return true;
         }
         catch (Exception e)
         {
             SynapseLogger<Synapse>.Error("Sy3 Patch: Scp0492Attack failed\n" + e);
             return true;
         }
+    }
+
+    private static bool ZombiePerformAttack(ZombieAttackAbility __instance)
+    {
+        var scp = __instance.GetSynapsePlayer();
+        var num = Physics.OverlapSphereNonAlloc(__instance.OverlapSphereOrigin, __instance._detectionRadius, ZombieAttackAbility.DetectionsNonAlloc, ZombieAttackAbility.DetectionMask);
+        __instance._syncAttack = AttackResult.None;
+            
+        for (var i = 0; i < num; i++)
+        {
+            var gameObject = ZombieAttackAbility.DetectionsNonAlloc[i];
+            if (!gameObject.TryGetComponent<IDestructible>(out var destructible)
+                || Physics.Linecast(__instance.PlyCam.position, destructible.CenterOfMass, ZombieAttackAbility.BlockerMask)) 
+                continue;
+            var hitBox = destructible as HitboxIdentity;
+                
+            if(hitBox != null && !ZombieAttackAbility.TargettedPlayers.Remove(hitBox.TargetHub)) continue;
+
+            var damage = __instance.DamageAmount;
+            if (hitBox != null)
+            {
+                var ev = new Scp0492AttackEvent(scp, hitBox.GetSynapsePlayer(), __instance.DamageAmount);
+                Scp.Scp0492Attack.RaiseSafely(ev);
+                if (!ev.Allow) continue;
+                damage = ev.Damage;
+            }
+
+            if (!destructible.Damage(damage,
+                    new Scp049DamageHandler(scp.Hub, damage, Scp049DamageHandler.AttackType.Scp0492),
+                    destructible.CenterOfMass)) continue;
+                
+            //OnDamage
+            __instance.OnDestructibleDamaged(destructible);
+            __instance._syncAttack |= AttackResult.AttackedObject;
+            if (hitBox == null) continue;
+            __instance._syncAttack |= AttackResult.AttackedHuman;
+            if (hitBox.TargetHub.playerStats.GetModule<HealthStat>().CurValue <= 0f)
+                __instance._syncAttack |= AttackResult.KilledHuman;
+        }
+        __instance.ServerSendRpc(toAll: true);
+        return false;
+    }
+
+    private static bool Scp939PerformAttack(Scp939ClawAbility __instance)
+    {
+        var scp = __instance.GetSynapsePlayer();
+        var num = Physics.OverlapSphereNonAlloc(__instance.OverlapSphereOrigin, __instance._detectionRadius, Scp939ClawAbility.DetectionsNonAlloc, Scp939ClawAbility.DetectionMask);
+        __instance._syncAttack = AttackResult.None;
+            
+        for (var i = 0; i < num; i++)
+        {
+            var gameObject = Scp939ClawAbility.DetectionsNonAlloc[i];
+            if (!gameObject.TryGetComponent<IDestructible>(out var destructible)
+                || Physics.Linecast(__instance.PlyCam.position, destructible.CenterOfMass, Scp939ClawAbility.BlockerMask)) 
+                continue;
+            var hitBox = destructible as HitboxIdentity;
+                
+            if(hitBox != null && !Scp939ClawAbility.TargettedPlayers.Remove(hitBox.TargetHub)) continue;
+
+            var damage = __instance.DamageAmount;
+            if (hitBox != null)
+            {
+                var ev = new Scp939AttackEvent(scp, hitBox.GetSynapsePlayer(), __instance.DamageAmount,
+                    Scp939DamageType.Claw);
+                Scp.Scp939Attack.RaiseSafely(ev);
+                if (!ev.Allow) continue;
+                damage = ev.Damage;
+            }
+
+            if (!destructible.Damage(damage,
+                    new Scp049DamageHandler(scp.Hub, damage, Scp049DamageHandler.AttackType.Scp0492),
+                    destructible.CenterOfMass)) continue;
+                
+            //OnDamage
+            __instance.OnDestructibleDamaged(destructible);
+            __instance._syncAttack |= AttackResult.AttackedObject;
+            if (hitBox == null) continue;
+            __instance._syncAttack |= AttackResult.AttackedHuman;
+            if (hitBox.TargetHub.playerStats.GetModule<HealthStat>().CurValue <= 0f)
+                __instance._syncAttack |= AttackResult.KilledHuman;
+        }
+        __instance.ServerSendRpc(toAll: true);
+        return false;
     }
 }
 
@@ -462,9 +517,8 @@ public static class Scp173AttackTpPatch
     }
 }
 
-//TODO: Check Events
 [Automatic]
-[SynapsePatch("Scp939Lunge", PatchType.ScpEvent)]
+[SynapsePatch("Scp939Damage", PatchType.ScpEvent)]
 public static class Scp939LunchPatch
 {
     private static readonly ScpEvents _scp;
@@ -476,6 +530,7 @@ public static class Scp939LunchPatch
     {
         try
         {
+            if (__instance._damageType == Scp939DamageType.Claw) return true;
             var scp = __instance.Attacker.GetSynapsePlayer();
             var victim = ply.GetSynapsePlayer();
             var ev =  new Scp939AttackEvent(scp, victim, __instance.Damage, __instance._damageType);
@@ -495,8 +550,8 @@ public static class Scp939LunchPatch
 [SynapsePatch("PlayerEscapePocketDimension", PatchType.ScpEvent)]
 public static class PlayerEscapePocketDimensionPatch
 {
-    private static readonly ScpEvents _scp;
-    static PlayerEscapePocketDimensionPatch() => _scp = Synapse.Get<ScpEvents>();
+    private static readonly ScpEvents Scp;
+    static PlayerEscapePocketDimensionPatch() => Scp = Synapse.Get<ScpEvents>();
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(PocketDimensionTeleport), nameof(PocketDimensionTeleport.OnTriggerEnter))]
@@ -511,15 +566,14 @@ public static class PlayerEscapePocketDimensionPatch
                 return false;
 
             var player = hub.GetSynapsePlayer();
-            var fpcRole = player.CurrentRole as IFpcRole;
-            if (fpcRole == null) return false;
+            if (player.CurrentRole is not IFpcRole fpcRole) return false;
             var escapePosition = Scp106PocketExitFinder.GetBestExitPosition(fpcRole);
             var enteredPosition = __instance.transform.position;
 
             var escape = __instance._type == PDTeleportType.Exit || AlphaWarheadController.Detonated;
             var ev = new Scp106LeavePocketEvent(player, escape, enteredPosition, escapePosition);
 
-            _scp.Scp106LeavePocket.RaiseSafely(ev);
+            Scp.Scp106LeavePocket.RaiseSafely(ev);
 
             if (!ev.Allow) return false;
 
@@ -531,6 +585,7 @@ public static class PlayerEscapePocketDimensionPatch
             }
             else
             {
+                
                 if (!EventManager.ExecuteEvent(ServerEventType.PlayerExitPocketDimension, hub, true))
                     return false;
                 fpcRole.FpcModule.ServerOverridePosition(ev.EscapePosition, Vector3.zero);
@@ -565,22 +620,23 @@ public static class Scp173TantrumPatch
         {
             if (!__instance.Cooldown.IsReady
                 || __instance._observersTracker.IsObserved
-                || !Physics.Raycast(__instance.ScpRole.FpcModule.Position, Vector3.down, out var hitInfo, 3f, __instance._tantrumMask)
-                || !EventManager.ExecuteEvent(ServerEventType.Scp173CreateTantrum, __instance.Owner))
-            {
+                || !Physics.Raycast(__instance.ScpRole.FpcModule.Position, Vector3.down, out var hitInfo, 3f,
+                    __instance._tantrumMask))
                 return false;
-            }
 
             var player = __instance.ScpRole._owner.GetSynapsePlayer();
 
-            var ev = new Scp173PlaceTantrumEvent(player, player.MainScpController.Scp173.TantrumCoolDown);
+            var ev = new Scp173PlaceTantrumEvent(player, player.MainScpController.Scp173.TantrumCoolDown)
+            {
+                Allow = EventManager.ExecuteEvent(ServerEventType.Scp173CreateTantrum, __instance.Owner)
+            };
 
             _scp.Scp173PlaceTantrum.RaiseSafely(ev);
 
             if (!ev.Allow) return false;
             
             __instance.Cooldown.Trigger(ev.CoolDown);
-            __instance.ServerSendRpc(toAll: true);
+            __instance.ServerSendRpc(true);
             var tantrumEnvironmentalHazard = UnityEngine.Object.Instantiate(__instance._tantrumPrefab);
             var targetPos = hitInfo.point + Vector3.up * 1.25f;
             tantrumEnvironmentalHazard.SynchronizedPosition = new RelativePosition(targetPos);
@@ -602,86 +658,95 @@ public static class Scp173TantrumPatch
     }
 }
 
-
 [Automatic]
-[SynapsePatch("Scp173Observe", PatchType.ScpEvent)]
-public static class Scp173ObservePatch
+[SynapsePatch("Scp173ObserveEvent", PatchType.ScpEvent)]
+public static class Scp173ObserversListPatch
 {
     private static readonly ScpEvents _scp;
-    static Scp173ObservePatch() => _scp = Synapse.Get<ScpEvents>();
+    private static readonly SynapseConfigService _config;
 
+    static Scp173ObserversListPatch()
+    {
+        _scp = Synapse.Get<ScpEvents>();
+        _config = Synapse.Get<SynapseConfigService>();
+    }
+    
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(Scp173TantrumAbility), nameof(Scp173TantrumAbility.ServerProcessCmd))]
-    public static bool OnServerProcessCmd(Scp173TantrumAbility __instance, NetworkReader reader)
+    [HarmonyPatch(typeof(Scp173ObserversTracker), nameof(Scp173ObserversTracker.CheckRemovedPlayer))]
+    public static bool CheckRemovedPlayer(Scp173ObserversTracker __instance, ReferenceHub ply)
+    {
+        var player = __instance.Owner.GetSynapsePlayer();
+        var controller = player.MainScpController.Scp173;
+
+        if (!__instance.Observers.Remove(ply)) return false;
+        controller._observer.Remove(player);
+        __instance.CurrentObservers--;
+        return false;
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp173ObserversTracker), nameof(Scp173ObserversTracker.UpdateObserver))]
+    public static bool UpdateObserver(Scp173ObserversTracker __instance, out int __result, ReferenceHub targetHub)
     {
         try
         {
-            if (!__instance.Cooldown.IsReady
-                || __instance._observersTracker.IsObserved
-                || !Physics.Raycast(__instance.ScpRole.FpcModule.Position, Vector3.down, out var hitInfo, 3f, __instance._tantrumMask)
-                || !EventManager.ExecuteEvent(ServerEventType.Scp173CreateTantrum, __instance.Owner))
+            if (targetHub == null || __instance.Owner == targetHub)
             {
+                __result = 0;
+                return false;
+            }
+            
+            var player = targetHub.GetSynapsePlayer();
+            var scp = __instance.GetSynapsePlayer();
+            var controller = scp.MainScpController.Scp173;
+
+            if (!_config.GamePlayConfiguration.CantObserve173.Contains(player.RoleID) && player.PlayerType != PlayerType.Server)
+            {
+                if (__instance.IsObservedBy(targetHub, 0.2f))
+                {
+                    if (__instance.Observers.Contains(targetHub))
+                    {
+                        var ev = new Scp173ObserveEvent(player, true, scp);
+                        _scp.Scp173Observe.RaiseSafely(ev);
+                        if (!ev.Allow)
+                        {
+                            __result = 0;
+                            return false;
+                        }
+                    }
+                    
+                    if (__instance.Observers.Add(targetHub))
+                    {
+                        controller._observer.Add(player);
+                        __result = 1;
+                        return false;
+                    }
+                }
+                else if (__instance.Observers.Remove(targetHub))
+                {
+                    controller._observer.Remove(player);
+                    __result = -1;
+                    return false;
+                }
+
+                __result = 0;
                 return false;
             }
 
-            var player = __instance.ScpRole._owner.GetSynapsePlayer();
-
-            var ev = new Scp173PlaceTantrumEvent(player, player.MainScpController.Scp173.TantrumCoolDown);
-
-            _scp.Scp173PlaceTantrum.RaiseSafely(ev);
-
-            if (!ev.Allow) return false;
-
-            __instance.Cooldown.Trigger(ev.CoolDown);
-            __instance.ServerSendRpc(toAll: true);
-            var tantrumEnvironmentalHazard = UnityEngine.Object.Instantiate(__instance._tantrumPrefab);
-            var targetPos = hitInfo.point + Vector3.up * 1.25f;
-            tantrumEnvironmentalHazard.SynchronizedPosition = new RelativePosition(targetPos);
-            NetworkServer.Spawn(tantrumEnvironmentalHazard.gameObject);
-            foreach (TeslaGate teslaGate in TeslaGateController.Singleton.TeslaGates)
+            if (!__instance.Observers.Remove(targetHub))
             {
-                if (teslaGate.PlayerInIdleRange(__instance.Owner))
-                {
-                    teslaGate.TantrumsToBeDestroyed.Add(tantrumEnvironmentalHazard);
-                }
+                __result = 0;
+                return false;
             }
+            controller._observer.Remove(player);
+            __result = -1;
             return false;
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            SynapseLogger<Synapse>.Error($"Sy3 Event: Scp173Observe failed!!\n{e}");
-            throw;
+            SynapseLogger<Synapse>.Error(ex);
+            __result = 0;
+            return true;
         }
-    }
-}
-
-[Automatic]
-[SynapsePatch("Scp173ObserversTracker", PatchType.Wrapper)]
-public static class Scp173ObserversTrackerPatch
-{
-    private static readonly SynapseConfigService _config;
-    private static readonly ScpEvents _scp;
-    static Scp173ObserversTrackerPatch()
-    {
-        _config = Synapse.Get<SynapseConfigService>();
-        _scp = Synapse.Get<ScpEvents>();
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(Scp173ObserversTracker), nameof(Scp173ObserversTracker.IsObservedBy))]
-    public static bool IsObservedBy(Scp173ObserversTracker __instance, ref bool __result, ReferenceHub target)
-    {
-        var player = target.GetSynapsePlayer();
-        var scp = __instance.Owner.GetSynapsePlayer();
-        var ev = new Scp173ObserveEvent(player, true, scp);
-
-        _scp.Scp173Observe.RaiseSafely(ev);
-
-        if (!ev.Allow || _config.GamePlayConfiguration.CantObserve173.Contains(player.RoleID))
-        {
-            __result = false;
-            return false;
-        }
-        return true;
     }
 }

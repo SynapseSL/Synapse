@@ -106,9 +106,10 @@ public partial class PlayerEvents : Service
 
         WalkOnSinkhole.Subscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Subscribe(WalkOnHazard.Raise);
-
-        PluginAPI.Events.EventManager.RegisterEvents(_synapse,this);
+        
         PlayerRoleManager.OnServerRoleSet += CallSimpleSetClass;
+        
+        PluginAPI.Events.EventManager.RegisterEvents(_synapse,this);
     }
 
     public override void Disable()
@@ -302,7 +303,12 @@ public class LockerUseEvent : PlayerInteractEvent
 
 public class StartWarheadEvent : PlayerInteractEvent
 {
-    public StartWarheadEvent(SynapsePlayer player, bool allow) : base(player, allow) { }
+    public StartWarheadEvent(SynapsePlayer player, bool allow, bool isResumed) : base(player, allow)
+    {
+        IsResumed = isResumed;
+    }
+
+    public bool IsResumed { get; }
 }
 
 public class WarheadPanelInteractEvent : PlayerInteractEvent
@@ -318,16 +324,12 @@ public class WarheadPanelInteractEvent : PlayerInteractEvent
 
 public class BanEvent : KickEvent
 {
-    public BanEvent(SynapsePlayer player, bool allow, SynapsePlayer admin, string reason, long duration,
-        bool global) : base(player, admin, reason, allow)
+    public BanEvent(SynapsePlayer player, bool allow, SynapsePlayer admin, string reason, long duration) : base(player, admin, reason, allow)
     {
         Duration = duration;
-        GlobalBan = global;
     }
 
     public long Duration { get; set; }
-
-    public bool GlobalBan { get; }
 }
 
 public class ChangeItemEvent : PlayerInteractEvent
@@ -394,15 +396,18 @@ public class FreePlayerEvent : PlayerInteractEvent
 
 public class DropAmmoEvent : PlayerInteractEvent
 {
-    public DropAmmoEvent(SynapsePlayer player, bool allow, AmmoType ammoType, ushort amount) : base(player, allow)
+    public DropAmmoEvent(SynapsePlayer player, bool allow, AmmoType ammoType, ushort amount, bool checkMinimals) : base(player, allow)
     {
         AmmoType = ammoType;
         Amount = amount;
+        CheckMinimals = checkMinimals;
     }
 
     public AmmoType AmmoType { get; set; }
 
     public ushort Amount { get; set; }
+    
+    public bool CheckMinimals { get; set; }
 }
 
 public class EscapeEvent : PlayerInteractEvent

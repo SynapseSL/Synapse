@@ -26,6 +26,7 @@ public partial class ServerEvents : Service
         _eventManager.RegisterEvent(Reload);
         _eventManager.RegisterEvent(PreAuthentication);
         _eventManager.RegisterEvent(StopServer);
+        
         PluginAPI.Events.EventManager.RegisterEvents(_synapse,this);
     }
 

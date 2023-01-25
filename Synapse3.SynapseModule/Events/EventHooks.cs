@@ -12,6 +12,7 @@ using PluginAPI.Events;
 using RemoteAdmin;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
+using UnityEngine;
 
 namespace Synapse3.SynapseModule.Events;
 
@@ -20,10 +21,9 @@ public partial class PlayerEvents
     [PluginEvent(ServerEventType.WarheadStart)]
     public bool WarheadStartHook(bool isAutomatic, IPlayer player, bool isResumed)
     {
-        var ev = new StartWarheadEvent(player?.GetSynapsePlayer(), true);
-
+        if (player == null) return true;
+        var ev = new StartWarheadEvent(player?.GetSynapsePlayer(), true, isResumed);
         StartWarhead.RaiseSafely(ev);
-
         return ev.Allow;
     }
 
@@ -31,10 +31,9 @@ public partial class PlayerEvents
     public bool PlayerChangeItemHook(IPlayer player, ushort oldItem, ushort newItem)
     {
         var sPlayer = player?.GetSynapsePlayer();
-        if (sPlayer == null || sPlayer.RoleType == RoleTypeId.None) return false;
-        var item = _item?.GetSynapseItem(newItem) ?? SynapseItem.None;
-        var ev = new ChangeItemEvent(player?.GetSynapsePlayer(), true, item);
-
+        if (sPlayer == null || sPlayer.RoleType == RoleTypeId.None) return true;
+        var item = newItem == 0 ? SynapseItem.None : _item?.GetSynapseItem(newItem) ?? SynapseItem.None;
+        var ev = new ChangeItemEvent(sPlayer, true, item);
         ChangeItem.RaiseSafely(ev);
         return ev.Allow;
     }
@@ -42,88 +41,20 @@ public partial class PlayerEvents
     [PluginEvent(ServerEventType.PlayerDamage)]
     public bool PlayerDamageHook(IPlayer player, IPlayer target, DamageHandlerBase damageHandler)
     {
-        var damageType = damageHandler.GetDamageType();
+        if (player == null) return true;
         var damageAmount = damageHandler is StandardDamageHandler standard ? standard.Damage : -1;
-
-        var ev = new DamageEvent(player.GetSynapsePlayer(), true, target?.GetSynapsePlayer(), damageType, damageAmount);
-
+        var ev = new DamageEvent(player.GetSynapsePlayer(), true, target?.GetSynapsePlayer(),
+            damageHandler.GetDamageType(), damageAmount);
         Damage.RaiseSafely(ev);
-
+        if (damageHandler is StandardDamageHandler standardDamageHandler) standardDamageHandler.Damage = ev.Damage;
         return ev.Allow;
     }
 
     [PluginEvent(ServerEventType.PlayerRemoveHandcuffs)]
-    public bool PlayerInteractShootingTargetHook(IPlayer player, IPlayer target)
+    public bool PlayerFreeHook(IPlayer player, IPlayer target)
     {
         var ev = new FreePlayerEvent(player.GetSynapsePlayer(), true, target.GetSynapsePlayer());
-
         FreePlayer.RaiseSafely(ev);
-
-        return ev.Allow;
-    }
-
-    [PluginEvent(ServerEventType.PlayerDropAmmo)]
-    public bool PlayerDropAmmoHook(IPlayer player, ItemType item, int amount)
-    {
-        var ev = new DropAmmoEvent(player.GetSynapsePlayer(), true, (AmmoType)item, (ushort)amount);
-
-        DropAmmo.RaiseSafely(ev);
-
-        return ev.Allow;
-    }
-
-    [PluginEvent(ServerEventType.PlayerUnlockGenerator)]
-    public bool PlayerUnlockGeneratorHook(IPlayer player, Scp079Generator generator)
-    {
-        var ev = new GeneratorInteractEvent(player.GetSynapsePlayer(), true,
-            generator.GetSynapseGenerator(), Enums.GeneratorInteract.UnlockDoor);
-
-        GeneratorInteract.RaiseSafely(ev);
-
-        return ev.Allow;
-    }
-
-    [PluginEvent(ServerEventType.PlayerOpenGenerator)]
-    public bool PlayerOpenGeneratorHook(IPlayer player, Scp079Generator generator)
-    {
-        var ev = new GeneratorInteractEvent(player.GetSynapsePlayer(), true,
-            generator.GetSynapseGenerator(), Enums.GeneratorInteract.OpenDoor);
-
-        GeneratorInteract.RaiseSafely(ev);
-
-        return ev.Allow;
-    }
-
-    [PluginEvent(ServerEventType.PlayerDeactivatedGenerator)]
-    public bool PlayerDeactivatedGeneratorHook(IPlayer player, Scp079Generator generator)
-    {
-        var ev = new GeneratorInteractEvent(player.GetSynapsePlayer(), true,
-            generator.GetSynapseGenerator(), Enums.GeneratorInteract.Cancel);
-
-        GeneratorInteract.RaiseSafely(ev);
-
-        return ev.Allow;
-    }
-
-    [PluginEvent(ServerEventType.PlayerCloseGenerator)]
-    public bool PlayerCloseGeneratorHook(IPlayer player, Scp079Generator generator)
-    {
-        var ev = new GeneratorInteractEvent(player.GetSynapsePlayer(), true,
-            generator.GetSynapseGenerator(), Enums.GeneratorInteract.CloseDoor);
-
-        GeneratorInteract.RaiseSafely(ev);
-
-        return ev.Allow;
-    }
-
-    [PluginEvent(ServerEventType.PlayerActivateGenerator)]
-    public bool PlayerActivateGeneratorHook(IPlayer player, Scp079Generator generator)
-    {
-        var ev = new GeneratorInteractEvent(player.GetSynapsePlayer(), true,
-            generator.GetSynapseGenerator(), Enums.GeneratorInteract.Activate);
-
-        GeneratorInteract.RaiseSafely(ev);
-
         return ev.Allow;
     }
 
@@ -131,54 +62,7 @@ public partial class PlayerEvents
     public bool PlayerSearchedPickupHook(IPlayer player, ItemPickupBase item)
     {
         var ev = new PickupEvent(player.GetSynapsePlayer(), true, item.GetItem());
-
         Pickup.RaiseSafely(ev);
-
-        return ev.Allow;
-    }
-
-    [PluginEvent(ServerEventType.PlayerReport)]
-    public bool PlayerReportHook(IPlayer player, IPlayer target, string reason)
-    {
-        var ev = new ReportEvent(player.GetSynapsePlayer(), true, target.GetSynapsePlayer(), reason, false);
-
-        Report.RaiseSafely(ev);
-
-        return ev.Allow;
-    }
-
-    [PluginEvent(ServerEventType.PlayerCheaterReport)]
-    public bool PlayerCheaterReportHook(IPlayer player, IPlayer target, string reason)
-    {
-        var ev = new ReportEvent(player.GetSynapsePlayer(), true, target.GetSynapsePlayer(), reason, false);
-
-        Report.RaiseSafely(ev);
-
-        return ev.Allow;
-    }
-
-    
-    [PluginEvent(ServerEventType.PlayerKicked)]
-    public bool PlayerKickedHook(IPlayer player, ICommandSender issuer, string reason)
-    {
-        var playerIssuer = (issuer as PlayerCommandSender)?.GetSynapsePlayer();
-        var sPlayer = player.GetSynapsePlayer();
-        if (playerIssuer == null || sPlayer == null) return true;
-        
-        var ev = new KickEvent(player?.GetSynapsePlayer(), playerIssuer, reason, true);
-        Kick.RaiseSafely(ev);
-        return ev.Allow;
-    }
-
-
-    [PluginEvent(ServerEventType.PlayerBanned)]
-    public bool PlayerBandHook(IPlayer player, ICommandSender issuer, string reason, long duration)
-    {
-        var playerIssuer = (issuer as PlayerCommandSender)?.GetSynapsePlayer();
-
-        var ev = new BanEvent(player?.GetSynapsePlayer(), true, playerIssuer, reason, duration, false);
-
-        Ban.RaiseSafely(ev);
         return ev.Allow;
     }
 }
@@ -197,8 +81,8 @@ public partial class RoundEvents
     [PluginEvent(ServerEventType.RoundStart)]
     public void RoundStartHook() => Start.RaiseSafely(new RoundStartEvent());
 
-/*    [PluginEvent(ServerEventType.RoundEnd)]//TODO: Found why parameters invalide
-    public void RoundEndHook(LeadingTeam leadingTeam) => End.RaiseSafely(new RoundEndEvent(LeadingTeam.Draw));*/
+    [PluginEvent(ServerEventType.RoundEnd)]
+    public void RoundEndHook(RoundSummary.LeadingTeam leadingTeam) => End.RaiseSafely(new RoundEndEvent(RoundSummary.LeadingTeam.Draw));
 
     [PluginEvent(ServerEventType.RoundRestart)]
     public void RoundRestartHook() => Restart.RaiseSafely(new RoundRestartEvent());
@@ -213,6 +97,15 @@ public partial class RoundEvents
             DecontaminationController.Singleton.NetworkDecontaminationOverride =
                 DecontaminationController.DecontaminationStatus.None;
         }
+        return ev.Allow;
+    }
+    
+    [PluginEvent(ServerEventType.WarheadStart)]
+    public bool WarheadStartHook(bool isAutomatic, IPlayer player, bool isResumed)
+    {
+        if (player != null) return true;
+        var ev = new WarheadStartEvent(isResumed, isAutomatic);
+        WarheadStart.RaiseSafely(ev);
         return ev.Allow;
     }
 }
@@ -231,31 +124,26 @@ public partial class ServerEvents
 
 public partial class ScpEvents
 {
-    [PluginEvent(ServerEventType.Scp049ResurrectBody)]//TODO: Hook it to the NW Api
+    [PluginEvent(ServerEventType.Scp049ResurrectBody)]
     public bool Scp049ResurrectBodyHook(IPlayer player, IPlayer target, BasicRagdoll body)
     {
         var synapse049 = player.GetSynapsePlayer();
-        var synapsetargert = target.GetSynapsePlayer();
-        var ragdoll = body.GetSynapseRagDoll();
-
-        var ev = new Scp049ReviveEvent(synapse049, synapsetargert, ragdoll, true);
-
+        var synapseTarget = target.GetSynapsePlayer();
+        var ragDoll = body.GetSynapseRagDoll();
+        var ev = new Scp049ReviveEvent(synapse049, synapseTarget, ragDoll, true);
         Scp049Revive.RaiseSafely(ev);
-
         return ev.Allow;
     }
 
     [PluginEvent(ServerEventType.Scp049StartResurrectingBody)]
-    public bool Scp049StartResurrectingBodyHook(IPlayer player, IPlayer target, BasicRagdoll body, bool canResurrct)
+    public bool Scp049StartResurrectingBodyHook(IPlayer player, IPlayer target, BasicRagdoll body, bool canResurrect)
     {
+        if (!canResurrect) return true;
         var synapse049 = player.GetSynapsePlayer();
-        var synapsetargert = target.GetSynapsePlayer();
-        var ragdoll = body.GetSynapseRagDoll();
-
-        var ev = new Scp049ReviveEvent(synapse049, synapsetargert, ragdoll, false);
-
+        var synapseTarget = target.GetSynapsePlayer();
+        var ragDoll = body.GetSynapseRagDoll();
+        var ev = new Scp049ReviveEvent(synapse049, synapseTarget, ragDoll, false);
         Scp049Revive.RaiseSafely(ev);
-
         return ev.Allow;
     }
 
@@ -263,11 +151,8 @@ public partial class ScpEvents
     public bool Scp173BreakneckSpeedsHook(IPlayer player, bool activate)
     {
         var synapse173 = player.GetSynapsePlayer();
-
         var ev = new Scp173ActivateBreakneckSpeedEvent(synapse173, activate);
-
         Scp173ActivateBreakneckSpeed.RaiseSafely(ev);
-
         return ev.Allow;
     }
 }
@@ -280,33 +165,28 @@ public partial class ItemEvents
         var synapsePlayer = player.GetSynapsePlayer();
         var synapseTarget = target.GetSynapsePlayer();
         var ev = new DisarmEvent(synapsePlayer.Inventory.ItemInHand, ItemInteractState.Finalize, synapsePlayer, synapseTarget);
-
         Disarm.RaiseSafely(ev);
-
         return ev.Allow;
     }
 
-    [PluginEvent(ServerEventType.PlayerCoinFlip)]
-    public PlayerPreCoinFlipCancellationData.CoinFlipCancellation PlayerFlipCoinHook(IPlayer player, bool IsTails)
+    [PluginEvent(ServerEventType.PlayerPreCoinFlip)]
+    public PlayerPreCoinFlipCancellationData PlayerFlipCoinHook(IPlayer player)
     {
         var synapsePlayer = player.GetSynapsePlayer();
         var synapseItem = synapsePlayer.Inventory.ItemInHand;
-        var ev = new FlipCoinEvent(synapseItem, synapsePlayer, IsTails);
+        var ev = new FlipCoinEvent(synapseItem, synapsePlayer, Random.value >= 0.5f);
         FlipCoin.RaiseSafely(ev);
-        
-        if (!ev.Allow)
-            return PlayerPreCoinFlipCancellationData.CoinFlipCancellation.PreventFlip;
-        if(ev.Tails)
-            return PlayerPreCoinFlipCancellationData.CoinFlipCancellation.Tails;
-        else
-            return PlayerPreCoinFlipCancellationData.CoinFlipCancellation.Heads;
+
+        return !ev.Allow
+            ? PlayerPreCoinFlipCancellationData.PreventFlip()
+            : PlayerPreCoinFlipCancellationData.Override(ev.Tails);
     }
 }
 
 public partial class MapEvents
 {
     [PluginEvent(ServerEventType.WarheadStop)]
-    public bool PlayerCancelWarHead(IPlayer player)
+    public bool PlayerCancelWarhead(IPlayer player)
     {
         var synapsePlayer = player.GetSynapsePlayer();
         var ev = new CancelWarheadEvent(synapsePlayer, true);
@@ -315,5 +195,4 @@ public partial class MapEvents
 
         return ev.Allow;
     }
-
 }

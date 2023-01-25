@@ -612,6 +612,7 @@ public static class PlayerDeathPatch
     {
         try
         {
+            if (handler == null) return false;
             var damage = (handler as StandardDamageHandler)?.Damage ?? 0;
             var victim = __instance.GetSynapsePlayer();
             var attacker = (handler as AttackerDamageHandler)?.Attacker.GetSynapsePlayer();
@@ -730,5 +731,105 @@ public static class LockerInteractPatch
         __instance.Chambers[colliderId].SetDoor(!__instance.Chambers[colliderId].IsOpen, __instance._grantedBeep);
         __instance.RefreshOpenedSyncvar();
         return false;
+    }
+}
+
+[Automatic]
+[SynapsePatch("DropAmmo", PatchType.PlayerEvent)]
+public static class DropAmmoPatch
+{
+    private static readonly PlayerEvents Player;
+    static DropAmmoPatch() => Player = Synapse.Get<PlayerEvents>();
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(InventoryExtensions), nameof(InventoryExtensions.ServerDropAmmo))]
+    public static bool DropAmmo(Inventory inv, ref ItemType ammoType, ref ushort amount, ref bool checkMinimals)
+    {
+        var player = inv._hub.GetSynapsePlayer();
+        if (player == null || !Enum.IsDefined(typeof(AmmoType), (AmmoType)ammoType)) return true;
+        var ev = new DropAmmoEvent(player, true, (AmmoType)ammoType, amount, checkMinimals);
+        Player.DropAmmo.RaiseSafely(ev);
+        ammoType = (ItemType)ev.AmmoType;
+        amount = ev.Amount;
+        checkMinimals = ev.CheckMinimals;
+        return ev.Allow;
+    }
+}
+
+[Automatic]
+[SynapsePatch("ReportPlayer", PatchType.PlayerEvent)]
+public static class ReportPlayerPatch
+{
+    private static readonly PlayerService PlayerService;
+    private static readonly PlayerEvents Player;
+    static ReportPlayerPatch()
+    {
+        PlayerService = Synapse.Get<PlayerService>();
+        Player = Synapse.Get<PlayerEvents>();
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(CheaterReport), nameof(CheaterReport.UserCode_CmdReport))]
+    public static bool OnReport(CheaterReport __instance, uint playerNetId, ref string reason, ref bool notifyGm)
+    {
+        try
+        {
+            if (reason == null) return false;
+            if (Time.time - __instance._lastReport < 2f) return true;
+            var reported = PlayerService.GetPlayer(playerNetId);
+            var player = __instance.GetSynapsePlayer();
+            var ev = new ReportEvent(player, true, reported, reason, notifyGm);
+            Player.Report.RaiseSafely(ev);
+            reason = ev.Reason;
+            notifyGm = ev.SendToNorthWood;
+            return ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Report Event failed\n" + ex);
+            return true;
+        }
+    }
+}
+
+[Automatic]
+[SynapsePatch("PlayerBan&Kick", PatchType.PlayerEvent)]
+public static class PlayerBanPatch
+{
+    private static readonly PlayerEvents Player;
+    static PlayerBanPatch() => Player = Synapse.Get<PlayerEvents>();
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(BanPlayer), nameof(BanPlayer.BanUser),
+        new[] { typeof(ReferenceHub), typeof(ICommandSender), typeof(string), typeof(long) })]
+    public static bool Ban(ReferenceHub target, ICommandSender issuer, ref string reason, ref long duration)
+    {
+        if (duration == 0)
+        {
+            return true;
+        }
+        if (target.serverRoles.BypassStaff) return false;
+        var player = target.GetSynapsePlayer();
+        var admin = (issuer as CommandSender)?.GetSynapsePlayer();
+        if (player == null || admin == null) return true;
+        var ev = new BanEvent(player, true, admin, reason, duration);
+        Player.Ban.RaiseSafely(ev);
+        reason = ev.Reason;
+        duration = ev.Duration;
+        return ev.Allow;
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(BanPlayer), nameof(BanPlayer.KickUser),
+        new[] { typeof(ReferenceHub), typeof(ICommandSender), typeof(string) })]
+    public static bool Kick(ReferenceHub target, ICommandSender issuer, ref string reason)
+    {
+        var player = target.GetSynapsePlayer();
+        var admin = (issuer as CommandSender)?.GetSynapsePlayer();
+        if (player == null || admin == null) return true;
+        var ev = new KickEvent(player, admin, reason, true);
+        Player.Kick.RaiseSafely(ev);
+        reason = ev.Reason;
+        return ev.Allow;
     }
 }

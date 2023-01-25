@@ -4,6 +4,7 @@ using Neuron.Core.Meta;
 using Neuron.Modules.Commands.Command;
 using RemoteAdmin;
 using Synapse3.SynapseModule.Command;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Player;
 using Utils.NonAllocLINQ;
 using Console = GameCore.Console;
@@ -131,6 +132,8 @@ public static class PlayerConsolePatch
         {
             var player = __instance._sender.GetSynapsePlayer();
             if (player == null) return true;
+            if (player.Hub.Mode != ClientInstanceMode.ReadyClient && player.PlayerType == PlayerType.Player)
+                return true;
 
             var result = _commandService.PlayerConsole
                 .Invoke(SynapseContext.Of(query, player, CommandPlatform.PlayerConsole));

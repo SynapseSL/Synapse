@@ -12,7 +12,8 @@ namespace Synapse3.SynapseModule.Events;
 public partial class ScpEvents : Service
 {
     private readonly EventManager _eventManager;
-    
+    private readonly Synapse _synapse;
+
     public readonly EventReactor<Scp0492AttackEvent> Scp0492Attack = new();
     public readonly EventReactor<Scp049AttackEvent> Scp049Attack = new();
     public readonly EventReactor<Scp049ReviveEvent> Scp049Revive = new();
@@ -37,9 +38,10 @@ public partial class ScpEvents : Service
 
     public readonly EventReactor<Scp939AttackEvent> Scp939Attack = new();
 
-    public ScpEvents(EventManager eventManager)
+    public ScpEvents(EventManager eventManager, Synapse synapse)
     {
         _eventManager = eventManager;
+        _synapse = synapse;
     }
 
     public override void Enable()
@@ -67,6 +69,8 @@ public partial class ScpEvents : Service
         _eventManager.RegisterEvent(Scp173ActivateBreakneckSpeed);
 
         _eventManager.RegisterEvent(Scp939Attack);
+        
+        PluginAPI.Events.EventManager.RegisterEvents(_synapse,this);
     }
 
     public override void Disable()
@@ -273,21 +277,20 @@ public class Scp049ReviveEvent : ScpActionEvent
 public class Scp106LeavePocketEvent : PlayerEvent
 {
     public Scp106LeavePocketEvent(SynapsePlayer player, bool escapePocket, 
-        Vector3 enteredPosition, Vector3 exitPosition) : base(player)
+        Vector3 enteredExitPosition, Vector3 exitPosition) : base(player)
     {
         EscapePocket = escapePocket;
-        EnteredPosition = enteredPosition;
+        EnteredExitPosition = enteredExitPosition;
         EscapePosition = exitPosition;
-        Allow = true;
     }
     
     public bool EscapePocket { get; set; }
     
-    public Vector3 EnteredPosition { get; set; }
+    public Vector3 EnteredExitPosition { get; }
 
     public Vector3 EscapePosition { get; set; }
 
-    public bool Allow { get; set; }//Strange but the NW API allow to do nothing
+    public bool Allow { get; set; } = true;
 }
 
 public class Scp096ObserveEvent : PlayerInteractEvent
