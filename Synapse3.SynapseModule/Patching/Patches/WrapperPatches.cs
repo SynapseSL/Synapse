@@ -125,7 +125,7 @@ public static class Scp096ShieldMaxPatch
     {
         var player = __instance.Owner.GetSynapsePlayer();
         if (player.MainScpController.CurrentController is not IScpShieldController shieldController) return true;
-
+        
         if (shieldController.UseDefaultMaxShield) return true;
         else
         {

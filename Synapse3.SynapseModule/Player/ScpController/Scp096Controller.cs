@@ -90,6 +90,7 @@ public class Scp096Controller : ScpShieldController<Scp096Role>
     public void ChargeDoor(SynapseDoor door)
     {
         if (IsInstance) return;
+        
         Scp096.ChargeDoor(door.Variant);
     }
     */

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Neuron.Core.Events;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
