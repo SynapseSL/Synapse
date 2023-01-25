@@ -242,7 +242,7 @@ public class TextHintList
     private IEnumerator<float> CallBackUpdateText(float time)
     {
         yield return Timing.WaitForSeconds(Math.Min(time, 2));
-        UpdateText();//A can't catch the hint of the client 
+        UpdateText();//I can't catch the hint of the client (max ammo, item and ect...) so i override them
         yield break;
     }
 
