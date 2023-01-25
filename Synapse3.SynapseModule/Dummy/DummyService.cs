@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using MEC;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Events;
 using UnityEngine;
@@ -23,29 +24,18 @@ public class DummyService : Service
     public override void Enable()
     {
         _round.Waiting.Subscribe(CreateDummyTransformParent);
-        _player.Ban.Subscribe(DespawnDummyKick);
-        _player.Kick.Unsubscribe(DespawnDummyKick);
-        _player.Death.Subscribe(DespawnDummyDeath);
+        _player.Ban.Subscribe(DeSpawnDummyKick);
+        _player.Kick.Subscribe(DeSpawnDummyKick);
     }
 
     public override void Disable()
     {
-        _round.Waiting.Subscribe(CreateDummyTransformParent);
-        _player.Ban.Subscribe(DespawnDummyKick);
-        _player.Kick.Unsubscribe(DespawnDummyKick);
-        _player.Death.Subscribe(DespawnDummyDeath);
+        _round.Waiting.Unsubscribe(CreateDummyTransformParent);
+        _player.Ban.Unsubscribe(DeSpawnDummyKick);
+        _player.Kick.Unsubscribe(DeSpawnDummyKick);
     }
 
-    private void DespawnDummyDeath(DeathEvent ev)
-    {
-        if (ev.Allow && ev.Player is DummyPlayer dummy
-            && dummy.DestroyWhenDied)
-        {
-            dummy.SynapseDummy.Destroy();
-        }
-    }
-
-    private void DespawnDummyKick(KickEvent ev)
+    private void DeSpawnDummyKick(KickEvent ev)
     {
         if (ev.Allow && ev.Player is DummyPlayer dummy)
         {

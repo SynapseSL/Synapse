@@ -2,6 +2,7 @@
 
 namespace Synapse3.SynapseModule.Item;
 
+[AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public class ItemAttribute : Attribute
 {
     public uint Id { get; set; }

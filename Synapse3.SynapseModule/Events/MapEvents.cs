@@ -9,19 +9,22 @@ using UnityEngine;
 
 namespace Synapse3.SynapseModule.Events;
 
-public class MapEvents : Service
+public partial class MapEvents : Service
 {
     private readonly EventManager _eventManager;
+    private readonly Synapse _synapse;
 
     public readonly EventReactor<Scp914UpgradeEvent> Scp914Upgrade = new();
     public readonly EventReactor<ElevatorMoveContentEvent> ElevatorMoveContent = new();
     public readonly EventReactor<TriggerTeslaEvent> TriggerTesla = new();
     public readonly EventReactor<DetonateWarheadEvent> DetonateWarhead = new();
     public readonly EventReactor<CancelWarheadEvent> CancelWarhead = new();
+    public readonly EventReactor<GeneratorEngageEvent> GeneratorEngage = new();
 
-    public MapEvents(EventManager eventManager)
+    public MapEvents(EventManager eventManager, Synapse synapse)
     {
         _eventManager = eventManager;
+        _synapse = synapse;
     }
 
     public override void Enable()
@@ -31,6 +34,9 @@ public class MapEvents : Service
         _eventManager.RegisterEvent(TriggerTesla);
         _eventManager.RegisterEvent(DetonateWarhead);
         _eventManager.RegisterEvent(CancelWarhead);
+        _eventManager.RegisterEvent(GeneratorEngage);
+        
+        PluginAPI.Events.EventManager.RegisterEvents(_synapse,this);
     }
 
     public override void Disable()
@@ -40,6 +46,7 @@ public class MapEvents : Service
         _eventManager.UnregisterEvent(TriggerTesla);
         _eventManager.UnregisterEvent(DetonateWarhead);
         _eventManager.UnregisterEvent(CancelWarhead);
+        _eventManager.UnregisterEvent(GeneratorEngage);
     }
 }
 

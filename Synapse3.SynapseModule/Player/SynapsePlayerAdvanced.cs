@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Mirror;
 using Neuron.Modules.Configs.Localization;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.KeyBind;
 using Synapse3.SynapseModule.Map.Schematic;
 using UnityEngine;
 
@@ -15,10 +17,13 @@ public partial class SynapsePlayer
 
     public BroadcastList ActiveBroadcasts { get; }
     
-    public ScpController ScpController { get; }
+    public ScpController.MainScpController MainScpController { get; }
 
     public Dictionary<string, object> Data { get; set; } = new();
     
+    internal Dictionary<KeyCode , List<IKeyBind>> _binds = new();
+    public ReadOnlyDictionary<KeyCode, List<IKeyBind>> Binds => new(_binds);
+
     public SerializedPlayerState State
     {
         get => this;

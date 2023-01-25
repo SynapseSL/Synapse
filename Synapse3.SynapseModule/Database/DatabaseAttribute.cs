@@ -2,6 +2,7 @@
 
 namespace Synapse3.SynapseModule.Database;
 
+[AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public class DatabaseAttribute : Attribute
 {
     public DatabaseAttribute() { }

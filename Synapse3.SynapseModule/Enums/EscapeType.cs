@@ -7,6 +7,7 @@ public enum EscapeType
     CuffedClassD,
     Scientist,
     CuffedScientist,
+    TooEarly,
     TooFarAway,
     NotAssigned,
     CustomRole,

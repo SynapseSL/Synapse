@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Reflection;
+using GameCore;
 using InventorySystem.Disarming;
 using Mirror.LiteNetLib4Mirror;
 using PlayerRoles;
@@ -91,8 +92,8 @@ public partial class SynapsePlayer
     /// </summary>
     public bool OverWatch
     {
-        get => ServerRoles.OverwatchEnabled;
-        set => ServerRoles.OverwatchEnabled = value;
+        get => ServerRoles.IsInOverwatch;
+        set => ServerRoles.IsInOverwatch = value;
     }
 
     /// <summary>
@@ -205,12 +206,16 @@ public partial class SynapsePlayer
         set => GetStatBase<StaminaStat>().CurValue = value / 100;
     }
     
+    /// <summary>
+    /// The curent stamina use by the player (set to -1 to use the default one)
+    /// </summary>
     public float StaminaUseRate
     {
         get => (CurrentRole as FpcStandardRoleBase)?.FpcModule?.StateProcessor?._useRate ?? 0;
         set
         {
-            if(CurrentRole is not FpcStandardRoleBase fpcRole) return;
+            if (CurrentRole is not FpcStandardRoleBase fpcRole) return;
+            if (value < 0) value = ConfigFile.ServerConfig.GetFloat("stamina_balance_use", 0.05f);
             typeof(FpcStateProcessor)
                 .GetField(nameof(FpcStateProcessor._useRate), BindingFlags.NonPublic | BindingFlags.Instance)
                 ?.SetValue(fpcRole.FpcModule.StateProcessor, value);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Database;
 using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.KeyBind;
 using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Permissions.RemoteAdmin;
 using Synapse3.SynapseModule.Role;
@@ -83,5 +84,14 @@ public class SynapseListenerBinding : IMetaBinding
 {
     public Type ListenerType { get; set; }
     
+    public IEnumerable<Type> PromisedServices => new Type[] { };
+}
+
+public class SynapseKeyBindBinding : IMetaBinding
+{
+    public KeyBindAttribute Info { get; set; }
+
+    public Type Type { get; set; }
+
     public IEnumerable<Type> PromisedServices => new Type[] { };
 }

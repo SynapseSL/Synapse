@@ -2,6 +2,7 @@
 
 namespace Synapse3.SynapseModule.Role;
 
+[AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public class RoleAttribute : Attribute
 {
     public RoleAttribute() { }

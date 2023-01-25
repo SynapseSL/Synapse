@@ -28,7 +28,9 @@ public class SynapseCommandService : Service
         typeof(RoomPointCommand),
         typeof(SchematicCommand),
         typeof(PluginCommand),
-        typeof(LanguageCommand)
+        typeof(LanguageCommand),
+        typeof(KeyBindCommand),
+        typeof(ScpProximityCommand)
     };
     
     private readonly CommandService _command;

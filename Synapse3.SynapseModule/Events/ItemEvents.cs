@@ -10,9 +10,10 @@ using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Events;
 
-public class ItemEvents : Service
+public partial class ItemEvents : Service
 {
     private readonly EventManager _eventManager;
+    private readonly Synapse _synapse;
 
     public readonly EventReactor<BasicItemInteractEvent> BasicInteract = new();
     public readonly EventReactor<KeyCardInteractEvent> KeyCardInteract = new ();
@@ -26,9 +27,10 @@ public class ItemEvents : Service
     public readonly EventReactor<MicroUseEvent> MicroUse = new();
 
 
-    public ItemEvents(EventManager eventManager)
+    public ItemEvents(EventManager eventManager, Synapse synapse)
     {
         _eventManager = eventManager;
+        _synapse = synapse;
     }
 
     public override void Enable()
@@ -53,6 +55,8 @@ public class ItemEvents : Service
         RadioUse.Subscribe(BasicInteract.Raise);
         ThrowGrenade.Subscribe(BasicInteract.Raise);
         MicroUse.Subscribe(BasicInteract.Raise);
+        
+        PluginAPI.Events.EventManager.RegisterEvents(_synapse,this);
     }
 
     public override void Disable()

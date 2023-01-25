@@ -489,7 +489,7 @@ public static class RemoteAdminPlayerDataRequestPatch
                 message += " <color=#43C6DB>[RA AUTHENTICATED]</color>";
             }
 
-            if (player.serverRoles.OverwatchEnabled)
+            if (player.serverRoles.IsInOverwatch)
             {
                 message += " <color=#008080>[OVERWATCH MODE]</color>";
             }

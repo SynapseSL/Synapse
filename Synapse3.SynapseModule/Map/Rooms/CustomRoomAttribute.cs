@@ -2,6 +2,7 @@
 
 namespace Synapse3.SynapseModule.Map.Rooms;
 
+[AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public class CustomRoomAttribute : Attribute
 {
     public CustomRoomAttribute() { }

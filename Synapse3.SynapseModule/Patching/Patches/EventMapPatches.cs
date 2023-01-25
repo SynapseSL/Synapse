@@ -1,9 +1,14 @@
 ﻿using System.Collections.Generic;
+using Footprinting;
 using HarmonyLib;
 using InventorySystem.Items.Armor;
 using InventorySystem.Items.Pickups;
+using MapGeneration.Distributors;
 using Neuron.Core.Meta;
+using PluginAPI.Enums;
+using PluginAPI.Events;
 using Scp914;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Player;
@@ -21,10 +26,185 @@ public static class Scp914UpgradePatch
         => DecoratedMapPatches.OnUpgrade(intake, moveVector, mode, setting);
 }
 
+[Automatic]
+[SynapsePatch("GeneratorEngage", PatchType.MapEvent)]
+public static class GeneratorEngagePatch
+{
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp079Generator), nameof(Scp079Generator.ServerUpdate))]
+    public static bool GeneratorEngage(Scp079Generator __instance)
+    {
+        DecoratedMapPatches.GeneratorUpdate(__instance);
+        return false;
+    }
+}
+
+[Automatic]
+[SynapsePatch("GeneratorInteract", PatchType.MapEvent)]
+public static class GeneratorInteractPatch
+{
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp079Generator), nameof(Scp079Generator.ServerInteract))]
+    public static bool GeneratorInteract(Scp079Generator __instance, ReferenceHub ply, byte colliderId)
+    {
+        DecoratedMapPatches.OnGenInteract(__instance, ply, colliderId);
+        return false;
+    }
+}
+
 public static class DecoratedMapPatches
 {
     private static readonly MapEvents MapEvents;
     static DecoratedMapPatches() => MapEvents = Synapse.Get<MapEvents>();
+    
+    public static void OnGenInteract(Scp079Generator gen, ReferenceHub hub, byte interaction)
+    {
+        if(gen._cooldownStopwatch.IsRunning && gen._cooldownStopwatch.Elapsed.TotalSeconds < gen._targetCooldown) return;
+
+        if (interaction != 0 && !gen.HasFlag(gen._flags, Scp079Generator.GeneratorFlags.Open))
+            return;
+        
+        gen._cooldownStopwatch.Stop();
+        var player = hub.GetSynapsePlayer();
+
+        var nwAllow = EventManager.ExecuteEvent(ServerEventType.PlayerInteractGenerator, hub, gen,
+            (Scp079Generator.GeneratorColliderId)interaction);
+
+        switch (interaction)
+        {
+            //0 - Request interaction with Generator Doors (doors)
+            case 0:
+                if (gen.HasFlag(gen._flags, Scp079Generator.GeneratorFlags.Unlocked))
+                {
+                    var isOpen = gen.HasFlag(gen._flags, Scp079Generator.GeneratorFlags.Open);
+                    var nwAllow2 = EventManager.ExecuteEvent(
+                        isOpen ? ServerEventType.PlayerCloseGenerator : ServerEventType.PlayerOpenGenerator, hub, gen);
+
+                    var ev = new GeneratorInteractEvent(player, nwAllow && nwAllow2, gen.GetSynapseGenerator(), isOpen
+                        ? GeneratorInteract.CloseDoor
+                        : GeneratorInteract.OpenDoor);
+                    
+                    Synapse.Get<PlayerEvents>().GeneratorInteract.RaiseSafely(ev);
+
+                    if (ev.Allow)
+                    {
+                        gen.ServerSetFlag(Scp079Generator.GeneratorFlags.Open, !isOpen);
+                        gen._targetCooldown = gen._doorToggleCooldownTime;
+                    }
+                }
+                else
+                {
+                    var allow = gen._requiredPermission.CheckPermission(player) &&
+                                Synapse3Extensions.CanHarmScp(player, true) &&
+                                EventManager.ExecuteEvent(ServerEventType.PlayerUnlockGenerator, hub, gen);
+                    var ev = new GeneratorInteractEvent(player, allow, gen.GetSynapseGenerator(),
+                        GeneratorInteract.UnlockDoor);
+                    Synapse.Get<PlayerEvents>().GeneratorInteract.RaiseSafely(ev);
+
+                    if (ev.Allow)
+                    {
+                        gen.ServerSetFlag(Scp079Generator.GeneratorFlags.Unlocked, true);
+                        gen.ServerGrantTicketsConditionally(new Footprint(hub), 0.5f);
+                    }
+                    else
+                    {
+                        gen.RpcDenied();
+                    }
+                    gen._targetCooldown = gen._unlockCooldownTime;
+                }
+                break;
+            
+            //1 - Request to swap the Activation State (lever)
+            case 1:
+                if ((gen.Activating || Synapse3Extensions.CanHarmScp(player,true)) && !gen.Engaged)
+                {
+                    var nwAllow2 = EventManager.ExecuteEvent(
+                        gen.Activating
+                            ? ServerEventType.PlayerDeactivatedGenerator
+                            : ServerEventType.PlayerActivateGenerator, hub, gen);
+                    var ev = new GeneratorInteractEvent(player, nwAllow && nwAllow2, gen.GetSynapseGenerator(),
+                        gen.Activating ? GeneratorInteract.Cancel : GeneratorInteract.Activate);
+                    Synapse.Get<PlayerEvents>().GeneratorInteract.RaiseSafely(ev);
+                    if(!ev.Allow) break;
+                    
+                    gen.Activating = !gen.Activating;
+                    if (gen.Activating)
+                    {
+                        gen._leverStopwatch.Restart();
+                        gen._lastActivator = new Footprint(hub);
+                    }
+                    else
+                    {
+                        gen._lastActivator = default;
+                    }
+
+                    gen._targetCooldown = gen._doorToggleCooldownTime;
+                }
+                break;
+            
+            //2 - Request to cancel the activation (cancel button)
+            case 2:
+                if (gen.Activating && !gen.Engaged)
+                {
+                    var ev = new GeneratorInteractEvent(player,
+                        nwAllow && EventManager.ExecuteEvent(ServerEventType.PlayerDeactivatedGenerator, hub, gen),
+                        gen.GetSynapseGenerator(),
+                        GeneratorInteract.Cancel);
+                    Synapse.Get<PlayerEvents>().GeneratorInteract.RaiseSafely(ev);
+                    if (!ev.Allow) break;
+
+                    gen.ServerSetFlag(Scp079Generator.GeneratorFlags.Activating, false);
+                    gen._targetCooldown = gen._unlockCooldownTime;
+                    gen._lastActivator = default;
+                }
+                break;
+            
+            default:
+                gen._targetCooldown = 1f;
+                break;
+        }
+        
+        gen._cooldownStopwatch.Restart();
+    }
+
+    public static void GeneratorUpdate(Scp079Generator generator)
+    {
+        var engageReady = generator._currentTime >= generator._totalActivationTime;
+        if (!engageReady)
+        {
+            var time = Mathf.FloorToInt(generator._totalActivationTime - generator._currentTime);
+            if (time != generator._syncTime)
+                generator.Network_syncTime = (short)time;
+        }
+
+        if (generator.ActivationReady)
+        {
+            if (engageReady && !generator.Engaged)
+            {
+                var ev = new GeneratorEngageEvent(generator.GetSynapseGenerator());
+                MapEvents.GeneratorEngage.RaiseSafely(ev);
+
+                if (!ev.Allow || ev.ForcedUnAllow ||
+                    !EventManager.ExecuteEvent(ServerEventType.GeneratorActivated, generator))
+                    return;
+                
+                generator.Engaged = true;
+                generator.Activating = false;
+                return;
+            }
+
+            generator._currentTime += Time.deltaTime;
+        }
+        else
+        {
+            if(generator._currentTime == 0f || engageReady)
+                return;
+            
+            generator._currentTime -= generator.DropdownSpeed * Time.deltaTime;
+        }
+
+        generator._currentTime = Mathf.Clamp(generator._currentTime, 0f, generator._totalActivationTime);
+    }
     
     public static bool OnUpgrade(Collider[] intake, Vector3 moveVector, Scp914Mode mode, Scp914KnobSetting setting)
     {

@@ -2,6 +2,7 @@
 
 namespace Synapse3.SynapseModule.Permissions.RemoteAdmin;
 
+[AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public class RaCategoryAttribute : Attribute
 {
     public RaCategoryAttribute() { }

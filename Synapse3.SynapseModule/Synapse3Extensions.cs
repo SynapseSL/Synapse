@@ -17,7 +17,10 @@ using Neuron.Core.Logging;
 using Neuron.Modules.Configs.Localization;
 using PlayerRoles;
 using PlayerRoles.PlayableScps.Scp079.Cameras;
+using PlayerRoles.PlayableScps.Subroutines;
 using PlayerStatsSystem;
+using PluginAPI.Core.Interfaces;
+using PluginAPI.Events;
 using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
@@ -155,11 +158,14 @@ public static class Synapse3Extensions
         .GetPlayer(x => x.CommandSender == sender, PlayerType.Dummy, PlayerType.Player, PlayerType.Server);
     public static SynapsePlayer GetSynapsePlayer(this StatBase stat) => stat.Hub.GetSynapsePlayer();
     public static SynapsePlayer GetSynapsePlayer(this Footprint footprint) => footprint.Hub?.GetSynapsePlayer();
+    public static SynapsePlayer GetSynapsePlayer(this IPlayer player) => player.ReferenceHub?.GetSynapsePlayer();
 
-    
+    public static SynapsePlayer GetSynapsePlayer<TScpRole>(this ScpStandardSubroutine<TScpRole> role)
+        where TScpRole : PlayerRoleBase
+        => role.Owner.GetSynapsePlayer();
+
     public static SynapseItem GetItem(this ItemPickupBase pickupBase) => _item.GetSynapseItem(pickupBase.Info.Serial);
     public static SynapseItem GetItem(this ItemBase itemBase) => _item.GetSynapseItem(itemBase.ItemSerial);
-
     
     /// <summary>
     /// Returns a UniversalDamageHandler based upon the given DamageType
@@ -173,22 +179,17 @@ public static class Synapse3Extensions
     public static DamageType GetDamageType(this DamageHandlerBase handler)
     {
         if (handler == null) return DamageType.Unknown;
-                
-        if(Enum.TryParse<DamageType>(handler.GetType().Name.Replace("DamageHandler",""),out var type))
-        {
-            if(type == DamageType.Universal)
-            {
-                var id = ((UniversalDamageHandler)handler).TranslationId;
 
-                if (id > 23) return DamageType.Universal;
+        if (!Enum.TryParse<DamageType>(handler.GetType().Name.Replace("DamageHandler", ""), out var type))
+            return DamageType.Unknown;
+        
+        if (type != DamageType.Universal) return type;
+        var id = ((UniversalDamageHandler)handler).TranslationId;
 
-                return (DamageType)id;
-            }
+        if (id > 23) return DamageType.Universal;
 
-            return type;
-        }
+        return (DamageType)id;
 
-        return DamageType.Unknown;
     }
     public static IRoom GetRoom(this RoomType type) => _room._rooms.FirstOrDefault(x => x.Id == (int)type);
 
@@ -271,14 +272,13 @@ public static class Synapse3Extensions
     
     public static SynapseTesla GetSynapseTesla(this TeslaGate gate) => _map
         ._synapseTeslas.FirstOrDefault(x => x.Gate == gate);
-
+  
     public static IElevator GetSynapseElevator(this ElevatorChamber chamber) => _elevator.Elevators.FirstOrDefault(x =>
         x.Chamber is SynapseElevatorChamber synapseChamber && synapseChamber.Chamber == chamber);
     
     public static SynapseCamera GetCamera(this Scp079Camera cam) => _map
             ._synapseCameras.FirstOrDefault(x => x.Camera == cam);
 
-    
     public static bool CanHarmScp(SynapsePlayer player, bool message)
     {
         if (player.TeamID != (int)Team.SCPs &&
@@ -289,64 +289,72 @@ public static class Synapse3Extensions
         return false;
 
     }
+
     public static bool GetHarmPermission(SynapsePlayer attacker, SynapsePlayer victim, bool ignoreFFConfig = false)
     {
-        try
-        {
-            bool allow;
+        bool allow;
 
-            if (_round.RoundEnded && _config.GamePlayConfiguration.AutoFriendlyFire)
-            {
-                allow = true;
-            }
-            else if (attacker == victim)
-            {
-                allow = true;
-            }
-            else if (attacker.Team == Team.Dead && victim.Team == Team.Dead)
+        if (attacker == null || victim == null)
+        {
+            allow = true;
+            goto Event;
+        }
+
+        if (_round.RoundEnded && _config.GamePlayConfiguration.AutoFriendlyFire)
+        {
+            allow = true;
+            goto Event;
+        }
+        
+        if (attacker == victim)
+        {
+            allow = true;
+            goto Event;
+        }
+        
+        if (attacker.Team == Team.Dead && victim.Team == Team.Dead)
+        {
+            allow = false;
+            goto Event;
+        }
+        
+        if (attacker.CustomRole == null && victim.CustomRole == null)
+        {
+            if (attacker.Team == Team.SCPs && victim.Team == Team.SCPs)
             {
                 allow = false;
+                goto Event;
             }
-            else if (attacker.CustomRole == null && victim.CustomRole == null)
-            {
-                if (attacker.Team == Team.SCPs && victim.Team == Team.SCPs) allow = false;
 
-                var ff = ignoreFFConfig || _server.FF;
+            var ff = ignoreFFConfig || _server.FF;
 
-                if (ff)
-                {
-                    allow = true;
-                }
-                else
-                {
-                    allow = attacker.Faction != victim.Faction;
-                }
-            }
-            else
+            if (ff)
             {
                 allow = true;
-                if (attacker.CustomRole != null && attacker.CustomRole.GetFriendsID().Any(x => x == victim.TeamID))
-                {
-                    allow = false;
-                    attacker.SendHint(_config.Translation.Get(attacker).SameTeam);
-                }
-
-                if (victim.CustomRole != null && victim.CustomRole.GetFriendsID().Any(x => x == attacker.TeamID))
-                {
-                    allow = false;
-                    attacker.SendHint(_config.Translation.Get(attacker).SameTeam);
-                }
+                goto Event;
             }
             
-            var ev = new HarmPermissionEvent(attacker, victim, allow);
-            _playerEvents.HarmPermission.Raise(ev);
-            return ev.Allow;
+            allow = attacker.Faction != victim.Faction;
+            goto Event;
         }
-        catch (Exception ex)
+        
+        allow = true;
+        if (attacker.CustomRole != null && attacker.CustomRole.GetFriendsID().Any(x => x == victim.TeamID))
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 FF: Harm Permission Event failed\n" + ex);
-            return true;
+            allow = false;
+            attacker.SendHint(_config.Translation.Get(attacker).SameTeam);
         }
+
+        if (victim.CustomRole != null && victim.CustomRole.GetFriendsID().Any(x => x == attacker.TeamID))
+        {
+            allow = false;
+            attacker.SendHint(_config.Translation.Get(attacker).SameTeam);
+        }
+         
+        Event:
+        var ev = new HarmPermissionEvent(attacker, victim, allow);
+        _playerEvents.HarmPermission.RaiseSafely(ev);
+        return ev.Allow;
     }
 
     public static TTranslation Get<TTranslation>(this TTranslation translation)
@@ -380,4 +388,39 @@ public static class Synapse3Extensions
             SynapseLogger<Synapse>.Error($"{eventParameter.GetType().Name} failed\n" + ex);
         }
     }
+
+    private static FieldInfo FindField(Type type, string name)
+    {
+        var field = type.GetField(name, BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic);
+        if (field != null)
+        {
+            return field;
+        }
+        var baseType = type.BaseType;
+        if (baseType == null)
+        {
+            return null;
+        }
+        return FindField(baseType, name);
+    }
+
+    public static void RaiseEvent(object source, string eventName, params object [] args)
+    {
+        // Find the delegate and invoke it.
+        var delegateField = FindField(source.GetType(), eventName);
+        var eventDelegate = delegateField?.GetValue(source) as Delegate;
+        eventDelegate?.DynamicInvoke(args);
+    }
+
+    public static void RaiseEvent(Type source, string eventName, params object [] args)
+    {
+        // Find the delegate and invoke it.
+        var delegateField = FindField(source, eventName);
+        var eventDelegate = delegateField?.GetValue(null) as Delegate;
+        eventDelegate?.DynamicInvoke(args);
+    }
+
+    public static T GetSubroutine<T>(this ISubroutinedScpRole role) where T : ScpSubroutineBase
+        => role.SubroutineModule.AllSubroutines
+        .FirstOrDefault(p => p is T) as T;
 }

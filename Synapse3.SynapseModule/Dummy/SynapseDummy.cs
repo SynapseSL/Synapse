@@ -130,8 +130,12 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
 
     public PlayerMovementState Movement
     {
-        get => Player.FirstPersonMovement.CurrentMovementState;
-        set => Player.FirstPersonMovement.CurrentMovementState = value;
+        get => Player.FirstPersonMovement?.CurrentMovementState ?? PlayerMovementState.Crouching;
+        set
+        {
+            if (Player.FirstPersonMovement != null)
+                Player.FirstPersonMovement.CurrentMovementState = value;
+        }
     }
 
     public DummyPlayer Player { get; }
@@ -289,6 +293,12 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
                 SynapseLogger<Synapse>.Error($"Sy3 Dummy: Update Failed:\n{e}");
             }
         }
+    }
+
+    public override void Destroy()
+    {
+        FakeConnection.Disconnect();
+        NetworkServer.Destroy(GameObject);
     }
 
     public override void HideFromAll() => DeSpawn();

@@ -12,6 +12,7 @@ using Respawning;
 using RoundRestarting;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Role;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
@@ -239,7 +240,7 @@ public partial class SynapsePlayer
         
         if (HasCustomRole) return EscapeType.CustomRole;
         if (CurrentRole is not HumanRole human) return EscapeType.NotAssigned;
-        if (human.ActiveTime < 10f) return EscapeType.None;
+        if (human.ActiveTime < 10f) return EscapeType.TooEarly;
         
         var disarmed = IsDisarmed;
         if (IsDisarmed && !CharacterClassManager.CuffedChangeTeam) return EscapeType.NotAssigned;
@@ -267,14 +268,9 @@ public partial class SynapsePlayer
         var ev = new EscapeEvent(this, true, state);
         _playerEvents.Escape.Raise(ev);
 
-        var vanillaRole = RoleTypeId.None;
+        RoleTypeId vanillaRole;
         switch (ev.EscapeType)
         {
-            case EscapeType.NotAssigned:
-            case EscapeType.TooFarAway:
-            case EscapeType.None:
-                return;
-            
             case EscapeType.CustomRole:
                 CustomRole?.TryEscape();
                 return;
@@ -285,7 +281,9 @@ public partial class SynapsePlayer
                     ScenarioId = (byte)Escape.EscapeScenarioType.ClassD,
                     EscapeTime = (ushort)Mathf.CeilToInt(CurrentRole.ActiveTime)
                 });
-                RoleID = ev.OverrideRole;
+                if (ev.OverrideRole is >= 0 and <= RoleService.HighestRole)
+                    RoleManager.ServerSetRole((RoleTypeId)ev.OverrideRole, RoleChangeReason.Escaped);
+                else RoleID = ev.OverrideRole;
                 return;
             
             case EscapeType.ClassD:
@@ -300,6 +298,13 @@ public partial class SynapsePlayer
             case EscapeType.Scientist:
                 vanillaRole = RoleTypeId.NtfSpecialist;
                 break;
+            
+            case EscapeType.NotAssigned:
+            case EscapeType.TooFarAway:
+            case EscapeType.TooEarly:
+            case EscapeType.None:
+            default:
+                return;
         }
 
         if (!EventManager.ExecuteEvent(ServerEventType.PlayerEscape, Hub, vanillaRole)) return;

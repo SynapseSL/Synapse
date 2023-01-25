@@ -12,7 +12,7 @@ namespace Synapse3.SynapseModule.Item;
 
 public class ItemService : Service
 {
-    public const int HighestItem = (int)ItemType.ParticleDisruptor;
+    public const int HighestItem = (int)ItemType.Jailbird;
 
     private readonly IKernel _kernel;
     private readonly RoundEvents _round;

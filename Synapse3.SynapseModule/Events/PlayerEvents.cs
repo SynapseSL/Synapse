@@ -10,6 +10,7 @@ using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
+using VoiceChat;
 
 namespace Synapse3.SynapseModule.Events;
 
@@ -17,6 +18,7 @@ public partial class PlayerEvents : Service
 {
     private readonly Synapse _synapse;
     private readonly EventManager _eventManager;
+    private readonly ItemService _item;
 
     public readonly EventReactor<LoadComponentEvent> LoadComponent = new();
     public readonly EventReactor<KeyPressEvent> KeyPress = new();
@@ -36,14 +38,12 @@ public partial class PlayerEvents : Service
     public readonly EventReactor<ChangeItemEvent> ChangeItem = new();
     public readonly EventReactor<PickupEvent> Pickup = new();
     public readonly EventReactor<DropItemEvent> DropItem = new();
-    public readonly EventReactor<EnterFemurEvent> EnterFemur = new();
     public readonly EventReactor<GeneratorInteractEvent> GeneratorInteract = new();
     public readonly EventReactor<HealEvent> Heal = new();
     public readonly EventReactor<JoinEvent> Join = new();
     public readonly EventReactor<LeaveEvent> Leave = new();
     public readonly EventReactor<PlaceBulletHoleEvent> PlaceBulletHole = new();
     public readonly EventReactor<ReportEvent> Report = new();
-    public readonly EventReactor<SpeakSecondaryEvent> SpeakSecondary = new();
     public readonly EventReactor<OpenWarheadButtonEvent> OpenWarheadButton = new();
     public readonly EventReactor<WalkOnHazardEvent> WalkOnHazard = new();
     public readonly EventReactor<WalkOnSinkholeEvent> WalkOnSinkhole = new();
@@ -57,11 +57,14 @@ public partial class PlayerEvents : Service
     public readonly EventReactor<SendPlayerDataEvent> SendPlayerData = new();
     public readonly EventReactor<ChangeRoleEvent> ChangeRole = new();
     public readonly EventReactor<KickEvent> Kick = new();
+    public readonly EventReactor<SpeakEvent> Speak = new();
+    public readonly EventReactor<SpeakToPlayerEvent> SpeakToPlayer = new();
 
-    public PlayerEvents(EventManager eventManager, Synapse synapse)
+    public PlayerEvents(EventManager eventManager, Synapse synapse, ItemService item)
     {
         _eventManager = eventManager;
         _synapse = synapse;
+        _item = item;
     }
 
     public override void Enable()
@@ -81,7 +84,6 @@ public partial class PlayerEvents : Service
         _eventManager.RegisterEvent(DropAmmo);
         _eventManager.RegisterEvent(Escape);
         _eventManager.RegisterEvent(DropItem);
-        _eventManager.RegisterEvent(EnterFemur);
         _eventManager.RegisterEvent(GeneratorInteract);
         _eventManager.RegisterEvent(Heal);
         _eventManager.RegisterEvent(Join);
@@ -89,7 +91,6 @@ public partial class PlayerEvents : Service
         _eventManager.RegisterEvent(Pickup);
         _eventManager.RegisterEvent(PlaceBulletHole);
         _eventManager.RegisterEvent(Report);
-        _eventManager.RegisterEvent(SpeakSecondary);
         _eventManager.RegisterEvent(OpenWarheadButton);
         _eventManager.RegisterEvent(StartWorkStation);
         _eventManager.RegisterEvent(FallingIntoAbyss);
@@ -100,13 +101,15 @@ public partial class PlayerEvents : Service
         _eventManager.RegisterEvent(SendPlayerData);
         _eventManager.RegisterEvent(ChangeRole);
         _eventManager.RegisterEvent(Kick);
+        _eventManager.RegisterEvent(Speak);
+        _eventManager.RegisterEvent(SpeakToPlayer);
 
         WalkOnSinkhole.Subscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Subscribe(WalkOnHazard.Raise);
-
+        
+        PlayerRoleManager.OnServerRoleSet += CallSimpleSetClass;
+        
         PluginAPI.Events.EventManager.RegisterEvents(_synapse,this);
-        //TODO:
-        //PlayerRoleManager.OnServerRoleSet += CallSimpleSetClass;
     }
 
     public override void Disable()
@@ -126,7 +129,6 @@ public partial class PlayerEvents : Service
         _eventManager.UnregisterEvent(DropAmmo);
         _eventManager.UnregisterEvent(Escape);
         _eventManager.UnregisterEvent(DropItem);
-        _eventManager.UnregisterEvent(EnterFemur);
         _eventManager.UnregisterEvent(GeneratorInteract);
         _eventManager.UnregisterEvent(Heal);
         _eventManager.UnregisterEvent(Join);
@@ -134,7 +136,6 @@ public partial class PlayerEvents : Service
         _eventManager.UnregisterEvent(Pickup);
         _eventManager.UnregisterEvent(PlaceBulletHole);
         _eventManager.UnregisterEvent(Report);
-        _eventManager.UnregisterEvent(SpeakSecondary);
         _eventManager.UnregisterEvent(OpenWarheadButton);
         _eventManager.UnregisterEvent(StartWorkStation);
         _eventManager.UnregisterEvent(FallingIntoAbyss);
@@ -145,24 +146,36 @@ public partial class PlayerEvents : Service
         _eventManager.UnregisterEvent(SendPlayerData);
         _eventManager.UnregisterEvent(ChangeRole);
         _eventManager.UnregisterEvent(Kick);
+        _eventManager.UnregisterEvent(Speak);
+        _eventManager.UnregisterEvent(SpeakToPlayer);
 
         WalkOnSinkhole.Unsubscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Unsubscribe(WalkOnHazard.Raise);
 
-        //TODO:
-        //CharacterClassManager.OnClassChanged -= CallSimpleSetClass;
+        PlayerRoleManager.OnServerRoleSet -= CallSimpleSetClass;
     }
 
-    private void CallSimpleSetClass(ReferenceHub hub, RoleTypeId previous, RoleTypeId next)
+    private void CallSimpleSetClass(ReferenceHub hub, RoleTypeId newRole, RoleChangeReason reason)
     {
         var player = hub.GetSynapsePlayer();
         if (player == null) return;
-        var ev = new SimpleSetClassEvent(player, previous, next);
+        var currentRole = player.RoleType;
+        var ev = new SimpleSetClassEvent(player, currentRole, newRole);
         SimpleSetClass.Raise(ev);
+        
+        switch (currentRole)
+        {
+            case RoleTypeId.Scp106:
+                player.MainScpController.Scp106.ResetDefault();
+                break;
+            case RoleTypeId.Scp173:
+                player.MainScpController.Scp173.ResetDefault();
+                break;
+        }
 
         if (player.CustomRole == null)
             Timing.CallDelayed(Timing.WaitForOneFrame,
-                () => ChangeRole.Raise(new ChangeRoleEvent(player) { RoleId = (uint)next }));
+                () => ChangeRole.Raise(new ChangeRoleEvent(player) { RoleId = (uint)newRole }));
     }
 }
 
@@ -233,30 +246,19 @@ public class HarmPermissionEvent : IEvent
 
 public class SetClassEvent : PlayerInteractEvent
 {
-    public SetClassEvent(SynapsePlayer player, RoleTypeId role, RoleChangeReason reason) : base(player,
-        true)
+    public SetClassEvent(SynapsePlayer player, RoleTypeId role, RoleChangeReason reason, RoleSpawnFlags spawnFlags) :
+        base(player,true)
     {
         Role = role;
         SpawnReason = reason;
+        SpawnFlags = spawnFlags;
     }
 
     public RoleTypeId Role { get; set; }
 
     public RoleChangeReason SpawnReason { get; set; }
-
-    /*TODO:
-    public List<uint> Items { get; set; } = new();
-
-    public List<SynapseItem> EscapeItems { get; set; } = new();
     
-    public byte UnitId { get; set; } = 0;
-*/
-    
-    public Vector3 Position { get; set; } = Vector3.zero;
-
-    public float HorizontalRotation { get; set; } = 0f;
-
-    public Dictionary<AmmoType, ushort> Ammo { get; set; } = new();
+    public RoleSpawnFlags SpawnFlags { get; set; }
 }
 
 public class UpdateEvent : PlayerEvent
@@ -284,12 +286,15 @@ public class DoorInteractEvent : PlayerInteractEvent
 
 public class LockerUseEvent : PlayerInteractEvent
 {
-    public LockerUseEvent(SynapsePlayer player, bool allow, SynapseLocker locker,
-        SynapseLocker.SynapseLockerChamber chamber) : base(player, allow)
+    public LockerUseEvent(SynapsePlayer player, bool hasPerm, SynapseLocker locker,
+        SynapseLocker.SynapseLockerChamber chamber) : base(player, true)
     {
         Locker = locker;
         Chamber = chamber;
+        IsAllowedToOpen = hasPerm;
     }
+    
+    public bool IsAllowedToOpen { get; set; }
 
     public SynapseLocker Locker { get; }
 
@@ -298,7 +303,12 @@ public class LockerUseEvent : PlayerInteractEvent
 
 public class StartWarheadEvent : PlayerInteractEvent
 {
-    public StartWarheadEvent(SynapsePlayer player, bool allow) : base(player, allow) { }
+    public StartWarheadEvent(SynapsePlayer player, bool allow, bool isResumed) : base(player, allow)
+    {
+        IsResumed = isResumed;
+    }
+
+    public bool IsResumed { get; }
 }
 
 public class WarheadPanelInteractEvent : PlayerInteractEvent
@@ -314,16 +324,12 @@ public class WarheadPanelInteractEvent : PlayerInteractEvent
 
 public class BanEvent : KickEvent
 {
-    public BanEvent(SynapsePlayer player, bool allow, SynapsePlayer admin, string reason, long duration,
-        bool global) : base(player, admin, reason, allow)
+    public BanEvent(SynapsePlayer player, bool allow, SynapsePlayer admin, string reason, long duration) : base(player, admin, reason, allow)
     {
         Duration = duration;
-        GlobalBan = global;
     }
 
     public long Duration { get; set; }
-
-    public bool GlobalBan { get; }
 }
 
 public class ChangeItemEvent : PlayerInteractEvent
@@ -358,13 +364,13 @@ public class DamageEvent : PlayerInteractEvent
 public class DeathEvent : PlayerInteractEvent
 {
     public DeathEvent(SynapsePlayer player, bool allow, SynapsePlayer attacker, DamageType damageType,
-        float lastTakenDamage, string playerMessage, string ragdollMessage) : base(player, allow)
+        float lastTakenDamage, string playerMessage, string ragDollMessage) : base(player, allow)
     {
         Attacker = attacker;
         DamageType = damageType;
         LastTakenDamage = lastTakenDamage;
         DeathMessage = playerMessage;
-        RagdollInfo = ragdollMessage;
+        RagDollInfo = ragDollMessage;
     }
 
     public SynapsePlayer Attacker { get; }
@@ -375,7 +381,7 @@ public class DeathEvent : PlayerInteractEvent
 
     public string DeathMessage { get; set; }
 
-    public string RagdollInfo { get; set; }
+    public string RagDollInfo { get; set; }
 }
 
 public class FreePlayerEvent : PlayerInteractEvent
@@ -390,15 +396,18 @@ public class FreePlayerEvent : PlayerInteractEvent
 
 public class DropAmmoEvent : PlayerInteractEvent
 {
-    public DropAmmoEvent(SynapsePlayer player, bool allow, AmmoType ammoType, ushort amount) : base(player, allow)
+    public DropAmmoEvent(SynapsePlayer player, bool allow, AmmoType ammoType, ushort amount, bool checkMinimals) : base(player, allow)
     {
         AmmoType = ammoType;
         Amount = amount;
+        CheckMinimals = checkMinimals;
     }
 
     public AmmoType AmmoType { get; set; }
 
     public ushort Amount { get; set; }
+    
+    public bool CheckMinimals { get; set; }
 }
 
 public class EscapeEvent : PlayerInteractEvent
@@ -430,19 +439,9 @@ public class DropItemEvent : PlayerInteractEvent
         Throw = @throw;
     }
 
-    public SynapseItem ItemToDrop { get; }
+    public SynapseItem ItemToDrop { get; set; }
 
     public bool Throw { get; set; }
-}
-
-public class EnterFemurEvent : PlayerInteractEvent
-{
-    public EnterFemurEvent(SynapsePlayer player, bool allow, bool closeFemur) : base(player, allow)
-    {
-        CloseFemur = closeFemur;
-    }
-
-    public bool CloseFemur { get; set; }
 }
 
 public class GeneratorInteractEvent : PlayerInteractEvent
@@ -519,29 +518,14 @@ public class ReportEvent : PlayerInteractEvent
     public bool SendToNorthWood { get; set; }
 }
 
-public class SpeakSecondaryEvent : PlayerInteractEvent
-{
-    public SpeakSecondaryEvent(SynapsePlayer player, bool allow, bool radioChat, bool scp939Chat, bool startSpeaking) : base(player, allow)
-    {
-        RadioChat = radioChat;
-        Scp939Chat = scp939Chat;
-        StartSpeaking = startSpeaking;
-    }
-
-    public bool RadioChat { get; set; }
-    public bool Scp939Chat { get; set; }
-
-    public bool StartSpeaking { get; }
-}
-
 public class OpenWarheadButtonEvent : PlayerInteractEvent
 {
-    public OpenWarheadButtonEvent(SynapsePlayer player, bool allow, bool open) : base(player, allow)
+    public OpenWarheadButtonEvent(SynapsePlayer player, bool allow, bool openButton) : base(player, allow)
     {
-        Open = open;
+        OpenButton = openButton;
     }
 
-    public bool Open { get; set; }
+    public bool OpenButton { get; set; }
 }
 
 public abstract class WalkOnHazardEvent : PlayerInteractEvent
@@ -610,7 +594,7 @@ public class UpdateDisplayNameEvent : PlayerEvent
         NewDisplayName = newDisplayName;
     }
 
-    public string NewDisplayName { get; }
+    public string NewDisplayName { get; set; }
 }
 
 public class CheckKeyCardPermissionEvent : PlayerInteractEvent
@@ -674,4 +658,23 @@ public class KickEvent : PlayerInteractEvent
     public SynapsePlayer Admin { get; }
 
     public string Reason { get; set; }
+}
+
+public class SpeakEvent : PlayerInteractEvent
+{
+    public SpeakEvent(SynapsePlayer player, bool allow, VoiceChatChannel channel) : base(player, allow)
+    {
+        Channel = channel;
+    }
+    
+    public VoiceChatChannel Channel { get; set; }
+}
+
+public class SpeakToPlayerEvent : SpeakEvent
+{
+    public SynapsePlayer Receiver { get; }
+
+    public SpeakToPlayerEvent(SynapsePlayer player, SynapsePlayer receiver, bool allow, VoiceChatChannel channel) :
+        base(player, allow, channel)
+        => Receiver = receiver;
 }

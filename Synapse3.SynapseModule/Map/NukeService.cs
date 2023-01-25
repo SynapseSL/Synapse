@@ -68,7 +68,7 @@ public class NukeService : Service
         => WarheadController.CancelDetonation();
 
     public void Shake() => WarheadController.RpcShake(true);
-
+    
     public void InstantDetonation()
     {
         WarheadController.InstantPrepare();

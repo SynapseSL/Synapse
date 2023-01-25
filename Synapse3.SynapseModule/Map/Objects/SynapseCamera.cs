@@ -43,4 +43,6 @@ public class SynapseCamera
     }
 
     public ushort SyncId => Camera.SyncId;
+
+    public string Name => Camera.name;
 }
