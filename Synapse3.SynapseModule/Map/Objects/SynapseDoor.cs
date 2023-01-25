@@ -14,27 +14,27 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
 {
     private readonly MirrorService _mirror;
     private readonly PlayerService _player;
-    
+
     public static Dictionary<SpawnableDoorType, BreakableDoor> Prefab { get; } = new();
 
     public DoorVariant Variant { get; }
-    
+
     public override GameObject GameObject => Variant.gameObject;
-    
+
     public override NetworkIdentity NetworkIdentity => Variant.netIdentity;
-    
+
     public override ObjectType Type => ObjectType.Door;
 
     public override void OnDestroy()
     {
         Map._synapseDoors.Remove(this);
         base.OnDestroy();
-        
+
         if (Parent is SynapseSchematic schematic) schematic._doors.Remove(this);
     }
 
     private string _name;
-    
+
     public DoorType DoorType { get; private set; }
 
     public string Name
@@ -100,7 +100,7 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
     public bool IsBreakable => Variant is BreakableDoor;
 
     public bool IsPryable => Variant is PryableDoor;
-    
+
     public SpawnableDoorType SpawnableType { get; private set; }
 
     public bool TryBreakDoor()
@@ -117,7 +117,7 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
     public bool TryPry()
     {
         if (Variant is PryableDoor door)
-            return door.TryPryGate(_player.Host);
+            return door.TryPryGate(null);
 
         return false;
     }
@@ -144,7 +144,7 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
         NeedsJoinUpdate = true;
         SetUp(type);
     }
-    
+
     internal SynapseDoor(DoorVariant variant) : this()
     {
         Variant = variant;
@@ -177,12 +177,12 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
         comp.Object = this;
         if (Variant.TryGetComponent<DoorNametagExtension>(out var nametag))
             _name = nametag.GetName;
-        
+
         DoorType = Map.GetDoorByName(Name);
 
         _player.JoinUpdates.Add(this);
     }
-    
+
     private DoorVariant CreateDoor(SpawnableDoorType type, Vector3 position, Quaternion rotation, Vector3 scale)
     {
         return CreateNetworkObject(Prefab[type], position, rotation, scale);

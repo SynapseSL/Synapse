@@ -2,11 +2,8 @@
 using System.Collections.ObjectModel;
 using HarmonyLib;
 using Hazards;
-using Hints;
 using Interactables.Interobjects;
-using InventorySystem.Searching;
 using Mirror;
-using Neuron.Core.Dev;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerRoles;
@@ -28,7 +25,6 @@ using Synapse3.SynapseModule.Player.ScpController;
 using UnityEngine;
 using VoiceChat;
 using VoiceChat.Networking;
-using static PlayerList;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
 
@@ -38,7 +34,7 @@ public static class PlayerLoadComponentPatch
 {
     private static readonly DummyService DummyService;
     static PlayerLoadComponentPatch() => DummyService = Synapse.Get<DummyService>();
-    
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ReferenceHub), nameof(ReferenceHub.Awake))]
     public static void PlayerLoadComponent(ReferenceHub __instance)
@@ -62,7 +58,7 @@ public static class PlayerLoadComponentPatch
                     player = __instance.gameObject.AddComponent<SynapsePlayer>();
                 }
             }
-            
+
             var ev = new LoadComponentEvent(__instance.gameObject, player);
             Synapse.Get<PlayerEvents>().LoadComponent.RaiseSafely(ev);
         }
@@ -109,7 +105,7 @@ public static class Scp096RegenerationPatch
     {
         var player = __instance.Owner.GetSynapsePlayer();
         if (player.MainScpController.CurrentController is not IScpShieldController shieldController) return true;
-        
+
         if (shieldController.UseDefaultShieldRegeneration) return true;
         else
         {
@@ -129,7 +125,7 @@ public static class Scp096ShieldMaxPatch
     {
         var player = __instance.Owner.GetSynapsePlayer();
         if (player.MainScpController.CurrentController is not IScpShieldController shieldController) return true;
-        
+
         if (shieldController.UseDefaultMaxShield) return true;
         else
         {
@@ -164,7 +160,7 @@ public static class UnDestroyableDoorPatch
 {
     [HarmonyPrefix]
     [HarmonyPatch(typeof(BreakableDoor), nameof(BreakableDoor.ServerDamage))]
-    public static bool OnDoorDamage(BreakableDoor __instance,float hp)
+    public static bool OnDoorDamage(BreakableDoor __instance, float hp)
     {
         try
         {

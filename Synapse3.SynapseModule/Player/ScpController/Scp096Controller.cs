@@ -71,12 +71,12 @@ public class Scp096Controller : ScpShieldController<Scp096Role>
         }
     }
 
-    public void AddTarget(SynapsePlayer player, bool isForLook = false)
+    public void AddTarget(SynapsePlayer player)
     {
         var rageManager = RageManager;
         if (rageManager != null) return;
 
-        rageManager._targetsTracker.AddTarget(player, isForLook);
+        rageManager._targetsTracker.AddTarget(player, false);
     }
 
     public void RemoveTarget(SynapsePlayer player)
@@ -90,7 +90,6 @@ public class Scp096Controller : ScpShieldController<Scp096Role>
     public void ChargeDoor(SynapseDoor door)
     {
         if (IsInstance) return;
-
         Scp096.ChargeDoor(door.Variant);
     }
     */
