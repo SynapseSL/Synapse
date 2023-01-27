@@ -15,19 +15,13 @@ public class SynapseRagDoll : NetworkSynapseObject
     public static Dictionary<RoleTypeId, BasicRagdoll> Prefabs = new();
 
     private readonly PlayerService _player;
-    private readonly MirrorService _mirror;
-
-    private SynapseRagDoll()
-    {
-        _player = Synapse.Get<PlayerService>();
-        _mirror = Synapse.Get<MirrorService>();
-    }
+    private SynapseRagDoll() => _player = Synapse.Get<PlayerService>();
 
     public BasicRagdoll BasicRagDoll { get; }
 
     public override GameObject GameObject => BasicRagDoll.gameObject;
     public override NetworkIdentity NetworkIdentity => BasicRagDoll.netIdentity;
-    public override ObjectType Type => ObjectType.Ragdoll;
+    public override ObjectType Type => ObjectType.RagDoll;
 
     public SynapsePlayer Owner { get; }
     public Vector3 OriginalRagDollScale { get; private set; }
@@ -95,8 +89,9 @@ public class SynapseRagDoll : NetworkSynapseObject
     public SynapseRagDoll(RoleTypeId role, Vector3 position, Quaternion rotation, Vector3 scale, SynapsePlayer owner,
         DamageHandlerBase damage, string nick, bool disableFadeOut = true) : this()
     {
+        var infoOwner = !disableFadeOut && owner != null ? owner : _player.Host;
         BasicRagDoll = CreateRagDoll(role, position, rotation, scale,
-            disableFadeOut || owner == null ? owner : _player.Host, damage, nick);
+            infoOwner.Hub, damage, nick);
         Owner = owner;
         SetUp();
     }

@@ -11,6 +11,7 @@ using InventorySystem.Items.Keycards;
 using InventorySystem.Items.Pickups;
 using MapGeneration;
 using MapGeneration.Distributors;
+using MEC;
 using Mirror;
 using Neuron.Core.Events;
 using Neuron.Core.Logging;
@@ -80,14 +81,13 @@ public static class Synapse3Extensions
             success, true, category);
     }
 
-    
+
     /// <summary>
     /// Updates Position Rotation and Scale of an NetworkObject for all players
     /// </summary>
     public static void UpdatePositionRotationScale(this NetworkIdentity identity)
         => NetworkServer.SendToAll(_mirror.GetSpawnMessage(identity));
-    
-    
+
 
     /// <summary>
     /// Hides an NetworkObject for a single players
@@ -158,7 +158,7 @@ public static class Synapse3Extensions
         .GetPlayer(x => x.CommandSender == sender, PlayerType.Dummy, PlayerType.Player, PlayerType.Server);
     public static SynapsePlayer GetSynapsePlayer(this StatBase stat) => stat.Hub.GetSynapsePlayer();
     public static SynapsePlayer GetSynapsePlayer(this Footprint footprint) => footprint.Hub?.GetSynapsePlayer();
-    public static SynapsePlayer GetSynapsePlayer(this IPlayer player) => player.ReferenceHub?.GetSynapsePlayer();
+    public static SynapsePlayer GetSynapsePlayer(this IPlayer player) => player?.ReferenceHub?.GetSynapsePlayer();
 
     public static SynapsePlayer GetSynapsePlayer<TScpRole>(this ScpStandardSubroutine<TScpRole> role)
         where TScpRole : PlayerRoleBase
@@ -423,4 +423,39 @@ public static class Synapse3Extensions
     public static T GetSubroutine<T>(this ISubroutinedScpRole role) where T : ScpSubroutineBase
         => role.SubroutineModule.AllSubroutines
         .FirstOrDefault(p => p is T) as T;
+
+    public static CoroutineHandle RunSafelyCoroutine(this IEnumerator<float> coroutine) =>
+        Timing.RunCoroutine(_RunSafelyCoroutine<Synapse>(coroutine));
+    
+    public static CoroutineHandle RunSafelyCoroutine<TName>(this IEnumerator<float> coroutine) =>
+        Timing.RunCoroutine(_RunSafelyCoroutine<TName>(coroutine));
+
+    private static IEnumerator<float> _RunSafelyCoroutine<TName>(IEnumerator<float> coroutine)
+    {
+        var time = 0f;
+        var done = false;
+        var count = 0;
+        while (!done)
+        {
+            try
+            {
+                if (coroutine.MoveNext())
+                {
+                    time = coroutine.Current;
+                }
+                else
+                {
+                    done = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                SynapseLogger<TName>.Error("Execution of coroutine failed at position " + count + ":\n" + ex);
+                yield break;
+            }
+
+            count++;
+            yield return time;
+        }
+    }
 }

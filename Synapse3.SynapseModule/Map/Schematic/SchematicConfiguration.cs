@@ -27,7 +27,6 @@ public class SchematicConfiguration : IDocumentSection
     public List<DummyConfiguration> Dummies { get; set; } = new ();
     public List<SimpleUpdateConfig> Generators { get; set; } = new ();
     public List<LockerConfiguration> Lockers { get; set; } = new ();
-    public List<OldGrenadeConfiguration> OldGrenades { get; set; } = new ();
 
 
     public abstract class DefaultConfig
@@ -46,11 +45,6 @@ public class SchematicConfiguration : IDocumentSection
         public bool Update { get; set; }
 
         public float UpdateFrequency { get; set; }
-    }
-    
-    public class OldGrenadeConfiguration : SimpleUpdateConfig
-    {
-        public bool IsFlash { get; set; }
     }
 
     public class PrimitiveConfiguration : DefaultConfig

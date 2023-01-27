@@ -30,12 +30,19 @@ public partial class PlayerEvents
     [PluginEvent(ServerEventType.PlayerChangeItem)]
     public bool PlayerChangeItemHook(IPlayer player, ushort oldItem, ushort newItem)
     {
-        var sPlayer = player?.GetSynapsePlayer();
-        if (sPlayer == null || sPlayer.RoleType == RoleTypeId.None) return true;
-        var item = newItem == 0 ? SynapseItem.None : _item?.GetSynapseItem(newItem) ?? SynapseItem.None;
-        var ev = new ChangeItemEvent(sPlayer, true, item);
-        ChangeItem.RaiseSafely(ev);
-        return ev.Allow;
+        try
+        {
+            var sPlayer = player?.GetSynapsePlayer();
+            if (sPlayer == null || sPlayer.RoleType == RoleTypeId.None) return true;
+            var item = newItem == 0 ? SynapseItem.None : _item?.GetSynapseItem(newItem) ?? SynapseItem.None;
+            var ev = new ChangeItemEvent(sPlayer, true, item);
+            ChangeItem.RaiseSafely(ev);
+            return ev.Allow;
+        }
+        catch
+        {
+            return true;
+        }
     }
 
     [PluginEvent(ServerEventType.PlayerDamage)]
