@@ -1,4 +1,11 @@
 using System;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using MEC;
+using Mirror;
+using Neuron.Core;
 using Neuron.Core.Events;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
@@ -8,9 +15,13 @@ using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map;
+using Synapse3.SynapseModule.Map.Objects;
+using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 
 namespace Synapse3.SynapseModule;
@@ -54,6 +65,9 @@ public class DebugService : Service
             reactor.Value.SubscribeUnsafe(this, method);
         }
         _player.KeyPress.Subscribe(OnKeyPress);
+
+        _round.Waiting.Subscribe(ev =>
+            Synapse.Get<SchematicService>().SpawnSchematic(SynapseTestSchematic(), new Vector3(26f, 992f, -41)));
     }
 
     public void Event(IEvent ev)
@@ -82,6 +96,7 @@ public class DebugService : Service
                 break;
 
         }
+
     }
 }
 #endif

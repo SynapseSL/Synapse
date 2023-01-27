@@ -211,8 +211,9 @@ public class SchematicService : Service
                 case "db602577-8d4f-97b4-890b-8c893bfcd553" when prefab.Value.TryGetComponent<Locker>(out var locker):
                     SynapseLocker.Prefabs[SynapseLocker.LockerType.AdrenalineWallCabinet] = locker;
                     break;
-                case "ad8a455f-062d-dea4-5b47-ac9217d4c58b" when prefab.Value.TryGetComponent<WorkstationController>(out var workstation):
-                    SynapseWorkStation.Prefab = workstation;
+                
+                case "ad8a455f-062d-dea4-5b47-ac9217d4c58b" when prefab.Value.TryGetComponent<WorkstationController>(out var station):
+                    SynapseWorkStation.Prefab = station;
                     break;
             }
 

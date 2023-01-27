@@ -1,6 +1,8 @@
 ﻿using HarmonyLib;
+using Mirror;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Config;
+using Synapse3.SynapseModule.Map.Schematic;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
 

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using MEC;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Events;
 using UnityEngine;

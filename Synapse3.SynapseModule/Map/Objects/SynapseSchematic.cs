@@ -91,7 +91,6 @@ public class SynapseSchematic : DefaultSynapseObject
     internal readonly List<SynapseGenerator> _generators = new();
     internal readonly List<SynapseLocker> _lockers = new();
     internal readonly List<SynapseItem> _items = new();
-    internal readonly List<SynapseOldGrenade> _oldGrenades = new();
     internal readonly List<SynapseDummy> _dummies = new();
 
     public ReadOnlyCollection<ISynapseObject> Children => _children.AsReadOnly();
@@ -105,7 +104,6 @@ public class SynapseSchematic : DefaultSynapseObject
     public ReadOnlyCollection<SynapseGenerator> Generators => _generators.AsReadOnly();
     public ReadOnlyCollection<SynapseLocker> Lockers => _lockers.AsReadOnly();
     public ReadOnlyCollection<SynapseItem> Items => _items.AsReadOnly();
-    public ReadOnlyCollection<SynapseOldGrenade> OldGrenades => _oldGrenades.AsReadOnly();
     public ReadOnlyCollection<SynapseDummy> Dummies => _dummies.AsReadOnly();
 
     public string Name { get; }
@@ -167,11 +165,6 @@ public class SynapseSchematic : DefaultSynapseObject
         foreach (var item in configuration.Items)
         {
             _children.Add(new SynapseItem(item, this));
-        }
-
-        foreach (var grenade in configuration.OldGrenades)
-        {
-            _children.Add(new SynapseOldGrenade(grenade, this));
         }
 
         foreach (var dummy in configuration.Dummies)

@@ -32,7 +32,7 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
 
         if (Parent is SynapseSchematic schematic) schematic._doors.Remove(this);
     }
-
+    
     private string _name;
 
     public DoorType DoorType { get; private set; }

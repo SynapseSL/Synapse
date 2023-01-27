@@ -58,7 +58,6 @@ public class MapService : Service
     internal readonly List<SynapseWorkStation> _synapseWorkStations = new();
     internal readonly List<SynapseRagDoll> _synapseRagdolls = new();
     internal readonly List<SynapseSchematic> _synapseSchematics = new();
-    internal readonly List<SynapseOldGrenade> _synapseOldGrenades = new();
 
     //Other Objects
     internal readonly List<SynapseTesla> _synapseTeslas = new();
@@ -75,7 +74,6 @@ public class MapService : Service
     public ReadOnlyCollection<SynapseWorkStation> SynapseWorkStations => _synapseWorkStations.AsReadOnly();
     public ReadOnlyCollection<SynapseRagDoll> SynapseRagDolls => _synapseRagdolls.AsReadOnly();
     public ReadOnlyCollection<SynapseSchematic> SynapseSchematics => _synapseSchematics.AsReadOnly();
-    public ReadOnlyCollection<SynapseOldGrenade> SynapseOldGrenades => _synapseOldGrenades.AsReadOnly();
 
     public ReadOnlyCollection<SynapseTesla> SynapseTeslas => _synapseTeslas.AsReadOnly();
     public ReadOnlyCollection<SynapseCamera> SynapseCameras => _synapseCameras.AsReadOnly();
