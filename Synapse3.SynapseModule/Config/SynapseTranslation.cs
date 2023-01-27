@@ -47,4 +47,8 @@ public class SynapseTranslation : Translations<SynapseTranslation>
     public string EnableProximity { get; set; } = "Proximity Voice Chat has been enabled";
     public string NotScpProximity { get; set; } = "You are not an SCP and therefore can't use the SCP Proximity Chat";
     public string NotAllowedProximity { get; set; } = "You are not allowed to use the Proximity Chat";
+
+    public string LowerRank { get; set; } = "FOLLOW ORDERS";
+    public string SameRank { get; set; } = "SAME RANK";
+    public string HigherRank { get; set; } = "GIVE ORDERS";
 }

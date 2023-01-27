@@ -1,12 +1,17 @@
-﻿using System;
+﻿using Neuron.Core.Meta;
+using Ninject;
+using PlayerRoles;
+using PluginAPI.Enums;
+using Respawning;
+using Respawning.NamingRules;
+using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Map;
+using Synapse3.SynapseModule.Player;
+using Synapse3.SynapseModule.Role;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Neuron.Core.Meta;
-using Ninject;
-using PlayerRoles;
-using Respawning;
-using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Teams;
 
@@ -161,13 +166,11 @@ public class TeamService : Service
 
     public void Spawn()
     {
-    //TODO:
-        /*
         if (NextTeam == uint.MaxValue)
             goto ResetTeam;
 
         var players = Synapse.Get<PlayerService>().Players.ToList();
-        players = players.Where(x => x.RoleID == (int)RoleType.Spectator && !x.OverWatch).ToList();
+        players = players.Where(x => x.RoleID == (uint)RoleTypeId.Spectator).ToList();
 
         if (Synapse.Get<RoundService>().PrioritySpawn)
         {
@@ -192,51 +195,50 @@ public class TeamService : Service
 
         if (!ev.Allow || players.Count == 0)
             goto ResetTeam;
-        
+
         while (players.Count > GetMaxWaveSize(NextTeam))
         {
             players.RemoveAt(players.Count - 1);
         }
-        
+
         players.ShuffleList();
 
-        if (RespawnTickets.Singleton.IsFirstWave)
-        {
-            RespawnTickets.Singleton.IsFirstWave = false;
-        }
+        //var unitName = _unit.PrepareSpawnNewUnit(_unit.GetUnitIdFromTeamId(NextTeam), players);
 
-        var unitName = _unit.PrepareSpawnNewUnit(_unit.GetUnitIdFromTeamId(NextTeam), players);
-            
         switch (NextTeam)
         {
             case 1:
             case 2:
-                if (!RespawnWaveGenerator.SpawnableTeams.TryGetValue((SpawnableTeamType)NextTeam, out var handlerBase))
+                if (!RespawnManager.SpawnableTeams.TryGetValue((SpawnableTeamType)NextTeam, out var handlerBase))
                     goto ResetTeam;
+
+                RespawnTokensManager.ResetTokens();
+
+                if (!PluginAPI.Events.EventManager.ExecuteEvent(ServerEventType.TeamRespawn, (SpawnableTeamType)NextTeam))
+                {
+                    RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.UponRespawn, (SpawnableTeamType)NextTeam);
+                    return;
+                }
 
                 var roles = new Queue<RoleTypeId>();
                 handlerBase.GenerateQueue(roles, players.Count);
 
-                RespawnTickets.Singleton.GrantTickets((SpawnableTeamType)NextTeam,
-                    -players.Count * handlerBase.TicketRespawnCost);
-                
-                if (UnitNamingRules.TryGetNamingRule((SpawnableTeamType)NextTeam, out var naming))
+                if (UnitNamingRule.TryGetNamingRule((SpawnableTeamType)NextTeam, out var rule))
                 {
-                    naming.PlayEntranceAnnouncement(unitName);
+                    UnitNameMessageHandler.SendNew((SpawnableTeamType)NextTeam, rule);
                 }
 
                 foreach (var player in players)
                 {
                     var role = roles.Dequeue();
                     player.RemoveCustomRole(DeSpawnReason.API);
-                    player.ClassManager.SetPlayersClass(role, player.gameObject,
-                        CharacterClassManager.SpawnReason.Respawn);
+                    player.RoleManager.ServerSetRole(role, RoleChangeReason.Respawn);
                 }
 
                 RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.UponRespawn,
                     (SpawnableTeamType)NextTeam);
                 break;
-                
+
             default:
                 var team = GetTeam(NextTeam);
                 if (team == null)
@@ -246,8 +248,7 @@ public class TeamService : Service
                 break;
         }
 
-        ResetTeam:
+    ResetTeam:
         NextTeam = uint.MaxValue;
-        */
     }
 }
