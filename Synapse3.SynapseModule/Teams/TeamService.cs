@@ -212,8 +212,6 @@ public class TeamService : Service
                 if (!RespawnManager.SpawnableTeams.TryGetValue((SpawnableTeamType)NextTeam, out var handlerBase))
                     goto ResetTeam;
 
-                RespawnTokensManager.ResetTokens();
-
                 if (!PluginAPI.Events.EventManager.ExecuteEvent(ServerEventType.TeamRespawn, (SpawnableTeamType)NextTeam))
                 {
                     RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.UponRespawn, (SpawnableTeamType)NextTeam);
@@ -250,5 +248,7 @@ public class TeamService : Service
 
     ResetTeam:
         NextTeam = uint.MaxValue;
+        RespawnTokensManager.ResetTokens();
+
     }
 }

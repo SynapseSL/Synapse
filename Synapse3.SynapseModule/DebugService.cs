@@ -69,6 +69,7 @@ public class DebugService : Service
            
             case KeyCode.Alpha2:
                 Synapse.Get<TeamService>().NextTeam = 15;
+                Synapse.Get<TeamService>().Spawn(); 
                 break;
             case KeyCode.Alpha3:
                 Synapse.Get<TeamService>().NextTeam = 1;

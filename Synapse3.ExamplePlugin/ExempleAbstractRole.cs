@@ -38,6 +38,10 @@ public class ExmpleAbstractRoleConfig : IAbstractRoleConfig
 
     public RoleTypeId VisibleRole => RoleTypeId.ChaosConscript;
 
+    public bool Hierarchy => true;
+
+    public SerializedVector3 Scale => Vector3.one;
+
     public uint EscapeRole { get; set; } = (uint)RoleTypeId.Spectator;
 
     public float Health { get; set; } = 200;
@@ -58,8 +62,4 @@ public class ExmpleAbstractRoleConfig : IAbstractRoleConfig
     {
         new SerializedPlayerInventory()
     };
-
-    public bool Hierarchy => true;
-
-    public SerializedVector3 Scale => Vector3.one;
 }
