@@ -17,5 +17,5 @@ public class ExampleConfig : IDocumentSection
         (uint)ItemType.Adrenaline
     };
 
-    public ExmpleAbstractRoleConfig AbstractRoleConfig { get; set; } = new ExmpleAbstractRoleConfig();
+    public ExampleAbstractRole.Config AbstractRoleConfig { get; set; } = new ExampleAbstractRole.Config();
 }

@@ -8,6 +8,7 @@ public interface IAbstractRoleConfig
 {
     public RoleTypeId Role { get; }
     public RoleTypeId VisibleRole { get; }
+    public RoleTypeId OwnRole { get; }
     public uint EscapeRole { get; }
     public float Health { get; }
     public float MaxHealth { get; }

@@ -1,4 +1,5 @@
-﻿using PlayerRoles;
+﻿using Neuron.Core.Logging;
+using PlayerRoles;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Events;
@@ -71,6 +72,12 @@ public abstract class SynapseAbstractRole : SynapseRole
         {
             Player.FakeRoleManager.VisibleRole = new RoleInfo(config.VisibleRole, Player);
         }
+
+        if (config.OwnRole != RoleTypeId.None)
+        {
+            Player.FakeRoleManager.OwnVisibleRole = new RoleInfo(config.OwnRole, Player);
+        }
+
         var spawn = config.PossibleSpawns?[Random.Range(0, config.PossibleSpawns.Length)];
         if (spawn != null)
         {
@@ -104,7 +111,7 @@ public abstract class SynapseAbstractRole : SynapseRole
             RoleAndUnitEntry = new CustomInfoList.CustomInfoEntry()
             {
                 EveryoneCanSee = false,
-                Info = Attribute.Name,
+                Info = Attribute.Name + " (" + Player.UnitName + ")",
                 SeeCondition = CanSeeUnit
             };
 
@@ -154,6 +161,7 @@ public abstract class SynapseAbstractRole : SynapseRole
     public sealed override void DeSpawn(DeSpawnReason reason)
     {
         Player.FakeRoleManager.VisibleRole = new RoleInfo(RoleTypeId.None, null);
+        Player.FakeRoleManager.OwnVisibleRole = new RoleInfo(RoleTypeId.None, null);
         Player.Scale = Vector3.one;
 
         RemoveCustomDisplay();

@@ -46,6 +46,7 @@ public class DebugService : Service
             if (reactor.Key == typeof(EscapeEvent)) continue;
             if (reactor.Key == typeof(Scp173ObserveEvent)) continue;
             if (reactor.Key == typeof(KeyPressEvent)) continue;
+            if (reactor.Key == typeof(SpeakEvent)) continue;
             if (reactor.Key == typeof(RoundCheckEndEvent)) continue;
             if (reactor.Key.IsAbstract) continue;
             reactor.Value.SubscribeUnsafe(this, method);
@@ -58,13 +59,13 @@ public class DebugService : Service
         Logger.Warn("Event triggered: " + ev.GetType().Name);
     }
 
-    SynapseDummy testDummy;
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
                 ev.Player.RoleID = 61;
+                ev.Player.FakeRoleManager.OwnVisibleRole = new Player.RoleInfo(PlayerRoles.RoleTypeId.Scp939, ev.Player);
                 break;
            
             case KeyCode.Alpha2:
@@ -74,6 +75,9 @@ public class DebugService : Service
             case KeyCode.Alpha3:
                 Synapse.Get<TeamService>().NextTeam = 1;
                 Synapse.Get<TeamService>().Spawn();
+                break;
+            case KeyCode.Alpha4:
+                Logger.Warn("Yo"); 
                 break;
         }
     }

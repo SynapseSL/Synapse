@@ -19,10 +19,11 @@ public class ExampleAbstractRole : SynapseAbstractRole
 {
     private readonly ExamplePlugin _plugin;
 
-    protected override bool LowerRank(SynapsePlayer player) => false;
-    protected override bool HigherRank(SynapsePlayer player) => player.RoleID != 61;
-
+    protected override bool LowerRank(SynapsePlayer player) => CanSeeUnit(player) && player.RoleID != 61;
+    protected override bool HigherRank(SynapsePlayer player) => false;
     protected override bool SameRank(SynapsePlayer player) => player.RoleID == 61;
+
+    protected override bool CanSeeUnit(SynapsePlayer player) => player.TeamID == 15;
 
     public ExampleAbstractRole(ExamplePlugin plugin)
     {
@@ -30,36 +31,38 @@ public class ExampleAbstractRole : SynapseAbstractRole
     }
 
     protected override IAbstractRoleConfig GetConfig() => _plugin.Config.AbstractRoleConfig;
-}
 
-public class ExmpleAbstractRoleConfig : IAbstractRoleConfig
-{
-    public RoleTypeId Role => RoleTypeId.NtfCaptain;
-
-    public RoleTypeId VisibleRole => RoleTypeId.ChaosConscript;
-
-    public bool Hierarchy => true;
-
-    public SerializedVector3 Scale => Vector3.one;
-
-    public uint EscapeRole { get; set; } = (uint)RoleTypeId.Spectator;
-
-    public float Health { get; set; } = 200;
-
-    public float MaxHealth { get; set; } = 220;
-
-    public float ArtificialHealth { get; set; } = 0;
-
-    public float MaxArtificialHealth { get; set; } = 100;
-
-    public RoomPoint[] PossibleSpawns { get; set; } = new RoomPoint[]
+    public class Config : IAbstractRoleConfig
     {
+        public RoleTypeId Role => RoleTypeId.NtfCaptain;
+
+        public RoleTypeId VisibleRole => RoleTypeId.ChaosConscript;
+
+        public RoleTypeId OwnRole => RoleTypeId.NtfSergeant;
+
+        public bool Hierarchy => true;
+
+        public SerializedVector3 Scale => Vector3.one;
+
+        public uint EscapeRole { get; set; } = (uint)RoleTypeId.Spectator;
+
+        public float Health { get; set; } = 200;
+
+        public float MaxHealth { get; set; } = 220;
+
+        public float ArtificialHealth { get; set; } = 0;
+
+        public float MaxArtificialHealth { get; set; } = 100;
+
+        public RoomPoint[] PossibleSpawns { get; set; } = new RoomPoint[]
+        {
         new RoomPoint("Surface", new Vector3(8.5875f, -7.672f, -40.53928f), Vector3.zero),
         new RoomPoint("Surface", new Vector3(5.3678f, -7.672f, -40.53928f), Vector3.zero),
-    };
+        };
 
-    public SerializedPlayerInventory[] PossibleInventories { get; set; } = new SerializedPlayerInventory[]
-    {
-        new SerializedPlayerInventory()
-    };
+        public SerializedPlayerInventory[] PossibleInventories { get; set; } = new SerializedPlayerInventory[]
+        {
+            new SerializedPlayerInventory()
+        };
+    }
 }
