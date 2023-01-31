@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Teams;
 
-public abstract class SynapseTeam : ISynapseTeam
+public abstract class SynapseTeam : InjectedLoggerBase, ISynapseTeam
 {
     public abstract void SpawnPlayers(List<SynapsePlayer> players);
 

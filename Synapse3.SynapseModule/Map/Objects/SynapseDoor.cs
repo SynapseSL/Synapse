@@ -79,7 +79,6 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
             {
                 breakableDoor.RemainingHealth = value;
                 breakableDoor._maxHealth = value;
-                NeuronLogger.For<Synapse>().Warn(breakableDoor.RemainingHealth);
             }
         }
     }

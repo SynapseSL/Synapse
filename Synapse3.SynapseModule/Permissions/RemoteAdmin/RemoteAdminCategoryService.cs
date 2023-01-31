@@ -11,13 +11,11 @@ namespace Synapse3.SynapseModule.Permissions.RemoteAdmin;
 
 public class RemoteAdminCategoryService : Service
 {
-    private IKernel _kernel;
-    private Synapse _synapseModule;
-    private SynapseCommandService _commandService;
+    private readonly Synapse _synapseModule;
+    private readonly SynapseCommandService _commandService;
 
-    public RemoteAdminCategoryService(IKernel kernel, Synapse synapseModule, SynapseCommandService commandService)
+    public RemoteAdminCategoryService(Synapse synapseModule, SynapseCommandService commandService)
     {
-        _kernel = kernel;
         _synapseModule = synapseModule;
         _commandService = commandService;
     }
@@ -70,9 +68,7 @@ public class RemoteAdminCategoryService : Service
         if (info.CategoryType == null) return;
         if (IsIdRegistered(info.Id)) return;
 
-        var category = (RemoteAdminCategory)_kernel.Get(info.CategoryType);
-        _kernel.Bind(info.CategoryType).ToConstant(category).InSingletonScope();
-        
+        var category = (RemoteAdminCategory)Synapse.GetOrCreate(info.CategoryType);
         category.Attribute = info;
         category.Load();
         

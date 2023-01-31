@@ -12,13 +12,11 @@ namespace Synapse3.SynapseModule.Map.Scp914;
 
 public class Scp914Service : Service
 {
-    private readonly IKernel _kernel;
     private readonly RoundEvents _round;
     private readonly Synapse _synapseModule;
 
-    public Scp914Service(RoundEvents round, IKernel kernel, Synapse synapseModule)
+    public Scp914Service(RoundEvents round, Synapse synapseModule)
     {
-        _kernel = kernel;
         _round = round;
         _synapseModule = synapseModule;
 
@@ -104,8 +102,7 @@ public class Scp914Service : Service
 
     internal void LoadBinding(SynapseScp914ProcessorBinding binding)
     {
-        var processor = (ISynapse914Processor)_kernel.Get(binding.Processor);
-        _kernel.Bind(binding.Processor).ToConstant(processor).InSingletonScope();
+        var processor = (ISynapse914Processor)Synapse.GetOrCreate(binding.Processor);
         foreach (var id in binding.ReplaceHandlers)
         {
             Synapse914Processors[id] = processor;

@@ -80,16 +80,10 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                testDummy?.Destroy();
-                testDummy = new SynapseDummy(ev.Player.Position, ev.Player.Rotation, RoleTypeId.ClassD, "Test");
-                testDummy.RaVisible = true;
-                testDummy.DestroyWhenDied = false;
+                Synapse.Get<ReferenceHub>();
                 break;
            
             case KeyCode.Alpha2:
-                testDummy.RotateToPosition(ev.Player.Position);
-                testDummy.Movement = PlayerMovementState.Walking;
-                testDummy.Direction = MovementDirection.Forward;
                 break;
 
             case KeyCode.Alpha3:
