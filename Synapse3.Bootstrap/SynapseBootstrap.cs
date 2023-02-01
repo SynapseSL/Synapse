@@ -36,8 +36,6 @@ public class SynapseBootstrap
                 try
                 {
                     var fileUri = new Uri(file);
-                    var targetUri = currentUri.MakeRelativeUri(fileUri);
-                    Log($"Loading assembly at {Uri.UnescapeDataString(targetUri.ToString())}", ConsoleColor.DarkGray);
                     var assembly = domain.Load(File.ReadAllBytes(file));
                     Log($"Loaded assembly {assembly.FullName}");
                     assemblies.Add(assembly);

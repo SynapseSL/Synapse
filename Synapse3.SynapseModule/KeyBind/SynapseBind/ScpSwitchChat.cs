@@ -9,7 +9,7 @@ namespace Synapse3.SynapseModule.KeyBind.SynapseBind;
     CommandName = "ScpChat",
     CommandDescription = "Changes between scp and proximity chat when you are talking as scp"
     )]
-public class ScpSwitchChat : SynapseAbstractKeyBind
+public class ScpSwitchChat : KeyBind
 {
     private readonly SynapseConfigService _config;
     public ScpSwitchChat(SynapseConfigService config) => _config = config;

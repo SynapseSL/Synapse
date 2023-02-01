@@ -13,12 +13,10 @@ namespace Synapse3.SynapseModule.Teams;
 public class TeamService : Service
 {
     private readonly List<ISynapseTeam> _teams = new();
-    private readonly IKernel _kernel;
     private readonly Synapse _synapseModule;
 
-    public TeamService(IKernel kernel, Synapse synapseModule)
+    public TeamService(Synapse synapseModule)
     {
-        _kernel = kernel;
         _synapseModule = synapseModule;
     }
 
@@ -44,10 +42,8 @@ public class TeamService : Service
     {
         if(IsIdRegistered(info.Id)) return;
         if(!typeof(ISynapseTeam).IsAssignableFrom(teamType)) return;
-        
-        var teamHandler = (ISynapseTeam)_kernel.Get(teamType);
-        _kernel.Bind(teamType).ToConstant(teamHandler).InSingletonScope();
-        
+
+        var teamHandler = (ISynapseTeam)Synapse.GetOrCreate(teamType);
         teamHandler.Attribute = info;
         teamHandler.Load();
         

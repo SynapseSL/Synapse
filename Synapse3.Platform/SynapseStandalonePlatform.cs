@@ -9,7 +9,6 @@ namespace Synapse3.Platform;
 
 public class SynapseStandalonePlatform : IPlatform
 {
-    
     public static void Main()
     {
         var entrypoint = new SynapseStandalonePlatform();

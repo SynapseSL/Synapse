@@ -11,14 +11,8 @@ namespace Synapse3.SynapseModule.Database;
 
 public class DatabaseService : Service
 {
-    private readonly IKernel _kernel;
     private readonly Synapse _synapseModule;
-
-    public DatabaseService(IKernel kernel, Synapse synapseModule)
-    {
-        _kernel = kernel;
-        _synapseModule = synapseModule;
-    }
+    public DatabaseService(Synapse synapseModule) => _synapseModule = synapseModule;
 
     public override void Enable()
     {
@@ -48,9 +42,7 @@ public class DatabaseService : Service
         if (info.DataBaseType == null) return;
         if (IsIdRegistered(info.Id)) return;
 
-        var dataBase = (IDatabase)_kernel.Get(info.DataBaseType);
-        _kernel.Bind(info.DataBaseType).ToConstant(dataBase).InSingletonScope();
-
+        var dataBase = (IDatabase)Synapse.GetOrCreate(info.DataBaseType);
         dataBase.Attribute = info;
         dataBase.Load();
         

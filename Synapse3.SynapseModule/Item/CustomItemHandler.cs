@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 
 namespace Synapse3.SynapseModule.Item;
 
-public abstract class CustomItemHandler
+public abstract class CustomItemHandler : InjectedLoggerBase
 {
     private readonly ItemEvents _items;
     private readonly PlayerEvents _player;

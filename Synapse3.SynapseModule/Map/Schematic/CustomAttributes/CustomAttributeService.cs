@@ -10,14 +10,12 @@ namespace Synapse3.SynapseModule.Map.Schematic.CustomAttributes;
 
 public class CustomAttributeService : Service
 {
-    private readonly IKernel _kernel;
     private readonly SynapseObjectEvents _events;
     private readonly Synapse _synapseModule;
 
-    public CustomAttributeService(SynapseObjectEvents events, IKernel kernel, Synapse synapseModule)
+    public CustomAttributeService(SynapseObjectEvents events, Synapse synapseModule)
     {
         _events = events;
-        _kernel = kernel;
         _synapseModule = synapseModule;
     }
     
@@ -62,9 +60,7 @@ public class CustomAttributeService : Service
             if (!typeof(AttributeHandler).IsAssignableFrom(type)) return;
             if (type.IsAbstract) return;
 
-            var handler = (AttributeHandler)_kernel.Get(type);
-            _kernel.Bind(type).ToConstant(handler).InSingletonScope();
-            
+            var handler = (AttributeHandler)Synapse.GetOrCreate(type);
             if (string.IsNullOrWhiteSpace(handler.Name)) return;
             if (Handlers.Any(x => string.Equals(x.Name, handler.Name, StringComparison.CurrentCultureIgnoreCase))) return;
 

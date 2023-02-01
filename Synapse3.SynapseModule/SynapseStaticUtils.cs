@@ -27,7 +27,7 @@ public const VersionType Type = VersionType.Dev;
 
     public const string SubVersion = "1.0";
     public const string BasedGameVersion = "12.0.2";
-    
+
     /// <summary>
     /// Returns an instance of the specified object by either resolving it using
     /// ninject bindings (I.e. the object is already present in the ninject kernel)
@@ -35,38 +35,60 @@ public const VersionType Type = VersionType.Dev;
     /// injection usable.
     /// </summary>
     /// <exception cref=""></exception>
-    public static T Get<T>() => Globals.Get<T>();
+    public static T Get<T>()
+    {
+        if (Exist<T>()) return Globals.Kernel.Get<T>();
+        SynapseLogger<Synapse>.Warn(typeof(T).Name + " was requested but doesn't exist inside the kernel.");
+        return default;
+    }
+
+    public static T GetOrCreate<T>(bool bind = true)
+        => Exist<T>() ? Get<T>() : Create<T>(bind);
+
+    public static T Create<T>(bool bind)
+    {
+        var instance = Globals.Get<T>();
+        if (bind) Bind(instance);
+        Inject(instance);
+        return instance;
+    }
+
+    public static void Bind<T>(T instance) => Globals.Kernel.Bind<T>().ToConstant(instance).InSingletonScope();
+    
+    public static bool Exist<T>() => Globals.Kernel.GetBindings(typeof(T)).Any();
 
     /// <inheritdoc cref="Get{T}"/>
-    public static object Get(Type type) => Globals.Kernel.Get(type);
+    public static object Get(Type type)
+    {
+        if (Exist(type)) return Globals.Kernel.Get(type);
+        SynapseLogger<Synapse>.Warn(type.Name + " was requested but doesn't exist inside the kernel.");
+        return null;
+    }
 
-    /// <summary>
-    /// Returns an instance of the specified object by either resolving it using
-    /// ninject bindings (I.e. the object is already present in the ninject kernel)
-    /// or by creating and binding a new instance of the type using the ninject kernel making
-    /// injection usable.
-    /// </summary>
-    public static T GetAndBind<T>()
+    public static object GetOrCreate(Type type, bool bind = true)
+        => Exist(type) ? Get(type) : Create(type, bind);
+
+    public static object Create(Type type, bool bind)
     {
-        var returning = Get<T>();
-        Globals.Kernel.Bind<T>().ToConstant(returning).InSingletonScope();
-        return returning;
+        var instance = Globals.Kernel.Get(type);
+        if (bind) Bind(type, instance);
+        Inject(instance);
+        return instance;
     }
+
+    public static void Bind(Type type, object instance) =>
+        Globals.Kernel.Bind(type).ToConstant(instance).InSingletonScope();
+
+    public static bool Exist(Type type) => Globals.Kernel.GetBindings(type).Any();
     
-    /// <inheritdoc cref="GetAndBind{T}"/>
-    public static object GetAndBind(Type type)
-    {
-        var returning = Get(type);
-        Globals.Kernel.Bind(type).ToConstant(returning).InSingletonScope();
-        return returning;
-    }
+    public static void Inject(object instance) => Globals.Kernel.Inject(instance);
 
     /// <summary>
     /// Creates the Listener and Register all EventHandlers
     /// </summary>
     public static T GetEventHandler<T>() where T : Listener
     {
-        var listener = GetAndBind<T>();
+        var listener = GetOrCreate<T>();
         Get<EventManager>().RegisterListener(listener);
         return listener;
     }
@@ -78,12 +100,10 @@ public const VersionType Type = VersionType.Dev;
             throw new ArgumentException(
                 "listenerType of GetEventHandler was called with an invalid type that can not be casted to a Listener");
 
-        var listenerRaw = Get(listenerType);
+        var listenerRaw = GetOrCreate(listenerType);
         if (listenerRaw is not Listener listener)
             throw new ArgumentException(
                 "listenerType of GetEventHandler was called with an invalid type that can not be casted to a Listener");
-
-        Globals.Kernel.Bind(listenerType).ToConstant(listenerRaw).InSingletonScope();
         
         Get<EventManager>().RegisterListener(listener);
         return listener;

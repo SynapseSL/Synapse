@@ -14,7 +14,6 @@ namespace Synapse3.SynapseModule.Role;
 
 public class RoleService : Service
 {
-    private readonly IKernel _kernel;
     private readonly SynapseCommandService _command;
     private readonly PlayerService _player;
     private readonly List<RoleAttribute> _customRoles = new();
@@ -38,9 +37,8 @@ public class RoleService : Service
     /// <summary>
     /// Creates a new RoleService
     /// </summary>
-    public RoleService(IKernel kernel, SynapseCommandService command, PlayerService player,Synapse synapse)
+    public RoleService(SynapseCommandService command, PlayerService player,Synapse synapse)
     {
-        _kernel = kernel;
         _command = command;
         _player = player;
         _synapseModule = synapse;
@@ -170,7 +168,7 @@ public class RoleService : Service
     private ISynapseRole GetRole(RoleAttribute info)
     {
         if (info.RoleScript == null) return null;
-        var role = (ISynapseRole)_kernel.Get(info.RoleScript);
+        var role = (ISynapseRole)Synapse.Create(info.RoleScript, false);
         role.Attribute = info;
         role.Load();
         return role;

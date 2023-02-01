@@ -73,6 +73,12 @@ public class ItemInventory
         AmmoBox.DropAllAmmo();
     }
 
+    public void Clear()
+    {
+        ClearAllItems();
+        AmmoBox.Clear();
+    }
+
     public void ClearAllItems()
     {
         foreach (var item in Items)
