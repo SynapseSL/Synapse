@@ -127,7 +127,7 @@ public class DebugService : Service
                         break;
                     case RoleTypeId.Scp939:
                         var scp939 = ev.Player.MainScpController.Scp939;
-                        scp939.Sound(testDummy.Position, 2);//TODO
+                        scp939.Sound(testDummy.Position);
                         scp939.AmnesticCloudCooldown = 4;
                         scp939.MimicryCloudCooldown = 4;
                         NeuronLogger.For<Synapse>().Warn("MinicryPointPositioned: " + scp939.MinicryPointPositioned);

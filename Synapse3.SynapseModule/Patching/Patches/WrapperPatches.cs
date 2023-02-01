@@ -180,7 +180,7 @@ public static class Scp173BlinkCoolDownPatch
 {
     [HarmonyPrefix]
     [HarmonyPatch(typeof(Scp173BlinkTimer), nameof(Scp173BlinkTimer.OnObserversChanged))]
-    public static void OnObserversChanged(Scp173BlinkTimer __instance, int prev, int current)
+    public static bool OnObserversChanged(Scp173BlinkTimer __instance, int prev, int current)
     {
         var player = __instance.Role._lastOwner.GetSynapsePlayer();
 
@@ -191,7 +191,8 @@ public static class Scp173BlinkCoolDownPatch
         }
 
         __instance._totalCooldown += player.MainScpController.Scp173.BlinkCooldownPerPlayer * (current - prev);
-        __instance._endSustainTime = ((current > 0) ? (-1.0) : (NetworkTime.time + 3.0));
+        __instance._endSustainTime = ((current > 0) ? (-1.0) : (NetworkTime.time + player.MainScpController.Scp173.BlinkCooldownBase));
         __instance.ServerSendRpc(true);
+        return false;
     }
 }

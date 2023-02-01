@@ -3,6 +3,8 @@ using PlayerRoles;
 using PlayerRoles.PlayableScps.HumeShield;
 using PlayerRoles.PlayableScps.Scp939;
 using PlayerRoles.PlayableScps.Scp939.Mimicry;
+using PlayerRoles.PlayableScps.Scp939.Ripples;
+using RelativePositioning;
 using UnityEngine;
 using static PlayerRoles.PlayableScps.Scp939.Mimicry.MimicryRecorder;
 
@@ -16,6 +18,7 @@ public class Scp939Controller : ScpShieldController<Scp939Role>
     public Scp939LungeAbility LungeAbility => Role?.GetSubroutine<Scp939LungeAbility>();
     public EnvironmentalMimicry MimicryAbility => Role?.GetSubroutine<EnvironmentalMimicry>();
     public MimicryRecorder MimicryRecorder => Role?.GetSubroutine<MimicryRecorder>();
+    public FirearmRippleTrigger RippleTrigger => Role.GetSubroutine<FirearmRippleTrigger>();
 
     //TODO:
     public List<SynapsePlayer> VisiblePlayers { get; } = new();
@@ -49,13 +52,12 @@ public class Scp939Controller : ScpShieldController<Scp939Role>
 
     public void TriggerLunge() => LungeAbility.TriggerLunge();
 
-
-    //TODO:
-    public void Sound(Vector3 postion, float range)
+    public void Sound(Vector3 postion)
     {
-
-
-        //Fake player movement
+        var ripple = RippleTrigger;
+        ripple._syncRoleColor = RoleTypeId.ChaosRepressor;
+        ripple._syncRipplePos = new RelativePosition(postion);
+        Role.GetSubroutine<FirearmRippleTrigger>().ServerSendRpc(_player);
     }
 
     public override RoleTypeId ScpRole => RoleTypeId.Scp939;

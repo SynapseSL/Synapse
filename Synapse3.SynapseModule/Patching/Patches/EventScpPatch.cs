@@ -493,7 +493,7 @@ public static class Scp173AttackTpPatch
             var scp = __instance.Owner.GetSynapsePlayer();
             var ev = new Scp173AttackEvent(scp, targetHub.GetSynapsePlayer(), -1, true);
             _scp.Scp173Attack.RaiseSafely(ev);
-            if (EventManager.ExecuteEvent(ServerEventType.Scp173SnapPlayer, __instance.Owner, targetHub))
+            if (!EventManager.ExecuteEvent(ServerEventType.Scp173SnapPlayer, __instance.Owner, targetHub))
                 return false;
             if (!ev.Allow) return false;
 

@@ -40,6 +40,8 @@ public class GamePlayConfiguration : IDocumentSection
     [Description("Every Role in this List won't stop SCP-173 from moving when the player is looking at it")]
     public List<uint> CantObserve173 { get; set; } = new()
     {
+        (uint)RoleTypeId.Spectator,
+        (uint)RoleTypeId.Overwatch,
         (uint)RoleTypeId.Scp173,
         (uint)RoleTypeId.Scp106,
         (uint)RoleTypeId.Scp049,
