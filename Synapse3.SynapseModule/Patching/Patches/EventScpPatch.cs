@@ -704,15 +704,18 @@ public static class Scp173ObserversListPatch
             {
                 if (__instance.IsObservedBy(targetHub, 0.2f))
                 {
-                    if (__instance.Observers.Contains(targetHub))
+                    var ev = new Scp173ObserveEvent(player, true, scp);
+                    _scp.Scp173Observe.RaiseSafely(ev);
+
+                    if (!ev.Allow)
                     {
-                        var ev = new Scp173ObserveEvent(player, true, scp);
-                        _scp.Scp173Observe.RaiseSafely(ev);
-                        if (!ev.Allow)
+                        if (__instance.Observers.Remove(targetHub))
                         {
-                            __result = 0;
+                            __result = -1;
                             return false;
                         }
+                        __result = 0;
+                        return false;
                     }
                     
                     if (__instance.Observers.Add(targetHub))
