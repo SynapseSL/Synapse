@@ -491,10 +491,11 @@ public static class Scp173AttackTpPatch
                 return false;
 
             var scp = __instance.Owner.GetSynapsePlayer();
-            var ev = new Scp173AttackEvent(scp, targetHub.GetSynapsePlayer(), -1, true);
+            var ev = new Scp173AttackEvent(scp, targetHub.GetSynapsePlayer(), -1, true)
+            {
+                Allow = EventManager.ExecuteEvent(ServerEventType.Scp173SnapPlayer, __instance.Owner, targetHub)
+            };
             _scp.Scp173Attack.RaiseSafely(ev);
-            if (!EventManager.ExecuteEvent(ServerEventType.Scp173SnapPlayer, __instance.Owner, targetHub))
-                return false;
             if (!ev.Allow) return false;
 
             if (!targetHub.playerStats.DealDamage(new ScpDamageHandler(scp, ev.Damage, DeathTranslations.Scp173)))
