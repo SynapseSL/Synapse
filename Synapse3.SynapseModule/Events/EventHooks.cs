@@ -192,6 +192,14 @@ public partial class ItemEvents
 
 public partial class MapEvents
 {
+    [PluginEvent(ServerEventType.WarheadDetonation)]
+    public bool DetonateWarheadHook()
+    {
+        var ev = new DetonateWarheadEvent();
+        DetonateWarhead.RaiseSafely(ev);
+        return ev.Allow;
+    }
+    
     [PluginEvent(ServerEventType.WarheadStop)]
     public bool PlayerCancelWarhead(IPlayer player)
     {

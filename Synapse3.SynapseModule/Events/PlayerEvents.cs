@@ -662,19 +662,26 @@ public class KickEvent : PlayerInteractEvent
 
 public class SpeakEvent : PlayerInteractEvent
 {
-    public SpeakEvent(SynapsePlayer player, bool allow, VoiceChatChannel channel) : base(player, allow)
+    public SpeakEvent(SynapsePlayer player, bool allow, VoiceChatChannel channel, byte[] data, int dataLength) : base(player, allow)
     {
         Channel = channel;
+        Data = data;
+        DataLength = dataLength;
     }
     
     public VoiceChatChannel Channel { get; set; }
+    
+    public byte[] Data { get; set; }
+
+    public int DataLength { get; set; }
 }
 
 public class SpeakToPlayerEvent : SpeakEvent
 {
     public SynapsePlayer Receiver { get; }
 
-    public SpeakToPlayerEvent(SynapsePlayer player, SynapsePlayer receiver, bool allow, VoiceChatChannel channel) :
-        base(player, allow, channel)
+    public SpeakToPlayerEvent(SynapsePlayer player, SynapsePlayer receiver, bool allow, VoiceChatChannel channel,
+        byte[] data, int dataLength) :
+        base(player, allow, channel, data, dataLength)
         => Receiver = receiver;
 }

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using InventorySystem.Items.MicroHID;
+using InventorySystem.Items.Radio;
 using MEC;
 using Mirror;
 using Neuron.Core;
@@ -9,17 +11,18 @@ using Neuron.Core.Events;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerRoles;
-using PlayerRoles.FirstPersonControl;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
-using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
+using Utils.Networking;
+using VoiceChat;
+using VoiceChat.Networking;
 using Object = UnityEngine.Object;
 
 
@@ -64,9 +67,16 @@ public class DebugService : Service
             reactor.Value.SubscribeUnsafe(this, method);
         }
         _player.KeyPress.Subscribe(OnKeyPress);
-
+        _item.MicroUse.Subscribe(ev =>
+        {
+            Logger.Warn(ev.Player.NickName + " " + ev.Item.Name + " " + ev.MicroState + " " + ev.State);
+            if (ev.MicroState == HidState.Primed)
+                ev.OverrideEnergyToRemove = 0;
+        });
         _round.Waiting.Subscribe(ev =>
-            Synapse.Get<SchematicService>().SpawnSchematic(SynapseTestSchematic(), new Vector3(26f, 992f, -41)));
+        {
+            Synapse.Get<SchematicService>().SpawnSchematic(SynapseTestSchematic(), new Vector3(24f, 992f, -41));
+        });
     }
 
     public void Event(IEvent ev)
@@ -80,7 +90,7 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                Synapse.Get<ReferenceHub>();
+                testDummy = new SynapseDummy(ev.Player.Position, Quaternion.identity, RoleTypeId.ClassD, "Dummy");
                 break;
            
             case KeyCode.Alpha2:
@@ -148,6 +158,7 @@ public class DebugService : Service
         {
             Name = "test",
             Id = 99999,
+            /*
             Doors = new List<SchematicConfiguration.DoorConfiguration>()
             {
                 new SchematicConfiguration.DoorConfiguration()
@@ -159,6 +170,7 @@ public class DebugService : Service
                     UnDestroyable = false,
                 }
             },
+            */
             Generators = new List<SchematicConfiguration.SimpleUpdateConfig>()
             {
                 new SchematicConfiguration.SimpleUpdateConfig()
@@ -166,7 +178,6 @@ public class DebugService : Service
                     Position = Vector3.forward * 3,
                 }
             },
-            /*
             Dummies = new List<SchematicConfiguration.DummyConfiguration>()
             {
                 new SchematicConfiguration.DummyConfiguration()
@@ -178,7 +189,6 @@ public class DebugService : Service
                     BadgeColor = ""
                 }
             },
-            */
             Lights = new List<SchematicConfiguration.LightSourceConfiguration>()
             {
                 new SchematicConfiguration.LightSourceConfiguration()

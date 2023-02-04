@@ -63,6 +63,7 @@ public static class FallingIntoAbyssPatch
     }
 }
 
+//TODO: Make this to a replaced handler instead of a patch
 [Automatic]
 [SynapsePatch("Speak", PatchType.PlayerEvent)]
 public static class SpeakPatch
@@ -95,7 +96,7 @@ public static class SpeakPatch
             if (flags is VcMuteFlags.GlobalRegular or VcMuteFlags.LocalRegular) return false;
 
             var voiceChatChannel = voiceRoleSpeaker.VoiceModule.ValidateSend(msg.Channel);
-            var ev = new SpeakEvent(player, true, voiceChatChannel);
+            var ev = new SpeakEvent(player, true, voiceChatChannel, msg.Data, msg.DataLength);
             Player.Speak.RaiseSafely(ev);
             if (ev.Channel == VoiceChatChannel.None || !ev.Allow) return false;
             voiceRoleSpeaker.VoiceModule.CurrentChannel = ev.Channel;
@@ -132,7 +133,7 @@ public static class SpeakPatch
                         validatedChannel = VoiceChatChannel.None;
                 }
 
-                var ev2 = new SpeakToPlayerEvent(player, receiver, true, validatedChannel);
+                var ev2 = new SpeakToPlayerEvent(player, receiver, true, validatedChannel, msg.Data, msg.DataLength);
                 Player.SpeakToPlayer.RaiseSafely(ev2);
                 if (ev2.Channel == VoiceChatChannel.None || !ev2.Allow) continue;
                 msg.Channel = ev2.Channel;

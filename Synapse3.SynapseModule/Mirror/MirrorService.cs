@@ -1,6 +1,8 @@
 ﻿using System;
+using InventorySystem.Items.Firearms.BasicMessages;
 using Mirror;
 using Neuron.Core.Meta;
+using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule;
