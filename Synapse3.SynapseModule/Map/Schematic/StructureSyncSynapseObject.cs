@@ -1,7 +1,6 @@
 ﻿using MapGeneration.Distributors;
 using Mirror;
 using UnityEngine;
-using Utils.Networking;
 
 namespace Synapse3.SynapseModule.Map.Schematic;
 

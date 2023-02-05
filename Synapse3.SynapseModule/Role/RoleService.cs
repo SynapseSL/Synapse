@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using Neuron.Core.Meta;
 using Neuron.Modules.Commands.Event;
-using Ninject;
 using PlayerRoles;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Player;

@@ -3,7 +3,6 @@ using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Ninject;
 using PlayerRoles;
-using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
 

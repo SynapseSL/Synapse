@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using Neuron.Core.Meta;
-using Ninject;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Database;

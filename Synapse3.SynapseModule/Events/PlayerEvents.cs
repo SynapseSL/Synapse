@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using Hazards;
+﻿using Hazards;
 using Interactables.Interobjects.DoorUtils;
 using MEC;
 using Neuron.Core.Events;
 using Neuron.Core.Meta;
 using PlayerRoles;
+using PlayerRoles.FirstPersonControl;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Objects;
@@ -628,15 +628,20 @@ public class CallVanillaElevatorEvent : PlayerInteractEvent
 
 public class SendPlayerDataEvent : PlayerEvent
 {
-    public SynapsePlayer PlayerToSee { get; set; }
+    public SynapsePlayer PlayerToSee { get; }
+    
+    public PlayerMovementState MovementState { get; set; }
+    
+    public bool IsGrounded { get; set; }
 
     public bool IsInvisible { get; set; }
 
     public Vector3 Position { get; set; }
 
-    public float Rotation { get; set; }
-
-    public SendPlayerDataEvent(SynapsePlayer player) : base(player) { }
+    public SendPlayerDataEvent(SynapsePlayer player, SynapsePlayer playerToSee) : base(player)
+    {
+        PlayerToSee = playerToSee;
+    }
 }
 
 public class ChangeRoleEvent : PlayerEvent

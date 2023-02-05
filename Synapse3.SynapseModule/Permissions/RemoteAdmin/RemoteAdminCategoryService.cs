@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using Neuron.Core.Meta;
 using Neuron.Modules.Commands.Event;
-using Ninject;
 using Synapse3.SynapseModule.Command;
 
 namespace Synapse3.SynapseModule.Permissions.RemoteAdmin;

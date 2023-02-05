@@ -18,6 +18,7 @@ namespace Synapse3.SynapseModule.Mirror.Events;
 
 public class MirrorItemEvents : Service
 {
+#if !PATCHLESS
     private readonly RoundEvents _roundEvents;
     private readonly ItemEvents _itemEvents;
     private readonly PlayerService _playerService;
@@ -189,4 +190,5 @@ public class MirrorItemEvents : Service
             FirearmBasicMessagesHandler.ServerShotReceived(connection, message);
         }
     }
+#endif
 }

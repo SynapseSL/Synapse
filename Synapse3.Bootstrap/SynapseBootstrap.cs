@@ -7,6 +7,7 @@ using PluginAPI.Core.Attributes;
 
 namespace Synapse3.SynapseVector;
 
+
 public class SynapseBootstrap
 {
     [PluginEntryPoint(
@@ -15,7 +16,7 @@ public class SynapseBootstrap
         "Loads Neuron and therefore also Synapse if it is installed",
         "Dimenzio"
     )]
-    public static void Execute()
+    public void Execute()
     {
         try
         {
@@ -37,7 +38,6 @@ public class SynapseBootstrap
                 {
                     var fileUri = new Uri(file);
                     var assembly = domain.Load(File.ReadAllBytes(file));
-                    Log($"Loaded assembly {assembly.FullName}");
                     assemblies.Add(assembly);
                 }
                 catch (Exception ex)
@@ -64,7 +64,7 @@ public class SynapseBootstrap
         }
     }
 
-    private static void Log(string msg, ConsoleColor color = ConsoleColor.Gray)
+    private void Log(string msg, ConsoleColor color = ConsoleColor.Gray)
     {
         ServerConsole.AddLog("[Bootstrap] " + msg, color);
     }

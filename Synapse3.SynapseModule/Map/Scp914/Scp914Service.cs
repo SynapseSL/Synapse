@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Neuron.Core.Meta;
-using Ninject;
 using Scp914;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Objects;

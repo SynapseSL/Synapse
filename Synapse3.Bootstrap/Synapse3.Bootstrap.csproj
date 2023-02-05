@@ -37,9 +37,15 @@
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Dev|AnyCPU' ">
       <OutputPath>bin\Dev\</OutputPath>
     </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Patchless|AnyCPU' ">
+      <OutputPath>bin\Patchless\</OutputPath>
+    </PropertyGroup>
     <ItemGroup>
         <Reference Include="Assembly-CSharp">
           <HintPath>..\Refs\Assembly-CSharp-Publicized.dll</HintPath>
+        </Reference>
+        <Reference Include="Assembly-CSharp-firstpass">
+          <HintPath>..\Refs\Assembly-CSharp-firstpass.dll</HintPath>
         </Reference>
         <Reference Include="PluginAPI">
           <HintPath>..\Refs\PluginAPI.dll</HintPath>

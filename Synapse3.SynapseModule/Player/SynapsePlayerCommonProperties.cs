@@ -282,6 +282,10 @@ public partial class SynapsePlayer
     /// </summary>
     public bool IsDisarmed => VanillaInventory.IsDisarmed();
 
+    public bool IsAlive => Hub.IsAlive();
+
+    public bool IsHuman => Hub.IsHuman();
+
     /// <summary>
     /// The time a player is alive
     /// </summary>

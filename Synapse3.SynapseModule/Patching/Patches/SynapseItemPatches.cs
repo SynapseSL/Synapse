@@ -14,6 +14,7 @@ using UnityEngine;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
 
+#if !PATCHLESS
 [Automatic]
 [SynapsePatch("ItemSerialGenerator", PatchType.SynapseItem)]
 public static class ItemSerialGeneratorPatch
@@ -37,10 +38,10 @@ public static class DestroyPickupPatch
         try
         {
             if (__instance.Info.Serial == 0) return true;
-            
+
             var item = __instance.GetItem();
             if (item == null) return true;
-        
+
             //Whenever the Item should be transformed to a Inventory Item a ItemBase will be created before
             //so that when ItemBase null is the game wants to destroy it
             if (item.Item is null)
@@ -64,7 +65,7 @@ public static class ServerAddItemPatch
 {
     private static readonly ItemService ItemService;
     static ServerAddItemPatch() => ItemService = Synapse.Get<ItemService>();
-    
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(InventoryExtensions), nameof(InventoryExtensions.ServerAddItem))]
     public static bool ServerAddItem(ref ItemBase __result, Inventory inv, ItemType type, ushort itemSerial,
@@ -82,6 +83,7 @@ public static class ServerAddItemPatch
             {
                 item.DestroyPickup();
             }
+
             item.Pickup = pickup;
             item.EquipItem(player, false);
             __result = item.Item;
@@ -101,7 +103,7 @@ public static class ServerCreatePickupPatch
 {
     private static readonly ItemService ItemService;
     static ServerCreatePickupPatch() => ItemService = Synapse.Get<ItemService>();
-    
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(InventoryExtensions), nameof(InventoryExtensions.ServerCreatePickup))]
     public static bool ServerCreatePickup(ref ItemPickupBase __result, Inventory inv, ItemBase item, PickupSyncInfo psi,
@@ -141,7 +143,7 @@ public static class ServerRemoveItemPatch
 {
     private static readonly ItemService ItemService;
     static ServerRemoveItemPatch() => ItemService = Synapse.Get<ItemService>();
-    
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(InventoryExtensions), nameof(InventoryExtensions.ServerRemoveItem))]
     public static bool ServerRemoveItem(Inventory inv, ushort itemSerial, ItemPickupBase ipb)
@@ -215,7 +217,8 @@ public static class SpawnPickupPatch
 public static class ServerThrowPatch
 {
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(ThrowableItem), nameof(ThrowableItem.ServerThrow), typeof(float), typeof(float), typeof(Vector3), typeof(Vector3))]
+    [HarmonyPatch(typeof(ThrowableItem), nameof(ThrowableItem.ServerThrow), typeof(float), typeof(float),
+        typeof(Vector3), typeof(Vector3))]
     public static bool ServerThrow(ThrowableItem __instance, float forceAmount, float upwardFactor, Vector3 torque,
         Vector3 startVel)
     {
@@ -250,13 +253,15 @@ public static class ItemPatches
             var item = __instance.GetItem();
 
             item.Throwable.Fuse(__instance._attacker);
-            
+
             __instance._replaceNextFrame = false;
         }
         catch (Exception ex)
         {
             SynapseLogger<Synapse>.Error("Sy3 Items: Update Grenade failed\n" + ex);
         }
+
         return false;
     }
 }
+#endif

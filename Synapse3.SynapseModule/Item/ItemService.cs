@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
-using Ninject;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Schematic;
 

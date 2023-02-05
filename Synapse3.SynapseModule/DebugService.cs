@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using InventorySystem.Items.MicroHID;
-using InventorySystem.Items.Radio;
 using MEC;
 using Mirror;
 using Neuron.Core;
@@ -20,9 +18,6 @@ using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
-using Utils.Networking;
-using VoiceChat;
-using VoiceChat.Networking;
 using Object = UnityEngine.Object;
 
 
@@ -67,15 +62,15 @@ public class DebugService : Service
             reactor.Value.SubscribeUnsafe(this, method);
         }
         _player.KeyPress.Subscribe(OnKeyPress);
-        _item.MicroUse.Subscribe(ev =>
+        _player.HarmPermission.Subscribe(ev =>
         {
-            Logger.Warn(ev.Player.NickName + " " + ev.Item.Name + " " + ev.MicroState + " " + ev.State);
-            if (ev.MicroState == HidState.Primed)
-                ev.OverrideEnergyToRemove = 0;
+            ev.Allow = true;
         });
-        _round.Waiting.Subscribe(ev =>
+        _player.SendPlayerData.Subscribe(ev =>
         {
-            Synapse.Get<SchematicService>().SpawnSchematic(SynapseTestSchematic(), new Vector3(24f, 992f, -41));
+            if (invis)
+                ev.IsInvisible = true;
+            ev.Position += Vector3.up;
         });
     }
 
@@ -85,6 +80,7 @@ public class DebugService : Service
     }
 
     SynapseDummy testDummy;
+    private bool invis = false;
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)
@@ -94,49 +90,15 @@ public class DebugService : Service
                 break;
            
             case KeyCode.Alpha2:
+                invis = !invis;
                 break;
 
             case KeyCode.Alpha3:
-                //CheckObjects(ev.Player).RunSafelyCoroutine();
-                //var door = new SynapseDoor(SynapseDoor.SpawnableDoorType.Hcz, ev.Player.Position + ev.Player.transform.forward * 3, Quaternion.identity,
-                //    Vector3.one);
-                //Timing.CallDelayed(3f, () => door.Position = ev.Player.Position + ev.Player.transform.forward * 3);
-                var schematic = Synapse.Get<SchematicService>().SpawnSchematic(SynapseTestSchematic(), ev.Player.Position);
-                Timing.CallDelayed(3f, () => schematic.Position = ev.Player.Position);
+                ev.Player.SendFakeEffectIntensityFor(testDummy.Player, Effect.Invisible, 1);
                 break;
 
             case KeyCode.Alpha4:
-                switch (ev.Player.RoleType)
-                {
-                    case RoleTypeId.Scp173:
-                        var scp173 = ev.Player.MainScpController.Scp173;
-                        scp173.BlinkCooldownPerPlayer = 5;
-                        scp173.BlinkCooldownBase = 10;
-                        NeuronLogger.For<Synapse>().Warn("Observer: " + scp173.Observer.Count);
-                        break;
-                    case RoleTypeId.Scp106:
-                        var scp106 = ev.Player.MainScpController.Scp106;
-                        NeuronLogger.For<Synapse>().Warn("PoketPlayer: " + scp106.PlayersInPocket.Count);
-                        break;
-                    case RoleTypeId.Scp079:
-                        var scp079 = ev.Player.MainScpController.Scp079;
-                        scp079.RegenEnergy = 200;
-                        scp079.Exp = 3;
-                        break;
-                    case RoleTypeId.Scp096:
-                        var scp096 = ev.Player.MainScpController.Scp096;
-                        scp096.CurrentShield = 10;
-                        scp096.MaxShield = 100;
-                        scp096.ShieldRegeneration = 2000;
-                        break;
-                    case RoleTypeId.Scp939:
-                        var scp939 = ev.Player.MainScpController.Scp939;
-                        scp939.Sound(testDummy.Position, 2);//TODO
-                        scp939.AmnesticCloudCooldown = 4;
-                        scp939.MimicryCloudCooldown = 4;
-                        NeuronLogger.For<Synapse>().Warn("MinicryPointPositioned: " + scp939.MinicryPointPositioned);
-                        break;
-                }
+                ev.Player.SendFakeEffectIntensityFor(testDummy.Player, Effect.Invisible, 0);
                 break;
             
             case KeyCode.Alpha5:
