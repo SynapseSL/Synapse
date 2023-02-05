@@ -9,13 +9,11 @@ using Neuron.Core.Events;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerRoles;
-using PlayerRoles.FirstPersonControl;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
-using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
@@ -64,9 +62,16 @@ public class DebugService : Service
             reactor.Value.SubscribeUnsafe(this, method);
         }
         _player.KeyPress.Subscribe(OnKeyPress);
-
-        _round.Waiting.Subscribe(ev =>
-            Synapse.Get<SchematicService>().SpawnSchematic(SynapseTestSchematic(), new Vector3(26f, 992f, -41)));
+        _player.HarmPermission.Subscribe(ev =>
+        {
+            ev.Allow = true;
+        });
+        _player.SendPlayerData.Subscribe(ev =>
+        {
+            if (invis)
+                ev.IsInvisible = true;
+            ev.Position += Vector3.up;
+        });
     }
 
     public void Event(IEvent ev)
@@ -75,30 +80,21 @@ public class DebugService : Service
     }
 
     SynapseDummy testDummy;
+    private bool invis = false;
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                testDummy?.Destroy();
-                testDummy = new SynapseDummy(ev.Player.Position, ev.Player.Rotation, RoleTypeId.ClassD, "Test");
-                testDummy.RaVisible = true;
-                testDummy.DestroyWhenDied = false;
+                testDummy = new SynapseDummy(ev.Player.Position, Quaternion.identity, RoleTypeId.ClassD, "Dummy");
                 break;
            
             case KeyCode.Alpha2:
-                testDummy.RotateToPosition(ev.Player.Position);
-                testDummy.Movement = PlayerMovementState.Walking;
-                testDummy.Direction = MovementDirection.Forward;
+                invis = !invis;
                 break;
 
             case KeyCode.Alpha3:
-                //CheckObjects(ev.Player).RunSafelyCoroutine();
-                //var door = new SynapseDoor(SynapseDoor.SpawnableDoorType.Hcz, ev.Player.Position + ev.Player.transform.forward * 3, Quaternion.identity,
-                //    Vector3.one);
-                //Timing.CallDelayed(3f, () => door.Position = ev.Player.Position + ev.Player.transform.forward * 3);
-                var schematic = Synapse.Get<SchematicService>().SpawnSchematic(SynapseTestSchematic(), ev.Player.Position);
-                Timing.CallDelayed(3f, () => schematic.Position = ev.Player.Position);
+                ev.Player.SendFakeEffectIntensityFor(testDummy.Player, Effect.Invisible, 1);
                 break;
 
             case KeyCode.Alpha4:
@@ -154,6 +150,7 @@ public class DebugService : Service
         {
             Name = "test",
             Id = 99999,
+            /*
             Doors = new List<SchematicConfiguration.DoorConfiguration>()
             {
                 new SchematicConfiguration.DoorConfiguration()
@@ -165,6 +162,7 @@ public class DebugService : Service
                     UnDestroyable = false,
                 }
             },
+            */
             Generators = new List<SchematicConfiguration.SimpleUpdateConfig>()
             {
                 new SchematicConfiguration.SimpleUpdateConfig()
@@ -172,7 +170,6 @@ public class DebugService : Service
                     Position = Vector3.forward * 3,
                 }
             },
-            /*
             Dummies = new List<SchematicConfiguration.DummyConfiguration>()
             {
                 new SchematicConfiguration.DummyConfiguration()
@@ -184,7 +181,6 @@ public class DebugService : Service
                     BadgeColor = ""
                 }
             },
-            */
             Lights = new List<SchematicConfiguration.LightSourceConfiguration>()
             {
                 new SchematicConfiguration.LightSourceConfiguration()

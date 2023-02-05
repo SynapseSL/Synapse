@@ -28,7 +28,7 @@ public class ExamplePlugin : ReloadablePlugin<ExampleConfig, ExampleTranslations
             
         //Get and Bind ensures that you can always get the same instance everywhere, although it is not used and Synapse.Get would be enough for this case
         //ElevatorHandler = Synapse.GetAndBind<ElevatorEventHandler>();
-        RoomHandler = Synapse.GetAndBind<RoomEventHandler>();
+        RoomHandler = Synapse.GetOrCreate<RoomEventHandler>();
     }
 }
 

@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Database;
 
-public abstract class Database : IDatabase
+public abstract class Database : InjectedLoggerBase, IDatabase
 {
     public virtual string GetPlayerData(SynapsePlayer player, string key, out bool isHandled)
     {

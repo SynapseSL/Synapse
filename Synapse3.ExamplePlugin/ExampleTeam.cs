@@ -17,6 +17,7 @@ public class ExampleTeam : SynapseTeam
 {
     public override void SpawnPlayers(List<SynapsePlayer> players)
     {
+        Logger.Warn("Injected: " + (NeuronLoggerInjected != null));
         foreach (var player in players)
         {
             player.RoleID = 60;

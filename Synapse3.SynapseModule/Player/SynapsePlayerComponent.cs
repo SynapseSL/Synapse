@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Neuron.Core.Logging;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Role;

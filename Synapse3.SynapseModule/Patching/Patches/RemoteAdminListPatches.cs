@@ -21,6 +21,7 @@ using Random = UnityEngine.Random;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
 
+#if !PATCHLESS
 [Automatic]
 [SynapsePatch("RAPlayerList", PatchType.RemoteAdmin)]
 public static class RemoteAdminListPatch
@@ -39,7 +40,7 @@ public static class RemoteAdminListPatch
         ServerService = Synapse.Get<ServerService>();
         DummyService = Synapse.Get<DummyService>();
     }
-    
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(RaPlayerList), nameof(RaPlayerList.ReceiveData), typeof(CommandSender), typeof(string))]
     public static bool OnReceiveData(RaPlayerList __instance, CommandSender sender, string data)
@@ -189,10 +190,10 @@ public static class RemoteAdminListPatch
 
         foreach (var player in groupPlayers)
         {
-            text += player. Text + "\n";
+            text += player.Text + "\n";
         }
 
-        var dummys = DummyService.Dummies//Add the dummy
+        var dummys = DummyService.Dummies //Add the dummy
             .Where(p => p.RaVisible)
             .Select(d => new RemoteAdminPlayer()
             {
@@ -261,7 +262,7 @@ public static class RemoteAdminPlayerDataRequestPatch
 {
     private static readonly RemoteAdminCategoryService CategoryService;
     static RemoteAdminPlayerDataRequestPatch() => CategoryService = Synapse.Get<RemoteAdminCategoryService>();
-    
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(RaPlayer), nameof(RaPlayer.ReceiveData), typeof(CommandSender), typeof(string))]
     public static bool OnRequestPlayer(CommandSender sender, string data)
@@ -294,8 +295,9 @@ public static class RemoteAdminPlayerDataRequestPatch
                 RAUtils.ProcessPlayerIdOrNamesList(new ArraySegment<string>(args.Skip(1).ToArray()), 0, out _);
             if (players.Count == 0) return false;
 
-            var allowedToSeeUserIds = PermissionsHandler.IsPermitted(sender.Permissions, 18007046UL) || playerSender != null &&
-                (playerSender.ServerRoles.Staff || playerSender.ServerRoles.RaEverywhere);
+            var allowedToSeeUserIds = PermissionsHandler.IsPermitted(sender.Permissions, 18007046UL) ||
+                                      playerSender != null &&
+                                      (playerSender.ServerRoles.Staff || playerSender.ServerRoles.RaEverywhere);
 
             if (players.Count > 1)
             {
@@ -502,17 +504,19 @@ public static class RemoteAdminPlayerDataRequestPatch
                     case RoleTypeId.None:
                         message += "None";
                         break;
-                        
+
                     case RoleTypeId.Spectator:
                         message += "Spectator";
                         break;
-                        
+
                     default:
                         message += sPlayer.RoleName;
                         message += " <color=#fcff99>[HP: " + CommandProcessor.GetRoundedStat<HealthStat>(player) +
                                    "]</color>";
-                        message += " <color=green>[AHP: " + CommandProcessor.GetRoundedStat<AhpStat>(player) + "]</color>";
-                        message += " <color=#977dff>[HS: " + CommandProcessor.GetRoundedStat<HumeShieldStat>(player) + "]</color>";
+                        message += " <color=green>[AHP: " + CommandProcessor.GetRoundedStat<AhpStat>(player) +
+                                   "]</color>";
+                        message += " <color=#977dff>[HS: " + CommandProcessor.GetRoundedStat<HumeShieldStat>(player) +
+                                   "]</color>";
                         message += "\nPosition: " + player.transform.position;
                         message += "\nRoom: " + sPlayer.Room.Name;
                         break;
@@ -522,7 +526,7 @@ public static class RemoteAdminPlayerDataRequestPatch
             {
                 message += "\n<color=#D4AF37>Some fields were hidden. GameplayData permission required.</color>";
             }
-            
+
             message += "</color>";
             sender.RaReply("$1 " + message, true, true, string.Empty);
             RaPlayerQR.Send(sender, false,
@@ -552,32 +556,43 @@ public static class SelectPlayerPatch
     public static bool OnGettingPlayers(ArraySegment<string> args, int startindex, out string[] newargs,
         bool keepEmptyEntries, out List<ReferenceHub> __result)
     {
-        //TODO: Update this
-        newargs = null;
-        __result = new List<ReferenceHub>();
         try
         {
-            newargs = args.Count > 1
-                ? RAUtils.FormatArguments(args, startindex + 1).Split(new[] { ' ' },
-                    keepEmptyEntries ? StringSplitOptions.None : StringSplitOptions.RemoveEmptyEntries)
-                : null;
-
-            if (args.Count <= startindex) return false;
-        
-            var info = args.At(startindex);
-        
-            if (info.Length == 0) return false;
-        
-            if (PlayerService.TryGetPlayers(info, out var players))
+            //TODO: Update this
+            newargs = null;
+            __result = new List<ReferenceHub>();
+            try
             {
-                __result = players.Select(x => x.Hub).ToList();
+                newargs = args.Count > 1
+                    ? RAUtils.FormatArguments(args, startindex + 1).Split(new[] { ' ' },
+                        keepEmptyEntries ? StringSplitOptions.None : StringSplitOptions.RemoveEmptyEntries)
+                    : null;
+
+                if (args.Count <= startindex) return false;
+
+                var info = args.At(startindex);
+
+                if (info.Length == 0) return false;
+
+                if (PlayerService.TryGetPlayers(info, out var players))
+                {
+                    __result = players.Select(x => x.Hub).ToList();
+                }
             }
+            catch (Exception ex)
+            {
+                NeuronLogger.For<Synapse>().Error("Sy3 API: RemoteAdmin GetPlayers failed\n" + ex);
+            }
+
+            return false;
         }
         catch (Exception ex)
         {
-            NeuronLogger.For<Synapse>().Error("Sy3 API: RemoteAdmin GetPlayers failed\n" + ex);
+            SynapseLogger<Synapse>.Error("RA Select Player Patch failed\n" + ex);
+            newargs = null;
+            __result = null;
+            return true;
         }
-
-        return false;
     }
 }
+#endif

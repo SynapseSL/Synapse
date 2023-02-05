@@ -23,23 +23,11 @@ public class DummyService : Service
     public override void Enable()
     {
         _round.Waiting.Subscribe(CreateDummyTransformParent);
-        _player.Ban.Subscribe(DeSpawnDummyKick);
-        _player.Kick.Subscribe(DeSpawnDummyKick);
     }
 
     public override void Disable()
     {
         _round.Waiting.Unsubscribe(CreateDummyTransformParent);
-        _player.Ban.Unsubscribe(DeSpawnDummyKick);
-        _player.Kick.Unsubscribe(DeSpawnDummyKick);
-    }
-
-    private void DeSpawnDummyKick(KickEvent ev)
-    {
-        if (ev.Allow && ev.Player is DummyPlayer dummy)
-        {
-            dummy.SynapseDummy.Destroy();
-        }
     }
 
     public ReadOnlyCollection<SynapseDummy> Dummies => _dummies.AsReadOnly();

@@ -2,7 +2,6 @@
 using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
 using Mirror;
-using Neuron.Core.Logging;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
@@ -79,7 +78,6 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
             {
                 breakableDoor.RemainingHealth = value;
                 breakableDoor._maxHealth = value;
-                NeuronLogger.For<Synapse>().Warn(breakableDoor.RemainingHealth);
             }
         }
     }

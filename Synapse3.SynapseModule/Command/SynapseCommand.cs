@@ -1,6 +1,5 @@
 ﻿using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Command;
-using Ninject;
 
 namespace Synapse3.SynapseModule.Command;
 
@@ -9,7 +8,11 @@ namespace Synapse3.SynapseModule.Command;
 /// </summary>
 public abstract class SynapseCommand : Command<SynapseContext>
 {
-    protected SynapseCommand() => Synapse.Get<IKernel>().Bind(GetType()).ToConstant(this).InSingletonScope();
+    protected SynapseCommand()
+    {
+        Synapse.Bind(GetType(), this);
+        Synapse.Inject(this);
+    }
     
     /// <summary>
     /// This method is executed before Execute and is recommended to be a check for Permissions

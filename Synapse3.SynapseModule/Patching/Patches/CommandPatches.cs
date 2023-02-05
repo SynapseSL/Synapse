@@ -10,7 +10,7 @@ using Utils.NonAllocLINQ;
 using Console = GameCore.Console;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
-
+#if !PATCHLESS
 [Automatic]
 [SynapsePatch("ServerConsole", PatchType.Command)]
 internal static class ServerConsolePatch
@@ -173,3 +173,4 @@ public static class PlayerConsolePatch
         }
     }
 }
+#endif

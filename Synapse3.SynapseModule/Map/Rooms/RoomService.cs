@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using MapGeneration;
 using Neuron.Core.Meta;
-using Ninject;
 using Synapse3.SynapseModule.Events;
 using UnityEngine;
 
@@ -16,14 +15,12 @@ public class RoomService : Service
 
     private readonly RoundEvents _round;
     private readonly MapService _map;
-    private readonly IKernel _kernel;
     private readonly Synapse _synapseModule;
 
-    public RoomService(RoundEvents round, MapService map, IKernel kernel, Synapse synapseModule)
+    public RoomService(RoundEvents round, MapService map, Synapse synapseModule)
     {
         _round = round;
         _map = map;
-        _kernel = kernel;
         _synapseModule = synapseModule;
     }
 
@@ -108,7 +105,7 @@ public class RoomService : Service
     public SynapseCustomRoom CreateRoom(CustomRoomAttribute info)
     {
         if (info.RoomType == null) return null;
-        var room = (SynapseCustomRoom)_kernel.Get(info.RoomType);
+        var room = (SynapseCustomRoom)Synapse.Create(info.RoomType, false);
         room.Attribute = info;
         room.Load();
         return room;

@@ -1,5 +1,4 @@
 ﻿using System;
-using Achievements.Handlers;
 using InventorySystem;
 using InventorySystem.Items;
 using InventorySystem.Items.Firearms;

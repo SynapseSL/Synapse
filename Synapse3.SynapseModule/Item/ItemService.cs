@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
-using Ninject;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Schematic;
 
@@ -13,17 +12,15 @@ namespace Synapse3.SynapseModule.Item;
 public class ItemService : Service
 {
     public const int HighestItem = (int)ItemType.Jailbird;
-
-    private readonly IKernel _kernel;
+    
     private readonly RoundEvents _round;
     private readonly Synapse _synapseModule;
     
     private readonly List<ItemAttribute> _items = new();
     private readonly Dictionary<ItemType, SchematicConfiguration> overridenVanillaItems = new();
 
-    public ItemService(RoundEvents round, IKernel kernel, Synapse synapseModule)
+    public ItemService(RoundEvents round, Synapse synapseModule)
     {
-        _kernel = kernel;
         _round = round;
         _synapseModule = synapseModule;
     }
@@ -72,9 +69,7 @@ public class ItemService : Service
     /// </summary>
     public bool CreateAndRegisterItemHandler(ItemAttribute info, Type handlerType)
     {
-        var handler = (CustomItemHandler)_kernel.Get(handlerType);
-        _kernel.Bind(handlerType).ToConstant(handler).InSingletonScope();
-
+        var handler = (CustomItemHandler)Synapse.GetOrCreate(handlerType);
         handler.Attribute = info;
         handler.Load();
 

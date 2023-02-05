@@ -1,12 +1,9 @@
-﻿using Neuron.Modules.Commands;
-using Neuron.Modules.Commands.Command;
-using Ninject;
-using Synapse3.SynapseModule.Command;
+﻿using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.KeyBind;
 
-public abstract class SynapseAbstractKeyBind : IKeyBind
+public abstract class KeyBind : InjectedLoggerBase, IKeyBind
 {
     public KeyBindAttribute Attribute { get; set; }
 

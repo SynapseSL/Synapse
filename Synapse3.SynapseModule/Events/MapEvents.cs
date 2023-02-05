@@ -126,7 +126,10 @@ public class TriggerTeslaEvent : PlayerInteractEvent
     public SynapseTesla Tesla { get; }
 }
 
-public class DetonateWarheadEvent : IEvent { }
+public class DetonateWarheadEvent : IEvent
+{
+    public bool Allow { get; set; } = true;
+}
 
 public class CancelWarheadEvent : PlayerInteractEvent
 {

@@ -1,15 +1,12 @@
-using CommandSystem;
 using InventorySystem.Items.Pickups;
 using LightContainmentZoneDecontamination;
 using LiteNetLib;
-using MapGeneration.Distributors;
 using PlayerRoles;
 using PlayerStatsSystem;
 using PluginAPI.Core.Attributes;
 using PluginAPI.Core.Interfaces;
 using PluginAPI.Enums;
 using PluginAPI.Events;
-using RemoteAdmin;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
 using UnityEngine;
@@ -45,6 +42,7 @@ public partial class PlayerEvents
         }
     }
 
+    //TODO: Make this for all types of Damages not only damage by other player
     [PluginEvent(ServerEventType.PlayerDamage)]
     public bool PlayerDamageHook(IPlayer player, IPlayer target, DamageHandlerBase damageHandler)
     {
@@ -192,6 +190,14 @@ public partial class ItemEvents
 
 public partial class MapEvents
 {
+    [PluginEvent(ServerEventType.WarheadDetonation)]
+    public bool DetonateWarheadHook()
+    {
+        var ev = new DetonateWarheadEvent();
+        DetonateWarhead.RaiseSafely(ev);
+        return ev.Allow;
+    }
+    
     [PluginEvent(ServerEventType.WarheadStop)]
     public bool PlayerCancelWarhead(IPlayer player)
     {

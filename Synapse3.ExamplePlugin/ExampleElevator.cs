@@ -1,13 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using Synapse3.SynapseModule;
-using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Map.Elevators;
-using Synapse3.SynapseModule.Map.Schematic;
-using UnityEngine;
-
-namespace Synapse3.ExamplePlugin;
+﻿namespace Synapse3.ExamplePlugin;
 
 /*
 public class ExampleElevator : CustomElevator
