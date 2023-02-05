@@ -283,13 +283,13 @@ public static class Scp173AttackSnapPatch
             if (Scp173SnapAbility.TryHitTarget(scpCameraReference, out var target))
             {
                 var scp = __instance.Owner.GetSynapsePlayer();
-                var ev = new Scp173AttackEvent(scp, target.GetSynapsePlayer(), -1, false);
+                var ev = new Scp173AttackEvent(scp, target.GetSynapsePlayer(), -1, false)
+                {
+                    Allow = EventManager.ExecuteEvent(ServerEventType.Scp173SnapPlayer, __instance.Owner,
+                        __instance._targetHub)
+                };
                 _scp.Scp173Attack.RaiseSafely(ev);
                 var damageHandler = new ScpDamageHandler(scp, ev.Damage, DeathTranslations.Scp173);
-
-                if (!EventManager.ExecuteEvent(ServerEventType.Scp173SnapPlayer, __instance.Owner,
-                        __instance._targetHub))
-                    return false;
 
                 if (ev.Allow)
                 {
@@ -382,10 +382,11 @@ public static class Scp173AttackTpPatch
                 return false;
 
             var scp = __instance.Owner.GetSynapsePlayer();
-            var ev = new Scp173AttackEvent(scp, targetHub.GetSynapsePlayer(), -1, true);
+            var ev = new Scp173AttackEvent(scp, targetHub.GetSynapsePlayer(), -1, true)
+            {
+                Allow = EventManager.ExecuteEvent(ServerEventType.Scp173SnapPlayer, __instance.Owner, targetHub)
+            };
             _scp.Scp173Attack.RaiseSafely(ev);
-            if (EventManager.ExecuteEvent(ServerEventType.Scp173SnapPlayer, __instance.Owner, targetHub))
-                return false;
             if (!ev.Allow) return false;
 
             if (!targetHub.playerStats.DealDamage(new ScpDamageHandler(scp, ev.Damage, DeathTranslations.Scp173)))
@@ -421,6 +422,7 @@ public static class Scp939LunchPatch
     {
         try
         {
+            if (__instance._damageType == Scp939DamageType.Claw) return true;
             var scp = __instance.Attacker.GetSynapsePlayer();
             var victim = ply.GetSynapsePlayer();
             var ev = new Scp939AttackEvent(scp, victim, __instance.Damage, __instance._damageType);
@@ -631,48 +633,48 @@ public static class Scp173ObserversListPatch
             var scp = __instance.GetSynapsePlayer();
             var controller = scp.MainScpController.Scp173;
 
-            if (!(_config.GamePlayConfiguration.CantObserve173?.Contains(player.RoleID) ?? false) &&
-                player.PlayerType != PlayerType.Server)
+            if (player.Hub.IsAlive() && !_config.GamePlayConfiguration.CantObserve173.Contains(player.RoleID) && player.PlayerType != PlayerType.Server)
             {
                 if (__instance.IsObservedBy(targetHub, 0.2f))
                 {
-                    if (__instance.Observers.Contains(targetHub))
+                    var ev = new Scp173ObserveEvent(player, true, scp);
+                    _scp.Scp173Observe.RaiseSafely(ev);
+
+                    if (!ev.Allow)
                     {
-                        var ev = new Scp173ObserveEvent(player, player.Invisible < InvisibleMode.Ghost, scp);
-                        _scp.Scp173Observe.RaiseSafely(ev);
-                        if (!ev.Allow)
-                        {
-                            __result = 0;
-                            return false;
-                        }
+                        if (__instance.Observers.Remove(targetHub))
+                            goto RemovePlayer;
+                        
+                        __result = 0;
+                        return false;
                     }
 
                     if (__instance.Observers.Add(targetHub))
-                    {
-                        controller._observer.Add(player);
-                        __result = 1;
-                        return false;
-                    }
+                        goto AddPlayer;
                 }
                 else if (__instance.Observers.Remove(targetHub))
-                {
-                    controller._observer.Remove(player);
-                    __result = -1;
-                    return false;
-                }
+                    goto RemovePlayer;
 
                 __result = 0;
                 return false;
             }
 
-            if (!__instance.Observers.Remove(targetHub))
-            {
-                __result = 0;
-                return false;
-            }
-
+            if (__instance.Observers.Remove(targetHub))
+                goto RemovePlayer;
+            
+            __result = 0;
+            return false;
+            
+            
+            
+            RemovePlayer:
             controller._observer.Remove(player);
             __result = -1;
+            return false;
+            
+            AddPlayer:
+            controller._observer.Add(player);
+            __result = 1;
             return false;
         }
         catch (Exception ex)

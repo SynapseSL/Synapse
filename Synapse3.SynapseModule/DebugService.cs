@@ -98,7 +98,37 @@ public class DebugService : Service
                 break;
 
             case KeyCode.Alpha4:
-                ev.Player.SendFakeEffectIntensityFor(testDummy.Player, Effect.Invisible, 0);
+                switch (ev.Player.RoleType)
+                {
+                    case RoleTypeId.Scp173:
+                        var scp173 = ev.Player.MainScpController.Scp173;
+                        scp173.BlinkCooldownPerPlayer = 5;
+                        scp173.BlinkCooldownBase = 10;
+                        NeuronLogger.For<Synapse>().Warn("Observer: " + scp173.Observer.Count);
+                        break;
+                    case RoleTypeId.Scp106:
+                        var scp106 = ev.Player.MainScpController.Scp106;
+                        NeuronLogger.For<Synapse>().Warn("PoketPlayer: " + scp106.PlayersInPocket.Count);
+                        break;
+                    case RoleTypeId.Scp079:
+                        var scp079 = ev.Player.MainScpController.Scp079;
+                        scp079.RegenEnergy = 200;
+                        scp079.Exp = 3;
+                        break;
+                    case RoleTypeId.Scp096:
+                        var scp096 = ev.Player.MainScpController.Scp096;
+                        scp096.CurrentShield = 10;
+                        scp096.MaxShield = 100;
+                        scp096.ShieldRegeneration = 2000;
+                        break;
+                    case RoleTypeId.Scp939:
+                        var scp939 = ev.Player.MainScpController.Scp939;
+                        scp939.Sound(testDummy.Position);
+                        scp939.AmnesticCloudCooldown = 4;
+                        scp939.MimicryCloudCooldown = 4;
+                        NeuronLogger.For<Synapse>().Warn("MinicryPointPositioned: " + scp939.MinicryPointPositioned);
+                        break;
+                }
                 break;
             
             case KeyCode.Alpha5:

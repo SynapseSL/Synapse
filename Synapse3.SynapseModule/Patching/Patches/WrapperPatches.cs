@@ -222,7 +222,7 @@ public static class Scp173BlinkCoolDownPatch
             }
 
             __instance._totalCooldown += player.MainScpController.Scp173.BlinkCooldownPerPlayer * (current - prev);
-            __instance._endSustainTime = ((current > 0) ? (-1.0) : (NetworkTime.time + 3.0));
+            __instance._endSustainTime = ((current > 0) ? (-1.0) : (NetworkTime.time + player.MainScpController.Scp173.BlinkCooldownBase));
             __instance.ServerSendRpc(true);
         }
         catch (Exception ex)
