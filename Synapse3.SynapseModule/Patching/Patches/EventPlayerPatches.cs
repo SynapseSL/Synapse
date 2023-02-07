@@ -720,12 +720,18 @@ public static class SetClassPatch
     {
         try
         {
-            var ev = new SetClassEvent(__instance.Hub.GetSynapsePlayer(), newRole, reason, spawnFlags);
+            var player = __instance.Hub.GetSynapsePlayer();
+            var ev = new SetClassEvent(player, newRole, reason, spawnFlags);
             PlayerEvents.SetClass.RaiseSafely(ev);
             newRole = ev.Role;
             reason = ev.SpawnReason;
             spawnFlags = ev.SpawnFlags;
-            return ev.Allow;
+            if (ev.Allow)
+            {
+                player._maxHealth = 100;
+                return true;
+            }
+            return false;
         }
         catch (Exception ex)
         {

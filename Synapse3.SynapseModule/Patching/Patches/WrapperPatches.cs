@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using HarmonyLib;
 using Interactables.Interobjects;
 using Mirror;
 using Neuron.Core.Meta;
 using PlayerRoles;
+using PlayerRoles.FirstPersonControl;
+using PlayerRoles.PlayableScps;
 using PlayerRoles.PlayableScps.HumeShield;
 using PlayerRoles.PlayableScps.Scp079;
 using PlayerRoles.PlayableScps.Scp096;
@@ -56,6 +60,24 @@ public static class PlayerLoadComponentPatch
     }
 }
 #if !PATCHLESS
+
+[Automatic]
+[SynapsePatch("MaxHealth", PatchType.Wrapper)]
+public static class MaxHealthPatch
+{
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(HumanRole), nameof(HumanRole.MaxHealth), MethodType.Getter)]
+    public static bool MaxHealthHuman(FpcStandardRoleBase __instance, ref float __result)
+    {
+        if (!__instance.TryGetOwner(out var hub))
+            return true;
+
+        var player = hub.GetSynapsePlayer();
+        __result = player.MaxHealth;
+
+        return false;
+    }
+}
 
 [Automatic]
 [SynapsePatch("Scp079MaxAuxiliary", PatchType.Wrapper)]

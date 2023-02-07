@@ -5,6 +5,7 @@ using InventorySystem.Disarming;
 using Mirror.LiteNetLib4Mirror;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
+using PlayerRoles.PlayableScps;
 using PlayerRoles.Spectating;
 using PlayerStatsSystem;
 using RelativePositioning;
@@ -151,10 +152,26 @@ public partial class SynapsePlayer
         set => GetStatBase<HealthStat>().CurValue = value;
     }
 
+    internal float _maxHealth = 100;
+
     /// <summary>
     /// The maximum health a player can have
     /// </summary>
-    public float MaxHealth { get; set; } = 100f;
+    public float MaxHealth 
+    {
+        get 
+        {
+            if (this.CurrentRole is FpcStandardScp scp)
+                return scp.MaxHealth;
+            return _maxHealth;
+        }
+        set
+        {
+            if (this.CurrentRole is FpcStandardScp scp)
+                scp._maxHealth = (int)value;
+            _maxHealth = value;
+        } 
+    }
 
     /// <summary>
     /// The current artificial health of the player
