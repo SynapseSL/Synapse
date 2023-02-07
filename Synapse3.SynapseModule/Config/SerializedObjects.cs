@@ -5,7 +5,6 @@ using Mirror;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
 using PlayerRoles.PlayableScps.Scp049.Zombies;
-using RelativePositioning;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Rooms;

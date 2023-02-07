@@ -18,6 +18,7 @@ Global
 		Custom Version|Any CPU = Custom Version|Any CPU
 		Main Release|Any CPU = Main Release|Any CPU
 		Dev|Any CPU = Dev|Any CPU
+		Patchless|Any CPU = Patchless|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{AECE678B-12A9-47DA-B74A-6A2A6D85CBE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -28,6 +29,8 @@ Global
 		{AECE678B-12A9-47DA-B74A-6A2A6D85CBE7}.Main Release|Any CPU.Build.0 = Main Release|Any CPU
 		{AECE678B-12A9-47DA-B74A-6A2A6D85CBE7}.Dev|Any CPU.ActiveCfg = Dev|Any CPU
 		{AECE678B-12A9-47DA-B74A-6A2A6D85CBE7}.Dev|Any CPU.Build.0 = Dev|Any CPU
+		{AECE678B-12A9-47DA-B74A-6A2A6D85CBE7}.Patchless|Any CPU.ActiveCfg = Patchless|Any CPU
+		{AECE678B-12A9-47DA-B74A-6A2A6D85CBE7}.Patchless|Any CPU.Build.0 = Patchless|Any CPU
 		{9F7DC781-0B15-4BD9-9CE7-C3D9084F21EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9F7DC781-0B15-4BD9-9CE7-C3D9084F21EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F7DC781-0B15-4BD9-9CE7-C3D9084F21EF}.Custom Version|Any CPU.ActiveCfg = Custom Version|Any CPU
@@ -36,6 +39,8 @@ Global
 		{9F7DC781-0B15-4BD9-9CE7-C3D9084F21EF}.Main Release|Any CPU.Build.0 = Main Release|Any CPU
 		{9F7DC781-0B15-4BD9-9CE7-C3D9084F21EF}.Dev|Any CPU.ActiveCfg = Dev|Any CPU
 		{9F7DC781-0B15-4BD9-9CE7-C3D9084F21EF}.Dev|Any CPU.Build.0 = Dev|Any CPU
+		{9F7DC781-0B15-4BD9-9CE7-C3D9084F21EF}.Patchless|Any CPU.ActiveCfg = Patchless|Any CPU
+		{9F7DC781-0B15-4BD9-9CE7-C3D9084F21EF}.Patchless|Any CPU.Build.0 = Patchless|Any CPU
 		{F880C8DE-7742-42FF-AD28-840EB81238F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F880C8DE-7742-42FF-AD28-840EB81238F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F880C8DE-7742-42FF-AD28-840EB81238F4}.Custom Version|Any CPU.ActiveCfg = Custom Version|Any CPU
@@ -44,6 +49,8 @@ Global
 		{F880C8DE-7742-42FF-AD28-840EB81238F4}.Main Release|Any CPU.Build.0 = Main Release|Any CPU
 		{F880C8DE-7742-42FF-AD28-840EB81238F4}.Dev|Any CPU.ActiveCfg = Dev|Any CPU
 		{F880C8DE-7742-42FF-AD28-840EB81238F4}.Dev|Any CPU.Build.0 = Dev|Any CPU
+		{F880C8DE-7742-42FF-AD28-840EB81238F4}.Patchless|Any CPU.ActiveCfg = Patchless|Any CPU
+		{F880C8DE-7742-42FF-AD28-840EB81238F4}.Patchless|Any CPU.Build.0 = Patchless|Any CPU
 		{A15E8A0D-C71D-4615-97BE-53225FC36FAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A15E8A0D-C71D-4615-97BE-53225FC36FAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A15E8A0D-C71D-4615-97BE-53225FC36FAB}.Custom Version|Any CPU.ActiveCfg = Custom Version|Any CPU
@@ -52,6 +59,8 @@ Global
 		{A15E8A0D-C71D-4615-97BE-53225FC36FAB}.Main Release|Any CPU.Build.0 = Main Release|Any CPU
 		{A15E8A0D-C71D-4615-97BE-53225FC36FAB}.Dev|Any CPU.ActiveCfg = Dev|Any CPU
 		{A15E8A0D-C71D-4615-97BE-53225FC36FAB}.Dev|Any CPU.Build.0 = Dev|Any CPU
+		{A15E8A0D-C71D-4615-97BE-53225FC36FAB}.Patchless|Any CPU.ActiveCfg = Patchless|Any CPU
+		{A15E8A0D-C71D-4615-97BE-53225FC36FAB}.Patchless|Any CPU.Build.0 = Patchless|Any CPU
 		{61CAE88A-50E5-4B73-B69A-10D7B92889EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{61CAE88A-50E5-4B73-B69A-10D7B92889EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61CAE88A-50E5-4B73-B69A-10D7B92889EB}.Custom Version|Any CPU.ActiveCfg = Custom Version|Any CPU
@@ -60,6 +69,8 @@ Global
 		{61CAE88A-50E5-4B73-B69A-10D7B92889EB}.Main Release|Any CPU.Build.0 = Main Release|Any CPU
 		{61CAE88A-50E5-4B73-B69A-10D7B92889EB}.Dev|Any CPU.ActiveCfg = Dev|Any CPU
 		{61CAE88A-50E5-4B73-B69A-10D7B92889EB}.Dev|Any CPU.Build.0 = Dev|Any CPU
+		{61CAE88A-50E5-4B73-B69A-10D7B92889EB}.Patchless|Any CPU.ActiveCfg = Patchless|Any CPU
+		{61CAE88A-50E5-4B73-B69A-10D7B92889EB}.Patchless|Any CPU.Build.0 = Patchless|Any CPU
 		{AA11279E-D2C8-4FFC-8862-A2EF4F6453E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AA11279E-D2C8-4FFC-8862-A2EF4F6453E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA11279E-D2C8-4FFC-8862-A2EF4F6453E0}.Custom Version|Any CPU.ActiveCfg = Debug|Any CPU
@@ -68,5 +79,7 @@ Global
 		{AA11279E-D2C8-4FFC-8862-A2EF4F6453E0}.Main Release|Any CPU.Build.0 = Debug|Any CPU
 		{AA11279E-D2C8-4FFC-8862-A2EF4F6453E0}.Dev|Any CPU.ActiveCfg = Dev|Any CPU
 		{AA11279E-D2C8-4FFC-8862-A2EF4F6453E0}.Dev|Any CPU.Build.0 = Dev|Any CPU
+		{AA11279E-D2C8-4FFC-8862-A2EF4F6453E0}.Patchless|Any CPU.ActiveCfg = Patchless|Any CPU
+		{AA11279E-D2C8-4FFC-8862-A2EF4F6453E0}.Patchless|Any CPU.Build.0 = Patchless|Any CPU
 	EndGlobalSection
 EndGlobal

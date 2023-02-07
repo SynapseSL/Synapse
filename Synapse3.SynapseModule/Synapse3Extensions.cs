@@ -21,7 +21,6 @@ using PlayerRoles.PlayableScps.Scp079.Cameras;
 using PlayerRoles.PlayableScps.Subroutines;
 using PlayerStatsSystem;
 using PluginAPI.Core.Interfaces;
-using PluginAPI.Events;
 using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;

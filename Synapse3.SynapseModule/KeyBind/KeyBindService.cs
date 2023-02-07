@@ -1,5 +1,4 @@
 ﻿using Neuron.Core.Meta;
-using Ninject;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.KeyBind.SynapseBind;
 using Synapse3.SynapseModule.Player;

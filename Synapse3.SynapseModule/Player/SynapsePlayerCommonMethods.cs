@@ -266,7 +266,7 @@ public partial class SynapsePlayer
     {
         var state = GetEscapeType(ignoreEscapeDistance);
         var ev = new EscapeEvent(this, true, state);
-        _playerEvents.Escape.Raise(ev);
+        _playerEvents.Escape.RaiseSafely(ev);
 
         RoleTypeId vanillaRole;
         switch (ev.EscapeType)

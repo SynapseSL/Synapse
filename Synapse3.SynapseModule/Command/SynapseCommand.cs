@@ -1,7 +1,5 @@
 ﻿using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Command;
-using Ninject;
-using UnityEngine;
 
 namespace Synapse3.SynapseModule.Command;
 

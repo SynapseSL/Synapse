@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Mirror;
 using PlayerRoles;
-using PlayerRoles.PlayableScps.HumeShield;
 using PlayerRoles.PlayableScps.Scp173;
 using RelativePositioning;
 using UnityEngine;

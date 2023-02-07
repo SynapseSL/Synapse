@@ -10,13 +10,11 @@ using Neuron.Core.Events;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerRoles;
-using PlayerRoles.FirstPersonControl;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
-using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
@@ -65,15 +63,23 @@ public class DebugService : Service
             reactor.Value.SubscribeUnsafe(this, method);
         }
         _player.KeyPress.Subscribe(OnKeyPress);
-
-        _round.Waiting.Subscribe(ev =>
-            Synapse.Get<SchematicService>().SpawnSchematic(SynapseTestSchematic(), new Vector3(26f, 992f, -41)));
+        _player.HarmPermission.Subscribe(ev =>
+        {
+            ev.Allow = true;
+        });
+        _player.SendPlayerData.Subscribe(ev =>
+        {
+            if (invis)
+                ev.IsInvisible = true;
+            ev.Position += Vector3.up;
+        });
     }
 
     public void Event(IEvent ev)
     {
         Logger.Warn("Event triggered: " + ev.GetType().Name);
     }
+
 
     private void OnKeyPress(KeyPressEvent ev)
     {

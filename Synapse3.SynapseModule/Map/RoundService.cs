@@ -6,7 +6,6 @@ using Respawning;
 using RoundRestarting;
 using Synapse3.SynapseModule.Events;
 using UnityEngine;
-using Utils.NonAllocLINQ;
 
 namespace Synapse3.SynapseModule.Map;
 

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using MapGeneration;
 using Neuron.Core.Meta;
-using Ninject;
 using Synapse3.SynapseModule.Events;
 using UnityEngine;
 

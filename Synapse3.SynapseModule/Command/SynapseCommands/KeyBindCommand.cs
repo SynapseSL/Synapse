@@ -1,18 +1,9 @@
-﻿using MEC;
-using Neuron.Modules.Commands;
+﻿using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Command;
-using PluginAPI.Core;
 using Synapse3.SynapseModule.Config;
-using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.KeyBind;
-using Synapse3.SynapseModule.Player;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using YamlDotNet.Core.Tokens;
-using static CmdBinding;
 
 namespace Synapse3.SynapseModule.Command.SynapseCommands;
 

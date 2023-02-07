@@ -26,7 +26,7 @@ public partial class ScpEvents : Service
     public readonly EventReactor<Scp079StopSpeakerEvent> Scp079StopSpeaker = new();
 
     public readonly EventReactor<Scp096AttackEvent> Scp096Attack = new();
-    public readonly EventReactor<Scp096ObserveEvent> Scp096Observe = new();
+    public readonly EventReactor<Scp096AddTargetEvent> Scp096AddTarget = new();
 
     public readonly EventReactor<Scp106AttackEvent> Scp106Attack = new();
     public readonly EventReactor<Scp106LeavePocketEvent> Scp106LeavePocket = new();
@@ -58,7 +58,7 @@ public partial class ScpEvents : Service
         _eventManager.RegisterEvent(Scp079StopSpeaker);
 
         _eventManager.RegisterEvent(Scp096Attack);
-        _eventManager.RegisterEvent(Scp096Observe);
+        _eventManager.RegisterEvent(Scp096AddTarget);
 
         _eventManager.RegisterEvent(Scp106Attack);
         _eventManager.RegisterEvent(Scp106LeavePocket);
@@ -87,7 +87,7 @@ public partial class ScpEvents : Service
         _eventManager.UnregisterEvent(Scp079StopSpeaker);
 
         _eventManager.UnregisterEvent(Scp096Attack);
-        _eventManager.UnregisterEvent(Scp096Observe);
+        _eventManager.UnregisterEvent(Scp096AddTarget);
 
         _eventManager.UnregisterEvent(Scp106Attack);
         _eventManager.UnregisterEvent(Scp106LeavePocket);
@@ -293,14 +293,17 @@ public class Scp106LeavePocketEvent : PlayerEvent
     public bool Allow { get; set; } = true;
 }
 
-public class Scp096ObserveEvent : PlayerInteractEvent
+public class Scp096AddTargetEvent : PlayerInteractEvent
 {
-    public Scp096ObserveEvent(SynapsePlayer player, bool allow, SynapsePlayer scp) : base(player, allow)
+    public Scp096AddTargetEvent(SynapsePlayer player, bool allow, SynapsePlayer scp, bool isForLooking) : base(player, allow)
     {
         Scp = scp;
+        IsForLooking = isForLooking;
     }
     
     public SynapsePlayer Scp { get; }
+    
+    public bool IsForLooking { get; }
 }
 
 public class Scp079ContainEvent : IEvent

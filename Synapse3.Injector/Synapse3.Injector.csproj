@@ -6,7 +6,7 @@
         <LangVersion>10.0</LangVersion>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <OutputType>Exe</OutputType>
-        <Configurations>Debug;Custom Version;Main Release;Dev</Configurations>
+        <Configurations>Debug;Custom Version;Main Release;Dev;Patchless</Configurations>
         <Platforms>AnyCPU</Platforms>
         <RootNamespace>Synapse3.Injector</RootNamespace>
         <PackageId>Synapse3.Injector</PackageId>
