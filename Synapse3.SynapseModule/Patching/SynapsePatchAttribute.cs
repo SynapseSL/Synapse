@@ -1,7 +1,9 @@
-﻿using HarmonyLib;
+﻿using System;
+using HarmonyLib;
 
 namespace Synapse3.SynapseModule.Patching;
 
+[AttributeUsage(AttributeTargets.Class)]
 public class SynapsePatchAttribute : HarmonyPatch
 {
     public SynapsePatchAttribute(string name, PatchType patchType)

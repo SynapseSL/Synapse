@@ -195,19 +195,13 @@ public class ThrowGrenadeEvent : BasicItemInteractEvent
 
 public class MicroUseEvent : BasicItemInteractEvent
 {
-    public MicroUseEvent(SynapseItem item, ItemInteractState state, SynapsePlayer player, byte energy,
-        bool canScp939Hear, HidState microState) : base(item, state, player)
+    public MicroUseEvent(SynapseItem item, ItemInteractState state, SynapsePlayer player,
+        HidState microState) : base(item, state, player)
     {
-        Energy = energy;
-        CanScp939Hear = canScp939Hear;
         MicroState = microState;
     }
 
-    public byte Energy { get; set; }
-    
-    public bool CanScp939Hear { get; set; }
-    
-    public HidState MicroState { get; set; }
+    public float OverrideEnergyToRemove { get; set; } = -1f;
 
-    public bool AllowChangingState { get; set; } = true;
+    public HidState MicroState { get; }
 }

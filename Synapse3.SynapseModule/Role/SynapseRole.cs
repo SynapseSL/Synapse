@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.Role;
 
-public abstract class SynapseRole : ISynapseRole
+public abstract class SynapseRole : InjectedLoggerBase, ISynapseRole
 {
     private SynapsePlayer _player;
 

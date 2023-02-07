@@ -2,11 +2,16 @@
 using Neuron.Core.Events;
 using Neuron.Core.Meta;
 using PlayerStatsSystem;
+using PlayerRoles;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Teams;
 using System;
+using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.Map.Objects;
+using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 
@@ -71,13 +76,11 @@ public class DebugService : Service
             case KeyCode.Alpha2:
                 Synapse.Get<TeamService>().NextTeam = 15;
                 Synapse.Get<TeamService>().Spawn(); 
+
                 break;
             case KeyCode.Alpha3:
                 Synapse.Get<TeamService>().NextTeam = 1;
                 Synapse.Get<TeamService>().Spawn();
-                break;
-            case KeyCode.Alpha4:
-                Logger.Warn("Yo"); 
                 break;
         }
     }

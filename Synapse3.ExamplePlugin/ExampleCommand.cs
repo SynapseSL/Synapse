@@ -1,6 +1,8 @@
 ﻿using Neuron.Core.Meta;
 using Neuron.Modules.Commands;
+using Ninject;
 using Synapse3.SynapseModule.Command;
+using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.ExamplePlugin;
 
@@ -14,6 +16,10 @@ namespace Synapse3.ExamplePlugin;
 public class ExampleCommand : SynapseCommand
 {
     private ExamplePlugin _plugin;
+    
+    //You can use the constructor or an Injected Field
+    [Inject]
+    public PlayerService PlayerService { get; set; }
 
     public ExampleCommand(ExamplePlugin plugin)
     {
@@ -22,6 +28,7 @@ public class ExampleCommand : SynapseCommand
     
     public override void Execute(SynapseContext context, ref CommandResult result)
     {
-        result.Response = "Config Value is: " + _plugin.Config.ConfigValue;
+        Logger.Warn("Injected" + (NeuronLoggerInjected != null));
+        result.Response = "Config Value is: " + _plugin.Config.ConfigValue + " Service null: " + (PlayerService == null);
     }
 }

@@ -103,7 +103,7 @@ public class NukeService : Service
 
         internal void SetPanel()
         {
-            OutsidePanel = Synapse.Get<AlphaWarheadOutsitePanel>();
+            OutsidePanel = Synapse.GetObject<AlphaWarheadOutsitePanel>();
         }
 
         public bool KeyCardEntered

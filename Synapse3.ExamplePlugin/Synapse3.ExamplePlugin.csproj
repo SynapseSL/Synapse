@@ -6,7 +6,7 @@
         <LangVersion>10.0</LangVersion>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <OutputType>Library</OutputType>
-        <Configurations>Debug;Custom Version;Main Release;Dev</Configurations>
+        <Configurations>Debug;Custom Version;Main Release;Dev;Patchless</Configurations>
         <Platforms>AnyCPU</Platforms>
         <RootNamespace>Synapse3.ExamplePlugin</RootNamespace>
         <PackageId>Synapse3.ExamplePlugin</PackageId>

@@ -1,5 +1,4 @@
 ﻿using Neuron.Core.Meta;
-using Ninject;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.KeyBind.SynapseBind;
 using Synapse3.SynapseModule.Player;
@@ -17,8 +16,7 @@ namespace Synapse3.SynapseModule.KeyBind;
 public class KeyBindService : Service
 {
     public const string DataBaseKey = "KeyBindSave";
-
-    private readonly IKernel _kernel;
+    
     private readonly Synapse _synapseModule;
     private readonly PlayerService _player;
     private readonly PlayerEvents _playerEvents;
@@ -28,10 +26,9 @@ public class KeyBindService : Service
     internal Dictionary<SynapsePlayer, IKeyBind> NewBinding = new();
     public ReadOnlyCollection<IKeyBind> DefaultBinds => _binds.AsReadOnly();
 
-    public KeyBindService(IKernel kernel, Synapse synapseModule, PlayerService player, PlayerEvents playerEvents,
+    public KeyBindService(Synapse synapseModule, PlayerService player, PlayerEvents playerEvents,
         SynapseConfigService config)
     {
-        _kernel = kernel;
         _synapseModule = synapseModule;
         _player = player;
         _playerEvents = playerEvents;
@@ -44,6 +41,9 @@ public class KeyBindService : Service
         _playerEvents.KeyPress.Subscribe(KeyPress);
 
         RegisterKey<ScpSwitchChat>();
+        #if DEV
+        RegisterKey<Dev>();
+        #endif
 
         while (_synapseModule.ModuleKeyBindBindingQueue.Count != 0)
         {
@@ -73,9 +73,7 @@ public class KeyBindService : Service
         if (IsRegistered(info.CommandName)) return;
         if (!typeof(IKeyBind).IsAssignableFrom(keyBindType)) return;
 
-        var keyBind = (IKeyBind)_kernel.Get(keyBindType);
-        _kernel.Bind(keyBindType).ToConstant(keyBind).InSingletonScope();
-
+        var keyBind = (IKeyBind)Synapse.GetOrCreate(keyBindType);
         keyBind.Attribute = info;
         keyBind.Load();
 

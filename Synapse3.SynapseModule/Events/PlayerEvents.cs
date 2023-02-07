@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using Hazards;
+﻿using Hazards;
 using Interactables.Interobjects.DoorUtils;
 using MEC;
 using Neuron.Core.Events;
 using Neuron.Core.Meta;
 using PlayerRoles;
+using PlayerRoles.FirstPersonControl;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Objects;
@@ -628,15 +628,20 @@ public class CallVanillaElevatorEvent : PlayerInteractEvent
 
 public class SendPlayerDataEvent : PlayerEvent
 {
-    public SynapsePlayer PlayerToSee { get; set; }
+    public SynapsePlayer PlayerToSee { get; }
+    
+    public PlayerMovementState MovementState { get; set; }
+    
+    public bool IsGrounded { get; set; }
 
     public bool IsInvisible { get; set; }
 
     public Vector3 Position { get; set; }
 
-    public float Rotation { get; set; }
-
-    public SendPlayerDataEvent(SynapsePlayer player) : base(player) { }
+    public SendPlayerDataEvent(SynapsePlayer player, SynapsePlayer playerToSee) : base(player)
+    {
+        PlayerToSee = playerToSee;
+    }
 }
 
 public class ChangeRoleEvent : PlayerEvent
@@ -662,19 +667,26 @@ public class KickEvent : PlayerInteractEvent
 
 public class SpeakEvent : PlayerInteractEvent
 {
-    public SpeakEvent(SynapsePlayer player, bool allow, VoiceChatChannel channel) : base(player, allow)
+    public SpeakEvent(SynapsePlayer player, bool allow, VoiceChatChannel channel, byte[] data, int dataLength) : base(player, allow)
     {
         Channel = channel;
+        Data = data;
+        DataLength = dataLength;
     }
     
     public VoiceChatChannel Channel { get; set; }
+    
+    public byte[] Data { get; set; }
+
+    public int DataLength { get; set; }
 }
 
 public class SpeakToPlayerEvent : SpeakEvent
 {
     public SynapsePlayer Receiver { get; }
 
-    public SpeakToPlayerEvent(SynapsePlayer player, SynapsePlayer receiver, bool allow, VoiceChatChannel channel) :
-        base(player, allow, channel)
+    public SpeakToPlayerEvent(SynapsePlayer player, SynapsePlayer receiver, bool allow, VoiceChatChannel channel,
+        byte[] data, int dataLength) :
+        base(player, allow, channel, data, dataLength)
         => Receiver = receiver;
 }

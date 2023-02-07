@@ -1,7 +1,6 @@
 ﻿using MapGeneration.Distributors;
 using Mirror;
 using UnityEngine;
-using Utils.Networking;
 
 namespace Synapse3.SynapseModule.Map.Schematic;
 
@@ -13,6 +12,7 @@ public abstract class StructureSyncSynapseObject : NetworkSynapseObject
 
     public override void Refresh()
     {
+        //TODO:
         Sync.Network_position = Position;
         Sync.Network_rotationY = (sbyte)Mathf.RoundToInt(Rotation.eulerAngles.y / 5.625f);
         NetworkServer.UnSpawn(GameObject);
