@@ -56,18 +56,7 @@ public abstract class SynapseAbstractRole : SynapseRole
         }
 
         PreSpawn();
-
-        var oldRole = Player.CurrentRole;
-
-        Player.ChangeRoleLite(config.Role);
-
-        var newRole = Player.CurrentRole;
-
-        foreach (var effect in Player.PlayerEffectsController.AllEffects)
-        {
-            effect.OnRoleChanged(oldRole, newRole);
-        }
-
+        Player.SetRoleFlags(config.Role, RoleSpawnFlags.None);
         if (config.VisibleRole != RoleTypeId.None)
         {
             Player.FakeRoleManager.VisibleRole = new RoleInfo(config.VisibleRole, Player);

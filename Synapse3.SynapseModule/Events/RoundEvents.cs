@@ -107,6 +107,8 @@ public class SpawnTeamEvent : IEvent
     public uint TeamId { get; }
     
     public List<SynapsePlayer> Players { get; set; }
+    
+    public int MaxWaveSize { get; set; }
 
     public bool Allow { get; set; } = true;
 }

@@ -8,6 +8,7 @@ using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Teams;
 using System;
+using Respawning;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
@@ -57,6 +58,14 @@ public class DebugService : Service
             reactor.Value.SubscribeUnsafe(this, method);
         }
         _player.KeyPress.Subscribe(OnKeyPress);
+        _round.SelectTeam.Subscribe(ev =>
+        {
+            ev.TeamId = 15;
+        });
+        _round.SpawnTeam.Subscribe(ev =>
+        {
+            ev.Allow = false;
+        });
     }
 
     public void Event(IEvent ev)
