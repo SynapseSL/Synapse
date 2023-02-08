@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Neuron.Core.Meta;
 using Syml;
+using Synapse3.SynapseModule.Role;
 
 namespace Synapse3.ExamplePlugin;
 
@@ -15,4 +16,6 @@ public class ExampleConfig : IDocumentSection
         (uint)ItemType.Medkit,
         (uint)ItemType.Adrenaline
     };
+
+    public ExampleAbstractRole.Config AbstractRoleConfig { get; set; } = new ExampleAbstractRole.Config();
 }
