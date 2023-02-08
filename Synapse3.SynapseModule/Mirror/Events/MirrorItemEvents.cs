@@ -117,7 +117,7 @@ public class MirrorItemEvents : Service
             Scale = item.Scale,
             Parent = item.Parent,
             OriginalScale = item.OriginalScale,
-            UpgradeProcessor = item.UpgradeProcessor,
+            UpgradeProcessors = item.UpgradeProcessors,
             MoveInElevator = item.MoveInElevator,
             SchematicConfiguration = item.SchematicConfiguration,
             CanBePickedUp = item.CanBePickedUp

@@ -13,7 +13,7 @@ namespace Synapse3.ExamplePlugin;
 })]
 public class ExampleScp914Processor : ISynapse914Processor
 {
-    public void CreateUpgradedItem(SynapseItem item, Scp914KnobSetting setting, Vector3 position = default)
+    public bool CreateUpgradedItem(SynapseItem item, Scp914KnobSetting setting, Vector3 position = default)
     {
         var type = setting switch
         {
@@ -25,7 +25,7 @@ public class ExampleScp914Processor : ISynapse914Processor
             _ => ItemType.None
         };
 
-        if (type == ItemType.None) return;
+        if (type == ItemType.None) return false;
         var state = item.State;
         var owner = item.ItemOwner;
         
@@ -36,11 +36,13 @@ public class ExampleScp914Processor : ISynapse914Processor
         {
             case ItemState.Map:
                 new SynapseItem(type, position);
-                break;
+                return true;
                 
             case ItemState.Inventory:
                 new SynapseItem(type, owner);
-                break;
+                return true;
         }
+        //If return false, an other proccess will be called
+        return false;
     }
 }

@@ -83,14 +83,14 @@ public partial class SynapseItem : DefaultSynapseObject
             Weight = exampleBase.Weight;
         }
 
-        var processor = Synapse.Get<Scp914Service>().GetProcessor(Id);
-        if (processor == Default914Processor.DefaultProcessor)
+        var processors = Synapse.Get<Scp914Service>().GetProcessors(Id);
+        if (processors.Count == 0)
         {
             if (Scp914Upgrader.TryGetProcessor(ItemType, out var vanillaProcessor))
-                processor = new Default914Processor(vanillaProcessor);
+                processors.Add(new Default914Processor(vanillaProcessor));
         }
 
-        UpgradeProcessor = processor;
+        UpgradeProcessors = processors;
     }
 
     /// <summary>
@@ -140,14 +140,14 @@ public partial class SynapseItem : DefaultSynapseObject
 
         State = ItemState.Inventory;
         
-        var processor = Synapse.Get<Scp914Service>().GetProcessor(Id);
-        if (processor == Default914Processor.DefaultProcessor)
+        var processor = Synapse.Get<Scp914Service>().GetProcessors(Id);
+        if (processor.Count == 0)
         {
             if (Scp914Upgrader.TryGetProcessor(ItemType, out var vanillaProcessor))
-                processor = new Default914Processor(vanillaProcessor);
+                processor.Add(new Default914Processor(vanillaProcessor));
         }
 
-        UpgradeProcessor = processor;
+        UpgradeProcessors = processor;
     }
 
     /// <summary>
@@ -172,14 +172,14 @@ public partial class SynapseItem : DefaultSynapseObject
 
         State = ItemState.Map;
 
-        var processor = Synapse.Get<Scp914Service>().GetProcessor(Id);
-        if (processor == Default914Processor.DefaultProcessor)
+        var processor = Synapse.Get<Scp914Service>().GetProcessors(Id);
+        if (processor.Count == 0)
         {
             if (Scp914Upgrader.TryGetProcessor(ItemType, out var vanillaProcessor))
-                processor = new Default914Processor(vanillaProcessor);
+                processor.Add(new Default914Processor(vanillaProcessor));
         }
 
-        UpgradeProcessor = processor;
+        UpgradeProcessors = processor;
     }
 
     internal SynapseItem(SchematicConfiguration.ItemConfiguration configuration, SynapseSchematic schematic) : this()
@@ -208,14 +208,14 @@ public partial class SynapseItem : DefaultSynapseObject
             Weight = exampleBase.Weight;
         }
         
-        var processor = Synapse.Get<Scp914Service>().GetProcessor(Id);
-        if (processor == Default914Processor.DefaultProcessor)
+        var processor = Synapse.Get<Scp914Service>().GetProcessors(Id);
+        if (processor.Count == 0)
         {
             if (Scp914Upgrader.TryGetProcessor(ItemType, out var vanillaProcessor))
-                processor = new Default914Processor(vanillaProcessor);
+                processor.Add(new Default914Processor(vanillaProcessor));
         }
         
-        UpgradeProcessor = processor;
+        UpgradeProcessors = processor;
 
         Drop(configuration.Position);
         Rotation = configuration.Rotation;
