@@ -315,18 +315,18 @@ public static class DecoratedMapPatches
 
             foreach (var item in ev.Items)
             {
+                var destroy = true;
                 foreach (var processor in item.UpgradeProcessors)
                 {
-                    var destroy = true;
                     if (processor.CreateUpgradedItem(item, setting, 
                         ev.MoveItems ? item.Position + ev.MoveVector : item.Position))
                     {
                         destroy = false;
                         break;
                     }
-                    if (destroy)
-                        item.Destroy();
                 }
+                if (destroy)
+                    item.Destroy();
             }
 
             return false;

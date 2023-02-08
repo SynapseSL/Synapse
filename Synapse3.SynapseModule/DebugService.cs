@@ -60,20 +60,17 @@ public class DebugService : Service
             if (reactor.Key == typeof(Scp173ObserveEvent)) continue;
             if (reactor.Key == typeof(KeyPressEvent)) continue;
             if (reactor.Key == typeof(RoundCheckEndEvent)) continue;
+            if (reactor.Key == typeof(SendPlayerDataEvent)) continue;
             if (reactor.Key.IsAbstract) continue;
             reactor.Value.SubscribeUnsafe(this, method);
         }
         _player.KeyPress.Subscribe(OnKeyPress);
-        _player.HarmPermission.Subscribe(ev =>
-        {
-            ev.Allow = true;
-        });
-        _player.SendPlayerData.Subscribe(ev =>
-        {
-            if (invis)
-                ev.IsInvisible = true;
-            ev.Position += Vector3.up;
-        });
+        _round.Start.Subscribe(OnStart);
+    }
+
+    private void OnStart(RoundStartEvent args)
+    {
+        RegisterProcess();
     }
 
     public void Event(IEvent ev)
@@ -157,13 +154,9 @@ public class DebugService : Service
     {
         public bool CreateUpgradedItem(SynapseItem item, Scp914KnobSetting setting, Vector3 position = default)
         {
-            if (UnityEngine.Random.Range(1, 5) > 2)
-            {
-                item.Destroy(); 
-                new SynapseItem(ItemType.Jailbird, position);
-                return true;
-            }
-            return false;
+            item.Destroy();
+            new SynapseItem(ItemType.ArmorHeavy, position);
+            return true;
         }
     }
 

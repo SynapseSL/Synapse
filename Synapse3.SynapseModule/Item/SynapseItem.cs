@@ -84,11 +84,8 @@ public partial class SynapseItem : DefaultSynapseObject
         }
 
         var processors = Synapse.Get<Scp914Service>().GetProcessors(Id);
-        if (processors.Count == 0)
-        {
-            if (Scp914Upgrader.TryGetProcessor(ItemType, out var vanillaProcessor))
-                processors.Add(new Default914Processor(vanillaProcessor));
-        }
+        if (Scp914Upgrader.TryGetProcessor(ItemType, out var vanillaProcessor))
+            processors.Add(new Default914Processor(vanillaProcessor));
 
         UpgradeProcessors = processors;
     }
@@ -141,11 +138,9 @@ public partial class SynapseItem : DefaultSynapseObject
         State = ItemState.Inventory;
         
         var processor = Synapse.Get<Scp914Service>().GetProcessors(Id);
-        if (processor.Count == 0)
-        {
-            if (Scp914Upgrader.TryGetProcessor(ItemType, out var vanillaProcessor))
-                processor.Add(new Default914Processor(vanillaProcessor));
-        }
+        
+        if (Scp914Upgrader.TryGetProcessor(ItemType, out var vanillaProcessor))
+            processor.Add(new Default914Processor(vanillaProcessor));
 
         UpgradeProcessors = processor;
     }
@@ -173,11 +168,9 @@ public partial class SynapseItem : DefaultSynapseObject
         State = ItemState.Map;
 
         var processor = Synapse.Get<Scp914Service>().GetProcessors(Id);
-        if (processor.Count == 0)
-        {
-            if (Scp914Upgrader.TryGetProcessor(ItemType, out var vanillaProcessor))
-                processor.Add(new Default914Processor(vanillaProcessor));
-        }
+           
+        if (Scp914Upgrader.TryGetProcessor(ItemType, out var vanillaProcessor))
+            processor.Add(new Default914Processor(vanillaProcessor));
 
         UpgradeProcessors = processor;
     }
@@ -209,11 +202,9 @@ public partial class SynapseItem : DefaultSynapseObject
         }
         
         var processor = Synapse.Get<Scp914Service>().GetProcessors(Id);
-        if (processor.Count == 0)
-        {
-            if (Scp914Upgrader.TryGetProcessor(ItemType, out var vanillaProcessor))
-                processor.Add(new Default914Processor(vanillaProcessor));
-        }
+         
+        if (Scp914Upgrader.TryGetProcessor(ItemType, out var vanillaProcessor))
+            processor.Add(new Default914Processor(vanillaProcessor));
         
         UpgradeProcessors = processor;
 
