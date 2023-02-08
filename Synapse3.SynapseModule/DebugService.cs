@@ -9,6 +9,7 @@ using Neuron.Core.Events;
 using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerRoles;
+using Scp914;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
@@ -16,6 +17,7 @@ using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Map.Scp914;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -144,189 +146,39 @@ public class DebugService : Service
         }
     }
 
-    private SchematicConfiguration SynapseTestSchematic()
+    private void RegisterProcess()
     {
-        return new SchematicConfiguration()
+        var scp914 = Synapse.Get<Scp914Service>();
+        scp914.Synapse914Processors[(uint)ItemType.Medkit].Insert(0, new Process1());
+        scp914.Synapse914Processors[(uint)ItemType.Medkit].Insert(0, new Process2());
+    }
+
+    class Process1 : ISynapse914Processor
+    {
+        public bool CreateUpgradedItem(SynapseItem item, Scp914KnobSetting setting, Vector3 position = default)
         {
-            Name = "test",
-            Id = 99999,
-            /*
-            Doors = new List<SchematicConfiguration.DoorConfiguration>()
+            if (UnityEngine.Random.Range(1, 5) > 2)
             {
-                new SchematicConfiguration.DoorConfiguration()
-                {
-                    Position = Vector3.left * 6,
-                    Health = 100,
-                    Locked = false,
-                    DoorType = SynapseDoor.SpawnableDoorType.Ez,
-                    UnDestroyable = false,
-                }
-            },
-            */
-            Generators = new List<SchematicConfiguration.SimpleUpdateConfig>()
-            {
-                new SchematicConfiguration.SimpleUpdateConfig()
-                {
-                    Position = Vector3.forward * 3,
-                }
-            },
-            Dummies = new List<SchematicConfiguration.DummyConfiguration>()
-            {
-                new SchematicConfiguration.DummyConfiguration()
-                {
-                    Position = Vector3.forward *-3,
-                    Name = "Test Dummy",
-                    Role = RoleTypeId.ClassD,
-                    Badge = "",
-                    BadgeColor = ""
-                }
-            },
-            Lights = new List<SchematicConfiguration.LightSourceConfiguration>()
-            {
-                new SchematicConfiguration.LightSourceConfiguration()
-                {
-                    Position = Vector3.up *3,
-                    Color = Color.white,
-                    LightIntensity = 1,
-                    LightRange = 10,
-                    LightShadows = true
-                }
-            },
-            Lockers = new List<SchematicConfiguration.LockerConfiguration>()
-            {
-                new SchematicConfiguration.LockerConfiguration()
-                {
-                    Position = Vector3.left * 3,
-                    LockerType = SynapseLocker.LockerType.ScpPedestal,
-                    DeleteDefaultItems = false,
-                }
-            },
-            Primitives = new List<SchematicConfiguration.PrimitiveConfiguration>()
-            {
-                new SchematicConfiguration.PrimitiveConfiguration()
-                {
-                    Position = Vector3.right * 3,
-                    Color = Color.white,
-                    Physics = false,
-                }
-            },
-            Ragdolls = new List<SchematicConfiguration.RagdollConfiguration>()
-            {
-                new SchematicConfiguration.RagdollConfiguration()
-                {
-                    Position = Vector3.forward,
-                    DamageType = DamageType.Bleeding,
-                    Nick = "Test RagDoll",
-                    RoleType = RoleTypeId.ClassD,
-                }
-            },
-            Items = new List<SchematicConfiguration.ItemConfiguration>()
-            {
-                new SchematicConfiguration.ItemConfiguration()
-                {
-                    Position = Vector3.forward * -1,
-                        Physics = false,
-                        ItemType = ItemType.MicroHID,
-                        CanBePickedUp = false,
-                        Attachments = 0,
-                        Durabillity = 0,
-                }
-            },
-            Targets = new List<SchematicConfiguration.TargetConfiguration>()
-            {
-                new SchematicConfiguration.TargetConfiguration()
-                {
-                    Position = Vector3.forward * 6,
-                    TargetType = SynapseTarget.TargetType.DBoy,
-                }
-            },
-            WorkStations = new List<SchematicConfiguration.SimpleUpdateConfig>()
-            {
-                new SchematicConfiguration.SimpleUpdateConfig()
-                {
-                    Position = Vector3.forward * -6,
-                }
+                item.Destroy(); 
+                new SynapseItem(ItemType.Jailbird, position);
+                return true;
             }
-        };
+            return false;
+        }
     }
 
-    private IEnumerator<float> CheckObjects(SynapsePlayer player)
+    class Process2 : ISynapse914Processor
     {
-        var primitive = new SynapsePrimitive(PrimitiveType.Cube, Color.white, player.Position, Quaternion.identity,
-            Vector3.one);
-        yield return Timing.WaitForSeconds(3f);
-        primitive.Position = player.Position;
-
-        yield return Timing.WaitForSeconds(3f);
-        var light = new SynapseLight(Color.white, 1f, 10f, true, player.Position, Quaternion.identity, Vector3.one);
-        yield return Timing.WaitForSeconds(3f);
-        light.Position = player.Position;
-        
-        yield return Timing.WaitForSeconds(3f);
-        var target = new SynapseTarget(SynapseTarget.TargetType.DBoy, player.Position, Quaternion.identity,
-            Vector3.one);
-        yield return Timing.WaitForSeconds(3f);
-        target.Position = player.Position;
-        
-        yield return Timing.WaitForSeconds(3f);
-        //Doors can't spawn inside a player or the AC escalates
-        var door = new SynapseDoor(SynapseDoor.SpawnableDoorType.Hcz, player.Position + player.transform.forward * 3, Quaternion.identity,
-            Vector3.one);
-        yield return Timing.WaitForSeconds(3f);
-        door.Position = player.Position + player.transform.forward * 3;
-        
-        yield return Timing.WaitForSeconds(3f);
-        var workstation = new SynapseWorkStation(player.Position, Quaternion.identity, Vector3.one);
-        yield return Timing.WaitForSeconds(3f);
-        if (workstation != null)
-            workstation.Position = player.Position;
-        
-        yield return Timing.WaitForSeconds(3f);
-        var locker = new SynapseLocker(SynapseLocker.LockerType.ScpPedestal, player.Position, Quaternion.identity,
-            Vector3.one);
-        yield return Timing.WaitForSeconds(3f);
-        locker.Position = player.Position;
-        
-        yield return Timing.WaitForSeconds(3f);
-        var gen = new SynapseGenerator(player.Position, Quaternion.identity, Vector3.one);
-        yield return Timing.WaitForSeconds(3f);
-        gen.Position = player.Position;
-        
-        yield return Timing.WaitForSeconds(3f);
-        var item = new SynapseItem(ItemType.MicroHID, player.Position);
-        yield return Timing.WaitForSeconds(3f);
-        item.Position = player.Position;
-        
-        yield return Timing.WaitForSeconds(3f);
-        var rag = new SynapseRagDoll(RoleTypeId.ClassD, player.Position, Quaternion.identity, Vector3.one, null,
-                DamageType.Asphyxiated, "");
-        yield return Timing.WaitForSeconds(3f);
-        if (rag != null)
-            rag.Position = player.Position;
-
-        yield return Timing.WaitForSeconds(3f);
-        var dummy = new SynapseDummy(player.Position, Quaternion.identity, RoleTypeId.ClassD, "");
-        yield return Timing.WaitForSeconds(3f);
-        dummy.Position = player.Position;
-    }
-
-    private void StoreNetworkObjects()
-    {
-        var msg = "Manager Prefabs:\n";
-
-        foreach (var spawnPrefab in NetworkManager.singleton.spawnPrefabs)
+        public bool CreateUpgradedItem(SynapseItem item, Scp914KnobSetting setting, Vector3 position = default)
         {
-            msg += spawnPrefab.name + "\n";
+            if (UnityEngine.Random.Range(1, 5) > 2)
+            {
+                item.Destroy();
+                new SynapseItem(ItemType.Flashlight, position);
+                return true;
+            }
+            return false;
         }
-
-        msg += "\nClient Prefabs:\n";
-
-        foreach (var prefab in NetworkClient.prefabs)
-        {
-            msg += prefab.Value.name + "    -   " + prefab.Key + "\n";
-        }
-
-        File.WriteAllText(Synapse.Get<NeuronBase>().RelativePath("Prefabs.txt"), msg);
     }
 }
 #endif
