@@ -5,6 +5,7 @@ public enum DeSpawnReason
     Unknown,
     Death,
     Leave,
+    Respawn,
     ForceClass,
     Lite,
     API,

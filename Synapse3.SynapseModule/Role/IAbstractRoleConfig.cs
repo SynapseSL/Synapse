@@ -8,6 +8,7 @@ public interface IAbstractRoleConfig
 {
     public RoleTypeId Role { get; }
     public RoleTypeId VisibleRole { get; }
+    public RoleTypeId OwnRole { get; }
     public uint EscapeRole { get; }
     public float Health { get; }
     public float MaxHealth { get; }
@@ -15,7 +16,6 @@ public interface IAbstractRoleConfig
     public float MaxArtificialHealth { get; }
     public RoomPoint[] PossibleSpawns { get; }
     public SerializedPlayerInventory[] PossibleInventories { get; }
-    public byte UnitId { get; }
-    public string Unit { get; }
+    public bool Hierarchy { get; }
     public SerializedVector3 Scale { get; }
 }

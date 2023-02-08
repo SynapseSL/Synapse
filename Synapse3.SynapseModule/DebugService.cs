@@ -1,26 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using MEC;
-using Mirror;
-using Neuron.Core;
+﻿using MEC;
 using Neuron.Core.Events;
-using Neuron.Core.Logging;
 using Neuron.Core.Meta;
+using PlayerStatsSystem;
 using PlayerRoles;
 using Scp914;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Dummy;
-using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Teams;
+using System;
+using Respawning;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Map.Scp914;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 
 namespace Synapse3.SynapseModule;
@@ -59,6 +54,7 @@ public class DebugService : Service
             if (reactor.Key == typeof(EscapeEvent)) continue;
             if (reactor.Key == typeof(Scp173ObserveEvent)) continue;
             if (reactor.Key == typeof(KeyPressEvent)) continue;
+            if (reactor.Key == typeof(SpeakEvent)) continue;
             if (reactor.Key == typeof(RoundCheckEndEvent)) continue;
             if (reactor.Key == typeof(SendPlayerDataEvent)) continue;
             if (reactor.Key.IsAbstract) continue;
@@ -78,67 +74,23 @@ public class DebugService : Service
         Logger.Warn("Event triggered: " + ev.GetType().Name);
     }
 
-    SynapseDummy testDummy;
-    private bool invis = false;
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                testDummy = new SynapseDummy(ev.Player.Position, Quaternion.identity, RoleTypeId.ClassD, "Dummy");
+                ev.Player.RoleID = 61;
+                ev.Player.FakeRoleManager.OwnVisibleRole = new Player.RoleInfo(PlayerRoles.RoleTypeId.Scp939, ev.Player);
                 break;
            
             case KeyCode.Alpha2:
-                invis = !invis;
-                break;
+                Synapse.Get<TeamService>().NextTeam = 15;
+                Synapse.Get<TeamService>().Spawn(); 
 
+                break;
             case KeyCode.Alpha3:
-                ev.Player.SendFakeEffectIntensityFor(testDummy.Player, Effect.Invisible, 1);
-                break;
-
-            case KeyCode.Alpha4:
-                switch (ev.Player.RoleType)
-                {
-                    case RoleTypeId.Scp173:
-                        var scp173 = ev.Player.MainScpController.Scp173;
-                        scp173.BlinkCooldownPerPlayer = 5;
-                        scp173.BlinkCooldownBase = 10;
-                        NeuronLogger.For<Synapse>().Warn("Observer: " + scp173.Observer.Count);
-                        break;
-                    case RoleTypeId.Scp106:
-                        var scp106 = ev.Player.MainScpController.Scp106;
-                        NeuronLogger.For<Synapse>().Warn("PoketPlayer: " + scp106.PlayersInPocket.Count);
-                        break;
-                    case RoleTypeId.Scp079:
-                        var scp079 = ev.Player.MainScpController.Scp079;
-                        scp079.RegenEnergy = 200;
-                        scp079.Exp = 3;
-                        break;
-                    case RoleTypeId.Scp096:
-                        var scp096 = ev.Player.MainScpController.Scp096;
-                        scp096.CurrentShield = 10;
-                        scp096.MaxShield = 100;
-                        scp096.ShieldRegeneration = 2000;
-                        break;
-                    case RoleTypeId.Scp939:
-                        var scp939 = ev.Player.MainScpController.Scp939;
-                        scp939.Sound(testDummy.Position);
-                        scp939.AmnesticCloudCooldown = 4;
-                        scp939.MimicryCloudCooldown = 4;
-                        NeuronLogger.For<Synapse>().Warn("MinicryPointPositioned: " + scp939.MinicryPointPositioned);
-                        break;
-                }
-                break;
-            
-            case KeyCode.Alpha5:
-                for (int i = 0; i < NetworkClient.prefabs.Count; i++)
-                {
-                    if (i == 0) continue;
-                    var prefab = NetworkClient.prefabs.ElementAt(i);
-                    Timing.CallDelayed(i * 0.5f,
-                        () => NetworkServer.Spawn(Object.Instantiate(prefab.Value, ev.Player.Position,
-                            Quaternion.identity)));
-                }
+                Synapse.Get<TeamService>().NextTeam = 1;
+                Synapse.Get<TeamService>().Spawn();
                 break;
         }
     }

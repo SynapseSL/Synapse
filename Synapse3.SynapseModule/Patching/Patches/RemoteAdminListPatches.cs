@@ -15,6 +15,7 @@ using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Permissions;
 using Synapse3.SynapseModule.Permissions.RemoteAdmin;
 using Synapse3.SynapseModule.Player;
+using Synapse3.SynapseModule.Teams;
 using Utils;
 using VoiceChat;
 using Random = UnityEngine.Random;
@@ -261,7 +262,13 @@ public static class RemoteAdminListPatch
 public static class RemoteAdminPlayerDataRequestPatch
 {
     private static readonly RemoteAdminCategoryService CategoryService;
-    static RemoteAdminPlayerDataRequestPatch() => CategoryService = Synapse.Get<RemoteAdminCategoryService>();
+    private static readonly TeamService TeamService;
+
+    static RemoteAdminPlayerDataRequestPatch()
+    {
+        CategoryService = Synapse.Get<RemoteAdminCategoryService>();
+        TeamService = Synapse.Get<TeamService>();
+    }
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(RaPlayer), nameof(RaPlayer.ReceiveData), typeof(CommandSender), typeof(string))]
@@ -517,6 +524,7 @@ public static class RemoteAdminPlayerDataRequestPatch
                                    "]</color>";
                         message += " <color=#977dff>[HS: " + CommandProcessor.GetRoundedStat<HumeShieldStat>(player) +
                                    "]</color>";
+                        message += "\nTeam: " + TeamService.GetTeamName(sPlayer.TeamID);
                         message += "\nPosition: " + player.transform.position;
                         message += "\nRoom: " + sPlayer.Room.Name;
                         break;
