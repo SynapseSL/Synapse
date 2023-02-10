@@ -151,10 +151,16 @@ public partial class SynapsePlayer
         set => GetStatBase<HealthStat>().CurValue = value;
     }
 
+    internal float _maxHealth { get; set; } = -1;
+
     /// <summary>
     /// The maximum health a player can have
     /// </summary>
-    public float MaxHealth { get; set; } = 100f;
+    public float MaxHealth
+    {
+        get => _maxHealth == -1 ? CurrentRole is IHealthbarRole healthRole ? healthRole.MaxHealth : 0 : _maxHealth;
+        set => _maxHealth = value;
+    }
 
     /// <summary>
     /// The current artificial health of the player

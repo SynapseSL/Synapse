@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using MEC;
 using Neuron.Core.Meta;
+using PlayerRoles;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
@@ -36,14 +38,14 @@ public class PlayerService : Service
     {
         _player.Join.Subscribe(Join);
         _round.Restart.Subscribe(ClearJoinUpdates);
-        _player.SimpleSetClass.Subscribe(ChangeClass);
+        _player.SetClass.Subscribe(ChangeClass);
     }
 
     public override void Disable()
     {
         _player.Join.Unsubscribe(Join);
         _round.Restart.Unsubscribe(ClearJoinUpdates);
-        _player.SimpleSetClass.Unsubscribe(ChangeClass);
+        _player.SetClass.Unsubscribe(ChangeClass);
     }
 
     /// <summary>
@@ -329,5 +331,22 @@ public class PlayerService : Service
     
     private void ClearJoinUpdates(RoundRestartEvent _) => JoinUpdates.Clear();
 
-    private void ChangeClass(SimpleSetClassEvent ev) => ev.Player.MainScpController.ProximityChat = false;
+    private void ChangeClass(SetClassEvent ev)
+    {
+        ev.Player.MainScpController.ProximityChat = false;
+        ev.Player._maxHealth = -1;
+        switch (ev.Player.RoleType)
+        {
+            case RoleTypeId.Scp106:
+                ev.Player.MainScpController.Scp106.ResetDefault();
+                break;
+            case RoleTypeId.Scp173:
+                ev.Player.MainScpController.Scp173.ResetDefault();
+                break;
+        }
+
+        if (ev.Player.CustomRole == null)
+            Timing.CallDelayed(Timing.WaitForOneFrame,
+                () => _player.ChangeRole.RaiseSafely(new ChangeRoleEvent(ev.Player) { RoleId = (uint)ev.Role }));
+    }
 }

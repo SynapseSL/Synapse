@@ -50,7 +50,6 @@ public partial class PlayerEvents : Service
     public readonly EventReactor<WalkOnTantrumEvent> WalkOnTantrum = new();
     public readonly EventReactor<StartWorkStationEvent> StartWorkStation = new();
     public readonly EventReactor<FallingIntoAbyssEvent> FallingIntoAbyss = new();
-    public readonly EventReactor<SimpleSetClassEvent> SimpleSetClass = new();
     public readonly EventReactor<UpdateDisplayNameEvent> UpdateDisplayName = new();
     public readonly EventReactor<CheckKeyCardPermissionEvent> CheckKeyCardPermission = new();
     public readonly EventReactor<CallVanillaElevatorEvent> CallVanillaElevator = new();
@@ -94,7 +93,6 @@ public partial class PlayerEvents : Service
         _eventManager.RegisterEvent(OpenWarheadButton);
         _eventManager.RegisterEvent(StartWorkStation);
         _eventManager.RegisterEvent(FallingIntoAbyss);
-        _eventManager.RegisterEvent(SimpleSetClass);
         _eventManager.RegisterEvent(UpdateDisplayName);
         _eventManager.RegisterEvent(CheckKeyCardPermission);
         _eventManager.RegisterEvent(CallVanillaElevator);
@@ -106,9 +104,7 @@ public partial class PlayerEvents : Service
 
         WalkOnSinkhole.Subscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Subscribe(WalkOnHazard.Raise);
-        
-        PlayerRoleManager.OnServerRoleSet += CallSimpleSetClass;
-        
+
         PluginAPI.Events.EventManager.RegisterEvents(_synapse,this);
     }
 
@@ -139,7 +135,6 @@ public partial class PlayerEvents : Service
         _eventManager.UnregisterEvent(OpenWarheadButton);
         _eventManager.UnregisterEvent(StartWorkStation);
         _eventManager.UnregisterEvent(FallingIntoAbyss);
-        _eventManager.UnregisterEvent(SimpleSetClass);
         _eventManager.UnregisterEvent(UpdateDisplayName);
         _eventManager.UnregisterEvent(CheckKeyCardPermission);
         _eventManager.UnregisterEvent(CallVanillaElevator);
@@ -151,31 +146,6 @@ public partial class PlayerEvents : Service
 
         WalkOnSinkhole.Unsubscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Unsubscribe(WalkOnHazard.Raise);
-
-        PlayerRoleManager.OnServerRoleSet -= CallSimpleSetClass;
-    }
-
-    private void CallSimpleSetClass(ReferenceHub hub, RoleTypeId newRole, RoleChangeReason reason)
-    {
-        var player = hub.GetSynapsePlayer();
-        if (player == null) return;
-        var currentRole = player.RoleType;
-        var ev = new SimpleSetClassEvent(player, currentRole, newRole);
-        SimpleSetClass.Raise(ev);
-        
-        switch (currentRole)
-        {
-            case RoleTypeId.Scp106:
-                player.MainScpController.Scp106.ResetDefault();
-                break;
-            case RoleTypeId.Scp173:
-                player.MainScpController.Scp173.ResetDefault();
-                break;
-        }
-
-        if (player.CustomRole == null)
-            Timing.CallDelayed(Timing.WaitForOneFrame,
-                () => ChangeRole.Raise(new ChangeRoleEvent(player) { RoleId = (uint)newRole }));
     }
 }
 
@@ -572,19 +542,6 @@ public class StartWorkStationEvent : PlayerInteractEvent
 public class FallingIntoAbyssEvent : PlayerInteractEvent
 {
     public FallingIntoAbyssEvent(SynapsePlayer player, bool allow) : base(player, allow) { }
-}
-
-public class SimpleSetClassEvent : PlayerEvent
-{
-    public RoleTypeId PreviousRole { get; }
-
-    public RoleTypeId NextRole { get; }
-
-    public SimpleSetClassEvent(SynapsePlayer player, RoleTypeId previousRole, RoleTypeId nextRole) : base(player)
-    {
-        PreviousRole = previousRole;
-        NextRole = nextRole;
-    }
 }
 
 public class UpdateDisplayNameEvent : PlayerEvent

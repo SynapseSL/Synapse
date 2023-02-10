@@ -78,13 +78,11 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                ev.Player.RoleID = 61;
-                ev.Player.FakeRoleManager.OwnVisibleRole = new Player.RoleInfo(PlayerRoles.RoleTypeId.Scp939, ev.Player);
+                Logger.Warn(ev.Player.MaxHealth);
                 break;
            
             case KeyCode.Alpha2:
-                Synapse.Get<TeamService>().NextTeam = 15;
-                Synapse.Get<TeamService>().Spawn(); 
+                ev.Player.MaxHealth = 98;
 
                 break;
             case KeyCode.Alpha3:
