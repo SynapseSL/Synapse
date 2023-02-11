@@ -175,6 +175,7 @@ public static class RemoteAdminListPatch
                 var colors = ServerService.Colors;
                 color = colors.ElementAt(Random.Range(0, colors.Count)).Value;
             }
+            color = ServerService.GetColorHexCode(color);
 
             text += "<align=center><size=0>(" + group.GroupId + ")</size> <size=20><color=" + color + ">[" +
                     group.Name +
@@ -194,7 +195,7 @@ public static class RemoteAdminListPatch
             text += player.Text + "\n";
         }
 
-        var dummys = DummyService.Dummies //Add the dummy
+        var dummies = DummyService.Dummies //Add the dummy
             .Where(p => p.RaVisible)
             .Select(d => new RemoteAdminPlayer()
             {
@@ -202,10 +203,10 @@ public static class RemoteAdminListPatch
                 Text = $"<color={{RA_ClassColor}}>({d.Player.PlayerId}) {d.Player.DisplayName}</color>"
             });
 
-        if (dummys.Any())
+        if (dummies.Any())
             text += "<align=center><size=0>(dummy)</size> <size=20>[Dummy]</size></align>\n";
 
-        foreach (var dummy in dummys)
+        foreach (var dummy in dummies)
         {
             text += dummy.Text + "\n";
         }

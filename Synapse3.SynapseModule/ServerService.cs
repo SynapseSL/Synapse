@@ -73,6 +73,9 @@ public class ServerService : Service
     /// </summary>
     public Dictionary<Misc.PlayerInfoColorTypes, string> Colors { get; } = Misc.AllowedColors;
 
+    public string GetColorHexCode(string color) =>
+        Colors[(Misc.PlayerInfoColorTypes)Enum.Parse(typeof(Misc.PlayerInfoColorTypes), color, true)];
+
     /// <summary>
     /// Rank badges needs an exact string for each color and therefore returns this a version of the colors that will actually be displayed
     /// </summary>
