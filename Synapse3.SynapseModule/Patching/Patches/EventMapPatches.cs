@@ -4,8 +4,12 @@ using Footprinting;
 using HarmonyLib;
 using InventorySystem.Items.Armor;
 using InventorySystem.Items.Pickups;
+using MapGeneration;
 using MapGeneration.Distributors;
 using Neuron.Core.Meta;
+using PlayerRoles;
+using PlayerRoles.FirstPersonControl;
+using PlayerRoles.PlayableScps.Scp079;
 using PluginAPI.Enums;
 using PluginAPI.Events;
 using Scp914;
@@ -50,6 +54,75 @@ public static class GeneratorInteractPatch
     public static bool GeneratorInteract(Scp079Generator __instance, ReferenceHub ply, byte colliderId)
     {
         DecoratedMapPatches.OnGenInteract(__instance, ply, colliderId);
+        return false;
+    }
+}
+
+[Automatic]
+[SynapsePatch("TeslaPatch", PatchType.MapEvent)]
+public static class TeslaPatch
+{
+    private static readonly MapEvents MapEvents;
+    static TeslaPatch() => MapEvents = Synapse.Get<MapEvents>();
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(TeslaGate), nameof(TeslaGate.PlayerInRange))]
+    public static bool PlayerInRange(TeslaGate __instance, ReferenceHub player, out bool __result)
+    {
+        __result = false;
+        try
+        {
+            var sPlayer = player.GetSynapsePlayer();
+            var tesla = __instance.GetSynapseTesla();
+            if (sPlayer == null || tesla == null) return false;
+            if (!__instance.InRange(player.transform.position)) return false;
+            var ev = new TriggerTeslaEvent(sPlayer,
+                sPlayer.Invisible < InvisibleMode.Ghost && (sPlayer.CurrentRole is not ITeslaControllerRole teslaRole ||
+                                                            teslaRole.CanActivateShock), tesla, false);
+            MapEvents.TriggerTesla.RaiseSafely(ev);
+            __result = ev.Allow;
+            return false;
+        }
+        catch (Exception ex)
+        {
+            SynapseLogger<Synapse>.Error("Trigger Tesla Patch failed\n" + ex);
+        }
+
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(TeslaGate), nameof(TeslaGate.PlayerInIdleRange))]
+    public static bool PlayerInIdleRange(TeslaGate __instance, ReferenceHub player, out bool __result)
+    {
+        __result = false;
+        try
+        {
+            var sPlayer = player.GetSynapsePlayer();
+            var tesla = __instance.GetSynapseTesla();
+            if (sPlayer == null || tesla == null || !sPlayer.IsAlive) return false;
+            var pos = __instance.transform.position;
+            switch (sPlayer.CurrentRole)
+            {
+                case IFpcRole fpcRole
+                    when Vector3.Distance(pos, fpcRole.FpcModule.Position) < __instance.distanceToIdle:
+                case Scp079Role scp079Role when RoomIdUtils.IsTheSameRoom(scp079Role.CurrentCamera.Position, pos):
+                    var ev = new TriggerTeslaEvent(sPlayer,
+                        sPlayer.Invisible < InvisibleMode.Ghost &&
+                        (sPlayer.CurrentRole is not ITeslaControllerRole teslaRole ||
+                         teslaRole.CanActivateIdle), tesla, true);
+                    MapEvents.TriggerTesla.RaiseSafely(ev);
+                    __result = ev.Allow;
+                    break;
+            }
+
+            return false;
+        }
+        catch (Exception ex)
+        {
+            SynapseLogger<Synapse>.Error("Trigger Tesla Idle Patch failed\n" + ex);
+        }
+
         return false;
     }
 }

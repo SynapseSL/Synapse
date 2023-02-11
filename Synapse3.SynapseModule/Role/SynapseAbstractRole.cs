@@ -1,5 +1,4 @@
-﻿using Neuron.Core.Logging;
-using PlayerRoles;
+﻿using PlayerRoles;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Events;

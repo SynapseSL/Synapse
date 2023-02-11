@@ -4,7 +4,6 @@ using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Synapse3.ExamplePlugin;

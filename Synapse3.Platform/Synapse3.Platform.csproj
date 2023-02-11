@@ -45,5 +45,9 @@
       <Optimize Condition=" '$(Optimize)' == '' ">true</Optimize>
       <DocumentationFile />
     </PropertyGroup>
+    
+    <PropertyGroup Condition=" '$(Configuration)' == 'Custom Version' ">
+      <Optimize>true</Optimize>
+    </PropertyGroup>
 
 </Project>

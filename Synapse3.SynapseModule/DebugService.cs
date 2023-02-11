@@ -1,18 +1,10 @@
-﻿using MEC;
-using Neuron.Core.Events;
+﻿using Neuron.Core.Events;
 using Neuron.Core.Meta;
-using PlayerStatsSystem;
-using PlayerRoles;
 using Synapse3.SynapseModule.Command;
-using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Teams;
 using System;
-using Respawning;
-using Synapse3.SynapseModule.Item;
-using Synapse3.SynapseModule.Map.Objects;
-using Synapse3.SynapseModule.Map.Schematic;
-using Synapse3.SynapseModule.Player;
+using Synapse3.SynapseModule.Enums;
 using UnityEngine;
 
 
@@ -49,23 +41,18 @@ public class DebugService : Service
         foreach (var reactor in _event.Reactors)
         {
             if (reactor.Key == typeof(UpdateObjectEvent)) continue;
+            if (reactor.Key == typeof(UpdateEvent)) continue;
             if (reactor.Key == typeof(EscapeEvent)) continue;
             if (reactor.Key == typeof(Scp173ObserveEvent)) continue;
             if (reactor.Key == typeof(KeyPressEvent)) continue;
             if (reactor.Key == typeof(SpeakEvent)) continue;
             if (reactor.Key == typeof(RoundCheckEndEvent)) continue;
+            if (reactor.Key == typeof(SendPlayerDataEvent)) continue;
             if (reactor.Key.IsAbstract) continue;
             reactor.Value.SubscribeUnsafe(this, method);
         }
         _player.KeyPress.Subscribe(OnKeyPress);
-        _round.SelectTeam.Subscribe(ev =>
-        {
-            ev.TeamId = 15;
-        });
-        _round.SpawnTeam.Subscribe(ev =>
-        {
-            ev.Allow = false;
-        });
+        _player.Pickup.Subscribe(ev => ev.Allow = false);
     }
 
     public void Event(IEvent ev)
@@ -78,7 +65,8 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                Logger.Warn(ev.Player.MaxHealth);
+                ev.Player.Invisible += 1;
+                if (ev.Player.Invisible > InvisibleMode.Full) ev.Player.Invisible = InvisibleMode.None;
                 break;
            
             case KeyCode.Alpha2:

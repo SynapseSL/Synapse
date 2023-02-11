@@ -37,14 +37,14 @@ public class PlayerService : Service
     public override void Enable()
     {
         _player.Join.Subscribe(Join);
-        _round.Restart.Subscribe(ClearJoinUpdates);
+        _round.Restart.Subscribe(RoundRestart);
         _player.SetClass.Subscribe(ChangeClass);
     }
 
     public override void Disable()
     {
         _player.Join.Unsubscribe(Join);
-        _round.Restart.Unsubscribe(ClearJoinUpdates);
+        _round.Restart.Unsubscribe(RoundRestart);
         _player.SetClass.Unsubscribe(ChangeClass);
     }
 
@@ -328,8 +328,13 @@ public class PlayerService : Service
                 joinUpdate.UpdatePlayer(ev.Player);
         }
     }
-    
-    private void ClearJoinUpdates(RoundRestartEvent _) => JoinUpdates.Clear();
+
+    private void RoundRestart(RoundRestartEvent _)
+    {
+        JoinUpdates.Clear();
+        RecyclablePlayerId._autoIncrement = 0;
+        RecyclablePlayerId.FreeIds.Clear();
+    }
 
     private void ChangeClass(SetClassEvent ev)
     {

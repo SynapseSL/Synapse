@@ -1,6 +1,5 @@
 ﻿using Hazards;
 using Interactables.Interobjects.DoorUtils;
-using MEC;
 using Neuron.Core.Events;
 using Neuron.Core.Meta;
 using PlayerRoles;
@@ -72,11 +71,13 @@ public partial class PlayerEvents : Service
         _eventManager.RegisterEvent(KeyPress);
         _eventManager.RegisterEvent(HarmPermission);
         _eventManager.RegisterEvent(SetClass);
+        _eventManager.RegisterEvent(Update);
         _eventManager.RegisterEvent(StartWarhead);
         _eventManager.RegisterEvent(DoorInteract);
         _eventManager.RegisterEvent(LockerUse);
         _eventManager.RegisterEvent(WarheadPanelInteract);
         _eventManager.RegisterEvent(Ban);
+        _eventManager.RegisterEvent(Damage);
         _eventManager.RegisterEvent(ChangeItem);
         _eventManager.RegisterEvent(Death);
         _eventManager.RegisterEvent(FreePlayer);
@@ -114,11 +115,13 @@ public partial class PlayerEvents : Service
         _eventManager.UnregisterEvent(KeyPress);
         _eventManager.UnregisterEvent(HarmPermission);
         _eventManager.UnregisterEvent(SetClass);
+        _eventManager.UnregisterEvent(Update);
         _eventManager.UnregisterEvent(StartWarhead);
         _eventManager.UnregisterEvent(DoorInteract);
         _eventManager.UnregisterEvent(LockerUse);
         _eventManager.UnregisterEvent(WarheadPanelInteract);
         _eventManager.UnregisterEvent(Ban);
+        _eventManager.UnregisterEvent(Damage);
         _eventManager.UnregisterEvent(ChangeItem);
         _eventManager.UnregisterEvent(Death);
         _eventManager.UnregisterEvent(FreePlayer);

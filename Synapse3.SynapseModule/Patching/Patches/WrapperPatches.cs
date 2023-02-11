@@ -248,4 +248,19 @@ public static class MaxHealthPatch
         return false;
     }
 }
+
+[Automatic]
+[SynapsePatch("Artificial Health",PatchType.Wrapper)]
+public static class ArtificialHealthPatch
+{
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(AhpStat), nameof(AhpStat.ServerAddProcess), typeof(float))]
+    public static bool ServerAddProcess(AhpStat __instance, float amount, out AhpStat.AhpProcess __result)
+    {
+        var player = __instance.GetSynapsePlayer();
+        __result = __instance.ServerAddProcess(amount, player.MaxArtificialHealth, player.DecayArtificialHealth, 0.7f,
+            0f, false);
+        return false;
+    }
+}
 #endif
