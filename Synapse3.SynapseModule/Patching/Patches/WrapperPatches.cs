@@ -8,6 +8,7 @@ using PlayerRoles.PlayableScps.HumeShield;
 using PlayerRoles.PlayableScps.Scp079;
 using PlayerRoles.PlayableScps.Scp096;
 using PlayerRoles.PlayableScps.Scp173;
+using PlayerStatsSystem;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
@@ -229,6 +230,37 @@ public static class Scp173BlinkCoolDownPatch
         {
             SynapseLogger<Synapse>.Error("Scp173 Blink Cooldown Patch failed\n" + ex);
         }
+    }
+}
+
+[Automatic]
+[SynapsePatch("MaxHealth",PatchType.Wrapper)]
+public static class MaxHealthPatch
+{
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(HealthStat), nameof(HealthStat.MaxValue), MethodType.Getter)]
+    public static bool GetMaxValue(out float __result, HealthStat __instance)
+    {
+        __result = 0;
+        var player = __instance.GetSynapsePlayer();
+        if (player == null) return true;
+        __result = player.MaxHealth;
+        return false;
+    }
+}
+
+[Automatic]
+[SynapsePatch("Artificial Health",PatchType.Wrapper)]
+public static class ArtificialHealthPatch
+{
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(AhpStat), nameof(AhpStat.ServerAddProcess), typeof(float))]
+    public static bool ServerAddProcess(AhpStat __instance, float amount, out AhpStat.AhpProcess __result)
+    {
+        var player = __instance.GetSynapsePlayer();
+        __result = __instance.ServerAddProcess(amount, player.MaxArtificialHealth, player.DecayArtificialHealth, 0.7f,
+            0f, false);
+        return false;
     }
 }
 #endif

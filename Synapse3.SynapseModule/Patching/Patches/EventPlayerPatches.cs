@@ -23,6 +23,7 @@ using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
 using System;
 using System.Linq;
+using InventorySystem.Searching;
 using MapGeneration.Distributors;
 using PlayerRoles.FirstPersonControl;
 using PlayerRoles.FirstPersonControl.NetworkMessages;
@@ -653,7 +654,7 @@ public static class PlayerDeathPatch
 
             if (attacker?.CustomRole != null)
             {
-                var translation = victim.GetTranslation(Translation).DeathMessage.Replace("\\n", "\n");
+                var translation = Translation.Get(victim).DeathMessage.Replace("\\n", "\n");
                 playerMsg = string.Format(translation, attacker.DisplayName, attacker.RoleName);
             }
 
@@ -1056,4 +1057,48 @@ public static class SendPlayerDataPatch
         return syncData;
     }
 }
+
+[Automatic]
+[SynapsePatch("Pickup",PatchType.PlayerEvent)]
+public static class PickupPatches
+{
+    private static readonly PlayerEvents Player;
+    static PickupPatches() => Player = Synapse.Get<PlayerEvents>();
+
+    private static void ValidateStart(SearchCompletor searchCompletor, ref bool allow)
+    {
+        try
+        {
+            var player = searchCompletor.Hub.GetSynapsePlayer();
+            var item = searchCompletor.TargetPickup.GetItem();
+            var ev = new PickupEvent(player.GetSynapsePlayer(), allow, item);
+            Player.Pickup.RaiseSafely(ev);
+            allow = ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            SynapseLogger<Synapse>.Error("Search Completor Validate Start Patch failed\n" + ex);
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ArmorSearchCompletor), nameof(ArmorSearchCompletor.ValidateStart))]
+    public static void ValidateArmo(ArmorSearchCompletor __instance, ref bool __result) =>
+        ValidateStart(__instance, ref __result);
+    
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ItemSearchCompletor), nameof(ItemSearchCompletor.ValidateStart))]
+    public static void ValidateItem(ItemSearchCompletor __instance, ref bool __result) =>
+        ValidateStart(__instance, ref __result);
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(SearchCompletor), nameof(SearchCompletor.ValidateStart))]
+    public static void ValidateDefault(SearchCompletor __instance, ref bool __result)
+    {
+        if(__instance.GetType() == typeof(ArmorSearchCompletor) || __instance.GetType() == typeof(ItemSearchCompletor)) return;
+        ValidateStart(__instance, ref __result);
+    }
+}
+
 #endif

@@ -56,7 +56,7 @@ public class RemoteAdminCategoryService : Service
     public void RegisterCategory<TCategory>() where TCategory : RemoteAdminCategory
     {
         var info = typeof(TCategory).GetCustomAttribute<RaCategoryAttribute>();
-        if(info == null) return;
+        if (info == null) return;
         info.CategoryType = typeof(TCategory);
 
         RegisterCategory(info);
@@ -70,7 +70,7 @@ public class RemoteAdminCategoryService : Service
         var category = (RemoteAdminCategory)Synapse.GetOrCreate(info.CategoryType);
         category.Attribute = info;
         category.Load();
-        
+
         _remoteAdminCategories.Add(category);
     }
 
@@ -79,13 +79,13 @@ public class RemoteAdminCategoryService : Service
     private void OnCommand(CommandEvent ev)
     {
         if (ev.Context.Command.ToUpper() != "EXTERNALLOOKUP") return;
-        if(ev.Context.Arguments.Length == 0) return;
-        
+        if (ev.Context.Arguments.Length == 0) return;
+
         foreach (var category in _remoteAdminCategories)
         {
-            if(ev.Context.Arguments[0] != category.Attribute.Id.ToString()) continue;
+            if (ev.Context.Arguments[0] != category.Attribute.Id.ToString()) continue;
             ev.IsHandled = true;
-            
+
             var context = (SynapseContext)ev.Context;
             context.Player.CommandSender.RaReply("% none % " + category.ExternalURL, true, false, "");
         }

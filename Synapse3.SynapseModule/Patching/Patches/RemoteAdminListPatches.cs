@@ -15,6 +15,7 @@ using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Permissions;
 using Synapse3.SynapseModule.Permissions.RemoteAdmin;
 using Synapse3.SynapseModule.Player;
+using Synapse3.SynapseModule.Teams;
 using Utils;
 using VoiceChat;
 using Random = UnityEngine.Random;
@@ -174,6 +175,7 @@ public static class RemoteAdminListPatch
                 var colors = ServerService.Colors;
                 color = colors.ElementAt(Random.Range(0, colors.Count)).Value;
             }
+            color = ServerService.GetColorHexCode(color);
 
             text += "<align=center><size=0>(" + group.GroupId + ")</size> <size=20><color=" + color + ">[" +
                     group.Name +
@@ -193,7 +195,7 @@ public static class RemoteAdminListPatch
             text += player.Text + "\n";
         }
 
-        var dummys = DummyService.Dummies //Add the dummy
+        var dummies = DummyService.Dummies //Add the dummy
             .Where(p => p.RaVisible)
             .Select(d => new RemoteAdminPlayer()
             {
@@ -201,10 +203,10 @@ public static class RemoteAdminListPatch
                 Text = $"<color={{RA_ClassColor}}>({d.Player.PlayerId}) {d.Player.DisplayName}</color>"
             });
 
-        if (dummys.Any())
+        if (dummies.Any())
             text += "<align=center><size=0>(dummy)</size> <size=20>[Dummy]</size></align>\n";
 
-        foreach (var dummy in dummys)
+        foreach (var dummy in dummies)
         {
             text += dummy.Text + "\n";
         }
@@ -261,7 +263,13 @@ public static class RemoteAdminListPatch
 public static class RemoteAdminPlayerDataRequestPatch
 {
     private static readonly RemoteAdminCategoryService CategoryService;
-    static RemoteAdminPlayerDataRequestPatch() => CategoryService = Synapse.Get<RemoteAdminCategoryService>();
+    private static readonly TeamService TeamService;
+
+    static RemoteAdminPlayerDataRequestPatch()
+    {
+        CategoryService = Synapse.Get<RemoteAdminCategoryService>();
+        TeamService = Synapse.Get<TeamService>();
+    }
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(RaPlayer), nameof(RaPlayer.ReceiveData), typeof(CommandSender), typeof(string))]
@@ -517,6 +525,7 @@ public static class RemoteAdminPlayerDataRequestPatch
                                    "]</color>";
                         message += " <color=#977dff>[HS: " + CommandProcessor.GetRoundedStat<HumeShieldStat>(player) +
                                    "]</color>";
+                        message += "\nTeam: " + TeamService.GetTeamName(sPlayer.TeamID);
                         message += "\nPosition: " + player.transform.position;
                         message += "\nRoom: " + sPlayer.Room.Name;
                         break;

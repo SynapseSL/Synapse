@@ -118,10 +118,13 @@ public class ElevatorMoveContentEvent : IEvent//TODO
 
 public class TriggerTeslaEvent : PlayerInteractEvent
 {
-    public TriggerTeslaEvent(SynapsePlayer player, bool allow, SynapseTesla tesla) : base(player, allow)
+    public TriggerTeslaEvent(SynapsePlayer player, bool allow, SynapseTesla tesla, bool idle) : base(player, allow)
     {
         Tesla = tesla;
+        Idle = idle;
     }
+    
+    public bool Idle { get; }
     
     public SynapseTesla Tesla { get; }
 }

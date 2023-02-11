@@ -24,7 +24,7 @@ public class CustomInfoList :
         _player = player;
         _playerService = playerService;
         _mirrorService = mirrorService;
-        playerEvent.SimpleSetClass.Subscribe(ev => UpdatePlayer(ev.Player));
+        playerEvent.SetClass.Subscribe(ev => UpdatePlayer(ev.Player));
     }
 
     public bool IsForEveryoneEqual { get; private set; } = true;
