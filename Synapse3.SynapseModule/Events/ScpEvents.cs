@@ -4,6 +4,7 @@ using PlayerRoles.PlayableScps.Scp939;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Objects;
+using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
@@ -23,6 +24,15 @@ public partial class ScpEvents : Service
     public readonly EventReactor<Scp079DoorInteractEvent> Scp079DoorInteract = new();
     public readonly EventReactor<Scp079LockDoorEvent> Scp079LockDoor = new();
     public readonly EventReactor<Scp079SpeakerUseEvent> Scp079SpeakerUse = new();
+    public readonly EventReactor<Scp079TeslaInteractEvent> Scp079TeslaInteract = new();
+    public readonly EventReactor<Scp079BlackOutRoomEvent> Scp079BalckOutRoom = new();
+    public readonly EventReactor<Scp079BlackOutZoneEvent> Scp079BalckOutZone = new();
+    public readonly EventReactor<Scp079LockReleaserAllEvent> Scp079LockReleaserAll = new();
+    public readonly EventReactor<Scp079LockdownRoomEvent> Scp079LockdownRoom = new();
+    //TODO :
+    /*
+     * Scp079ElevatorStateChanger
+     */
 
     public readonly EventReactor<Scp096AttackEvent> Scp096Attack = new();
     public readonly EventReactor<Scp096AddTargetEvent> Scp096AddTarget = new();
@@ -54,7 +64,12 @@ public partial class ScpEvents : Service
         _eventManager.RegisterEvent(Scp079DoorInteract);
         _eventManager.RegisterEvent(Scp079LockDoor);
         _eventManager.RegisterEvent(Scp079SpeakerUse);
-
+        _eventManager.RegisterEvent(Scp079TeslaInteract); 
+        _eventManager.RegisterEvent(Scp079BalckOutRoom);
+        _eventManager.RegisterEvent(Scp079BalckOutZone);
+        _eventManager.RegisterEvent(Scp079LockReleaserAll);
+        _eventManager.RegisterEvent(Scp079LockdownRoom);
+        
         _eventManager.RegisterEvent(Scp096Attack);
         _eventManager.RegisterEvent(Scp096AddTarget);
 
@@ -82,6 +97,11 @@ public partial class ScpEvents : Service
         _eventManager.UnregisterEvent(Scp079DoorInteract);
         _eventManager.UnregisterEvent(Scp079LockDoor);
         _eventManager.UnregisterEvent(Scp079SpeakerUse);
+        _eventManager.UnregisterEvent(Scp079TeslaInteract);
+        _eventManager.UnregisterEvent(Scp079BalckOutRoom);
+        _eventManager.UnregisterEvent(Scp079BalckOutZone);
+        _eventManager.UnregisterEvent(Scp079LockReleaserAll);
+        _eventManager.UnregisterEvent(Scp079LockdownRoom);
 
         _eventManager.UnregisterEvent(Scp096Attack);
         _eventManager.UnregisterEvent(Scp096AddTarget);
@@ -371,5 +391,69 @@ public class Scp079SpeakerUseEvent : ScpActionEvent
     }
 
     public Vector3 SpeackerPostion { get; }
+
+}
+
+public class Scp079TeslaInteractEvent : ScpActionEvent
+{
+    public Scp079TeslaInteractEvent(SynapsePlayer scp, SynapseTesla tesla, int cost) : base(scp, true)
+    {
+        Tesla = tesla;
+        Cost = cost;
+    }
+
+    public SynapseTesla Tesla { get; }
+    public int Cost { get; set; }
+
+}
+
+public class Scp079BlackOutRoomEvent : ScpActionEvent
+{
+    public Scp079BlackOutRoomEvent(SynapsePlayer scp, IVanillaRoom room, int cost) : base(scp, true)
+    {
+        Room = room;
+        Cost = cost;
+    }
+
+    public IVanillaRoom Room { get; }
+    public int Cost { get; set; }
+
+}
+
+public class Scp079BlackOutZoneEvent : ScpActionEvent
+{
+    public Scp079BlackOutZoneEvent(SynapsePlayer scp, ZoneType zone, int cost) : base(scp, true)
+    {
+        Zone = zone;
+        Cost = cost;
+    }
+
+    public ZoneType Zone { get; }
+    public int Cost { get; set; }
+
+}
+
+public class Scp079LockReleaserAllEvent : ScpActionEvent
+{
+    public Scp079LockReleaserAllEvent(SynapsePlayer scp, int cost) : base(scp, true)
+    {
+        Cost = cost;
+    }
+
+    public int Cost { get; set; }
+
+}
+
+public class Scp079LockdownRoomEvent : ScpActionEvent
+{
+    public Scp079LockdownRoomEvent(SynapsePlayer scp, int cost, IVanillaRoom room) : base(scp, true)
+    {
+        Cost = cost;
+        Room = room;
+    }
+
+    public int Cost { get; set; }
+
+    public IVanillaRoom Room { get; set; }
 
 }
