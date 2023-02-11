@@ -22,8 +22,7 @@ public partial class ScpEvents : Service
     public readonly EventReactor<Scp079SwitchCameraEvent> Scp079SwitchCamera = new();
     public readonly EventReactor<Scp079DoorInteractEvent> Scp079DoorInteract = new();
     public readonly EventReactor<Scp079LockDoorEvent> Scp079LockDoor = new();
-    public readonly EventReactor<Scp079StartSpeakerEvent> Scp079StartSpeaker = new();
-    public readonly EventReactor<Scp079StopSpeakerEvent> Scp079StopSpeaker = new();
+    public readonly EventReactor<Scp079SpeakerUseEvent> Scp079SpeakerUse = new();
 
     public readonly EventReactor<Scp096AttackEvent> Scp096Attack = new();
     public readonly EventReactor<Scp096AddTargetEvent> Scp096AddTarget = new();
@@ -54,8 +53,7 @@ public partial class ScpEvents : Service
         _eventManager.RegisterEvent(Scp079SwitchCamera);
         _eventManager.RegisterEvent(Scp079DoorInteract);
         _eventManager.RegisterEvent(Scp079LockDoor);
-        _eventManager.RegisterEvent(Scp079StartSpeaker);
-        _eventManager.RegisterEvent(Scp079StopSpeaker);
+        _eventManager.RegisterEvent(Scp079SpeakerUse);
 
         _eventManager.RegisterEvent(Scp096Attack);
         _eventManager.RegisterEvent(Scp096AddTarget);
@@ -83,8 +81,7 @@ public partial class ScpEvents : Service
         _eventManager.UnregisterEvent(Scp079SwitchCamera);
         _eventManager.UnregisterEvent(Scp079DoorInteract);
         _eventManager.UnregisterEvent(Scp079LockDoor);
-        _eventManager.UnregisterEvent(Scp079StartSpeaker);
-        _eventManager.UnregisterEvent(Scp079StopSpeaker);
+        _eventManager.UnregisterEvent(Scp079SpeakerUse);
 
         _eventManager.UnregisterEvent(Scp096Attack);
         _eventManager.UnregisterEvent(Scp096AddTarget);
@@ -320,69 +317,59 @@ public class Scp079ContainEvent : IEvent
 
 public class Scp079SwitchCameraEvent : ScpActionEvent
 {
-    public Scp079SwitchCameraEvent(bool spawning, SynapsePlayer scp, SynapseCamera camera) : base(scp, true)
+    public Scp079SwitchCameraEvent(bool spawning, SynapsePlayer scp, SynapseCamera camera, int cost) 
+        : base(scp, true)
     {
         Spawning = spawning;
         Camera = camera;
+        Cost = cost;
     }
 
     public SynapseCamera Camera { get; set; }
     
     public bool Spawning { get; }
+
+    public int Cost { get; set; }
 }
 
 public class Scp079DoorInteractEvent : ScpActionEvent
 {
-    public Scp079DoorInteractEvent(SynapsePlayer scp, SynapseDoor door, float energy) : base(scp, true)
+    public Scp079DoorInteractEvent(SynapsePlayer scp, SynapseDoor door, int cost) : base(scp, true)
     {
         Door = door;
-        Energy = energy;
+        Cost = cost;
     }
 
     public SynapseDoor Door { get; }
     
-    public float Energy { get; set; }
+    public int Cost { get; set; }
 
 }
 
 public class Scp079LockDoorEvent : ScpActionEvent
 {
-    public Scp079LockDoorEvent(SynapsePlayer scp, SynapseDoor door, bool unlock, float energy) : base(scp, true)
+    public Scp079LockDoorEvent(SynapsePlayer scp, SynapseDoor door, bool unlock, int cost) : base(scp, true)
     {
         Door = door;
         Unlock = unlock;
-        Energy = energy;
+        Cost = cost;
     }
 
     public SynapseDoor Door { get; }
 
     public bool Unlock { get; }
     
-    public float Energy { get; set; }
+    public int Cost { get; set; }
 
 }
 
-public class Scp079StartSpeakerEvent : ScpActionEvent
+public class Scp079SpeakerUseEvent : ScpActionEvent
 {
-    public Scp079StartSpeakerEvent(SynapsePlayer scp, float energy, string speakerName) : base(scp, true)
+    public Scp079SpeakerUseEvent(SynapsePlayer scp, Vector3 speackerPostion) : base(scp, true)
     {
-        Energy = energy;
-        SpeakerName = speakerName;
+        SpeackerPostion = speackerPostion;
     }
 
-    public string SpeakerName { get; }
+    public Vector3 SpeackerPostion { get; }
 
-    public float Energy { get; set; }
-
-}
-
-public class Scp079StopSpeakerEvent : ScpActionEvent
-{
-    public Scp079StopSpeakerEvent(SynapsePlayer scp, string speakerName) : base(scp, true)
-    {
-        SpeakerName = speakerName;
-    }
-
-    public string SpeakerName { get; }
-    
 }

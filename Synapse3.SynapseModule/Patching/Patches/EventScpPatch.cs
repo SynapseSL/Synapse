@@ -26,10 +26,389 @@ using UnityEngine;
 using Utils.Networking;
 using static PlayerRoles.PlayableScps.Scp173.Scp173TeleportAbility;
 using static PocketDimensionTeleport;
+using Neuron.Core.Logging;
+using PlayerRoles.PlayableScps.Scp079;
+using PluginAPI.Core.Zones.Heavy;
+using Subtitles;
+using PlayerRoles.PlayableScps.Scp079.Cameras;
+using PlayerRoles.Spectating;
+using Interactables.Interobjects.DoorUtils;
+using System.Runtime.Remoting.Messaging;
+using static PlayerList;
+using System.Data;
+using PluginAPI.Core;
+using System.Reflection;
+using FMOD;
+using VoiceChat;
+using Synapse3.SynapseModule.Map.Objects;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
 
 #if !PATCHLESS
+
+[Automatic]
+[SynapsePatch("Scp079Recontain", PatchType.ScpEvent)]
+public static class Scp079RecontainPatch
+{
+    private static readonly ScpEvents _scp;
+    static Scp079RecontainPatch() => _scp = Synapse.Get<ScpEvents>();
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp079Recontainer), nameof(Scp079Recontainer.UpdateStatus))]
+    static bool UpdateContain079Status(Scp079Recontainer __instance, int engagedGenerators)
+    {
+        try
+        {
+            var count = Scp079Recontainer.AllGenerators.Count;
+            var announcement = string.Format(__instance._announcementProgress, engagedGenerators, count);
+            var parts = new List<SubtitlePart>
+            {
+            new(SubtitleType.GeneratorsActivated, new[] { engagedGenerators.ToString(), count.ToString() })
+        };
+
+            if (engagedGenerators >= count)
+            {
+                var ev = new Scp079ContainEvent(Scp079ContainmentStatus.OverrideDoors);
+                Synapse.Get<ScpEvents>().Scp079Contain.RaiseSafely(ev);
+                if (!ev.Allow) return false;
+
+                announcement += __instance._announcementAllActivated;
+                __instance.SetContainmentDoors(true, Scp079Role.ActiveInstances.Count > 0);
+                parts.Add(new SubtitlePart(SubtitleType.AllGeneratorsEngaged, null));
+            }
+
+            new SubtitleMessage(parts.ToArray()).SendToAuthenticated();
+            __instance.PlayAnnouncement(announcement, 1f);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Scp079 Contain (OverrideDoors) Event Failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Scp079Recontainer), nameof(Scp079Recontainer.EndOvercharge))]
+    static void End079Contain()
+    {
+        try
+        {
+            var ev = new Scp079ContainEvent(Scp079ContainmentStatus.Finished);
+            Synapse.Get<ScpEvents>().Scp079Contain.Raise(ev);
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Scp079 Contain (End) Event Failed\n" + ex);
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp079Recontainer), nameof(Scp079Recontainer.Recontain))]
+    static bool Start079Contain()
+    {
+        try
+        {
+            var ev = new Scp079ContainEvent(Scp079ContainmentStatus.AnnounceOvercharge);
+            Synapse.Get<ScpEvents>().Scp079Contain.Raise(ev);
+            return ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp079 Contain (Start) Event Failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp079Recontainer), nameof(Scp079Recontainer.RefreshActivator))]
+    static bool Refresh079ContainActivator(Scp079Recontainer __instance)
+    {
+        try
+        {
+            if (!__instance._delayStopwatch.IsRunning ||
+                __instance._delayStopwatch.Elapsed.TotalSeconds <= __instance._activationDelay) return true;
+
+            var ev = new Scp079ContainEvent(Scp079ContainmentStatus.Overcharge);
+            Synapse.Get<ScpEvents>().Scp079Contain.Raise(ev);
+            return ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Scp079 Contain (Refresh) Event Failed\n" + ex);
+            return true;
+        }
+    }
+
+}
+
+[Automatic]
+[SynapsePatch("Scp079ChangeCamera", PatchType.ScpEvent)]
+public static class Scp079ChangeCameraPatch
+{
+    private static readonly ScpEvents _scp;
+    static Scp079ChangeCameraPatch() => _scp = Synapse.Get<ScpEvents>();
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp079CurrentCameraSync), nameof(Scp079CurrentCameraSync.ServerProcessCmd))]
+    static bool SwitchCamera(Scp079CurrentCameraSync __instance, NetworkReader reader)
+    {
+        try
+        {
+            __instance._clientSwitchRequest = (Scp079CurrentCameraSync.ClientSwitchState)reader.ReadByte();
+            __instance._requestedCamId = reader.ReadUInt16();
+            if (__instance._clientSwitchRequest != 0)
+            {
+                __instance.ServerSendRpc(x => x.roleManager.CurrentRole is SpectatorRole);
+                return false;
+            }
+
+            if (!Scp079InteractableBase.TryGetInteractable(__instance._requestedCamId, out __instance._switchTarget))
+            {
+                __instance._errorCode = Scp079HudTranslation.InvalidCamera;
+                __instance.ServerSendRpc(toAll: true);
+                return false;
+            }
+
+            
+            //TODO Test the spawning
+            var player = __instance.Owner.GetSynapsePlayer();
+            var camera = __instance._switchTarget.GetCamera();
+            var cost = __instance.GetSwitchCost(__instance._switchTarget);
+            var ev = new Scp079SwitchCameraEvent(false, player, camera, cost);
+
+            _scp.Scp079SwitchCamera.RaiseSafely(ev);
+
+            if (!ev.Allow) return false;
+            
+            cost = ev.Cost;
+
+            if (cost > __instance._auxManager.CurrentAux)
+            {
+                __instance._errorCode = Scp079HudTranslation.NotEnoughAux;
+                __instance.ServerSendRpc(toAll: true);
+                return false;
+            }
+
+            if (__instance._lostSignalHandler.Lost)
+            {
+                __instance._errorCode = Scp079HudTranslation.SignalLost;
+                __instance.ServerSendRpc(toAll: true);
+                return false;
+            }
+
+            if (__instance._switchTarget != __instance.CurrentCamera)
+            {
+                __instance.Role.TryGetOwner(out var hub);
+                if (!EventManager.ExecuteEvent(ServerEventType.Scp079CameraChanged, hub, __instance._switchTarget))
+                {
+                    __instance._errorCode = Scp079HudTranslation.SignalLost;
+                    __instance.ServerSendRpc(toAll: true);
+                    return false;
+                }
+            }
+
+            __instance._auxManager.CurrentAux -= cost;
+            __instance._errorCode = Scp079HudTranslation.Zoom;
+            if (__instance._switchTarget != __instance.CurrentCamera)
+            {
+                __instance.CurrentCamera = __instance._switchTarget;
+            }
+            else
+            {
+                __instance.ServerSendRpc(toAll: true);
+            }
+
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Scp079 SwitchCamera Event Failed\n" + ex);
+            return true;
+        }
+    }
+
+}
+
+[Automatic]
+[SynapsePatch("Scp079DoorInteract", PatchType.ScpEvent)]
+public static class Scp079DoorInteractPatch
+{
+    private static readonly ScpEvents _scp;
+    static Scp079DoorInteractPatch() => _scp = Synapse.Get<ScpEvents>();
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp079DoorLockChanger), nameof(Scp079DoorLockChanger.ServerProcessCmd))]
+    static bool DoorLockChange(Scp079DoorLockChanger __instance, NetworkReader reader)
+    {
+        try
+        {
+            if (!NetworkIdentity.spawned.TryGetValue(reader.ReadUInt32(), out var value)
+            || !value.TryGetComponent<DoorVariant>(out __instance.LastDoor) || !__instance.IsReady)
+            {
+                return false;
+            }
+            var player = __instance.Owner.GetSynapsePlayer();
+            var door = __instance.LastDoor.GetSynapseDoor();
+
+            if (__instance.TargetAction == DoorAction.Locked)
+            {
+                if (__instance.GetRemainingCooldown(__instance.LastDoor) <= 0
+                    && !Scp079LockdownRoomAbility.IsLockedDown(__instance.LastDoor)
+                    && !__instance.LostSignalHandler.Lost)
+                {
+                    var cost = __instance.GetCostForDoor(DoorAction.Locked, __instance.LastDoor);
+                    var ev = new Scp079LockDoorEvent(player, door, false, cost)
+                    {
+                        Allow = EventManager.ExecuteEvent(ServerEventType.Scp079LockDoor, __instance.Owner, __instance.LastDoor)
+                    };
+                    _scp.Scp079LockDoor.RaiseSafely(ev);
+
+                    cost = ev.Cost;
+
+                    if (!ev.Allow)
+                        return false;
+
+                    if (cost > __instance.AuxManager.CurrentAux)
+                        return false;
+                    InvokeOnServerDoorLocked(__instance.ScpRole, __instance.LastDoor);
+                    __instance.SetDoorLock(__instance.LastDoor, lockState: true);
+                    __instance.RewardManager.MarkRooms(__instance.LastDoor.Rooms);
+                    __instance.AuxManager.CurrentAux -= cost;
+                }
+            }
+            else
+            {
+                var cost = 0;
+                var ev = new Scp079LockDoorEvent(player, door, true, cost)
+                {
+                    Allow = EventManager.ExecuteEvent(ServerEventType.Scp079UnlockDoor, __instance.Owner, __instance.LastDoor)
+                };
+                _scp.Scp079LockDoor.RaiseSafely(ev);
+
+                cost = ev.Cost;
+
+                if (!ev.Allow)
+                    return false;
+
+                if (cost > __instance.AuxManager.CurrentAux)
+                    return false;
+
+                __instance.AuxManager.CurrentAux -= cost;
+                __instance.SetDoorLock(__instance.LastDoor, lockState: false);
+            }
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Scp079 SwitchCamera Event Failed\n" + ex);
+            return true;
+        }
+    }
+
+    public static void InvokeOnServerDoorLocked(Scp079Role scp079, DoorVariant door)
+    {
+        var delegateField = typeof(Scp079DoorLockChanger).GetField(nameof(Scp079DoorLockChanger.OnServerDoorLocked), 
+            BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic);
+        var eventDelegate = delegateField?.GetValue(null) as Delegate;
+        eventDelegate?.DynamicInvoke(scp079, door);
+    }
+
+}
+
+[Automatic]
+[SynapsePatch("Scp079DoorLock", PatchType.ScpEvent)]
+public static class Scp079DoorLockPatch
+{
+    private static readonly ScpEvents _scp;
+    static Scp079DoorLockPatch() => _scp = Synapse.Get<ScpEvents>();
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp079DoorStateChanger), nameof(Scp079DoorStateChanger.ServerProcessCmd))]
+    static bool DoorStateChange(Scp079DoorStateChanger __instance, NetworkReader reader)
+    {
+        try
+        {
+            if (NetworkIdentity.spawned.TryGetValue(reader.ReadUInt32(), out var value)
+            && value.TryGetComponent<DoorVariant>(out __instance.LastDoor)
+            && __instance.IsReady && __instance.Role.TryGetOwner(out var hub)
+            && !__instance.LostSignalHandler.Lost)
+            {
+                bool targetState = __instance.LastDoor.TargetState;
+                __instance.LastDoor.ServerInteract(hub, 0);
+                var player = hub.GetSynapsePlayer();
+                var door = __instance.LastDoor.GetSynapseDoor();
+                var cost = __instance.GetCostForDoor(__instance.TargetAction, __instance.LastDoor);
+                var ev = new Scp079DoorInteractEvent(player, door, cost);
+                _scp.Scp079DoorInteract.RaiseSafely(ev);
+
+                cost = ev.Cost;
+
+                if (!ev.Allow)
+                    return false;
+
+                if (cost > __instance.AuxManager.CurrentAux)
+                    return false;
+
+                if (targetState != __instance.LastDoor.TargetState)
+                {
+                    __instance.RewardManager.MarkRooms(__instance.LastDoor.Rooms);
+                    InvokeOnServerDoorLocked(__instance.ScpRole, __instance.LastDoor);
+                    __instance.AuxManager.CurrentAux -= cost;
+                    __instance.ServerSendRpc(toAll: false);
+                }
+            }
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Scp079 Scp079DoorLock Event Failed\n" + ex);
+            return true;
+        }
+    }
+
+    public static void InvokeOnServerDoorLocked(Scp079Role scp079, DoorVariant door)
+    {
+        var delegateField = typeof(Scp079DoorStateChanger).GetField(nameof(Scp079DoorStateChanger.OnServerDoorToggled),
+            BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic);
+        var eventDelegate = delegateField?.GetValue(null) as Delegate;
+        eventDelegate?.DynamicInvoke(scp079, door);
+    }
+}
+
+[Automatic]
+[SynapsePatch("Scp079Speack", PatchType.ScpEvent)]
+public static class Scp079SpeackPatch
+{
+    private static readonly ScpEvents _scp;
+    static Scp079SpeackPatch() => _scp = Synapse.Get<ScpEvents>();
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp079VoiceModule), nameof(Scp079VoiceModule.ValidateSend))]
+    static bool DoorStateChange(Scp079VoiceModule __instance, ref VoiceChatChannel __result, VoiceChatChannel channel)
+    {
+        if (channel != VoiceChatChannel.Proximity || !__instance._speakerAbility.CanTransmit)
+        {
+            if (channel != __instance.PrimaryChannel)
+            {
+                __result = VoiceChatChannel.None;
+                return false;
+            }
+
+            __result = channel;
+            return false;
+        }
+        var player = __instance.Owner.GetSynapsePlayer();
+        var ability = player.MainScpController.Scp079.Role.GetSubroutine<Scp079SpeakerAbility>();
+        var speacker = __instance.ProximityPlayback.transform.position;
+        var ev = new Scp079SpeakerUseEvent(player, speacker);
+        _scp.Scp079SpeakerUse.RaiseSafely(ev);
+
+        __result = VoiceChatChannel.Proximity;
+        return false;
+    }
+}
+
 [Automatic]
 [SynapsePatch("Scp096Attack", PatchType.ScpEvent)]
 public static class Scp096AttackPatch

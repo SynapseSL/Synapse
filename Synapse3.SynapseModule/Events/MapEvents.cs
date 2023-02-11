@@ -100,7 +100,7 @@ public class GeneratorEngageEvent : IEvent
     }
 }
 
-public class ElevatorMoveContentEvent : IEvent
+public class ElevatorMoveContentEvent : IEvent//TODO
 {
     public IElevator Elevator { get; }
 

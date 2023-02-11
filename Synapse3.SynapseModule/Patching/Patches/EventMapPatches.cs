@@ -5,7 +5,9 @@ using HarmonyLib;
 using InventorySystem.Items.Armor;
 using InventorySystem.Items.Pickups;
 using MapGeneration.Distributors;
+using Neuron.Core.Logging;
 using Neuron.Core.Meta;
+using PlayerRoles;
 using PluginAPI.Enums;
 using PluginAPI.Events;
 using Scp914;
@@ -26,6 +28,42 @@ public static class Scp914UpgradePatch
     [HarmonyPatch(typeof(Scp914Upgrader), nameof(Scp914Upgrader.Upgrade))]
     public static bool Scp914Upgrade(Collider[] intake, Vector3 moveVector, Scp914Mode mode, Scp914KnobSetting setting)
         => DecoratedMapPatches.OnUpgrade(intake, moveVector, mode, setting);
+}
+
+[Automatic]
+[SynapsePatch("TeslaTriger", PatchType.MapEvent)]
+public static class TeslaTrigerPatch
+{
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(TeslaGate), nameof(TeslaGate.PlayerInRange))]
+    public static bool OnTeslaRange(TeslaGate __instance, out bool __result, ReferenceHub player)
+    {
+        __result = false;
+        try
+        {
+            if (player.roleManager.CurrentRole is ITeslaControllerRole teslaControllerRole && !teslaControllerRole.CanActivateShock)
+                return false;
+
+            var sPlayer = player.GetSynapsePlayer();
+
+            if (__instance.InRange(sPlayer.Position))
+            {
+                __result = sPlayer.Invisible < InvisibleMode.Ghost;
+
+                var ev = new TriggerTeslaEvent(sPlayer, __result, __instance.GetSynapseTesla());
+                Synapse.Get<MapEvents>().TriggerTesla.Raise(ev);
+
+                __result = ev.Allow;
+            }
+
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: Trigger Tesla Event failed\n" + ex);
+            return true;
+        }
+    }
 }
 
 [Automatic]
