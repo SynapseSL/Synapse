@@ -110,7 +110,6 @@ public class MapService : Service
 
     private void LoadObjects(RoundWaitingEvent ev)
     {
-        SynapseLogger<MapService>.Warn("Doors");
         foreach (var doorVariant in Synapse.GetObjects<DoorVariant>())
         {
             _ = new SynapseDoor(doorVariant);
