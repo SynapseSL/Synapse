@@ -31,42 +31,6 @@ public static class Scp914UpgradePatch
 }
 
 [Automatic]
-[SynapsePatch("TeslaTriger", PatchType.MapEvent)]
-public static class TeslaTrigerPatch
-{
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(TeslaGate), nameof(TeslaGate.PlayerInRange))]
-    public static bool OnTeslaRange(TeslaGate __instance, out bool __result, ReferenceHub player)
-    {
-        __result = false;
-        try
-        {
-            if (player.roleManager.CurrentRole is ITeslaControllerRole teslaControllerRole && !teslaControllerRole.CanActivateShock)
-                return false;
-
-            var sPlayer = player.GetSynapsePlayer();
-
-            if (__instance.InRange(sPlayer.Position))
-            {
-                __result = sPlayer.Invisible < InvisibleMode.Ghost;
-
-                var ev = new TriggerTeslaEvent(sPlayer, __result, __instance.GetSynapseTesla());
-                Synapse.Get<MapEvents>().TriggerTesla.Raise(ev);
-
-                __result = ev.Allow;
-            }
-
-            return false;
-        }
-        catch (Exception ex)
-        {
-            NeuronLogger.For<Synapse>().Error("Sy3 Event: Trigger Tesla Event failed\n" + ex);
-            return true;
-        }
-    }
-}
-
-[Automatic]
 [SynapsePatch("GeneratorEngage", PatchType.MapEvent)]
 public static class GeneratorEngagePatch
 {

@@ -3,6 +3,7 @@ using Neuron.Core.Meta;
 using PlayerRoles.PlayableScps.Scp939;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Player;
@@ -29,10 +30,7 @@ public partial class ScpEvents : Service
     public readonly EventReactor<Scp079BlackOutZoneEvent> Scp079BalckOutZone = new();
     public readonly EventReactor<Scp079LockReleaserAllEvent> Scp079LockReleaserAll = new();
     public readonly EventReactor<Scp079LockdownRoomEvent> Scp079LockdownRoom = new();
-    //TODO :
-    /*
-     * Scp079ElevatorStateChanger
-     */
+    public readonly EventReactor<Scp079ElevatorInteractEvent> Scp079ElevatorInteract = new();
 
     public readonly EventReactor<Scp096AttackEvent> Scp096Attack = new();
     public readonly EventReactor<Scp096AddTargetEvent> Scp096AddTarget = new();
@@ -69,7 +67,8 @@ public partial class ScpEvents : Service
         _eventManager.RegisterEvent(Scp079BalckOutZone);
         _eventManager.RegisterEvent(Scp079LockReleaserAll);
         _eventManager.RegisterEvent(Scp079LockdownRoom);
-        
+        _eventManager.RegisterEvent(Scp079ElevatorInteract);
+
         _eventManager.RegisterEvent(Scp096Attack);
         _eventManager.RegisterEvent(Scp096AddTarget);
 
@@ -102,6 +101,7 @@ public partial class ScpEvents : Service
         _eventManager.UnregisterEvent(Scp079BalckOutZone);
         _eventManager.UnregisterEvent(Scp079LockReleaserAll);
         _eventManager.UnregisterEvent(Scp079LockdownRoom);
+        _eventManager.UnregisterEvent(Scp079ElevatorInteract);
 
         _eventManager.UnregisterEvent(Scp096Attack);
         _eventManager.UnregisterEvent(Scp096AddTarget);
@@ -455,5 +455,22 @@ public class Scp079LockdownRoomEvent : ScpActionEvent
     public int Cost { get; set; }
 
     public IVanillaRoom Room { get; set; }
+
+}
+
+public class Scp079ElevatorInteractEvent : ScpActionEvent
+{
+    public Scp079ElevatorInteractEvent(SynapsePlayer scp, int cost, IElevator elevator, int destioantion) : base(scp, true)
+    {
+        Cost = cost;
+        Elevator = elevator;
+        Destionation = destioantion;
+    }
+
+    public int Cost { get; set; }
+
+    public IElevator Elevator { get; set; }
+
+    public int Destionation { get; set; }
 
 }

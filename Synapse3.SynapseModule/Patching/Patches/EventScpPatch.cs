@@ -1,6 +1,7 @@
 ﻿using Achievements;
 using CustomPlayerEffects;
 using HarmonyLib;
+using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items.MicroHID;
 using MapGeneration;
@@ -25,10 +26,12 @@ using Subtitles;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Role;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using Utils.Networking;
@@ -656,6 +659,88 @@ public static class Scp079LockdownRoomPatch
             NeuronLogger.For<Synapse>().Error("Scp079LockdownRoom Event Failed\n" + ex);
             return true;
         }
+    }
+}
+
+[Automatic]
+[SynapsePatch("Scp079ElevatorInteract", PatchType.ScpEvent)]
+public static class Scp079ElevatorInteractPatch
+{
+    private static readonly ScpEvents _scp;
+    private static readonly ElevatorService _elevator;
+
+    static Scp079ElevatorInteractPatch()
+    {
+        _scp = Synapse.Get<ScpEvents>();
+        _elevator = Synapse.Get<ElevatorService>();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Scp079ElevatorStateChanger), nameof(Scp079ElevatorStateChanger.ServerProcessCmd))]
+    static bool ServerProcessCmd(Scp079ElevatorStateChanger __instance, NetworkReader reader)
+    {
+        try
+        {
+            if (__instance.AuxManager.CurrentAux < __instance._cost || __instance.LostSignalHandler.Lost)
+                return false;
+
+            var elevatorGroup = (ElevatorManager.ElevatorGroup)reader.ReadByte();
+            if (!ElevatorDoor.AllElevatorDoors.TryGetValue(elevatorGroup, out var value) || ListExtensions.Any(value, (ElevatorDoor x) => x.ActiveLocks != 0))
+                return false;
+
+            RoomIdentifier curRoom = __instance.CurrentCamSync.CurrentCamera.Room;
+            if (!ListExtensions.TryGetFirst(value, (ElevatorDoor x) => CollectionExtensions.Contains(x.Rooms, curRoom), out var first))
+                return false;
+
+            var targetState = first.TargetState;
+            var chamber = first.TargetPanel.AssignedChamber;
+            int num = chamber.CurrentLevel + 1;
+
+            var player = __instance.Owner.GetSynapsePlayer();
+            var cost = __instance._cost;
+            var destionation = num % value.Count;
+            var elevator = _elevator.Elevators
+                .FirstOrDefault(p => (p.Chamber as SynapseElevatorChamber)?.Chamber == chamber);
+            var ev = new Scp079ElevatorInteractEvent(player, cost, elevator, destionation);
+
+            _scp.Scp079ElevatorInteract.RaiseSafely(ev);
+
+            cost = ev.Cost;
+            destionation = ev.Destionation % value.Count;
+            if (!ev.Allow)
+                return false;
+
+            if (cost > __instance.AuxManager.CurrentAux)
+                return false;
+
+            if (ElevatorManager.TrySetDestination(elevatorGroup, destionation))
+            {
+                __instance.AuxManager.CurrentAux -= cost;
+                value.ForEach(delegate (ElevatorDoor x)
+                {
+                    __instance.RewardManager.MarkRooms(x.Rooms);
+                });
+                __instance.ServerSendRpc(toAll: false);
+                if (targetState)
+                {
+                    InvokeOnServerDoorLocked(__instance.ScpRole, first);
+                }
+            }
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Scp079ElevatorInteract Event Failed\n" + ex);
+            return true;
+        }
+    }
+
+    public static void InvokeOnServerDoorLocked(Scp079Role scp079, ElevatorDoor door)
+    {
+        var delegateField = typeof(Scp079ElevatorStateChanger).GetField(nameof(Scp079ElevatorStateChanger.OnServerElevatorDoorClosed),
+            BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic);
+        var eventDelegate = delegateField?.GetValue(null) as Delegate;
+        eventDelegate?.DynamicInvoke(scp079, door);
     }
 }
 
