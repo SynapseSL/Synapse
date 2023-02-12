@@ -2,6 +2,8 @@
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Rooms;
@@ -39,6 +41,8 @@ public abstract class SynapseCustomRoom : DefaultSynapseObject, IRoom
     public uint Id => Attribute.Id;
     
     public abstract uint Zone { get; }
+
+    public ReadOnlyCollection<SynapseDoor> Doors => RoomSchematic.Doors;
 
     public virtual void OnGenerate() { }
     public virtual void OnDeSpawn() { }

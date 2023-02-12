@@ -6,7 +6,7 @@ using Synapse3.SynapseModule.Teams;
 using System;
 using Synapse3.SynapseModule.Enums;
 using UnityEngine;
-
+using Synapse3.SynapseModule.Map.Rooms;
 
 namespace Synapse3.SynapseModule;
 
@@ -65,17 +65,10 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                ev.Player.Invisible += 1;
-                if (ev.Player.Invisible > InvisibleMode.Full) ev.Player.Invisible = InvisibleMode.None;
+                SynapseLogger<DebugService>.Warn(ev.Player.Room.Doors.Count);
                 break;
-           
             case KeyCode.Alpha2:
-                ev.Player.MaxHealth = 98;
-
-                break;
-            case KeyCode.Alpha3:
-                Synapse.Get<TeamService>().NextTeam = 1;
-                Synapse.Get<TeamService>().Spawn();
+                (ev.Player.Room as IVanillaRoom).WarheadColor = Color.green;
                 break;
         }
     }

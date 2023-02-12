@@ -20,7 +20,13 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
         RoomType = type;
         NetworkIdentity = GetNetworkIdentity(type);
         LightController = Identifier.GetComponentInChildren<FlickerableLightController>();
-        
+
+        foreach (var door in Synapse.Get<MapService>().SynapseDoors)
+        {
+            if (door.Variant.Rooms.Contains(identifier))
+                _doors.Add(door);
+        }
+
         var comp = identifier.gameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
         
@@ -103,4 +109,13 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
 
     private List<SynapseCamera> _cameras = new();
     public ReadOnlyCollection<SynapseCamera> Cameras => _cameras.AsReadOnly();
+
+    public Color WarheadColor
+    {
+        get => LightController.Network_warheadLightColor;
+        set => LightController.Network_warheadLightColor = value;
+    }
+
+    private List<SynapseDoor> _doors = new List<SynapseDoor>();
+    public ReadOnlyCollection<SynapseDoor> Doors => _doors.AsReadOnly();
 }

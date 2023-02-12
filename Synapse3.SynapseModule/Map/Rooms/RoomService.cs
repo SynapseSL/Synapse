@@ -124,6 +124,8 @@ public class RoomService : Service
 
     private void LoadRooms(RoundWaitingEvent ev)
     {
+        SynapseLogger<RoomService>.Warn("LoadRoom");
+
         foreach (var room in RoomIdentifier.AllRoomIdentifiers)
         {
             var type = GetRoomTypeFromName(room.gameObject.name);

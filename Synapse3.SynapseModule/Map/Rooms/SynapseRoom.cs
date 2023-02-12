@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using MapGeneration;
+﻿using MapGeneration;
 using PlayerRoles.PlayableScps.Scp079;
 using PlayerRoles.PlayableScps.Scp079.Cameras;
 using Synapse3.SynapseModule.Map.Objects;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Rooms;
@@ -15,6 +15,12 @@ public class SynapseRoom : IVanillaRoom
         Identifier = identifier;
         RoomType = type;
         LightController = Identifier.GetComponentInChildren<FlickerableLightController>();
+
+        foreach (var door in Synapse.Get<MapService>().SynapseDoors)
+        {
+            if (door.Variant.Rooms.Contains(identifier))
+                _doors.Add(door);
+        }
 
         foreach (var interactable in Scp079InteractableBase.AllInstances)
         {
@@ -71,4 +77,14 @@ public class SynapseRoom : IVanillaRoom
 
     private List<SynapseCamera> _cameras = new();
     public ReadOnlyCollection<SynapseCamera> Cameras => _cameras.AsReadOnly();
+
+    public Color WarheadColor 
+    { 
+        get => LightController.Network_warheadLightColor; 
+        set => LightController.Network_warheadLightColor = value; 
+    }
+
+
+    private List<SynapseDoor> _doors = new List<SynapseDoor>();
+    public ReadOnlyCollection<SynapseDoor> Doors => _doors.AsReadOnly();
 }

@@ -13,6 +13,7 @@ using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Objects;
+using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -109,6 +110,7 @@ public class MapService : Service
 
     private void LoadObjects(RoundWaitingEvent ev)
     {
+        SynapseLogger<MapService>.Warn("Doors");
         foreach (var doorVariant in Synapse.GetObjects<DoorVariant>())
         {
             _ = new SynapseDoor(doorVariant);
