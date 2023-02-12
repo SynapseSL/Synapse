@@ -1315,9 +1315,10 @@ public static class Scp173ObserversListPatch
     {
         try
         {
-            var player = __instance?.Owner?.GetSynapsePlayer();
-            var controller = player?.MainScpController?.Scp173;
-            if (player == null || controller == null) return false;
+            if (__instance == null || __instance.Owner == null) return true;
+            var player = __instance.Owner.GetSynapsePlayer();
+            if (player == null) return true;
+            var controller = player.MainScpController.Scp173;
 
             if (!__instance.Observers.Remove(ply)) return false;
             controller._observer.Remove(player);
@@ -1351,7 +1352,7 @@ public static class Scp173ObserversListPatch
             {
                 if (__instance.IsObservedBy(targetHub, 0.2f))
                 {
-                    var ev = new Scp173ObserveEvent(player, true, scp);
+                    var ev = new Scp173ObserveEvent(player, player.Invisible < InvisibleMode.Ghost, scp);
                     _scp.Scp173Observe.RaiseSafely(ev);
 
                     if (!ev.Allow)

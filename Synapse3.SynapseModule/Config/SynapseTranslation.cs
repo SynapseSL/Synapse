@@ -32,7 +32,7 @@ public class SynapseTranslation : Translations<SynapseTranslation>
     public string DnT { get; set; } =
         "You have enabled Do Not Track in your settings therefore can we not store your language";
 
-    public string DeathMessage { get; set; } = "You were killed by\n{0}\nas\n{1}";
+    public string DeathMessage { get; set; } = "You were killed by\\n{0}\\nas\\n{1}";
 
     public string KeyBindCommandGetCommand { get; set; } = "Select a command whose bind you want to change, current bind:{0}";
     public string KeyBindCommandSelectKey { get; set; } = "Please press the new key";
@@ -47,4 +47,8 @@ public class SynapseTranslation : Translations<SynapseTranslation>
     public string EnableProximity { get; set; } = "Proximity Voice Chat has been enabled";
     public string NotScpProximity { get; set; } = "You are not an SCP and therefore can't use the SCP Proximity Chat";
     public string NotAllowedProximity { get; set; } = "You are not allowed to use the Proximity Chat";
+
+    public string LowerRank { get; set; } = "FOLLOW ORDERS";
+    public string SameRank { get; set; } = "SAME RANK";
+    public string HigherRank { get; set; } = "GIVE ORDERS";
 }

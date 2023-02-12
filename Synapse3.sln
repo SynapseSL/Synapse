@@ -73,13 +73,13 @@ Global
 		{61CAE88A-50E5-4B73-B69A-10D7B92889EB}.Patchless|Any CPU.Build.0 = Patchless|Any CPU
 		{AA11279E-D2C8-4FFC-8862-A2EF4F6453E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AA11279E-D2C8-4FFC-8862-A2EF4F6453E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AA11279E-D2C8-4FFC-8862-A2EF4F6453E0}.Custom Version|Any CPU.ActiveCfg = Debug|Any CPU
-		{AA11279E-D2C8-4FFC-8862-A2EF4F6453E0}.Custom Version|Any CPU.Build.0 = Debug|Any CPU
 		{AA11279E-D2C8-4FFC-8862-A2EF4F6453E0}.Main Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{AA11279E-D2C8-4FFC-8862-A2EF4F6453E0}.Main Release|Any CPU.Build.0 = Debug|Any CPU
 		{AA11279E-D2C8-4FFC-8862-A2EF4F6453E0}.Dev|Any CPU.ActiveCfg = Dev|Any CPU
 		{AA11279E-D2C8-4FFC-8862-A2EF4F6453E0}.Dev|Any CPU.Build.0 = Dev|Any CPU
 		{AA11279E-D2C8-4FFC-8862-A2EF4F6453E0}.Patchless|Any CPU.ActiveCfg = Patchless|Any CPU
 		{AA11279E-D2C8-4FFC-8862-A2EF4F6453E0}.Patchless|Any CPU.Build.0 = Patchless|Any CPU
+		{AA11279E-D2C8-4FFC-8862-A2EF4F6453E0}.Custom Version|Any CPU.ActiveCfg = Custom Version|Any CPU
+		{AA11279E-D2C8-4FFC-8862-A2EF4F6453E0}.Custom Version|Any CPU.Build.0 = Custom Version|Any CPU
 	EndGlobalSection
 EndGlobal

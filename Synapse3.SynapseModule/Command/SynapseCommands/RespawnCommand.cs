@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Command;
+using Ninject;
 using PlayerRoles;
 using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Teams;
@@ -17,6 +18,9 @@ namespace Synapse3.SynapseModule.Command.SynapseCommands;
 )]
 public class RespawnCommand : SynapseCommand
 {
+    [Inject]
+    public TeamService TeamService { get; set; }
+    
     public override void Execute(SynapseContext context, ref CommandResult result)
     {
         if (context.Arguments.Length < 1)
@@ -47,7 +51,7 @@ public class RespawnCommand : SynapseCommand
             return;
         }
 
-        Synapse.Get<TeamService>().SpawnCustomTeam(id, players);
+        TeamService.SpawnCustomTeam(id, players);
         result.Response = "Team was spawned";
         result.StatusCode = CommandStatusCode.Error;
     }
