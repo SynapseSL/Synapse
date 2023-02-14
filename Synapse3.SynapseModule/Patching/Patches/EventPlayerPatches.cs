@@ -972,10 +972,9 @@ public static class SendPlayerDataPatch
         try
         {
             ushort num = 0;
-            ICustomVisibilityRole customVisibilityRole;
             bool flag;
             VisibilityController visibilityController;
-            if ((customVisibilityRole = (receiver.roleManager.CurrentRole as ICustomVisibilityRole)) != null)
+            if (receiver.roleManager.CurrentRole is ICustomVisibilityRole customVisibilityRole)
             {
                 flag = true;
                 visibilityController = customVisibilityRole.VisibilityController;
@@ -985,19 +984,30 @@ public static class SendPlayerDataPatch
                 flag = false;
                 visibilityController = null;
             }
-            foreach (ReferenceHub referenceHub in ReferenceHub.AllHubs)
+            foreach (var hub in ReferenceHub.AllHubs)
             {
-                IFpcRole fpcRole;
-                if (referenceHub.netId != receiver.netId && (fpcRole = (referenceHub.roleManager.CurrentRole as IFpcRole)) != null)
+                if (hub.netId != receiver.netId)
                 {
-                    bool flag2 = flag && !visibilityController.ValidateVisibility(referenceHub);
-                    var newSyncData = GetSyncData(receiver, referenceHub, fpcRole.FpcModule, flag2, out var canSee);
+                    if (hub.roleManager.CurrentRole is not IFpcRole fpcRole) continue;
+
+                    bool flag2 = flag && !visibilityController.ValidateVisibility(hub);
+                    var newSyncData = GetSyncData(receiver, hub, fpcRole.FpcModule, flag2, out var canSee);
                     if (!flag2 && canSee)
                     {
-                        FpcServerPositionDistributor._bufferPlayerIDs[(int)num] = referenceHub.PlayerId;
+                        FpcServerPositionDistributor._bufferPlayerIDs[(int)num] = hub.PlayerId;
                         FpcServerPositionDistributor._bufferSyncData[(int)num] = newSyncData;
                         num += 1;
                     }
+                }
+                else
+                {
+                    if (hub.roleManager.CurrentRole is not IFpcRole fpcRole) continue;
+                    var player = hub.GetSynapsePlayer();
+                    if (!player.refreshHorizontalRotation && !player.refreshVerticalRotation) continue;
+                    var newSyncData = GetSelfPlayerData(player, fpcRole.FpcModule);
+                    FpcServerPositionDistributor._bufferPlayerIDs[(int)num] = hub.PlayerId;
+                    FpcServerPositionDistributor._bufferSyncData[(int)num] = newSyncData;
+                    num += 1;
                 }
             }
             writer.WriteUInt16(num);
@@ -1013,6 +1023,28 @@ public static class SendPlayerDataPatch
         }
 
         return false;
+    }
+    
+    private static FpcSyncData GetSelfPlayerData(SynapsePlayer player, FirstPersonMovementModule firtstPersonModule)
+    {
+        if (player.refreshHorizontalRotation)
+        {
+            firtstPersonModule.MouseLook.CurrentHorizontal = player.horizontalRotation;
+            player.refreshHorizontalRotation = false;
+        }
+        if (player.refreshVerticalRotation)
+        { 
+            firtstPersonModule.MouseLook.CurrentVertical = player.verticalRotation;
+            player.refreshVerticalRotation = false;
+        }
+
+
+        var data = new FpcSyncData(default, 
+        firtstPersonModule.SyncMovementState,
+        firtstPersonModule.IsGrounded, 
+        new RelativePosition(Vector3.zero), 
+        firtstPersonModule.MouseLook);
+        return data;
     }
 
     private static FpcSyncData GetSyncData(ReferenceHub receiver, ReferenceHub target,

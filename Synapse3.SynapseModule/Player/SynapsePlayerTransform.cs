@@ -8,6 +8,12 @@ namespace Synapse3.SynapseModule.Player;
 public partial class SynapsePlayer
 {
 
+    internal bool refreshVerticalRotation = false;
+    internal bool refreshHorizontalRotation = false;
+
+    internal float verticalRotation = 0;
+    internal float horizontalRotation = 0;
+
     /// <summary>
     /// If the player ave a postion in the game, not the case if the player ave no player model
     /// </summary>
@@ -28,6 +34,8 @@ public partial class SynapsePlayer
 
     /// <summary>
     /// The current Position of the Player
+    /// Note: The rotation is only applied if it is different from the previous one!
+    /// The precision of the rotation is 0.01 float
     /// </summary>
     public virtual Vector3 Position
     {
@@ -47,10 +55,19 @@ public partial class SynapsePlayer
                 ? new Quaternion(0, 0, 0, 0)
                 : Quaternion.Euler(mouseLook.CurrentVertical,mouseLook.CurrentHorizontal, 0f);
         }
+        set
+        {
+            refreshHorizontalRotation = true;
+            refreshVerticalRotation = true;
+            verticalRotation = value.eulerAngles.y;
+            horizontalRotation = value.eulerAngles.x;
+        }
     }
 
     /// <summary>
     /// The Rotation of the Player as vector2
+    /// Note: The rotation is only applied if it is different from the previous one!
+    /// The precision of the rotation is 0.01 float
     /// </summary>
     public virtual Vector2 RotationVector2
     {
@@ -61,18 +78,44 @@ public partial class SynapsePlayer
                 ? Vector2.zero
                 : new Vector2(mouseLook.CurrentVertical,mouseLook.CurrentHorizontal);
         }
+        set
+        {
+            refreshHorizontalRotation = true;
+            refreshVerticalRotation = true;
+            verticalRotation = value.y;
+            horizontalRotation = value.x;
+        }
     }
 
 
     /// <summary>
     /// The Rotation of the Player on the y axe (min 0, max 360)
+    /// Note: The rotation is only applied if it is different from the previous one!
+    /// The precision of the rotation is 0.01 float
     /// </summary>
-    public virtual float RotationHorizontal => FirstPersonMovement?.MouseLook.CurrentHorizontal ?? 0;
-
+    public virtual float RotationHorizontal
+    { 
+        get => FirstPersonMovement?.MouseLook.CurrentHorizontal ?? 0;
+        set
+        {
+            refreshHorizontalRotation = true;
+            horizontalRotation = value;
+        }
+    }
     /// <summary>
     /// The Rotation of the Player on the x axe (min -88, max 88)
+    /// Note: The rotation is only applied if it is different from the previous one!
+    /// The precision of the rotation is 0.01 float
     /// </summary>
-    public virtual float RotationVertical => FirstPersonMovement?.MouseLook.CurrentVertical ?? 0;
+    public virtual float RotationVertical
+    {
+        get => FirstPersonMovement?.MouseLook.CurrentVertical ?? 0;
+        set
+        {
+            refreshVerticalRotation = true;
+            verticalRotation = value;
+        }
+    }
 
     public Vector3 Scale
     {

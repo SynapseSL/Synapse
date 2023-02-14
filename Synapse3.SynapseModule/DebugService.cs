@@ -65,17 +65,17 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                ev.Player.Invisible += 1;
-                if (ev.Player.Invisible > InvisibleMode.Full) ev.Player.Invisible = InvisibleMode.None;
+                ev.Player.RotationVertical += 1;
                 break;
            
             case KeyCode.Alpha2:
-                ev.Player.MaxHealth = 98;
-
+                ev.Player.RotationVertical += 0.1f;
                 break;
             case KeyCode.Alpha3:
-                Synapse.Get<TeamService>().NextTeam = 1;
-                Synapse.Get<TeamService>().Spawn();
+                ev.Player.RotationVertical += 0.01f;
+                break;
+            case KeyCode.Alpha4:
+                ev.Player.RotationVertical += 0.001f;
                 break;
         }
     }
