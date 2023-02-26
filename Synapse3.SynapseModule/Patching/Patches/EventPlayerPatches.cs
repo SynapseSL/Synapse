@@ -751,7 +751,7 @@ public static class LockerInteractPatch
         {
             if (colliderId >= __instance.Chambers.Length || !__instance.Chambers[colliderId].CanInteract) return false;
             var player = ply.GetSynapsePlayer();
-            var hasPerms = __instance.Chambers[colliderId].RequiredPermissions.CheckPermission(player);
+            var hasPerms = __instance.Chambers[colliderId].RequiredPermissions.CheckPermission(player, true);
             var locker = __instance.GetSynapseLocker();
             var ev = new LockerUseEvent(player, hasPerms, locker, locker.Chambers[colliderId])
             {

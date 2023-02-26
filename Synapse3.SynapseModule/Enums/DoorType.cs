@@ -11,7 +11,6 @@ public enum DoorType
     Scp096,
     Scp106Primary,
     Scp106Secondary,
-    Scp106Bottom,
     Scp173Armory,
     Scp173Connector,
     Scp173Gate,

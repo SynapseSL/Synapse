@@ -50,6 +50,7 @@ public static class RoundCheckEndPatch
 [SynapsePatch("FirstSpawn", PatchType.RoundEvent)]
 public static class FirstSpawnPatch
 {
+    internal static List<SynapsePlayer> _blockedPlayer = new();
     private static readonly RoundEvents _round;
     static FirstSpawnPatch() => _round = Synapse.Get<RoundEvents>();
 
@@ -98,10 +99,11 @@ public static class FirstSpawnPatch
                 HumanQueue = RoleAssigner._humanQueue
             };
             _round.FirstSpawn.RaiseSafely(ev);
+            _blockedPlayer = ev.PlayersBlockedFromSpawning;
             if (ev.EnableLateJoin)
             {
                 RoleAssigner._spawned = true;
-                RoleAssigner.LateJoinTimer.Reset();
+                RoleAssigner.LateJoinTimer.Restart();
             }
 
             if (!ev.EnableNormalSpawning) return false;
@@ -112,7 +114,7 @@ public static class FirstSpawnPatch
             {
                 RoleAssigner.AlreadySpawnedPlayers.Add(hub.characterClassManager.UserId);
             }
-
+            _blockedPlayer.Clear();
             return false;
         }
         catch (Exception ex)
@@ -120,6 +122,14 @@ public static class FirstSpawnPatch
             SynapseLogger<Synapse>.Error("Role Assign Patch failed\n" + ex);
             return true;
         }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(RoleAssigner), nameof(RoleAssigner.CheckPlayer))]
+    public static void CheckPlayer(ref bool __result, ReferenceHub hub)
+    {
+        if (_blockedPlayer.Any(x => x.Hub == hub))
+            __result = false;
     }
 }
 

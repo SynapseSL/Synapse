@@ -19,8 +19,6 @@ public partial class SynapseItem
 {
     public void EquipItem(SynapsePlayer player, bool dropWhenFull = true, bool provideFully = false)
     {
-        if(player.RoleType is RoleTypeId.Spectator or RoleTypeId.None) return;
-        
         if (player.Inventory.Items.Count >= 8)
         {
             if (dropWhenFull)
@@ -96,7 +94,7 @@ public partial class SynapseItem
         
         if(!InventoryItemLoader.AvailableItems.TryGetValue(ItemType, out var exampleBase)) return;
 
-        if (owner is not null)
+        if (owner != null)
         {
             rot = owner.CameraReference.rotation * exampleBase.PickupDropModel.transform.rotation;
         }

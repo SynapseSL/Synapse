@@ -4,7 +4,10 @@ using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Teams;
 using System;
+using System.Linq;
 using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Map;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 
@@ -52,7 +55,11 @@ public class DebugService : Service
             reactor.Value.SubscribeUnsafe(this, method);
         }
         _player.KeyPress.Subscribe(OnKeyPress);
-        _player.Pickup.Subscribe(ev => ev.Allow = false);
+        _item.ConsumeItem.Subscribe(ev =>
+        {
+            if (ev.State == ItemInteractState.Finalize)
+                ev.Allow = false;
+        });
     }
 
     public void Event(IEvent ev)
@@ -65,12 +72,11 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                ev.Player.Invisible += 1;
-                if (ev.Player.Invisible > InvisibleMode.Full) ev.Player.Invisible = InvisibleMode.None;
+                Synapse.Get<NukeService>().StartDetonation();
                 break;
            
             case KeyCode.Alpha2:
-                ev.Player.MaxHealth = 98;
+                Synapse.Get<NukeService>().InstantDetonation();
 
                 break;
             case KeyCode.Alpha3:
