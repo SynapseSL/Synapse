@@ -4,7 +4,10 @@ using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Teams;
 using System;
+using System.Linq;
 using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Map;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 using Synapse3.SynapseModule.Map.Rooms;
 
@@ -52,7 +55,11 @@ public class DebugService : Service
             reactor.Value.SubscribeUnsafe(this, method);
         }
         _player.KeyPress.Subscribe(OnKeyPress);
-        _player.Pickup.Subscribe(ev => ev.Allow = false);
+        _item.ConsumeItem.Subscribe(ev =>
+        {
+            if (ev.State == ItemInteractState.Finalize)
+                ev.Allow = false;
+        });
     }
 
     public void Event(IEvent ev)

@@ -20,6 +20,8 @@ public class RaCategoryAttribute : Attribute
 
     public int Size { get; set; } = 20;
     
+    public string RemoteAdminIdentifier { get; set; }
+    
     public uint Id { get; set; }
     
     public Type CategoryType { get; internal set; }

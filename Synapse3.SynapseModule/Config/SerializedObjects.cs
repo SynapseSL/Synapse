@@ -50,7 +50,8 @@ public class SerializedItem
         FireArm =
         {
             Attachments = WeaponAttachments
-        }
+        },
+        Scale = new Vector3(XSize, YSize, ZSize)
     };
 
     public static explicit operator SynapseItem(SerializedItem item) => item.Parse();

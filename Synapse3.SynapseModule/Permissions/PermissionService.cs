@@ -11,7 +11,6 @@ namespace Synapse3.SynapseModule.Permissions;
 
 public class PermissionService : Service
 {
-    private uint _currentGroupId = 500;
     private ConfigService _configService;
     private ServerEvents _server;
     public ConfigContainer Container { get; private set; }
@@ -123,10 +122,10 @@ public class PermissionService : Service
         }
 
 
-        _currentGroupId = 500;
+        var id = 1u;
         foreach (var group in Groups)
         {
-            group.Value.GroupId = _currentGroupId++;
+            group.Value.GroupId = id++;
         }
         
         
