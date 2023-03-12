@@ -115,7 +115,7 @@ public static class Synapse3Extensions
         CheckPermission(door.RequiredPermissions, player, door.RequireAll);
     
     public static bool CheckPermission(this KeycardPermissions permissions, SynapsePlayer player,
-        bool needIdentical = false)
+        bool checkCombinedPerms = false)
     {
         var ev2 = new CheckKeyCardPermissionEvent(player, false, permissions);
         if (player.Bypass || (ushort)permissions == 0) ev2.Allow = true;
@@ -134,7 +134,7 @@ public static class Synapse3Extensions
                 var overlappingPerms = ((KeycardItem)item.Item).Permissions & permissions;
                 var ev = new KeyCardInteractEvent(item, ItemInteractState.Finalize, player, permissions)
                 {
-                    Allow = needIdentical ? overlappingPerms == permissions : overlappingPerms > KeycardPermissions.None,
+                    Allow = checkCombinedPerms ? overlappingPerms == permissions : overlappingPerms > KeycardPermissions.None,
                 };
             
                 _itemEvents.KeyCardInteract.Raise(ev);

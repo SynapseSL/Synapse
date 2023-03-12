@@ -9,7 +9,7 @@ namespace Synapse3.SynapseModule.Permissions.RemoteAdmin;
     Name = "[ GodMode]",
     Color = "#03f8fc",
     Size = 20,
-    Id = 10003
+    Id = 103
     )]
 public class GodModeCategory : RemoteAdminCategory
 {

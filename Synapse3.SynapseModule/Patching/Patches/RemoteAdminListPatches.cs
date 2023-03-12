@@ -175,9 +175,12 @@ public static class RemoteAdminListPatch
                 var colors = ServerService.Colors;
                 color = colors.ElementAt(Random.Range(0, colors.Count)).Value;
             }
-            color = ServerService.GetColorHexCode(color);
+            else
+            {
+                color = ServerService.GetColorHexCode(color);
+            }
 
-            text += "<align=center><size=0>(" + group.GroupId + ")</size> <size=20><color=" + color + ">[" +
+            text += "<align=center><size=0>(-" + group.GroupId + ")</size> <size=20><color=" + color + ">[" +
                     group.Name +
                     "]</color></size>\n</align>";
 

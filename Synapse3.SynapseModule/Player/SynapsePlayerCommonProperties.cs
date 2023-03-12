@@ -92,8 +92,9 @@ public partial class SynapsePlayer
     /// </summary>
     public bool OverWatch
     {
-        get => ServerRoles.IsInOverwatch;
-        set => ServerRoles.IsInOverwatch = value;
+        get => CurrentRole is OverwatchRole;
+        set => SetRoleFlags(value ? RoleTypeId.Overwatch : RoleTypeId.Spectator, RoleSpawnFlags.All,
+            RoleChangeReason.RemoteAdmin);
     }
 
     /// <summary>

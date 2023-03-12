@@ -202,8 +202,7 @@ public class MapService : Service
         
         { "106_PRIMARY", DoorType.Scp106Primary },
         { "106_SECONDARY", DoorType.Scp106Secondary },
-        { "106_BOTTOM", DoorType.Scp106Bottom },
-        
+
         { "Unsecured Pryable GateDoor", DoorType.Scp049Gate },
         { "049_ARMORY", DoorType.Scp049Armory },
         

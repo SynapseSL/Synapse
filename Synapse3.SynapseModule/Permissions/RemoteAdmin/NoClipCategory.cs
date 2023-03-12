@@ -9,7 +9,7 @@ namespace Synapse3.SynapseModule.Permissions.RemoteAdmin;
     Name = "[ NoClip]",
     Color = "#03f8fc",
     Size = 20,
-    Id = 10004
+    Id = 104
 )]
 public class NoClipCategory : RemoteAdminCategory
 {

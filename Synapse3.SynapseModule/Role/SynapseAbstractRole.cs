@@ -58,12 +58,12 @@ public abstract class SynapseAbstractRole : SynapseRole
         Player.SetRoleFlags(config.Role, RoleSpawnFlags.None);
         if (config.VisibleRole != RoleTypeId.None)
         {
-            Player.FakeRoleManager.VisibleRole = new RoleInfo(config.VisibleRole, Player);
+            Player.FakeRoleManager.VisibleRoleInfo = new RoleInfo(config.VisibleRole, Player);
         }
 
         if (config.OwnRole != RoleTypeId.None)
         {
-            Player.FakeRoleManager.OwnVisibleRole = new RoleInfo(config.OwnRole, Player);
+            Player.FakeRoleManager.OwnVisibleRoleInfo = new RoleInfo(config.OwnRole, Player);
         }
 
         var spawn = config.PossibleSpawns?[Random.Range(0, config.PossibleSpawns.Length)];
@@ -148,8 +148,8 @@ public abstract class SynapseAbstractRole : SynapseRole
 
     public sealed override void DeSpawn(DeSpawnReason reason)
     {
-        Player.FakeRoleManager.VisibleRole = new RoleInfo(RoleTypeId.None, null);
-        Player.FakeRoleManager.OwnVisibleRole = new RoleInfo(RoleTypeId.None, null);
+        Player.FakeRoleManager.VisibleRoleInfo = new RoleInfo(RoleTypeId.None, null);
+        Player.FakeRoleManager.OwnVisibleRoleInfo = new RoleInfo(RoleTypeId.None, null);
         Player.Scale = Vector3.one;
 
         RemoveCustomDisplay();
@@ -182,12 +182,15 @@ public abstract class SynapseAbstractRole : SynapseRole
 
     public override void TryEscape()
     {
+        var config = GetConfig();
+        if(config.EscapeRole == RoleService.NoneRole) return;
+        
         var items = Player.Inventory.Items.ToList();
         foreach (var item in items)
         {
             item.Destroy();
         }
-        Player.RoleID = GetConfig().EscapeRole;
+        Player.RoleID = config.EscapeRole;
         foreach (var item in items)
         {
             Player.Inventory.GiveItem(item);

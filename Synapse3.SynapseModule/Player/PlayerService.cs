@@ -291,6 +291,8 @@ public class PlayerService : Service
                     {
                         if (int.TryParse(parameter, out var id))
                         {
+                            id *= -1;
+                            Logger.Warn(id);
                             //Check For SynapseGroupID
                             foreach (var player in GetPlayers(id, playerTypes))
                             {
@@ -330,11 +332,7 @@ public class PlayerService : Service
     }
 
     private void RoundRestart(RoundRestartEvent _)
-    {
-        JoinUpdates.Clear();
-        RecyclablePlayerId._autoIncrement = 0;
-        RecyclablePlayerId.FreeIds.Clear();
-    }
+        => JoinUpdates.Clear();
 
     private void ChangeClass(SetClassEvent ev)
     {
