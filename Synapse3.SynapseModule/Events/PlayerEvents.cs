@@ -644,9 +644,14 @@ public class SpeakEvent : PlayerInteractEvent
 public class SpeakToPlayerEvent : SpeakEvent
 {
     public SynapsePlayer Receiver { get; }
+    
+    public VoiceChatChannel OriginalChannel { get; }
 
     public SpeakToPlayerEvent(SynapsePlayer player, SynapsePlayer receiver, bool allow, VoiceChatChannel channel,
-        byte[] data, int dataLength) :
+        byte[] data, int dataLength, VoiceChatChannel originalChannel) :
         base(player, allow, channel, data, dataLength)
-        => Receiver = receiver;
+    {
+        Receiver = receiver;
+        OriginalChannel = originalChannel;
+    }
 }

@@ -283,11 +283,9 @@ public static class Scp173AttackSnapPatch
             if (Scp173SnapAbility.TryHitTarget(scpCameraReference, out var target))
             {
                 var scp = __instance.Owner.GetSynapsePlayer();
-                var ev = new Scp173AttackEvent(scp, target.GetSynapsePlayer(), -1, false)
-                {
-                    Allow = EventManager.ExecuteEvent(ServerEventType.Scp173SnapPlayer, __instance.Owner,
-                        __instance._targetHub)
-                };
+                var ev = new Scp173AttackEvent(scp, target.GetSynapsePlayer(), -1, false);
+                ev.Allow = ev.Allow && EventManager.ExecuteEvent(ServerEventType.Scp173SnapPlayer, __instance.Owner,
+                    __instance._targetHub);
                 _scp.Scp173Attack.RaiseSafely(ev);
                 var damageHandler = new ScpDamageHandler(scp, ev.Damage, DeathTranslations.Scp173);
 
@@ -422,7 +420,6 @@ public static class Scp939LunchPatch
     {
         try
         {
-            if (__instance._damageType == Scp939DamageType.Claw) return true;
             var scp = __instance.Attacker.GetSynapsePlayer();
             var victim = ply.GetSynapsePlayer();
             var ev = new Scp939AttackEvent(scp, victim, __instance.Damage, __instance._damageType);

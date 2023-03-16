@@ -72,7 +72,7 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                Synapse.Get<NukeService>().StartDetonation();
+                ev.Player.GiveEffect(Effect.Bleeding);
                 break;
            
             case KeyCode.Alpha2:

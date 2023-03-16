@@ -105,25 +105,28 @@ public class FakeRoleManager
 
     public RoleInfo GetRoleInfo(SynapsePlayer receiver)
     {
-        if (receiver == _player && OwnVisibleRoleInfo.RoleTypeId != RoleTypeId.None)
+        if (receiver == _player)
         {
-            return OwnVisibleRoleInfo;
+            if (OwnVisibleRoleInfo.RoleTypeId != RoleTypeId.None)
+                return OwnVisibleRoleInfo;
         }
-
-        if (ToPlayerVisibleRole.ContainsKey(receiver))
+        else
         {
-            return ToPlayerVisibleRole[receiver];
-        }
+            if (ToPlayerVisibleRole.ContainsKey(receiver))
+            {
+                return ToPlayerVisibleRole[receiver];
+            }
 
-        foreach (var condition in VisibleRoleCondition)
-        {
-            if (condition.Key(receiver))
-                return condition.Value;
-        }
+            foreach (var condition in VisibleRoleCondition)
+            {
+                if (condition.Key(receiver))
+                    return condition.Value;
+            }
 
-        if (VisibleRoleInfo.RoleTypeId != RoleTypeId.None)
-        {
-            return VisibleRoleInfo;
+            if (VisibleRoleInfo.RoleTypeId != RoleTypeId.None)
+            {
+                return VisibleRoleInfo;
+            }   
         }
 
         var publicWriter = _player.CurrentRole as IPublicSpawnDataWriter;

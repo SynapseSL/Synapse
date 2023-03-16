@@ -13,11 +13,13 @@ public abstract class SynapseAbstractRole : SynapseRole
 {
     private readonly SynapseConfigService _config;
     private readonly PlayerEvents _player;
+    private readonly RoleService _role;
 
     protected SynapseAbstractRole()
     {
         _config = Synapse.Get<SynapseConfigService>();
         _player = Synapse.Get<PlayerEvents>();
+        _role = Synapse.Get<RoleService>();
     }
 
     public CustomInfoList.CustomInfoEntry NameEntry { get; private set; }
@@ -71,13 +73,19 @@ public abstract class SynapseAbstractRole : SynapseRole
         {
             Player.FirstPersonMovement?.ServerOverridePosition(spawn.GetMapPosition(), spawn.GetMapRotation().eulerAngles);
         }
-        Player.Health = config.Health;
         Player.MaxHealth = config.MaxHealth;
-        Player.ArtificialHealth = config.ArtificialHealth;
+        Player.Health = config.Health;
         Player.MaxArtificialHealth = config.MaxArtificialHealth;
+        Player.ArtificialHealth = config.ArtificialHealth;
         Player.Scale = config.Scale;
         config.PossibleInventories?[Random.Range(0, config.PossibleInventories.Length)]?.Apply(Player);
         Player.GetStatBase<StaminaStat>().ClassChanged();
+
+        if (!config.CustomDisplay)
+        {
+            OnSpawn(config);
+            return;
+        }
 
         Player.RemoveDisplayInfo(PlayerInfoArea.Nickname);
         Player.RemoveDisplayInfo(PlayerInfoArea.Role);
@@ -178,12 +186,14 @@ public abstract class SynapseAbstractRole : SynapseRole
 
         if (PowerStatusEntries.ContainsKey(PowerStatus.HigherRank))
             Player.CustomInfo.Remove(PowerStatusEntries[PowerStatus.HigherRank]);
+        Player.CustomInfo.UpdateInfo();
     }
 
     public override void TryEscape()
     {
         var config = GetConfig();
         if(config.EscapeRole == RoleService.NoneRole) return;
+        if (!_role.IsIdRegistered(config.EscapeRole)) return;
         
         var items = Player.Inventory.Items.ToList();
         foreach (var item in items)

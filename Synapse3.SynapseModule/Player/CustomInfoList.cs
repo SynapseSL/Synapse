@@ -180,10 +180,6 @@ public class CustomInfoList :
             }
         }
 
-        player.SendNetworkMessage(_mirrorService.GetCustomVarMessage(_player.NicknameSync, writer =>
-        {
-            writer.WriteUInt64(2ul);
-            writer.WriteString(string.Join("\n", values));
-        }));
+        player.SendFakeSyncVar(_player.NicknameSync, 2ul, string.Join("\n", values));
     }
 }

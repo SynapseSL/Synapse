@@ -143,7 +143,8 @@ public static class SpeakPatch
                         validatedChannel = VoiceChatChannel.None;
                 }
 
-                var ev2 = new SpeakToPlayerEvent(player, receiver, true, validatedChannel, msg.Data, msg.DataLength);
+                var ev2 = new SpeakToPlayerEvent(player, receiver, true, validatedChannel, msg.Data, msg.DataLength,
+                    voiceChatChannel);
                 Player.SpeakToPlayer.RaiseSafely(ev2);
                 if (ev2.Channel == VoiceChatChannel.None || !ev2.Allow) continue;
                 msg.Channel = ev2.Channel;

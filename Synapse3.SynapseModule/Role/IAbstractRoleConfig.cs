@@ -1,4 +1,5 @@
-﻿using PlayerRoles;
+﻿using System;
+using PlayerRoles;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Map.Rooms;
 
@@ -16,6 +17,7 @@ public interface IAbstractRoleConfig
     public float MaxArtificialHealth { get; }
     public RoomPoint[] PossibleSpawns { get; }
     public SerializedPlayerInventory[] PossibleInventories { get; }
+    public bool CustomDisplay { get; }
     public bool Hierarchy { get; }
     public SerializedVector3 Scale { get; }
 }

@@ -39,6 +39,7 @@ public class ExampleAbstractRole : SynapseAbstractRole
 
         public RoleTypeId OwnRole => RoleTypeId.NtfSergeant;
 
+        public bool CustomDisplay => true;
         public bool Hierarchy => true;
 
         public SerializedVector3 Scale => Vector3.one;

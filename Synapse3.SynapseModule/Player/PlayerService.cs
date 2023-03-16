@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using MEC;
 using Neuron.Core.Meta;
 using PlayerRoles;
@@ -292,7 +293,7 @@ public class PlayerService : Service
                         if (int.TryParse(parameter, out var id))
                         {
                             id *= -1;
-                            Logger.Warn(id);
+                            Logger.Warn(id + " " + Assembly.GetCallingAssembly().FullName);
                             //Check For SynapseGroupID
                             foreach (var player in GetPlayers(id, playerTypes))
                             {
