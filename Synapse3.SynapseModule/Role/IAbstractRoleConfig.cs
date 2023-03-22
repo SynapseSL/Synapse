@@ -1,5 +1,4 @@
-﻿using System;
-using PlayerRoles;
+﻿using PlayerRoles;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Map.Rooms;
 
@@ -19,5 +18,7 @@ public interface IAbstractRoleConfig
     public SerializedPlayerInventory[] PossibleInventories { get; }
     public bool CustomDisplay { get; }
     public bool Hierarchy { get; }
+    public bool UseCustomUnitName { get; }
+    public string CustomUnitName { get; }
     public SerializedVector3 Scale { get; }
 }

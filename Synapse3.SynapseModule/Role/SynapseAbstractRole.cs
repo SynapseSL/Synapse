@@ -5,6 +5,7 @@ using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
 using System.Collections.Generic;
 using System.Linq;
+using MEC;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Role;
@@ -107,7 +108,7 @@ public abstract class SynapseAbstractRole : SynapseRole
             RoleAndUnitEntry = new CustomInfoList.CustomInfoEntry()
             {
                 EveryoneCanSee = false,
-                Info = Attribute.Name + " (" + Player.UnitName + ")",
+                Info = Attribute.Name + " (" + (config.UseCustomUnitName ? config.CustomUnitName : Player.UnitName) + ")",
                 SeeCondition = CanSeeUnit
             };
 
@@ -137,7 +138,8 @@ public abstract class SynapseAbstractRole : SynapseRole
                 Info = Attribute.Name
             };
         }
-
+        
+        Player.CustomInfo.AutomaticUpdateOnChange = false;
         Player.CustomInfo.Add(NameEntry);
         Player.CustomInfo.Add(RoleEntry);
 
@@ -148,6 +150,8 @@ public abstract class SynapseAbstractRole : SynapseRole
             Player.CustomInfo.Add(PowerStatusEntries[PowerStatus.SameRank]);
             Player.CustomInfo.Add(PowerStatusEntries[PowerStatus.HigherRank]);
         }
+        Player.CustomInfo.AutomaticUpdateOnChange = true;
+        Player.CustomInfo.UpdateInfo();
 
         OnSpawn(config);
 
@@ -174,6 +178,7 @@ public abstract class SynapseAbstractRole : SynapseRole
         Player.AddDisplayInfo(PlayerInfoArea.UnitName);
         Player.AddDisplayInfo(PlayerInfoArea.PowerStatus);
 
+        Player.CustomInfo.AutomaticUpdateOnChange = false;
         Player.CustomInfo.Remove(NameEntry);
         Player.CustomInfo.Remove(RoleEntry);
         Player.CustomInfo.Remove(RoleAndUnitEntry);
@@ -186,6 +191,8 @@ public abstract class SynapseAbstractRole : SynapseRole
 
         if (PowerStatusEntries.ContainsKey(PowerStatus.HigherRank))
             Player.CustomInfo.Remove(PowerStatusEntries[PowerStatus.HigherRank]);
+        
+        Player.CustomInfo.AutomaticUpdateOnChange = true;
         Player.CustomInfo.UpdateInfo();
     }
 
@@ -208,11 +215,15 @@ public abstract class SynapseAbstractRole : SynapseRole
     }
 
     public virtual string GetName() =>
-        Player.NicknameSync.HasCustomName ? Player.NicknameSync._displayName : Player.NickName;
+        Player.NicknameSync.HasCustomName ? Player.NicknameSync._displayName + "*" : Player.NickName;
 
     public virtual void UpdateDisplayName(UpdateDisplayNameEvent ev)
     {
-        NameEntry.Info = GetName();
-        Player.CustomInfo.UpdateInfo();
+        if (ev.Player != Player) return;
+        Timing.CallDelayed(Timing.WaitForOneFrame, () =>
+        {
+            NameEntry.Info = GetName();
+            Player.CustomInfo.UpdateInfo();
+        });
     }
 }

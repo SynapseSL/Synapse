@@ -41,6 +41,8 @@ public class ExampleAbstractRole : SynapseAbstractRole
 
         public bool CustomDisplay => true;
         public bool Hierarchy => true;
+        public bool UseCustomUnitName => true;
+        public string CustomUnitName => "Special Unit 11";
 
         public SerializedVector3 Scale => Vector3.one;
 

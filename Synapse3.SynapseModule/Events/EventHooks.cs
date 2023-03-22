@@ -1,4 +1,3 @@
-using InventorySystem.Items.Pickups;
 using LightContainmentZoneDecontamination;
 using LiteNetLib;
 using PlayerRoles;

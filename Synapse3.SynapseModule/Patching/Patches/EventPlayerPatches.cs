@@ -297,7 +297,7 @@ public static class PlayerHealPatch
     {
         try
         {
-            var player = __instance.Hub.GetSynapsePlayer();
+            var player = __instance?.Hub?.GetSynapsePlayer();
             if (player == null) return true;
 
             var ev = new HealEvent(player, true, healAmount);

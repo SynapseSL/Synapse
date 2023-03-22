@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection;
 using MEC;
 using Neuron.Core.Meta;
 using PlayerRoles;
@@ -293,7 +292,6 @@ public class PlayerService : Service
                         if (int.TryParse(parameter, out var id))
                         {
                             id *= -1;
-                            Logger.Warn(id + " " + Assembly.GetCallingAssembly().FullName);
                             //Check For SynapseGroupID
                             foreach (var player in GetPlayers(id, playerTypes))
                             {
@@ -348,9 +346,17 @@ public class PlayerService : Service
                 ev.Player.MainScpController.Scp173.ResetDefault();
                 break;
         }
-
-        if (ev.Player.CustomRole == null)
-            Timing.CallDelayed(Timing.WaitForOneFrame,
-                () => _player.ChangeRole.RaiseSafely(new ChangeRoleEvent(ev.Player) { RoleId = (uint)ev.Role }));
+        
+        Timing.CallDelayed(Timing.WaitForOneFrame, () =>
+        {
+            if (ev.Player.CustomRole == null)
+                _player.ChangeRole.RaiseSafely(new ChangeRoleEvent(ev.Player) { RoleId = (uint)ev.Role });
+            
+            foreach (var player in GetPlayers(PlayerType.Player,PlayerType.Dummy))
+            {
+                if (ev.Player == player || player.CustomInfo.IsForEveryoneEqual) continue;
+                player.CustomInfo.UpdatePlayer(ev.Player);
+            }
+        });
     }
 }
