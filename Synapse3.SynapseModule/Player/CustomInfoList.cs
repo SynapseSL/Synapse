@@ -203,9 +203,7 @@ public class CustomInfoList :
                 values.Add(entry.Info);
             }
         }
-
-        SynapseLogger<CustomInfoList>.Warn("Send DisplayInfo from " + _player.NickName + " to " + player.NickName +
-                                           "\\n" + string.Join("\\n", values));
+        
         player.SendFakeSyncVar(_player.NicknameSync, 2ul, string.Join("\n", values));
     }
 }

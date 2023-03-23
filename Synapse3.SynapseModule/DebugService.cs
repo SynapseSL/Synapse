@@ -59,6 +59,11 @@ public class DebugService : Service
             if (ev.State == ItemInteractState.Finalize)
                 ev.Allow = false;
         });
+        _player.Escape.Subscribe(ev =>
+        {
+            if(ev.EscapeType == EscapeType.NotAssigned)
+                Logger.Warn("Escape not assigned");
+        });
     }
 
     public void Event(IEvent ev)
