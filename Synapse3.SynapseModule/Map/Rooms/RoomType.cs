@@ -36,6 +36,7 @@ public enum RoomType : uint
     HeavyArmory,
     Nuke,
     Servers,
+    TestingRoom,
     Tesla,
     MicroHid,
     HczElevatorA,
