@@ -29,7 +29,7 @@ public partial class SynapseItem
     public ItemBase Item { get; internal set; }
     public ItemPickupBase Pickup { get; internal set; }
 
-    public SynapsePlayer ItemOwner => Item?.Owner;
+    public SynapsePlayer ItemOwner => Item?.Owner?.GetSynapsePlayer();
 
     public NetworkIdentity NetworkIdentity
     {

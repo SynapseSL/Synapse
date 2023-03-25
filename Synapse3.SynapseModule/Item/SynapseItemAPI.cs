@@ -6,7 +6,7 @@ using InventorySystem.Items.Firearms.Attachments;
 using InventorySystem.Items.Pickups;
 using Mirror;
 using Neuron.Core.Logging;
-using PlayerRoles;
+using Scp914;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
@@ -17,6 +17,9 @@ namespace Synapse3.SynapseModule.Item;
 
 public partial class SynapseItem
 {
+    public void Upgrade(Scp914KnobSetting settings, Vector3 position = default) =>
+        UpgradeProcessor.CreateUpgradedItem(this, settings, position);
+    
     public void EquipItem(SynapsePlayer player, bool dropWhenFull = true, bool provideFully = false)
     {
         if (player.Inventory.Items.Count >= 8)

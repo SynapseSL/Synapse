@@ -2,17 +2,13 @@
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Teams;
 using System;
-using System.Linq;
-using MapGeneration;
-using MEC;
-using Mirror;
+using PlayerRoles;
+using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
-using Synapse3.SynapseModule.Map;
-using Synapse3.SynapseModule.Player;
+using Synapse3.SynapseModule.Role;
 using UnityEngine;
-using Synapse3.SynapseModule.Map.Rooms;
+
 
 namespace Synapse3.SynapseModule;
 
@@ -63,23 +59,11 @@ public class DebugService : Service
             if (ev.State == ItemInteractState.Finalize)
                 ev.Allow = false;
         });
-        /*_round.Waiting.Subscribe(ev =>
+        _player.Escape.Subscribe(ev =>
         {
-            Timing.CallDelayed(1f, () =>
-            {
-                try
-                {
-                    (Synapse.Get<RoomService>().GetRoom((uint)RoomType.TestingRoom) as SynapseNetworkRoom).Position +=
-                        Vector3.up * 5;
-                    (Synapse.Get<RoomService>().GetRoom((uint)RoomType.Scp330) as SynapseNetworkRoom).Position +=
-                        Vector3.up * 5;
-                }
-                catch (Exception ex)
-                {
-                    Logger.Warn(ex);
-                }
-            });
-        });*/
+            if(ev.EscapeType == EscapeType.NotAssigned)
+                Logger.Warn("Escape not assigned");
+        });
     }
 
     public void Event(IEvent ev)
@@ -87,19 +71,30 @@ public class DebugService : Service
         Logger.Warn("Event triggered: " + ev.GetType().Name);
     }
 
+    private SynapseDummy _dummy;
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                SynapseLogger<DebugService>.Warn(ev.Player.Room.Doors.Count);
+                _dummy = new SynapseDummy(ev.Player.Position, ev.Player.Rotation, RoleTypeId.Scientist, "TestDummy", "Moderator",
+                    "red");
+                _dummy.RaVisible = true;
                 break;
+           
             case KeyCode.Alpha2:
-                (ev.Player.Room as IVanillaRoom).RoomColor = Color.green;
+                var role = (_dummy.Player.CustomRole as SynapseAbstractRole);
+                Logger.Warn("Role Entry " + role.RoleEntry.SeeCondition(ev.Player));
+                Logger.Warn("RoleAndUnitEntry " + role.RoleAndUnitEntry.SeeCondition(ev.Player));
+                Logger.Warn("LowerRank " + role.PowerStatusEntries[PowerStatus.LowerRank].SeeCondition(ev.Player));
+                Logger.Warn("SameRank " + role.PowerStatusEntries[PowerStatus.SameRank].SeeCondition(ev.Player));
+                Logger.Warn("HigherRank " + role.PowerStatusEntries[PowerStatus.HigherRank].SeeCondition(ev.Player));
+                break;
+            case KeyCode.Alpha3:
+                (_dummy.Player.CustomRole as SynapseAbstractRole)?.RemoveCustomDisplay();
                 break;
             
-            case KeyCode.Alpha3:
-                (ev.Player.Room as IVanillaRoom).RoomColor = default;
+            case KeyCode.Alpha4:
                 break;
         }
     }
