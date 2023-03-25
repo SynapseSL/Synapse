@@ -585,7 +585,7 @@ public static class SelectPlayerPatch
                 var info = args.At(startindex);
 
                 if (info.Length == 0) return false;
-
+                
                 if (PlayerService.TryGetPlayers(info, out var players))
                 {
                     __result = players.Select(x => x.Hub).ToList();

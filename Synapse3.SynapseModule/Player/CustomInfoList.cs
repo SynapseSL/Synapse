@@ -2,8 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Mirror;
+using MEC;
 using Synapse3.SynapseModule.Events;
+using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
 
@@ -14,18 +15,16 @@ public class CustomInfoList :
 {
     private readonly SynapsePlayer _player;
     private readonly PlayerService _playerService;
-    private readonly MirrorService _mirrorService;
     private readonly List<CustomInfoEntry> _values = new();
 
-
-    internal CustomInfoList(SynapsePlayer player, PlayerService playerService, MirrorService mirrorService,
+    internal CustomInfoList(SynapsePlayer player, PlayerService playerService,
         PlayerEvents playerEvent)
     {
         _player = player;
-        _playerService = playerService;
-        _mirrorService = mirrorService;
-        playerEvent.SetClass.Subscribe(ev => UpdatePlayer(ev.Player));
+        _playerService = playerService; 
     }
+
+    public bool AutomaticUpdateOnChange { get; set; } = true;
 
     public bool IsForEveryoneEqual { get; private set; } = true;
 
@@ -74,7 +73,8 @@ public class CustomInfoList :
         {
             _values[index] = value;
             CheckAllEntries();
-            UpdateInfo();
+            if (AutomaticUpdateOnChange)
+                UpdateInfo();
         }
     }
 
@@ -85,8 +85,9 @@ public class CustomInfoList :
         _values.Add(item);
         if (!item.EveryoneCanSee)
             IsForEveryoneEqual = false;
-
-        UpdateInfo();
+        
+        if (AutomaticUpdateOnChange)
+            UpdateInfo();
     }
 
     public void Add(string item)
@@ -117,7 +118,9 @@ public class CustomInfoList :
 
         if(item?.EveryoneCanSee != false)
             CheckAllEntries();
-        UpdateInfo();
+        
+        if (AutomaticUpdateOnChange)
+            UpdateInfo();
 
         return result;
     }
@@ -127,14 +130,16 @@ public class CustomInfoList :
         _values.RemoveAt(index);
 
         CheckAllEntries();
-        UpdateInfo();
+        if (AutomaticUpdateOnChange)
+            UpdateInfo();
     }
 
     public void Clear()
     {
         _values.Clear();
         IsForEveryoneEqual = true;
-        UpdateInfo();
+        if (AutomaticUpdateOnChange)
+            UpdateInfo();
     }
 
     public void Insert(int index, CustomInfoEntry item)
@@ -144,7 +149,9 @@ public class CustomInfoList :
         _values.Insert(index, item);
         if (!item.EveryoneCanSee)
             IsForEveryoneEqual = false;
-        UpdateInfo();
+        
+        if (AutomaticUpdateOnChange)
+            UpdateInfo();
     }
     
 
@@ -169,8 +176,25 @@ public class CustomInfoList :
 
     int IReadOnlyCollection<CustomInfoEntry>.Count => _values.Count;
     public bool NeedsJoinUpdate => true;
+
+    private readonly Dictionary<SynapsePlayer, float> _lastUpdates = new();
+    private readonly Dictionary<SynapsePlayer, bool> _activeUpdate = new();
+
     public void UpdatePlayer(SynapsePlayer player)
     {
+        if (_activeUpdate.ContainsKey(player) && _activeUpdate[player]) return;
+        if (_lastUpdates.ContainsKey(player) && Time.time < _lastUpdates[player] + 0.1f)
+        {
+            _activeUpdate[player] = true;
+            Timing.CallDelayed(0.1f, () =>
+            {
+                _activeUpdate[player] = false;
+                UpdatePlayer(player);
+            });
+            return;
+        }
+        
+        _lastUpdates[player] = Time.time;
         var values = new List<string>();
         foreach (var entry in _values)
         {
@@ -179,11 +203,7 @@ public class CustomInfoList :
                 values.Add(entry.Info);
             }
         }
-
-        player.SendNetworkMessage(_mirrorService.GetCustomVarMessage(_player.NicknameSync, writer =>
-        {
-            writer.WriteUInt64(2ul);
-            writer.WriteString(string.Join("\n", values));
-        }));
+        
+        player.SendFakeSyncVar(_player.NicknameSync, 2ul, string.Join("\n", values));
     }
 }

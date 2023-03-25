@@ -2,13 +2,11 @@
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Teams;
 using System;
-using System.Linq;
-using PlayerRoles.FirstPersonControl.NetworkMessages;
+using PlayerRoles;
+using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
-using Synapse3.SynapseModule.Map;
-using Synapse3.SynapseModule.Player;
+using Synapse3.SynapseModule.Role;
 using UnityEngine;
 
 
@@ -61,6 +59,11 @@ public class DebugService : Service
             if (ev.State == ItemInteractState.Finalize)
                 ev.Allow = false;
         });
+        _player.Escape.Subscribe(ev =>
+        {
+            if(ev.EscapeType == EscapeType.NotAssigned)
+                Logger.Warn("Escape not assigned");
+        });
     }
 
     public void Event(IEvent ev)
@@ -68,24 +71,30 @@ public class DebugService : Service
         Logger.Warn("Event triggered: " + ev.GetType().Name);
     }
 
+    private SynapseDummy _dummy;
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                ev.Player.RotationVertical += 5;
+                _dummy = new SynapseDummy(ev.Player.Position, ev.Player.Rotation, RoleTypeId.Scientist, "TestDummy", "Moderator",
+                    "red");
+                _dummy.RaVisible = true;
                 break;
-
+           
             case KeyCode.Alpha2:
-                ev.Player.RotationHorizontal += 5f;
+                var role = (_dummy.Player.CustomRole as SynapseAbstractRole);
+                Logger.Warn("Role Entry " + role.RoleEntry.SeeCondition(ev.Player));
+                Logger.Warn("RoleAndUnitEntry " + role.RoleAndUnitEntry.SeeCondition(ev.Player));
+                Logger.Warn("LowerRank " + role.PowerStatusEntries[PowerStatus.LowerRank].SeeCondition(ev.Player));
+                Logger.Warn("SameRank " + role.PowerStatusEntries[PowerStatus.SameRank].SeeCondition(ev.Player));
+                Logger.Warn("HigherRank " + role.PowerStatusEntries[PowerStatus.HigherRank].SeeCondition(ev.Player));
+                break;
+            case KeyCode.Alpha3:
+                (_dummy.Player.CustomRole as SynapseAbstractRole)?.RemoveCustomDisplay();
                 break;
             
-            case KeyCode.Alpha3:
-                ev.Player.RotationVertical -= 5;
-                break;
-
             case KeyCode.Alpha4:
-                ev.Player.RotationHorizontal -= 5f;
                 break;
         }
     }

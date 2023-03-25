@@ -1,4 +1,3 @@
-using InventorySystem.Items.Pickups;
 using LightContainmentZoneDecontamination;
 using LiteNetLib;
 using PlayerRoles;
@@ -138,9 +137,10 @@ public partial class ScpEvents
     public bool Scp049StartResurrectingBodyHook(IPlayer player, IPlayer target, BasicRagdoll body, bool canResurrect)
     {
         if (!canResurrect) return true;
-        var synapse049 = player.GetSynapsePlayer();
-        var synapseTarget = target.GetSynapsePlayer();
-        var ragDoll = body.GetSynapseRagDoll();
+        var synapse049 = player?.GetSynapsePlayer();
+        var synapseTarget = target?.GetSynapsePlayer();
+        var ragDoll = body?.GetSynapseRagDoll();
+        if (synapse049 == null || synapseTarget == null || ragDoll == null) return true;
         var ev = new Scp049ReviveEvent(synapse049, synapseTarget, ragDoll, false);
         Scp049Revive.RaiseSafely(ev);
         return ev.Allow;
