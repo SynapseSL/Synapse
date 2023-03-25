@@ -78,10 +78,14 @@ public class SynapseRoom : IVanillaRoom
     private List<SynapseCamera> _cameras = new();
     public ReadOnlyCollection<SynapseCamera> Cameras => _cameras.AsReadOnly();
 
-    public Color WarheadColor 
-    { 
-        get => LightController.Network_warheadLightColor; 
-        set => LightController.Network_warheadLightColor = value; 
+    public Color RoomColor
+    {
+        get => LightController.Network_warheadLightColor;
+        set
+        {
+            LightController.Network_warheadLightColor = value == default ? FlickerableLightController.DefaultWarheadColor : value;
+            LightController.Network_warheadLightOverride = value != default;
+        }
     }
 
 

@@ -5,6 +5,9 @@ using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Teams;
 using System;
 using System.Linq;
+using MapGeneration;
+using MEC;
+using Mirror;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Player;
@@ -60,6 +63,23 @@ public class DebugService : Service
             if (ev.State == ItemInteractState.Finalize)
                 ev.Allow = false;
         });
+        /*_round.Waiting.Subscribe(ev =>
+        {
+            Timing.CallDelayed(1f, () =>
+            {
+                try
+                {
+                    (Synapse.Get<RoomService>().GetRoom((uint)RoomType.TestingRoom) as SynapseNetworkRoom).Position +=
+                        Vector3.up * 5;
+                    (Synapse.Get<RoomService>().GetRoom((uint)RoomType.Scp330) as SynapseNetworkRoom).Position +=
+                        Vector3.up * 5;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn(ex);
+                }
+            });
+        });*/
     }
 
     public void Event(IEvent ev)
@@ -75,7 +95,11 @@ public class DebugService : Service
                 SynapseLogger<DebugService>.Warn(ev.Player.Room.Doors.Count);
                 break;
             case KeyCode.Alpha2:
-                (ev.Player.Room as IVanillaRoom).WarheadColor = Color.green;
+                (ev.Player.Room as IVanillaRoom).RoomColor = Color.green;
+                break;
+            
+            case KeyCode.Alpha3:
+                (ev.Player.Room as IVanillaRoom).RoomColor = default;
                 break;
         }
     }

@@ -20,6 +20,8 @@ public interface IRoom
     public uint Zone { get; }
 
     ReadOnlyCollection<SynapseDoor> Doors { get; }
+    
+    public Color RoomColor { get; set; }
 
     public void TurnOffLights(float duration);
 }

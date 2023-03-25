@@ -13,7 +13,5 @@ public interface IVanillaRoom : IRoom
 
     public FlickerableLightController LightController { get; }
 
-    public Color WarheadColor { get; set; }
-
     public RoomType RoomType { get; }
 }

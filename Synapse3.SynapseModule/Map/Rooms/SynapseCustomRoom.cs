@@ -4,6 +4,7 @@ using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Rooms;
@@ -94,6 +95,18 @@ public abstract class SynapseCustomRoom : DefaultSynapseObject, IRoom
                 light.ToyBase.netIdentity.UpdatePositionRotationScale();
             }
         });
+    }
+
+    public virtual Color RoomColor
+    {
+        get => RoomSchematic.Lights.FirstOrDefault()?.LightColor ?? default;
+        set
+        {
+            foreach (var light in RoomSchematic.Lights)
+            {
+                light.LightColor = value;
+            }
+        }
     }
     
     public sealed override void HideFromAll() => RoomSchematic.HideFromAll();
