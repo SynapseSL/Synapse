@@ -5,6 +5,7 @@ using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Teams;
 using System;
 using System.Linq;
+using PlayerRoles.FirstPersonControl.NetworkMessages;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Player;
@@ -72,17 +73,19 @@ public class DebugService : Service
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-              ev.Player.RotationVertical += 1;
+                ev.Player.RotationVertical += 5;
                 break;
-           
+
             case KeyCode.Alpha2:
-                ev.Player.RotationVertical += 0.1f;
+                ev.Player.RotationHorizontal += 5f;
                 break;
+            
             case KeyCode.Alpha3:
-                ev.Player.RotationVertical += 0.01f;
+                ev.Player.RotationVertical -= 5;
                 break;
+
             case KeyCode.Alpha4:
-                ev.Player.RotationVertical += 0.001f;
+                ev.Player.RotationHorizontal -= 5f;
                 break;
         }
     }

@@ -15,12 +15,12 @@ public partial class SynapsePlayer
     internal float horizontalRotation = 0;
 
     /// <summary>
-    /// If the player ave a postion in the game, not the case if the player ave no player model
+    /// If the player have a position in the game, not the case if the player have no player model
     /// </summary>
     public bool ExistsInSpace => FirstPersonMovement != null;
 
     /// <summary>
-    /// The frist person movement module if the player ave one
+    /// The first person movement module if the player have one
     /// </summary>
     public FirstPersonMovementModule FirstPersonMovement
     {
@@ -34,8 +34,6 @@ public partial class SynapsePlayer
 
     /// <summary>
     /// The current Position of the Player
-    /// Note: The rotation is only applied if it is different from the previous one!
-    /// The precision of the rotation is 0.01 float
     /// </summary>
     public virtual Vector3 Position
     {
@@ -45,6 +43,8 @@ public partial class SynapsePlayer
 
     /// <summary>
     /// The Rotation of the Player as Quaternion
+    /// Note: The rotation is only applied if it is different from the previous one!
+    /// The precision of the rotation is 0.01 float
     /// </summary>
     public virtual Quaternion Rotation
     {

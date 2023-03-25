@@ -911,7 +911,13 @@ public static class PlayerBanPatch
 public static class SendPlayerDataPatch
 {
     private static readonly PlayerEvents Player;
-    static SendPlayerDataPatch() => Player = Synapse.Get<PlayerEvents>();
+    private static readonly PlayerService PlayerService;
+
+    static SendPlayerDataPatch()
+    {
+        Player = Synapse.Get<PlayerEvents>();
+        PlayerService = Synapse.Get<PlayerService>();
+    }
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(FpcServerPositionDistributor), nameof(FpcServerPositionDistributor.GetNewSyncData))]
@@ -984,34 +990,29 @@ public static class SendPlayerDataPatch
                 flag = false;
                 visibilityController = null;
             }
-            foreach (var hub in ReferenceHub.AllHubs)
+            foreach (var player in PlayerService.GetAbsoluteAllPlayers())
             {
-                if (hub.netId != receiver.netId)
+                if (player.CurrentRole is not IFpcRole fpcRole) continue;
+                if (player.NetId != receiver.netId)
                 {
-                    if (hub.roleManager.CurrentRole is not IFpcRole fpcRole) continue;
-
-                    bool flag2 = flag && !visibilityController.ValidateVisibility(hub);
-                    var newSyncData = GetSyncData(receiver, hub, fpcRole.FpcModule, flag2, out var canSee);
-                    if (!flag2 && canSee)
-                    {
-                        FpcServerPositionDistributor._bufferPlayerIDs[(int)num] = hub.PlayerId;
-                        FpcServerPositionDistributor._bufferSyncData[(int)num] = newSyncData;
-                        num += 1;
-                    }
+                    var flag2 = flag && !visibilityController.ValidateVisibility(player);
+                    var newSyncData = GetSyncData(receiver, player, fpcRole.FpcModule, flag2, out var canSee);
+                    if (flag2 || !canSee) continue;
+                    FpcServerPositionDistributor._bufferPlayerIDs[num] = player.PlayerId;
+                    FpcServerPositionDistributor._bufferSyncData[num] = newSyncData;
+                    num += 1;
                 }
                 else
                 {
-                    if (hub.roleManager.CurrentRole is not IFpcRole fpcRole) continue;
-                    var player = hub.GetSynapsePlayer();
                     if (!player.refreshHorizontalRotation && !player.refreshVerticalRotation) continue;
                     var newSyncData = GetSelfPlayerData(player, fpcRole.FpcModule);
-                    FpcServerPositionDistributor._bufferPlayerIDs[(int)num] = hub.PlayerId;
-                    FpcServerPositionDistributor._bufferSyncData[(int)num] = newSyncData;
+                    FpcServerPositionDistributor._bufferPlayerIDs[num] = player.PlayerId;
+                    FpcServerPositionDistributor._bufferSyncData[num] = newSyncData;
                     num += 1;
                 }
             }
             writer.WriteUInt16(num);
-            for (int i = 0; i < (int)num; i++)
+            for (int i = 0; i < num; i++)
             {
                 writer.WriteRecyclablePlayerId(new RecyclablePlayerId(FpcServerPositionDistributor._bufferPlayerIDs[i]));
                 FpcServerPositionDistributor._bufferSyncData[i].Write(writer);
@@ -1048,7 +1049,7 @@ public static class SendPlayerDataPatch
     }
 
     private static FpcSyncData GetSyncData(ReferenceHub receiver, ReferenceHub target,
-        FirstPersonMovementModule firtstPersonModule, bool isInvisible, out bool canSee)
+        FirstPersonMovementModule firstPersonModule, bool isInvisible, out bool canSee)
     {
         var prevSyncData = FpcServerPositionDistributor.GetPrevSyncData(receiver, target);
         var player = receiver.GetSynapsePlayer();
@@ -1061,9 +1062,9 @@ public static class SendPlayerDataPatch
         var ev = new SendPlayerDataEvent(player, targetPlayer)
         {
             Position = targetPlayer.Position,
-            IsGrounded = firtstPersonModule.IsGrounded,
+            IsGrounded = firstPersonModule.IsGrounded,
             IsInvisible = isInvisible,
-            MovementState = firtstPersonModule.SyncMovementState
+            MovementState = firstPersonModule.SyncMovementState
         };
 
         switch (targetPlayer.Invisible)
@@ -1082,7 +1083,7 @@ public static class SendPlayerDataPatch
         var syncData = ev.IsInvisible
             ? default
             : new FpcSyncData(prevSyncData, ev.MovementState, ev.IsGrounded,
-                new RelativePosition(ev.Position), firtstPersonModule.MouseLook);
+                new RelativePosition(ev.Position), firstPersonModule.MouseLook);
 
         FpcServerPositionDistributor.PreviouslySent[receiver.netId][target.netId] = syncData;
         canSee = !ev.IsInvisible;
