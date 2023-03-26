@@ -4,10 +4,12 @@ using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Events;
 using System;
 using InventorySystem.Items.MicroHID;
+using MEC;
 using PlayerRoles;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map;
+using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Role;
 using UnityEngine;
 
@@ -39,8 +41,6 @@ public class DebugService : Service
 
     public override void Enable()
     {
-        Synapse.Get<SynapseCommandService>().ServerConsole.Subscribe(ev => Logger.Warn(ev.Context.FullCommand));
-
         var method = ((Action<IEvent>)Event).Method;
         foreach (var reactor in _event.Reactors)
         {
@@ -50,6 +50,7 @@ public class DebugService : Service
             if (reactor.Key == typeof(Scp173ObserveEvent)) continue;
             if (reactor.Key == typeof(KeyPressEvent)) continue;
             if (reactor.Key == typeof(SpeakEvent)) continue;
+            if (reactor.Key == typeof(SpeakToPlayerEvent)) continue;
             if (reactor.Key == typeof(RoundCheckEndEvent)) continue;
             if (reactor.Key == typeof(SendPlayerDataEvent)) continue;
             if (reactor.Key.IsAbstract) continue;
@@ -67,16 +68,20 @@ public class DebugService : Service
                 Logger.Warn("Escape not assigned");
         });
     }
-
-    public void Event(IEvent ev)
+    
+    public void Event(IEvent e)
     {
-        if (ev is ChangeItemEvent ev2)
+        switch (e)
         {
-            Logger.Warn("Change Item " +ev2.PreviousItem?.Name+" "+ ev2.NewItem.Name);
-            //ev2.Allow = false;
-            return;
+            case Scp079PingEvent ev:
+                Logger.Warn("079Ping " + ev.PingType + ev.Position + ev.Normal);
+                return;
+            case TriggerTeslaEvent:
+                return;
+            default:
+                Logger.Warn("Event triggered: " + e.GetType().Name);
+                break;
         }
-        Logger.Warn("Event triggered: " + ev.GetType().Name);
     }
 
     private SynapseDummy _dummy;
@@ -99,7 +104,7 @@ public class DebugService : Service
                 Logger.Warn("HigherRank " + role.PowerStatusEntries[PowerStatus.HigherRank].SeeCondition(ev.Player));
                 break;
             case KeyCode.Alpha3:
-                (_dummy.Player.CustomRole as SynapseAbstractRole)?.RemoveCustomDisplay();
+                ev.Player.MainScpController.Scp079.GiveExperience(999999999);
                 break;
             
             case KeyCode.Alpha4:

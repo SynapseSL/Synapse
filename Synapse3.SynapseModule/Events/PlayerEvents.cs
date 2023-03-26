@@ -17,7 +17,6 @@ public partial class PlayerEvents : Service
 {
     private readonly Synapse _synapse;
     private readonly EventManager _eventManager;
-    private readonly ItemService _item;
 
     public readonly EventReactor<LoadComponentEvent> LoadComponent = new();
     public readonly EventReactor<KeyPressEvent> KeyPress = new();
@@ -58,11 +57,10 @@ public partial class PlayerEvents : Service
     public readonly EventReactor<SpeakEvent> Speak = new();
     public readonly EventReactor<SpeakToPlayerEvent> SpeakToPlayer = new();
 
-    public PlayerEvents(EventManager eventManager, Synapse synapse, ItemService item)
+    public PlayerEvents(EventManager eventManager, Synapse synapse)
     {
         _eventManager = eventManager;
         _synapse = synapse;
-        _item = item;
     }
 
     public override void Enable()

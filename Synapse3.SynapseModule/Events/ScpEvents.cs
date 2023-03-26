@@ -1,5 +1,6 @@
 ﻿using Neuron.Core.Events;
 using Neuron.Core.Meta;
+using PlayerRoles.PlayableScps.Scp079.Pinging;
 using PlayerRoles.PlayableScps.Scp939;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule.Enums;
@@ -31,6 +32,7 @@ public partial class ScpEvents : Service
     public readonly EventReactor<Scp079ReleaseAllLocksEvent> Scp079ReleaseAllLocks = new();
     public readonly EventReactor<Scp079LockdownRoomEvent> Scp079LockdownRoom = new();
     public readonly EventReactor<Scp079ElevatorInteractEvent> Scp079ElevatorInteract = new();
+    public readonly EventReactor<Scp079PingEvent> Scp079Ping = new();
 
     public readonly EventReactor<Scp096AttackEvent> Scp096Attack = new();
     public readonly EventReactor<Scp096AddTargetEvent> Scp096AddTarget = new();
@@ -68,6 +70,7 @@ public partial class ScpEvents : Service
         _eventManager.RegisterEvent(Scp079ReleaseAllLocks);
         _eventManager.RegisterEvent(Scp079LockdownRoom);
         _eventManager.RegisterEvent(Scp079ElevatorInteract);
+        _eventManager.RegisterEvent(Scp079Ping);
 
         _eventManager.RegisterEvent(Scp096Attack);
         _eventManager.RegisterEvent(Scp096AddTarget);
@@ -102,6 +105,7 @@ public partial class ScpEvents : Service
         _eventManager.UnregisterEvent(Scp079ReleaseAllLocks);
         _eventManager.UnregisterEvent(Scp079LockdownRoom);
         _eventManager.UnregisterEvent(Scp079ElevatorInteract);
+        _eventManager.UnregisterEvent(Scp079Ping);
 
         _eventManager.UnregisterEvent(Scp096Attack);
         _eventManager.UnregisterEvent(Scp096AddTarget);
@@ -346,16 +350,13 @@ public class Scp079InteractEvent : ScpActionEvent
 
 public class Scp079SwitchCameraEvent : Scp079InteractEvent
 {
-    public Scp079SwitchCameraEvent(bool spawning, SynapsePlayer scp, SynapseCamera camera, int cost)
-        : base(scp, true, cost)
+    public Scp079SwitchCameraEvent(SynapsePlayer scp, SynapseCamera camera, int cost, bool allow)
+        : base(scp, allow, cost)
     {
-        Spawning = spawning;
         Camera = camera;
     }
 
     public SynapseCamera Camera { get; set; }
-    
-    public bool Spawning { get; }
 }
 
 public class Scp079DoorInteractEvent : Scp079InteractEvent
@@ -366,6 +367,8 @@ public class Scp079DoorInteractEvent : Scp079InteractEvent
     }
 
     public SynapseDoor Door { get; }
+
+    public bool Opening => !Door.Open;
 }
 
 public class Scp079LockDoorEvent : Scp079InteractEvent
@@ -442,10 +445,26 @@ public class Scp079ElevatorInteractEvent : Scp079InteractEvent
         true, cost)
     {
         Elevator = elevator;
-        Destionation = destioantion;
+        Destination = destioantion;
     }
 
     public IElevator Elevator { get; set; }
 
-    public int Destionation { get; set; }
+    public int Destination { get; set; }
+}
+
+public class Scp079PingEvent : Scp079InteractEvent
+{
+    public Scp079PingEvent(SynapsePlayer scp, bool allow, int cost, Scp079PingType pingType, Vector3 position, Vector3 normal) : base(scp, allow, cost)
+    {
+        PingType = pingType;
+        Position = position;
+        Normal = normal;
+    }
+    
+    public Scp079PingType PingType { get; set; }
+    
+    public Vector3 Position { get; set; }
+    
+    public Vector3 Normal { get; set; }
 }
