@@ -20,18 +20,15 @@ public class PlayerService : Service
     private readonly PlayerEvents _player;
     private readonly RoundEvents _round;
     private readonly PermissionService _permission;
-    private readonly SynapseConfigService _config;
 
     public List<IJoinUpdate> JoinUpdates { get; } = new();
 
-    public PlayerService(DummyService dummy, PlayerEvents player, RoundEvents round, PermissionService permission,
-        SynapseConfigService config)
+    public PlayerService(DummyService dummy, PlayerEvents player, RoundEvents round, PermissionService permission)
     {
         _dummy = dummy;
         _player = player;
         _round = round;
         _permission = permission;
-        _config = config;
     }
 
     public override void Enable()
@@ -76,6 +73,7 @@ public class PlayerService : Service
     public List<SynapsePlayer> GetPlayers(params PlayerType[] playerTypes)
     {
         var result = new List<SynapsePlayer>();
+        if (playerTypes == null) return result;
         if (playerTypes.Contains(PlayerType.Player))
         {
             result.AddRange(Players);
@@ -88,8 +86,9 @@ public class PlayerService : Service
 
         if (playerTypes.Contains(PlayerType.Dummy))
         {
-            foreach (var dummy in _dummy._dummies)
+            foreach (var dummy in _dummy?._dummies ?? new List<SynapseDummy>())
             {
+                if (dummy == null) continue;
                 result.Add(dummy.Player);
             }
         }
