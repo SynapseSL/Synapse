@@ -3,9 +3,11 @@ using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Events;
 using System;
+using InventorySystem.Items.MicroHID;
 using PlayerRoles;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Role;
 using UnityEngine;
 
@@ -68,6 +70,12 @@ public class DebugService : Service
 
     public void Event(IEvent ev)
     {
+        if (ev is ChangeItemEvent ev2)
+        {
+            Logger.Warn("Change Item " +ev2.PreviousItem?.Name+" "+ ev2.NewItem.Name);
+            //ev2.Allow = false;
+            return;
+        }
         Logger.Warn("Event triggered: " + ev.GetType().Name);
     }
 
@@ -95,6 +103,12 @@ public class DebugService : Service
                 break;
             
             case KeyCode.Alpha4:
+                if (!Physics.Raycast(ev.Player.Position, Vector3.down, out var raycastHit, 3f, MicroHIDItem.WallMask))
+                {
+                    return;
+                }
+
+                Synapse.Get<MapService>().SpawnTantrum(ev.Player.Position + Vector3.up * 0.25f);
                 break;
         }
     }

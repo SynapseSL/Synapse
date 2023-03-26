@@ -22,6 +22,8 @@ public partial class SynapseItem
     
     public void EquipItem(SynapsePlayer player, bool dropWhenFull = true, bool provideFully = false)
     {
+        if (player == null || player.Hub == null) return;
+        
         if (player.Inventory.Items.Count >= 8)
         {
             if (dropWhenFull)
@@ -34,6 +36,8 @@ public partial class SynapseItem
     
     public void ForceEquipItem(SynapsePlayer player, bool provideFully = false)
     {
+        if (player == null || player.Hub == null) return;
+        
         if (RootParent is SynapseItem parent)
         {
             parent.EquipItem(player, false);
@@ -45,7 +49,7 @@ public partial class SynapseItem
 
 
         Item = player.VanillaInventory.CreateItemInstance(new ItemIdentifier(ItemType, Serial), player.VanillaInventory.isLocalPlayer);
-        if(Item == null) return;
+        if (Item == null) return;
         
         player.VanillaInventory.UserInventory.Items[Serial] = Item;
         player.VanillaInventory.SendItemsNextFrame = true;
@@ -53,8 +57,8 @@ public partial class SynapseItem
         
         Item.ItemSerial = Serial;
         Item.OnAdded(Pickup);
-        Synapse3Extensions.RaiseEvent(typeof(InventoryExtensions), nameof(InventoryExtensions.OnItemAdded), player.Hub,
-            Item, Pickup);
+        Synapse3Extensions.RaiseEventSafe(typeof(InventoryExtensions), nameof(InventoryExtensions.OnItemAdded),
+            false,player.Hub, Item, Pickup);
 
         if (player.VanillaInventory.isLocalPlayer && Item is IAcquisitionConfirmationTrigger trigger)
         {
@@ -136,7 +140,7 @@ public partial class SynapseItem
 
     internal void DestroyItem()
     {
-        if(Item == null) return;
+        if (Item == null) return;
         Item.OnRemoved(Pickup);
         
         var holder = ItemOwner;
@@ -148,8 +152,8 @@ public partial class SynapseItem
             holder.VanillaInventory.UserInventory.Items.Remove(Serial);
             holder.VanillaInventory.SendItemsNextFrame = true;
             holder.Inventory._items.Remove(this);
-            Synapse3Extensions.RaiseEvent(typeof(InventoryExtensions), nameof(InventoryExtensions.OnItemRemoved),
-                holder.Hub, Item, Pickup);
+            Synapse3Extensions.RaiseEventSafe(typeof(InventoryExtensions), nameof(InventoryExtensions.OnItemRemoved),
+                false, holder.Hub, Item, Pickup);
         }
         
         if(Item == null) return;

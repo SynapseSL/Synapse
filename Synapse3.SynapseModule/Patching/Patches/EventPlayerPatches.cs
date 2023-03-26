@@ -31,6 +31,7 @@ using PlayerRoles.Visibility;
 using PluginAPI.Enums;
 using PluginAPI.Events;
 using RelativePositioning;
+using Synapse3.SynapseModule.Item;
 using UnityEngine;
 using VoiceChat;
 using VoiceChat.Networking;
@@ -1102,4 +1103,27 @@ public static class PickupPatches
     }
 }
 
+[Automatic]
+[SynapsePatch("ChangeItem",PatchType.PlayerEvent)]
+public static class ChangeItemPatch
+{
+    private static readonly PlayerEvents Player;
+    private static readonly ItemService ItemService;
+
+    static ChangeItemPatch()
+    {
+        Player = Synapse.Get<PlayerEvents>();
+        ItemService = Synapse.Get<ItemService>();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Inventory), nameof(Inventory.NetworkCurItem), MethodType.Setter)]
+    public static bool SetCurItem(Inventory __instance, ItemIdentifier value)
+    {
+        var ev = new ChangeItemEvent(__instance.GetSynapsePlayer(), true,
+            value.SerialNumber == 0 ? SynapseItem.None : ItemService.GetSynapseItem(value.SerialNumber));
+        Player.ChangeItem.RaiseSafely(ev);
+        return ev.Allow;
+    }
+}
 #endif
