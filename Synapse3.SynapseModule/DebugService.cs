@@ -4,6 +4,7 @@ using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Teams;
 using System;
+using PlayerRoles;
 using Synapse3.SynapseModule.Enums;
 using UnityEngine;
 
@@ -70,7 +71,8 @@ public class DebugService : Service
                 break;
            
             case KeyCode.Alpha2:
-                ev.Player.MaxHealth = 98;
+                ev.Player.MainScpController.Scp939.Sound(ev.Player.Position + ev.Player.transform.forward * 2,
+                    RoleTypeId.Scientist);
 
                 break;
             case KeyCode.Alpha3:

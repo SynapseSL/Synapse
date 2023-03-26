@@ -51,12 +51,12 @@ public class Scp939Controller : ScpShieldController<Scp939Role>
 
     public void TriggerLunge() => LungeAbility.TriggerLunge();
 
-    public void Sound(Vector3 postion, RoleTypeId roleType = RoleTypeId.ChaosRepressor)
+    public void Sound(Vector3 position, RoleTypeId roleType = RoleTypeId.ChaosRepressor)
     {
         var ripple = RippleTrigger;
         if (ripple == null) return;
         ripple._syncRoleColor = roleType;
-        ripple._syncRipplePos = new RelativePosition(postion);
+        ripple._syncRipplePos = new RelativePosition(position);
         Role.GetSubroutine<FirearmRippleTrigger>().ServerSendRpc(_player);
     }
 

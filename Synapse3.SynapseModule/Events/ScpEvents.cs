@@ -26,9 +26,9 @@ public partial class ScpEvents : Service
     public readonly EventReactor<Scp079LockDoorEvent> Scp079LockDoor = new();
     public readonly EventReactor<Scp079SpeakerUseEvent> Scp079SpeakerUse = new();
     public readonly EventReactor<Scp079TeslaInteractEvent> Scp079TeslaInteract = new();
-    public readonly EventReactor<Scp079BlackOutRoomEvent> Scp079BalckOutRoom = new();
-    public readonly EventReactor<Scp079BlackOutZoneEvent> Scp079BalckOutZone = new();
-    public readonly EventReactor<Scp079LockReleaserAllEvent> Scp079LockReleaserAll = new();
+    public readonly EventReactor<Scp079BlackOutRoomEvent> Scp079BlackOutRoom = new();
+    public readonly EventReactor<Scp079BlackOutZoneEvent> Scp079BlackOutZone = new();
+    public readonly EventReactor<Scp079ReleaseAllLocksEvent> Scp079ReleaseAllLocks = new();
     public readonly EventReactor<Scp079LockdownRoomEvent> Scp079LockdownRoom = new();
     public readonly EventReactor<Scp079ElevatorInteractEvent> Scp079ElevatorInteract = new();
 
@@ -63,9 +63,9 @@ public partial class ScpEvents : Service
         _eventManager.RegisterEvent(Scp079LockDoor);
         _eventManager.RegisterEvent(Scp079SpeakerUse);
         _eventManager.RegisterEvent(Scp079TeslaInteract); 
-        _eventManager.RegisterEvent(Scp079BalckOutRoom);
-        _eventManager.RegisterEvent(Scp079BalckOutZone);
-        _eventManager.RegisterEvent(Scp079LockReleaserAll);
+        _eventManager.RegisterEvent(Scp079BlackOutRoom);
+        _eventManager.RegisterEvent(Scp079BlackOutZone);
+        _eventManager.RegisterEvent(Scp079ReleaseAllLocks);
         _eventManager.RegisterEvent(Scp079LockdownRoom);
         _eventManager.RegisterEvent(Scp079ElevatorInteract);
 
@@ -97,9 +97,9 @@ public partial class ScpEvents : Service
         _eventManager.UnregisterEvent(Scp079LockDoor);
         _eventManager.UnregisterEvent(Scp079SpeakerUse);
         _eventManager.UnregisterEvent(Scp079TeslaInteract);
-        _eventManager.UnregisterEvent(Scp079BalckOutRoom);
-        _eventManager.UnregisterEvent(Scp079BalckOutZone);
-        _eventManager.UnregisterEvent(Scp079LockReleaserAll);
+        _eventManager.UnregisterEvent(Scp079BlackOutRoom);
+        _eventManager.UnregisterEvent(Scp079BlackOutZone);
+        _eventManager.UnregisterEvent(Scp079ReleaseAllLocks);
         _eventManager.UnregisterEvent(Scp079LockdownRoom);
         _eventManager.UnregisterEvent(Scp079ElevatorInteract);
 
@@ -335,142 +335,118 @@ public class Scp079ContainEvent : IEvent
     public bool Allow { get; set; } = true;
 }
 
-public class Scp079SwitchCameraEvent : ScpActionEvent
+public class Scp079InteractEvent : ScpActionEvent
 {
-    public Scp079SwitchCameraEvent(bool spawning, SynapsePlayer scp, SynapseCamera camera, int cost) 
-        : base(scp, true)
+    public int Cost { get; set; }
+
+    public Scp079InteractEvent(SynapsePlayer scp, bool allow, int cost) : base(scp, allow)
+    {
+        Cost = cost;
+    }
+}
+
+public class Scp079SwitchCameraEvent : Scp079InteractEvent
+{
+    public Scp079SwitchCameraEvent(bool spawning, SynapsePlayer scp, SynapseCamera camera, int cost)
+        : base(scp, true, cost)
     {
         Spawning = spawning;
         Camera = camera;
-        Cost = cost;
     }
 
     public SynapseCamera Camera { get; set; }
     
     public bool Spawning { get; }
-
-    public int Cost { get; set; }
 }
 
-public class Scp079DoorInteractEvent : ScpActionEvent
+public class Scp079DoorInteractEvent : Scp079InteractEvent
 {
-    public Scp079DoorInteractEvent(SynapsePlayer scp, SynapseDoor door, int cost) : base(scp, true)
+    public Scp079DoorInteractEvent(SynapsePlayer scp, SynapseDoor door, int cost) : base(scp, true, cost)
     {
         Door = door;
-        Cost = cost;
     }
 
     public SynapseDoor Door { get; }
-    
-    public int Cost { get; set; }
-
 }
 
-public class Scp079LockDoorEvent : ScpActionEvent
+public class Scp079LockDoorEvent : Scp079InteractEvent
 {
-    public Scp079LockDoorEvent(SynapsePlayer scp, SynapseDoor door, bool unlock, int cost) : base(scp, true)
+    public Scp079LockDoorEvent(SynapsePlayer scp, SynapseDoor door, bool unlock, int cost) : base(scp, true, cost)
     {
         Door = door;
         Unlock = unlock;
-        Cost = cost;
     }
 
     public SynapseDoor Door { get; }
 
     public bool Unlock { get; }
-    
-    public int Cost { get; set; }
-
 }
 
 public class Scp079SpeakerUseEvent : ScpActionEvent
 {
-    public Scp079SpeakerUseEvent(SynapsePlayer scp, Vector3 speackerPostion) : base(scp, true)
+    public Scp079SpeakerUseEvent(SynapsePlayer scp, Vector3 speakerPosition) : base(scp, true)
     {
-        SpeackerPostion = speackerPostion;
+        SpeakerPosition = speakerPosition;
     }
 
-    public Vector3 SpeackerPostion { get; }
-
+    public Vector3 SpeakerPosition { get; }
 }
 
-public class Scp079TeslaInteractEvent : ScpActionEvent
+public class Scp079TeslaInteractEvent : Scp079InteractEvent
 {
-    public Scp079TeslaInteractEvent(SynapsePlayer scp, SynapseTesla tesla, int cost) : base(scp, true)
+    public Scp079TeslaInteractEvent(SynapsePlayer scp, SynapseTesla tesla, int cost) : base(scp, true, cost)
     {
         Tesla = tesla;
-        Cost = cost;
     }
 
     public SynapseTesla Tesla { get; }
-    public int Cost { get; set; }
-
 }
 
-public class Scp079BlackOutRoomEvent : ScpActionEvent
+public class Scp079BlackOutRoomEvent : Scp079InteractEvent
 {
-    public Scp079BlackOutRoomEvent(SynapsePlayer scp, IVanillaRoom room, int cost) : base(scp, true)
+    public Scp079BlackOutRoomEvent(SynapsePlayer scp, IVanillaRoom room, int cost) : base(scp, true, cost)
     {
         Room = room;
-        Cost = cost;
     }
 
     public IVanillaRoom Room { get; }
-    public int Cost { get; set; }
-
 }
 
-public class Scp079BlackOutZoneEvent : ScpActionEvent
+public class Scp079BlackOutZoneEvent : Scp079InteractEvent
 {
-    public Scp079BlackOutZoneEvent(SynapsePlayer scp, ZoneType zone, int cost) : base(scp, true)
+    public Scp079BlackOutZoneEvent(SynapsePlayer scp, ZoneType zone, int cost) : base(scp, true, cost)
     {
         Zone = zone;
-        Cost = cost;
     }
 
     public ZoneType Zone { get; }
-    public int Cost { get; set; }
-
 }
 
-public class Scp079LockReleaserAllEvent : ScpActionEvent
+public class Scp079ReleaseAllLocksEvent : Scp079InteractEvent
 {
-    public Scp079LockReleaserAllEvent(SynapsePlayer scp, int cost) : base(scp, true)
-    {
-        Cost = cost;
-    }
-
-    public int Cost { get; set; }
-
+    public Scp079ReleaseAllLocksEvent(SynapsePlayer scp, int cost) : base(scp, true, cost) { }
 }
 
-public class Scp079LockdownRoomEvent : ScpActionEvent
+public class Scp079LockdownRoomEvent : Scp079InteractEvent
 {
-    public Scp079LockdownRoomEvent(SynapsePlayer scp, int cost, IVanillaRoom room) : base(scp, true)
+    public Scp079LockdownRoomEvent(SynapsePlayer scp, int cost, IVanillaRoom room) : base(scp, true, cost)
     {
-        Cost = cost;
         Room = room;
     }
 
-    public int Cost { get; set; }
-
     public IVanillaRoom Room { get; set; }
-
 }
 
-public class Scp079ElevatorInteractEvent : ScpActionEvent
+public class Scp079ElevatorInteractEvent : Scp079InteractEvent
 {
-    public Scp079ElevatorInteractEvent(SynapsePlayer scp, int cost, IElevator elevator, int destioantion) : base(scp, true)
+    public Scp079ElevatorInteractEvent(SynapsePlayer scp, int cost, IElevator elevator, int destioantion) : base(scp,
+        true, cost)
     {
-        Cost = cost;
         Elevator = elevator;
         Destionation = destioantion;
     }
 
-    public int Cost { get; set; }
-
     public IElevator Elevator { get; set; }
 
     public int Destionation { get; set; }
-
 }

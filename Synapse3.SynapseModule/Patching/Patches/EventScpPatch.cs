@@ -497,7 +497,7 @@ public static class Scp079BlackOutRoomPatch
                     Allow =  EventManager.ExecuteEvent(ServerEventType.Scp079BlackoutRoom, __instance.Owner, __instance._roomController.Room)
                 };
 
-                _scp.Scp079BalckOutRoom.RaiseSafely(ev);
+                _scp.Scp079BlackOutRoom.RaiseSafely(ev);
 
                 cost = ev.Cost;
 
@@ -551,7 +551,7 @@ public static class Scp079BlackOutZonePatch
             var cost = __instance._cost;
             var ev = new Scp079BlackOutZoneEvent(player, (ZoneType)zone, cost);
 
-            _scp.Scp079BalckOutZone.RaiseSafely(ev);
+            _scp.Scp079BlackOutZone.RaiseSafely(ev);
 
             cost = ev.Cost;
 
@@ -596,9 +596,9 @@ public static class Scp079DoorLockReleaserPatch
     {
         var cost = 0;
         var player = __instance.Owner.GetSynapsePlayer(); 
-        var ev = new Scp079LockReleaserAllEvent(player, cost);
+        var ev = new Scp079ReleaseAllLocksEvent(player, cost);
 
-        _scp.Scp079LockReleaserAll.RaiseSafely(ev);
+        _scp.Scp079ReleaseAllLocks.RaiseSafely(ev);
 
         cost = ev.Cost;
 
