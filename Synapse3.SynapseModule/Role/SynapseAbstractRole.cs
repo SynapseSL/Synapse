@@ -5,6 +5,7 @@ using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
 using System.Collections.Generic;
 using System.Linq;
+using MEC;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Role;
@@ -13,11 +14,13 @@ public abstract class SynapseAbstractRole : SynapseRole
 {
     private readonly SynapseConfigService _config;
     private readonly PlayerEvents _player;
+    private readonly RoleService _role;
 
     protected SynapseAbstractRole()
     {
         _config = Synapse.Get<SynapseConfigService>();
         _player = Synapse.Get<PlayerEvents>();
+        _role = Synapse.Get<RoleService>();
     }
 
     public CustomInfoList.CustomInfoEntry NameEntry { get; private set; }
@@ -58,12 +61,12 @@ public abstract class SynapseAbstractRole : SynapseRole
         Player.SetRoleFlags(config.Role, RoleSpawnFlags.None);
         if (config.VisibleRole != RoleTypeId.None)
         {
-            Player.FakeRoleManager.VisibleRole = new RoleInfo(config.VisibleRole, Player);
+            Player.FakeRoleManager.VisibleRoleInfo = new RoleInfo(config.VisibleRole, Player);
         }
 
         if (config.OwnRole != RoleTypeId.None)
         {
-            Player.FakeRoleManager.OwnVisibleRole = new RoleInfo(config.OwnRole, Player);
+            Player.FakeRoleManager.OwnVisibleRoleInfo = new RoleInfo(config.OwnRole, Player);
         }
 
         var spawn = config.PossibleSpawns?[Random.Range(0, config.PossibleSpawns.Length)];
@@ -71,13 +74,19 @@ public abstract class SynapseAbstractRole : SynapseRole
         {
             Player.FirstPersonMovement?.ServerOverridePosition(spawn.GetMapPosition(), spawn.GetMapRotation().eulerAngles);
         }
-        Player.Health = config.Health;
         Player.MaxHealth = config.MaxHealth;
-        Player.ArtificialHealth = config.ArtificialHealth;
+        Player.Health = config.Health;
         Player.MaxArtificialHealth = config.MaxArtificialHealth;
+        Player.ArtificialHealth = config.ArtificialHealth;
         Player.Scale = config.Scale;
         config.PossibleInventories?[Random.Range(0, config.PossibleInventories.Length)]?.Apply(Player);
         Player.GetStatBase<StaminaStat>().ClassChanged();
+
+        if (!config.CustomDisplay)
+        {
+            OnSpawn(config);
+            return;
+        }
 
         Player.RemoveDisplayInfo(PlayerInfoArea.Nickname);
         Player.RemoveDisplayInfo(PlayerInfoArea.Role);
@@ -99,7 +108,7 @@ public abstract class SynapseAbstractRole : SynapseRole
             RoleAndUnitEntry = new CustomInfoList.CustomInfoEntry()
             {
                 EveryoneCanSee = false,
-                Info = Attribute.Name + " (" + Player.UnitName + ")",
+                Info = Attribute.Name + " (" + (config.UseCustomUnitName ? config.CustomUnitName : Player.UnitName) + ")",
                 SeeCondition = CanSeeUnit
             };
 
@@ -129,7 +138,8 @@ public abstract class SynapseAbstractRole : SynapseRole
                 Info = Attribute.Name
             };
         }
-
+        
+        Player.CustomInfo.AutomaticUpdateOnChange = false;
         Player.CustomInfo.Add(NameEntry);
         Player.CustomInfo.Add(RoleEntry);
 
@@ -140,6 +150,8 @@ public abstract class SynapseAbstractRole : SynapseRole
             Player.CustomInfo.Add(PowerStatusEntries[PowerStatus.SameRank]);
             Player.CustomInfo.Add(PowerStatusEntries[PowerStatus.HigherRank]);
         }
+        Player.CustomInfo.AutomaticUpdateOnChange = true;
+        Player.CustomInfo.UpdateInfo();
 
         OnSpawn(config);
 
@@ -148,8 +160,8 @@ public abstract class SynapseAbstractRole : SynapseRole
 
     public sealed override void DeSpawn(DeSpawnReason reason)
     {
-        Player.FakeRoleManager.VisibleRole = new RoleInfo(RoleTypeId.None, null);
-        Player.FakeRoleManager.OwnVisibleRole = new RoleInfo(RoleTypeId.None, null);
+        Player.FakeRoleManager.VisibleRoleInfo = new RoleInfo(RoleTypeId.None, null);
+        Player.FakeRoleManager.OwnVisibleRoleInfo = new RoleInfo(RoleTypeId.None, null);
         Player.Scale = Vector3.one;
 
         RemoveCustomDisplay();
@@ -166,6 +178,7 @@ public abstract class SynapseAbstractRole : SynapseRole
         Player.AddDisplayInfo(PlayerInfoArea.UnitName);
         Player.AddDisplayInfo(PlayerInfoArea.PowerStatus);
 
+        Player.CustomInfo.AutomaticUpdateOnChange = false;
         Player.CustomInfo.Remove(NameEntry);
         Player.CustomInfo.Remove(RoleEntry);
         Player.CustomInfo.Remove(RoleAndUnitEntry);
@@ -178,16 +191,23 @@ public abstract class SynapseAbstractRole : SynapseRole
 
         if (PowerStatusEntries.ContainsKey(PowerStatus.HigherRank))
             Player.CustomInfo.Remove(PowerStatusEntries[PowerStatus.HigherRank]);
+        
+        Player.CustomInfo.AutomaticUpdateOnChange = true;
+        Player.CustomInfo.UpdateInfo();
     }
 
     public override void TryEscape()
     {
+        var config = GetConfig();
+        if(config.EscapeRole == RoleService.NoneRole) return;
+        if (!_role.IsIdRegistered(config.EscapeRole)) return;
+        
         var items = Player.Inventory.Items.ToList();
         foreach (var item in items)
         {
             item.Destroy();
         }
-        Player.RoleID = GetConfig().EscapeRole;
+        Player.RoleID = config.EscapeRole;
         foreach (var item in items)
         {
             Player.Inventory.GiveItem(item);
@@ -195,11 +215,15 @@ public abstract class SynapseAbstractRole : SynapseRole
     }
 
     public virtual string GetName() =>
-        Player.NicknameSync.HasCustomName ? Player.NicknameSync._displayName : Player.NickName;
+        Player.NicknameSync.HasCustomName ? Player.NicknameSync._displayName + "*" : Player.NickName;
 
     public virtual void UpdateDisplayName(UpdateDisplayNameEvent ev)
     {
-        NameEntry.Info = GetName();
-        Player.CustomInfo.UpdateInfo();
+        if (ev.Player != Player) return;
+        Timing.CallDelayed(Timing.WaitForOneFrame, () =>
+        {
+            NameEntry.Info = GetName();
+            Player.CustomInfo.UpdateInfo();
+        });
     }
 }

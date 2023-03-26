@@ -1,5 +1,7 @@
-﻿using Neuron.Modules.Commands;
+﻿using System;
+using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Command;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -86,6 +88,15 @@ public class GiveCustomItemCommand : SynapseCommand
             {
                 if (!uint.TryParse(itemArgument, out var id)) continue;
                 if (!Synapse.Get<ItemService>().IsIdRegistered(id)) continue;
+                
+                if (Enum.IsDefined(typeof(AmmoType), (AmmoType)id))
+                {
+                    if (durability <= 0) durability = 15;
+                    player.Inventory.AmmoBox[(AmmoType)id] += (ushort)durability;
+                    success = true;
+                    continue;
+                }
+                
                 switch (context.Arguments.Length)
                 {
                     case <=2:

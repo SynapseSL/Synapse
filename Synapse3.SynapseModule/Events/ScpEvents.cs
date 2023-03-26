@@ -129,7 +129,6 @@ public abstract class ScpActionEvent : IEvent
     public SynapsePlayer Scp { get; }
 
     public bool Allow { get; set; }
-
 }
 
 public abstract class ScpAttackEvent : ScpActionEvent

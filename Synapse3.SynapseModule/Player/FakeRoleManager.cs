@@ -30,8 +30,8 @@ public class FakeRoleManager
 
     public void Reset()
     {
-        _ownVisibleRole = new RoleInfo(RoleTypeId.None, null, null);
-        _visibleRole = new RoleInfo(RoleTypeId.None, null, null);
+        _ownVisibleRoleInfo = new RoleInfo(RoleTypeId.None, null, null);
+        _visibleRoleInfo = new RoleInfo(RoleTypeId.None, null, null);
         ToPlayerVisibleRole.Clear();
         VisibleRoleCondition.Clear();
         UpdateAll();
@@ -48,24 +48,36 @@ public class FakeRoleManager
     public void UpdatePlayer(SynapsePlayer player) 
         => player.SendNetworkMessage(new RoleSyncInfo(_player, RoleTypeId.None, player));
 
-    private RoleInfo _ownVisibleRole = new(RoleTypeId.None, null, null);
-    public RoleInfo OwnVisibleRole
+    public RoleTypeId OwnVisibleRole
     {
-        get => _ownVisibleRole;
+        get => OwnVisibleRoleInfo.RoleTypeId;
+        set => OwnVisibleRoleInfo = new RoleInfo(value, _player);
+    }
+
+    private RoleInfo _ownVisibleRoleInfo = new(RoleTypeId.None, null, null);
+    public RoleInfo OwnVisibleRoleInfo
+    {
+        get => _ownVisibleRoleInfo;
         set
         {
-            _ownVisibleRole = value;
+            _ownVisibleRoleInfo = value;
             UpdatePlayer(_player);
         }
     }
-
-    private RoleInfo _visibleRole = new(RoleTypeId.None, null, null);
-    public RoleInfo VisibleRole
+    
+    public RoleTypeId VisibleRole
     {
-        get => _visibleRole;
+        get => VisibleRoleInfo.RoleTypeId;
+        set => VisibleRoleInfo = new RoleInfo(value, _player);
+    }
+
+    private RoleInfo _visibleRoleInfo = new(RoleTypeId.None, null, null);
+    public RoleInfo VisibleRoleInfo
+    {
+        get => _visibleRoleInfo;
         set
         {
-            _visibleRole = value;
+            _visibleRoleInfo = value;
             foreach (var player in _playerService.Players)
             {
                 if (player != _player)
@@ -93,25 +105,28 @@ public class FakeRoleManager
 
     public RoleInfo GetRoleInfo(SynapsePlayer receiver)
     {
-        if (receiver == _player && OwnVisibleRole.RoleTypeId != RoleTypeId.None)
+        if (receiver == _player)
         {
-            return OwnVisibleRole;
+            if (OwnVisibleRoleInfo.RoleTypeId != RoleTypeId.None)
+                return OwnVisibleRoleInfo;
         }
-
-        if (ToPlayerVisibleRole.ContainsKey(receiver))
+        else
         {
-            return ToPlayerVisibleRole[receiver];
-        }
+            if (ToPlayerVisibleRole.ContainsKey(receiver))
+            {
+                return ToPlayerVisibleRole[receiver];
+            }
 
-        foreach (var condition in VisibleRoleCondition)
-        {
-            if (condition.Key(receiver))
-                return condition.Value;
-        }
+            foreach (var condition in VisibleRoleCondition)
+            {
+                if (condition.Key(receiver))
+                    return condition.Value;
+            }
 
-        if (VisibleRole.RoleTypeId != RoleTypeId.None)
-        {
-            return VisibleRole;
+            if (VisibleRoleInfo.RoleTypeId != RoleTypeId.None)
+            {
+                return VisibleRoleInfo;
+            }   
         }
 
         var publicWriter = _player.CurrentRole as IPublicSpawnDataWriter;
@@ -190,7 +205,7 @@ public class RoleInfo
             
             default:
                 if (typeof(HumanRole).IsAssignableFrom(FakeRoleManager.EnumToType[role]))
-                    PrepareHumanRole(role, 0, player);
+                    PrepareHumanRole(role, player.UnitNameId, player);
                 else if (typeof(FpcStandardRoleBase).IsAssignableFrom(FakeRoleManager.EnumToType[role]))
                     PrepareFpcRole(player);
                 break;

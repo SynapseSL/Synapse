@@ -73,8 +73,9 @@ public class ServerService : Service
     /// </summary>
     public Dictionary<Misc.PlayerInfoColorTypes, string> Colors { get; } = Misc.AllowedColors;
 
-    public string GetColorHexCode(string color) =>
-        Colors[(Misc.PlayerInfoColorTypes)Enum.Parse(typeof(Misc.PlayerInfoColorTypes), color, true)];
+    public string GetColorHexCode(string color) => !Enum.TryParse(color, true, out Misc.PlayerInfoColorTypes colorEnum)
+        ? Colors[Misc.PlayerInfoColorTypes.White]
+        : Colors[colorEnum];
 
     /// <summary>
     /// Rank badges needs an exact string for each color and therefore returns this a version of the colors that will actually be displayed

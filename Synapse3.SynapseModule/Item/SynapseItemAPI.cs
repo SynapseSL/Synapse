@@ -6,7 +6,7 @@ using InventorySystem.Items.Firearms.Attachments;
 using InventorySystem.Items.Pickups;
 using Mirror;
 using Neuron.Core.Logging;
-using PlayerRoles;
+using Scp914;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
@@ -17,9 +17,12 @@ namespace Synapse3.SynapseModule.Item;
 
 public partial class SynapseItem
 {
+    public void Upgrade(Scp914KnobSetting settings, Vector3 position = default) =>
+        UpgradeProcessor.CreateUpgradedItem(this, settings, position);
+    
     public void EquipItem(SynapsePlayer player, bool dropWhenFull = true, bool provideFully = false)
     {
-        if(player.RoleType is RoleTypeId.Spectator or RoleTypeId.None) return;
+        if (player == null || player.Hub == null) return;
         
         if (player.Inventory.Items.Count >= 8)
         {
@@ -33,6 +36,8 @@ public partial class SynapseItem
     
     public void ForceEquipItem(SynapsePlayer player, bool provideFully = false)
     {
+        if (player == null || player.Hub == null) return;
+        
         if (RootParent is SynapseItem parent)
         {
             parent.EquipItem(player, false);
@@ -44,7 +49,7 @@ public partial class SynapseItem
 
 
         Item = player.VanillaInventory.CreateItemInstance(new ItemIdentifier(ItemType, Serial), player.VanillaInventory.isLocalPlayer);
-        if(Item == null) return;
+        if (Item == null) return;
         
         player.VanillaInventory.UserInventory.Items[Serial] = Item;
         player.VanillaInventory.SendItemsNextFrame = true;
@@ -52,8 +57,8 @@ public partial class SynapseItem
         
         Item.ItemSerial = Serial;
         Item.OnAdded(Pickup);
-        Synapse3Extensions.RaiseEvent(typeof(InventoryExtensions), nameof(InventoryExtensions.OnItemAdded), player.Hub,
-            Item, Pickup);
+        Synapse3Extensions.RaiseEventSafe(typeof(InventoryExtensions), nameof(InventoryExtensions.OnItemAdded),
+            false,player.Hub, Item, Pickup);
 
         if (player.VanillaInventory.isLocalPlayer && Item is IAcquisitionConfirmationTrigger trigger)
         {
@@ -96,7 +101,7 @@ public partial class SynapseItem
         
         if(!InventoryItemLoader.AvailableItems.TryGetValue(ItemType, out var exampleBase)) return;
 
-        if (owner is not null)
+        if (owner != null)
         {
             rot = owner.CameraReference.rotation * exampleBase.PickupDropModel.transform.rotation;
         }
@@ -135,7 +140,7 @@ public partial class SynapseItem
 
     internal void DestroyItem()
     {
-        if(Item == null) return;
+        if (Item == null) return;
         Item.OnRemoved(Pickup);
         
         var holder = ItemOwner;
@@ -147,8 +152,8 @@ public partial class SynapseItem
             holder.VanillaInventory.UserInventory.Items.Remove(Serial);
             holder.VanillaInventory.SendItemsNextFrame = true;
             holder.Inventory._items.Remove(this);
-            Synapse3Extensions.RaiseEvent(typeof(InventoryExtensions), nameof(InventoryExtensions.OnItemRemoved),
-                holder.Hub, Item, Pickup);
+            Synapse3Extensions.RaiseEventSafe(typeof(InventoryExtensions), nameof(InventoryExtensions.OnItemRemoved),
+                false, holder.Hub, Item, Pickup);
         }
         
         if(Item == null) return;

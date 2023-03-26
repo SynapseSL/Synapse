@@ -291,6 +291,7 @@ public class PlayerService : Service
                     {
                         if (int.TryParse(parameter, out var id))
                         {
+                            id *= -1;
                             //Check For SynapseGroupID
                             foreach (var player in GetPlayers(id, playerTypes))
                             {
@@ -330,11 +331,7 @@ public class PlayerService : Service
     }
 
     private void RoundRestart(RoundRestartEvent _)
-    {
-        JoinUpdates.Clear();
-        RecyclablePlayerId._autoIncrement = 0;
-        RecyclablePlayerId.FreeIds.Clear();
-    }
+        => JoinUpdates.Clear();
 
     private void ChangeClass(SetClassEvent ev)
     {
@@ -349,9 +346,17 @@ public class PlayerService : Service
                 ev.Player.MainScpController.Scp173.ResetDefault();
                 break;
         }
-
-        if (ev.Player.CustomRole == null)
-            Timing.CallDelayed(Timing.WaitForOneFrame,
-                () => _player.ChangeRole.RaiseSafely(new ChangeRoleEvent(ev.Player) { RoleId = (uint)ev.Role }));
+        
+        Timing.CallDelayed(Timing.WaitForOneFrame, () =>
+        {
+            if (ev.Player.CustomRole == null)
+                _player.ChangeRole.RaiseSafely(new ChangeRoleEvent(ev.Player) { RoleId = (uint)ev.Role });
+            
+            foreach (var player in GetPlayers(PlayerType.Player,PlayerType.Dummy))
+            {
+                if (ev.Player == player || player.CustomInfo.IsForEveryoneEqual) continue;
+                player.CustomInfo.UpdatePlayer(ev.Player);
+            }
+        });
     }
 }

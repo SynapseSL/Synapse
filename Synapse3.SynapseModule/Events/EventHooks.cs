@@ -1,4 +1,3 @@
-using InventorySystem.Items.Pickups;
 using LightContainmentZoneDecontamination;
 using LiteNetLib;
 using PlayerRoles;
@@ -22,24 +21,6 @@ public partial class PlayerEvents
         var ev = new StartWarheadEvent(player?.GetSynapsePlayer(), true, isResumed);
         StartWarhead.RaiseSafely(ev);
         return ev.Allow;
-    }
-
-    [PluginEvent(ServerEventType.PlayerChangeItem)]
-    public bool PlayerChangeItemHook(IPlayer player, ushort oldItem, ushort newItem)
-    {
-        try
-        {
-            var sPlayer = player?.GetSynapsePlayer();
-            if (sPlayer == null || sPlayer.RoleType == RoleTypeId.None) return true;
-            var item = newItem == 0 ? SynapseItem.None : _item?.GetSynapseItem(newItem) ?? SynapseItem.None;
-            var ev = new ChangeItemEvent(sPlayer, true, item);
-            ChangeItem.RaiseSafely(ev);
-            return ev.Allow;
-        }
-        catch
-        {
-            return true;
-        }
     }
 
     [PluginEvent(ServerEventType.PlayerDamage)]
@@ -138,9 +119,10 @@ public partial class ScpEvents
     public bool Scp049StartResurrectingBodyHook(IPlayer player, IPlayer target, BasicRagdoll body, bool canResurrect)
     {
         if (!canResurrect) return true;
-        var synapse049 = player.GetSynapsePlayer();
-        var synapseTarget = target.GetSynapsePlayer();
-        var ragDoll = body.GetSynapseRagDoll();
+        var synapse049 = player?.GetSynapsePlayer();
+        var synapseTarget = target?.GetSynapsePlayer();
+        var ragDoll = body?.GetSynapseRagDoll();
+        if (synapse049 == null || synapseTarget == null || ragDoll == null) return true;
         var ev = new Scp049ReviveEvent(synapse049, synapseTarget, ragDoll, false);
         Scp049Revive.RaiseSafely(ev);
         return ev.Allow;
