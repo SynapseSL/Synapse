@@ -1087,10 +1087,9 @@ public static class Scp173AttackTpPatch
                 return false;
 
             var scp = __instance.Owner.GetSynapsePlayer();
-            var ev = new Scp173AttackEvent(scp, targetHub.GetSynapsePlayer(), -1, true)
-            {
-                Allow = EventManager.ExecuteEvent(ServerEventType.Scp173SnapPlayer, __instance.Owner, targetHub)
-            };
+            var ev = new Scp173AttackEvent(scp, targetHub.GetSynapsePlayer(), -1, true);
+            ev.Allow = ev.Allow &&
+                       EventManager.ExecuteEvent(ServerEventType.Scp173SnapPlayer, __instance.Owner, targetHub);
             _scp.Scp173Attack.RaiseSafely(ev);
             if (!ev.Allow) return false;
 
@@ -1116,10 +1115,10 @@ public static class Scp173AttackTpPatch
 
 [Automatic]
 [SynapsePatch("Scp939Damage", PatchType.ScpEvent)]
-public static class Scp939LunchPatch
+public static class Scp939DamagePatch
 {
     private static readonly ScpEvents _scp;
-    static Scp939LunchPatch() => _scp = Synapse.Get<ScpEvents>();
+    static Scp939DamagePatch() => _scp = Synapse.Get<ScpEvents>();
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(Scp939DamageHandler), nameof(Scp939DamageHandler.ProcessDamage))]
@@ -1132,6 +1131,7 @@ public static class Scp939LunchPatch
             var ev = new Scp939AttackEvent(scp, victim, __instance.Damage, __instance._damageType);
             _scp.Scp939Attack.RaiseSafely(ev);
             __instance.Damage = ev.Damage;
+            if (!ev.Allow) __instance.Damage = 0;
             return ev.Allow;
         }
         catch (Exception ex)

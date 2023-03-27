@@ -73,11 +73,6 @@ public class DebugService : Service
     {
         switch (e)
         {
-            case Scp079PingEvent ev:
-                Logger.Warn("079Ping " + ev.PingType + ev.Position + ev.Normal);
-                return;
-            case TriggerTeslaEvent:
-                return;
             default:
                 Logger.Warn("Event triggered: " + e.GetType().Name);
                 break;

@@ -79,7 +79,7 @@ public static class FallingIntoAbyssPatch
 [SynapsePatch("Speak", PatchType.PlayerEvent)]
 public static class SpeakPatch
 {
-    private const int ProximityRange = 100; //Take the root of this so the range is 10
+    private const int ProximityRange = 625; //Take the root of this so the range is 25
 
     private static readonly PlayerEvents Player;
     private static readonly SynapseConfigService Config;
