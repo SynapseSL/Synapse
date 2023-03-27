@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;

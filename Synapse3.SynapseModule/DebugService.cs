@@ -1,5 +1,3 @@
-using System;
-﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,18 +6,20 @@ using Mirror;
 using Neuron.Core;
 using Neuron.Core.Events;
 using Neuron.Core.Logging;
+using Neuron.Core.Events;
 using Neuron.Core.Meta;
-using PlayerRoles;
 using Synapse3.SynapseModule.Command;
+using Synapse3.SynapseModule.Events;
+using System;
+using InventorySystem.Items.MicroHID;
+using MEC;
+using PlayerRoles;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
-using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Item;
-using Synapse3.SynapseModule.Map.Objects;
-using Synapse3.SynapseModule.Map.Schematic;
-using Synapse3.SynapseModule.Player;
+using Synapse3.SynapseModule.Map;
+using Synapse3.SynapseModule.Map.Elevators;
+using Synapse3.SynapseModule.Role;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 
 namespace Synapse3.SynapseModule;
@@ -49,37 +49,50 @@ public class DebugService : Service
 
     public override void Enable()
     {
-        Synapse.Get<SynapseCommandService>().ServerConsole.Subscribe(ev => Logger.Warn(ev.Context.FullCommand));
-
         var method = ((Action<IEvent>)Event).Method;
         foreach (var reactor in _event.Reactors)
         {
             if (reactor.Key == typeof(UpdateObjectEvent)) continue;
+            if (reactor.Key == typeof(UpdateEvent)) continue;
             if (reactor.Key == typeof(EscapeEvent)) continue;
             if (reactor.Key == typeof(Scp173ObserveEvent)) continue;
             if (reactor.Key == typeof(KeyPressEvent)) continue;
+            if (reactor.Key == typeof(SpeakEvent)) continue;
+            if (reactor.Key == typeof(SpeakToPlayerEvent)) continue;
             if (reactor.Key == typeof(RoundCheckEndEvent)) continue;
+            if (reactor.Key == typeof(SendPlayerDataEvent)) continue;
             if (reactor.Key.IsAbstract) continue;
             reactor.Value.SubscribeUnsafe(this, method);
         }
         _player.KeyPress.Subscribe(OnKeyPress);
-        _player.HarmPermission.Subscribe(ev =>
+        _item.ConsumeItem.Subscribe(ev =>
         {
-            ev.Allow = true;
+            if (ev.State == ItemInteractState.Finalize)
+                ev.Allow = false;
         });
-        _player.SendPlayerData.Subscribe(ev =>
+        _player.Escape.Subscribe(ev =>
         {
-            if (invis)
-                ev.IsInvisible = true;
-            ev.Position += Vector3.up;
+            if(ev.EscapeType == EscapeType.NotAssigned)
+                Logger.Warn("Escape not assigned");
         });
     }
-
-    public void Event(IEvent ev)
+    
+    public void Event(IEvent e)
     {
-        Logger.Warn("Event triggered: " + ev.GetType().Name);
+        switch (e)
+        {
+            case Scp079PingEvent ev:
+                Logger.Warn("079Ping " + ev.PingType + ev.Position + ev.Normal);
+                return;
+            case TriggerTeslaEvent:
+                return;
+            default:
+                Logger.Warn("Event triggered: " + e.GetType().Name);
+                break;
+        }
     }
 
+    private SynapseDummy _dummy;
 
     private void OnKeyPress(KeyPressEvent ev)
     {
@@ -100,9 +113,7 @@ public class DebugService : Service
             case KeyCode.Alpha3:
                 ev.Player.ActiveHint.Clear();
                 break;
-
         }
-
     }
 }
 #endif

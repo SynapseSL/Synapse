@@ -20,7 +20,13 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
         RoomType = type;
         NetworkIdentity = GetNetworkIdentity(type);
         LightController = Identifier.GetComponentInChildren<FlickerableLightController>();
-        
+
+        foreach (var door in Synapse.Get<MapService>().SynapseDoors)
+        {
+            if (door.Variant.Rooms.Contains(identifier))
+                _doors.Add(door);
+        }
+
         var comp = identifier.gameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
         
@@ -91,16 +97,26 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
             case RoomType.Scp330:
                 return _networkIdentities.FirstOrDefault(x => x?.assetId == new Guid("17f38aa5-1bc8-8bc4-0ad1-fffcbe4214ae"));
 
-            case RoomType.Scp939:
+            case RoomType.TestingRoom:
                 return _networkIdentities.FirstOrDefault(x => x?.assetId == new Guid("d1566564-d477-24c4-c953-c619898e4751"));
-
-            case RoomType.Scp106:
-                return _networkIdentities.FirstOrDefault(x => x?.assetId == new Guid("c1ae9ee4-cc8e-0794-3b2c-358aa6e57565"));
-
+            
             default: return null;
         }
     }
 
     private List<SynapseCamera> _cameras = new();
     public ReadOnlyCollection<SynapseCamera> Cameras => _cameras.AsReadOnly();
+
+    public Color RoomColor
+    {
+        get => LightController.Network_warheadLightColor;
+        set
+        {
+            LightController.Network_warheadLightColor = value == default ? FlickerableLightController.DefaultWarheadColor : value;
+            LightController.Network_warheadLightOverride = value != default;
+        }
+    }
+
+    private List<SynapseDoor> _doors = new List<SynapseDoor>();
+    public ReadOnlyCollection<SynapseDoor> Doors => _doors.AsReadOnly();
 }

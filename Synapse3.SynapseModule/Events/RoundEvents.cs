@@ -107,6 +107,8 @@ public class SpawnTeamEvent : IEvent
     public uint TeamId { get; }
     
     public List<SynapsePlayer> Players { get; set; }
+    
+    public int MaxWaveSize { get; set; }
 
     public bool Allow { get; set; } = true;
 }
@@ -117,7 +119,7 @@ public class FirstSpawnEvent : IEvent
     public Team[] HumanQueue { get; set; }
     public bool EnableLateJoin { get; set; } = true;
     public bool EnableNormalSpawning { get; set; } = true;
-    public bool CustomSpawning { get; set; } = false;
+    public List<SynapsePlayer> PlayersBlockedFromSpawning { get; set; } = new();
 }
 
 public class DecontaminationEvent : IEvent

@@ -1,11 +1,17 @@
-﻿using System;
+﻿using Neuron.Core.Meta;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Neuron.Core.Meta;
 using PlayerRoles;
+using PluginAPI.Enums;
 using Respawning;
+using Respawning.NamingRules;
+using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Player;
+using Synapse3.SynapseModule.Role;
+using PluginAPI.Events;
 
 namespace Synapse3.SynapseModule.Teams;
 
@@ -13,10 +19,17 @@ public class TeamService : Service
 {
     private readonly List<ISynapseTeam> _teams = new();
     private readonly Synapse _synapseModule;
+    private readonly RoundEvents _roundEvents;
+    private readonly PlayerService _playerService;
+    private readonly RoundService _roundService;
 
-    public TeamService(Synapse synapseModule)
+    public TeamService(Synapse synapseModule, RoundEvents roundEvents, PlayerService playerService,
+        RoundService roundService)
     {
         _synapseModule = synapseModule;
+        _roundEvents = roundEvents;
+        _playerService = playerService;
+        _roundService = roundService;
     }
 
     public override void Enable()
@@ -56,6 +69,7 @@ public class TeamService : Service
     {
         if(IsIdRegistered(info.Id)) return;
         team.Attribute = info;
+        team.Load();
         _teams.Add(team);
     }
 
@@ -65,12 +79,12 @@ public class TeamService : Service
     {
         return id switch
         {
-            0 => "SCP",
+            0 => "SCPs",
             1 => "Foundation Forces",
             2 => "Chaos Insurgency",
             3 => "Scientist",
-            4 => "Class-D",
-            5 => "Spectator",
+            4 => "ClassD",
+            5 => "Dead",
             6 => "Tutorial",
             _ => GetTeam(id)?.Attribute.Name ?? ""
         };
@@ -154,19 +168,23 @@ public class TeamService : Service
         team.SpawnPlayers(players);
     }
 
+    public void SpawnTeam(uint id)
+    {
+        NextTeam = id;
+        Spawn();
+    }
+
     public void Spawn()
     {
-    //TODO:
-        /*
         if (NextTeam == uint.MaxValue)
             goto ResetTeam;
 
-        var players = Synapse.Get<PlayerService>().Players.ToList();
-        players = players.Where(x => x.RoleID == (int)RoleType.Spectator && !x.OverWatch).ToList();
+        var players = _playerService.Players.ToList();
+        players = players.Where(x => RespawnManager.Singleton.CheckSpawnable(x.Hub)).ToList();
 
-        if (Synapse.Get<RoundService>().PrioritySpawn)
+        if (_roundService.PrioritySpawn)
         {
-            players = players.OrderBy(x => x.DeathTime).ToList();
+            players = players.OrderByDescending(x => x.DeathTime).ToList();
         }
         else
         {
@@ -180,58 +198,59 @@ public class TeamService : Service
 
         var ev = new SpawnTeamEvent(NextTeam)
         {
-            Players = players
+            Players = players,
+            MaxWaveSize = GetMaxWaveSize(NextTeam),
         };
-        Synapse.Get<RoundEvents>().SpawnTeam.Raise(ev);
+        _roundEvents.SpawnTeam.RaiseSafely(ev);
         players = ev.Players;
 
-        if (!ev.Allow || players.Count == 0)
+        if (!ev.Allow)
             goto ResetTeam;
-        
-        while (players.Count > GetMaxWaveSize(NextTeam))
+
+        while (players.Count > ev.MaxWaveSize)
         {
             players.RemoveAt(players.Count - 1);
         }
-        
+
+        if (players.Count == 0)
+            goto ResetTeam;
+
         players.ShuffleList();
 
-        if (RespawnTickets.Singleton.IsFirstWave)
-        {
-            RespawnTickets.Singleton.IsFirstWave = false;
-        }
-
-        var unitName = _unit.PrepareSpawnNewUnit(_unit.GetUnitIdFromTeamId(NextTeam), players);
-            
         switch (NextTeam)
         {
             case 1:
             case 2:
-                if (!RespawnWaveGenerator.SpawnableTeams.TryGetValue((SpawnableTeamType)NextTeam, out var handlerBase))
+                if (!RespawnManager.SpawnableTeams.TryGetValue((SpawnableTeamType)NextTeam, out var handlerBase))
                     goto ResetTeam;
+
+                if (!EventManager.ExecuteEvent(ServerEventType.TeamRespawn, (SpawnableTeamType)NextTeam))
+                {
+                    RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.UponRespawn, (SpawnableTeamType)NextTeam);
+                    break;
+                }
 
                 var roles = new Queue<RoleTypeId>();
                 handlerBase.GenerateQueue(roles, players.Count);
 
-                RespawnTickets.Singleton.GrantTickets((SpawnableTeamType)NextTeam,
-                    -players.Count * handlerBase.TicketRespawnCost);
-                
-                if (UnitNamingRules.TryGetNamingRule((SpawnableTeamType)NextTeam, out var naming))
+                if (UnitNamingRule.TryGetNamingRule((SpawnableTeamType)NextTeam, out var rule))
                 {
-                    naming.PlayEntranceAnnouncement(unitName);
+                    UnitNameMessageHandler.SendNew((SpawnableTeamType)NextTeam, rule);
                 }
 
                 foreach (var player in players)
                 {
                     var role = roles.Dequeue();
-                    player.RemoveCustomRole(DeSpawnReason.API);
-                    player.ClassManager.SetPlayersClass(role, player.gameObject,
-                        CharacterClassManager.SpawnReason.Respawn);
+                    player.RemoveCustomRole(DeSpawnReason.Respawn);
+                    player.RoleManager.ServerSetRole(role, RoleChangeReason.Respawn);
                 }
 
                 RespawnEffectsController.ExecuteAllEffects(RespawnEffectsController.EffectType.UponRespawn,
                     (SpawnableTeamType)NextTeam);
+                Synapse3Extensions.RaiseEvent(typeof(RespawnManager), nameof(RespawnManager.ServerOnRespawned),
+                    (SpawnableTeamType)NextTeam, players.Select(x => x.Hub).ToList());
                 break;
-                
+
             default:
                 var team = GetTeam(NextTeam);
                 if (team == null)
@@ -241,8 +260,7 @@ public class TeamService : Service
                 break;
         }
 
-        ResetTeam:
+    ResetTeam:
         NextTeam = uint.MaxValue;
-        */
     }
 }

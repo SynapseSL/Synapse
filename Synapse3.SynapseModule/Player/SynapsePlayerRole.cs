@@ -78,6 +78,9 @@ public partial class SynapsePlayer
         }
     }
 
+    public void SetRoleFlags(RoleTypeId role, RoleSpawnFlags flags, RoleChangeReason reason = RoleChangeReason.None) =>
+        RoleManager.ServerSetRole(role, reason, flags);
+
     //TODO: Rework this since NW decided to make this easier
     
     /// <summary>

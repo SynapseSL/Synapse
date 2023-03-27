@@ -1,4 +1,3 @@
-using InventorySystem.Items.Pickups;
 using LightContainmentZoneDecontamination;
 using LiteNetLib;
 using PlayerRoles;
@@ -24,25 +23,6 @@ public partial class PlayerEvents
         return ev.Allow;
     }
 
-    [PluginEvent(ServerEventType.PlayerChangeItem)]
-    public bool PlayerChangeItemHook(IPlayer player, ushort oldItem, ushort newItem)
-    {
-        try
-        {
-            var sPlayer = player?.GetSynapsePlayer();
-            if (sPlayer == null || sPlayer.RoleType == RoleTypeId.None) return true;
-            var item = newItem == 0 ? SynapseItem.None : _item?.GetSynapseItem(newItem) ?? SynapseItem.None;
-            var ev = new ChangeItemEvent(sPlayer, true, item);
-            ChangeItem.RaiseSafely(ev);
-            return ev.Allow;
-        }
-        catch
-        {
-            return true;
-        }
-    }
-
-    //TODO: Make this for all types of Damages not only damage by other player
     [PluginEvent(ServerEventType.PlayerDamage)]
     public bool PlayerDamageHook(IPlayer player, IPlayer target, DamageHandlerBase damageHandler)
     {
@@ -62,19 +42,12 @@ public partial class PlayerEvents
         FreePlayer.RaiseSafely(ev);
         return ev.Allow;
     }
-
-    [PluginEvent(ServerEventType.PlayerSearchPickup)]
-    public bool PlayerSearchedPickupHook(IPlayer player, ItemPickupBase item)
-    {
-        var ev = new PickupEvent(player.GetSynapsePlayer(), true, item.GetItem());
-        Pickup.RaiseSafely(ev);
-        return ev.Allow;
-    }
 }
 
 public partial class RoundEvents
 {
     private bool _firstTime = true;
+
     [PluginEvent(ServerEventType.WaitingForPlayers)]
     public void RoundWaitingHook()
     {
@@ -87,7 +60,8 @@ public partial class RoundEvents
     public void RoundStartHook() => Start.RaiseSafely(new RoundStartEvent());
 
     [PluginEvent(ServerEventType.RoundEnd)]
-    public void RoundEndHook(RoundSummary.LeadingTeam leadingTeam) => End.RaiseSafely(new RoundEndEvent(RoundSummary.LeadingTeam.Draw));
+    public void RoundEndHook(RoundSummary.LeadingTeam leadingTeam) =>
+        End.RaiseSafely(new RoundEndEvent(RoundSummary.LeadingTeam.Draw));
 
     [PluginEvent(ServerEventType.RoundRestart)]
     public void RoundRestartHook() => Restart.RaiseSafely(new RoundRestartEvent());
@@ -102,9 +76,10 @@ public partial class RoundEvents
             DecontaminationController.Singleton.NetworkDecontaminationOverride =
                 DecontaminationController.DecontaminationStatus.None;
         }
+
         return ev.Allow;
     }
-    
+
     [PluginEvent(ServerEventType.WarheadStart)]
     public bool WarheadStartHook(bool isAutomatic, IPlayer player, bool isResumed)
     {
@@ -144,9 +119,10 @@ public partial class ScpEvents
     public bool Scp049StartResurrectingBodyHook(IPlayer player, IPlayer target, BasicRagdoll body, bool canResurrect)
     {
         if (!canResurrect) return true;
-        var synapse049 = player.GetSynapsePlayer();
-        var synapseTarget = target.GetSynapsePlayer();
-        var ragDoll = body.GetSynapseRagDoll();
+        var synapse049 = player?.GetSynapsePlayer();
+        var synapseTarget = target?.GetSynapsePlayer();
+        var ragDoll = body?.GetSynapseRagDoll();
+        if (synapse049 == null || synapseTarget == null || ragDoll == null) return true;
         var ev = new Scp049ReviveEvent(synapse049, synapseTarget, ragDoll, false);
         Scp049Revive.RaiseSafely(ev);
         return ev.Allow;
@@ -169,7 +145,8 @@ public partial class ItemEvents
     {
         var synapsePlayer = player.GetSynapsePlayer();
         var synapseTarget = target.GetSynapsePlayer();
-        var ev = new DisarmEvent(synapsePlayer.Inventory.ItemInHand, ItemInteractState.Finalize, synapsePlayer, synapseTarget);
+        var ev = new DisarmEvent(synapsePlayer.Inventory.ItemInHand, ItemInteractState.Finalize, synapsePlayer,
+            synapseTarget);
         Disarm.RaiseSafely(ev);
         return ev.Allow;
     }
@@ -197,7 +174,7 @@ public partial class MapEvents
         DetonateWarhead.RaiseSafely(ev);
         return ev.Allow;
     }
-    
+
     [PluginEvent(ServerEventType.WarheadStop)]
     public bool PlayerCancelWarhead(IPlayer player)
     {

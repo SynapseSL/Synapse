@@ -251,6 +251,7 @@ public static class ItemPatches
                 return false;
 
             var item = __instance.GetItem();
+            if (item == null || item.Serial == 0) return false;
 
             item.Throwable.Fuse(__instance._attacker);
 

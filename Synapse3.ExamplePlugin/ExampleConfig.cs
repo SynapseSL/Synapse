@@ -15,4 +15,6 @@ public class ExampleConfig : IDocumentSection
         (uint)ItemType.Medkit,
         (uint)ItemType.Adrenaline
     };
+
+    public ExampleAbstractRole.Config AbstractRoleConfig { get; set; } = new ExampleAbstractRole.Config();
 }

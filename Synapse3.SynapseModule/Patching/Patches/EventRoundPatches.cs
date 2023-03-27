@@ -1,21 +1,25 @@
 ﻿using GameCore;
 using HarmonyLib;
 using MEC;
+using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerRoles;
 using PlayerRoles.RoleAssign;
 using PluginAPI.Enums;
 using PluginAPI.Events;
+using Respawning;
 using RoundRestarting;
 using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
+using Synapse3.SynapseModule.Teams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static Respawning.RespawnManager;
 using Console = GameCore.Console;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
@@ -46,6 +50,7 @@ public static class RoundCheckEndPatch
 [SynapsePatch("FirstSpawn", PatchType.RoundEvent)]
 public static class FirstSpawnPatch
 {
+    internal static List<SynapsePlayer> _blockedPlayer = new();
     private static readonly RoundEvents _round;
     static FirstSpawnPatch() => _round = Synapse.Get<RoundEvents>();
 
@@ -94,10 +99,11 @@ public static class FirstSpawnPatch
                 HumanQueue = RoleAssigner._humanQueue
             };
             _round.FirstSpawn.RaiseSafely(ev);
+            _blockedPlayer = ev.PlayersBlockedFromSpawning;
             if (ev.EnableLateJoin)
             {
                 RoleAssigner._spawned = true;
-                RoleAssigner.LateJoinTimer.Reset();
+                RoleAssigner.LateJoinTimer.Restart();
             }
 
             if (!ev.EnableNormalSpawning) return false;
@@ -108,13 +114,112 @@ public static class FirstSpawnPatch
             {
                 RoleAssigner.AlreadySpawnedPlayers.Add(hub.characterClassManager.UserId);
             }
-
+            _blockedPlayer.Clear();
             return false;
         }
         catch (Exception ex)
         {
             SynapseLogger<Synapse>.Error("Role Assign Patch failed\n" + ex);
             return true;
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(RoleAssigner), nameof(RoleAssigner.CheckPlayer))]
+    public static void CheckPlayer(ref bool __result, ReferenceHub hub)
+    {
+        if (_blockedPlayer.Any(x => x.Hub == hub))
+            __result = false;
+    }
+}
+
+[Automatic]
+[SynapsePatch("TeamSelect", PatchType.RoundEvent)]
+public static class TeamSelectPatch
+{
+    private static readonly TeamService _team;
+    private static readonly RoundEvents _round;
+    static TeamSelectPatch()
+    {
+        _team = Synapse.Get<TeamService>();
+        _round = Synapse.Get<RoundEvents>();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(RespawnManager), nameof(RespawnManager.Update))]
+    public static bool OnTeamUpdate(RespawnManager __instance)
+    {
+        try
+        {
+            if (!__instance.ReadyToCommence()) return false;
+            if (__instance._stopwatch.Elapsed.TotalSeconds > __instance._timeForNextSequence)
+                __instance._curSequence++;
+
+            switch (__instance._curSequence)
+            {
+                case RespawnSequencePhase.SelectingTeam:
+                    if (!ReferenceHub.AllHubs.Any(__instance.CheckSpawnable))
+                    {
+                        __instance.RestartSequence();
+                        return false;
+                    }
+                    var dominatingTeam = RespawnTokensManager.DominatingTeam;
+
+                    var ev = new SelectTeamEvent
+                    {
+                        TeamId = (uint)dominatingTeam,
+                        Reset = !EventManager.ExecuteEvent(ServerEventType.TeamRespawnSelected, dominatingTeam),
+                    };
+                    _round.SelectTeam.RaiseSafely(ev);
+                    var nextTeam = ev.TeamId;
+
+                    dominatingTeam = _team.IsDefaultSpawnableID(nextTeam) ?
+                        (SpawnableTeamType)nextTeam : SpawnableTeamType.None;
+
+                    if (ev.Reset)
+                    {
+                        __instance.RestartSequence();
+                        return false;
+                    }
+                    _team.NextTeam = ev.TeamId;
+
+                    __instance.NextKnownTeam = dominatingTeam;
+                    __instance._curSequence = RespawnSequencePhase.PlayingEntryAnimations;
+                    __instance._stopwatch.Restart();
+                    __instance._timeForNextSequence = _team.GetRespawnTime(ev.TeamId);
+                    _team.ExecuteRespawnAnnouncement(nextTeam);
+                    break;
+
+                case RespawnSequencePhase.SpawningSelectedTeam:
+                    _team.Spawn();
+                    __instance.RestartSequence();
+                    break;
+            }
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Event: SelectTeam Event failed\n" + ex);
+            return true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(RespawnManager), nameof(RespawnManager.ForceSpawnTeam))]
+    public static bool ForceRespawn(RespawnManager __instance, SpawnableTeamType teamToSpawn)
+    {
+        try
+        {
+            _team.NextTeam = (uint)teamToSpawn;
+            __instance.NextKnownTeam = teamToSpawn;
+            _team.Spawn();
+            __instance.RestartSequence();
+            return false;
+        }
+        catch (Exception ex)
+        {
+            NeuronLogger.For<Synapse>().Error("Sy3 Team: Force Team Respawn failed\n" + ex);
+            return false;
         }
     }
 }

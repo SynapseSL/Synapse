@@ -74,22 +74,18 @@ public class CustomAttributeService : Service
 
     private void OnLoad(LoadObjectEvent ev)
     {
-        foreach (var handler in Handlers)
+        foreach (var attribute in ev.SynapseObject.CustomAttributes ?? new List<string>())
         {
-            var name = handler.Name;
-
-            foreach(var attribute in ev.SynapseObject.CustomAttributes)
+            if (attribute == null) continue;
+            var args = attribute.Split(':');
+            var newArgs = args.Segment(1);
+            
+            foreach (var handler in Handlers)
             {
-                if (attribute == null) continue;
-
-                var args = attribute.Split(':');
-                if (args[0].ToLower() != handler.Name.ToLower()) continue;
-                var newArgs = args.Segment(1);
-
+                if (!string.Equals(args[0], handler.Name, StringComparison.CurrentCultureIgnoreCase)) continue;
                 handler.SynapseObjects.Add(ev.SynapseObject);
                 handler.OnLoad(ev.SynapseObject, newArgs);
-                return;
-            }
+            }   
         }
     }
 

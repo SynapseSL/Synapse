@@ -4,6 +4,7 @@ using InventorySystem.Items.Firearms.Attachments;
 using Mirror;
 using Neuron.Core.Logging;
 using PlayerRoles;
+using PlayerRoles.FirstPersonControl;
 using PlayerStatsSystem;
 using PluginAPI.Enums;
 using PluginAPI.Events;
@@ -234,14 +235,14 @@ public partial class SynapsePlayer
 
     private EscapeType GetEscapeType(bool ignoreEscapeDistance)
     {
-        var fpcRole = CurrentRole as HumanRole;
+        var fpcRole = CurrentRole as FpcStandardRoleBase;
         if (fpcRole == null && !ignoreEscapeDistance) return EscapeType.TooFarAway;
         if (!ignoreEscapeDistance && (fpcRole.FpcModule.Position - Escape.WorldPos).sqrMagnitude > Escape.RadiusSqr) return EscapeType.TooFarAway;
         
         if (HasCustomRole) return EscapeType.CustomRole;
-        if (CurrentRole is not HumanRole human) return EscapeType.NotAssigned;
-        if (human.ActiveTime < 10f) return EscapeType.TooEarly;
-        
+        if (CurrentRole.ActiveTime < 10f) return EscapeType.TooEarly;
+        if (CurrentRole is not HumanRole) return EscapeType.NotAssigned;
+
         var disarmed = IsDisarmed;
         if (IsDisarmed && !CharacterClassManager.CuffedChangeTeam) return EscapeType.NotAssigned;
         switch (RoleType)

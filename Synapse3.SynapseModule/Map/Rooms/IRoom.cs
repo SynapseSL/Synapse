@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using Synapse3.SynapseModule.Map.Objects;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Rooms;
 
@@ -15,6 +18,10 @@ public interface IRoom
     public uint Id { get; }
     
     public uint Zone { get; }
+
+    ReadOnlyCollection<SynapseDoor> Doors { get; }
+    
+    public Color RoomColor { get; set; }
 
     public void TurnOffLights(float duration);
 }

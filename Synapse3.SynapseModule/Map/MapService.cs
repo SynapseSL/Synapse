@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Hazards;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items.Firearms.Attachments;
 using MapGeneration;
@@ -9,10 +10,12 @@ using MEC;
 using Mirror;
 using Neuron.Core.Meta;
 using PlayerRoles.Ragdolls;
+using RelativePositioning;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Objects;
+using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -99,6 +102,8 @@ public class MapService : Service
     {
         var prefab = NetworkClient.prefabs[Guid.Parse("a0e7ee93-b802-e5a4-38bd-95e27cc133ea")];
         var gameObject = Object.Instantiate(prefab, position, Quaternion.identity);
+        var comp = gameObject.GetComponent<TantrumEnvironmentalHazard>();
+        comp.SynchronizedPosition = new RelativePosition(position);
         NetworkServer.Spawn(gameObject.gameObject);
 
         if (destroy >= 0)
@@ -202,8 +207,7 @@ public class MapService : Service
         
         { "106_PRIMARY", DoorType.Scp106Primary },
         { "106_SECONDARY", DoorType.Scp106Secondary },
-        { "106_BOTTOM", DoorType.Scp106Bottom },
-        
+
         { "Unsecured Pryable GateDoor", DoorType.Scp049Gate },
         { "049_ARMORY", DoorType.Scp049Armory },
         

@@ -23,6 +23,7 @@ using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
 using System;
 using System.Linq;
+using InventorySystem.Searching;
 using MapGeneration.Distributors;
 using PlayerRoles.FirstPersonControl;
 using PlayerRoles.FirstPersonControl.NetworkMessages;
@@ -30,6 +31,7 @@ using PlayerRoles.Visibility;
 using PluginAPI.Enums;
 using PluginAPI.Events;
 using RelativePositioning;
+using Synapse3.SynapseModule.Item;
 using UnityEngine;
 using VoiceChat;
 using VoiceChat.Networking;
@@ -142,7 +144,8 @@ public static class SpeakPatch
                         validatedChannel = VoiceChatChannel.None;
                 }
 
-                var ev2 = new SpeakToPlayerEvent(player, receiver, true, validatedChannel, msg.Data, msg.DataLength);
+                var ev2 = new SpeakToPlayerEvent(player, receiver, true, validatedChannel, msg.Data, msg.DataLength,
+                    voiceChatChannel);
                 Player.SpeakToPlayer.RaiseSafely(ev2);
                 if (ev2.Channel == VoiceChatChannel.None || !ev2.Allow) continue;
                 msg.Channel = ev2.Channel;
@@ -295,7 +298,7 @@ public static class PlayerHealPatch
     {
         try
         {
-            var player = __instance.Hub.GetSynapsePlayer();
+            var player = __instance?.Hub?.GetSynapsePlayer();
             if (player == null) return true;
 
             var ev = new HealEvent(player, true, healAmount);
@@ -653,7 +656,7 @@ public static class PlayerDeathPatch
 
             if (attacker?.CustomRole != null)
             {
-                var translation = victim.GetTranslation(Translation).DeathMessage.Replace("\\n", "\n");
+                var translation = Translation.Get(victim).DeathMessage.Replace("\\n", "\n");
                 playerMsg = string.Format(translation, attacker.DisplayName, attacker.RoleName);
             }
 
@@ -750,7 +753,7 @@ public static class LockerInteractPatch
         {
             if (colliderId >= __instance.Chambers.Length || !__instance.Chambers[colliderId].CanInteract) return false;
             var player = ply.GetSynapsePlayer();
-            var hasPerms = __instance.Chambers[colliderId].RequiredPermissions.CheckPermission(player);
+            var hasPerms = __instance.Chambers[colliderId].RequiredPermissions.CheckPermission(player, true);
             var locker = __instance.GetSynapseLocker();
             var ev = new LockerUseEvent(player, hasPerms, locker, locker.Chambers[colliderId])
             {
@@ -910,7 +913,13 @@ public static class PlayerBanPatch
 public static class SendPlayerDataPatch
 {
     private static readonly PlayerEvents Player;
-    static SendPlayerDataPatch() => Player = Synapse.Get<PlayerEvents>();
+    private static readonly PlayerService PlayerService;
+
+    static SendPlayerDataPatch()
+    {
+        Player = Synapse.Get<PlayerEvents>();
+        PlayerService = Synapse.Get<PlayerService>();
+    }
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(FpcServerPositionDistributor), nameof(FpcServerPositionDistributor.GetNewSyncData))]
@@ -971,10 +980,9 @@ public static class SendPlayerDataPatch
         try
         {
             ushort num = 0;
-            ICustomVisibilityRole customVisibilityRole;
             bool flag;
             VisibilityController visibilityController;
-            if ((customVisibilityRole = (receiver.roleManager.CurrentRole as ICustomVisibilityRole)) != null)
+            if (receiver.roleManager.CurrentRole is ICustomVisibilityRole customVisibilityRole)
             {
                 flag = true;
                 visibilityController = customVisibilityRole.VisibilityController;
@@ -984,23 +992,29 @@ public static class SendPlayerDataPatch
                 flag = false;
                 visibilityController = null;
             }
-            foreach (ReferenceHub referenceHub in ReferenceHub.AllHubs)
+            foreach (var player in PlayerService.GetAbsoluteAllPlayers())
             {
-                IFpcRole fpcRole;
-                if (referenceHub.netId != receiver.netId && (fpcRole = (referenceHub.roleManager.CurrentRole as IFpcRole)) != null)
+                if (player.CurrentRole is not IFpcRole fpcRole) continue;
+                if (player.NetId != receiver.netId)
                 {
-                    bool flag2 = flag && !visibilityController.ValidateVisibility(referenceHub);
-                    var newSyncData = GetSyncData(receiver, referenceHub, fpcRole.FpcModule, flag2, out var canSee);
-                    if (!flag2 && canSee)
-                    {
-                        FpcServerPositionDistributor._bufferPlayerIDs[(int)num] = referenceHub.PlayerId;
-                        FpcServerPositionDistributor._bufferSyncData[(int)num] = newSyncData;
-                        num += 1;
-                    }
+                    var flag2 = flag && !visibilityController.ValidateVisibility(player);
+                    var newSyncData = GetSyncData(receiver, player, fpcRole.FpcModule, flag2, out var canSee);
+                    if (flag2 || !canSee) continue;
+                    FpcServerPositionDistributor._bufferPlayerIDs[num] = player.PlayerId;
+                    FpcServerPositionDistributor._bufferSyncData[num] = newSyncData;
+                    num += 1;
+                }
+                else
+                {
+                    if (!player.refreshHorizontalRotation && !player.refreshVerticalRotation) continue;
+                    var newSyncData = GetSelfPlayerData(player, fpcRole.FpcModule);
+                    FpcServerPositionDistributor._bufferPlayerIDs[num] = player.PlayerId;
+                    FpcServerPositionDistributor._bufferSyncData[num] = newSyncData;
+                    num += 1;
                 }
             }
             writer.WriteUInt16(num);
-            for (int i = 0; i < (int)num; i++)
+            for (int i = 0; i < num; i++)
             {
                 writer.WriteRecyclablePlayerId(new RecyclablePlayerId(FpcServerPositionDistributor._bufferPlayerIDs[i]));
                 FpcServerPositionDistributor._bufferSyncData[i].Write(writer);
@@ -1013,9 +1027,31 @@ public static class SendPlayerDataPatch
 
         return false;
     }
+    
+    private static FpcSyncData GetSelfPlayerData(SynapsePlayer player, FirstPersonMovementModule firtstPersonModule)
+    {
+        if (player.refreshHorizontalRotation)
+        {
+            firtstPersonModule.MouseLook.CurrentHorizontal = player.horizontalRotation;
+            player.refreshHorizontalRotation = false;
+        }
+        if (player.refreshVerticalRotation)
+        { 
+            firtstPersonModule.MouseLook.CurrentVertical = player.verticalRotation;
+            player.refreshVerticalRotation = false;
+        }
+
+
+        var data = new FpcSyncData(default, 
+        firtstPersonModule.SyncMovementState,
+        firtstPersonModule.IsGrounded, 
+        new RelativePosition(Vector3.zero), 
+        firtstPersonModule.MouseLook);
+        return data;
+    }
 
     private static FpcSyncData GetSyncData(ReferenceHub receiver, ReferenceHub target,
-        FirstPersonMovementModule firtstPersonModule, bool isInvisible, out bool canSee)
+        FirstPersonMovementModule firstPersonModule, bool isInvisible, out bool canSee)
     {
         var prevSyncData = FpcServerPositionDistributor.GetPrevSyncData(receiver, target);
         var player = receiver.GetSynapsePlayer();
@@ -1028,9 +1064,9 @@ public static class SendPlayerDataPatch
         var ev = new SendPlayerDataEvent(player, targetPlayer)
         {
             Position = targetPlayer.Position,
-            IsGrounded = firtstPersonModule.IsGrounded,
+            IsGrounded = firstPersonModule.IsGrounded,
             IsInvisible = isInvisible,
-            MovementState = firtstPersonModule.SyncMovementState
+            MovementState = firstPersonModule.SyncMovementState
         };
 
         switch (targetPlayer.Invisible)
@@ -1049,11 +1085,78 @@ public static class SendPlayerDataPatch
         var syncData = ev.IsInvisible
             ? default
             : new FpcSyncData(prevSyncData, ev.MovementState, ev.IsGrounded,
-                new RelativePosition(ev.Position), firtstPersonModule.MouseLook);
+                new RelativePosition(ev.Position), firstPersonModule.MouseLook);
 
         FpcServerPositionDistributor.PreviouslySent[receiver.netId][target.netId] = syncData;
         canSee = !ev.IsInvisible;
         return syncData;
+    }
+}
+
+[Automatic]
+[SynapsePatch("Pickup",PatchType.PlayerEvent)]
+public static class PickupPatches
+{
+    private static readonly PlayerEvents Player;
+    static PickupPatches() => Player = Synapse.Get<PlayerEvents>();
+
+    private static void ValidateStart(SearchCompletor searchCompletor, ref bool allow)
+    {
+        try
+        {
+            var player = searchCompletor.Hub.GetSynapsePlayer();
+            var item = searchCompletor.TargetPickup.GetItem();
+            var ev = new PickupEvent(player.GetSynapsePlayer(), allow, item);
+            Player.Pickup.RaiseSafely(ev);
+            allow = ev.Allow;
+        }
+        catch (Exception ex)
+        {
+            SynapseLogger<Synapse>.Error("Search Completor Validate Start Patch failed\n" + ex);
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ArmorSearchCompletor), nameof(ArmorSearchCompletor.ValidateStart))]
+    public static void ValidateArmo(ArmorSearchCompletor __instance, ref bool __result) =>
+        ValidateStart(__instance, ref __result);
+    
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ItemSearchCompletor), nameof(ItemSearchCompletor.ValidateStart))]
+    public static void ValidateItem(ItemSearchCompletor __instance, ref bool __result) =>
+        ValidateStart(__instance, ref __result);
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(SearchCompletor), nameof(SearchCompletor.ValidateStart))]
+    public static void ValidateDefault(SearchCompletor __instance, ref bool __result)
+    {
+        if(__instance.GetType() == typeof(ArmorSearchCompletor) || __instance.GetType() == typeof(ItemSearchCompletor)) return;
+        ValidateStart(__instance, ref __result);
+    }
+}
+
+[Automatic]
+[SynapsePatch("ChangeItem",PatchType.PlayerEvent)]
+public static class ChangeItemPatch
+{
+    private static readonly PlayerEvents Player;
+    private static readonly ItemService ItemService;
+
+    static ChangeItemPatch()
+    {
+        Player = Synapse.Get<PlayerEvents>();
+        ItemService = Synapse.Get<ItemService>();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Inventory), nameof(Inventory.NetworkCurItem), MethodType.Setter)]
+    public static bool SetCurItem(Inventory __instance, ItemIdentifier value)
+    {
+        var ev = new ChangeItemEvent(__instance.GetSynapsePlayer(), true,
+            value.SerialNumber == 0 ? SynapseItem.None : ItemService.GetSynapseItem(value.SerialNumber));
+        Player.ChangeItem.RaiseSafely(ev);
+        return ev.Allow;
     }
 }
 #endif
