@@ -10,6 +10,7 @@ using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Elevators;
+using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Role;
 using UnityEngine;
 
@@ -99,7 +100,7 @@ public class DebugService : Service
                 Logger.Warn("HigherRank " + role.PowerStatusEntries[PowerStatus.HigherRank].SeeCondition(ev.Player));
                 break;
             case KeyCode.Alpha3:
-                ev.Player.MainScpController.Scp079.GiveExperience(999999999);
+                Logger.Warn((ev.Player.Room as IVanillaRoom).Identifier.gameObject.name);
                 break;
             
             case KeyCode.Alpha4:

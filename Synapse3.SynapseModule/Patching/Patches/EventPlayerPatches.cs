@@ -111,7 +111,7 @@ public static class SpeakPatch
             Player.Speak.RaiseSafely(ev);
             if (ev.Channel == VoiceChatChannel.None || !ev.Allow) return false;
             voiceRoleSpeaker.VoiceModule.CurrentChannel = ev.Channel;
-            var checkForScpProximity = player.Team == Team.SCPs && player.MainScpController.ProximityChat;
+            var checkForScpProximity = player.Team == Team.SCPs && player.MainScpController.ProximityChat && player.RoleType != RoleTypeId.Scp079;
 
             foreach (var hub in ReferenceHub.AllHubs)
             {
