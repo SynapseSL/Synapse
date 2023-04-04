@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using MonoMod.Utils;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Player;
 
@@ -79,6 +80,30 @@ public class DatabaseService : Service
         }
     }
 
+    public bool IsPlayerKeySet(SynapsePlayer player, string key)
+    {
+        foreach (var dataBase in DataBases)
+        {
+            if (dataBase.IsPlayerKeySet(player, key))
+                return true;
+        }
+
+        return false;
+    }
+
+    public Dictionary<string, string> GetAllPlayerData(SynapsePlayer player)
+    {
+        var allData = new Dictionary<string, string>();
+        foreach (var dataBase in DataBases)
+        {
+            var data = dataBase.GetAllPlayerData(player, out var handled);
+            if (!handled) continue;
+            allData.AddRange(data);
+        }
+
+        return allData;
+    }
+
     public string GetData(string key)
     {
         foreach (var dataBase in DataBases)
@@ -107,6 +132,30 @@ public class DatabaseService : Service
             dataBase.DeleteData(key, out var handled);
             if (handled) return;
         }
+    }
+
+    public bool IsKeySet(string key)
+    {
+        foreach (var dataBase in DataBases)
+        {
+            if (dataBase.IsKeySet(key))
+                return true;
+        }
+
+        return false;
+    }
+    
+    public Dictionary<string, string> GetAllData()
+    {
+        var allData = new Dictionary<string, string>();
+        foreach (var dataBase in DataBases)
+        {
+            var data = dataBase.GetAllData(out var handled);
+            if (!handled) continue;
+            allData.AddRange(data);
+        }
+
+        return allData;
     }
 
     public Dictionary<string, string> GetLeaderBoard(string key, bool orderFromHighest = true, ushort size = 0)

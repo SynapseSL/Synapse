@@ -1,4 +1,6 @@
-﻿namespace Synapse3.SynapseModule.Player;
+﻿using System.Collections.Generic;
+
+namespace Synapse3.SynapseModule.Player;
 
 public partial class SynapsePlayer
 {
@@ -9,4 +11,8 @@ public partial class SynapsePlayer
     public void SetData(string key, string value) => _database.SetPlayerData(this, key, value);
 
     public void DeleteData(string key) => _database.DeletePlayerData(this, key);
+
+    public bool IsKeySet(string key) => _database.IsPlayerKeySet(this, key);
+
+    public Dictionary<string, string> GetAllData() => _database.GetAllPlayerData(this);
 }

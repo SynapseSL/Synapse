@@ -14,6 +14,13 @@ public abstract class Database : InjectedLoggerBase, IDatabase
 
     public virtual void SetPlayerData(SynapsePlayer player, string key, string value, out bool isHandled) => isHandled = false;
     public void DeletePlayerData(SynapsePlayer player, string key, out bool isHandled) => isHandled = false;
+    public bool IsPlayerKeySet(SynapsePlayer player, string key) => false;
+
+    public Dictionary<string, string> GetAllPlayerData(SynapsePlayer player, out bool isHandled)
+    {
+        isHandled = false;
+        return null;
+    }
 
     public virtual string GetData(string key, out bool isHandled)
     {
@@ -23,6 +30,13 @@ public abstract class Database : InjectedLoggerBase, IDatabase
 
     public virtual void SetData(string key, string value, out bool isHandled) => isHandled = false;
     public void DeleteData(string key, out bool isHandled) => isHandled = false;
+    public bool IsKeySet(string key) => false;
+
+    public Dictionary<string, string> GetAllData(out bool isHandled)
+    {
+        isHandled = false;
+        return null;
+    }
 
     public virtual Dictionary<string, string> GetLeaderBoard(string key, out bool isHandled, bool orderFromHighest = true, ushort size = 0)
     {
