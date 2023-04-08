@@ -56,6 +56,7 @@ public partial class PlayerEvents : Service
     public readonly EventReactor<KickEvent> Kick = new();
     public readonly EventReactor<SpeakEvent> Speak = new();
     public readonly EventReactor<SpeakToPlayerEvent> SpeakToPlayer = new();
+    public readonly EventReactor<HotKeyEvent> HotKey = new();
 
     public PlayerEvents(EventManager eventManager, Synapse synapse)
     {
@@ -100,6 +101,7 @@ public partial class PlayerEvents : Service
         _eventManager.RegisterEvent(Kick);
         _eventManager.RegisterEvent(Speak);
         _eventManager.RegisterEvent(SpeakToPlayer);
+        _eventManager.RegisterEvent(HotKey);
 
         WalkOnSinkhole.Subscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Subscribe(WalkOnHazard.Raise);
@@ -144,6 +146,7 @@ public partial class PlayerEvents : Service
         _eventManager.UnregisterEvent(Kick);
         _eventManager.UnregisterEvent(Speak);
         _eventManager.UnregisterEvent(SpeakToPlayer);
+        _eventManager.UnregisterEvent(HotKey);
 
         WalkOnSinkhole.Unsubscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Unsubscribe(WalkOnHazard.Raise);
@@ -652,4 +655,14 @@ public class SpeakToPlayerEvent : SpeakEvent
         Receiver = receiver;
         OriginalChannel = originalChannel;
     }
+}
+
+public class HotKeyEvent : PlayerEvent
+{
+    public HotKeyEvent(SynapsePlayer player, ActionName hotKey) : base(player)
+    {
+        HotKey = hotKey;
+    }
+    
+    public ActionName HotKey { get; }
 }

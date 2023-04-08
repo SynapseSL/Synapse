@@ -3,6 +3,7 @@ using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Events;
 using System;
+using System.Collections.Generic;
 using InventorySystem.Items.MicroHID;
 using MEC;
 using PlayerRoles;
@@ -10,7 +11,9 @@ using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Elevators;
+using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Rooms;
+using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Role;
 using UnityEngine;
 
@@ -92,24 +95,41 @@ public class DebugService : Service
                 break;
            
             case KeyCode.Alpha2:
-                var role = (_dummy.Player.CustomRole as SynapseAbstractRole);
-                Logger.Warn("Role Entry " + role.RoleEntry.SeeCondition(ev.Player));
-                Logger.Warn("RoleAndUnitEntry " + role.RoleAndUnitEntry.SeeCondition(ev.Player));
-                Logger.Warn("LowerRank " + role.PowerStatusEntries[PowerStatus.LowerRank].SeeCondition(ev.Player));
-                Logger.Warn("SameRank " + role.PowerStatusEntries[PowerStatus.SameRank].SeeCondition(ev.Player));
-                Logger.Warn("HigherRank " + role.PowerStatusEntries[PowerStatus.HigherRank].SeeCondition(ev.Player));
+                new SynapseRagDoll(RoleTypeId.ClassD, ev.Player.Position, ev.Player.Rotation, Vector3.one, ev.Player,
+                    DamageType.Asphyxiated, "rag");
                 break;
             case KeyCode.Alpha3:
-                Logger.Warn((ev.Player.Room as IVanillaRoom).Identifier.gameObject.name);
+                new SynapseDoor(SynapseDoor.SpawnableDoorType.Hcz, ev.Player.Position, ev.Player.Rotation, Vector3.one)
+                {
+                    MoveInElevator = true
+                };
                 break;
             
             case KeyCode.Alpha4:
-                if (!Physics.Raycast(ev.Player.Position, Vector3.down, out var raycastHit, 3f, MicroHIDItem.WallMask))
+                var schem = new SynapseSchematic(new SchematicConfiguration()
                 {
-                    return;
-                }
-
-                Synapse.Get<MapService>().SpawnTantrum(ev.Player.Position + Vector3.up * 0.25f);
+                    Doors = new List<SchematicConfiguration.DoorConfiguration>()
+                    {
+                        new SchematicConfiguration.DoorConfiguration()
+                        {
+                            Position = Vector3.up,
+                            DoorType = SynapseDoor.SpawnableDoorType.Ez
+                        }
+                    },
+                    Primitives = new List<SchematicConfiguration.PrimitiveConfiguration>()
+                    {
+                        new SchematicConfiguration.PrimitiveConfiguration()
+                        {
+                            Position = Vector3.right,
+                            Color = Color.white,
+                            PrimitiveType = PrimitiveType.Sphere
+                        }
+                    }
+                })
+                {
+                    MoveInElevator = true
+                };
+                schem.Position = ev.Player.Position;
                 break;
         }
     }

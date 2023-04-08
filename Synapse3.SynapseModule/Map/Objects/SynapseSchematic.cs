@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Objects;
 
-public class SynapseSchematic : DefaultSynapseObject
+public class SynapseSchematic : DefaultSynapseObject, IHideable, IRefreshable
 {
     public override GameObject GameObject { get; }
     public override ObjectType Type => ObjectType.Schematic;
@@ -48,35 +48,39 @@ public class SynapseSchematic : DefaultSynapseObject
         base.OnDestroy();
     }
 
-    public override void HideFromAll()
+    public void HideFromAll()
     {
         foreach (var child in _children)
         {
-            child.HideFromAll();
+            if (child is IHideable hideable)
+                hideable.HideFromAll();
         }
     }
 
-    public override void ShowAll()
+    public void ShowAll()
     {
         foreach (var child in _children)
         {
-            child.ShowAll();
+            if (child is IHideable hideable)
+                hideable.ShowAll();
         }
     }
 
-    public override void HideFromPlayer(SynapsePlayer player)
+    public void HideFromPlayer(SynapsePlayer player)
     {
         foreach (var child in _children)
         {
-            child.HideFromPlayer(player);
+            if (child is IHideable hideable)
+                hideable.HideFromPlayer(player);
         }
     }
 
-    public override void ShowPlayer(SynapsePlayer player)
+    public void ShowPlayer(SynapsePlayer player)
     {
         foreach (var child in _children)
         {
-            child.ShowPlayer(player);
+            if (child is IHideable hideable)
+                hideable.ShowPlayer(player);
         }
     }
 
@@ -182,7 +186,7 @@ public class SynapseSchematic : DefaultSynapseObject
     {
         foreach (var child in Children)
         {
-            if(child is not IRefreshable refresh) continue;
+            if (child is not IRefreshable refresh) continue;
             
             refresh.Refresh();
         }
@@ -191,10 +195,19 @@ public class SynapseSchematic : DefaultSynapseObject
     {
         foreach (var child in Children)
         {
-            if(child is not DefaultSynapseObject defaultObject) continue;
+            if (child is not DefaultSynapseObject defaultObject) continue;
 
             child.Scale = new Vector3(defaultObject.OriginalScale.x * Scale.x, defaultObject.OriginalScale.y * Scale.y,
                 defaultObject.OriginalScale.z * Scale.z);
         }
     }
+
+    public void Refresh()
+    {
+        UpdatePositionAndRotation();
+        UpdateScale();
+    }
+
+    public bool Update { get; set; } = false;
+    public float UpdateFrequency { get; set; }
 }

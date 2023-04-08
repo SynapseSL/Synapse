@@ -13,10 +13,10 @@ public abstract class Database : InjectedLoggerBase, IDatabase
     }
 
     public virtual void SetPlayerData(SynapsePlayer player, string key, string value, out bool isHandled) => isHandled = false;
-    public void DeletePlayerData(SynapsePlayer player, string key, out bool isHandled) => isHandled = false;
-    public bool IsPlayerKeySet(SynapsePlayer player, string key) => false;
+    public virtual void DeletePlayerData(SynapsePlayer player, string key, out bool isHandled) => isHandled = false;
+    public virtual bool IsPlayerKeySet(SynapsePlayer player, string key) => false;
 
-    public Dictionary<string, string> GetAllPlayerData(SynapsePlayer player, out bool isHandled)
+    public virtual Dictionary<string, string> GetAllPlayerData(SynapsePlayer player, out bool isHandled)
     {
         isHandled = false;
         return null;
@@ -32,7 +32,7 @@ public abstract class Database : InjectedLoggerBase, IDatabase
     public void DeleteData(string key, out bool isHandled) => isHandled = false;
     public bool IsKeySet(string key) => false;
 
-    public Dictionary<string, string> GetAllData(out bool isHandled)
+    public virtual Dictionary<string, string> GetAllData(out bool isHandled)
     {
         isHandled = false;
         return null;

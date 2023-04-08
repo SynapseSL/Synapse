@@ -204,11 +204,11 @@ public partial class SynapseItem
         _subApi[ItemCategory]?.ChangeState(state);
     }
 
-    public override void HideFromAll() => NetworkIdentity?.UnSpawnForAllPlayers();
+    public void HideFromAll() => NetworkIdentity?.UnSpawnForAllPlayers();
 
-    public override void ShowAll() => NetworkIdentity?.SpawnForAllPlayers();
+    public void ShowAll() => NetworkIdentity?.SpawnForAllPlayers();
 
-    public override void HideFromPlayer(SynapsePlayer player) => NetworkIdentity?.UnSpawnForOnePlayer(player);
+    public void HideFromPlayer(SynapsePlayer player) => NetworkIdentity?.UnSpawnForOnePlayer(player);
 
-    public override void ShowPlayer(SynapsePlayer player) => NetworkIdentity?.SpawnForOnePlayer(player);
+    public void ShowPlayer(SynapsePlayer player) => NetworkIdentity?.SpawnForOnePlayer(player);
 }

@@ -36,6 +36,7 @@ public class PlayerService : Service
         _player.Join.Subscribe(Join);
         _round.Restart.Subscribe(RoundRestart);
         _player.SetClass.Subscribe(ChangeClass);
+        _player.ChangeRole.Subscribe(ChangeRole);
     }
 
     public override void Disable()
@@ -43,6 +44,7 @@ public class PlayerService : Service
         _player.Join.Unsubscribe(Join);
         _round.Restart.Unsubscribe(RoundRestart);
         _player.SetClass.Unsubscribe(ChangeClass);
+        _player.ChangeRole.Unsubscribe(ChangeRole);
     }
 
     /// <summary>
@@ -357,5 +359,14 @@ public class PlayerService : Service
                 player.CustomInfo.UpdatePlayer(ev.Player);
             }
         });
+    }
+
+    private void ChangeRole(ChangeRoleEvent ev)
+    {
+        foreach (var player in GetAbsoluteAllPlayers())
+        {
+            if (player.FakeRoleManager.VisibleRoleCondition.Count == 0) continue;
+            player.FakeRoleManager.UpdatePlayer(ev.Player);
+        }
     }
 }

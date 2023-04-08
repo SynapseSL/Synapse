@@ -92,12 +92,4 @@ public abstract class DefaultSynapseObject : ISynapseObject
     {
         Map._synapseObjects.Remove(this);
     }
-
-    public abstract void HideFromAll();
-
-    public abstract void ShowAll();
-
-    public abstract void HideFromPlayer(SynapsePlayer player);
-
-    public abstract void ShowPlayer(SynapsePlayer player);
 }
