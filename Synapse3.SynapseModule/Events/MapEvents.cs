@@ -100,19 +100,22 @@ public class GeneratorEngageEvent : IEvent
     }
 }
 
-public class ElevatorMoveContentEvent : IEvent//TODO
+public class ElevatorMoveContentEvent : IEvent
 {
     public IElevator Elevator { get; }
-
-    public float OpenManuallyDelay { get; set; } = 4f;
-
-    public bool OpenDoorManually { get; set; } = false;
     
-    public IElevatorDestination Destination { get; set; }
+    public Vector3 DeltaPosition { get; }
+    
+    public Quaternion DeltaRotation { get; }
+    
+    public Bounds Bounds { get; }
 
-    public ElevatorMoveContentEvent(IElevator elevator)
+    public ElevatorMoveContentEvent(IElevator elevator, Vector3 deltaPosition, Quaternion deltaRotation, Bounds bounds)
     {
         Elevator = elevator;
+        DeltaPosition = deltaPosition;
+        DeltaRotation = deltaRotation;
+        Bounds = bounds;
     }
 }
 

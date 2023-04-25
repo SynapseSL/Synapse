@@ -95,7 +95,9 @@ public class DummyPlayer : SynapsePlayer
         var service = Synapse.Get<DummyService>();
         service._dummies.Remove(SynapseDummy);
     }
-   
+
+    public override void SendWindowMessage(string text) { }
+
     public SynapseDummy SynapseDummy { get; internal set; }
 
     public override TTranslation GetTranslation<TTranslation>(TTranslation translation) => translation.Get();

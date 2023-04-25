@@ -1,4 +1,5 @@
 ﻿using Mirror;
+using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
 using Synapse3.SynapseModule.Map.Rooms;
 using UnityEngine;
@@ -37,7 +38,7 @@ public partial class SynapsePlayer
     /// </summary>
     public virtual Vector3 Position
     {
-        get => FirstPersonMovement?.Position ?? Vector3.zero;
+        get => RoleType == RoleTypeId.Scp079 ? MainScpController.Scp079.Camera.Position : FirstPersonMovement?.Position ?? Vector3.zero;
         set => FirstPersonMovement.ServerOverridePosition(value, new Vector3(0f, 0f, 0f));
     }
 

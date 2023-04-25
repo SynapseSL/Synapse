@@ -30,6 +30,22 @@ public class MainScpController
 
     public readonly Scp939Controller Scp939;
 
+    public bool ProximityToggle(out string message, out bool enabled)
+    {
+        message = "";
+        enabled = false;
+        if (_player.Team != Team.SCPs) return false;
+        if (!_config.GamePlayConfiguration.SpeakingScp.Contains(_player.RoleID) &&
+            !_player.HasPermission("synapse.scp-proximity")) return false;
+        
+        enabled = ProximityChat = !ProximityChat;
+        var translation = _config.Translation.Get(_player);
+        message = _player.MainScpController.ProximityChat
+            ? translation.EnableProximity
+            : translation.DisableProximity;
+        return true;
+    }
+
     public bool ProximityChat { get; set; }
 
     public IScpControllerBase CurrentController =>

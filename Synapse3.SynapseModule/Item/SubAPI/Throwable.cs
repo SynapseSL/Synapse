@@ -48,6 +48,7 @@ public class Throwable : ISubSynapseItem
         if(itemBase is not ThrowableItem throwableItem) return;
 
         Projectile = Object.Instantiate(throwableItem.Projectile);
+        Projectile.transform.localScale = _item.Scale;
         if (Projectile.TryGetComponent<Rigidbody>(out var rigidbody))
         {
             rigidbody.position = _item.Pickup.Rb.position;
@@ -92,6 +93,7 @@ public class Throwable : ISubSynapseItem
         Projectile = Object.Instantiate(throwableItem.Projectile, throwableItem.Owner.PlayerCameraReference.position,
             throwableItem.Owner.PlayerCameraReference.rotation);
         var transform = Projectile.transform;
+        transform.localScale = _item.Scale;
         var info = new PickupSyncInfo
         {
             ItemId = _item.ItemType,

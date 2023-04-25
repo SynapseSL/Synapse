@@ -47,7 +47,7 @@ public partial class SynapsePlayer
     /// <summary>
     /// Opens the Window that is usually used for Reports with a Custom Message
     /// </summary>
-    public void SendWindowMessage(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
+    public virtual void SendWindowMessage(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
     
     /// <summary>
     /// Displays a hint on the Player's screen, that override the hint list!

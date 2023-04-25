@@ -300,14 +300,4 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         FakeConnection.Disconnect();
         NetworkServer.Destroy(GameObject);
     }
-
-    public override void HideFromAll() => DeSpawn();
-
-    public override void ShowAll() => Spawn();
-
-    public override void HideFromPlayer(SynapsePlayer player) => Player.NetworkIdentity?.UnSpawnForOnePlayer(player);
-
-    public override void ShowPlayer(SynapsePlayer player) =>
-        SynapseLogger<SynapseDummy>.Warn(
-            "Plugin tried to show Dummy to a specific Player. This Feature is currently not implemented");
 }

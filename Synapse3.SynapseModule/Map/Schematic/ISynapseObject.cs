@@ -30,6 +30,8 @@ public interface ISynapseObject
     /// The Current Scale of the Object
     /// </summary>
     public Vector3 Scale { get; set; }
+    
+    public bool MoveInElevator { get; set; }
 
     /// <summary>
     /// The underlying GameObject which is managed by the SynapseObject
@@ -69,12 +71,4 @@ public interface ISynapseObject
     /// Method which is executed before the Object is destroyed. Don't call it manually
     /// </summary>
     public void OnDestroy();
-
-    public void HideFromAll();
-
-    public void ShowAll();
-    
-    public void HideFromPlayer(SynapsePlayer player);
-
-    public void ShowPlayer(SynapsePlayer player);
 }

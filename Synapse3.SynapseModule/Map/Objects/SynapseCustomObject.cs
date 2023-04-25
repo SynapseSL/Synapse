@@ -56,13 +56,4 @@ public class SynapseCustomObject : DefaultSynapseObject
         };
         return gameObject;
     }
-    
-    //The Custom Object can never be seen by the Player visually in the first place so all of these methods are empty
-    public override void HideFromAll() { }
-
-    public override void ShowAll() { }
-
-    public override void HideFromPlayer(SynapsePlayer player) { }
-
-    public override void ShowPlayer(SynapsePlayer player) { }
 }

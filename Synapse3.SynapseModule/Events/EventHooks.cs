@@ -14,6 +14,14 @@ namespace Synapse3.SynapseModule.Events;
 
 public partial class PlayerEvents
 {
+    [PluginEvent(ServerEventType.PlayerUseHotkey)]
+    public void HotKeyHook(IPlayer player, ActionName hotkey)
+    {
+        var sPlayer = player?.GetSynapsePlayer();
+        if (sPlayer == null) return;
+        HotKey.RaiseSafely(new HotKeyEvent(sPlayer, hotkey));
+    }
+    
     [PluginEvent(ServerEventType.WarheadStart)]
     public bool WarheadStartHook(bool isAutomatic, IPlayer player, bool isResumed)
     {

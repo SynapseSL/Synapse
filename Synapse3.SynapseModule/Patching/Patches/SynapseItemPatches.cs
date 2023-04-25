@@ -247,6 +247,7 @@ public static class ItemPatches
     {
         try
         {
+            if (__instance == null) return false;
             if (!__instance._replaceNextFrame)
                 return false;
 

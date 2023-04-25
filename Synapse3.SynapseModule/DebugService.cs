@@ -11,6 +11,7 @@ using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Events;
 using System;
+using System.Collections.Generic;
 using InventorySystem.Items.MicroHID;
 using MEC;
 using PlayerRoles;
@@ -18,6 +19,9 @@ using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map;
 using Synapse3.SynapseModule.Map.Elevators;
+using Synapse3.SynapseModule.Map.Objects;
+using Synapse3.SynapseModule.Map.Rooms;
+using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Role;
 using UnityEngine;
 
@@ -81,11 +85,6 @@ public class DebugService : Service
     {
         switch (e)
         {
-            case Scp079PingEvent ev:
-                Logger.Warn("079Ping " + ev.PingType + ev.Position + ev.Normal);
-                return;
-            case TriggerTeslaEvent:
-                return;
             default:
                 Logger.Warn("Event triggered: " + e.GetType().Name);
                 break;

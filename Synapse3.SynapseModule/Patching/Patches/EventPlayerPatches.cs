@@ -79,7 +79,7 @@ public static class FallingIntoAbyssPatch
 [SynapsePatch("Speak", PatchType.PlayerEvent)]
 public static class SpeakPatch
 {
-    private const int ProximityRange = 100; //Take the root of this so the range is 10
+    private const int ProximityRange = 100; //Take the root of this so the range is 25
 
     private static readonly PlayerEvents Player;
     private static readonly SynapseConfigService Config;
@@ -111,7 +111,7 @@ public static class SpeakPatch
             Player.Speak.RaiseSafely(ev);
             if (ev.Channel == VoiceChatChannel.None || !ev.Allow) return false;
             voiceRoleSpeaker.VoiceModule.CurrentChannel = ev.Channel;
-            var checkForScpProximity = player.Team == Team.SCPs && player.MainScpController.ProximityChat;
+            var checkForScpProximity = player.Team == Team.SCPs && player.MainScpController.ProximityChat && player.RoleType != RoleTypeId.Scp079;
 
             foreach (var hub in ReferenceHub.AllHubs)
             {

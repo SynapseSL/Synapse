@@ -38,7 +38,7 @@
 
 
     <ItemGroup>
-      <PackageReference Include="NeuronModding.Core" Version="1.0.0.5" />
+      <PackageReference Include="NeuronModding.Core" Version="1.0.2" />
     </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">

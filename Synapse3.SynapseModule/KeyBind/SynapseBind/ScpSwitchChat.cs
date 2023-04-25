@@ -16,13 +16,7 @@ public class ScpSwitchChat : KeyBind
     
     public override void Execute(SynapsePlayer player)
     {
-        if (player.Team != Team.SCPs) return;
-        if (!_config.GamePlayConfiguration.SpeakingScp.Contains(player.RoleID) && !player.HasPermission("synapse.scp-proximity")) return;
-
-        player.MainScpController.ProximityChat = !player.MainScpController.ProximityChat;
-        var translation = _config.Translation.Get(player);
-        player.SendHint(player.MainScpController.ProximityChat
-            ? translation.EnableProximity
-            : translation.DisableProximity);
+        if (player.MainScpController.ProximityToggle(out var message, out _))
+            player.SendHint(message);
     }
 }

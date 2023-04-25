@@ -12,7 +12,7 @@ using UnityEngine;
 // ReSharper disable MemberCanBePrivate.Global
 namespace Synapse3.SynapseModule.Item;
 
-public partial class SynapseItem : DefaultSynapseObject
+public partial class SynapseItem : DefaultSynapseObject, IHideable
 {
     /// <summary>
     /// The Default SynapseItem that will be returned instead of null
