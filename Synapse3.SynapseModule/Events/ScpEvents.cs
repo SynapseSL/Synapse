@@ -1,6 +1,5 @@
 ﻿using Neuron.Core.Events;
 using Neuron.Core.Meta;
-using PlayerRoles.PlayableScps.Scp079.Pinging;
 using PlayerRoles.PlayableScps.Scp939;
 using PlayerStatsSystem;
 using Synapse3.SynapseModule.Enums;

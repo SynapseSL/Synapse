@@ -32,7 +32,6 @@ using Synapse3.SynapseModule.Role;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using PlayerRoles.PlayableScps.Scp079.Pinging;
 using UnityEngine;
 using Utils.Networking;

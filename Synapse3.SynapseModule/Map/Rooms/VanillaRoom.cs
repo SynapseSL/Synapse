@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using MapGeneration;
 using Synapse3.SynapseModule.Map.Objects;
-using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Rooms;
 

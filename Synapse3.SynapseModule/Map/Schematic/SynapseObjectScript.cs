@@ -1,5 +1,4 @@
-﻿using System;
-using Elevators;
+﻿using Elevators;
 using Interactables.Interobjects;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
@@ -115,11 +114,6 @@ public class SynapseObjectScript : MonoBehaviour
                 if (Object is not SynapseRagDoll rag) goto default;
                 if (rag.Rigidbody.IsSleeping()) return;
                 _lastPosition = rag.Rigidbody.position;
-                break;
-
-            case ObjectType.Door:
-                if (Object is not SynapseDoor door) goto default;
-                _lastPosition = door.Position;
                 break;
 
             default:

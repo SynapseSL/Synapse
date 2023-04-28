@@ -9,7 +9,9 @@ public class DummyPlayer : SynapsePlayer
 {
     public override PlayerType PlayerType => PlayerType.Dummy;
 
-    public bool RaVisible { get; set; } = true;
+    public bool RaVisible { get; set; } = false;
+
+    public bool SpectatorVisible { get; set; } = false;
 
     public bool DestroyWhenDied { get; set; } = true;
 

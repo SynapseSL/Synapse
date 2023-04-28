@@ -1,41 +1,28 @@
-﻿namespace Synapse3.ExamplePlugin;
+﻿using Neuron.Core.Meta;
+using Synapse3.SynapseModule.Map.Elevators;
+using Synapse3.SynapseModule.Map.Rooms;
+using UnityEngine;
 
-/*
+namespace Synapse3.ExamplePlugin;
+
+[Automatic]
+[Elevator(
+    Name = "Test",
+    Id = 99,
+    ChamberSchematicId = 50,
+    DestinationSchematicId = 51
+)]
 public class ExampleElevator : CustomElevator
 {
-    public ExampleElevator()
+    protected override void OnGenerate()
     {
-        var list = new List<IElevatorDestination>();
-        var service = Synapse.Get<SchematicService>();
-
-        var range = Vector3.one * 3;
-        range.y *= 1.5f;
-
-        var schematic1 = service.SpawnSchematic(8, new Vector3(0f, 1000f, 2.5f), Quaternion.Euler(0f, 90f, 0f));
-        var schematic2 = service.SpawnSchematic(8, new Vector3(0f, 1000f, -70f), Quaternion.Euler(0f, -90f, 0f));
-        var schematic3 = service.SpawnSchematic(8, new Vector3(190f, 992.5f, -87), Quaternion.Euler(0f, -90f, 0f));
-
-        list.Add(new SchematicDestination(schematic1, 0, "Gate-A", this, range));
-        list.Add(new SchematicDestination(schematic2, 1, "Above Chaos", this, range));
-        list.Add(new SchematicDestination(schematic3, 2, "MTF Spawn", this, range));
-
-        foreach (var destination in list)
-        {
-            if (destination.ElevatorId == 0)
-                destination.Open = true;
-            
-            var schematicDestination = (SchematicDestination)destination;
-            schematicDestination.Schematic.Doors.First().ObjectData["elev"] = this;
-            schematicDestination.Schematic.Doors.First().ObjectData["id"] = destination.ElevatorId;
-        }
-        
-        Destinations = list.AsReadOnly();
-        CurrentDestination = Destinations[0];
+        Logger.Warn("GENERATE ELEVATOR!");
+        SpawnDestination(new RoomPoint(RoomType.Scp914.ToString(), Vector3.up, Vector3.zero));
+        SpawnDestination(new RoomPoint(RoomType.Scp914.ToString(), Vector3.up * 8, Vector3.zero));
     }
-    
-    public override ReadOnlyCollection<IElevatorDestination> Destinations { get; }
 }
 
+/*
 public class ElevatorEventHandler
 {
     public ElevatorEventHandler(PlayerEvents playerEvents, RoundEvents roundEvents)
@@ -65,5 +52,4 @@ public class ElevatorEventHandler
     {
         new ExampleElevator();
     }
-}
-*/
+}*/

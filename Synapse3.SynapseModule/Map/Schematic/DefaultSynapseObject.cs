@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Mirror;
-using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Schematic;

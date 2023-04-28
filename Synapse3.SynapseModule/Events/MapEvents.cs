@@ -109,13 +109,18 @@ public class ElevatorMoveContentEvent : IEvent
     public Quaternion DeltaRotation { get; }
     
     public Bounds Bounds { get; }
+    
+    public bool CustomElevator { get; }
 
-    public ElevatorMoveContentEvent(IElevator elevator, Vector3 deltaPosition, Quaternion deltaRotation, Bounds bounds)
+    public ElevatorMoveContentEvent(IElevator elevator, Vector3 deltaPosition, Quaternion deltaRotation, Bounds bounds,
+        bool customElevator = false)
+
     {
         Elevator = elevator;
         DeltaPosition = deltaPosition;
         DeltaRotation = deltaRotation;
         Bounds = bounds;
+        CustomElevator = customElevator;
     }
 }
 

@@ -9,6 +9,7 @@ public class SynapseElevator : IElevator
     {
         Chamber = new SynapseElevatorChamber(chamber, this);
         ElevatorId = (uint)chamber._assignedGroup;
+        ElevatorGroup = chamber._assignedGroup;
 
         if (!ElevatorDoor.AllElevatorDoors.TryGetValue(chamber._assignedGroup, out var doors)) return;
         var doorList = new List<IElevatorDestination>();
@@ -19,6 +20,8 @@ public class SynapseElevator : IElevator
 
         Destinations = doorList.ToArray();
     }
+    
+    public ElevatorManager.ElevatorGroup ElevatorGroup { get; }
 
     public uint ElevatorId { get; }
     public IElevatorChamber Chamber { get; }

@@ -14,6 +14,8 @@ using PlayerRoles.SpawnData;
 using PlayerRoles.Spectating;
 using PlayerStatsSystem;
 using RelativePositioning;
+using Synapse3.SynapseModule.Dummy;
+using Synapse3.SynapseModule.Enums;
 
 namespace Synapse3.SynapseModule.Player;
 
@@ -92,6 +94,17 @@ public class FakeRoleManager
     {
         writer.WriteUInt32(_player.NetworkIdentity.netId);
         var roleInfo = GetRoleInfo(receiver);
+        if (receiver.PlayerType == PlayerType.Player && _player.PlayerType == PlayerType.Dummy)
+        {
+            SynapseLogger<Synapse>.Warn(receiver.Team + " " + receiver.RoleType);
+            SynapseLogger<Synapse>.Warn((receiver.Team == Team.Dead) + " && " + (_player is DummyPlayer { SpectatorVisible: false }));
+        }
+        if (receiver.Team == Team.Dead && _player is DummyPlayer { SpectatorVisible: false })
+        {
+            SynapseLogger<Synapse>.Warn("HIDE");
+            writer.WriteRoleType(RoleTypeId.Spectator);
+            return;
+        }
         writer.WriteRoleType(roleInfo.RoleObfuscation ? roleInfo.ObfuscationRole(receiver) : roleInfo.RoleTypeId);
 
         if (typeof(IPublicSpawnDataWriter).IsAssignableFrom(EnumToType[roleInfo.RoleTypeId]) &&

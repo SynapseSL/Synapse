@@ -2,10 +2,11 @@
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Rooms;
+using UnityEngine;
 
 namespace Synapse3.ExamplePlugin;
 
-[Automatic]
+//[Automatic]
 [CustomRoom(
     Name = "ExampleRoom",
     Id = 99,
@@ -34,6 +35,6 @@ public class RoomEventHandler
 
     private void OnStart(RoundStartEvent _)
     {
-        //_roomService.SpawnCustomRoom(99, Vector3.up * 1100f);
+        _roomService.SpawnCustomRoom(99, Vector3.up * 1100f);
     }
 }

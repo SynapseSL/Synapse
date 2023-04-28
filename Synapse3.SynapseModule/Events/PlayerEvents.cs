@@ -1,4 +1,5 @@
 ﻿using Hazards;
+using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
 using Neuron.Core.Events;
 using Neuron.Core.Meta;
@@ -6,6 +7,7 @@ using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -570,20 +572,14 @@ public class CheckKeyCardPermissionEvent : PlayerInteractEvent
 
 public class CallVanillaElevatorEvent : PlayerInteractEvent
 {
-    //TODO:
-    /*
     public SynapseElevator Elevator { get; }
 
-    public VanillaDestination RequestedDestination { get; }
+    public SynapseElevatorDestination Destination { get; }
 
-    public CallVanillaElevatorEvent(SynapsePlayer player, bool allow, SynapseElevator elevator, VanillaDestination requestedDestination) : base(player, allow)
+    public CallVanillaElevatorEvent(SynapsePlayer player, bool allow, SynapseElevator elevator, SynapseElevatorDestination destination) : base(player, allow)
     {
         Elevator = elevator;
-        RequestedDestination = requestedDestination;
-    }
-    */
-    public CallVanillaElevatorEvent(SynapsePlayer player, bool allow) : base(player, allow)
-    {
+        Destination = destination;
     }
 }
 

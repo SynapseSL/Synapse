@@ -6,7 +6,6 @@ using InventorySystem.Items.Armor;
 using InventorySystem.Items.Pickups;
 using MapGeneration;
 using MapGeneration.Distributors;
-using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
