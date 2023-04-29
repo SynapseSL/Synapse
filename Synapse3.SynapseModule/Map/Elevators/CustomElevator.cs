@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Neuron.Core.Meta;
 using Ninject;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Rooms;
-using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Elevators;
@@ -13,7 +11,7 @@ public abstract class CustomElevator : InjectedLoggerBase, ICustomElevator
 {
     [Inject] public MapEvents MapEvents { get; set; }
 
-    private readonly List<IElevatorDestination> _destinations = new();
+    protected readonly List<IElevatorDestination> _destinations = new();
 
     public uint ElevatorId => Attribute.Id;
     public IElevatorChamber Chamber { get; private set; }
@@ -22,18 +20,11 @@ public abstract class CustomElevator : InjectedLoggerBase, ICustomElevator
 
     public void MoveToDestination(uint destinationId)
     {
+        if (Chamber.IsMoving) return;
         if (Destinations.Length == 0) return;
         if (Destinations.Length <= destinationId) destinationId = 0;
-        var oldDestination = CurrentDestination;
         var nextDestination = Destinations[destinationId];
-        var schematic = (Chamber as CustomElevatorChamber)?.Schematic;
-        if (schematic == null) return;
-
-        var ev = new ElevatorMoveContentEvent(this, nextDestination.Position - oldDestination.Position,
-            Quaternion.identity, new Bounds(Chamber.Position, Vector3.one * 10), true);
-        schematic.Position = nextDestination.Position;
-        schematic.Rotation = nextDestination.Rotation;
-        MapEvents.ElevatorMoveContent.RaiseSafely(ev);
+        (Chamber as ICustomElevatorChamber)?.MoveToLocation(nextDestination.Position, nextDestination.Rotation);
         CurrentDestination = nextDestination;
     }
 
@@ -73,9 +64,9 @@ public abstract class CustomElevator : InjectedLoggerBase, ICustomElevator
 
     public ElevatorAttribute Attribute { get; set; }
 
-    public void Load()
-    {
-    }
+    public virtual void Load() { }
 
     protected abstract void OnGenerate();
+    
+    public abstract float MoveTime { get; }
 }

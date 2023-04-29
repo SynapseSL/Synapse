@@ -94,14 +94,8 @@ public class FakeRoleManager
     {
         writer.WriteUInt32(_player.NetworkIdentity.netId);
         var roleInfo = GetRoleInfo(receiver);
-        if (receiver.PlayerType == PlayerType.Player && _player.PlayerType == PlayerType.Dummy)
-        {
-            SynapseLogger<Synapse>.Warn(receiver.Team + " " + receiver.RoleType);
-            SynapseLogger<Synapse>.Warn((receiver.Team == Team.Dead) + " && " + (_player is DummyPlayer { SpectatorVisible: false }));
-        }
         if (receiver.Team == Team.Dead && _player is DummyPlayer { SpectatorVisible: false })
         {
-            SynapseLogger<Synapse>.Warn("HIDE");
             writer.WriteRoleType(RoleTypeId.Spectator);
             return;
         }

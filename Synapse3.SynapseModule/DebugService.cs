@@ -4,12 +4,15 @@ using Synapse3.SynapseModule.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AdminToys;
 using MEC;
-using PlayerRoles;
+using Mirror;
+using RelativePositioning;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Map.Objects;
+using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic;
 using UnityEngine;
 
@@ -122,8 +125,31 @@ public class DebugService : Service
                 break;
            
             case KeyCode.Alpha2:
-                (Synapse.Get<ElevatorService>().Elevators.FirstOrDefault(x => x.ElevatorId == 99).Chamber as
-                    CustomElevatorChamber).Schematic.Position = ev.Player.Position;
+                var pos = Vector3.zero;
+                var points = WaypointBase.AllWaypoints.Where(x => x != null).Reverse().Take(5);
+                foreach (var waypoint in points)
+                {
+                    switch (waypoint)
+                    {
+                        case NetIdWaypoint netIdWaypoint:
+                            pos = netIdWaypoint.transform.position;
+                            break;
+                            
+                        case ElevatorWaypoint elevatorWaypoint:
+                            pos = elevatorWaypoint.ElevatorTransform.position;
+                            break;
+                            
+                        default:
+                            Logger.Warn("Other Waypoint?");
+                            break;
+                    }
+                
+                    Logger.Warn(Synapse.Get<RoomService>().Rooms
+                                    .OrderBy(x => Vector3.Distance(ev.Player.Position, x.Position)).First().Name +
+                                " " +
+                                pos);    
+                }
+                
                 break;
             case KeyCode.Alpha3:
                 new SynapseDoor(SynapseDoor.SpawnableDoorType.Hcz, ev.Player.Position, ev.Player.Rotation, Vector3.one)
@@ -133,30 +159,7 @@ public class DebugService : Service
                 break;
             
             case KeyCode.Alpha4:
-                var schem = new SynapseSchematic(new SchematicConfiguration()
-                {
-                    Doors = new List<SchematicConfiguration.DoorConfiguration>()
-                    {
-                        new SchematicConfiguration.DoorConfiguration()
-                        {
-                            Position = Vector3.up,
-                            DoorType = SynapseDoor.SpawnableDoorType.Ez
-                        }
-                    },
-                    Primitives = new List<SchematicConfiguration.PrimitiveConfiguration>()
-                    {
-                        new SchematicConfiguration.PrimitiveConfiguration()
-                        {
-                            Position = Vector3.right,
-                            Color = Color.white,
-                            PrimitiveType = PrimitiveType.Sphere
-                        }
-                    }
-                })
-                {
-                    MoveInElevator = true
-                };
-                schem.Position = ev.Player.Position;
+                
                 break;
         }
     }

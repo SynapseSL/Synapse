@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using RelativePositioning;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Schematic;
@@ -179,6 +180,13 @@ public class SynapseSchematic : DefaultSynapseObject, IHideable, IRefreshable
         Map._synapseSchematics.Add(this);
         var comp = GameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
+
+        var waypoints = GameObject.GetComponentsInChildren<WaypointBase>();
+        foreach (var waypoint in waypoints)
+        {
+            SynapseLogger<SynapseSchematic>.Warn("Found Waypoint in Schematic ... deleting");
+            Object.Destroy(waypoint);
+        }
     }
     
     private void UpdatePositionAndRotation()

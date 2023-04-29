@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Interactables.Interobjects;
-using Neuron.Core.Logging;
 using Neuron.Core.Meta;
+using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -16,13 +16,15 @@ public class ElevatorService : Service
     private readonly Synapse _synapseModule;
     private readonly RoundEvents _round;
     private readonly MapEvents _map;
+    private readonly PlayerEvents _playerEvents;
     private readonly PlayerService _playerService;
 
-    public ElevatorService(Synapse synapseModule, RoundEvents round, MapEvents map, PlayerService playerService)
+    public ElevatorService(Synapse synapseModule, RoundEvents round, MapEvents map,PlayerEvents playerEvents, PlayerService playerService)
     {
         _synapseModule = synapseModule;
         _round = round;
         _map = map;
+        _playerEvents = playerEvents;
         _playerService = playerService;
     }
 
@@ -37,6 +39,7 @@ public class ElevatorService : Service
         _round.Waiting.Subscribe(OnWaiting);
         _round.Restart.Subscribe(Clear);
         _map.ElevatorMoveContent.Subscribe(MoveContent);
+        _playerEvents.Update.Subscribe(Update);
         ElevatorChamber.OnElevatorMoved += MoveVanillaContent;
     }
 
@@ -45,6 +48,7 @@ public class ElevatorService : Service
         _round.Waiting.Unsubscribe(OnWaiting);
         _round.Restart.Unsubscribe(Clear);
         _map.ElevatorMoveContent.Unsubscribe(MoveContent);
+        _playerEvents.Update.Unsubscribe(Update);
         ElevatorChamber.OnElevatorMoved -= MoveVanillaContent;
     }
 
@@ -104,6 +108,16 @@ public class ElevatorService : Service
         foreach (var elevator in _customElevators)
         {
             elevator.Unload();
+        }
+    }
+
+    private void Update(UpdateEvent ev)
+    {
+        if (ev.Player.PlayerType != PlayerType.Server) return;
+        foreach (var customElevator in _customElevators)
+        {
+            if(customElevator.Chamber is ICustomElevatorChamber customElevatorChamber)
+                customElevatorChamber.Update();
         }
     }
 

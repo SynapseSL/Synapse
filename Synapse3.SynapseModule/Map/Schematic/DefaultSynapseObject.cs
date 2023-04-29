@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Mirror;
+using RelativePositioning;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Schematic;
@@ -90,5 +91,14 @@ public abstract class DefaultSynapseObject : ISynapseObject
     public virtual void OnDestroy()
     {
         Map._synapseObjects.Remove(this);
+    }
+    
+    public void DeleteWayPoints()
+    {
+        var waypoints = GameObject.GetComponentsInChildren<WaypointBase>();
+        foreach (var waypoint in waypoints)
+        {
+            Object.Destroy(waypoint);
+        }
     }
 }

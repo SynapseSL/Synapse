@@ -17,9 +17,12 @@ public class ExampleElevator : CustomElevator
     protected override void OnGenerate()
     {
         Logger.Warn("GENERATE ELEVATOR!");
-        SpawnDestination(new RoomPoint(RoomType.Scp914.ToString(), Vector3.up, Vector3.zero));
-        SpawnDestination(new RoomPoint(RoomType.Scp914.ToString(), Vector3.up * 8, Vector3.zero));
+        SpawnDestination(new RoomPoint(RoomType.Surface.ToString(), new(18.92f,-8.35f,-42.84f), Vector3.zero));
+        SpawnDestination(new RoomPoint(RoomType.Surface.ToString(), new (18.92f,-8.35f + 10f,-42.84f), Vector3.zero));
+        SpawnDestination(new RoomPoint(RoomType.Surface.ToString(), new (18.92f,-8.35f + 20f,-42.84f), Vector3.zero));
     }
+
+    public override float MoveTime => 5f;
 }
 
 /*

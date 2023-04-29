@@ -1,5 +1,4 @@
 ﻿using Neuron.Core.Logging;
-using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Map.Rooms;
 using UnityEngine;

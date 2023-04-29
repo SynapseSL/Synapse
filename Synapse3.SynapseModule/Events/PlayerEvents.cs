@@ -1,5 +1,4 @@
 ﻿using Hazards;
-using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
 using Neuron.Core.Events;
 using Neuron.Core.Meta;
