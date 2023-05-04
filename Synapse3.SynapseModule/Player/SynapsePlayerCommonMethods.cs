@@ -282,7 +282,7 @@ public partial class SynapsePlayer
                     ScenarioId = (byte)Escape.EscapeScenarioType.ClassD,
                     EscapeTime = (ushort)Mathf.CeilToInt(CurrentRole.ActiveTime)
                 });
-                if (ev.OverrideRole is >= 0 and <= RoleService.HighestRole)
+                if (_role.IsIdVanila(ev.OverrideRole))
                     RoleManager.ServerSetRole((RoleTypeId)ev.OverrideRole, RoleChangeReason.Escaped);
                 else RoleID = ev.OverrideRole;
                 return;

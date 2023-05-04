@@ -66,7 +66,7 @@ public partial class SynapsePlayer
         }
         set
         {
-            if (value is >= 0 and <= (int)RoleService.HighestRole)
+            if (_role.IsIdVanila(value))
             {
                 RemoveCustomRole(DeSpawnReason.API);
                 RoleType = (RoleTypeId)value;
