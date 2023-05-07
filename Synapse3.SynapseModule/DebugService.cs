@@ -159,9 +159,53 @@ public class DebugService : Service
                 break;
             
             case KeyCode.Alpha4:
-                
+                var roomService = Synapse.Get<RoomService>();
+                if (!roomService.IsIdRegistered(999))
+                {
+                    var schematicService = Synapse.Get<SchematicService>();
+                    var schematic = new SchematicConfiguration()
+                    {
+                        Id = 999,
+                        Name = "TestSchematic"
+                    };
+                    for (int i = 0; i < 250; i++)//Avrage amount of primitve on Azarus per room
+                    {
+                        schematic.Primitives.Add(new()
+                        {
+                            Color = Color.white,
+                            CustomAttributes = new(),
+                            Physics = false,
+                            Position = Vector3.zero,
+                            PrimitiveType = PrimitiveType.Cube,
+                            Rotation = new Quaternion(0,0,0,0),
+                            Scale = Vector3.one
+                        });
+                    }
+                    schematicService.RegisterSchematic(schematic);
+                    roomService.RegisterCustomRoom<TestRoom>();
+                }
+                roomService.SpawnCustomRoom(999, ev.Player.Position);
+                break;
+            case KeyCode.Alpha5:
+                SynapseLogger<Debug>.Warn("Tps: " + Math.Round(1 / Time.deltaTime));
+
+
                 break;
         }
     }
+}
+
+[CustomRoom(
+    Id = 999,
+    SchematicId = 999,
+    Name = "TestRoom"
+    )]
+class TestRoom : SynapseCustomRoom
+{
+    public override uint Zone => (uint)ZoneType.Surface;
+
+    public override float VisibleDistance => 5;
+
+    public override float UpdateFrequencyVisble => 1;
 }
 #endif
