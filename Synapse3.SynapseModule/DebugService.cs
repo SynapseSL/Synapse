@@ -7,6 +7,7 @@ using System.Linq;
 using AdminToys;
 using MEC;
 using Mirror;
+using PlayerRoles;
 using RelativePositioning;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
@@ -114,8 +115,7 @@ public class DebugService : Service
                 break;
         }
     }
-
-    private SynapseDummy _dummy;
+    
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)
@@ -152,16 +152,24 @@ public class DebugService : Service
                 
                 break;
             case KeyCode.Alpha3:
-                new SynapseDoor(SynapseDoor.SpawnableDoorType.Hcz, ev.Player.Position, ev.Player.Rotation, Vector3.one)
+                new SynapseRagDoll(RoleTypeId.ClassD, ev.Player.Position, Quaternion.identity, Vector3.one, ev.Player,
+                    DamageType.Unknown, "Elevator Dummy")
                 {
                     MoveInElevator = true
                 };
                 break;
             
             case KeyCode.Alpha4:
-                
+                Dummy = new SynapseDummy(ev.Player.Position, ev.Player.Rotation, ev.Player.RoleType,"testdummy");
+                Dummy.RaVisible = true;
+                break;
+            
+            case KeyCode.Alpha5:
+                ev.Player.Disarmer = Dummy.Player;
                 break;
         }
     }
+
+    private SynapseDummy Dummy;
 }
 #endif

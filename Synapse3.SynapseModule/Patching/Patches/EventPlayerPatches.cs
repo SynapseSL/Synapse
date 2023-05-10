@@ -23,6 +23,7 @@ using Synapse3.SynapseModule.Player;
 using Synapse3.SynapseModule.Role;
 using System;
 using System.Linq;
+using InventorySystem.Items.Usables;
 using InventorySystem.Searching;
 using MapGeneration.Distributors;
 using PlayerRoles.FirstPersonControl;
@@ -66,10 +67,10 @@ public static class FallingIntoAbyssPatch
     {
         var player = other?.GetComponentInParent<SynapsePlayer>();
         if (player == null) return;
+        if (player.AliveTime <= CheckpointKiller.MinAliveDuration) return;
         var ev = new FallingIntoAbyssEvent(player, true);
         _playerEvents.FallingIntoAbyss.RaiseSafely(ev);
         if (!ev.Allow) return;
-
         player.Hub.playerStats.DealDamage(new UniversalDamageHandler(-1f, DeathTranslations.Crushed));
     }
 }
@@ -380,7 +381,7 @@ public static class WarheadInteractPatch
 
 
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.UserCode_CmdUsePanel))]
+    [HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.UserCode_CmdUsePanel__AlphaPanelOperations))]
     public static bool OnPanelInteract(PlayerInteract __instance, PlayerInteract.AlphaPanelOperations n)
     {
         try
@@ -572,7 +573,8 @@ public static class PlayerJoinPatch
     {
         try
         {
-            var player = __instance.GetSynapsePlayer();
+            var player = __instance?.GetSynapsePlayer();
+            if(player == null) return;
             if (player.PlayerType == PlayerType.Server) return;
             var ev = new JoinEvent(__instance.GetSynapsePlayer(), nick);
             Player.Join.RaiseSafely(ev);
@@ -598,13 +600,15 @@ public static class PlayerDropItemPatch
 
 
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(Inventory), nameof(Inventory.UserCode_CmdDropItem))]
+    [HarmonyPatch(typeof(Inventory), nameof(Inventory.UserCode_CmdDropItem__UInt16__Boolean))]
     public static bool OnDropItem(Inventory __instance, ref ushort itemSerial, ref bool tryThrow)
     {
         try
         {
             if (!__instance.UserInventory.Items.TryGetValue(itemSerial, out var itemBase) || !itemBase.CanHolster())
                 return false;
+
+            if (itemBase is Consumable { _alreadyActivated: true }) return false;
 
             var ev = new DropItemEvent(__instance.GetSynapsePlayer(), true, itemBase.GetItem(), tryThrow);
             Player.DropItem.RaiseSafely(ev);
@@ -826,7 +830,7 @@ public static class ReportPlayerPatch
     }
 
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(CheaterReport), nameof(CheaterReport.UserCode_CmdReport))]
+    [HarmonyPatch(typeof(CheaterReport), nameof(CheaterReport.CmdReport))]
     public static bool OnReport(CheaterReport __instance, uint playerNetId, ref string reason, ref bool notifyGm)
     {
         try
@@ -1013,7 +1017,7 @@ public static class SendPlayerDataPatch
                     num += 1;
                 }
             }
-            writer.WriteUInt16(num);
+            writer.WriteUShort(num);
             for (int i = 0; i < num; i++)
             {
                 writer.WriteRecyclablePlayerId(new RecyclablePlayerId(FpcServerPositionDistributor._bufferPlayerIDs[i]));

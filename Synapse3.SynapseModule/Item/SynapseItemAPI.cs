@@ -124,7 +124,7 @@ public partial class SynapseItem
         CreateSchematic();
         
         DestroyItem();
-
+        
         var comp = Pickup.gameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
     }

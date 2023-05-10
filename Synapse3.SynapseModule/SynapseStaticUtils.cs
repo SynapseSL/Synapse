@@ -25,8 +25,8 @@ public const VersionType Type = VersionType.Dev;
     public const VersionType Type = VersionType.None;
 #endif
 
-    public const string SubVersion = "1.2";
-    public const string BasedGameVersion = "12.0.2";
+    public const string SubVersion = "1.3 custom";
+    public const string BasedGameVersion = "13.0.0";
 
     /// <summary>
     /// Returns an instance of the specified object by either resolving it using

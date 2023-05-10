@@ -56,7 +56,7 @@ public static class PlayerLoadComponentPatch
         }
     }
 }
-#if !PATCHLESS
+//#if !PATCHLESS
 
 [Automatic]
 [SynapsePatch("Scp079MaxAuxiliary", PatchType.Wrapper)]
@@ -263,4 +263,4 @@ public static class ArtificialHealthPatch
         return false;
     }
 }
-#endif
+//#endif

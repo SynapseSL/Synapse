@@ -4,7 +4,7 @@ using Neuron.Core.Meta;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
 
-#if !PATCHLESS
+//#if !PATCHLESS
 [Automatic]
 [SynapsePatch("RefreshPermission", PatchType.Permission)]
 public static class RefreshPermissionPatch
@@ -33,4 +33,4 @@ public static class SetPermissionPatch
     [HarmonyPatch(typeof(ServerRoles), nameof(ServerRoles.SetGroup)), HarmonyPrefix]
     public static bool SetGroup() => false;
 }
-#endif
+//#endif

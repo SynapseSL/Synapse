@@ -1,25 +1,26 @@
 ﻿using System;
 using Mirror;
 using Neuron.Core.Meta;
+using PlayerRoles.SpawnData;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule;
 
 public class MirrorService : Service
 {
-    public UpdateVarsMessage GetCustomVarMessage<TNetworkBehaviour>(TNetworkBehaviour behaviour,
+    public EntityStateMessage GetCustomVarMessage<TNetworkBehaviour>(TNetworkBehaviour behaviour,
         Action<NetworkWriter> writeCustomData, bool writeDefaultObjectData = true)
         where TNetworkBehaviour : NetworkBehaviour
     {
-        var writer = NetworkWriterPool.GetWriter();
+        var writer = new NetworkWriterPooled();
         
-        var pos = writer.position;
+        var pos = writer.Position;
         writer.WriteByte((byte)behaviour.ComponentIndex);
 
         var pos1 = writer.Position;
         //This is just a placeholder and contains the length of the Data for this
         //Component since you could send multiple Component changes with just one message
-        writer.WriteInt32(0);
+        writer.WriteInt(0);
         var pos2 = writer.Position;
 
         //This will write the SyncObject Data can be used the modify Synced List or similar
@@ -30,7 +31,7 @@ public class MirrorService : Service
 
         var pos3 = writer.Position;
         writer.Position = pos1;
-        writer.WriteInt32(pos3-pos2);
+        writer.WriteInt(pos3-pos2);
         writer.Position = pos3;
                     
         if (behaviour.syncMode == SyncMode.Observers)
@@ -40,22 +41,21 @@ public class MirrorService : Service
             writer.WriteBytes(segment.Array, pos, counter);
         }
 
-        var msg = new UpdateVarsMessage()
+        var msg = new EntityStateMessage()
         {
             netId = behaviour.netId,
             //If I use the writer directly and recycle it the array will be reused afterwards and a wrong payload will be send
-            payload = new ArraySegment<byte>(writer.buffer.ToArray<byte>(), 0, writer.length)
+            payload = new ArraySegment<byte>(writer.buffer.ToArray<byte>(), 0, writer.Position)
         };
         writer.Reset();
-        NetworkWriterPool.Recycle(writer);
         return msg;
     }
 
-    public UpdateVarsMessage GetCustomVarMessage<TNetworkBehaviour, TValue>(TNetworkBehaviour behaviour, ulong id,
+    public EntityStateMessage GetCustomVarMessage<TNetworkBehaviour, TValue>(TNetworkBehaviour behaviour, ulong id,
         TValue value) where TNetworkBehaviour : NetworkBehaviour => GetCustomVarMessage(behaviour,
         writer =>
         {
-            writer.WriteUInt64(id);
+            writer.WriteULong(id);
             writer.Write(value);
         });
 
@@ -63,17 +63,16 @@ public class MirrorService : Service
         Action<NetworkWriter> writeArguments)
         where TNetworkBehaviour : NetworkBehaviour
     {
-        var writer = NetworkWriterPool.GetWriter();
+        var writer = new NetworkWriterPooled();
         writeArguments?.Invoke(writer);
         var msg = new RpcMessage()
         {
             netId = behaviour.netId,
             componentIndex = behaviour.ComponentIndex,
-            functionHash = typeof(TNetworkBehaviour).FullName.GetStableHashCode() * 503 + methodName.GetStableHashCode(),
-            payload = new ArraySegment<byte>(writer.buffer.ToArray<byte>(), 0, writer.length)
+            functionHash = (ushort)(methodName.GetStableHashCode() & 65535),
+            payload = new ArraySegment<byte>(writer.buffer.ToArray<byte>(), 0, writer.Position)
         };
-        writer.Reset();
-        NetworkWriterPool.Recycle(writer);
+        writer.Dispose();
         return msg;
     }
 
@@ -82,10 +81,12 @@ public class MirrorService : Service
     /// </summary>
     public SpawnMessage GetSpawnMessage(NetworkIdentity identity)
     {
-        var writer = NetworkWriterPool.GetWriter();
-        var writer2 = NetworkWriterPool.GetWriter();
+        var writer = new NetworkWriterPooled();
+        var writer2 = new NetworkWriterPooled();
         var payload = NetworkServer.CreateSpawnMessagePayload(false, identity, writer, writer2);
         var gameObject = identity.gameObject;
+        writer.Dispose();
+        writer2.Dispose();
         return new SpawnMessage
         {
             netId = identity.netId,
@@ -102,8 +103,8 @@ public class MirrorService : Service
 
     public SpawnMessage GetSpawnMessage(NetworkIdentity identity, SynapsePlayer playerToReceive)
     {
-        var writer = NetworkWriterPool.GetWriter();
-        var writer2 = NetworkWriterPool.GetWriter();
+        var writer = new NetworkWriterPooled();
+        var writer2 = new NetworkWriterPooled();
         var isOwner = identity.connectionToClient == playerToReceive.Connection;
         var payload = NetworkServer.CreateSpawnMessagePayload(isOwner, identity, writer, writer2);
         var transform = identity.transform;
@@ -119,6 +120,8 @@ public class MirrorService : Service
             scale = transform.localScale,
             payload = payload
         };
+        writer.Dispose();
+        writer2.Dispose();
         return msg;
     }
 }

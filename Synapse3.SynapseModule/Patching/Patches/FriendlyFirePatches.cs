@@ -1,13 +1,15 @@
 ﻿using System;
 using HarmonyLib;
-using InventorySystem.Items.ThrowableProjectiles;
 using Neuron.Core.Meta;
 using PlayerStatsSystem;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
 
-#if !PATCHLESS
+#if Patch
+
+#endif
+//#if !PATCHLESS
 [Automatic]
 [SynapsePatch("CheckFF", PatchType.FriendlyFire)]
 public static class CheckFriendlyFirePatch
@@ -31,13 +33,13 @@ public static class CheckFriendlyFirePatch
         }
     }
 }
-
+/*
 [Automatic]
 [SynapsePatch("Flash bang", PatchType.FriendlyFire)]
 public static class FlashBangCheckPatch
 {
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(FlashbangGrenade), nameof(FlashbangGrenade.PlayExplosionEffects))]
+    //TODO: [HarmonyPatch(typeof(FlashbangGrenade), nameof(FlashbangGrenade.PlayExplosionEffects))]
     public static bool FlashBangCheck(FlashbangGrenade __instance)
     {
         try
@@ -62,6 +64,7 @@ public static class FlashBangCheckPatch
         }
     }
 }
+*/
 
 [Automatic]
 [SynapsePatch("Player Damage", PatchType.FriendlyFire)]
@@ -76,4 +79,4 @@ public static class PlayerDamagePatch
                Synapse3Extensions.GetHarmPermission(aHandler.Attacker, __instance?.TargetHub);
     }
 }
-#endif
+//#endif

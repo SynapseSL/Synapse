@@ -74,6 +74,11 @@ public class SynapseObjectScript : MonoBehaviour
 
     private void MoveElevator(ElevatorMoveContentEvent ev)
     {
+        if (ev.CustomElevator)
+        {
+            Object.Position += ev.DeltaPosition;
+            return;
+        }
         if (!Object.MoveInElevator || Object.Parent != null) return;
         var isAlreadyMoving = _inElevator && ev.Elevator == _elevator;
         if (!ev.Bounds.Contains(_lastPosition))

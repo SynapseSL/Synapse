@@ -181,12 +181,7 @@ public class SynapseSchematic : DefaultSynapseObject, IHideable, IRefreshable
         var comp = GameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
 
-        var waypoints = GameObject.GetComponentsInChildren<WaypointBase>();
-        foreach (var waypoint in waypoints)
-        {
-            SynapseLogger<SynapseSchematic>.Warn("Found Waypoint in Schematic ... deleting");
-            Object.Destroy(waypoint);
-        }
+        DeleteWayPoints();
     }
     
     private void UpdatePositionAndRotation()
