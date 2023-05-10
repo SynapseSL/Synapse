@@ -130,6 +130,7 @@ public class MirrorItemEvents : Service
     {
         try
         {
+            if (connection?.identity?.gameObject == null) return;
             if (message.Request != RequestType.Reload)
             {
                 FirearmBasicMessagesHandler.ServerRequestReceived(connection, message);

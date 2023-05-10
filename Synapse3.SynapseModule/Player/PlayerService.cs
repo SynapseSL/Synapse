@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using MEC;
 using Neuron.Core.Meta;
-using Synapse3.SynapseModule.Config;
+using PlayerRoles;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
@@ -18,32 +19,31 @@ public class PlayerService : Service
     private readonly PlayerEvents _player;
     private readonly RoundEvents _round;
     private readonly PermissionService _permission;
-    private readonly SynapseConfigService _config;
 
     public List<IJoinUpdate> JoinUpdates { get; } = new();
 
-    public PlayerService(DummyService dummy, PlayerEvents player, RoundEvents round, PermissionService permission,
-        SynapseConfigService config)
+    public PlayerService(DummyService dummy, PlayerEvents player, RoundEvents round, PermissionService permission)
     {
         _dummy = dummy;
         _player = player;
         _round = round;
         _permission = permission;
-        _config = config;
     }
 
     public override void Enable()
     {
         _player.Join.Subscribe(Join);
-        _round.Restart.Subscribe(ClearJoinUpdates);
-        _player.SimpleSetClass.Subscribe(ChangeClass);
+        _round.Restart.Subscribe(RoundRestart);
+        _player.SetClass.Subscribe(ChangeClass);
+        _player.ChangeRole.Subscribe(ChangeRole);
     }
 
     public override void Disable()
     {
         _player.Join.Unsubscribe(Join);
-        _round.Restart.Unsubscribe(ClearJoinUpdates);
-        _player.SimpleSetClass.Unsubscribe(ChangeClass);
+        _round.Restart.Unsubscribe(RoundRestart);
+        _player.SetClass.Unsubscribe(ChangeClass);
+        _player.ChangeRole.Unsubscribe(ChangeRole);
     }
 
     /// <summary>
@@ -74,6 +74,7 @@ public class PlayerService : Service
     public List<SynapsePlayer> GetPlayers(params PlayerType[] playerTypes)
     {
         var result = new List<SynapsePlayer>();
+        if (playerTypes == null) return result;
         if (playerTypes.Contains(PlayerType.Player))
         {
             result.AddRange(Players);
@@ -86,8 +87,9 @@ public class PlayerService : Service
 
         if (playerTypes.Contains(PlayerType.Dummy))
         {
-            foreach (var dummy in _dummy._dummies)
+            foreach (var dummy in _dummy?._dummies ?? new List<SynapseDummy>())
             {
+                if (dummy == null) continue;
                 result.Add(dummy.Player);
             }
         }
@@ -289,6 +291,7 @@ public class PlayerService : Service
                     {
                         if (int.TryParse(parameter, out var id))
                         {
+                            id *= -1;
                             //Check For SynapseGroupID
                             foreach (var player in GetPlayers(id, playerTypes))
                             {
@@ -326,8 +329,42 @@ public class PlayerService : Service
                 joinUpdate.UpdatePlayer(ev.Player);
         }
     }
-    
-    private void ClearJoinUpdates(RoundRestartEvent _) => JoinUpdates.Clear();
 
-    private void ChangeClass(SimpleSetClassEvent ev) => ev.Player.MainScpController.ProximityChat = false;
+    private void RoundRestart(RoundRestartEvent _)
+        => JoinUpdates.Clear();
+
+    private void ChangeClass(SetClassEvent ev)
+    {
+        ev.Player.MainScpController.ProximityChat = false;
+        ev.Player._maxHealth = -1;
+        switch (ev.Player.RoleType)
+        {
+            case RoleTypeId.Scp106:
+                ev.Player.MainScpController.Scp106.ResetDefault();
+                break;
+            case RoleTypeId.Scp173:
+                ev.Player.MainScpController.Scp173.ResetDefault();
+                break;
+        }
+        
+        Timing.CallDelayed(Timing.WaitForOneFrame, () =>
+        {
+            if (ev.Player.CustomRole == null)
+                _player.ChangeRole.RaiseSafely(new ChangeRoleEvent(ev.Player) { RoleId = (uint)ev.Role });
+            
+            foreach (var player in GetPlayers(PlayerType.Player,PlayerType.Dummy))
+            {
+                if (ev.Player == player || player.CustomInfo.IsForEveryoneEqual) continue;
+                player.CustomInfo.UpdatePlayer(ev.Player);
+            }
+        });
+    }
+
+    private void ChangeRole(ChangeRoleEvent ev)
+    {
+        foreach (var player in GetAbsoluteAllPlayers())
+        {
+            player.FakeRoleManager.UpdatePlayer(ev.Player);
+        }
+    }
 }

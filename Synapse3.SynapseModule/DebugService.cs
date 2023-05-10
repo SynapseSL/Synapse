@@ -1,5 +1,4 @@
-﻿using MEC;
-using Neuron.Core.Events;
+﻿using Neuron.Core.Events;
 using Neuron.Core.Meta;
 using PlayerStatsSystem;
 using PlayerRoles;
@@ -7,11 +6,22 @@ using Scp914;
 using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Events;
-using Synapse3.SynapseModule.Teams;
 using System;
-using Respawning;
-using Synapse3.SynapseModule.Item;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using AdminToys;
+using MapGeneration;
+using MEC;
+using Mirror;
+using Neuron.Core;
+using PlayerRoles;
+using RelativePositioning;
+using Synapse3.SynapseModule.Dummy;
+using Synapse3.SynapseModule.Enums;
+using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Map.Objects;
+using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Map.Scp914;
 using Synapse3.SynapseModule.Player;
@@ -45,16 +55,44 @@ public class DebugService : Service
 
     public override void Enable()
     {
-        Synapse.Get<SynapseCommandService>().ServerConsole.Subscribe(ev => Logger.Warn(ev.Context.FullCommand));
-
+        Synapse.Get<SchematicService>().RegisterSchematic(new SchematicConfiguration()
+        {
+            Name = "ElevatorChamber",
+            Id = 50,
+            Primitives = new List<SchematicConfiguration.PrimitiveConfiguration>()
+            {
+                new SchematicConfiguration.PrimitiveConfiguration()
+                {
+                    Position = Vector3.down * 0.4f,
+                    PrimitiveType = PrimitiveType.Plane,
+                    Color = Color.white,
+                    Scale = Vector3.one * 0.3f
+                }
+            }
+        });
+        Synapse.Get<SchematicService>().RegisterSchematic(new SchematicConfiguration()
+        {
+            Name = "ElevatorDestination",
+            Id = 51,
+            Doors = new List<SchematicConfiguration.DoorConfiguration>()
+            {
+                new SchematicConfiguration.DoorConfiguration()
+                {
+                    DoorType = SynapseDoor.SpawnableDoorType.Ez,
+                    Position = Vector3.forward
+                }
+            }
+        });
         var method = ((Action<IEvent>)Event).Method;
         foreach (var reactor in _event.Reactors)
         {
             if (reactor.Key == typeof(UpdateObjectEvent)) continue;
+            if (reactor.Key == typeof(UpdateEvent)) continue;
             if (reactor.Key == typeof(EscapeEvent)) continue;
             if (reactor.Key == typeof(Scp173ObserveEvent)) continue;
             if (reactor.Key == typeof(KeyPressEvent)) continue;
             if (reactor.Key == typeof(SpeakEvent)) continue;
+            if (reactor.Key == typeof(SpeakToPlayerEvent)) continue;
             if (reactor.Key == typeof(RoundCheckEndEvent)) continue;
             if (reactor.Key == typeof(SendPlayerDataEvent)) continue;
             if (reactor.Key.IsAbstract) continue;
@@ -67,30 +105,41 @@ public class DebugService : Service
     private void OnStart(RoundStartEvent args)
     {
         RegisterProcess();
-    }
+        _round.Waiting.Subscribe(ev =>
+        {
+            ((SynapseNetworkRoom)Synapse.Get<RoomService>().GetRoom((uint)RoomType.TestingRoom)).Position +=
+                Vector3.up * 5;
+            ((SynapseNetworkRoom)Synapse.Get<RoomService>().GetRoom((uint)RoomType.Scp330)).Position +=
+                Vector3.up * 5;
+            
+            var text = "";
+            foreach (var prefab in NetworkClient.prefabs)
+            {
+                text += "\n" + prefab.Value.name + " ID: " + prefab.Key;
+            }
 
-    public void Event(IEvent ev)
+            File.WriteAllText(Path.Combine(Synapse.Get<NeuronBase>().RelativePath(), "prefabs.txt"), text);
+        });
+    }
+    
+    public void Event(IEvent e)
     {
-        Logger.Warn("Event triggered: " + ev.GetType().Name);
+        switch (e)
+        {
+            default:
+                Logger.Warn("Event triggered: " + e.GetType().Name);
+                break;
+        }
     }
-
+    
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)
         {
             case KeyCode.Alpha1:
-                ev.Player.RoleID = 61;
-                ev.Player.FakeRoleManager.OwnVisibleRole = new Player.RoleInfo(PlayerRoles.RoleTypeId.Scp939, ev.Player);
-                break;
-           
-            case KeyCode.Alpha2:
-                Synapse.Get<TeamService>().NextTeam = 15;
-                Synapse.Get<TeamService>().Spawn(); 
-
-                break;
-            case KeyCode.Alpha3:
-                Synapse.Get<TeamService>().NextTeam = 1;
-                Synapse.Get<TeamService>().Spawn();
+                var dummy = new SynapseDummy(ev.Player.Position, ev.Player.Rotation, ev.Player.RoleType, "Dummy");
+                dummy.RaVisible = true;
+                dummy.Player.CustomInfo.Add("TestMessage Only for you", new List<SynapsePlayer>() { ev.Player });
                 break;
         }
     }
@@ -125,5 +174,7 @@ public class DebugService : Service
             return false;
         }
     }
+    private SynapseDummy Dummy;
+
 }
 #endif

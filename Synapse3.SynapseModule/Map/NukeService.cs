@@ -62,18 +62,17 @@ public class NukeService : Service
                                WarheadController.CooldownEndTime <= NetworkTime.time && !WarheadController.IsLocked;
 
     public void StartDetonation()
-        => WarheadController.StartDetonation();
+    {
+        WarheadController.InstantPrepare();
+        WarheadController.StartDetonation();
+    }
 
     public void CancelDetonation()
         => WarheadController.CancelDetonation();
 
     public void Shake() => WarheadController.RpcShake(true);
-    
-    public void InstantDetonation()
-    {
-        WarheadController.InstantPrepare();
-        WarheadController.StartDetonation(false, true);
-    }
+
+    public void InstantDetonation() => WarheadController.ForceTime(0f);
 
     public class NukeInsidePanel
     {

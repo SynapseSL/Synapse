@@ -4,7 +4,10 @@ using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Schematic;
 
-public abstract class SynapseToyObject<TToy> : DefaultSynapseObject where TToy : AdminToyBase
+public abstract class SynapseToyObject<TToy> : 
+    DefaultSynapseObject,
+    IHideable
+    where TToy : AdminToyBase
 {
     public abstract TToy ToyBase { get; }
 
@@ -20,11 +23,11 @@ public abstract class SynapseToyObject<TToy> : DefaultSynapseObject where TToy :
         }
     }
 
-    public override void HideFromAll() => ToyBase.netIdentity.UnSpawnForAllPlayers();
+    public void HideFromAll() => ToyBase.netIdentity.UnSpawnForAllPlayers();
 
-    public override void ShowAll() => ToyBase.netIdentity.SpawnForAllPlayers();
+    public void ShowAll() => ToyBase.netIdentity.SpawnForAllPlayers();
 
-    public override void HideFromPlayer(SynapsePlayer player) => ToyBase.netIdentity.UnSpawnForOnePlayer(player);
+    public void HideFromPlayer(SynapsePlayer player) => ToyBase.netIdentity.UnSpawnForOnePlayer(player);
 
-    public override void ShowPlayer(SynapsePlayer player) => ToyBase.netIdentity.SpawnForOnePlayer(player);
+    public void ShowPlayer(SynapsePlayer player) => ToyBase.netIdentity.SpawnForOnePlayer(player);
 }

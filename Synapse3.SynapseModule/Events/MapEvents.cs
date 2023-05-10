@@ -103,25 +103,36 @@ public class GeneratorEngageEvent : IEvent
 public class ElevatorMoveContentEvent : IEvent
 {
     public IElevator Elevator { get; }
-
-    public float OpenManuallyDelay { get; set; } = 4f;
-
-    public bool OpenDoorManually { get; set; } = false;
     
-    public IElevatorDestination Destination { get; set; }
+    public Vector3 DeltaPosition { get; }
+    
+    public Quaternion DeltaRotation { get; }
+    
+    public Bounds Bounds { get; }
+    
+    public bool CustomElevator { get; }
 
-    public ElevatorMoveContentEvent(IElevator elevator)
+    public ElevatorMoveContentEvent(IElevator elevator, Vector3 deltaPosition, Quaternion deltaRotation, Bounds bounds,
+        bool customElevator = false)
+
     {
         Elevator = elevator;
+        DeltaPosition = deltaPosition;
+        DeltaRotation = deltaRotation;
+        Bounds = bounds;
+        CustomElevator = customElevator;
     }
 }
 
 public class TriggerTeslaEvent : PlayerInteractEvent
 {
-    public TriggerTeslaEvent(SynapsePlayer player, bool allow, SynapseTesla tesla) : base(player, allow)
+    public TriggerTeslaEvent(SynapsePlayer player, bool allow, SynapseTesla tesla, bool idle) : base(player, allow)
     {
         Tesla = tesla;
+        Idle = idle;
     }
+    
+    public bool Idle { get; }
     
     public SynapseTesla Tesla { get; }
 }

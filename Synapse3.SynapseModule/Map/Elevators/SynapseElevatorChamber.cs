@@ -11,8 +11,10 @@ public class SynapseElevatorChamber : IElevatorChamber
         MainElevator = elevator;
     }
     public ElevatorChamber Chamber { get; }
-    
-    public Vector3 Position { get; }
-    public bool IsMoving { get; set; }
+
+    public Transform ParentTransform => Chamber.transform;
+    public Vector3 Position => Chamber.transform.position;
+    public Quaternion Rotation => Chamber.transform.rotation;
+    public bool IsMoving => Chamber._curSequence == ElevatorChamber.ElevatorSequence.MovingAway;
     public IElevator MainElevator { get; }
 }

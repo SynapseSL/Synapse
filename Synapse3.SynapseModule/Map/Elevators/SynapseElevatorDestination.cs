@@ -16,7 +16,8 @@ public class SynapseElevatorDestination : IElevatorDestination
     public ElevatorDoor Door { get; }
     public SynapseDoor SynapseDoor { get; }
 
-    public Vector3 Position => Door._targetPosition;
+    public Vector3 Position => SynapseDoor.Position;
+    public Quaternion Rotation => SynapseDoor.Rotation;
 
     public bool Open
     {

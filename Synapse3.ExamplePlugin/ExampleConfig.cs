@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Neuron.Core.Meta;
 using Syml;
-using Synapse3.SynapseModule.Role;
 
 namespace Synapse3.ExamplePlugin;
 

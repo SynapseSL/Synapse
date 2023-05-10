@@ -9,7 +9,9 @@ public class DummyPlayer : SynapsePlayer
 {
     public override PlayerType PlayerType => PlayerType.Dummy;
 
-    public bool RaVisible { get; set; } = true;
+    public bool RaVisible { get; set; } = false;
+
+    public bool SpectatorVisible { get; set; } = false;
 
     public bool DestroyWhenDied { get; set; } = true;
 
@@ -95,7 +97,9 @@ public class DummyPlayer : SynapsePlayer
         var service = Synapse.Get<DummyService>();
         service._dummies.Remove(SynapseDummy);
     }
-   
+
+    public override void SendWindowMessage(string text) { }
+
     public SynapseDummy SynapseDummy { get; internal set; }
 
     public override TTranslation GetTranslation<TTranslation>(TTranslation translation) => translation.Get();

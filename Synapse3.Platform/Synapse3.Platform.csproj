@@ -31,7 +31,7 @@
 
 
     <ItemGroup>
-      <PackageReference Include="NeuronModding.Core" Version="1.0.0.3" />
+      <PackageReference Include="NeuronModding.Core" Version="1.0.2" />
     </ItemGroup>
     
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -44,6 +44,10 @@
       <DebugType>Portable</DebugType>
       <Optimize Condition=" '$(Optimize)' == '' ">true</Optimize>
       <DocumentationFile />
+    </PropertyGroup>
+    
+    <PropertyGroup Condition=" '$(Configuration)' == 'Custom Version' ">
+      <Optimize>true</Optimize>
     </PropertyGroup>
 
 </Project>

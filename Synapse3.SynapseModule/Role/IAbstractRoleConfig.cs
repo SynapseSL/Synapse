@@ -16,6 +16,9 @@ public interface IAbstractRoleConfig
     public float MaxArtificialHealth { get; }
     public RoomPoint[] PossibleSpawns { get; }
     public SerializedPlayerInventory[] PossibleInventories { get; }
+    public bool CustomDisplay { get; }
     public bool Hierarchy { get; }
+    public bool UseCustomUnitName { get; }
+    public string CustomUnitName { get; }
     public SerializedVector3 Scale { get; }
 }

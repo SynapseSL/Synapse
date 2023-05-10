@@ -4,6 +4,7 @@ using InventorySystem.Items.Firearms.Attachments;
 using Mirror;
 using Neuron.Core.Logging;
 using PlayerRoles;
+using PlayerRoles.FirstPersonControl;
 using PlayerStatsSystem;
 using PluginAPI.Enums;
 using PluginAPI.Events;
@@ -46,7 +47,7 @@ public partial class SynapsePlayer
     /// <summary>
     /// Opens the Window that is usually used for Reports with a Custom Message
     /// </summary>
-    public void SendWindowMessage(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
+    public virtual void SendWindowMessage(string text) => GameConsoleTransmission.SendToClient(Connection, "[REPORTING] " + text, "white");
     
     /// <summary>
     /// Displays a hint on the Player's screen
@@ -198,7 +199,7 @@ public partial class SynapsePlayer
         AlphaWarheadController.Singleton, nameof(AlphaWarheadController.RpcShake),
         writer =>
         {
-            writer.WriteBoolean(achieve);
+            writer.WriteBool(achieve);
         }));
 
     /// <summary>
@@ -234,15 +235,17 @@ public partial class SynapsePlayer
 
     private EscapeType GetEscapeType(bool ignoreEscapeDistance)
     {
-        var fpcRole = CurrentRole as HumanRole;
+        var disarmed = IsDisarmed;
+        var fpcRole = CurrentRole as FpcStandardRoleBase;
         if (fpcRole == null && !ignoreEscapeDistance) return EscapeType.TooFarAway;
         if (!ignoreEscapeDistance && (fpcRole.FpcModule.Position - Escape.WorldPos).sqrMagnitude > Escape.RadiusSqr) return EscapeType.TooFarAway;
         
+        if (CurrentRole.ActiveTime < 10f) return EscapeType.TooEarly;
+        if (disarmed && Disarmer?.CustomTeam?.Attribute.EvacuatePlayers == true)
+            return EscapeType.CustomTeamEvacuate;
         if (HasCustomRole) return EscapeType.CustomRole;
-        if (CurrentRole is not HumanRole human) return EscapeType.NotAssigned;
-        if (human.ActiveTime < 10f) return EscapeType.TooEarly;
-        
-        var disarmed = IsDisarmed;
+        if (CurrentRole is not HumanRole) return EscapeType.NotAssigned;
+
         if (IsDisarmed && !CharacterClassManager.CuffedChangeTeam) return EscapeType.NotAssigned;
         switch (RoleType)
         {
@@ -273,6 +276,10 @@ public partial class SynapsePlayer
         {
             case EscapeType.CustomRole:
                 CustomRole?.TryEscape();
+                return;
+            
+            case EscapeType.CustomTeamEvacuate:
+                Disarmer?.CustomTeam?.EvacuatePlayer(this);
                 return;
             
             case EscapeType.PluginOverride:

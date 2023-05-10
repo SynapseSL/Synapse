@@ -131,9 +131,8 @@ public class RoomService : Service
             IVanillaRoom iRoom;
             switch (type)
             {
-                case RoomType.Scp939:
+                case RoomType.TestingRoom:
                 case RoomType.Scp330:
-                case RoomType.Scp106:
                     iRoom = new SynapseNetworkRoom(room, type);
                     break;
 
@@ -193,7 +192,7 @@ public class RoomService : Service
             { "HCZ_Curve", RoomType.HczCurve },
             { "HCZ_Crossing", RoomType.HczCrossing },
             { "HCZ_Room3ar", RoomType.HeavyArmory },
-            { "HCZ_Testroom", RoomType.Scp939 },
+            { "HCZ_Testroom", RoomType.TestingRoom },
             { "HCZ_Room3", RoomType.HczTCross },
             { "HCZ_Nuke", RoomType.Nuke },
             { "HCZ_Servers", RoomType.Servers },
@@ -201,12 +200,14 @@ public class RoomService : Service
             { "HCZ_Hid", RoomType.MicroHid },
             { "HCZ_ChkpA", RoomType.HczElevatorA },
             { "HCZ_ChkpB", RoomType.HczElevatorB },
-            { "HCZ_EZ_Checkpoint", RoomType.HeavyEntranceCheckpoint },
+            { "HCZ Part", RoomType.HeavyCheckpoint },
             { "HCZ_049", RoomType.Scp049 },
             { "HCZ_079", RoomType.Scp079 },
             { "HCZ_457", RoomType.Scp096 },
             { "HCZ_106", RoomType.Scp106 },
+            { "HCZ_939", RoomType.Scp939 },
 
+            { "EZ Part", RoomType.EntranceCheckpoint },
             { "EZ_Straight", RoomType.EzStraight },
             { "EZ_Curve", RoomType.EzCurve },
             { "EZ_ThreeWay", RoomType.EzTCross },

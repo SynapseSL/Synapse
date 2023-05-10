@@ -1,12 +1,12 @@
 ﻿using Hazards;
 using Interactables.Interobjects.DoorUtils;
-using MEC;
 using Neuron.Core.Events;
 using Neuron.Core.Meta;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -18,7 +18,6 @@ public partial class PlayerEvents : Service
 {
     private readonly Synapse _synapse;
     private readonly EventManager _eventManager;
-    private readonly ItemService _item;
 
     public readonly EventReactor<LoadComponentEvent> LoadComponent = new();
     public readonly EventReactor<KeyPressEvent> KeyPress = new();
@@ -50,7 +49,6 @@ public partial class PlayerEvents : Service
     public readonly EventReactor<WalkOnTantrumEvent> WalkOnTantrum = new();
     public readonly EventReactor<StartWorkStationEvent> StartWorkStation = new();
     public readonly EventReactor<FallingIntoAbyssEvent> FallingIntoAbyss = new();
-    public readonly EventReactor<SimpleSetClassEvent> SimpleSetClass = new();
     public readonly EventReactor<UpdateDisplayNameEvent> UpdateDisplayName = new();
     public readonly EventReactor<CheckKeyCardPermissionEvent> CheckKeyCardPermission = new();
     public readonly EventReactor<CallVanillaElevatorEvent> CallVanillaElevator = new();
@@ -59,12 +57,12 @@ public partial class PlayerEvents : Service
     public readonly EventReactor<KickEvent> Kick = new();
     public readonly EventReactor<SpeakEvent> Speak = new();
     public readonly EventReactor<SpeakToPlayerEvent> SpeakToPlayer = new();
+    public readonly EventReactor<HotKeyEvent> HotKey = new();
 
-    public PlayerEvents(EventManager eventManager, Synapse synapse, ItemService item)
+    public PlayerEvents(EventManager eventManager, Synapse synapse)
     {
         _eventManager = eventManager;
         _synapse = synapse;
-        _item = item;
     }
 
     public override void Enable()
@@ -73,11 +71,13 @@ public partial class PlayerEvents : Service
         _eventManager.RegisterEvent(KeyPress);
         _eventManager.RegisterEvent(HarmPermission);
         _eventManager.RegisterEvent(SetClass);
+        _eventManager.RegisterEvent(Update);
         _eventManager.RegisterEvent(StartWarhead);
         _eventManager.RegisterEvent(DoorInteract);
         _eventManager.RegisterEvent(LockerUse);
         _eventManager.RegisterEvent(WarheadPanelInteract);
         _eventManager.RegisterEvent(Ban);
+        _eventManager.RegisterEvent(Damage);
         _eventManager.RegisterEvent(ChangeItem);
         _eventManager.RegisterEvent(Death);
         _eventManager.RegisterEvent(FreePlayer);
@@ -94,7 +94,6 @@ public partial class PlayerEvents : Service
         _eventManager.RegisterEvent(OpenWarheadButton);
         _eventManager.RegisterEvent(StartWorkStation);
         _eventManager.RegisterEvent(FallingIntoAbyss);
-        _eventManager.RegisterEvent(SimpleSetClass);
         _eventManager.RegisterEvent(UpdateDisplayName);
         _eventManager.RegisterEvent(CheckKeyCardPermission);
         _eventManager.RegisterEvent(CallVanillaElevator);
@@ -103,12 +102,11 @@ public partial class PlayerEvents : Service
         _eventManager.RegisterEvent(Kick);
         _eventManager.RegisterEvent(Speak);
         _eventManager.RegisterEvent(SpeakToPlayer);
+        _eventManager.RegisterEvent(HotKey);
 
         WalkOnSinkhole.Subscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Subscribe(WalkOnHazard.Raise);
-        
-        PlayerRoleManager.OnServerRoleSet += CallSimpleSetClass;
-        
+
         PluginAPI.Events.EventManager.RegisterEvents(_synapse,this);
     }
 
@@ -118,11 +116,13 @@ public partial class PlayerEvents : Service
         _eventManager.UnregisterEvent(KeyPress);
         _eventManager.UnregisterEvent(HarmPermission);
         _eventManager.UnregisterEvent(SetClass);
+        _eventManager.UnregisterEvent(Update);
         _eventManager.UnregisterEvent(StartWarhead);
         _eventManager.UnregisterEvent(DoorInteract);
         _eventManager.UnregisterEvent(LockerUse);
         _eventManager.UnregisterEvent(WarheadPanelInteract);
         _eventManager.UnregisterEvent(Ban);
+        _eventManager.UnregisterEvent(Damage);
         _eventManager.UnregisterEvent(ChangeItem);
         _eventManager.UnregisterEvent(Death);
         _eventManager.UnregisterEvent(FreePlayer);
@@ -139,7 +139,6 @@ public partial class PlayerEvents : Service
         _eventManager.UnregisterEvent(OpenWarheadButton);
         _eventManager.UnregisterEvent(StartWorkStation);
         _eventManager.UnregisterEvent(FallingIntoAbyss);
-        _eventManager.UnregisterEvent(SimpleSetClass);
         _eventManager.UnregisterEvent(UpdateDisplayName);
         _eventManager.UnregisterEvent(CheckKeyCardPermission);
         _eventManager.UnregisterEvent(CallVanillaElevator);
@@ -148,34 +147,10 @@ public partial class PlayerEvents : Service
         _eventManager.UnregisterEvent(Kick);
         _eventManager.UnregisterEvent(Speak);
         _eventManager.UnregisterEvent(SpeakToPlayer);
+        _eventManager.UnregisterEvent(HotKey);
 
         WalkOnSinkhole.Unsubscribe(WalkOnHazard.Raise);
         WalkOnTantrum.Unsubscribe(WalkOnHazard.Raise);
-
-        PlayerRoleManager.OnServerRoleSet -= CallSimpleSetClass;
-    }
-
-    private void CallSimpleSetClass(ReferenceHub hub, RoleTypeId newRole, RoleChangeReason reason)
-    {
-        var player = hub.GetSynapsePlayer();
-        if (player == null) return;
-        var currentRole = player.RoleType;
-        var ev = new SimpleSetClassEvent(player, currentRole, newRole);
-        SimpleSetClass.Raise(ev);
-        
-        switch (currentRole)
-        {
-            case RoleTypeId.Scp106:
-                player.MainScpController.Scp106.ResetDefault();
-                break;
-            case RoleTypeId.Scp173:
-                player.MainScpController.Scp173.ResetDefault();
-                break;
-        }
-
-        if (player.CustomRole == null)
-            Timing.CallDelayed(Timing.WaitForOneFrame,
-                () => ChangeRole.Raise(new ChangeRoleEvent(player) { RoleId = (uint)newRole }));
     }
 }
 
@@ -211,10 +186,7 @@ public class LoadComponentEvent : PlayerEvent
     public TComponent AddComponent<TComponent>() where TComponent : Component
     {
         var comp = (TComponent)PlayerGameObject.GetComponent(typeof(TComponent));
-        if (comp == null)
-            return PlayerGameObject.AddComponent<TComponent>();
-
-        return comp;
+        return comp ?? PlayerGameObject.AddComponent<TComponent>();
     }
 }
 
@@ -574,19 +546,6 @@ public class FallingIntoAbyssEvent : PlayerInteractEvent
     public FallingIntoAbyssEvent(SynapsePlayer player, bool allow) : base(player, allow) { }
 }
 
-public class SimpleSetClassEvent : PlayerEvent
-{
-    public RoleTypeId PreviousRole { get; }
-
-    public RoleTypeId NextRole { get; }
-
-    public SimpleSetClassEvent(SynapsePlayer player, RoleTypeId previousRole, RoleTypeId nextRole) : base(player)
-    {
-        PreviousRole = previousRole;
-        NextRole = nextRole;
-    }
-}
-
 public class UpdateDisplayNameEvent : PlayerEvent
 {
     public UpdateDisplayNameEvent(SynapsePlayer player, string newDisplayName) : base(player)
@@ -609,20 +568,14 @@ public class CheckKeyCardPermissionEvent : PlayerInteractEvent
 
 public class CallVanillaElevatorEvent : PlayerInteractEvent
 {
-    //TODO:
-    /*
     public SynapseElevator Elevator { get; }
 
-    public VanillaDestination RequestedDestination { get; }
+    public SynapseElevatorDestination Destination { get; }
 
-    public CallVanillaElevatorEvent(SynapsePlayer player, bool allow, SynapseElevator elevator, VanillaDestination requestedDestination) : base(player, allow)
+    public CallVanillaElevatorEvent(SynapsePlayer player, bool allow, SynapseElevator elevator, SynapseElevatorDestination destination) : base(player, allow)
     {
         Elevator = elevator;
-        RequestedDestination = requestedDestination;
-    }
-    */
-    public CallVanillaElevatorEvent(SynapsePlayer player, bool allow) : base(player, allow)
-    {
+        Destination = destination;
     }
 }
 
@@ -684,9 +637,24 @@ public class SpeakEvent : PlayerInteractEvent
 public class SpeakToPlayerEvent : SpeakEvent
 {
     public SynapsePlayer Receiver { get; }
+    
+    public VoiceChatChannel OriginalChannel { get; }
 
     public SpeakToPlayerEvent(SynapsePlayer player, SynapsePlayer receiver, bool allow, VoiceChatChannel channel,
-        byte[] data, int dataLength) :
+        byte[] data, int dataLength, VoiceChatChannel originalChannel) :
         base(player, allow, channel, data, dataLength)
-        => Receiver = receiver;
+    {
+        Receiver = receiver;
+        OriginalChannel = originalChannel;
+    }
+}
+
+public class HotKeyEvent : PlayerEvent
+{
+    public HotKeyEvent(SynapsePlayer player, ActionName hotKey) : base(player)
+    {
+        HotKey = hotKey;
+    }
+    
+    public ActionName HotKey { get; }
 }

@@ -2,11 +2,13 @@
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
+using System.Collections.ObjectModel;
+using System.Linq;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Rooms;
 
-public abstract class SynapseCustomRoom : DefaultSynapseObject, IRoom
+public abstract class SynapseCustomRoom : DefaultSynapseObject, IRoom, IHideable
 {
     public SynapseSchematic RoomSchematic { get; private set; }
 
@@ -39,6 +41,8 @@ public abstract class SynapseCustomRoom : DefaultSynapseObject, IRoom
     public uint Id => Attribute.Id;
     
     public abstract uint Zone { get; }
+
+    public ReadOnlyCollection<SynapseDoor> Doors => RoomSchematic.Doors;
 
     public virtual void OnGenerate() { }
     public virtual void OnDeSpawn() { }
@@ -91,12 +95,24 @@ public abstract class SynapseCustomRoom : DefaultSynapseObject, IRoom
             }
         });
     }
+
+    public virtual Color RoomColor
+    {
+        get => RoomSchematic.Lights.FirstOrDefault()?.LightColor ?? default;
+        set
+        {
+            foreach (var light in RoomSchematic.Lights)
+            {
+                light.LightColor = value;
+            }
+        }
+    }
     
-    public sealed override void HideFromAll() => RoomSchematic.HideFromAll();
+    public void HideFromAll() => RoomSchematic.HideFromAll();
 
-    public sealed override void ShowAll() => RoomSchematic.ShowAll();
+    public void ShowAll() => RoomSchematic.ShowAll();
 
-    public sealed override void HideFromPlayer(SynapsePlayer player) => RoomSchematic.HideFromPlayer(player);
+    public void HideFromPlayer(SynapsePlayer player) => RoomSchematic.HideFromPlayer(player);
 
-    public sealed override void ShowPlayer(SynapsePlayer player) => RoomSchematic.ShowPlayer(player);
+    public void ShowPlayer(SynapsePlayer player) => RoomSchematic.ShowPlayer(player);
 }

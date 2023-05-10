@@ -11,6 +11,7 @@ using PluginAPI.Enums;
 using PluginAPI.Events;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Item;
 using UnityEngine;
 using Utils.Networking;
 using StatusMessage = InventorySystem.Items.Usables.StatusMessage;
@@ -167,8 +168,15 @@ public static class ConsumeItemPatch
                 };
                 ItemEvents.ConsumeItem.RaiseSafely(ev);
 
-                if (!ev.Allow) continue;
-
+                if (!ev.Allow)
+                {
+                    handler.Value.CurrentUsable.Item.OnUsingCancelled();
+                    handler.Value.CurrentUsable = CurrentlyUsedItem.None;
+                    new StatusMessage(StatusMessage.StatusType.Cancel, handler.Value.CurrentUsable.ItemSerial)
+                        .SendToAuthenticated();
+                    ev.Player.Inventory.ItemInHand = SynapseItem.None;
+                    continue;
+                }
                 usable.Item.ServerOnUsingCompleted();
                 Synapse3Extensions.RaiseEvent(typeof(UsableItemsController),
                     nameof(UsableItemsController.ServerOnUsingCompleted), handler.Key, usable.Item);

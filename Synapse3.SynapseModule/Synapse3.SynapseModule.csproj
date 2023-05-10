@@ -39,11 +39,17 @@
         <Reference Include="Mirror">
           <HintPath>..\Refs\Mirror_publicized.dll</HintPath>
         </Reference>
+        <Reference Include="Mirror.Components">
+          <HintPath>..\Refs\Mirror.Components.dll</HintPath>
+        </Reference>
         <Reference Include="NorthwoodLib">
           <HintPath>..\Refs\NorthwoodLib.dll</HintPath>
         </Reference>
         <Reference Include="PluginAPI">
           <HintPath>..\Refs\PluginAPI.dll</HintPath>
+        </Reference>
+        <Reference Include="Pooling">
+          <HintPath>..\Refs\Pooling.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine">
             <HintPath>..\Refs\UnityEngine.dll</HintPath>
@@ -64,14 +70,6 @@
 
 
     <ItemGroup>
-      <PackageReference Include="NeuronModding.Core" Version="1.0.0.5" />
-      <PackageReference Include="NeuronModding.Modules.Commands" Version="1.0.0.5" />
-      <PackageReference Include="NeuronModding.Modules.Configs" Version="1.0.0.5" />
-      <PackageReference Include="NeuronModding.Modules.Patcher" Version="1.0.0.5" />
-    </ItemGroup>
-
-
-    <ItemGroup>
       <Compile Remove="OldPatches\**" />
     </ItemGroup>
 
@@ -83,6 +81,14 @@
 
     <ItemGroup>
       <None Remove="OldPatches\**" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <PackageReference Include="NeuronModding.Core" Version="1.0.2" />
+      <PackageReference Include="NeuronModding.Modules.Commands" Version="1.0.2" />
+      <PackageReference Include="NeuronModding.Modules.Configs" Version="1.0.2" />
+      <PackageReference Include="NeuronModding.Modules.Patcher" Version="1.0.2" />
     </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">

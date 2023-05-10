@@ -108,18 +108,19 @@ public static class Synapse3Extensions
         var msg = new ObjectDestroyMessage { netId = identity.netId };
         NetworkServer.SendToAll(msg);
     }
-    
+
     public static void SpawnForAllPlayers(this NetworkIdentity identity) => UpdatePositionRotationScale(identity);
-    
+
     public static bool CheckPermission(this DoorPermissions door, SynapsePlayer player) =>
         CheckPermission(door.RequiredPermissions, player, door.RequireAll);
-    
+
     public static bool CheckPermission(this KeycardPermissions permissions, SynapsePlayer player,
-        bool needIdentical = false)
+        bool checkCombinedPerms = false)
     {
         var ev2 = new CheckKeyCardPermissionEvent(player, false, permissions);
         if (player.Bypass || (ushort)permissions == 0) ev2.Allow = true;
-        if (player.TeamID == (uint)Team.SCPs && permissions.HasFlagFast(KeycardPermissions.ScpOverride)) ev2.Allow = true;
+        if (player.TeamID == (uint)Team.SCPs && permissions.HasFlagFast(KeycardPermissions.ScpOverride))
+            ev2.Allow = true;
 
         if (!ev2.Allow)
         {
@@ -134,27 +135,35 @@ public static class Synapse3Extensions
                 var overlappingPerms = ((KeycardItem)item.Item).Permissions & permissions;
                 var ev = new KeyCardInteractEvent(item, ItemInteractState.Finalize, player, permissions)
                 {
-                    Allow = needIdentical ? overlappingPerms == permissions : overlappingPerms > KeycardPermissions.None,
+                    Allow = checkCombinedPerms
+                        ? overlappingPerms == permissions
+                        : overlappingPerms > KeycardPermissions.None,
                 };
-            
+
                 _itemEvents.KeyCardInteract.Raise(ev);
                 if (!ev.Allow) continue;
                 ev2.Allow = true;
                 break;
-            }   
+            }
         }
 
         _playerEvents.CheckKeyCardPermission.Raise(ev2);
         return ev2.Allow;
     }
-    
-    
-    
-    public static SynapsePlayer GetSynapsePlayer(this NetworkConnection connection) => connection?.identity?.GetSynapsePlayer();
-    public static SynapsePlayer GetSynapsePlayer(this MonoBehaviour mono) => mono?.gameObject?.GetComponent<SynapsePlayer>();
-    public static SynapsePlayer GetSynapsePlayer(this GameObject gameObject) => gameObject?.GetComponent<SynapsePlayer>();
+
+
+    public static SynapsePlayer GetSynapsePlayer(this NetworkConnection connection) =>
+        connection?.identity?.GetSynapsePlayer();
+
+    public static SynapsePlayer GetSynapsePlayer(this MonoBehaviour mono) =>
+        mono?.gameObject?.GetComponent<SynapsePlayer>();
+
+    public static SynapsePlayer GetSynapsePlayer(this GameObject gameObject) =>
+        gameObject?.GetComponent<SynapsePlayer>();
+
     public static SynapsePlayer GetSynapsePlayer(this CommandSender sender) => _player
         .GetPlayer(x => x.CommandSender == sender, PlayerType.Dummy, PlayerType.Player, PlayerType.Server);
+
     public static SynapsePlayer GetSynapsePlayer(this StatBase stat) => stat.Hub.GetSynapsePlayer();
     public static SynapsePlayer GetSynapsePlayer(this Footprint footprint) => footprint.Hub?.GetSynapsePlayer();
     public static SynapsePlayer GetSynapsePlayer(this IPlayer player) => player?.ReferenceHub?.GetSynapsePlayer();
@@ -165,31 +174,32 @@ public static class Synapse3Extensions
 
     public static SynapseItem GetItem(this ItemPickupBase pickupBase) => _item.GetSynapseItem(pickupBase.Info.Serial);
     public static SynapseItem GetItem(this ItemBase itemBase) => _item.GetSynapseItem(itemBase.ItemSerial);
-    
+
     /// <summary>
     /// Returns a UniversalDamageHandler based upon the given DamageType
     /// </summary>
     public static UniversalDamageHandler GetUniversalDamageHandler(this DamageType type)
     {
-        if((int)type < 0 || (int)type > 23) return new UniversalDamageHandler(0f,DeathTranslations.Unknown);
+        if ((int)type < 0 || (int)type > 23) return new UniversalDamageHandler(0f, DeathTranslations.Unknown);
 
         return new UniversalDamageHandler(0f, DeathTranslations.TranslationsById[(byte)type]);
     }
+
     public static DamageType GetDamageType(this DamageHandlerBase handler)
     {
         if (handler == null) return DamageType.Unknown;
 
         if (!Enum.TryParse<DamageType>(handler.GetType().Name.Replace("DamageHandler", ""), out var type))
             return DamageType.Unknown;
-        
+
         if (type != DamageType.Universal) return type;
         var id = ((UniversalDamageHandler)handler).TranslationId;
 
         if (id > 23) return DamageType.Universal;
 
         return (DamageType)id;
-
     }
+
     public static IRoom GetRoom(this RoomType type) => _room._rooms.FirstOrDefault(x => x.Id == (int)type);
 
     public static IElevator GetSynapseElevator(this ElevatorManager.ElevatorGroup type) =>
@@ -198,7 +208,7 @@ public static class Synapse3Extensions
 
     public static IVanillaRoom GetVanillaRoom(this RoomIdentifier identifier) => (IVanillaRoom)_room._rooms
         .FirstOrDefault(x => x.GameObject == identifier.gameObject);
-    
+
     public static SynapseDoor GetSynapseDoor(this DoorVariant variant)
     {
         var script = variant.GetComponent<SynapseObjectScript>();
@@ -253,7 +263,7 @@ public static class Synapse3Extensions
             .Debug("Found Locker without SynapseObjectScript ... creating new SynapseLocker");
         return new SynapseLocker(locker);
     }
-    
+
     public static SynapseRagDoll GetSynapseRagDoll(this BasicRagdoll rag)
     {
         var script = rag.GetComponent<SynapseObjectScript>();
@@ -268,25 +278,24 @@ public static class Synapse3Extensions
         return new SynapseRagDoll(rag);
     }
 
-    
+
     public static SynapseTesla GetSynapseTesla(this TeslaGate gate) => _map
         ._synapseTeslas.FirstOrDefault(x => x.Gate == gate);
-  
+
     public static IElevator GetSynapseElevator(this ElevatorChamber chamber) => _elevator.Elevators.FirstOrDefault(x =>
         x.Chamber is SynapseElevatorChamber synapseChamber && synapseChamber.Chamber == chamber);
-    
+
     public static SynapseCamera GetCamera(this Scp079Camera cam) => _map
-            ._synapseCameras.FirstOrDefault(x => x.Camera == cam);
+        ._synapseCameras.FirstOrDefault(x => x.Camera == cam);
 
     public static bool CanHarmScp(SynapsePlayer player, bool message)
     {
         if (player.TeamID != (int)Team.SCPs &&
             player.CustomRole?.GetFriendsID().Any(x => x == (int)Team.SCPs) != true) return true;
-        
+
         if (message)
             player.SendHint(_config.Translation.Get(player).ScpTeam);
         return false;
-
     }
 
     public static bool GetHarmPermission(SynapsePlayer attacker, SynapsePlayer victim, bool ignoreFFConfig = false)
@@ -304,19 +313,19 @@ public static class Synapse3Extensions
             allow = true;
             goto Event;
         }
-        
+
         if (attacker == victim)
         {
             allow = true;
             goto Event;
         }
-        
+
         if (attacker.Team == Team.Dead && victim.Team == Team.Dead)
         {
             allow = false;
             goto Event;
         }
-        
+
         if (attacker.CustomRole == null && victim.CustomRole == null)
         {
             if (attacker.Team == Team.SCPs && victim.Team == Team.SCPs)
@@ -332,11 +341,11 @@ public static class Synapse3Extensions
                 allow = true;
                 goto Event;
             }
-            
+
             allow = attacker.Faction != victim.Faction;
             goto Event;
         }
-        
+
         allow = true;
         if (attacker.CustomRole != null && attacker.CustomRole.GetFriendsID().Any(x => x == victim.TeamID))
         {
@@ -349,7 +358,7 @@ public static class Synapse3Extensions
             allow = false;
             attacker.SendHint(_config.Translation.Get(attacker).SameTeam);
         }
-         
+
         Event:
         var ev = new HarmPermissionEvent(attacker, victim, allow);
         _playerEvents.HarmPermission.RaiseSafely(ev);
@@ -395,15 +404,17 @@ public static class Synapse3Extensions
         {
             return field;
         }
+
         var baseType = type.BaseType;
         if (baseType == null)
         {
             return null;
         }
+
         return FindField(baseType, name);
     }
 
-    public static void RaiseEvent(object source, string eventName, params object [] args)
+    public static void RaiseEvent(object source, string eventName, params object[] args)
     {
         // Find the delegate and invoke it.
         var delegateField = FindField(source.GetType(), eventName);
@@ -411,7 +422,7 @@ public static class Synapse3Extensions
         eventDelegate?.DynamicInvoke(args);
     }
 
-    public static void RaiseEvent(Type source, string eventName, params object [] args)
+    public static void RaiseEvent(Type source, string eventName, params object[] args)
     {
         // Find the delegate and invoke it.
         var delegateField = FindField(source, eventName);
@@ -419,13 +430,45 @@ public static class Synapse3Extensions
         eventDelegate?.DynamicInvoke(args);
     }
 
+    public static void RaiseEventSafe(object source, string eventName, bool log, params object[] args)
+    {
+        // Find the delegate and invoke it.
+        var delegateField = FindField(source.GetType(), eventName);
+        var eventDelegate = delegateField?.GetValue(source) as Delegate;
+        try
+        {
+            eventDelegate?.DynamicInvoke(args);
+        }
+        catch (Exception ex)
+        {
+            if (log)
+                SynapseLogger<Synapse>.Error("Error while invoking event " + source.GetType().Name + "." + eventName +
+                                             "\n" + ex);
+        }
+    }
+
+    public static void RaiseEventSafe(Type source, string eventName, bool log, params object[] args)
+    {
+        // Find the delegate and invoke it.
+        var delegateField = FindField(source, eventName);
+        var eventDelegate = delegateField?.GetValue(null) as Delegate;
+        try
+        {
+            eventDelegate?.DynamicInvoke(args);
+        }
+        catch (Exception ex)
+        {
+            if (log)
+                SynapseLogger<Synapse>.Error("Error while invoking event " + source.Name + "." + eventName + "\n" + ex);
+        }
+    }
+
     public static T GetSubroutine<T>(this ISubroutinedScpRole role) where T : ScpSubroutineBase
-        => role.SubroutineModule.AllSubroutines
-        .FirstOrDefault(p => p is T) as T;
+        => role.SubroutineModule.AllSubroutines.FirstOrDefault(p => p is T) as T;
 
     public static CoroutineHandle RunSafelyCoroutine(this IEnumerator<float> coroutine) =>
         Timing.RunCoroutine(_RunSafelyCoroutine<Synapse>(coroutine));
-    
+
     public static CoroutineHandle RunSafelyCoroutine<TName>(this IEnumerator<float> coroutine) =>
         Timing.RunCoroutine(_RunSafelyCoroutine<TName>(coroutine));
 

@@ -9,7 +9,7 @@ namespace Synapse3.SynapseModule.Permissions.RemoteAdmin;
     Name = "[ OverWatch]",
     Color = "#03f8fc",
     Size = 20,
-    Id = 10001
+    Id = 101
     )]
 public class OverWatchCategory : RemoteAdminCategory
 {

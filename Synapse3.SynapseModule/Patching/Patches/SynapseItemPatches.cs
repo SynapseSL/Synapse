@@ -247,10 +247,12 @@ public static class ItemPatches
     {
         try
         {
+            if (__instance == null) return false;
             if (!__instance._replaceNextFrame)
                 return false;
 
             var item = __instance.GetItem();
+            if (item == null || item.Serial == 0) return false;
 
             item.Throwable.Fuse(__instance._attacker);
 

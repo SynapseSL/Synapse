@@ -33,7 +33,6 @@ public class SynapseCommandService : Service
         typeof(ScpProximityCommand)
     };
     
-    private readonly CommandService _command;
     private readonly RoundEvents _round;
     private readonly Synapse _synapseModule;
 
@@ -55,9 +54,17 @@ public class SynapseCommandService : Service
     /// </summary>
     public SynapseCommandService(CommandService command,RoundEvents round, Synapse synapseModule)
     {
-        _command = command;
         _round = round;
         _synapseModule = synapseModule;
+        
+        ServerConsole = command.CreateCommandReactor();
+        ServerConsole.NotFoundFallbackHandler = NotFound;
+        
+        RemoteAdmin = command.CreateCommandReactor();
+        RemoteAdmin.NotFoundFallbackHandler = NotFound;
+        
+        PlayerConsole = command.CreateCommandReactor();
+        PlayerConsole.NotFoundFallbackHandler = NotFound;
     }
 
     /// <summary>
@@ -65,15 +72,6 @@ public class SynapseCommandService : Service
     /// </summary>
     public override void Enable()
     {
-        ServerConsole = _command.CreateCommandReactor();
-        ServerConsole.NotFoundFallbackHandler = NotFound;
-        
-        RemoteAdmin = _command.CreateCommandReactor();
-        RemoteAdmin.NotFoundFallbackHandler = NotFound;
-        
-        PlayerConsole = _command.CreateCommandReactor();
-        PlayerConsole.NotFoundFallbackHandler = NotFound;
-
         while (_synapseModule.ModuleCommandBindingQueue.Count != 0)
         {
             var binding = _synapseModule.ModuleCommandBindingQueue.Dequeue();

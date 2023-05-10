@@ -9,6 +9,7 @@ using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Database;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.KeyBind;
+using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic.CustomAttributes;
 using Synapse3.SynapseModule.Map.Scp914;
@@ -23,6 +24,7 @@ public partial class Synapse
 {
     private void MetaGenerateBindings(MetaGenerateBindingsEvent args)
     {
+        OnGenerateElevatorBinding(args);
         OnGenerateRoleBinding(args);
         OnGenerateCommandBinding(args);
         OnGenerateTeamBinding(args);
@@ -44,6 +46,19 @@ public partial class Synapse
         args.Outputs.Add(new SynapseListenerBinding()
         {
             ListenerType = args.MetaType.Type
+        });
+    }
+    
+    private void OnGenerateElevatorBinding(MetaGenerateBindingsEvent args)
+    {
+        if (!args.MetaType.TryGetAttribute<AutomaticAttribute>(out _)) return;
+        if (!args.MetaType.TryGetAttribute<ElevatorAttribute>(out var info)) return;
+        if (!args.MetaType.Is<CustomElevator>()) return;
+        
+        args.Outputs.Add(new SynapseElevatorBinding()
+        {
+            Info = info,
+            Type = args.MetaType.Type
         });
     }
     
@@ -180,6 +195,10 @@ public partial class Synapse
             CustomNetworkManager.HeavilyModded = true;
         
         args.Context.MetaBindings
+            .OfType<SynapseElevatorBinding>()
+            .ToList().ForEach(x=> ElevatorService.LoadBinding(x));
+        
+        args.Context.MetaBindings
             .OfType<SynapseCommandBinding>()
             .ToList().ForEach(x=> SynapseCommandService.LoadBinding(x));
 
@@ -235,11 +254,19 @@ public partial class Synapse
     internal readonly Queue<SynapseDataBaseBinding> ModuleDataBaseBindingQueue = new();
     private readonly Queue<SynapseListenerBinding> ModuleListenerBindingQueue = new();
     internal readonly Queue<SynapseKeyBindBinding> ModuleKeyBindBindingQueue = new();
+    internal readonly Queue<SynapseElevatorBinding> ModuleElevatorBindingQueue = new();
 
     private void LoadModuleLate(ModuleLoadEvent args)
     {
         if (args.Context.ModuleType.GetCustomAttribute<HeavyModded>() != null)
             CustomNetworkManager.HeavilyModded = true;
+        
+        args.Context.MetaBindings
+            .OfType<SynapseElevatorBinding>()
+            .ToList().ForEach(binding =>
+            {
+                ModuleElevatorBindingQueue.Enqueue(binding);
+            });
         
         args.Context.MetaBindings
             .OfType<SynapseCommandBinding>()

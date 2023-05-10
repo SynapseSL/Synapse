@@ -50,7 +50,8 @@ public class SerializedItem
         FireArm =
         {
             Attachments = WeaponAttachments
-        }
+        },
+        Scale = new Vector3(XSize, YSize, ZSize)
     };
 
     public static explicit operator SynapseItem(SerializedItem item) => item.Parse();
@@ -376,7 +377,7 @@ public class SerializedPlayerState
 
                     if (RoleType == RoleTypeId.Scp0492)
                     {
-                        writer.WriteUInt16(ZombieMaxHealth);
+                        writer.WriteUInt(ZombieMaxHealth);
                     }
                 });
             

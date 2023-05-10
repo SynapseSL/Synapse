@@ -33,15 +33,16 @@ public enum RoomType : uint
     HczTCross,
     HczCrossing,
     
+    HeavyCheckpoint,
     HeavyArmory,
     Nuke,
     Servers,
+    TestingRoom,
     Tesla,
     MicroHid,
     HczElevatorA,
     HczElevatorB,
-    HeavyEntranceCheckpoint,
-    
+
     Scp049,
     Scp079,
     Scp096,
@@ -56,6 +57,7 @@ public enum RoomType : uint
     EzDeadEnd,
     CollapsedTunnel,
     
+    EntranceCheckpoint,
     Intercom,
     EzOffice,
     EzOfficeDownstairs,

@@ -93,10 +93,16 @@ public partial class SynapseItem
                 return;
             }
 
-            if (Pickup is not null)
+            if (Pickup != null)
             {
                 Pickup.transform.localScale = value;
                 Pickup.netIdentity.UpdatePositionRotationScale();
+            }
+
+            if (Throwable.Projectile != null)
+            {
+                Throwable.Projectile.transform.localScale = value;
+                Throwable.Projectile.netIdentity.UpdatePositionRotationScale();
             }
         }
     }

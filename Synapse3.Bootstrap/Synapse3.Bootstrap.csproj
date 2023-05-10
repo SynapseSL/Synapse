@@ -40,6 +40,12 @@
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Patchless|AnyCPU' ">
       <OutputPath>bin\Patchless\</OutputPath>
     </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Custom Version|AnyCPU' ">
+      <OutputPath>bin\Custom Version\</OutputPath>
+      <Optimize>true</Optimize>
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+      <PlatformTarget>x64</PlatformTarget>
+    </PropertyGroup>
     <ItemGroup>
         <Reference Include="Assembly-CSharp">
           <HintPath>..\Refs\Assembly-CSharp-Publicized.dll</HintPath>

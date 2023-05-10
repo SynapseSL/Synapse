@@ -10,7 +10,9 @@ public abstract class SynapseTeam : InjectedLoggerBase, ISynapseTeam
 
     public abstract int MaxWaveSize { get; }
     public virtual float RespawnTime => 15f;
-    
+
+    public virtual void EvacuatePlayer(SynapsePlayer player) { }
+
     public virtual void RespawnAnnouncement() { }
     public virtual void Load() { }
 

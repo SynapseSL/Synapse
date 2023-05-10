@@ -25,16 +25,14 @@ public class Throwable : ISubSynapseItem
     /// <summary>
     /// The Time that is left until the Grenade is exploded
     /// </summary>
-    public float FuseTime
+    public double FuseTime
     {
-        get => Projectile == null ? 0 : Projectile.GetComponent<TimeGrenade>().TargetTime - Time.timeSinceLevelLoad;
+        get => Projectile == null ? 0 : Projectile.GetComponent<TimeGrenade>().TargetTime - (double)Time.timeSinceLevelLoad;
         set
         {
             if (Projectile == null) return;
             var comp = Projectile.GetComponent<TimeGrenade>();
-
-            comp.RpcSetTime(value);
-            comp.UserCode_RpcSetTime(value);
+            comp.TargetTime = value;
         }
     }
 
@@ -48,6 +46,7 @@ public class Throwable : ISubSynapseItem
         if(itemBase is not ThrowableItem throwableItem) return;
 
         Projectile = Object.Instantiate(throwableItem.Projectile);
+        Projectile.transform.localScale = _item.Scale;
         if (Projectile.TryGetComponent<Rigidbody>(out var rigidbody))
         {
             rigidbody.position = _item.Pickup.Rb.position;
@@ -92,6 +91,7 @@ public class Throwable : ISubSynapseItem
         Projectile = Object.Instantiate(throwableItem.Projectile, throwableItem.Owner.PlayerCameraReference.position,
             throwableItem.Owner.PlayerCameraReference.rotation);
         var transform = Projectile.transform;
+        transform.localScale = _item.Scale;
         var info = new PickupSyncInfo
         {
             ItemId = _item.ItemType,
@@ -131,7 +131,7 @@ public class Throwable : ISubSynapseItem
 
     public float Durability
     {
-        get => FuseTime;
+        get => (float)FuseTime;
         set => FuseTime = value;
     }
 

@@ -15,6 +15,7 @@ using Synapse3.SynapseModule.Command;
 using Synapse3.SynapseModule.Database;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.KeyBind;
+using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic.CustomAttributes;
 using Synapse3.SynapseModule.Map.Scp914;
@@ -61,6 +62,7 @@ public partial class Synapse : Module
     public DatabaseService DatabaseService { get; private set; }
     public RemoteAdminCategoryService RemoteAdminCategoryService { get; private set; }
     public KeyBindService KeyBindService { get; private set; }
+    public ElevatorService ElevatorService { get; private set; }
 
     public override void Load(IKernel kernel)
     {
@@ -95,7 +97,8 @@ public partial class Synapse : Module
         RemoteAdminCategoryService = _kernel.GetSafe<RemoteAdminCategoryService>();
         DatabaseService = _kernel.GetSafe<DatabaseService>();
         KeyBindService = _kernel.GetSafe<KeyBindService>();
-
+        ElevatorService = _kernel.GetSafe<ElevatorService>();
+        
         //EventHandlers are the only Bindings that are loaded during the Enable Method of Synapse to ensure that the EventServices are all enabled
         while (ModuleListenerBindingQueue.Count > 0)
         {

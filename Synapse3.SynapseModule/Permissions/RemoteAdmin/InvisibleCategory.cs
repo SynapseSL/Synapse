@@ -9,7 +9,7 @@ namespace Synapse3.SynapseModule.Permissions.RemoteAdmin;
     Name = "[ Invisible]",
     Color = "#03f8fc",
     Size = 20,
-    Id = 10002
+    Id = 102
     )]
 public class InvisibleCategory : RemoteAdminCategory
 {
