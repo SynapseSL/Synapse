@@ -8,7 +8,7 @@ public class FakeConnection : NetworkConnectionToClient
 {
     public RecyclablePlayerId FakePlayerId { get; }
 
-    public FakeConnection(RecyclablePlayerId id) : base(id.Value, false, 0f)
+    public FakeConnection(RecyclablePlayerId id) : base(id.Value)
     {
         FakePlayerId = id;
     }

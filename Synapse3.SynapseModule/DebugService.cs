@@ -3,10 +3,14 @@ using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Events;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using AdminToys;
+using MapGeneration;
 using MEC;
 using Mirror;
+using Neuron.Core;
+using PlayerRoles;
 using RelativePositioning;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
@@ -14,6 +18,7 @@ using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 
@@ -103,6 +108,21 @@ public class DebugService : Service
             if (ev.State == ItemInteractState.Finalize)
                 ev.Allow = false;
         });
+        _round.Waiting.Subscribe(ev =>
+        {
+            ((SynapseNetworkRoom)Synapse.Get<RoomService>().GetRoom((uint)RoomType.TestingRoom)).Position +=
+                Vector3.up * 5;
+            ((SynapseNetworkRoom)Synapse.Get<RoomService>().GetRoom((uint)RoomType.Scp330)).Position +=
+                Vector3.up * 5;
+            
+            var text = "";
+            foreach (var prefab in NetworkClient.prefabs)
+            {
+                text += "\n" + prefab.Value.name + " ID: " + prefab.Key;
+            }
+
+            File.WriteAllText(Path.Combine(Synapse.Get<NeuronBase>().RelativePath(), "prefabs.txt"), text);
+        });
     }
     
     public void Event(IEvent e)
@@ -114,8 +134,7 @@ public class DebugService : Service
                 break;
         }
     }
-
-    private SynapseDummy _dummy;
+    
     private void OnKeyPress(KeyPressEvent ev)
     {
         switch (ev.KeyCode)
@@ -188,11 +207,11 @@ public class DebugService : Service
                 break;
             case KeyCode.Alpha5:
                 SynapseLogger<Debug>.Warn("Tps: " + Math.Round(1 / Time.deltaTime));
-
-
                 break;
         }
     }
+
+    private SynapseDummy Dummy;
 }
 
 [CustomRoom(

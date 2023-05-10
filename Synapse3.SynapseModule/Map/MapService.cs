@@ -100,7 +100,7 @@ public class MapService : Service
 
     public GameObject SpawnTantrum(Vector3 position, float destroy = -1)
     {
-        var prefab = NetworkClient.prefabs[Guid.Parse("a0e7ee93-b802-e5a4-38bd-95e27cc133ea")];
+        var prefab = NetworkClient.prefabs[1306864341];
         var gameObject = Object.Instantiate(prefab, position, Quaternion.identity);
         var comp = gameObject.GetComponent<TantrumEnvironmentalHazard>();
         comp.SynchronizedPosition = new RelativePosition(position);

@@ -141,7 +141,6 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
         Variant = CreateDoor(type, position, rotation, scale);
         NeedsJoinUpdate = true;
         SetUp(type);
-        DeleteWayPoints();
     }
     
     internal SynapseDoor(DoorVariant variant) : this()

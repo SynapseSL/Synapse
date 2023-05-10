@@ -199,7 +199,7 @@ public partial class SynapsePlayer
         AlphaWarheadController.Singleton, nameof(AlphaWarheadController.RpcShake),
         writer =>
         {
-            writer.WriteBoolean(achieve);
+            writer.WriteBool(achieve);
         }));
 
     /// <summary>
@@ -235,15 +235,17 @@ public partial class SynapsePlayer
 
     private EscapeType GetEscapeType(bool ignoreEscapeDistance)
     {
+        var disarmed = IsDisarmed;
         var fpcRole = CurrentRole as FpcStandardRoleBase;
         if (fpcRole == null && !ignoreEscapeDistance) return EscapeType.TooFarAway;
         if (!ignoreEscapeDistance && (fpcRole.FpcModule.Position - Escape.WorldPos).sqrMagnitude > Escape.RadiusSqr) return EscapeType.TooFarAway;
         
-        if (HasCustomRole) return EscapeType.CustomRole;
         if (CurrentRole.ActiveTime < 10f) return EscapeType.TooEarly;
+        if (disarmed && Disarmer?.CustomTeam?.Attribute.EvacuatePlayers == true)
+            return EscapeType.CustomTeamEvacuate;
+        if (HasCustomRole) return EscapeType.CustomRole;
         if (CurrentRole is not HumanRole) return EscapeType.NotAssigned;
 
-        var disarmed = IsDisarmed;
         if (IsDisarmed && !CharacterClassManager.CuffedChangeTeam) return EscapeType.NotAssigned;
         switch (RoleType)
         {
@@ -274,6 +276,10 @@ public partial class SynapsePlayer
         {
             case EscapeType.CustomRole:
                 CustomRole?.TryEscape();
+                return;
+            
+            case EscapeType.CustomTeamEvacuate:
+                Disarmer?.CustomTeam?.EvacuatePlayer(this);
                 return;
             
             case EscapeType.PluginOverride:

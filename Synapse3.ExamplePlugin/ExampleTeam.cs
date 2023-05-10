@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Neuron.Core.Meta;
+using PlayerRoles;
 using Synapse3.SynapseModule;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map;
@@ -11,7 +12,8 @@ namespace Synapse3.ExamplePlugin;
 [Automatic]
 [Team(
     Name = "Example",
-    Id = 15
+    Id = 15,
+    EvacuatePlayers = true
 )]
 public class ExampleTeam : SynapseTeam
 {
@@ -34,5 +36,10 @@ public class ExampleTeam : SynapseTeam
     public override void RespawnAnnouncement()
     {
         Synapse.Get<CassieService>().Announce("New Team will be spawned in 5 seconds", CassieSettings.DisplayText);
+    }
+
+    public override void EvacuatePlayer(SynapsePlayer player)
+    {
+        player.SetRoleFlags(RoleTypeId.ChaosConscript, RoleSpawnFlags.All, RoleChangeReason.Escaped);
     }
 }

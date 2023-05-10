@@ -68,5 +68,5 @@ public abstract class CustomElevator : InjectedLoggerBase, ICustomElevator
 
     protected abstract void OnGenerate();
     
-    public abstract float MoveTime { get; }
+    public abstract float MoveSpeed { get; }
 }

@@ -31,14 +31,16 @@ public class ItemInventory
         }
         set
         {
-            if (value == null || value == SynapseItem.None|| !_items.Contains(value))
+            if (!ItemInHand.Item.CanHolster()) return;
+            
+            if (value == null || value == SynapseItem.None || !_items.Contains(value))
             {
                 _player.VanillaInventory.NetworkCurItem = ItemIdentifier.None;
                 _player.VanillaInventory.CurInstance = null;
                 return;
             }
             
-            if(!ItemInHand.Item.CanHolster() || !value.Item.CanEquip()) return;
+            if(!value.Item.CanEquip()) return;
 
             _player.VanillaInventory.NetworkCurItem = new ItemIdentifier(value.ItemType, value.Serial);
             _player.VanillaInventory.CurInstance = value.Item;

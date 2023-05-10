@@ -186,10 +186,7 @@ public class LoadComponentEvent : PlayerEvent
     public TComponent AddComponent<TComponent>() where TComponent : Component
     {
         var comp = (TComponent)PlayerGameObject.GetComponent(typeof(TComponent));
-        if (comp == null)
-            return PlayerGameObject.AddComponent<TComponent>();
-
-        return comp;
+        return comp ?? PlayerGameObject.AddComponent<TComponent>();
     }
 }
 

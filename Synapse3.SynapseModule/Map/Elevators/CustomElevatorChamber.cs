@@ -9,9 +9,9 @@ namespace Synapse3.SynapseModule.Map.Elevators;
 public class CustomElevatorChamber : ICustomElevatorChamber
 {
     private Vector3 _targetPosition;
+    private Vector3 _direction;
     private Quaternion _targetRotation;
-    private float _elapsedTime = 0f;
-    private float _moveTime = 0f;
+    private float _moveSpeed = 0f;
     
     [Inject]
     public SchematicService SchematicService { get; set; }
@@ -28,25 +28,25 @@ public class CustomElevatorChamber : ICustomElevatorChamber
     public void Update()
     {
         if (!IsMoving) return;
-        var currentRot = Rotation.eulerAngles;
-        var deltaPos = _targetPosition - Position;
-        var deltaRotRaw = _targetRotation.eulerAngles - currentRot;
-        if (_elapsedTime < _moveTime)
-        {
-            deltaPos *= Time.deltaTime / _moveTime;
-            deltaRotRaw *= Time.deltaTime / _moveTime;
-        }
-        else
+        if (Position == _targetPosition)
         {
             IsMoving = false;
+            return;
         }
-        _elapsedTime += Time.deltaTime;
-
-        var deltaRot = Quaternion.Euler(deltaRotRaw);
+        
+        var deltaPos = _direction * Time.deltaTime * _moveSpeed;
+        var currentDifference = _targetPosition - Position;
+        var nextDifference = currentDifference - deltaPos;
+        
+        //The nextDifference normalized is basically the direction * -1 when it would overshoot the destination
+        if (nextDifference.normalized != _direction)
+        {
+            deltaPos = currentDifference;
+            IsMoving = false;
+        }
         var ev = new ElevatorMoveContentEvent(MainElevator, deltaPos,
-            deltaRot, new Bounds(Position, Vector3.one * 10), true);
+            Quaternion.identity, new Bounds(Position, Vector3.one * 10), true);
         Schematic.Position += deltaPos;
-        Schematic.Rotation = Quaternion.Euler(currentRot + deltaRotRaw);
         MapEvents.ElevatorMoveContent.RaiseSafely(ev);
     }
 
@@ -54,21 +54,10 @@ public class CustomElevatorChamber : ICustomElevatorChamber
     {
         if (Schematic == null) return;
         IsMoving = true;
-        _elapsedTime = 0f;
         _targetPosition = position;
+        _direction = (position - Position).normalized;
         _targetRotation = rotation;
-        _moveTime = (MainElevator as CustomElevator)?.MoveTime ?? 10f;
-        /*
-         This would be for an Elevator that moves instant
-        var deltaPos = position - Position;
-        var deltaRot = Quaternion.Euler(rotation.eulerAngles - Rotation.eulerAngles);
-        
-        var ev = new ElevatorMoveContentEvent(MainElevator, deltaPos,
-            deltaRot, new Bounds(Position, Vector3.one * 10), true);
-        Schematic.Position = position;
-        Schematic.Rotation = rotation;
-        MapEvents.ElevatorMoveContent.RaiseSafely(ev);
-        */
+        _moveSpeed = (MainElevator as CustomElevator)?.MoveSpeed ?? 10f;
     }
 
     public void Generate(CustomElevator elevator,uint schematicId,CustomElevatorDestination destination)

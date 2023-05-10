@@ -170,7 +170,6 @@ public static class ConsumeItemPatch
 
                 if (!ev.Allow)
                 {
-                    SynapseLogger<Synapse>.Warn("CANCEL FINALIZE EVENT");
                     handler.Value.CurrentUsable.Item.OnUsingCancelled();
                     handler.Value.CurrentUsable = CurrentlyUsedItem.None;
                     new StatusMessage(StatusMessage.StatusType.Cancel, handler.Value.CurrentUsable.ItemSerial)
@@ -178,8 +177,6 @@ public static class ConsumeItemPatch
                     ev.Player.Inventory.ItemInHand = SynapseItem.None;
                     continue;
                 }
-
-                SynapseLogger<Synapse>.Warn("FINALIZE EVENT");
                 usable.Item.ServerOnUsingCompleted();
                 Synapse3Extensions.RaiseEvent(typeof(UsableItemsController),
                     nameof(UsableItemsController.ServerOnUsingCompleted), handler.Key, usable.Item);

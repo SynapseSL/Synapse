@@ -19,10 +19,10 @@ public class ExampleElevator : CustomElevator
         Logger.Warn("GENERATE ELEVATOR!");
         SpawnDestination(new RoomPoint(RoomType.Surface.ToString(), new(18.92f,-8.35f,-42.84f), Vector3.zero));
         SpawnDestination(new RoomPoint(RoomType.Surface.ToString(), new (18.92f,-8.35f + 10f,-42.84f), Vector3.zero));
-        SpawnDestination(new RoomPoint(RoomType.Surface.ToString(), new (18.92f,-8.35f + 20f,-42.84f), Vector3.zero));
+        SpawnDestination(new RoomPoint(RoomType.Surface.ToString(), new (13.92f,-8.35f + 10f,-42.84f), Vector3.zero));
     }
 
-    public override float MoveTime => 5f;
+    public override float MoveSpeed => 1000f;
 }
 
 /*

@@ -25,16 +25,14 @@ public class Throwable : ISubSynapseItem
     /// <summary>
     /// The Time that is left until the Grenade is exploded
     /// </summary>
-    public float FuseTime
+    public double FuseTime
     {
-        get => Projectile == null ? 0 : Projectile.GetComponent<TimeGrenade>().TargetTime - Time.timeSinceLevelLoad;
+        get => Projectile == null ? 0 : Projectile.GetComponent<TimeGrenade>().TargetTime - (double)Time.timeSinceLevelLoad;
         set
         {
             if (Projectile == null) return;
             var comp = Projectile.GetComponent<TimeGrenade>();
-
-            comp.RpcSetTime(value);
-            comp.UserCode_RpcSetTime(value);
+            comp.TargetTime = value;
         }
     }
 
@@ -133,7 +131,7 @@ public class Throwable : ISubSynapseItem
 
     public float Durability
     {
-        get => FuseTime;
+        get => (float)FuseTime;
         set => FuseTime = value;
     }
 
