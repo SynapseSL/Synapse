@@ -94,14 +94,12 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
                 .ToList();
         switch (room)
         {
-            /*TODO:
             case RoomType.Scp330:
-                return _networkIdentities.FirstOrDefault(x => x?.assetId == new Guid("17f38aa5-1bc8-8bc4-0ad1-fffcbe4214ae"));
-
-            case RoomType.TestingRoom:
-                return _networkIdentities.FirstOrDefault(x => x?.assetId == new Guid("d1566564-d477-24c4-c953-c619898e4751"));
-                */
+                return _networkIdentities.FirstOrDefault(x => x?.assetId == 3470525145);
             
+            case RoomType.TestingRoom:
+                return _networkIdentities.FirstOrDefault(x => x?.assetId == 3172166739);
+
             default: return null;
         }
     }

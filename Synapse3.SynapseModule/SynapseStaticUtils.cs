@@ -25,7 +25,7 @@ public const VersionType Type = VersionType.Dev;
     public const VersionType Type = VersionType.None;
 #endif
 
-    public const string SubVersion = "1.3 custom";
+    public const string SubVersion = "1.4 unstable";
     public const string BasedGameVersion = "13.0.0";
 
     /// <summary>
