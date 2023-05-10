@@ -11,5 +11,6 @@ public enum EscapeType
     TooFarAway,
     NotAssigned,
     CustomRole,
+    CustomTeamEvacuate,
     PluginOverride
 }

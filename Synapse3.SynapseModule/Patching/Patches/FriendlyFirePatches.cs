@@ -37,21 +37,28 @@ public static class CheckFriendlyFirePatch
 public static class FlashBangCheckPatch
 {
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(FlashbangGrenade), nameof(FlashbangGrenade.PlayExplosionEffects))]
+    [HarmonyPatch(typeof(FlashbangGrenade), nameof(FlashbangGrenade.ServerFuseEnd))]
     public static bool FlashBangCheck(FlashbangGrenade __instance)
     {
         try
         {
             var time = __instance._blindingOverDistance.keys[__instance._blindingOverDistance.length - 1].time;
             var squared = time * time;
+            var playersHit = 0;
 
             foreach (var hub in ReferenceHub.AllHubs)
             {
                 if ((__instance.transform.position - hub.transform.position).sqrMagnitude <= squared &&
                     hub != __instance.PreviousOwner.Hub &&
                     HitboxIdentity.CheckFriendlyFire(__instance.PreviousOwner.Hub, hub))
+                {
+                    playersHit++;
                     __instance.ProcessPlayer(hub);
+                }
             }
+
+            if (playersHit > 0)
+                Hitmarker.SendHitmarker(__instance.PreviousOwner.Hub, playersHit);
 
             return false;
         }

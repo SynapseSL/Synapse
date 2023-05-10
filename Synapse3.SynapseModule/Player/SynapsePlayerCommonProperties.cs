@@ -10,6 +10,7 @@ using PlayerStatsSystem;
 using RelativePositioning;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Teams;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Player;
@@ -304,6 +305,8 @@ public partial class SynapsePlayer
     /// </summary>
     public int Ping => LiteNetLib4MirrorServer.Peers[Connection.connectionId].Ping;
 
+    public ISynapseTeam CustomTeam => CustomRole == null ? null : _team.Teams.FirstOrDefault(x => x.Attribute.Id == TeamID);
+    
     /// <summary>
     /// The current Team of the player
     /// </summary>

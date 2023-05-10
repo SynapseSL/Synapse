@@ -15,7 +15,6 @@ using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Objects;
-using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -27,12 +26,10 @@ namespace Synapse3.SynapseModule.Map;
 public class MapService : Service
 {
     private readonly RoundEvents _round;
-    private readonly PlayerEvents _player;
 
-    public MapService(RoundEvents round, PlayerEvents player)
+    public MapService(RoundEvents round)
     {
         _round = round;
-        _player = player;
     }
 
     public override void Enable()
@@ -100,7 +97,7 @@ public class MapService : Service
 
     public GameObject SpawnTantrum(Vector3 position, float destroy = -1)
     {
-        var prefab = NetworkClient.prefabs[Guid.Parse("a0e7ee93-b802-e5a4-38bd-95e27cc133ea")];
+        var prefab = NetworkClient.prefabs[1306864341];
         var gameObject = Object.Instantiate(prefab, position, Quaternion.identity);
         var comp = gameObject.GetComponent<TantrumEnvironmentalHazard>();
         comp.SynchronizedPosition = new RelativePosition(position);

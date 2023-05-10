@@ -39,11 +39,17 @@
         <Reference Include="Mirror">
           <HintPath>..\Refs\Mirror_publicized.dll</HintPath>
         </Reference>
+        <Reference Include="Mirror.Components">
+          <HintPath>..\Refs\Mirror.Components.dll</HintPath>
+        </Reference>
         <Reference Include="NorthwoodLib">
           <HintPath>..\Refs\NorthwoodLib.dll</HintPath>
         </Reference>
         <Reference Include="PluginAPI">
           <HintPath>..\Refs\PluginAPI.dll</HintPath>
+        </Reference>
+        <Reference Include="Pooling">
+          <HintPath>..\Refs\Pooling.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine">
             <HintPath>..\Refs\UnityEngine.dll</HintPath>

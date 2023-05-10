@@ -377,7 +377,7 @@ public class SerializedPlayerState
 
                     if (RoleType == RoleTypeId.Scp0492)
                     {
-                        writer.WriteUInt16(ZombieMaxHealth);
+                        writer.WriteUInt(ZombieMaxHealth);
                     }
                 });
             

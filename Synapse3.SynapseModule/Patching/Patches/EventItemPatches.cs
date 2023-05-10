@@ -177,7 +177,6 @@ public static class ConsumeItemPatch
                     ev.Player.Inventory.ItemInHand = SynapseItem.None;
                     continue;
                 }
-
                 usable.Item.ServerOnUsingCompleted();
                 Synapse3Extensions.RaiseEvent(typeof(UsableItemsController),
                     nameof(UsableItemsController.ServerOnUsingCompleted), handler.Key, usable.Item);

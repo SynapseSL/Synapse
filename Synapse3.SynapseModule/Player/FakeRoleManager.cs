@@ -14,6 +14,8 @@ using PlayerRoles.SpawnData;
 using PlayerRoles.Spectating;
 using PlayerStatsSystem;
 using RelativePositioning;
+using Synapse3.SynapseModule.Dummy;
+using Synapse3.SynapseModule.Enums;
 
 namespace Synapse3.SynapseModule.Player;
 
@@ -90,8 +92,13 @@ public class FakeRoleManager
 
     public void WriteRoleSyncInfoFor(SynapsePlayer receiver, NetworkWriter writer)
     {
-        writer.WriteUInt32(_player.NetworkIdentity.netId);
+        writer.WriteUInt(_player.NetworkIdentity.netId);
         var roleInfo = GetRoleInfo(receiver);
+        if (receiver.Team == Team.Dead && _player is DummyPlayer { SpectatorVisible: false })
+        {
+            writer.WriteRoleType(RoleTypeId.Spectator);
+            return;
+        }
         writer.WriteRoleType(roleInfo.RoleObfuscation ? roleInfo.ObfuscationRole(receiver) : roleInfo.RoleTypeId);
 
         if (typeof(IPublicSpawnDataWriter).IsAssignableFrom(EnumToType[roleInfo.RoleTypeId]) &&
@@ -217,17 +224,17 @@ public class RoleInfo
         RoleTypeId = RoleTypeId.Scp0492;
         WritePublicSpawnData = writer =>
         {
-            writer.WriteUInt16(maxHealth);
+            writer.WriteUShort(maxHealth);
             writer.WriteRelativePosition(new RelativePosition(playerToShow.Position));
 
             if (playerToShow.CurrentRole is FpcStandardRoleBase role)
             {
                 role.FpcModule.MouseLook.GetSyncValues(0, out var rotation, out _);
-                writer.WriteUInt16(rotation);
+                writer.WriteUShort(rotation);
             }
             else
             {
-                writer.WriteUInt16(0);
+                writer.WriteUShort(0);
             }
         };
     }
@@ -247,11 +254,11 @@ public class RoleInfo
             if (playerToShow.CurrentRole is FpcStandardRoleBase role)
             {
                 role.FpcModule.MouseLook.GetSyncValues(0, out var rotation, out _);
-                writer.WriteUInt16(rotation);
+                writer.WriteUShort(rotation);
             }
             else
             {
-                writer.WriteUInt16(0);
+                writer.WriteUShort(0);
             }
         };
     }
@@ -265,11 +272,11 @@ public class RoleInfo
             if (playerToShow.CurrentRole is FpcStandardRoleBase role)
             {
                 role.FpcModule.MouseLook.GetSyncValues(0, out var rotation, out _);
-                writer.WriteUInt16(rotation);
+                writer.WriteUShort(rotation);
             }
             else
             {
-                writer.WriteUInt16(0);
+                writer.WriteUShort(0);
             }
         };
     }

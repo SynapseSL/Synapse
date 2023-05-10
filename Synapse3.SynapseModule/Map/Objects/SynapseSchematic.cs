@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using RelativePositioning;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Item;
-using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -180,6 +180,8 @@ public class SynapseSchematic : DefaultSynapseObject, IHideable, IRefreshable
         Map._synapseSchematics.Add(this);
         var comp = GameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
+
+        DeleteWayPoints();
     }
     
     private void UpdatePositionAndRotation()

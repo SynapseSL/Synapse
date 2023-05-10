@@ -7,6 +7,7 @@ public interface IElevatorChamber
     public Transform ParentTransform { get; }
     
     public Vector3 Position { get; }
+    public Quaternion Rotation { get; }
     
     public bool IsMoving { get; }
     

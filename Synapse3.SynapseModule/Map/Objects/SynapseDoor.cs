@@ -175,7 +175,7 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
         comp.Object = this;
         if (Variant.TryGetComponent<DoorNametagExtension>(out var nametag))
             _name = nametag.GetName;
-
+        
         DoorType = Map.GetDoorByName(Name);
 
         _player.JoinUpdates.Add(this);

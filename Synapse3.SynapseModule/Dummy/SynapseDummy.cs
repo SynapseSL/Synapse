@@ -28,6 +28,12 @@ public class SynapseDummy : DefaultSynapseObject, IRefreshable
         set => Player.RaVisible = value;
     }
 
+    public bool SpectatorVisible
+    {
+        get => Player.SpectatorVisible;
+        set => Player.SpectatorVisible = value;
+    }
+
     public float WalkSpeed
     {
         get => Player.WalkSpeed;

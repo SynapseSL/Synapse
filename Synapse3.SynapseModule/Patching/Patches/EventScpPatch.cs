@@ -32,7 +32,6 @@ using Synapse3.SynapseModule.Role;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using PlayerRoles.PlayableScps.Scp079.Pinging;
 using UnityEngine;
 using Utils.Networking;
@@ -154,7 +153,7 @@ public static class Scp079ChangeCameraPatch
         try
         {
             __instance._clientSwitchRequest = (Scp079CurrentCameraSync.ClientSwitchState)reader.ReadByte();
-            __instance._requestedCamId = reader.ReadUInt16();
+            __instance._requestedCamId = reader.ReadUShort();
             if (__instance._clientSwitchRequest != 0)
             {
                 __instance.ServerSendRpc(x => x.roleManager.CurrentRole is SpectatorRole);
@@ -231,7 +230,7 @@ public static class Scp079DoorLockPatch
     {
         try
         {
-            if (!NetworkIdentity.spawned.TryGetValue(reader.ReadUInt32(), out var netIden)
+            if (!NetworkServer.spawned.TryGetValue(reader.ReadUInt(), out var netIden)
                 || !netIden.TryGetComponent(out __instance.LastDoor) || !__instance.IsReady)
             {
                 return false;
@@ -312,7 +311,7 @@ public static class Scp079DoorInteractPatch
     {
         try
         {
-            if (!NetworkIdentity.spawned.TryGetValue(reader.ReadUInt32(), out var netIden) ||
+            if (!NetworkServer.spawned.TryGetValue(reader.ReadUInt(), out var netIden) ||
                 !netIden.TryGetComponent(out __instance.LastDoor) ||
                 !__instance.IsReady || __instance.LostSignalHandler.Lost) return false;
             var player = __instance.GetSynapsePlayer();
@@ -1054,7 +1053,7 @@ public static class Scp173AttackTpPatch
             __instance._cmdData = cmdData;
             var rotation = playerCameraReference.rotation;
             playerCameraReference.rotation = reader.ReadQuaternion();
-            var canBlink = __instance.TryBlink(reader.ReadSingle());
+            var canBlink = __instance.TryBlink(reader.ReadFloat());
             playerCameraReference.rotation = rotation;
             if (!canBlink)
                 return false;
@@ -1218,7 +1217,6 @@ public static class PlayerEscapePocketDimensionPatch
                 fpcRole.FpcModule.ServerOverridePosition(ev.EscapePosition, Vector3.zero);
                 hub.playerEffectsController.EnableEffect<Disabled>(10f, addDuration: true);
                 hub.playerEffectsController.DisableEffect<Corroding>();
-                AchievementHandlerBase.ServerAchieve(component.connectionToClient, AchievementName.LarryFriend);
                 ImageGenerator.pocketDimensionGenerator.GenerateRandom();
             }
 

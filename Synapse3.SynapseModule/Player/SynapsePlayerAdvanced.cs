@@ -43,24 +43,24 @@ public partial class SynapsePlayer
     public void SendFakeEffectIntensity(Effect effect, byte intensity = 1)
         => SendNetworkMessage(_mirror.GetCustomVarMessage(PlayerEffectsController, writer =>
         {
-            writer.WriteUInt64(1); //Which SyncObject will be updated
+            writer.WriteUInt(1); //Which SyncObject will be updated
 
             //SyncList Specific
-            writer.WriteUInt32(1); //The amount of changes
+            writer.WriteUInt(1); //The amount of changes
             writer.WriteByte((byte)SyncList<byte>.Operation.OP_SET);
-            writer.WriteUInt32((uint)effect); //effect id/index
+            writer.WriteUInt((uint)effect); //effect id/index
             writer.WriteByte(intensity); // Intensity
         }, false));
 
     public void SendFakeEffectIntensityFor(SynapsePlayer player, Effect effect, byte intensity = 1)
     => SendNetworkMessage(_mirror.GetCustomVarMessage(player.PlayerEffectsController, writer =>
     {
-        writer.WriteUInt64(1); //Which SyncObject will be updated
+        writer.WriteULong(1); //Which SyncObject will be updated
 
         //SyncList Specific
-        writer.WriteUInt32(1); //The amount of changes
+        writer.WriteUInt(1); //The amount of changes
         writer.WriteByte((byte)SyncList<byte>.Operation.OP_SET);
-        writer.WriteUInt32((uint)effect); //effect id/index
+        writer.WriteUInt((uint)effect); //effect id/index
         writer.WriteByte(intensity); // Intensity
     }, false));
 

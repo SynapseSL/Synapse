@@ -1,5 +1,4 @@
 ﻿using Synapse3.SynapseModule.Map.Objects;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UnityEngine;
 
