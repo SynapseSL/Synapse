@@ -160,15 +160,68 @@ public class DebugService : Service
                 break;
             
             case KeyCode.Alpha4:
-                Dummy = new SynapseDummy(ev.Player.Position, ev.Player.Rotation, ev.Player.RoleType,"testdummy");
-                Dummy.RaVisible = true;
+                var schematicService = Synapse.Get<SchematicService>();
+                Schematic = schematicService.SpawnSchematic(new SchematicConfiguration()
+                {
+                    Lockers = new List<SchematicConfiguration.LockerConfiguration>()
+                    {
+                        new SchematicConfiguration.LockerConfiguration()
+                        {
+                            CustomAttributes = new List<string>(),
+                            Position = Vector3.zero,
+                            Rotation = new Config.SerializedVector3(0,0,0),
+                            Scale = Vector3.one,
+                            LockerType = SynapseLocker.LockerType.StandardLocker,
+                            Update = false,
+                            Chambers = new List<SchematicConfiguration.LockerConfiguration.LockerChamber>(),
+                            DeleteDefaultItems = false,
+                            UpdateFrequency = -1
+                        }
+                    }
+
+                    /*                  Primitives = new List<SchematicConfiguration.PrimitiveConfiguration>()
+                                      {
+                                          new SchematicConfiguration.PrimitiveConfiguration()
+                                          {
+                                              Color = Color.black,
+                                              CustomAttributes = new List<string>(),
+                                              Physics = false,
+                                              Position = Vector3.zero,
+                                              PrimitiveType = PrimitiveType.Cube,
+                                              Rotation = new Config.SerializedVector3(0,0,0),
+                                              Scale = Vector3.one
+                                          }
+                                      }*/
+                }, ev.Player.Position, ev.Player.Rotation);
+                Schematic.ApplyPhysics();
+                var rigidbody = Schematic.GameObject.GetComponent<Rigidbody>();
+                rigidbody.mass /= 20;
                 break;
             
             case KeyCode.Alpha5:
-                ev.Player.Disarmer = Dummy.Player;
+                Schematic.HideFromAll();
                 break;
+            case KeyCode.Alpha6:
+                Schematic.ShowAll();
+                break;
+            case KeyCode.Alpha7:
+                Schematic.HideFromPlayer(ev.Player);
+                break;
+            case KeyCode.Alpha8:
+                Schematic.ShowPlayer(ev.Player);
+                break;
+            case KeyCode.Alpha9:
+                ev.Player.Invisible = InvisibleMode.Full;
+                break;
+
+            case KeyCode.Alpha0:
+                ev.Player.Invisible = InvisibleMode.None;
+                break;
+
         }
     }
+
+    private SynapseSchematic Schematic;
 
     private SynapseDummy Dummy;
 }

@@ -135,7 +135,15 @@ public class SynapseLocker : StructureSyncSynapseObject
         RifleRackLocker,
         ScpPedestal,
         MedkitWallCabinet,
-        AdrenalineWallCabinet
+        AdrenalineWallCabinet,
+        Scp018PedestalVariant,
+        Scp207PedestalVariant,
+        Scp244PedestalVariant,
+        Scp268PedestalVariant,
+        Scp500PedestalVariant,
+        Scp1853PedestalVariant,
+        Scp2176PedestalVariant,
+        Scp1576PedestalVariant,
     }
     
     public class SynapseLockerChamber
