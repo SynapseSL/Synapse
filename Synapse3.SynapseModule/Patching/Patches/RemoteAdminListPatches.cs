@@ -22,7 +22,7 @@ using Random = UnityEngine.Random;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
 
-//#if !PATCHLESS
+#if !PATCHLESS
 [Automatic]
 [SynapsePatch("RAPlayerList", PatchType.RemoteAdmin)]
 public static class RemoteAdminListPatch
@@ -607,4 +607,4 @@ public static class SelectPlayerPatch
         }
     }
 }
-//#endif
+#endif
