@@ -113,10 +113,18 @@ public class SynapseLocker : StructureSyncSynapseObject
     {
         if (Name.Contains("AdrenalineMedkit")) return LockerType.MedkitWallCabinet;
         if (Name.Contains("RegularMedkit")) return LockerType.AdrenalineWallCabinet;
-        if (Name.Contains("Pedestal")) return LockerType.ScpPedestal;
         if (Name.Contains("MiscLocker")) return LockerType.StandardLocker;
         if (Name.Contains("RifleRack")) return LockerType.RifleRackLocker;
         if (Name.Contains("LargeGunLocker")) return LockerType.LargeGunLocker;
+        if (Name.Contains("Scp018")) return LockerType.Scp018PedestalVariant;
+        if (Name.Contains("Scp1576")) return LockerType.Scp1576PedestalVariant;
+        if (Name.Contains("Scp1853")) return LockerType.Scp1853PedestalVariant;
+        if (Name.Contains("Scp207")) return LockerType.Scp207PedestalVariant;
+        if (Name.Contains("Scp2176")) return LockerType.Scp2176PedestalVariant;
+        if (Name.Contains("Scp244")) return LockerType.Scp244PedestalVariant;
+        if (Name.Contains("Scp268")) return LockerType.Scp268PedestalVariant;
+        if (Name.Contains("Scp500")) return LockerType.Scp500PedestalVariant;
+        if (Name.Contains("Pedestal")) return LockerType.ScpPedestal;
         return default;
     }
     private void UnfreezeAll()
