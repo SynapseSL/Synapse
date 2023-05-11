@@ -71,9 +71,9 @@ public class SchematicService : Service
 
         var so = new SynapseSchematic(configuration)
         {
-            Position = position,
+           /* Position = position,//TODO:Fix the postion
             Rotation = rotation,
-            Scale = scale,
+            Scale = scale,*/
         };
         return so;
     }
@@ -223,6 +223,11 @@ public class SchematicService : Service
                 case "3578915554" when prefab.Value.TryGetComponent<Locker>(out var locker):
 
                     SynapseLocker.Prefabs[SynapseLocker.LockerType.Scp2176PedestalVariant] = locker;
+                    break;
+
+                case "3372339835" when prefab.Value.TryGetComponent<Locker>(out var locker):
+
+                    SynapseLocker.Prefabs[SynapseLocker.LockerType.Scp1576PedestalVariant] = locker;
                     break;
 
                 case "2830750618" when prefab.Value.TryGetComponent<Locker>(out var locker):

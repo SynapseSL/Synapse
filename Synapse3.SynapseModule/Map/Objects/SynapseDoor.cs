@@ -21,7 +21,9 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
     public override GameObject GameObject => Variant.gameObject;
     
     public override NetworkIdentity NetworkIdentity => Variant.netIdentity;
-    
+
+    protected override NetworkBehaviour NetworkObject => Variant;
+
     public override ObjectType Type => ObjectType.Door;
 
     public override void OnDestroy()

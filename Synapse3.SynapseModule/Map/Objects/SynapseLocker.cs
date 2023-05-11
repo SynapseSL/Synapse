@@ -19,6 +19,7 @@ public class SynapseLocker : StructureSyncSynapseObject
     public ReadOnlyCollection<SynapseLockerChamber> Chambers { get; private set; }
     public override GameObject GameObject => Locker.gameObject;
     public override NetworkIdentity NetworkIdentity => Locker.netIdentity;
+    protected override NetworkBehaviour NetworkObject => Locker;
     public override ObjectType Type => ObjectType.Locker;
 
     public override void OnDestroy()

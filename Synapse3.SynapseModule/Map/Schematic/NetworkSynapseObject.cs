@@ -8,6 +8,8 @@ public abstract class NetworkSynapseObject :  DefaultSynapseObject, IRefreshable
 {
     public abstract NetworkIdentity NetworkIdentity { get; }
 
+    protected abstract NetworkBehaviour NetworkObject { get; }
+
     public virtual void Refresh() => NetworkIdentity.UpdatePositionRotationScale();
     public bool Update { get; set; } = false;
     public float UpdateFrequency { get; set; } = 0;
@@ -50,10 +52,19 @@ public abstract class NetworkSynapseObject :  DefaultSynapseObject, IRefreshable
         return gameObject;
     }
 
-    public void HideFromAll() => NetworkIdentity.UnSpawnForAllPlayers();
+    public void HideFromAll()
+    {
+        //Update All var
+        NetworkObject.syncVarDirtyBits = ~(0uL);
+        NetworkIdentity.UnSpawnForAllPlayers();
+    }
 
-    public void ShowAll() => Refresh();
-
+    public void ShowAll()
+    {
+        //Update All var
+        NetworkObject.syncVarDirtyBits = ~(0uL);
+        Refresh();
+    }
     public void HideFromPlayer(SynapsePlayer player) => NetworkIdentity.UnSpawnForOnePlayer(player);
 
     public void ShowPlayer(SynapsePlayer player) => NetworkIdentity.SpawnForOnePlayer(player);

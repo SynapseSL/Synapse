@@ -16,6 +16,8 @@ using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic;
 using UnityEngine;
+using MapGeneration.Distributors;
+using PluginAPI.Core.Zones.Heavy;
 
 
 namespace Synapse3.SynapseModule;
@@ -161,41 +163,120 @@ public class DebugService : Service
             
             case KeyCode.Alpha4:
                 var schematicService = Synapse.Get<SchematicService>();
-                Schematic = schematicService.SpawnSchematic(new SchematicConfiguration()
+                var configuration = new SchematicConfiguration()
                 {
-                    Lockers = new List<SchematicConfiguration.LockerConfiguration>()
-                    {
-                        new SchematicConfiguration.LockerConfiguration()
-                        {
-                            CustomAttributes = new List<string>(),
-                            Position = Vector3.zero,
-                            Rotation = new Config.SerializedVector3(0,0,0),
-                            Scale = Vector3.one,
-                            LockerType = SynapseLocker.LockerType.StandardLocker,
-                            Update = false,
-                            Chambers = new List<SchematicConfiguration.LockerConfiguration.LockerChamber>(),
-                            DeleteDefaultItems = false,
-                            UpdateFrequency = -1
-                        }
-                    }
+                    Lockers = new (),
+                    Primitives = new (),
+                    Doors = new (),
+                    Generators = new (),
+                    Lights = new (),
+                    WorkStations = new (),
+                    Targets = new()
+                };
 
-                    /*                  Primitives = new List<SchematicConfiguration.PrimitiveConfiguration>()
-                                      {
-                                          new SchematicConfiguration.PrimitiveConfiguration()
-                                          {
-                                              Color = Color.black,
-                                              CustomAttributes = new List<string>(),
-                                              Physics = false,
-                                              Position = Vector3.zero,
-                                              PrimitiveType = PrimitiveType.Cube,
-                                              Rotation = new Config.SerializedVector3(0,0,0),
-                                              Scale = Vector3.one
-                                          }
-                                      }*/
-                }, ev.Player.Position, ev.Player.Rotation);
-                Schematic.ApplyPhysics();
-                var rigidbody = Schematic.GameObject.GetComponent<Rigidbody>();
-                rigidbody.mass /= 20;
+                var position = ev.Player.Position;
+
+                foreach (var lockerType in (SynapseLocker.LockerType[])Enum.GetValues(typeof(SynapseLocker.LockerType)))
+                {
+                    configuration.Lockers.Add(new SchematicConfiguration.LockerConfiguration()
+                    {
+                        DeleteDefaultItems = false,
+                        LockerType = lockerType,
+                        CustomAttributes = new List<string>(),
+                        Position = position,
+                        Rotation = new Config.SerializedVector3(0, 0, 0),
+                        Scale = Vector3.one,
+                        Update = false,
+                        UpdateFrequency = -1
+                    });
+                    position += Vector3.forward;
+                }
+
+                foreach (var primitiveType in (PrimitiveType[])Enum.GetValues(typeof(PrimitiveType)))
+                {
+                    configuration.Primitives.Add(new SchematicConfiguration.PrimitiveConfiguration()
+                    {
+                        Physics = false,
+                        Color = Color.white,
+                        PrimitiveType = primitiveType,
+                        CustomAttributes = new List<string>(),
+                        Position = position,
+                        Rotation = new Config.SerializedVector3(0, 0, 0),
+                        Scale = Vector3.one,
+                    });
+                    position += Vector3.forward;
+                }
+
+                foreach (var doorType in (SynapseDoor.SpawnableDoorType[])Enum.GetValues(typeof(SynapseDoor.SpawnableDoorType)))
+                {
+                    if (doorType == SynapseDoor.SpawnableDoorType.None) continue;
+
+                    configuration.Doors.Add(new SchematicConfiguration.DoorConfiguration()
+                    {
+                        DoorType = doorType,
+                        Health = 100,
+                        Locked = false,
+                        Open = false,
+                        UnDestroyable = false,
+                        Update = false,
+                        UpdateFrequency = -1,
+                        CustomAttributes = new List<string>(),
+                        Position = position,
+                        Rotation = new Config.SerializedVector3(0, 0, 0),
+                        Scale = Vector3.one,
+                    });
+                    position += Vector3.forward;
+                }
+
+                configuration.Generators.Add(new SchematicConfiguration.SimpleUpdateConfig()
+                {
+                    Update = true,
+                    UpdateFrequency = 2,
+                    CustomAttributes = new List<string>(),
+                    Position = position,
+                    Rotation = new Config.SerializedVector3(0, 0, 0),
+                    Scale = Vector3.one,
+                });
+                position += Vector3.forward;
+
+                configuration.Lights.Add(new SchematicConfiguration.LightSourceConfiguration()
+                {
+                    Color = Color.white,
+                    LightIntensity = 20,
+                    LightRange = 100,
+                    LightShadows = false,
+                    CustomAttributes = new List<string>(),
+                    Position = position,
+                    Rotation = new Config.SerializedVector3(0, 0, 0),
+                    Scale = Vector3.one,
+                });
+                position += Vector3.forward;
+
+                configuration.WorkStations.Add(new SchematicConfiguration.SimpleUpdateConfig()
+                {
+                    Update = true,
+                    UpdateFrequency = -1,
+                    CustomAttributes = new List<string>(),
+                    Position = position,
+                    Rotation = new Config.SerializedVector3(0, 0, 0),
+                    Scale = Vector3.one,
+                });
+                position += Vector3.forward;
+
+                foreach (var targetType in (SynapseTarget.TargetType[])Enum.GetValues(typeof(SynapseTarget.TargetType)))
+                {
+                    configuration.Targets.Add(new SchematicConfiguration.TargetConfiguration()
+                    {
+                        TargetType = targetType,
+                        CustomAttributes = new List<string>(),
+                        Position = position,
+                        Rotation = new Config.SerializedVector3(0, 0, 0),
+                        Scale = Vector3.one,
+                    });
+                    position += Vector3.forward;
+                }
+
+                Schematic = schematicService.SpawnSchematic(configuration, ev.Player.Position, ev.Player.Rotation);
                 break;
             
             case KeyCode.Alpha5:
@@ -208,14 +289,11 @@ public class DebugService : Service
                 Schematic.HideFromPlayer(ev.Player);
                 break;
             case KeyCode.Alpha8:
+                //The doors of lokers are not opens
                 Schematic.ShowPlayer(ev.Player);
                 break;
             case KeyCode.Alpha9:
-                ev.Player.Invisible = InvisibleMode.Full;
-                break;
-
-            case KeyCode.Alpha0:
-                ev.Player.Invisible = InvisibleMode.None;
+                Schematic.Position = ev.Player.Position;
                 break;
 
         }

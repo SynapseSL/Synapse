@@ -181,7 +181,7 @@ public class SynapseSchematic : DefaultSynapseObject, IHideable, IRefreshable
         var comp = GameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
 
-        DeleteWayPoints();
+        //DeleteWayPoints();
     }
     
     private void UpdatePositionAndRotation()

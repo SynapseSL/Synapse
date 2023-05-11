@@ -18,6 +18,8 @@ public class SynapseWorkStation : NetworkSynapseObject, IJoinUpdate
     public override GameObject GameObject => WorkstationController.gameObject;
     public override ObjectType Type => ObjectType.Workstation;
     public override NetworkIdentity NetworkIdentity => WorkstationController.netIdentity;
+    protected override NetworkBehaviour NetworkObject => WorkstationController;
+
     public override void OnDestroy()
     {
         Map._synapseWorkStations.Remove(this);

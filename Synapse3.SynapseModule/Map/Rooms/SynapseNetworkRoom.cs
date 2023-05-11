@@ -18,7 +18,8 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
     {
         Identifier = identifier;
         RoomType = type;
-        NetworkIdentity = GetNetworkIdentity(type);
+        NetworkObject = GetNetworkIdentity(type);
+        NetworkIdentity = NetworkObject?.netIdentity;
         LightController = Identifier.GetComponentInChildren<FlickerableLightController>();
 
         foreach (var door in Synapse.Get<MapService>().SynapseDoors)
@@ -41,6 +42,7 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
     public RoomIdentifier Identifier { get; }
     public FlickerableLightController LightController { get; }
     public override NetworkIdentity NetworkIdentity { get; }
+    protected override NetworkBehaviour NetworkObject { get; }
     public override GameObject GameObject => Identifier.gameObject;
     
     public override ObjectType Type => ObjectType.Room;
@@ -87,7 +89,7 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
     }
 
     internal static List<NetworkIdentity> _networkIdentities;
-    private NetworkIdentity GetNetworkIdentity(RoomType room)
+    private NetworkBehaviour GetNetworkIdentity(RoomType room)
     {
         if (_networkIdentities == null || _networkIdentities.Count == 0)
             _networkIdentities = Synapse.GetObjects<NetworkIdentity>().Where(x => x.name.Contains("All"))
