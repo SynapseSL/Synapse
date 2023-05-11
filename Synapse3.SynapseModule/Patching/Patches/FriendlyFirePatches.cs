@@ -1,15 +1,13 @@
 ﻿using System;
 using HarmonyLib;
+using InventorySystem.Items.ThrowableProjectiles;
 using Neuron.Core.Meta;
 using PlayerStatsSystem;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
 
-#if Patch
-
-#endif
-//#if !PATCHLESS
+#if !PATCHLESS
 [Automatic]
 [SynapsePatch("CheckFF", PatchType.FriendlyFire)]
 public static class CheckFriendlyFirePatch
@@ -33,27 +31,34 @@ public static class CheckFriendlyFirePatch
         }
     }
 }
-/*
+
 [Automatic]
 [SynapsePatch("Flash bang", PatchType.FriendlyFire)]
 public static class FlashBangCheckPatch
 {
     [HarmonyPrefix]
-    //TODO: [HarmonyPatch(typeof(FlashbangGrenade), nameof(FlashbangGrenade.PlayExplosionEffects))]
+    [HarmonyPatch(typeof(FlashbangGrenade), nameof(FlashbangGrenade.ServerFuseEnd))]
     public static bool FlashBangCheck(FlashbangGrenade __instance)
     {
         try
         {
             var time = __instance._blindingOverDistance.keys[__instance._blindingOverDistance.length - 1].time;
             var squared = time * time;
+            var playersHit = 0;
 
             foreach (var hub in ReferenceHub.AllHubs)
             {
                 if ((__instance.transform.position - hub.transform.position).sqrMagnitude <= squared &&
                     hub != __instance.PreviousOwner.Hub &&
                     HitboxIdentity.CheckFriendlyFire(__instance.PreviousOwner.Hub, hub))
+                {
+                    playersHit++;
                     __instance.ProcessPlayer(hub);
+                }
             }
+
+            if (playersHit > 0)
+                Hitmarker.SendHitmarker(__instance.PreviousOwner.Hub, playersHit);
 
             return false;
         }
@@ -64,7 +69,6 @@ public static class FlashBangCheckPatch
         }
     }
 }
-*/
 
 [Automatic]
 [SynapsePatch("Player Damage", PatchType.FriendlyFire)]
@@ -79,4 +83,4 @@ public static class PlayerDamagePatch
                Synapse3Extensions.GetHarmPermission(aHandler.Attacker, __instance?.TargetHub);
     }
 }
-//#endif
+#endif
