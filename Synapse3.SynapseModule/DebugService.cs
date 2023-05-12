@@ -193,7 +193,7 @@ public class DebugService : Service
                     Targets = new()
                 };
 
-                var position = ev.Player.Position;
+                var position = Vector3.zero;
 
                 foreach (var lockerType in (SynapseLocker.LockerType[])Enum.GetValues(typeof(SynapseLocker.LockerType)))
                 {
@@ -299,16 +299,17 @@ public class DebugService : Service
                 break;
             
             case KeyCode.Alpha5:
+                //The generator start to flick
+                //Wrokstation don't be hide
+                //Door create unsync
                 Schematic.HideFromAll();
                 break;
             case KeyCode.Alpha6:
                 Schematic.ShowAll();
                 break;
             case KeyCode.Alpha7:
+                //Wrokstation don't be hide
                 Schematic.HideFromPlayer(ev.Player);
-                var dummy = new SynapseDummy(ev.Player.Position, ev.Player.Rotation, ev.Player.RoleType, "Dummy");
-                dummy.RaVisible = true;
-                dummy.Player.CustomInfo.Add("TestMessage Only for you", new List<SynapsePlayer>() { ev.Player });
                 break;
             case KeyCode.Alpha8:
                 //The doors of lokers are not opens

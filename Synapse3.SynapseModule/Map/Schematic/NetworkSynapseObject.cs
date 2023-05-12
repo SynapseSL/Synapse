@@ -55,14 +55,16 @@ public abstract class NetworkSynapseObject :  DefaultSynapseObject, IRefreshable
     public void HideFromAll()
     {
         //Update All var
-        NetworkObject.syncVarDirtyBits = ~(0uL);
+        if (NetworkObject != null)
+            NetworkObject.syncVarDirtyBits = ~(0uL);
         NetworkIdentity.UnSpawnForAllPlayers();
     }
 
     public void ShowAll()
     {
         //Update All var
-        NetworkObject.syncVarDirtyBits = ~(0uL);
+        if (NetworkObject != null)
+            NetworkObject.syncVarDirtyBits = ~(0uL);
         Refresh();
     }
     public void HideFromPlayer(SynapsePlayer player) => NetworkIdentity.UnSpawnForOnePlayer(player);

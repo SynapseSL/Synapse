@@ -71,9 +71,9 @@ public class SchematicService : Service
 
         var so = new SynapseSchematic(configuration)
         {
-           /* Position = position,//TODO:Fix the postion
+            Position = position,
             Rotation = rotation,
-            Scale = scale,*/
+            Scale = scale,
         };
         return so;
     }
