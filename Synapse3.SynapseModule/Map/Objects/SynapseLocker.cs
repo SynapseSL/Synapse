@@ -5,13 +5,17 @@ using InventorySystem.Items.Pickups;
 using MapGeneration.Distributors;
 using Mirror;
 using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Objects;
 
 //TODO: Fix Item Floating
-public class SynapseLocker : StructureSyncSynapseObject
+public class SynapseLocker : StructureSyncSynapseObject, IJoinUpdate
 {
+    private readonly MirrorService _mirror;
+    private readonly PlayerService _player;
+
     public static Dictionary<LockerType, Locker> Prefabs { get; } = new ();
 
 
@@ -21,6 +25,7 @@ public class SynapseLocker : StructureSyncSynapseObject
     public override NetworkIdentity NetworkIdentity => Locker.netIdentity;
     protected override NetworkBehaviour NetworkObject => Locker;
     public override ObjectType Type => ObjectType.Locker;
+    public bool NeedsJoinUpdate => hideForAll;
 
     public override void OnDestroy()
     {
@@ -42,13 +47,28 @@ public class SynapseLocker : StructureSyncSynapseObject
     
     public LockerType SynapseLockerType { get; private set; }
 
+
+    internal bool hideForAll = false;
+    internal HashSet<SynapsePlayer> hideForPlayer = new ();
+
+    public override void Refresh()
+    {
+        var message = _mirror.GetSpawnMessage(NetworkIdentity);
+        var realScale = Scale;
+        foreach (var player in _player.Players)
+        {
+            if (!hideForPlayer.Contains(player))
+                player.Connection.Send(message);
+        }
+    }
+
     public SynapseLocker(LockerType lockerType, Vector3 position, Quaternion rotation, Vector3 scale,
-        bool removeDefaultItems = false)
+        bool removeDefaultItems = false) : this()
     {
         Locker = CreateLocker(lockerType, position, rotation, scale, removeDefaultItems);
         SetUp(lockerType);
     }
-    internal SynapseLocker(Locker locker)
+    internal SynapseLocker(Locker locker) : this()
     {
         Locker = locker;
         SetUp(GetLockerType());
@@ -73,6 +93,13 @@ public class SynapseLocker : StructureSyncSynapseObject
                 SpawnItem(item, i);
         }
     }
+
+    private SynapseLocker()
+    {
+        _mirror = Synapse.Get<MirrorService>();
+        _player = Synapse.Get<PlayerService>();
+    }
+
     private void SetUp(LockerType type)
     {
         Map._synapseLockers.Add(this);
@@ -137,6 +164,13 @@ public class SynapseLocker : StructureSyncSynapseObject
                 rigidbody.useGravity = true;
             }
     }
+
+    public void UpdatePlayer(SynapsePlayer player)
+    {
+        hideForPlayer.Add(player);
+        Refresh();
+    }
+
     public enum LockerType
     {
         StandardLocker,

@@ -379,5 +379,13 @@ public static class DecoratedMapPatches
             return true;
         }
     }
+    /*
+
+    [2023-05-13 20:01:32.874 +02:00] [Error] [Synapse] Scp914 Upgrade Patch failed
+                                 System.NullReferenceException: Object reference not set to an instance of an object
+                                   at Scp914.Processors.StandardItemProcessor.OnPickupUpgraded (Scp914.Scp914KnobSetting setting, InventorySystem.Items.Pickups.ItemPickupBase ipb, UnityEngine.Vector3 newPosition) [0x000bd] in <73d4913995c442f28bf61ed6f016cde6>:0
+                                   at Synapse3.SynapseModule.Map.Scp914.Default914Processor.CreateUpgradedItem (Synapse3.SynapseModule.Item.SynapseItem item, Scp914.Scp914KnobSetting setting, UnityEngine.Vector3 position) [0x0006f] in <648363896e554f699a64bf3f639700cc>:0
+                                   at Synapse3.SynapseModule.Patching.Patches.DecoratedMapPatches.OnUpgrade (UnityEngine.Collider[] intake, UnityEngine.Vector3 moveVector, Scp914.Scp914Mode mode, Scp914.Scp914KnobSetting setting) [0x002ad] in <648363896e554f699a64bf3f639700cc>:0
+    */
 }
 #endif

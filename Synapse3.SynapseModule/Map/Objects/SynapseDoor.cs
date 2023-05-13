@@ -132,6 +132,55 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
 
     public override string ToString() => Name;
 
+    internal bool hideForAll = false;
+    internal HashSet<SynapsePlayer> hideForPlayer = new ();
+
+    public override void HideFromAll()
+    {
+        hideForAll = true;
+        foreach (var player in _player.Players)
+	    {
+            hideForPlayer.Add(player);
+        }
+        Refresh();
+    }
+
+    public override void ShowAll()
+    {
+        hideForAll = false;
+        hideForPlayer.Clear();
+        Refresh();
+    }
+
+    public override void ShowPlayer(SynapsePlayer player)
+    {
+        if (hideForPlayer.Remove(player))
+        {
+            Refresh();
+        }
+    }
+
+    public override void HideFromPlayer(SynapsePlayer player)
+    {
+        if (hideForPlayer.Add(player))
+        {
+            Refresh();
+        }
+    }
+
+    public override void Refresh()
+    {
+        var message = _mirror.GetSpawnMessage(NetworkIdentity);
+        var realScale = Scale;
+        foreach (var player in _player.Players)
+	    {
+            if (hideForPlayer.Contains(player))
+                message.scale = Vector3.zero;
+            else
+                message.scale = realScale;
+            player.Connection.Send(message);
+        }
+    }
 
     private SynapseDoor()
     {
@@ -192,6 +241,8 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
     public void UpdatePlayer(SynapsePlayer player)
     {
         player.SendNetworkMessage(_mirror.GetSpawnMessage(NetworkIdentity));
+        if (hideForAll)
+            HideFromPlayer(player);
     }
 
     public enum SpawnableDoorType

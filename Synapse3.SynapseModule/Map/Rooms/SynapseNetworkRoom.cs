@@ -8,6 +8,7 @@ using PlayerRoles.PlayableScps.Scp079;
 using PlayerRoles.PlayableScps.Scp079.Cameras;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Rooms;
@@ -76,6 +77,15 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
             }
         }
     }
+
+    //Can't be show or hide in round
+    public override void HideFromPlayer(SynapsePlayer player) { }
+
+    public override void HideFromAll() { }
+
+    public override void ShowPlayer(SynapsePlayer player) { }
+
+    public override void ShowAll() { }
 
     public void TurnOffLights(float duration)
     {

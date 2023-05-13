@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Schematic;
 
-public abstract class NetworkSynapseObject :  DefaultSynapseObject, IRefreshable, IHideable
+public abstract class NetworkSynapseObject : DefaultSynapseObject, IRefreshable, IHideable
 {
     public abstract NetworkIdentity NetworkIdentity { get; }
 
@@ -52,22 +52,20 @@ public abstract class NetworkSynapseObject :  DefaultSynapseObject, IRefreshable
         return gameObject;
     }
 
-    public void HideFromAll()
-    {
-        //Update All var
-        if (NetworkObject != null)
-            NetworkObject.syncVarDirtyBits = ~(0uL);
-        NetworkIdentity.UnSpawnForAllPlayers();
-    }
+    public virtual void HideFromAll() => NetworkIdentity.UnSpawnForAllPlayers();
 
-    public void ShowAll()
+    public virtual void ShowAll()
     {
         //Update All var
-        if (NetworkObject != null)
-            NetworkObject.syncVarDirtyBits = ~(0uL);
+        NetworkObject.syncVarDirtyBits = ~(0uL);
         Refresh();
     }
-    public void HideFromPlayer(SynapsePlayer player) => NetworkIdentity.UnSpawnForOnePlayer(player);
+    public virtual void HideFromPlayer(SynapsePlayer player) => NetworkIdentity.UnSpawnForOnePlayer(player);
 
-    public void ShowPlayer(SynapsePlayer player) => NetworkIdentity.SpawnForOnePlayer(player);
+    public virtual void ShowPlayer(SynapsePlayer player)
+    {
+        //Update All var
+        NetworkObject.syncVarDirtyBits = ~(0uL);
+        NetworkIdentity.SpawnForOnePlayer(player);
+    }
 }

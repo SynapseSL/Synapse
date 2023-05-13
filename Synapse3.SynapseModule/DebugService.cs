@@ -22,7 +22,7 @@ using Synapse3.SynapseModule.Player;
 using UnityEngine;
 using MapGeneration.Distributors;
 using PluginAPI.Core.Zones.Heavy;
-
+using Synapse3.SynapseModule.Map;
 
 namespace Synapse3.SynapseModule;
 
@@ -179,140 +179,22 @@ public class DebugService : Service
                     MoveInElevator = true
                 };
                 break;
-            
+
             case KeyCode.Alpha4:
-                var schematicService = Synapse.Get<SchematicService>();
-                var configuration = new SchematicConfiguration()
-                {
-                    Lockers = new (),
-                    Primitives = new (),
-                    Doors = new (),
-                    Generators = new (),
-                    Lights = new (),
-                    WorkStations = new (),
-                    Targets = new()
-                };
-
-                var position = Vector3.zero;
-
-                foreach (var lockerType in (SynapseLocker.LockerType[])Enum.GetValues(typeof(SynapseLocker.LockerType)))
-                {
-                    configuration.Lockers.Add(new SchematicConfiguration.LockerConfiguration()
-                    {
-                        DeleteDefaultItems = false,
-                        LockerType = lockerType,
-                        CustomAttributes = new List<string>(),
-                        Position = position,
-                        Rotation = new Config.SerializedVector3(0, 0, 0),
-                        Scale = Vector3.one,
-                        Update = false,
-                        UpdateFrequency = -1
-                    });
-                    position += Vector3.forward;
-                }
-
-                foreach (var primitiveType in (PrimitiveType[])Enum.GetValues(typeof(PrimitiveType)))
-                {
-                    configuration.Primitives.Add(new SchematicConfiguration.PrimitiveConfiguration()
-                    {
-                        Physics = false,
-                        Color = Color.white,
-                        PrimitiveType = primitiveType,
-                        CustomAttributes = new List<string>(),
-                        Position = position,
-                        Rotation = new Config.SerializedVector3(0, 0, 0),
-                        Scale = Vector3.one,
-                    });
-                    position += Vector3.forward;
-                }
-
-                foreach (var doorType in (SynapseDoor.SpawnableDoorType[])Enum.GetValues(typeof(SynapseDoor.SpawnableDoorType)))
-                {
-                    if (doorType == SynapseDoor.SpawnableDoorType.None) continue;
-
-                    configuration.Doors.Add(new SchematicConfiguration.DoorConfiguration()
-                    {
-                        DoorType = doorType,
-                        Health = 100,
-                        Locked = false,
-                        Open = false,
-                        UnDestroyable = false,
-                        Update = false,
-                        UpdateFrequency = -1,
-                        CustomAttributes = new List<string>(),
-                        Position = position,
-                        Rotation = new Config.SerializedVector3(0, 0, 0),
-                        Scale = Vector3.one,
-                    });
-                    position += Vector3.forward;
-                }
-
-                configuration.Generators.Add(new SchematicConfiguration.SimpleUpdateConfig()
-                {
-                    Update = true,
-                    UpdateFrequency = 2,
-                    CustomAttributes = new List<string>(),
-                    Position = position,
-                    Rotation = new Config.SerializedVector3(0, 0, 0),
-                    Scale = Vector3.one,
-                });
-                position += Vector3.forward;
-
-                configuration.Lights.Add(new SchematicConfiguration.LightSourceConfiguration()
-                {
-                    Color = Color.white,
-                    LightIntensity = 20,
-                    LightRange = 100,
-                    LightShadows = false,
-                    CustomAttributes = new List<string>(),
-                    Position = position,
-                    Rotation = new Config.SerializedVector3(0, 0, 0),
-                    Scale = Vector3.one,
-                });
-                position += Vector3.forward;
-
-                configuration.WorkStations.Add(new SchematicConfiguration.SimpleUpdateConfig()
-                {
-                    Update = true,
-                    UpdateFrequency = -1,
-                    CustomAttributes = new List<string>(),
-                    Position = position,
-                    Rotation = new Config.SerializedVector3(0, 0, 0),
-                    Scale = Vector3.one,
-                });
-                position += Vector3.forward;
-
-                foreach (var targetType in (SynapseTarget.TargetType[])Enum.GetValues(typeof(SynapseTarget.TargetType)))
-                {
-                    configuration.Targets.Add(new SchematicConfiguration.TargetConfiguration()
-                    {
-                        TargetType = targetType,
-                        CustomAttributes = new List<string>(),
-                        Position = position,
-                        Rotation = new Config.SerializedVector3(0, 0, 0),
-                        Scale = Vector3.one,
-                    });
-                    position += Vector3.forward;
-                }
-
-                Schematic = schematicService.SpawnSchematic(configuration, ev.Player.Position, ev.Player.Rotation);
+                SpawnDebugShematic(ev.Player);
                 break;
-            
+
             case KeyCode.Alpha5:
                 //The generator start to flick
-                //Wrokstation don't be hide
-                //Door create unsync
                 Schematic.HideFromAll();
                 break;
             case KeyCode.Alpha6:
                 Schematic.ShowAll();
                 break;
             case KeyCode.Alpha7:
-                //Wrokstation don't be hide
                 Schematic.HideFromPlayer(ev.Player);
                 break;
             case KeyCode.Alpha8:
-                //The doors of lokers are not opens
                 Schematic.ShowPlayer(ev.Player);
                 break;
             case KeyCode.Alpha9:
@@ -320,6 +202,125 @@ public class DebugService : Service
                 break;
 
         }
+    }
+
+    private void SpawnDebugShematic(SynapsePlayer player)
+    {
+        var schematicService = Synapse.Get<SchematicService>();
+        var configuration = new SchematicConfiguration()
+        {
+            Lockers = new (),
+            Primitives = new (),
+            Doors = new (),
+            Generators = new (),
+            Lights = new (),
+            WorkStations = new (),
+            Targets = new()
+        };
+
+        var position = Vector3.zero;
+
+        foreach (var lockerType in (SynapseLocker.LockerType[])Enum.GetValues(typeof(SynapseLocker.LockerType)))
+        {
+            configuration.Lockers.Add(new SchematicConfiguration.LockerConfiguration()
+            {
+                DeleteDefaultItems = false,
+                LockerType = lockerType,
+                CustomAttributes = new List<string>(),
+                Position = position,
+                Rotation = new Config.SerializedVector3(0, 0, 0),
+                Scale = Vector3.one,
+                Update = false,
+                UpdateFrequency = -1
+            });
+            position += Vector3.forward;
+        }
+
+        foreach (var primitiveType in (PrimitiveType[])Enum.GetValues(typeof(PrimitiveType)))
+        {
+            configuration.Primitives.Add(new SchematicConfiguration.PrimitiveConfiguration()
+            {
+                Physics = false,
+                Color = Color.white,
+                PrimitiveType = primitiveType,
+                CustomAttributes = new List<string>(),
+                Position = position,
+                Rotation = new Config.SerializedVector3(0, 0, 0),
+                Scale = Vector3.one,
+            });
+            position += Vector3.forward;
+        }
+
+        foreach (var doorType in (SynapseDoor.SpawnableDoorType[])Enum.GetValues(typeof(SynapseDoor.SpawnableDoorType)))
+        {
+            if (doorType == SynapseDoor.SpawnableDoorType.None) continue;
+
+            configuration.Doors.Add(new SchematicConfiguration.DoorConfiguration()
+            {
+                DoorType = doorType,
+                Health = 100,
+                Locked = false,
+                Open = false,
+                UnDestroyable = false,
+                Update = false,
+                UpdateFrequency = -1,
+                CustomAttributes = new List<string>(),
+                Position = position,
+                Rotation = new Config.SerializedVector3(0, 0, 0),
+                Scale = Vector3.one,
+            });
+            position += Vector3.forward;
+        }
+
+        configuration.Generators.Add(new SchematicConfiguration.SimpleUpdateConfig()
+        {
+            Update = true,
+            UpdateFrequency = 2,
+            CustomAttributes = new List<string>(),
+            Position = position,
+            Rotation = new Config.SerializedVector3(0, 0, 0),
+            Scale = Vector3.one,
+        });
+        position += Vector3.forward;
+
+        configuration.Lights.Add(new SchematicConfiguration.LightSourceConfiguration()
+        {
+            Color = Color.white,
+            LightIntensity = 20,
+            LightRange = 100,
+            LightShadows = false,
+            CustomAttributes = new List<string>(),
+            Position = position,
+            Rotation = new Config.SerializedVector3(0, 0, 0),
+            Scale = Vector3.one,
+        });
+        position += Vector3.forward;
+
+        configuration.WorkStations.Add(new SchematicConfiguration.SimpleUpdateConfig()
+        {
+            Update = true,
+            UpdateFrequency = -1,
+            CustomAttributes = new List<string>(),
+            Position = position,
+            Rotation = new Config.SerializedVector3(0, 0, 0),
+            Scale = Vector3.one,
+        });
+        position += Vector3.forward;
+
+        foreach (var targetType in (SynapseTarget.TargetType[])Enum.GetValues(typeof(SynapseTarget.TargetType)))
+        {
+            configuration.Targets.Add(new SchematicConfiguration.TargetConfiguration()
+            {
+                TargetType = targetType,
+                CustomAttributes = new List<string>(),
+                Position = position,
+                Rotation = new Config.SerializedVector3(0, 0, 0),
+                Scale = Vector3.one,
+            });
+            position += Vector3.forward;
+        }
+
+        Schematic = schematicService.SpawnSchematic(configuration, player.Position, player.Rotation);
     }
 
     private SynapseSchematic Schematic;
