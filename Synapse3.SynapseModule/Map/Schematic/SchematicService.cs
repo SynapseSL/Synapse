@@ -130,8 +130,6 @@ public class SchematicService : Service
         
         foreach (var prefab in NetworkManager.singleton.spawnPrefabs)
         {
-            SynapseLogger<SchematicService>.Warn(prefab.name);
-
             switch (prefab.name)
             {
                 case "EZ BreakableDoor" when prefab.TryGetComponent<BreakableDoor>(out var door):
