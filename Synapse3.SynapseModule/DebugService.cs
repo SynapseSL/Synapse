@@ -191,25 +191,6 @@ public class DebugService : Service
 
                 dummy.Player.FakeRoleManager.ToPlayerVisibleRole[ev.Player] = new RoleInfo(RoleTypeId.ChaosMarauder, ev.Player);
                 dummy.Player.FakeRoleManager.UpdatePlayer(ev.Player);
-
-                break;
-
-            case KeyCode.Alpha5:
-                ThrowableItem defaultItem = InventoryItemLoader.AvailableItems[ItemType.GrenadeHE] as ThrowableItem;
-                ThrowableItem.ProjectileSettings settings = defaultItem.FullThrowSettings;
-                Transform reference = ev.Player.CameraReference;
-                Vector3 a2 = reference.forward + (reference.up * settings.UpwardsFactor) *
-            (1f - Mathf.Abs(Vector3.Dot(reference.forward, Vector3.up)));
-                Vector3 velocity = a2 * 20 * 2;
-
-                SynapseItem grenade = new(ItemType.GrenadeHE, ev.Player.CameraReference.position - new Vector3(0, 0.15f));
-                grenade.Pickup.Rb.velocity = velocity;
-                grenade.Throwable.Fuse(ev.Player);
-                grenade.Throwable.FuseTime = 4;
-                break;
-
-            case KeyCode.Alpha6:
-                Synapse.Get<MapService>().Explode(ev.Player.Position,GrenadeType.Grenade, ev.Player);
                 break;
 
            /* case KeyCode.Alpha4:
