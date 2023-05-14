@@ -27,12 +27,12 @@ public class Throwable : ISubSynapseItem
     /// </summary>
     public double FuseTime
     {
-        get => Projectile == null ? 0 : Projectile.GetComponent<TimeGrenade>().TargetTime - (double)Time.timeSinceLevelLoad;
+        get => Projectile == null ? 0 : Projectile.GetComponent<TimeGrenade>().TargetTime - NetworkTime.time;
         set
         {
             if (Projectile == null) return;
             var comp = Projectile.GetComponent<TimeGrenade>();
-            comp.TargetTime = value;
+            comp.TargetTime = value + NetworkTime.time;
         }
     }
 

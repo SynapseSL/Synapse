@@ -23,6 +23,11 @@ using UnityEngine;
 using MapGeneration.Distributors;
 using PluginAPI.Core.Zones.Heavy;
 using Synapse3.SynapseModule.Map;
+using System.Diagnostics.Eventing.Reader;
+using PluginAPI.Core;
+using InventorySystem.Items.ThrowableProjectiles;
+using InventorySystem;
+using Synapse3.SynapseModule.Item;
 
 namespace Synapse3.SynapseModule;
 
@@ -110,6 +115,7 @@ public class DebugService : Service
             if (ev.State == ItemInteractState.Finalize)
                 ev.Allow = false;
         });
+
         _round.Waiting.Subscribe(ev =>
         {
             ((SynapseNetworkRoom)Synapse.Get<RoomService>().GetRoom((uint)RoomType.TestingRoom)).Position +=
@@ -181,6 +187,32 @@ public class DebugService : Service
                 break;
 
             case KeyCode.Alpha4:
+                var dummy = new SynapseDummy(ev.Player.Position, ev.Player.Rotation, RoleTypeId.ClassD, "Hello", "Crash?");
+
+                dummy.Player.FakeRoleManager.ToPlayerVisibleRole[ev.Player] = new RoleInfo(RoleTypeId.ChaosMarauder, ev.Player);
+                dummy.Player.FakeRoleManager.UpdatePlayer(ev.Player);
+
+                break;
+
+            case KeyCode.Alpha5:
+                ThrowableItem defaultItem = InventoryItemLoader.AvailableItems[ItemType.GrenadeHE] as ThrowableItem;
+                ThrowableItem.ProjectileSettings settings = defaultItem.FullThrowSettings;
+                Transform reference = ev.Player.CameraReference;
+                Vector3 a2 = reference.forward + (reference.up * settings.UpwardsFactor) *
+            (1f - Mathf.Abs(Vector3.Dot(reference.forward, Vector3.up)));
+                Vector3 velocity = a2 * 20 * 2;
+
+                SynapseItem grenade = new(ItemType.GrenadeHE, ev.Player.CameraReference.position - new Vector3(0, 0.15f));
+                grenade.Pickup.Rb.velocity = velocity;
+                grenade.Throwable.Fuse(ev.Player);
+                grenade.Throwable.FuseTime = 4;
+                break;
+
+            case KeyCode.Alpha6:
+                Synapse.Get<MapService>().Explode(ev.Player.Position,GrenadeType.Grenade, ev.Player);
+                break;
+
+           /* case KeyCode.Alpha4:
                 SpawnDebugShematic(ev.Player);
                 break;
 
@@ -199,7 +231,7 @@ public class DebugService : Service
                 break;
             case KeyCode.Alpha9:
                 Schematic.Position = ev.Player.Position;
-                break;
+                break;*/
 
         }
     }
