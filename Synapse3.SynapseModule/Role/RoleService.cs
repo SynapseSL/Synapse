@@ -19,14 +19,14 @@ public class RoleService : Service
     private readonly Synapse _synapseModule;
 
     /// <summary>
-    /// The value to use by synapse to designate <see cref="RoleType.None"/>
+    /// The value to use by synapse to designate <see cref="RoleTypeId.None"/>
     /// </summary>
     public const uint NoneRole = uint.MaxValue;
 
     /// <summary>
     /// The Hightest vanilla number for Roles
     /// </summary>
-    public const uint HighestRole = (uint)RoleTypeId.Overwatch;
+    public const uint HighestRole = (uint)RoleTypeId.Filmmaker;
     
     /// <summary>
     /// A list of all Registered CustomRoles that can spawn
