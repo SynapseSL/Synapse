@@ -4,6 +4,7 @@ using System.Reflection;
 using Mirror;
 using Neuron.Core.Meta;
 using PlayerRoles.SpawnData;
+using PluginAPI.Core;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
@@ -31,14 +32,13 @@ public class MirrorService : Service
         Action<NetworkWriter> writeCustomVarData = null, Action<NetworkWriter> writCustomObjectData = null)
         where TNetworkBehaviour : NetworkBehaviour
     {
-        var index = behaviour.netIdentity.NetworkBehaviours.IndexOf(behaviour);//behaviour.ComponentIndex ?
-
+        var index = behaviour.ComponentIndex;
         var writer = new NetworkWriter();
         Compression.CompressVarUInt(writer, 1u << index);
-        int position1 = writer.Position;
+        var headerPosition = writer.Position;
         writer.WriteByte(0);
+        var contentPosition = writer.Position;
 
-        int position2 = writer.Position;
         if (writCustomObjectData == null)
         {
             //By default, we don't update the ObjectData only when syncObjectDirtyBits is set to 0 do
@@ -59,11 +59,13 @@ public class MirrorService : Service
             writeCustomVarData.Invoke(writer);
         }
 
-        int position3 = writer.Position;
-        writer.Position = position1;
-        byte num = (byte) (position3 - position2 & (int) byte.MaxValue);
-        writer.WriteByte(num);
-        writer.Position = position3;
+        var endPosition = writer.Position;
+
+        writer.Position = headerPosition;
+        var size = endPosition - contentPosition;
+        var safety = (byte)(size & 0xFF);
+        writer.WriteByte(safety);
+        writer.Position = endPosition;
 
         var msg = new EntityStateMessage()
         {

@@ -184,24 +184,13 @@ public class DebugService : Service
                 break;
 
             case KeyCode.Alpha4:
-                var dummy = SpawnDebugRole(ev.Player);
-
-                dummy.Player.RoleType = RoleTypeId.ClassD;
-                dummy.Player.FakeRoleManager.VisibleRole = RoleTypeId.Scientist;
-
-                ev.Player.SendFakeEffectIntensity(Effect.Burned, 1);
-
+                ev.Player.SendFakeEffectIntensity(Effect.Concussed, 1);
                 break;
 
-                /*                case KeyCode.Alpha5:
-                                    var dummy2 = SpawnDebugRole(ev.Player);
-                                    Timing.CallDelayed(1f, () =>
-                                    {
-                                        dummy2.Player.FakeRoleManager.UpdateAll();
-                                        dummy2.Player.FakeRoleManager.VisibleRole = RoleTypeId.ClassD;
-                                        dummy2.Player.FakeRoleManager.UpdateAll();
-                                    });
-                                break;*/
+            case KeyCode.Alpha5:
+                var dummy2 = SpawnDebugRole(ev.Player);
+                dummy2.Player.FakeRoleManager.VisibleRole = RoleTypeId.ClassD;
+                break;
 
                 /* case KeyCode.Alpha4:
                      SpawnDebugShematic(ev.Player);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Mirror;
 using Neuron.Modules.Configs.Localization;
 using Synapse3.SynapseModule.Config;
@@ -43,7 +44,7 @@ public partial class SynapsePlayer
     public void SendFakeEffectIntensity(Effect effect, byte intensity = 1)
         => SendNetworkMessage(_mirror.GetCustomVarMessage(PlayerEffectsController, writCustomObjectData: writer =>
         {
-            writer.WriteUInt(1); //Which SyncObject will be updated
+            writer.WriteULong(1); //Which SyncObject will be updated
 
             //SyncList Specific
             writer.WriteUInt(1); //The amount of changes
