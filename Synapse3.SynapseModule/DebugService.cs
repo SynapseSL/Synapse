@@ -186,14 +186,12 @@ public class DebugService : Service
             case KeyCode.Alpha4:
                 var dummy = SpawnDebugRole(ev.Player);
 
-            dummy.Player.RoleType = RoleTypeId.ClassD;
-            dummy.Player.FakeRoleManager.OwnVisibleRole = RoleTypeId.Scientist;
-            break;
-/*
-            case KeyCode.Alpha4:
-                ev.Player.SendFakeEffectIntensity(Effect.Hypothermia, 1);
+                dummy.Player.RoleType = RoleTypeId.ClassD;
+                dummy.Player.FakeRoleManager.VisibleRole = RoleTypeId.Scientist;
 
-                break;*/
+                ev.Player.SendFakeEffectIntensity(Effect.Burned, 1);
+
+                break;
 
                 /*                case KeyCode.Alpha5:
                                     var dummy2 = SpawnDebugRole(ev.Player);

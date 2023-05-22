@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MEC;
 using Mirror;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
@@ -16,6 +17,8 @@ public class FakeRoleManager
     private readonly SynapsePlayer _player;
     private readonly PlayerService _playerService;
 
+    internal bool ready = false;
+
     static FakeRoleManager()
     {
         foreach (var TypeRoles in PlayerRoleLoader.AllRoles)
@@ -28,6 +31,7 @@ public class FakeRoleManager
     {
         _player = player;
         _playerService = playerService;
+        Timing.CallDelayed(Timing.WaitForOneFrame, () => ready = true);
     }
 
     public void Reset()
@@ -47,8 +51,16 @@ public class FakeRoleManager
         }
     }
     
-    public void UpdatePlayer(SynapsePlayer player) 
-        => player.SendNetworkMessage(new RoleSyncInfo(_player, RoleTypeId.None, player));
+    public void UpdatePlayer(SynapsePlayer player)
+    {
+        if (!ready)
+        {
+            Timing.CallDelayed(Timing.WaitForOneFrame, () => UpdatePlayer(player));
+            return;
+        }
+        player.SendNetworkMessage(new RoleSyncInfo(_player, RoleTypeId.None, player));
+    }
+        
 
     public RoleTypeId OwnVisibleRole
     {

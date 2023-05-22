@@ -11,57 +11,79 @@ namespace Synapse3.SynapseModule;
 
 public class MirrorService : Service
 {
+    /// <summary>
+    /// Use to spoof information to a specific client by sending the result of this method over its connection
+    /// The resulte can be send to a client using the <see cref="SynapsePlayer.SendNetworkMessage{TNetworkMessage}(TNetworkMessage, int)"/>.
+    /// <exemple> 
+    /// <para>To write custom varaible data and keep a default refresh of ObjectData:</para>
+    /// <code>
+    /// GetCustomVarMessage(behaviour, writer => MyLambdaWriter, writer => behaviour.SerializeObjectsDelta(writer));
+    /// </code>
+    /// To write custome object data and keep a default refresh of variable
+    /// <code>
+    /// GetCustomVarMessage(behaviour, writer => behaviour.SerializeSyncVars(writer), writer => MyLambdaWriter());
+    /// </code>
+    /// </exemple>
+    /// By default the ObjectData and Variable are not update
+    /// </summary>
+    /// <param name="behaviour">The target NetWorkBehaviour who will see this value change on the client side of the receving player</param>
     public EntityStateMessage GetCustomVarMessage<TNetworkBehaviour>(TNetworkBehaviour behaviour,
-        Action<NetworkWriter> writeCustomData, bool writeDefaultObjectData = true)
+        Action<NetworkWriter> writeCustomVarData = null, Action<NetworkWriter> writCustomObjectData = null)
         where TNetworkBehaviour : NetworkBehaviour
     {
         var index = behaviour.netIdentity.NetworkBehaviours.IndexOf(behaviour);//behaviour.ComponentIndex ?
-        
-        var writerData = new NetworkWriter();
-        Compression.CompressVarUInt(writerData, 1u << index);
-        int position1 = writerData.Position;
-        writerData.WriteByte(0);
 
-        int position2 = writerData.Position;
-        if (!writeDefaultObjectData)
+        var writer = new NetworkWriter();
+        Compression.CompressVarUInt(writer, 1u << index);
+        int position1 = writer.Position;
+        writer.WriteByte(0);
+
+        int position2 = writer.Position;
+        if (writCustomObjectData == null)
         {
             //By default, we don't update the ObjectData only when syncObjectDirtyBits is set to 0 do
-            writerData.WriteULong(0);
+            writer.WriteULong(0);
         }
         else
         {
-            behaviour.SerializeObjectsDelta(writerData);
+            writCustomObjectData.Invoke(writer);
         }
 
-        if (writeCustomData == null)
+        if (writeCustomVarData == null)
         {
             //By default, we don't update the syncVarDirtyBits only when syncVarDirtyBits is set to 0
-            writerData.WriteULong(0);
+            writer.WriteULong(0);
         }
         else
         {
-            writeCustomData.Invoke(writerData);
+            writeCustomVarData.Invoke(writer);
         }
 
-        int position3 = writerData.Position;
-        writerData.Position = position1;
+        int position3 = writer.Position;
+        writer.Position = position1;
         byte num = (byte) (position3 - position2 & (int) byte.MaxValue);
-        writerData.WriteByte(num);
-        writerData.Position = position3;
+        writer.WriteByte(num);
+        writer.Position = position3;
 
         var msg = new EntityStateMessage()
         {
             netId = behaviour.netId,
-            payload = writerData.ToArraySegment()
+            payload = writer.ToArraySegment()
         };
 
-        //writer.Reset();
         return msg;
     }
 
+    /// <summary>
+    /// Use to spoof information on SyncVar.
+    /// </summary>
+    /// <typeparam name="TValue">The value type needs to be consistent with the type of the variable to change</typeparam>
+    /// <param name="behaviour">The target NetWorkBehaviour who will see this value change on the client side of the receving player</param>
+    /// <param name="id">The derty byte of the behaviour, can be found in the if condition of SerializeSyncVars of the target NetWorkBehaviour</param>
+    /// <param name="value">The fictitious value for the client</param>
     public EntityStateMessage GetCustomVarMessage<TNetworkBehaviour, TValue>(TNetworkBehaviour behaviour, ulong id,
         TValue value) where TNetworkBehaviour : NetworkBehaviour => GetCustomVarMessage(behaviour,
-        writer =>
+        writeCustomVarData: writer =>
         {
             writer.WriteULong(id);
             writer.Write(value);
