@@ -28,6 +28,8 @@ using PluginAPI.Core;
 using InventorySystem.Items.ThrowableProjectiles;
 using InventorySystem;
 using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.Role;
+using Synapse3.SynapseModule.Config;
 
 namespace Synapse3.SynapseModule;
 
@@ -110,11 +112,6 @@ public class DebugService : Service
             if(ev.EscapeType == EscapeType.NotAssigned)
                 Logger.Warn("Escape not assigned");
         });
-        _item.ConsumeItem.Subscribe(ev =>
-        {
-            if (ev.State == ItemInteractState.Finalize)
-                ev.Allow = false;
-        });
 
         _round.Waiting.Subscribe(ev =>
         {
@@ -187,34 +184,112 @@ public class DebugService : Service
                 break;
 
             case KeyCode.Alpha4:
-                var dummy = new SynapseDummy(ev.Player.Position, ev.Player.Rotation, RoleTypeId.ClassD, "Hello", "Crash?");
+                var dummy = SpawnDebugRole(ev.Player);
 
-                dummy.Player.FakeRoleManager.ToPlayerVisibleRole[ev.Player] = new RoleInfo(RoleTypeId.ChaosMarauder, ev.Player);
-                dummy.Player.FakeRoleManager.UpdatePlayer(ev.Player);
-                break;
+            dummy.Player.RoleType = RoleTypeId.ClassD;
+            dummy.Player.FakeRoleManager.OwnVisibleRole = RoleTypeId.Scientist;
+            break;
+/*
+            case KeyCode.Alpha4:
+                ev.Player.SendFakeEffectIntensity(Effect.Hypothermia, 1);
 
-           /* case KeyCode.Alpha4:
-                SpawnDebugShematic(ev.Player);
-                break;
-
-            case KeyCode.Alpha5:
-                //The generator start to flick
-                Schematic.HideFromAll();
-                break;
-            case KeyCode.Alpha6:
-                Schematic.ShowAll();
-                break;
-            case KeyCode.Alpha7:
-                Schematic.HideFromPlayer(ev.Player);
-                break;
-            case KeyCode.Alpha8:
-                Schematic.ShowPlayer(ev.Player);
-                break;
-            case KeyCode.Alpha9:
-                Schematic.Position = ev.Player.Position;
                 break;*/
 
+                /*                case KeyCode.Alpha5:
+                                    var dummy2 = SpawnDebugRole(ev.Player);
+                                    Timing.CallDelayed(1f, () =>
+                                    {
+                                        dummy2.Player.FakeRoleManager.UpdateAll();
+                                        dummy2.Player.FakeRoleManager.VisibleRole = RoleTypeId.ClassD;
+                                        dummy2.Player.FakeRoleManager.UpdateAll();
+                                    });
+                                break;*/
+
+                /* case KeyCode.Alpha4:
+                     SpawnDebugShematic(ev.Player);
+                     break;
+
+
+                 case KeyCode.Alpha5:
+                     //The generator start to flick
+                     Schematic.HideFromAll();
+                     break;
+                 case KeyCode.Alpha6:
+                     Schematic.ShowAll();
+                     break;
+                 case KeyCode.Alpha7:
+                     Schematic.HideFromPlayer(ev.Player);
+                     break;
+                 case KeyCode.Alpha8:
+                     Schematic.ShowPlayer(ev.Player);
+                     break;
+                 case KeyCode.Alpha9:
+                     Schematic.Position = ev.Player.Position;
+                     break;*/
+
         }
+    }
+
+    class CustomRoleTest : SynapseAbstractRole
+    {
+        class config : IAbstractRoleConfig
+        {
+            public RoleTypeId Role => RoleTypeId.NtfCaptain;
+
+            public RoleTypeId VisibleRole => RoleTypeId.None;//Unsyc
+
+            public RoleTypeId OwnRole => RoleTypeId.None;
+
+            public uint EscapeRole => (uint)RoleTypeId.ClassD;
+
+            public float Health => 100;
+
+            public float MaxHealth => 120;
+
+            public float ArtificialHealth => 0;
+
+            public float MaxArtificialHealth => 200;
+
+            public RoomPoint[] PossibleSpawns => null;
+
+            public SerializedPlayerInventory[] PossibleInventories => null;
+
+            public bool CustomDisplay => true;
+
+            public bool Hierarchy => true;//Hide all custom info
+
+            public bool UseCustomUnitName => true;//Not present
+
+            public string CustomUnitName => "Hi my unite name";
+
+            public SerializedVector3 Scale => Vector3.one;
+        }
+
+        protected override bool CanSeeUnit(SynapsePlayer player) => true;
+
+        protected override bool HigherRank(SynapsePlayer player) => true;
+        protected override bool LowerRank(SynapsePlayer player) => false;
+        protected override bool SameRank(SynapsePlayer player) => false;
+
+        protected override IAbstractRoleConfig GetConfig() => new config();
+    }
+
+    private SynapseDummy SpawnDebugRole(SynapsePlayer player)
+    {
+        var roleService = Synapse.Get<RoleService>();
+        if (!roleService.IsIdRegistered(999))
+        {
+            roleService.RegisterRole(new RoleAttribute()
+            {
+                Id = 999,
+                Name = "Debug Role",
+                RoleScript = typeof(CustomRoleTest),
+                TeamId = (uint)Team.FoundationForces
+            });
+        }
+        var dummy = new SynapseDummy(player.Position, player.Rotation, RoleTypeId.ClassD, "Hello", "I can destroy your server at any time!");
+        dummy.Player.RoleID = 999;
+        return dummy;
     }
 
     private void SpawnDebugShematic(SynapsePlayer player)

@@ -41,6 +41,7 @@ public partial class SynapsePlayer
     public void SendFakeEffectIntensity(Effect effect, byte intensity = 1)
         => SendNetworkMessage(_mirror.GetCustomVarMessage(PlayerEffectsController, writer =>
         {
+            //TODO: Redo it Mirror change
             writer.WriteUInt(1); //Which SyncObject will be updated
 
             //SyncList Specific
@@ -53,6 +54,7 @@ public partial class SynapsePlayer
     public void SendFakeEffectIntensityFor(SynapsePlayer player, Effect effect, byte intensity = 1)
     => SendNetworkMessage(_mirror.GetCustomVarMessage(player.PlayerEffectsController, writer =>
     {
+        //TODO: Redo it Mirror change
         writer.WriteULong(1); //Which SyncObject will be updated
 
         //SyncList Specific

@@ -139,7 +139,7 @@ public class SynapseDoor : NetworkSynapseObject, IJoinUpdate
     {
         hideForAll = true;
         foreach (var player in _player.Players)
-	    {
+        {
             hideForPlayer.Add(player);
         }
         Refresh();

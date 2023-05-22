@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using MEC;
+using Microsoft.Extensions.Logging;
 using Synapse3.SynapseModule.Events;
 using UnityEngine;
 
@@ -204,6 +206,6 @@ public class CustomInfoList :
             }
         }
         
-        player.SendFakeSyncVar(_player.NicknameSync, 2ul, string.Join("\n", values));
+        player.SendFakeSyncVar(_player.NicknameSync, 2ul, string.Join("\n", values));//TODO: Fix this
     }
 }
