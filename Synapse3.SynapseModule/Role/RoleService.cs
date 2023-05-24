@@ -75,7 +75,7 @@ public class RoleService : Service
     /// </summary>
     public bool IsIdRegistered(uint id)
     {
-        if (id is >= 0 and <= HighestRole) return true;
+        if (IsDefaultId(id)) return true;
 
         return _customRoles.Any(x => x.Id == id);
     }
@@ -85,7 +85,7 @@ public class RoleService : Service
     /// </summary>
     public string GetRoleName(uint id)
     {
-        if (id is >= 0 and <= HighestRole)
+        if (IsDefaultId(id))
             return ((RoleTypeId)id).ToString();
 
         return !IsIdRegistered(id) ? string.Empty : _customRoles.FirstOrDefault(x => x.Id == id)?.Name;
@@ -109,7 +109,7 @@ public class RoleService : Service
     public bool RegisterRole(RoleAttribute info)
     {
         if (info.RoleScript == null) return false;
-        if (info.Id is >= 0 and <= HighestRole) return false;
+        if (IsDefaultId(info.Id)) return false;
         if (IsIdRegistered(info.Id)) return false;
 
         _customRoles.Add(info);
