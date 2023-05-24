@@ -19,15 +19,15 @@ public class RoleService : Service
     private readonly Synapse _synapseModule;
 
     /// <summary>
-    /// The value to use by synapse to designate <see cref="RoleType.None"/>
+    /// The value to use by synapse to designate <see cref="RoleTypeId.None"/>
     /// </summary>
     public const uint NoneRole = uint.MaxValue;
 
     /// <summary>
     /// The Hightest vanilla number for Roles
     /// </summary>
-    public const uint HighestRole = (uint)RoleTypeId.Overwatch;
-    
+    public const uint HighestRole = (uint)RoleTypeId.Filmmaker;
+
     /// <summary>
     /// A list of all Registered CustomRoles that can spawn
     /// </summary>
@@ -36,7 +36,7 @@ public class RoleService : Service
     /// <summary>
     /// Creates a new RoleService
     /// </summary>
-    public RoleService(SynapseCommandService command, PlayerService player,Synapse synapse)
+    public RoleService(SynapseCommandService command, PlayerService player, Synapse synapse)
     {
         _command = command;
         _player = player;
@@ -49,7 +49,7 @@ public class RoleService : Service
     public override void Enable()
     {
         _command.RemoteAdmin.Subscribe(OnRemoteAdmin);
-        
+
         while (_synapseModule.ModuleRoleBindingQueue.Count != 0)
         {
             var binding = _synapseModule.ModuleRoleBindingQueue.Dequeue();
@@ -75,17 +75,17 @@ public class RoleService : Service
     /// </summary>
     public bool IsIdRegistered(uint id)
     {
-        if (id is >= 0 and <= HighestRole) return true;
+        if (IsDefaultId(id)) return true;
 
         return _customRoles.Any(x => x.Id == id);
     }
-    
+
     /// <summary>
     /// Returns the Name of an Custom or Vanilla Role
     /// </summary>
     public string GetRoleName(uint id)
     {
-        if (id is >= 0 and <= HighestRole)
+        if (IsDefaultId(id))
             return ((RoleTypeId)id).ToString();
 
         return !IsIdRegistered(id) ? string.Empty : _customRoles.FirstOrDefault(x => x.Id == id)?.Name;
@@ -109,7 +109,7 @@ public class RoleService : Service
     public bool RegisterRole(RoleAttribute info)
     {
         if (info.RoleScript == null) return false;
-        if (info.Id is >= 0 and <= HighestRole) return false;
+        if (IsDefaultId(info.Id)) return false;
         if (IsIdRegistered(info.Id)) return false;
 
         _customRoles.Add(info);
@@ -126,6 +126,12 @@ public class RoleService : Service
         var role = _customRoles.FirstOrDefault(x => x.Id == id);
         return role != null && _customRoles.Remove(role);
     }
+
+    /// <summary>
+    /// If the roleId is by default in the game
+    /// </summary>
+    public bool IsDefaultId(uint id)
+        => id is >= 0 and <= HighestRole and not NoneRole;
 
     public TRole GetRole<TRole>()
         where TRole : SynapseRole
@@ -144,7 +150,7 @@ public class RoleService : Service
         var role = GetRole(info);
         return role as TRole;
     }
-    
+
     /// <inheritdoc cref="GetRole(Synapse3.SynapseModule.Role.RoleAttribute)"/>
     public ISynapseRole GetRole(string name)
     {
@@ -183,21 +189,21 @@ public class RoleService : Service
         if (!string.Equals(ev.Context.Command, "overwatch", StringComparison.OrdinalIgnoreCase) &&
             !kill &&
             !string.Equals(ev.Context.Command, "forceclass", StringComparison.OrdinalIgnoreCase)) return;
-        
-        if(ev.Context.Arguments.Length == 0) return;
+
+        if (ev.Context.Arguments.Length == 0) return;
 
         var ids = ev.Context.Arguments[0].Split('.');
         foreach (var id in ids)
         {
             if (string.IsNullOrEmpty(id))
                 continue;
-            
-            if(!int.TryParse(id,out var result)) continue;
+
+            if (!int.TryParse(id, out var result)) continue;
 
             var player = _player.GetPlayer(result);
             if (player == null) continue;
 
-            player.RemoveCustomRole(kill? DeSpawnReason.Death : DeSpawnReason.ForceClass);
+            player.RemoveCustomRole(kill ? DeSpawnReason.Death : DeSpawnReason.ForceClass);
         }
     }
 }
