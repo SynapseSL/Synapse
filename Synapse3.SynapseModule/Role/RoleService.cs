@@ -127,6 +127,12 @@ public class RoleService : Service
         return role != null && _customRoles.Remove(role);
     }
 
+    /// <summary>
+    /// If the roleId is by default in the game
+    /// </summary>
+    public bool IsDefaultId(uint id)
+        => id is >= 0 and <= HighestRole and not NoneRole;
+
     public TRole GetRole<TRole>()
         where TRole : SynapseRole
     {
