@@ -1,0 +1,44 @@
+name: Bug Fix
+description: Create a pull request for new event
+labels: [event]
+  - type: input
+    id: eventName
+    attributes:
+      label: Name
+      description: Name of the event.
+      placeholder: JumpEvent
+  - type: textarea
+    attributes:
+      id: description
+      label: Description::
+      description: A clear description of what is this event.
+    validations:
+      required: false
+ - type: checkboxes
+    id: readable
+    attributes:
+      label: The code is readable ?
+      description: If your code is readable (unlike transpiler).
+      options:
+        - label: Yes my code is readable.
+          required: true
+ - type: checkboxes
+    id: tested
+    attributes:
+      label: The code get tested ?
+      description: If you test your code.
+      options:
+        - label: Yes my code is tested.
+          required: true
+ - type: dropdown
+    id: implementation
+    attributes:
+      label: Implementation type:
+      multiple: true
+      options:
+        - Transpiler (impossible to do otherwise)
+        - Prefix
+        - Postfix
+        - Prefix/Postfix
+        - NortWoodEvent
+        - Other
