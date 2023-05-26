@@ -1,16 +1,18 @@
-name: Bug Fix
-description: Create a pull request for a bug fix
-labels: [bug]
-- type: textarea
+name: "Ask for error/lack of documentation"
+description: Report lack or miss information in the the doc
+labels: [documentation, enhancement]
+body:
+- id: description
+  type: textarea
     attributes:
-      id: description
       label: Description::
       description: A clear description of what is missing in documentation or what is wrong.
     validations:
       required: true
-- type: textarea
-    attributes:
-      id: need
-      label: What wanted us to do::
-    validations:
-      required: false
+
+- id: need
+  type: textarea
+  attributes:
+    label: What wanted us to do::
+  validations:
+    required: false
