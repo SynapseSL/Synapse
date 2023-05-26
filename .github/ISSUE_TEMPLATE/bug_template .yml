@@ -5,7 +5,7 @@ body:
 - id: major
   type: checkboxes
   attributes:
-    label: Crash or unsyc::
+    label: Crash or unsyc
     description: If the server crashes after the bug or if the player get unsync (the player cannot interact with the server but is still "connected")
     options:
       - label: Yes the server crash or player are unsyc
@@ -22,7 +22,7 @@ body:
 - id: description
   type: textarea
   attributes:
-    label: Description::
+    label: Description
     description: A clear description of the bug.
   validations:
     required: true
@@ -30,7 +30,7 @@ body:
 - id: steps
   type: textarea
   attributes:
-    label: Steps To Reproduce the bug::
+    label: Steps To Reproduce the bug
     description: Steps to reproduce the behavior.
     placeholder: |
       1.
@@ -42,7 +42,7 @@ body:
 - id: modules
   type: textarea
   attributes:
-    label: Modules::
+    label: Modules
     description: The list of the modules of the server
   validations:
     required: false
@@ -50,7 +50,7 @@ body:
 - id: plugins
   type: textarea
   attributes:
-    label: Plugins::
+    label: Plugins
     description: The list of the plugins of the server
   validations:
     required: false
@@ -58,7 +58,7 @@ body:
 - id: log
   type: textarea
   attributes:
-    label: Log::
+    label: Log
     description: Output log when the bug occur.
   validations:
     required: false

@@ -5,7 +5,7 @@ body:
 - id: langage
   type: textarea
   attributes:
-    label: Langage::
+    label: Langage
     placeholder: "French"
     validations:
     required: true

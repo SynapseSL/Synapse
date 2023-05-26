@@ -5,7 +5,7 @@ body:
 - id: description
   type: textarea
     attributes:
-      label: Description::
+      label: Description
       description: A clear description of what is missing in documentation or what is wrong.
     validations:
       required: true
@@ -13,6 +13,6 @@ body:
 - id: need
   type: textarea
   attributes:
-    label: What wanted us to do::
+    label: What wanted us to do
   validations:
     required: false
