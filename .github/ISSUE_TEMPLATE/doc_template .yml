@@ -4,11 +4,11 @@ labels: [documentation, enhancement]
 body:
 - id: description
   type: textarea
-    attributes:
-      label: Description
-      description: A clear description of what is missing in documentation or what is wrong.
-    validations:
-      required: true
+  attributes:
+    label: Description
+    description: A clear description of what is missing in documentation or what is wrong.
+  validations:
+    required: true
 
 - id: need
   type: textarea

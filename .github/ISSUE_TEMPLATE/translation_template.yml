@@ -7,5 +7,5 @@ body:
   attributes:
     label: Langage
     placeholder: "French"
-    validations:
+  validations:
     required: true
