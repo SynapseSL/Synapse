@@ -14,10 +14,10 @@ body:
 
 - id: version
   type: input
-  attribtues:
+  attributes:
     placeholder: "3.0.0"
   validations:
-  required: true
+    required: true
 
 - id: description
   type: textarea
