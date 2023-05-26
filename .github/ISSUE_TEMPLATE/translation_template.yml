@@ -3,7 +3,7 @@ description: Ask for a new translation
 labels: [No Priority, enhancement]
 body:
 - id: langage
-  type: textarea
+  type: input
   attributes:
     label: Langage
     placeholder: "French"
