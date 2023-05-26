@@ -38,3 +38,13 @@ Implementation(s) type(s):
 - [ ] Other
 
 ## Other [Delet if not use]
+
+Description:
+```
+[A clear description of what you add.]
+```
+
+Use case:
+```
+[An exemple or link to a sugestion]
+```
