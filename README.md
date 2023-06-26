@@ -1,5 +1,9 @@
 ![discord badge](https://img.shields.io/discord/716698782317805629?color=7289DA&label=discord)
 # **Synapse**
+## **SynapseSL is discontinued.**
+As of 6/25/23, "The Synapse project is now offically concluded" - Dimenzio.   
+For more information, join the [Discord](https://discord.gg/wSBHXwy), and check in `#news`. 
+
 ### **What is Synapse?**
 Synapse is a project created by two german official community Server-Hosters. We used Harmony to create a framework which makes it easier for us to implement new functions, game updates and overall a new experience for players.
 
