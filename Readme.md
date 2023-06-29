@@ -1,5 +1,8 @@
 [![discord badge](https://img.shields.io/discord/716698782317805629?color=7289DA&label=discord)](https://discord.gg/uVtNr9Czng) [![Docs](https://img.shields.io/badge/-Documentary-blue)](https://docs3.synapsesl.xyz/)
 
+## Project Ended
+The Project Synapse3 was concluded. We won't provide any support for installing Synapse anymore
+
 # **Synapse**
 ## What is Synapse?
 Synapse is an SCP:SL Plugin Framework and High-Level Modding API.
