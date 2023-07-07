@@ -62,5 +62,5 @@ public partial class SynapseItem
         }
     }
     
-    public ISynapse914Processor UpgradeProcessor { get; set; }
+    public List<ISynapse914Processor> UpgradeProcessors { get; set; }
 }

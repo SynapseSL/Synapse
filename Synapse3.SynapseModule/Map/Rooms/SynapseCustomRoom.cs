@@ -41,6 +41,15 @@ public abstract class SynapseCustomRoom : DefaultSynapseObject, IRoom, IHideable
     public uint Id => Attribute.Id;
     
     public abstract uint Zone { get; }
+    /// <summary>
+    /// If set other than -1 or 0, the coin will disappear if the player is too far away
+    /// </summary>
+    public virtual float VisibleDistance => -1;
+
+    /// <summary>
+    /// Update frequency in seconds to check player for <see cref="VisibleDistance"/>
+    /// </summary>
+    public virtual float UpdateFrequencyVisble => -1;
 
     public ReadOnlyCollection<SynapseDoor> Doors => RoomSchematic.Doors;
 
@@ -57,9 +66,10 @@ public abstract class SynapseCustomRoom : DefaultSynapseObject, IRoom, IHideable
         comp.Object = this;
         
         RoomSchematic = Synapse.Get<SchematicService>().SpawnSchematic(Attribute.SchematicId, position);
-        RoomSchematic.Parent = this;
-        
-        Synapse.Get<RoomService>()._rooms.Add(this);
+
+        var roomService = Synapse.Get<RoomService>();
+        roomService._rooms.Add(this);
+        roomService._customRooms.Add(this);
         OnGenerate();
     }
 
@@ -76,7 +86,9 @@ public abstract class SynapseCustomRoom : DefaultSynapseObject, IRoom, IHideable
     public sealed override void OnDestroy()
     {
         OnDeSpawn();
-        Synapse.Get<RoomService>()._rooms.Remove(this);
+        var roomService = Synapse.Get<RoomService>();
+        roomService._rooms.Remove(this);
+        roomService._customRooms.Remove(this);
         base.OnDestroy();
     }
 

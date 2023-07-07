@@ -23,7 +23,7 @@ public class ExampleCustomItem : CustomItemHandler, ISynapse914Processor
     public ExampleCustomItem(ItemEvents items, PlayerEvents player) : base(items, player) { }
     
     //Destroy the custom item 99 and create a coin
-    public void CreateUpgradedItem(SynapseItem item, Scp914KnobSetting setting, Vector3 position = default)
+    public bool CreateUpgradedItem(SynapseItem item, Scp914KnobSetting setting, Vector3 position = default)
     {
         var state = item.State;
         var owner = item.ItemOwner;
@@ -33,12 +33,13 @@ public class ExampleCustomItem : CustomItemHandler, ISynapse914Processor
         {
             case ItemState.Map:
                 new SynapseItem(ItemType.Coin, position);
-                break;
+                return true;
                 
             case ItemState.Inventory:
                 new SynapseItem(ItemType.Coin, owner);
-                break;
+                return true;
         }
+        return false;
     }
 
     public override void OnEquip(ChangeItemEvent ev)

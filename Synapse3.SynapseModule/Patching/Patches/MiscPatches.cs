@@ -1,6 +1,9 @@
 ﻿using System;
+using System.CodeDom;
 using HarmonyLib;
+using Mirror;
 using Neuron.Core.Meta;
+using Neuron.Modules.Configs;
 using Synapse3.SynapseModule.Config;
 
 namespace Synapse3.SynapseModule.Patching.Patches;

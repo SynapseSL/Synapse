@@ -1,4 +1,5 @@
-﻿using InventorySystem.Items.Firearms.Attachments;
+﻿using System.Collections.Generic;
+using InventorySystem.Items.Firearms.Attachments;
 using Mirror;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Map.Schematic;
@@ -18,6 +19,8 @@ public class SynapseWorkStation : NetworkSynapseObject, IJoinUpdate
     public override GameObject GameObject => WorkstationController.gameObject;
     public override ObjectType Type => ObjectType.Workstation;
     public override NetworkIdentity NetworkIdentity => WorkstationController.netIdentity;
+    protected override NetworkBehaviour NetworkObject => WorkstationController;
+
     public override void OnDestroy()
     {
         Map._synapseWorkStations.Remove(this);
@@ -25,7 +28,57 @@ public class SynapseWorkStation : NetworkSynapseObject, IJoinUpdate
         
         if (Parent is SynapseSchematic schematic) schematic._workStations.Remove(this);
     }
-    
+
+    internal bool hideForAll = false;
+    internal HashSet<SynapsePlayer> hideForPlayer = new ();
+
+    public override void HideFromAll()
+    {
+        hideForAll = true;
+        foreach (var player in _player.Players)
+        {
+            hideForPlayer.Add(player);
+        }
+        Refresh();
+    }
+
+    public override void ShowAll()
+    {
+        hideForAll = false;
+        hideForPlayer.Clear();
+        Refresh();
+    }
+
+    public override void ShowPlayer(SynapsePlayer player)
+    {
+        if (hideForPlayer.Remove(player))
+        {
+            Refresh();
+        }
+    }
+
+    public override void HideFromPlayer(SynapsePlayer player)
+    {
+        if (hideForPlayer.Add(player))
+        {
+            Refresh();
+        }
+    }
+
+    public override void Refresh()
+    {
+        var message = _mirror.GetSpawnMessage(NetworkIdentity);
+        var realScale = Scale;
+        foreach (var player in _player.Players)
+        {
+            if (hideForPlayer.Contains(player))
+                message.scale = Vector3.zero;
+            else
+                message.scale = realScale;
+            player.Connection.Send(message);
+        }
+    }
+
     public string Name => GameObject.name;
     
     public SynapsePlayer KnownUser

@@ -513,13 +513,19 @@ public static class RemoteAdminPlayerDataRequestPatch
                 switch (sPlayer.RoleType)
                 {
                     case RoleTypeId.None:
-                        message += "None";
-                        break;
-
                     case RoleTypeId.Spectator:
-                        message += "Spectator";
+                        message += sPlayer.RoleName;
                         break;
 
+                    case RoleTypeId.Scp079:
+                        message += sPlayer.RoleName;
+                        message += " <color=blue>[AP: " + sPlayer.MainScpController.Scp079.Energy +
+                            "]</color>";
+                        message += "\nTeam: " + TeamService.GetTeamName(sPlayer.TeamID);
+                        message += "\nCamera: " + sPlayer.MainScpController.Scp079.Camera.Name;
+                        message += "\nRoom: " + sPlayer.MainScpController.Scp079.Camera.Room.Name;
+
+                        break;
                     default:
                         message += sPlayer.RoleName;
                         message += " <color=#fcff99>[HP: " + CommandProcessor.GetRoundedStat<HealthStat>(player) +
@@ -529,7 +535,7 @@ public static class RemoteAdminPlayerDataRequestPatch
                         message += " <color=#977dff>[HS: " + CommandProcessor.GetRoundedStat<HumeShieldStat>(player) +
                                    "]</color>";
                         message += "\nTeam: " + TeamService.GetTeamName(sPlayer.TeamID);
-                        message += "\nPosition: " + player.transform.position;
+                        message += "\nPosition: " + sPlayer.Position;
                         message += "\nRoom: " + sPlayer.Room.Name;
                         break;
                 }

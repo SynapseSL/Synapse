@@ -8,6 +8,7 @@ using Interactables.Interobjects;
 using InventorySystem.Items.Firearms.Attachments;
 using MapGeneration.Distributors;
 using MEC;
+using Microsoft.Extensions.Logging;
 using Mirror;
 using Neuron.Core;
 using Neuron.Core.Logging;
@@ -183,36 +184,72 @@ public class SchematicService : Service
         {
             switch (prefab.Key.ToString())
             {
-                case "daf3ccde-4392-c0e4-882d-b7002185c6b8" when prefab.Value.TryGetComponent<Scp079Generator>(out var gen):
+                case "2724603877" when prefab.Value.TryGetComponent<Scp079Generator>(out var gen):
                     SynapseGenerator.GeneratorPrefab = gen;
                     break;
                 
-                case "68f13209-e652-6024-2b89-0f75fb88a998" when prefab.Value.TryGetComponent<Locker>(out var locker):
+                case "2286635216" when prefab.Value.TryGetComponent<Locker>(out var locker):
 
                     SynapseLocker.Prefabs[SynapseLocker.LockerType.ScpPedestal] = locker;
+                    SynapseLocker.Prefabs[SynapseLocker.LockerType.Scp018PedestalVariant] = locker;
                     break;
 
-                case "5ad5dc6d-7bc5-3154-8b1a-3598b96e0d5b" when prefab.Value.TryGetComponent<Locker>(out var locker):
+                case "664776131" when prefab.Value.TryGetComponent<Locker>(out var locker):
+
+                    SynapseLocker.Prefabs[SynapseLocker.LockerType.Scp207PedestalVariant] = locker;
+                    break;
+
+                case "3724306703" when prefab.Value.TryGetComponent<Locker>(out var locker):
+
+                    SynapseLocker.Prefabs[SynapseLocker.LockerType.Scp244PedestalVariant] = locker;
+                    break;
+
+                case "3849573771" when prefab.Value.TryGetComponent<Locker>(out var locker):
+
+                    SynapseLocker.Prefabs[SynapseLocker.LockerType.Scp268PedestalVariant] = locker;
+                    break;
+
+                case "373821065" when prefab.Value.TryGetComponent<Locker>(out var locker):
+
+                    SynapseLocker.Prefabs[SynapseLocker.LockerType.Scp500PedestalVariant] = locker;
+                    break;
+
+                case "3962534659" when prefab.Value.TryGetComponent<Locker>(out var locker):
+
+                    SynapseLocker.Prefabs[SynapseLocker.LockerType.Scp1853PedestalVariant] = locker;
+                    break;
+
+                case "3578915554" when prefab.Value.TryGetComponent<Locker>(out var locker):
+
+                    SynapseLocker.Prefabs[SynapseLocker.LockerType.Scp2176PedestalVariant] = locker;
+                    break;
+
+                case "3372339835" when prefab.Value.TryGetComponent<Locker>(out var locker):
+
+                    SynapseLocker.Prefabs[SynapseLocker.LockerType.Scp1576PedestalVariant] = locker;
+                    break;
+
+                case "2830750618" when prefab.Value.TryGetComponent<Locker>(out var locker):
                     SynapseLocker.Prefabs[SynapseLocker.LockerType.LargeGunLocker] = locker;
                     break;
 
-                case "850f84ad-e273-1824-8885-11ae5e01e2f4" when prefab.Value.TryGetComponent<Locker>(out var locker):
+                case "3352879624" when prefab.Value.TryGetComponent<Locker>(out var locker):
                     SynapseLocker.Prefabs[SynapseLocker.LockerType.RifleRackLocker] = locker;
                     break;
 
-                case "d54bead1-286f-3004-facd-74482a872ad8" when prefab.Value.TryGetComponent<Locker>(out var locker):
+                case "1964083310" when prefab.Value.TryGetComponent<Locker>(out var locker):
                     SynapseLocker.Prefabs[SynapseLocker.LockerType.StandardLocker] = locker;
                     break;
 
-                case "5b227bd2-1ed2-8fc4-2aa1-4856d7cb7472" when prefab.Value.TryGetComponent<Locker>(out var locker):
+                case "4040822781" when prefab.Value.TryGetComponent<Locker>(out var locker):
                     SynapseLocker.Prefabs[SynapseLocker.LockerType.MedkitWallCabinet] = locker;
                     break;
 
-                case "db602577-8d4f-97b4-890b-8c893bfcd553" when prefab.Value.TryGetComponent<Locker>(out var locker):
+                case "2525847434" when prefab.Value.TryGetComponent<Locker>(out var locker):
                     SynapseLocker.Prefabs[SynapseLocker.LockerType.AdrenalineWallCabinet] = locker;
                     break;
                 
-                case "ad8a455f-062d-dea4-5b47-ac9217d4c58b" when prefab.Value.TryGetComponent<WorkstationController>(out var station):
+                case "1783091262" when prefab.Value.TryGetComponent<WorkstationController>(out var station):
                     SynapseWorkStation.Prefab = station;
                     break;
             }
@@ -251,7 +288,7 @@ public class SchematicService : Service
         { "Ragdoll_1",RoleTypeId.ClassD },
         { "SCP-106_Ragdoll",RoleTypeId.Scp106},
         { "Ragdoll_4", RoleTypeId.NtfSpecialist},
-        {"Ragdoll_6",RoleTypeId.Scientist},
+        { "Ragdoll_6",RoleTypeId.Scientist},
         { "Ragdoll_7",RoleTypeId.Scp049},
         { "Ragdoll_8", RoleTypeId.ChaosConscript},
         { "SCP-096_Ragdoll", RoleTypeId.Scp096},

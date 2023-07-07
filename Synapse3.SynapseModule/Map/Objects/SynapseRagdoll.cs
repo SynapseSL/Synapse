@@ -21,6 +21,7 @@ public class SynapseRagDoll : NetworkSynapseObject
 
     public override GameObject GameObject => BasicRagDoll.gameObject;
     public override NetworkIdentity NetworkIdentity => BasicRagDoll.netIdentity;
+    protected override NetworkBehaviour NetworkObject => BasicRagDoll;
     public override ObjectType Type => ObjectType.RagDoll;
 
     public SynapsePlayer Owner { get; }

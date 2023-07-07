@@ -44,7 +44,7 @@ public class MirrorItemEvents : Service
     {
         NetworkServer.ReplaceHandler<RequestMessage>(OnWeaponRequestMessage);
         NetworkServer.ReplaceHandler<ShotMessage>(OnShotMessage);
-        NetworkServer.ReplaceHandler<ThrowableNetworkHandler.ThrowableItemRequestMessage>(OnThrowMessage);
+        //NetworkServer.ReplaceHandler<ThrowableNetworkHandler.ThrowableItemRequestMessage>(OnThrowMessage);
     }
 
     private void OnThrowMessage(NetworkConnection connection,
@@ -117,7 +117,7 @@ public class MirrorItemEvents : Service
             Scale = item.Scale,
             Parent = item.Parent,
             OriginalScale = item.OriginalScale,
-            UpgradeProcessor = item.UpgradeProcessor,
+            UpgradeProcessors = item.UpgradeProcessors,
             MoveInElevator = item.MoveInElevator,
             SchematicConfiguration = item.SchematicConfiguration,
             CanBePickedUp = item.CanBePickedUp

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Neuron.Core.Meta;
 using Neuron.Modules.Commands.Event;
 using PlayerRoles;
@@ -19,15 +20,15 @@ public class RoleService : Service
     private readonly Synapse _synapseModule;
 
     /// <summary>
-    /// The value to use by synapse to designate <see cref="RoleType.None"/>
+    /// The value to use by synapse to designate <see cref="RoleTypeId.None"/>
     /// </summary>
     public const uint NoneRole = uint.MaxValue;
 
     /// <summary>
     /// The Hightest vanilla number for Roles
     /// </summary>
-    public const uint HighestRole = (uint)RoleTypeId.Overwatch;
-    
+    public const uint HighestRole = (uint)RoleTypeId.Filmmaker;
+
     /// <summary>
     /// A list of all Registered CustomRoles that can spawn
     /// </summary>
@@ -36,7 +37,7 @@ public class RoleService : Service
     /// <summary>
     /// Creates a new RoleService
     /// </summary>
-    public RoleService(SynapseCommandService command, PlayerService player,Synapse synapse)
+    public RoleService(SynapseCommandService command, PlayerService player, Synapse synapse)
     {
         _command = command;
         _player = player;
@@ -49,7 +50,7 @@ public class RoleService : Service
     public override void Enable()
     {
         _command.RemoteAdmin.Subscribe(OnRemoteAdmin);
-        
+
         while (_synapseModule.ModuleRoleBindingQueue.Count != 0)
         {
             var binding = _synapseModule.ModuleRoleBindingQueue.Dequeue();
@@ -71,21 +72,31 @@ public class RoleService : Service
     internal void LoadBinding(SynapseRoleBinding binding) => RegisterRole(binding.Info);
 
     /// <summary>
+    /// Returns true if the id is an Vanilla Role
+    /// </summary>
+    public bool IsIdVanila(uint id)
+    {
+        if (id is >= 0 and <= HighestRole) return true;
+        
+        return false;
+    }
+
+    /// <summary>
     /// Returns true if the Id is registered or is an Vanilla Role
     /// </summary>
     public bool IsIdRegistered(uint id)
     {
-        if (id is >= 0 and <= HighestRole) return true;
+        if (IsIdVanila(id)) return true;
 
         return _customRoles.Any(x => x.Id == id);
     }
-    
+
     /// <summary>
     /// Returns the Name of an Custom or Vanilla Role
     /// </summary>
     public string GetRoleName(uint id)
     {
-        if (id is >= 0 and <= HighestRole)
+        if (IsIdVanila(id))
             return ((RoleTypeId)id).ToString();
 
         return !IsIdRegistered(id) ? string.Empty : _customRoles.FirstOrDefault(x => x.Id == id)?.Name;
@@ -109,7 +120,7 @@ public class RoleService : Service
     public bool RegisterRole(RoleAttribute info)
     {
         if (info.RoleScript == null) return false;
-        if (info.Id is >= 0 and <= HighestRole) return false;
+        if (IsIdVanila(info.Id)) return false;
         if (IsIdRegistered(info.Id)) return false;
 
         _customRoles.Add(info);
@@ -144,7 +155,7 @@ public class RoleService : Service
         var role = GetRole(info);
         return role as TRole;
     }
-    
+
     /// <inheritdoc cref="GetRole(Synapse3.SynapseModule.Role.RoleAttribute)"/>
     public ISynapseRole GetRole(string name)
     {
@@ -183,21 +194,21 @@ public class RoleService : Service
         if (!string.Equals(ev.Context.Command, "overwatch", StringComparison.OrdinalIgnoreCase) &&
             !kill &&
             !string.Equals(ev.Context.Command, "forceclass", StringComparison.OrdinalIgnoreCase)) return;
-        
-        if(ev.Context.Arguments.Length == 0) return;
+
+        if (ev.Context.Arguments.Length == 0) return;
 
         var ids = ev.Context.Arguments[0].Split('.');
         foreach (var id in ids)
         {
             if (string.IsNullOrEmpty(id))
                 continue;
-            
-            if(!int.TryParse(id,out var result)) continue;
+
+            if (!int.TryParse(id, out var result)) continue;
 
             var player = _player.GetPlayer(result);
             if (player == null) continue;
 
-            player.RemoveCustomRole(kill? DeSpawnReason.Death : DeSpawnReason.ForceClass);
+            player.RemoveCustomRole(kill ? DeSpawnReason.Death : DeSpawnReason.ForceClass);
         }
     }
 }

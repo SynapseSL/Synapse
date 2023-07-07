@@ -23,7 +23,7 @@ public class Scp914Service : Service
         {
             if (item == ItemType.None) continue;
             
-            Synapse914Processors[(uint)item] = Default914Processor.DefaultProcessor;
+            Synapse914Processors[(uint)item] = new List<ISynapse914Processor>();
         }
     }
 
@@ -93,18 +93,18 @@ public class Scp914Service : Service
 
     public void Activate() => Scp914.ServerInteract(null, 0);
 
-    public Dictionary<uint, ISynapse914Processor> Synapse914Processors { get; set; } = new();
+    public Dictionary<uint, List<ISynapse914Processor>> Synapse914Processors { get; set; } = new();
 
-    public ISynapse914Processor GetProcessor(uint id) => Synapse914Processors.TryGetValue(id, out var processor)
+    public List<ISynapse914Processor> GetProcessors(uint id) => Synapse914Processors.TryGetValue(id, out var processor)
         ? processor
-        : Default914Processor.DefaultProcessor;
+        : new List<ISynapse914Processor>();
 
     internal void LoadBinding(SynapseScp914ProcessorBinding binding)
     {
         var processor = (ISynapse914Processor)Synapse.GetOrCreate(binding.Processor);
         foreach (var id in binding.ReplaceHandlers)
         {
-            Synapse914Processors[id] = processor;
+            Synapse914Processors[id].Insert(0, processor);
         }
     }
 }
