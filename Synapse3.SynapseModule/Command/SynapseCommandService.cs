@@ -30,7 +30,8 @@ public class SynapseCommandService : Service
         typeof(PluginCommand),
         typeof(LanguageCommand),
         typeof(KeyBindCommand),
-        typeof(ScpProximityCommand)
+        typeof(ScpProximityCommand),
+        typeof(RolesCommand)
     };
     
     private readonly RoundEvents _round;

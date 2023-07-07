@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Neuron.Core.Meta;
 using Neuron.Modules.Commands.Event;
 using PlayerRoles;
@@ -71,11 +72,21 @@ public class RoleService : Service
     internal void LoadBinding(SynapseRoleBinding binding) => RegisterRole(binding.Info);
 
     /// <summary>
+    /// Returns true if the id is an Vanilla Role
+    /// </summary>
+    public bool IsIdVanila(uint id)
+    {
+        if (id is >= 0 and <= HighestRole) return true;
+        
+        return false;
+    }
+
+    /// <summary>
     /// Returns true if the Id is registered or is an Vanilla Role
     /// </summary>
     public bool IsIdRegistered(uint id)
     {
-        if (IsDefaultId(id)) return true;
+        if (IsIdVanila(id)) return true;
 
         return _customRoles.Any(x => x.Id == id);
     }
@@ -85,7 +96,7 @@ public class RoleService : Service
     /// </summary>
     public string GetRoleName(uint id)
     {
-        if (IsDefaultId(id))
+        if (IsIdVanila(id))
             return ((RoleTypeId)id).ToString();
 
         return !IsIdRegistered(id) ? string.Empty : _customRoles.FirstOrDefault(x => x.Id == id)?.Name;
@@ -109,7 +120,7 @@ public class RoleService : Service
     public bool RegisterRole(RoleAttribute info)
     {
         if (info.RoleScript == null) return false;
-        if (IsDefaultId(info.Id)) return false;
+        if (IsIdVanila(info.Id)) return false;
         if (IsIdRegistered(info.Id)) return false;
 
         _customRoles.Add(info);
@@ -126,12 +137,6 @@ public class RoleService : Service
         var role = _customRoles.FirstOrDefault(x => x.Id == id);
         return role != null && _customRoles.Remove(role);
     }
-
-    /// <summary>
-    /// If the roleId is by default in the game
-    /// </summary>
-    public bool IsDefaultId(uint id)
-        => id is >= 0 and <= HighestRole and not NoneRole;
 
     public TRole GetRole<TRole>()
         where TRole : SynapseRole
