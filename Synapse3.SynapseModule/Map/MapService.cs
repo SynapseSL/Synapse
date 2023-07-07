@@ -10,15 +10,18 @@ using MEC;
 using Mirror;
 using Neuron.Core.Meta;
 using PlayerRoles.Ragdolls;
+using PluginAPI.Core;
 using RelativePositioning;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
 using Synapse3.SynapseModule.Map.Objects;
+using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 using Utils.NonAllocLINQ;
+using static UnityEngine.PlayerLoop.PreLateUpdate;
 using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule.Map;
@@ -110,6 +113,7 @@ public class MapService : Service
         return gameObject;
     }
 
+
     private void LoadObjects(RoundWaitingEvent ev)
     {
         foreach (var doorVariant in Synapse.GetObjects<DoorVariant>())
@@ -158,6 +162,7 @@ public class MapService : Service
         var newKey = doorName.Split('(')[0];
         return _doorByName.ContainsKey(newKey) ? _doorByName[newKey] : DoorType.Other;
     }
+
 
     private readonly Dictionary<string, DoorType> _doorByName = new()
     {

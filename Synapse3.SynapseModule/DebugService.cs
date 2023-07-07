@@ -176,43 +176,43 @@ public class DebugService : Service
                 
                 break;
             case KeyCode.Alpha3:
-                new SynapseRagDoll(RoleTypeId.ClassD, ev.Player.Position, Quaternion.identity, Vector3.one, ev.Player,
-                    DamageType.Unknown, "Elevator Dummy")
+                new SynapseDoor(SynapseDoor.SpawnableDoorType.Hcz, ev.Player.Position, ev.Player.Rotation, Vector3.one)
                 {
                     MoveInElevator = true
                 };
                 break;
-
+            
             case KeyCode.Alpha4:
-                ev.Player.SendFakeEffectIntensity(Effect.Concussed, 1);
+                var roomService = Synapse.Get<RoomService>();
+                if (!roomService.IsIdRegistered(999))
+                {
+                    var schematicService = Synapse.Get<SchematicService>();
+                    var schematic = new SchematicConfiguration()
+                    {
+                        Id = 999,
+                        Name = "TestSchematic"
+                    };
+                    for (int i = 0; i < 250; i++)//Avrage amount of primitve on Azarus per room
+                    {
+                        schematic.Primitives.Add(new()
+                        {
+                            Color = Color.white,
+                            CustomAttributes = new(),
+                            Physics = false,
+                            Position = Vector3.zero,
+                            PrimitiveType = PrimitiveType.Cube,
+                            Rotation = new Quaternion(0,0,0,0),
+                            Scale = Vector3.one
+                        });
+                    }
+                    schematicService.RegisterSchematic(schematic);
+                    roomService.RegisterCustomRoom<TestRoom>();
+                }
+                roomService.SpawnCustomRoom(999, ev.Player.Position);
                 break;
-
             case KeyCode.Alpha5:
-                var dummy2 = SpawnDebugRole(ev.Player);
-                dummy2.Player.FakeRoleManager.VisibleRole = RoleTypeId.ClassD;
+                SynapseLogger<Debug>.Warn("Tps: " + Math.Round(1 / Time.deltaTime));
                 break;
-
-                /* case KeyCode.Alpha4:
-                     SpawnDebugShematic(ev.Player);
-                     break;
-
-
-                 case KeyCode.Alpha5:
-                     //The generator start to flick
-                     Schematic.HideFromAll();
-                     break;
-                 case KeyCode.Alpha6:
-                     Schematic.ShowAll();
-                     break;
-                 case KeyCode.Alpha7:
-                     Schematic.HideFromPlayer(ev.Player);
-                     break;
-                 case KeyCode.Alpha8:
-                     Schematic.ShowPlayer(ev.Player);
-                     break;
-                 case KeyCode.Alpha9:
-                     Schematic.Position = ev.Player.Position;
-                     break;*/
 
         }
     }
@@ -401,5 +401,19 @@ public class DebugService : Service
     private SynapseSchematic Schematic;
 
     private SynapseDummy Dummy;
+}
+
+[CustomRoom(
+    Id = 999,
+    SchematicId = 999,
+    Name = "TestRoom"
+    )]
+class TestRoom : SynapseCustomRoom
+{
+    public override uint Zone => (uint)ZoneType.Surface;
+
+    public override float VisibleDistance => 5;
+
+    public override float UpdateFrequencyVisble => 1;
 }
 #endif

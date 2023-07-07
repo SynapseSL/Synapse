@@ -3,9 +3,13 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using MapGeneration;
+using Mono.Collections.Generic;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Events;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
+using static Synapse3.SynapseModule.Map.MapService;
+using static Synapse3.SynapseModule.Map.Rooms.RoomService;
 
 namespace Synapse3.SynapseModule.Map.Rooms;
 
@@ -16,18 +20,23 @@ public class RoomService : Service
     private readonly RoundEvents _round;
     private readonly MapService _map;
     private readonly Synapse _synapseModule;
+    private readonly PlayerEvents _player;
 
-    public RoomService(RoundEvents round, MapService map, Synapse synapseModule)
+    internal readonly Dictionary<SynapsePlayer, PlayerUpdateRoom> PlayerUpdateRooms = new();
+
+    public RoomService(RoundEvents round, MapService map, Synapse synapseModule, PlayerEvents player)
     {
         _round = round;
         _map = map;
         _synapseModule = synapseModule;
+        _player = player;
     }
 
     public override void Enable()
     {
         _round.Waiting.Subscribe(LoadRooms);
         _round.Restart.Subscribe(ClearRooms);
+        _player.Update.Subscribe(OnUpdate);
 
         while (_synapseModule.ModuleRoomBindingQueue.Count != 0)
         {
@@ -40,15 +49,18 @@ public class RoomService : Service
     {
         _round.Waiting.Unsubscribe(LoadRooms);
         _round.Restart.Unsubscribe(ClearRooms);
+        _player.Update.Unsubscribe(OnUpdate);
     }
 
     internal void LoadBinding(SynapseRoomBinding binding) => RegisterCustomRoom(binding.Info);
 
     internal readonly List<IRoom> _rooms = new();
+    internal readonly List<SynapseCustomRoom> _customRooms = new();
     private readonly List<CustomRoomAttribute> _customRoomInformation = new();
 
 
     public ReadOnlyCollection<IRoom> Rooms => _rooms.AsReadOnly();
+    public ReadOnlyCollection<SynapseCustomRoom> CustomRooms => _customRooms.AsReadOnly();
     public ReadOnlyCollection<CustomRoomAttribute> CustomRoomInformation => _customRoomInformation.AsReadOnly();
 
 
@@ -122,6 +134,18 @@ public class RoomService : Service
     public bool IsIdRegistered(uint id)
         => id is >= 0 and <= HighestRoom || _customRoomInformation.Any(x => x.Id == id);
 
+    private void OnUpdate(UpdateEvent ev)
+    {
+        if (!PlayerUpdateRooms.TryGetValue(ev.Player, out var playerUpdate))
+            playerUpdate = PlayerUpdateRooms[ev.Player] = new PlayerUpdateRoom(ev.Player);
+
+        foreach (var room in _customRooms)
+        {
+            playerUpdate.Update(room);
+        }
+
+    }
+
     private void LoadRooms(RoundWaitingEvent ev)
     {
         foreach (var room in RoomIdentifier.AllRoomIdentifiers)
@@ -150,6 +174,7 @@ public class RoomService : Service
     private void ClearRooms(RoundRestartEvent ev)
     {
         _rooms.Clear();
+        _customRooms.Clear();
         SynapseNetworkRoom._networkIdentities.Clear();
     }
 
@@ -225,4 +250,46 @@ public class RoomService : Service
             { "EZ_GateA", RoomType.GateA },
             { "EZ_GateB", RoomType.GateB }
         });
+
+    internal class PlayerUpdateRoom
+    {
+        public readonly SynapsePlayer player;
+
+        public readonly Dictionary<SynapseCustomRoom, bool> roomsVisble = new();
+
+        public readonly Dictionary<SynapseCustomRoom, float> roomsNextUpdate = new();
+
+        public PlayerUpdateRoom(SynapsePlayer player)
+        {
+            this.player = player;
+        }
+
+        public void Update(SynapseCustomRoom room)
+        {
+            if (room.VisibleDistance <= 0) return;
+
+            if (!roomsNextUpdate.TryGetValue(room, out var nextUpdate))
+                roomsNextUpdate[room] = nextUpdate = 0;
+
+            if (room.UpdateFrequencyVisble > 0 && Time.time < nextUpdate) return;
+            
+            roomsNextUpdate[room] = Time.time + room.UpdateFrequencyVisble;
+
+            if (!roomsVisble.TryGetValue(room, out var visible))
+                visible = roomsVisble[room] = true;
+
+            if (Vector3.Distance(player.Position, room.Position) >= room.VisibleDistance)
+            {
+                if (!visible) return;
+                room.HideFromPlayer(player);
+                roomsVisble[room] = false;
+            }
+            else
+            {
+                if (visible) return;
+                room.ShowPlayer(player);
+                roomsVisble[room] = true;
+            }
+        }
+    }
 }
