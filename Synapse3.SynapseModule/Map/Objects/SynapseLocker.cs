@@ -5,13 +5,17 @@ using InventorySystem.Items.Pickups;
 using MapGeneration.Distributors;
 using Mirror;
 using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Objects;
 
 //TODO: Fix Item Floating
-public class SynapseLocker : StructureSyncSynapseObject
+public class SynapseLocker : StructureSyncSynapseObject, IJoinUpdate
 {
+    private readonly MirrorService _mirror;
+    private readonly PlayerService _player;
+
     public static Dictionary<LockerType, Locker> Prefabs { get; } = new ();
 
 
@@ -19,7 +23,9 @@ public class SynapseLocker : StructureSyncSynapseObject
     public ReadOnlyCollection<SynapseLockerChamber> Chambers { get; private set; }
     public override GameObject GameObject => Locker.gameObject;
     public override NetworkIdentity NetworkIdentity => Locker.netIdentity;
+    protected override NetworkBehaviour NetworkObject => Locker;
     public override ObjectType Type => ObjectType.Locker;
+    public bool NeedsJoinUpdate => hideForAll;
 
     public override void OnDestroy()
     {
@@ -41,13 +47,28 @@ public class SynapseLocker : StructureSyncSynapseObject
     
     public LockerType SynapseLockerType { get; private set; }
 
+
+    internal bool hideForAll = false;
+    internal HashSet<SynapsePlayer> hideForPlayer = new ();
+
+    public override void Refresh()
+    {
+        var message = _mirror.GetSpawnMessage(NetworkIdentity);
+        var realScale = Scale;
+        foreach (var player in _player.Players)
+        {
+            if (!hideForPlayer.Contains(player))
+                player.Connection.Send(message);
+        }
+    }
+
     public SynapseLocker(LockerType lockerType, Vector3 position, Quaternion rotation, Vector3 scale,
-        bool removeDefaultItems = false)
+        bool removeDefaultItems = false) : this()
     {
         Locker = CreateLocker(lockerType, position, rotation, scale, removeDefaultItems);
         SetUp(lockerType);
     }
-    internal SynapseLocker(Locker locker)
+    internal SynapseLocker(Locker locker) : this()
     {
         Locker = locker;
         SetUp(GetLockerType());
@@ -72,6 +93,13 @@ public class SynapseLocker : StructureSyncSynapseObject
                 SpawnItem(item, i);
         }
     }
+
+    private SynapseLocker()
+    {
+        _mirror = Synapse.Get<MirrorService>();
+        _player = Synapse.Get<PlayerService>();
+    }
+
     private void SetUp(LockerType type)
     {
         Map._synapseLockers.Add(this);
@@ -113,10 +141,18 @@ public class SynapseLocker : StructureSyncSynapseObject
     {
         if (Name.Contains("AdrenalineMedkit")) return LockerType.MedkitWallCabinet;
         if (Name.Contains("RegularMedkit")) return LockerType.AdrenalineWallCabinet;
-        if (Name.Contains("Pedestal")) return LockerType.ScpPedestal;
         if (Name.Contains("MiscLocker")) return LockerType.StandardLocker;
         if (Name.Contains("RifleRack")) return LockerType.RifleRackLocker;
         if (Name.Contains("LargeGunLocker")) return LockerType.LargeGunLocker;
+        if (Name.Contains("Scp018")) return LockerType.Scp018PedestalVariant;
+        if (Name.Contains("Scp1576")) return LockerType.Scp1576PedestalVariant;
+        if (Name.Contains("Scp1853")) return LockerType.Scp1853PedestalVariant;
+        if (Name.Contains("Scp207")) return LockerType.Scp207PedestalVariant;
+        if (Name.Contains("Scp2176")) return LockerType.Scp2176PedestalVariant;
+        if (Name.Contains("Scp244")) return LockerType.Scp244PedestalVariant;
+        if (Name.Contains("Scp268")) return LockerType.Scp268PedestalVariant;
+        if (Name.Contains("Scp500")) return LockerType.Scp500PedestalVariant;
+        if (Name.Contains("Pedestal")) return LockerType.ScpPedestal;
         return default;
     }
     private void UnfreezeAll()
@@ -128,6 +164,13 @@ public class SynapseLocker : StructureSyncSynapseObject
                 rigidbody.useGravity = true;
             }
     }
+
+    public void UpdatePlayer(SynapsePlayer player)
+    {
+        hideForPlayer.Add(player);
+        Refresh();
+    }
+
     public enum LockerType
     {
         StandardLocker,
@@ -135,7 +178,15 @@ public class SynapseLocker : StructureSyncSynapseObject
         RifleRackLocker,
         ScpPedestal,
         MedkitWallCabinet,
-        AdrenalineWallCabinet
+        AdrenalineWallCabinet,
+        Scp018PedestalVariant,
+        Scp207PedestalVariant,
+        Scp244PedestalVariant,
+        Scp268PedestalVariant,
+        Scp500PedestalVariant,
+        Scp1853PedestalVariant,
+        Scp2176PedestalVariant,
+        Scp1576PedestalVariant,
     }
     
     public class SynapseLockerChamber

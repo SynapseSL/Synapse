@@ -911,11 +911,8 @@ public static class Scp106AttackPatch
                 }
 
                 ev = new Scp106AttackEvent(scp, victim, __instance._damage, true, __instance._hitCooldown);
+                ev.Allow = EventManager.ExecuteEvent(ServerEventType.Scp106TeleportPlayer, __instance.Owner, __instance._targetHub);
                 _scp.Scp106Attack.RaiseSafely(ev);
-
-                if (!EventManager.ExecuteEvent(ServerEventType.Scp106TeleportPlayer, __instance.Owner,
-                        __instance._targetHub))
-                    return false;
 
                 if (!ev.Allow) return false;
 
@@ -932,7 +929,7 @@ public static class Scp106AttackPatch
             Hitmarker.SendHitmarker(scp, 1f);
             if (!ev.TakeToPocket) return false;
 
-            Synapse3Extensions.RaiseEvent(typeof(Scp106Attack), nameof(Scp106Attack.OnPlayerTeleported), victim.Hub);
+            Synapse3Extensions.RaiseEvent(typeof(Scp106Attack), nameof(Scp106Attack.OnPlayerTeleported),  __instance.Owner, victim.Hub);
             var playerEffectsController = victim.PlayerEffectsController;
             playerEffectsController.EnableEffect<Traumatized>(180f);
             playerEffectsController.EnableEffect<Corroding>();

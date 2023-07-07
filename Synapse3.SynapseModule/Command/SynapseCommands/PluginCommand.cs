@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HarmonyLib;
 using Neuron.Modules.Commands;
 using Neuron.Modules.Commands.Command;
+using PluginAPI.Core;
+using Synapse3.SynapseModule.Role;
 
 namespace Synapse3.SynapseModule.Command.SynapseCommands;
 
+
 [SynapseRaCommand(
     CommandName = "Plugins",
-    Aliases = new [] { "pl, plugin" },
-    Parameters = new [] { "(pluginName)" },
+    Aliases = new[] { "pls, plugin" },
+    Parameters = new[] { "(pluginName)" },
     Description = "A command which provides information about the currently installed Plugins",
     Permission = "synapse.command.plugins",
-    Platforms = new [] { CommandPlatform.PlayerConsole, CommandPlatform.RemoteAdmin, CommandPlatform.ServerConsole }
+    Platforms = new[] { CommandPlatform.PlayerConsole, CommandPlatform.RemoteAdmin, CommandPlatform.ServerConsole }
 )]
 public class PluginCommand : SynapseCommand
 {
@@ -22,40 +26,42 @@ public class PluginCommand : SynapseCommand
     {
         _server = server;
     }
-    
+
     public override void Execute(SynapseContext context, ref CommandResult result)
     {
-        if(context.Arguments.Length > 0)
+        if (context.Arguments.Length > 0)
         {
-            var pl = _server.Plugins.FirstOrDefault(x =>
-                string.Equals(x.Attribute.Name, context.Arguments[0], StringComparison.OrdinalIgnoreCase));
-            
-             if(pl == null)
-             {
-                 result.Response = "No Plugin was found";
-                 result.StatusCode = CommandStatusCode.Error;
-                 return;
-             }
+            var pluginName = string.Join(" ", context.Arguments);
 
-             result.Response = $"\n{pl.Attribute.Name}" +
-                               $"\n    - Description: {SplitDescription(pl.Attribute.Description, context.Platform)}" +
-                               $"\n    - Author: {pl.Attribute.Author}" +
-                               $"\n    - Version: {pl.Attribute.Version}" +
-                               $"\n    - Repository: {pl.Attribute.Repository}" +
-                               $"\n    - Website: {pl.Attribute.Website}";
+            var plugin = _server.Plugins.FirstOrDefault(x =>
+                string.Equals(x.Attribute.Name, pluginName, StringComparison.OrdinalIgnoreCase));
 
-             result.StatusCode = CommandStatusCode.Ok;
-             return;
+            if (plugin == null)
+            {
+                result.Response = "No Plugin was found";
+                result.StatusCode = CommandStatusCode.Error;
+                return;
+            }
+
+            result.Response = $"\n{plugin.Attribute.Name}" +
+                              $"\n    - Description: {SplitDescription(plugin.Attribute.Description, context.Platform)}" +
+                              $"\n    - Author: {plugin.Attribute.Author}" +
+                              $"\n    - Version: {plugin.Attribute.Version}" +
+                              $"\n    - Repository: {plugin.Attribute.Repository}" +
+                              $"\n    - Website: {plugin.Attribute.Website}";
+
+            result.StatusCode = CommandStatusCode.Ok;
+            return;
         }
 
         result.Response = "All Plugins:";
-        
-        foreach (var pl in _server.Plugins)
-            result.Response += $"\n{pl.Attribute.Name} Version: {pl.Attribute.Version} by {pl.Attribute.Author}";
+
+        foreach (var plugi in _server.Plugins)
+            result.Response += $"\n{plugi.Attribute.Name} Version: {plugi.Attribute.Version} by {plugi.Attribute.Author}";
 
         result.StatusCode = CommandStatusCode.Ok;
     }
-    
+
     private string SplitDescription(string message, CommandPlatform platform)
     {
         var count = 0;

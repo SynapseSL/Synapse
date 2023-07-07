@@ -5,14 +5,14 @@ using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Objects;
 
+
 public class SynapseGenerator : StructureSyncSynapseObject
 {
     public static Scp079Generator GeneratorPrefab { get; internal set; }
-    
-    
     public Scp079Generator Generator { get; }
     public override GameObject GameObject => Generator.gameObject;
     public override NetworkIdentity NetworkIdentity => Generator.netIdentity;
+    protected override NetworkBehaviour NetworkObject => Generator;
     public override ObjectType Type => ObjectType.Generator;
     public override void OnDestroy()
     {
