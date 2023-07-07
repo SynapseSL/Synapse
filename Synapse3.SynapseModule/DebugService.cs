@@ -1,5 +1,10 @@
 ﻿using Neuron.Core.Events;
 using Neuron.Core.Meta;
+using PlayerStatsSystem;
+using PlayerRoles;
+using Scp914;
+using Synapse3.SynapseModule.Command;
+using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Events;
 using System;
 using System.Collections.Generic;
@@ -18,6 +23,7 @@ using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Map.Scp914;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 using MapGeneration.Distributors;
@@ -102,6 +108,8 @@ public class DebugService : Service
             reactor.Value.SubscribeUnsafe(this, method);
         }
         _player.KeyPress.Subscribe(OnKeyPress);
+        _round.Start.Subscribe(OnStart);
+        
         _item.ConsumeItem.Subscribe(ev =>
         {
             if (ev.State == ItemInteractState.Finalize)
@@ -128,6 +136,11 @@ public class DebugService : Service
 
             File.WriteAllText(Path.Combine(Synapse.Get<NeuronBase>().RelativePath(), "prefabs.txt"), text);
         });
+    }
+
+    private void OnStart(RoundStartEvent args)
+    {
+        RegisterProcess();
     }
     
     public void Event(IEvent e)
@@ -398,9 +411,41 @@ public class DebugService : Service
         Schematic = schematicService.SpawnSchematic(configuration, player.Position, player.Rotation);
     }
 
+    private void RegisterProcess()
+    {
+        var scp914 = Synapse.Get<Scp914Service>();
+        scp914.Synapse914Processors[(uint)ItemType.Medkit].Insert(0, new Process1());
+        scp914.Synapse914Processors[(uint)ItemType.Medkit].Insert(0, new Process2());
+    }
+
+    class Process1 : ISynapse914Processor
+    {
+        public bool CreateUpgradedItem(SynapseItem item, Scp914KnobSetting setting, Vector3 position = default)
+        {
+            item.Destroy();
+            new SynapseItem(ItemType.ArmorHeavy, position);
+            return true;
+        }
+    }
+
+    class Process2 : ISynapse914Processor
+    {
+        public bool CreateUpgradedItem(SynapseItem item, Scp914KnobSetting setting, Vector3 position = default)
+        {
+            if (UnityEngine.Random.Range(1, 5) > 2)
+            {
+                item.Destroy();
+                new SynapseItem(ItemType.Flashlight, position);
+                return true;
+            }
+            return false;
+        }
+    }
+    
     private SynapseSchematic Schematic;
 
     private SynapseDummy Dummy;
+
 }
 
 [CustomRoom(

@@ -6,5 +6,5 @@ namespace Synapse3.SynapseModule.Map.Scp914;
 
 public interface ISynapse914Processor
 {
-    public void CreateUpgradedItem(SynapseItem item, Scp914KnobSetting setting, Vector3 position = default);
+    public bool CreateUpgradedItem(SynapseItem item, Scp914KnobSetting setting, Vector3 position = default);
 }
