@@ -20,7 +20,16 @@ using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
-
+using MapGeneration.Distributors;
+using PluginAPI.Core.Zones.Heavy;
+using Synapse3.SynapseModule.Map;
+using System.Diagnostics.Eventing.Reader;
+using PluginAPI.Core;
+using InventorySystem.Items.ThrowableProjectiles;
+using InventorySystem;
+using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.Role;
+using Synapse3.SynapseModule.Config;
 
 namespace Synapse3.SynapseModule;
 
@@ -103,11 +112,7 @@ public class DebugService : Service
             if(ev.EscapeType == EscapeType.NotAssigned)
                 Logger.Warn("Escape not assigned");
         });
-        _item.ConsumeItem.Subscribe(ev =>
-        {
-            if (ev.State == ItemInteractState.Finalize)
-                ev.Allow = false;
-        });
+
         _round.Waiting.Subscribe(ev =>
         {
             ((SynapseNetworkRoom)Synapse.Get<RoomService>().GetRoom((uint)RoomType.TestingRoom)).Position +=
@@ -208,8 +213,192 @@ public class DebugService : Service
             case KeyCode.Alpha5:
                 SynapseLogger<Debug>.Warn("Tps: " + Math.Round(1 / Time.deltaTime));
                 break;
+
         }
     }
+
+    class CustomRoleTest : SynapseAbstractRole
+    {
+        class config : IAbstractRoleConfig
+        {
+            public RoleTypeId Role => RoleTypeId.NtfCaptain;
+
+            public RoleTypeId VisibleRole => RoleTypeId.None;//Unsyc
+
+            public RoleTypeId OwnRole => RoleTypeId.None;
+
+            public uint EscapeRole => (uint)RoleTypeId.ClassD;
+
+            public float Health => 100;
+
+            public float MaxHealth => 120;
+
+            public float ArtificialHealth => 0;
+
+            public float MaxArtificialHealth => 200;
+
+            public RoomPoint[] PossibleSpawns => null;
+
+            public SerializedPlayerInventory[] PossibleInventories => null;
+
+            public bool CustomDisplay => true;
+
+            public bool Hierarchy => true;//Hide all custom info
+
+            public bool UseCustomUnitName => true;//Not present
+
+            public string CustomUnitName => "Hi my unite name";
+
+            public SerializedVector3 Scale => Vector3.one;
+        }
+
+        protected override bool CanSeeUnit(SynapsePlayer player) => true;
+
+        protected override bool HigherRank(SynapsePlayer player) => true;
+        protected override bool LowerRank(SynapsePlayer player) => false;
+        protected override bool SameRank(SynapsePlayer player) => false;
+
+        protected override IAbstractRoleConfig GetConfig() => new config();
+    }
+
+    private SynapseDummy SpawnDebugRole(SynapsePlayer player)
+    {
+        var roleService = Synapse.Get<RoleService>();
+        if (!roleService.IsIdRegistered(999))
+        {
+            roleService.RegisterRole(new RoleAttribute()
+            {
+                Id = 999,
+                Name = "Debug Role",
+                RoleScript = typeof(CustomRoleTest),
+                TeamId = (uint)Team.FoundationForces
+            });
+        }
+        var dummy = new SynapseDummy(player.Position, player.Rotation, RoleTypeId.ClassD, "Hello", "I can destroy your server at any time!");
+        dummy.Player.RoleID = 999;
+        return dummy;
+    }
+
+    private void SpawnDebugShematic(SynapsePlayer player)
+    {
+        var schematicService = Synapse.Get<SchematicService>();
+        var configuration = new SchematicConfiguration()
+        {
+            Lockers = new (),
+            Primitives = new (),
+            Doors = new (),
+            Generators = new (),
+            Lights = new (),
+            WorkStations = new (),
+            Targets = new()
+        };
+
+        var position = Vector3.zero;
+
+        foreach (var lockerType in (SynapseLocker.LockerType[])Enum.GetValues(typeof(SynapseLocker.LockerType)))
+        {
+            configuration.Lockers.Add(new SchematicConfiguration.LockerConfiguration()
+            {
+                DeleteDefaultItems = false,
+                LockerType = lockerType,
+                CustomAttributes = new List<string>(),
+                Position = position,
+                Rotation = new Config.SerializedVector3(0, 0, 0),
+                Scale = Vector3.one,
+                Update = false,
+                UpdateFrequency = -1
+            });
+            position += Vector3.forward;
+        }
+
+        foreach (var primitiveType in (PrimitiveType[])Enum.GetValues(typeof(PrimitiveType)))
+        {
+            configuration.Primitives.Add(new SchematicConfiguration.PrimitiveConfiguration()
+            {
+                Physics = false,
+                Color = Color.white,
+                PrimitiveType = primitiveType,
+                CustomAttributes = new List<string>(),
+                Position = position,
+                Rotation = new Config.SerializedVector3(0, 0, 0),
+                Scale = Vector3.one,
+            });
+            position += Vector3.forward;
+        }
+
+        foreach (var doorType in (SynapseDoor.SpawnableDoorType[])Enum.GetValues(typeof(SynapseDoor.SpawnableDoorType)))
+        {
+            if (doorType == SynapseDoor.SpawnableDoorType.None) continue;
+
+            configuration.Doors.Add(new SchematicConfiguration.DoorConfiguration()
+            {
+                DoorType = doorType,
+                Health = 100,
+                Locked = false,
+                Open = false,
+                UnDestroyable = false,
+                Update = false,
+                UpdateFrequency = -1,
+                CustomAttributes = new List<string>(),
+                Position = position,
+                Rotation = new Config.SerializedVector3(0, 0, 0),
+                Scale = Vector3.one,
+            });
+            position += Vector3.forward;
+        }
+
+        configuration.Generators.Add(new SchematicConfiguration.SimpleUpdateConfig()
+        {
+            Update = true,
+            UpdateFrequency = 2,
+            CustomAttributes = new List<string>(),
+            Position = position,
+            Rotation = new Config.SerializedVector3(0, 0, 0),
+            Scale = Vector3.one,
+        });
+        position += Vector3.forward;
+
+        configuration.Lights.Add(new SchematicConfiguration.LightSourceConfiguration()
+        {
+            Color = Color.white,
+            LightIntensity = 20,
+            LightRange = 100,
+            LightShadows = false,
+            CustomAttributes = new List<string>(),
+            Position = position,
+            Rotation = new Config.SerializedVector3(0, 0, 0),
+            Scale = Vector3.one,
+        });
+        position += Vector3.forward;
+
+        configuration.WorkStations.Add(new SchematicConfiguration.SimpleUpdateConfig()
+        {
+            Update = true,
+            UpdateFrequency = -1,
+            CustomAttributes = new List<string>(),
+            Position = position,
+            Rotation = new Config.SerializedVector3(0, 0, 0),
+            Scale = Vector3.one,
+        });
+        position += Vector3.forward;
+
+        foreach (var targetType in (SynapseTarget.TargetType[])Enum.GetValues(typeof(SynapseTarget.TargetType)))
+        {
+            configuration.Targets.Add(new SchematicConfiguration.TargetConfiguration()
+            {
+                TargetType = targetType,
+                CustomAttributes = new List<string>(),
+                Position = position,
+                Rotation = new Config.SerializedVector3(0, 0, 0),
+                Scale = Vector3.one,
+            });
+            position += Vector3.forward;
+        }
+
+        Schematic = schematicService.SpawnSchematic(configuration, player.Position, player.Rotation);
+    }
+
+    private SynapseSchematic Schematic;
 
     private SynapseDummy Dummy;
 }

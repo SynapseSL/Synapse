@@ -95,6 +95,7 @@ public class MapService : Service
     {
         var item = new SynapseItem((uint)type, position);
         item.Throwable.Fuse(owner);
+        item.Throwable.FuseTime = 0.01;
         Timing.CallDelayed(0.1f, item.Destroy);
     }
 

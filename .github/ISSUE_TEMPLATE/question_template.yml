@@ -1,0 +1,19 @@
+name: "Ask question on synapse"
+description: Ask a question on the API or it usage
+labels: [question, help wanted]
+body:
+- id: description
+  type: textarea
+  attributes:
+    label: Suggested
+    placeholder: The idea
+  validations:
+    required: true
+
+- id: scenario
+  type: textarea
+  attributes:
+    label: Scenario
+    placeholder: Who to install a plugins?
+  validations:
+    required: true

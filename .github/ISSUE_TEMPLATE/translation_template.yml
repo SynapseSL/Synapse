@@ -1,0 +1,11 @@
+name: "Requestion a new translation"
+description: Ask for a new translation
+labels: [No Priority, enhancement]
+body:
+- id: langage
+  type: input
+  attributes:
+    label: Langage
+    placeholder: "French"
+  validations:
+    required: true
