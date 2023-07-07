@@ -44,7 +44,7 @@ public class MirrorItemEvents : Service
     {
         NetworkServer.ReplaceHandler<RequestMessage>(OnWeaponRequestMessage);
         NetworkServer.ReplaceHandler<ShotMessage>(OnShotMessage);
-        NetworkServer.ReplaceHandler<ThrowableNetworkHandler.ThrowableItemRequestMessage>(OnThrowMessage);
+        //NetworkServer.ReplaceHandler<ThrowableNetworkHandler.ThrowableItemRequestMessage>(OnThrowMessage);
     }
 
     private void OnThrowMessage(NetworkConnection connection,

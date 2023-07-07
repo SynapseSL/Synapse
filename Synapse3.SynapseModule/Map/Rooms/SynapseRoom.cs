@@ -18,6 +18,12 @@ public class SynapseRoom : IVanillaRoom
 
         foreach (var door in Synapse.Get<MapService>().SynapseDoors)
         {
+            //Some spawned door by plugin ave null for Rooms
+            if (door.Variant.Rooms == null)
+            {
+                door.Variant.Rooms = new RoomIdentifier[0];
+                continue;
+            }
             if (door.Variant.Rooms.Contains(identifier))
                 _doors.Add(door);
         }

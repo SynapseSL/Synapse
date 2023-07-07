@@ -11,7 +11,7 @@ namespace Synapse3.SynapseModule.Item;
 
 public class ItemService : Service
 {
-    public const int HighestItem = (int)ItemType.Jailbird;
+    public const int HighestItem = (int)ItemType.AntiSCP207;
     
     private readonly RoundEvents _round;
     private readonly Synapse _synapseModule;

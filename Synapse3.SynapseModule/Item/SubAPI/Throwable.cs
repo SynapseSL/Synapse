@@ -1,4 +1,5 @@
-﻿using InventorySystem;
+﻿using Hints;
+using InventorySystem;
 using InventorySystem.Items.Pickups;
 using InventorySystem.Items.ThrowableProjectiles;
 using Mirror;
@@ -27,12 +28,13 @@ public class Throwable : ISubSynapseItem
     /// </summary>
     public double FuseTime
     {
-        get => Projectile == null ? 0 : Projectile.GetComponent<TimeGrenade>().TargetTime - (double)Time.timeSinceLevelLoad;
+        get => Projectile == null ? 0 : ((TimeGrenade)Projectile).TargetTime - NetworkTime.time;
         set
         {
             if (Projectile == null) return;
-            var comp = Projectile.GetComponent<TimeGrenade>();
-            comp.TargetTime = value;
+            var comp = (TimeGrenade)Projectile;
+            comp.TargetTime = value + NetworkTime.time;
+            comp.syncVarDirtyBits = ~(0uL);
         }
     }
 
@@ -61,11 +63,13 @@ public class Throwable : ISubSynapseItem
             Projectile.PreviousOwner = owner;
         NetworkServer.Spawn(Projectile.gameObject);
         Projectile.InfoReceived(default, _item.Pickup.Info);
-        
+
         var comp = Projectile.gameObject.AddComponent<SynapseObjectScript>();
         comp.Object = _item;
         
         Projectile.ServerActivate();
+        Projectile.syncVarDirtyBits = ~(0uL);
+
         _item.DestroyItem();
         _item.DestroyPickup();
         _item.State = ItemState.Thrown;

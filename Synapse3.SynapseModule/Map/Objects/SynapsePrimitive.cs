@@ -1,6 +1,7 @@
 ﻿using AdminToys;
 using Mirror;
 using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Objects;
@@ -60,16 +61,16 @@ public class SynapsePrimitive : SynapseToyObject<PrimitiveObjectToy>
     }
     private PrimitiveObjectToy CreatePrimitive(PrimitiveType primitiveType, Color color, Vector3 position, Quaternion rotation, Vector3 scale)
     {
-        var ot = Object.Instantiate(Prefab, position, rotation);
-        NetworkServer.Spawn(ot.gameObject);
-        ot.NetworkPrimitiveType = primitiveType;
-        ot.NetworkMaterialColor = color;
-        var transform = ot.transform;
+        var objectToy = Object.Instantiate(Prefab, position, rotation);
+        NetworkServer.Spawn(objectToy.gameObject);
+        objectToy.NetworkPrimitiveType = primitiveType;
+        objectToy.NetworkMaterialColor = color;
+        var transform = objectToy.transform;
         transform.position = position;
         transform.rotation = rotation;
         transform.localScale = scale;
-        ot.NetworkScale = scale;
+        objectToy.NetworkScale = scale;
 
-        return ot;
+        return objectToy;
     }
 }

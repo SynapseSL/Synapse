@@ -101,4 +101,13 @@ public abstract class DefaultSynapseObject : ISynapseObject
             Object.Destroy(waypoint);
         }
     }
+
+    public void DisbleWayPoints()
+    {
+        var waypoints = GameObject.GetComponentsInChildren<WaypointBase>();
+        foreach (var waypoint in waypoints)
+        {
+            WaypointBase.SetWaypoints[waypoint._id] = false;
+        }
+    }
 }
