@@ -97,6 +97,7 @@ public static class Synapse3Extensions
         player.Connection.Send(msg);
     }
 
+    //Todo: That ave not the same comportent as UpdatePositionRotationScale
     public static void SpawnForOnePlayer(this NetworkIdentity identity, SynapsePlayer player)
         => player.Connection.Send(_mirror.GetSpawnMessage(identity));
 

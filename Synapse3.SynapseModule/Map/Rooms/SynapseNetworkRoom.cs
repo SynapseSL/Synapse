@@ -8,6 +8,7 @@ using PlayerRoles.PlayableScps.Scp079;
 using PlayerRoles.PlayableScps.Scp079.Cameras;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Map.Schematic;
+using Synapse3.SynapseModule.Player;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Rooms;
@@ -19,6 +20,7 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
         Identifier = identifier;
         RoomType = type;
         NetworkIdentity = GetNetworkIdentity(type);
+        NetworkObject = null;
         LightController = Identifier.GetComponentInChildren<FlickerableLightController>();
 
         foreach (var door in Synapse.Get<MapService>().SynapseDoors)
@@ -41,6 +43,7 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
     public RoomIdentifier Identifier { get; }
     public FlickerableLightController LightController { get; }
     public override NetworkIdentity NetworkIdentity { get; }
+    protected override NetworkBehaviour NetworkObject { get; }
     public override GameObject GameObject => Identifier.gameObject;
     
     public override ObjectType Type => ObjectType.Room;
@@ -75,6 +78,15 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
         }
     }
 
+    //Can't be show or hide in round
+    public override void HideFromPlayer(SynapsePlayer player) { }
+
+    public override void HideFromAll() { }
+
+    public override void ShowPlayer(SynapsePlayer player) { }
+
+    public override void ShowAll() { }
+
     public void TurnOffLights(float duration)
     {
         LightController.ServerFlickerLights(duration);
@@ -86,7 +98,7 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
         base.OnDestroy();
     }
 
-    internal static List<NetworkIdentity> _networkIdentities;
+    internal static List<NetworkIdentity> _networkIdentities ;
     private NetworkIdentity GetNetworkIdentity(RoomType room)
     {
         if (_networkIdentities == null || _networkIdentities.Count == 0)
@@ -95,11 +107,11 @@ public class SynapseNetworkRoom : NetworkSynapseObject, IVanillaRoom
         switch (room)
         {
             case RoomType.Scp330:
-                return _networkIdentities.FirstOrDefault(x => x?.assetId == new Guid("17f38aa5-1bc8-8bc4-0ad1-fffcbe4214ae"));
-
-            case RoomType.TestingRoom:
-                return _networkIdentities.FirstOrDefault(x => x?.assetId == new Guid("d1566564-d477-24c4-c953-c619898e4751"));
+                return _networkIdentities.FirstOrDefault(x => x?.assetId == 3470525145);
             
+            case RoomType.TestingRoom:
+                return _networkIdentities.FirstOrDefault(x => x?.assetId == 3172166739);
+
             default: return null;
         }
     }

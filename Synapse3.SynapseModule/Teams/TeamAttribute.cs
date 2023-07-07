@@ -8,4 +8,6 @@ public class TeamAttribute : Attribute
     public uint Id { get; set; }
     
     public string Name { get; set; }
+    
+    public bool EvacuatePlayers { get; set; }
 }

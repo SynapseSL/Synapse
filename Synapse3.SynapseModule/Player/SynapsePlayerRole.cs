@@ -101,7 +101,7 @@ public partial class SynapsePlayer
         newRoleTransform.localRotation = Quaternion.identity;
         RoleManager.CurrentRole = newRole;
         newRole.Init(Hub, RoleChangeReason.RoundStart, RoleSpawnFlags.All);
-        newRole.SpawnPoolObject();
+        newRole.SetupPoolObject();
 
         if (data == null && newRole is FpcStandardRoleBase)
         {
@@ -113,7 +113,7 @@ public partial class SynapsePlayer
                     writer.WriteByte(prevRole is HumanRole prevHuman ? prevHuman.UnitNameId : (byte)0);
                     break;
                 case ZombieRole:
-                    writer.WriteUInt16(prevRole is ZombieRole prevZombie ? prevZombie._syncMaxHealth : (ushort)600);
+                    writer.WriteUShort(prevRole is ZombieRole prevZombie ? prevZombie._syncMaxHealth : (ushort)600);
                     break;
             }
 
@@ -122,14 +122,14 @@ public partial class SynapsePlayer
             if (prevRole is FpcStandardRoleBase prevFpcRole)
             {
                 prevFpcRole.FpcModule.MouseLook.GetSyncValues(0, out var rotation, out _);
-                writer.WriteUInt16(rotation);
+                writer.WriteUShort(rotation);
             }
             else
             {
-                writer.WriteUInt16(0);
+                writer.WriteUShort(6);
             }
 
-            data = new NetworkReader(writer.ToArray());
+            data = new NetworkReader(writer.ToArraySegment());
         }
         
         if (data != null && newRole is ISpawnDataReader reader)
@@ -154,7 +154,7 @@ public partial class SynapsePlayer
                     writer.WriteByte(0);
                     break;
                 case ZombieRole:
-                    writer.WriteUInt16(600);
+                    writer.WriteUShort(600);
                     break;
             }
 
@@ -163,14 +163,14 @@ public partial class SynapsePlayer
             if (prevRole is FpcStandardRoleBase prevFpcRole)
             {
                 prevFpcRole.FpcModule.MouseLook.GetSyncValues(0, out var rotation, out _);
-                writer.WriteUInt16(rotation);
+                writer.WriteUShort(rotation);
             }
             else
             {
-                writer.WriteUInt16(0);
+                writer.WriteUShort(0);
             }
             
-            fpc.ReadSpawnData(new NetworkReader(writer.ToArray()));
+            fpc.ReadSpawnData(new NetworkReader(writer.ToArraySegment()));
         }
     }
 
@@ -188,7 +188,7 @@ public partial class SynapsePlayer
                     writer.WriteByte(0);
                     break;
                 case ZombieRole:
-                    writer.WriteUInt16(600);
+                    writer.WriteUShort(600);
                     break;
             }
 
@@ -197,9 +197,9 @@ public partial class SynapsePlayer
                 (ushort)Mathf.RoundToInt(
                     Mathf.InverseLerp(0f, 360f, Quaternion.Euler(Vector3.up * horizontalRotation).eulerAngles.y) *
                     ushort.MaxValue);
-            writer.WriteUInt16(relRot);
+            writer.WriteUShort(relRot);
             
-            fpc.ReadSpawnData(new NetworkReader(writer.ToArray()));
+            fpc.ReadSpawnData(new NetworkReader(writer.ToArraySegment()));
         }
     }
 
@@ -216,9 +216,9 @@ public partial class SynapsePlayer
             (ushort)Mathf.RoundToInt(
                 Mathf.InverseLerp(0f, 360f, Quaternion.Euler(Vector3.up * horizontalRotation).eulerAngles.y) *
                 ushort.MaxValue);
-        writer.WriteUInt16(relRot);
+        writer.WriteUShort(relRot);
 
-        fpc.ReadSpawnData(new NetworkReader(writer.ToArray()));
+        fpc.ReadSpawnData(new NetworkReader(writer.ToArraySegment()));
     }
 
     private PlayerRoleBase SetUpNewRole(RoleTypeId role, out PlayerRoleBase prevRole)
@@ -236,7 +236,7 @@ public partial class SynapsePlayer
         newRoleTransform.localRotation = Quaternion.identity;
         RoleManager.CurrentRole = newRole;
         newRole.Init(Hub, RoleChangeReason.RemoteAdmin, RoleSpawnFlags.None);
-        newRole.SpawnPoolObject();
+        newRole.SetupPoolObject();
         RoleManager._sendNextFrame = true;
 
         return newRole;

@@ -1,13 +1,11 @@
 using LightContainmentZoneDecontamination;
 using LiteNetLib;
-using PlayerRoles;
 using PlayerStatsSystem;
 using PluginAPI.Core.Attributes;
 using PluginAPI.Core.Interfaces;
 using PluginAPI.Enums;
 using PluginAPI.Events;
 using Synapse3.SynapseModule.Enums;
-using Synapse3.SynapseModule.Item;
 using UnityEngine;
 
 namespace Synapse3.SynapseModule.Events;

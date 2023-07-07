@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using MEC;
 using Mirror;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
-using PlayerRoles.PlayableScps.Scp049;
-using PlayerRoles.PlayableScps.Scp049.Zombies;
-using PlayerRoles.PlayableScps.Scp079;
-using PlayerRoles.PlayableScps.Scp096;
-using PlayerRoles.PlayableScps.Scp106;
-using PlayerRoles.PlayableScps.Scp173;
-using PlayerRoles.PlayableScps.Scp939;
 using PlayerRoles.SpawnData;
 using PlayerRoles.Spectating;
 using PlayerStatsSystem;
 using RelativePositioning;
+using Synapse3.SynapseModule.Dummy;
 
 namespace Synapse3.SynapseModule.Player;
 
@@ -22,10 +17,21 @@ public class FakeRoleManager
     private readonly SynapsePlayer _player;
     private readonly PlayerService _playerService;
 
+    internal bool ready = false;
+
+    static FakeRoleManager()
+    {
+        foreach (var TypeRoles in PlayerRoleLoader.AllRoles)
+        {
+            EnumToType.Add(TypeRoles.Key, TypeRoles.Value.GetType());
+        }
+    }
+
     internal FakeRoleManager(SynapsePlayer player, MirrorService mirror, PlayerService playerService)
     {
         _player = player;
         _playerService = playerService;
+        Timing.CallDelayed(Timing.WaitForOneFrame, () => ready = true);
     }
 
     public void Reset()
@@ -45,8 +51,16 @@ public class FakeRoleManager
         }
     }
     
-    public void UpdatePlayer(SynapsePlayer player) 
-        => player.SendNetworkMessage(new RoleSyncInfo(_player, RoleTypeId.None, player));
+    public void UpdatePlayer(SynapsePlayer player)
+    {
+        if (!ready)
+        {
+            Timing.CallDelayed(Timing.WaitForOneFrame, () => UpdatePlayer(player));
+            return;
+        }
+        player.SendNetworkMessage(new RoleSyncInfo(_player, RoleTypeId.None, player));
+    }
+        
 
     public RoleTypeId OwnVisibleRole
     {
@@ -90,8 +104,13 @@ public class FakeRoleManager
 
     public void WriteRoleSyncInfoFor(SynapsePlayer receiver, NetworkWriter writer)
     {
-        writer.WriteUInt32(_player.NetworkIdentity.netId);
+        writer.WriteUInt(_player.NetworkIdentity.netId);
         var roleInfo = GetRoleInfo(receiver);
+        if (receiver.Team == Team.Dead && _player is DummyPlayer { SpectatorVisible: false })
+        {
+            writer.WriteRoleType(RoleTypeId.Spectator);
+            return;
+        }
         writer.WriteRoleType(roleInfo.RoleObfuscation ? roleInfo.ObfuscationRole(receiver) : roleInfo.RoleTypeId);
 
         if (typeof(IPublicSpawnDataWriter).IsAssignableFrom(EnumToType[roleInfo.RoleTypeId]) &&
@@ -144,33 +163,7 @@ public class FakeRoleManager
         return defaultInfo;
     }
 
-    public static readonly Dictionary<RoleTypeId, Type> EnumToType = new()
-    {
-        { RoleTypeId.None, typeof(NoneRole) },
-        { RoleTypeId.Scp173, typeof(Scp173Role) },
-        { RoleTypeId.ClassD, typeof(HumanRole) },
-        { RoleTypeId.Spectator, typeof(SpectatorRole) },
-        { RoleTypeId.Scp106, typeof(Scp106Role) },
-        { RoleTypeId.NtfSpecialist, typeof(HumanRole) },
-        { RoleTypeId.Scp049, typeof(Scp049Role) },
-        { RoleTypeId.Scientist, typeof(HumanRole) },
-        { RoleTypeId.Scp079, typeof(Scp079Role) },
-        { RoleTypeId.ChaosConscript, typeof(HumanRole) },
-        { RoleTypeId.Scp0492, typeof(ZombieRole) },
-        { RoleTypeId.NtfSergeant, typeof(HumanRole) },
-        { RoleTypeId.NtfCaptain, typeof(HumanRole) },
-        { RoleTypeId.NtfPrivate, typeof(HumanRole) },
-        { RoleTypeId.Tutorial, typeof(HumanRole) },
-        { RoleTypeId.FacilityGuard, typeof(HumanRole) },
-        { RoleTypeId.Scp939, typeof(Scp939Role) },
-        { RoleTypeId.ChaosRifleman, typeof(HumanRole) },
-        { RoleTypeId.ChaosRepressor, typeof(HumanRole) },
-        { RoleTypeId.ChaosMarauder, typeof(HumanRole) },
-        { RoleTypeId.Scp096, typeof(Scp096Role) },
-        { RoleTypeId.Overwatch, typeof(OverwatchRole) },
-        
-        { RoleTypeId.CustomRole, typeof(NoneRole) },
-    };
+    public static readonly Dictionary<RoleTypeId, Type> EnumToType = new();
     
     private class Converter
     {
@@ -217,17 +210,17 @@ public class RoleInfo
         RoleTypeId = RoleTypeId.Scp0492;
         WritePublicSpawnData = writer =>
         {
-            writer.WriteUInt16(maxHealth);
+            writer.WriteUShort(maxHealth);
             writer.WriteRelativePosition(new RelativePosition(playerToShow.Position));
 
             if (playerToShow.CurrentRole is FpcStandardRoleBase role)
             {
                 role.FpcModule.MouseLook.GetSyncValues(0, out var rotation, out _);
-                writer.WriteUInt16(rotation);
+                writer.WriteUShort(rotation);
             }
             else
             {
-                writer.WriteUInt16(0);
+                writer.WriteUShort(0);
             }
         };
     }
@@ -247,11 +240,11 @@ public class RoleInfo
             if (playerToShow.CurrentRole is FpcStandardRoleBase role)
             {
                 role.FpcModule.MouseLook.GetSyncValues(0, out var rotation, out _);
-                writer.WriteUInt16(rotation);
+                writer.WriteUShort(rotation);
             }
             else
             {
-                writer.WriteUInt16(0);
+                writer.WriteUShort(0);
             }
         };
     }
@@ -265,11 +258,11 @@ public class RoleInfo
             if (playerToShow.CurrentRole is FpcStandardRoleBase role)
             {
                 role.FpcModule.MouseLook.GetSyncValues(0, out var rotation, out _);
-                writer.WriteUInt16(rotation);
+                writer.WriteUShort(rotation);
             }
             else
             {
-                writer.WriteUInt16(0);
+                writer.WriteUShort(0);
             }
         };
     }

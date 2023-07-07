@@ -11,6 +11,8 @@ using Neuron.Core.Logging;
 using Neuron.Core.Meta;
 using Synapse3.SynapseModule.Item;
 using UnityEngine;
+using Utils;
+using static PlayerList;
 
 namespace Synapse3.SynapseModule.Patching.Patches;
 
@@ -239,7 +241,7 @@ public static class ServerThrowPatch
 
 [Automatic]
 [SynapsePatch("FuseGrenade", PatchType.SynapseItem)]
-public static class ItemPatches
+public static class GrenadePatchs
 {
     [HarmonyPrefix]
     [HarmonyPatch(typeof(TimedGrenadePickup), nameof(TimedGrenadePickup.Update))]

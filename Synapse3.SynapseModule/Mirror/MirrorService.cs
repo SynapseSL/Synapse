@@ -1,61 +1,93 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 using Mirror;
 using Neuron.Core.Meta;
+using PlayerRoles.SpawnData;
+using PluginAPI.Core;
 using Synapse3.SynapseModule.Player;
+using UnityEngine;
 
 namespace Synapse3.SynapseModule;
 
 public class MirrorService : Service
 {
-    public UpdateVarsMessage GetCustomVarMessage<TNetworkBehaviour>(TNetworkBehaviour behaviour,
-        Action<NetworkWriter> writeCustomData, bool writeDefaultObjectData = true)
+    /// <summary>
+    /// Use to spoof information to a specific client by sending the result of this method over its connection
+    /// The resulte can be send to a client using the <see cref="SynapsePlayer.SendNetworkMessage{TNetworkMessage}(TNetworkMessage, int)"/>.
+    /// <exemple> 
+    /// <para>To write custom varaible data and keep a default refresh of ObjectData:</para>
+    /// <code>
+    /// GetCustomVarMessage(behaviour, writer => MyLambdaWriter, writer => behaviour.SerializeObjectsDelta(writer));
+    /// </code>
+    /// To write custome object data and keep a default refresh of variable
+    /// <code>
+    /// GetCustomVarMessage(behaviour, writer => behaviour.SerializeSyncVars(writer), writer => MyLambdaWriter());
+    /// </code>
+    /// </exemple>
+    /// By default the ObjectData and Variable are not update
+    /// </summary>
+    /// <param name="behaviour">The target NetWorkBehaviour who will see this value change on the client side of the receving player</param>
+    public EntityStateMessage GetCustomVarMessage<TNetworkBehaviour>(TNetworkBehaviour behaviour,
+        Action<NetworkWriter> writeCustomVarData = null, Action<NetworkWriter> writCustomObjectData = null)
         where TNetworkBehaviour : NetworkBehaviour
     {
-        var writer = NetworkWriterPool.GetWriter();
-        
-        var pos = writer.position;
-        writer.WriteByte((byte)behaviour.ComponentIndex);
+        var index = behaviour.ComponentIndex;
+        var writer = new NetworkWriter();
+        Compression.CompressVarUInt(writer, 1u << index);
+        var headerPosition = writer.Position;
+        writer.WriteByte(0);
+        var contentPosition = writer.Position;
 
-        var pos1 = writer.Position;
-        //This is just a placeholder and contains the length of the Data for this
-        //Component since you could send multiple Component changes with just one message
-        writer.WriteInt32(0);
-        var pos2 = writer.Position;
-
-        //This will write the SyncObject Data can be used the modify Synced List or similar
-        if (writeDefaultObjectData)
-            behaviour.SerializeObjectsDelta(writer);
-
-        writeCustomData?.Invoke(writer);
-
-        var pos3 = writer.Position;
-        writer.Position = pos1;
-        writer.WriteInt32(pos3-pos2);
-        writer.Position = pos3;
-                    
-        if (behaviour.syncMode == SyncMode.Observers)
+        if (writCustomObjectData == null)
         {
-            var segment = writer.ToArraySegment();
-            var counter = writer.Position - pos;
-            writer.WriteBytes(segment.Array, pos, counter);
+            //By default, we don't update the ObjectData only when syncObjectDirtyBits is set to 0 do
+            writer.WriteULong(0);
+        }
+        else
+        {
+            writCustomObjectData.Invoke(writer);
         }
 
-        var msg = new UpdateVarsMessage()
+        if (writeCustomVarData == null)
+        {
+            //By default, we don't update the syncVarDirtyBits only when syncVarDirtyBits is set to 0
+            writer.WriteULong(0);
+        }
+        else
+        {
+            writeCustomVarData.Invoke(writer);
+        }
+
+        var endPosition = writer.Position;
+
+        writer.Position = headerPosition;
+        var size = endPosition - contentPosition;
+        var safety = (byte)(size & 0xFF);
+        writer.WriteByte(safety);
+        writer.Position = endPosition;
+
+        var msg = new EntityStateMessage()
         {
             netId = behaviour.netId,
-            //If I use the writer directly and recycle it the array will be reused afterwards and a wrong payload will be send
-            payload = new ArraySegment<byte>(writer.buffer.ToArray<byte>(), 0, writer.length)
+            payload = writer.ToArraySegment()
         };
-        writer.Reset();
-        NetworkWriterPool.Recycle(writer);
+
         return msg;
     }
 
-    public UpdateVarsMessage GetCustomVarMessage<TNetworkBehaviour, TValue>(TNetworkBehaviour behaviour, ulong id,
+    /// <summary>
+    /// Use to spoof information on SyncVar.
+    /// </summary>
+    /// <typeparam name="TValue">The value type needs to be consistent with the type of the variable to change</typeparam>
+    /// <param name="behaviour">The target NetWorkBehaviour who will see this value change on the client side of the receving player</param>
+    /// <param name="id">The derty byte of the behaviour, can be found in the if condition of SerializeSyncVars of the target NetWorkBehaviour</param>
+    /// <param name="value">The fictitious value for the client</param>
+    public EntityStateMessage GetCustomVarMessage<TNetworkBehaviour, TValue>(TNetworkBehaviour behaviour, ulong id,
         TValue value) where TNetworkBehaviour : NetworkBehaviour => GetCustomVarMessage(behaviour,
-        writer =>
+        writeCustomVarData: writer =>
         {
-            writer.WriteUInt64(id);
+            writer.WriteULong(id);
             writer.Write(value);
         });
 
@@ -63,17 +95,16 @@ public class MirrorService : Service
         Action<NetworkWriter> writeArguments)
         where TNetworkBehaviour : NetworkBehaviour
     {
-        var writer = NetworkWriterPool.GetWriter();
+        var writer = NetworkWriterPool.Get();
         writeArguments?.Invoke(writer);
         var msg = new RpcMessage()
         {
             netId = behaviour.netId,
             componentIndex = behaviour.ComponentIndex,
-            functionHash = typeof(TNetworkBehaviour).FullName.GetStableHashCode() * 503 + methodName.GetStableHashCode(),
-            payload = new ArraySegment<byte>(writer.buffer.ToArray<byte>(), 0, writer.length)
+            functionHash = (ushort)(methodName.GetStableHashCode() & 65535),
+            payload = new ArraySegment<byte>(writer.buffer.ToArray<byte>(), 0, writer.Position)
         };
-        writer.Reset();
-        NetworkWriterPool.Recycle(writer);
+        writer.Dispose();
         return msg;
     }
 
@@ -82,10 +113,12 @@ public class MirrorService : Service
     /// </summary>
     public SpawnMessage GetSpawnMessage(NetworkIdentity identity)
     {
-        var writer = NetworkWriterPool.GetWriter();
-        var writer2 = NetworkWriterPool.GetWriter();
-        var payload = NetworkServer.CreateSpawnMessagePayload(false, identity, writer, writer2);
+        var writer1 = NetworkWriterPool.Get();
+        var writer2 = NetworkWriterPool.Get();
+        var payload = NetworkServer.CreateSpawnMessagePayload(false, identity, writer1, writer2);
         var gameObject = identity.gameObject;
+        writer1.Dispose();
+        writer2.Dispose();
         return new SpawnMessage
         {
             netId = identity.netId,
@@ -102,10 +135,10 @@ public class MirrorService : Service
 
     public SpawnMessage GetSpawnMessage(NetworkIdentity identity, SynapsePlayer playerToReceive)
     {
-        var writer = NetworkWriterPool.GetWriter();
-        var writer2 = NetworkWriterPool.GetWriter();
+        var writer1 = NetworkWriterPool.Get();
+        var writer2 = NetworkWriterPool.Get();
         var isOwner = identity.connectionToClient == playerToReceive.Connection;
-        var payload = NetworkServer.CreateSpawnMessagePayload(isOwner, identity, writer, writer2);
+        var payload = NetworkServer.CreateSpawnMessagePayload(isOwner, identity, writer1, writer2);
         var transform = identity.transform;
         var msg = new SpawnMessage()
         {
@@ -119,6 +152,8 @@ public class MirrorService : Service
             scale = transform.localScale,
             payload = payload
         };
+        writer1.Dispose();
+        writer2.Dispose();
         return msg;
     }
 }

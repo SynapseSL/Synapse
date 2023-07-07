@@ -1,5 +1,4 @@
-﻿using System;
-using Elevators;
+﻿using Elevators;
 using Interactables.Interobjects;
 using Synapse3.SynapseModule.Events;
 using Synapse3.SynapseModule.Item;
@@ -75,8 +74,16 @@ public class SynapseObjectScript : MonoBehaviour
 
     private void MoveElevator(ElevatorMoveContentEvent ev)
     {
+        if (Object?.GameObject == null) return;
+
+        if (ev.CustomElevator)
+        {
+            Object.Position += ev.DeltaPosition;
+            return;
+        }
         if (!Object.MoveInElevator || Object.Parent != null) return;
         var isAlreadyMoving = _inElevator && ev.Elevator == _elevator;
+
         if (!ev.Bounds.Contains(_lastPosition))
         {
             if (!isAlreadyMoving)
@@ -87,6 +94,7 @@ public class SynapseObjectScript : MonoBehaviour
             _inElevator = false;
             _elevator = null;
             Object.Position -= ev.DeltaPosition;
+
             Object.GameObject.transform.SetParent(_previousParent);
             if (Object is IRefreshable refreshable)
                 refreshable.Update = _refresh;
@@ -104,6 +112,7 @@ public class SynapseObjectScript : MonoBehaviour
                 _refresh = refreshable.Update;
                 refreshable.Update = true;
             }
+
         }
     }
 
@@ -115,11 +124,6 @@ public class SynapseObjectScript : MonoBehaviour
                 if (Object is not SynapseRagDoll rag) goto default;
                 if (rag.Rigidbody.IsSleeping()) return;
                 _lastPosition = rag.Rigidbody.position;
-                break;
-
-            case ObjectType.Door:
-                if (Object is not SynapseDoor door) goto default;
-                _lastPosition = door.Position;
                 break;
 
             default:

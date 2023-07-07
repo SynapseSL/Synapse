@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Item;
-using Synapse3.SynapseModule.Map.Rooms;
 using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -33,7 +32,6 @@ public class SynapseSchematic : DefaultSynapseObject, IHideable, IRefreshable
     {
         set
         {
-            base.Scale = value;
             UpdateScale();
         }
     }
@@ -180,6 +178,8 @@ public class SynapseSchematic : DefaultSynapseObject, IHideable, IRefreshable
         Map._synapseSchematics.Add(this);
         var comp = GameObject.AddComponent<SynapseObjectScript>();
         comp.Object = this;
+        //That create unsync, waypoint are spawning client side 
+        //DeleteWayPoints();
     }
     
     private void UpdatePositionAndRotation()

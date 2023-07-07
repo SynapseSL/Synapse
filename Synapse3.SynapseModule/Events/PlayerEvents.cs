@@ -6,6 +6,7 @@ using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Item;
+using Synapse3.SynapseModule.Map.Elevators;
 using Synapse3.SynapseModule.Map.Objects;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
@@ -185,10 +186,7 @@ public class LoadComponentEvent : PlayerEvent
     public TComponent AddComponent<TComponent>() where TComponent : Component
     {
         var comp = (TComponent)PlayerGameObject.GetComponent(typeof(TComponent));
-        if (comp == null)
-            return PlayerGameObject.AddComponent<TComponent>();
-
-        return comp;
+        return comp ?? PlayerGameObject.AddComponent<TComponent>();
     }
 }
 
@@ -570,20 +568,14 @@ public class CheckKeyCardPermissionEvent : PlayerInteractEvent
 
 public class CallVanillaElevatorEvent : PlayerInteractEvent
 {
-    //TODO:
-    /*
     public SynapseElevator Elevator { get; }
 
-    public VanillaDestination RequestedDestination { get; }
+    public SynapseElevatorDestination Destination { get; }
 
-    public CallVanillaElevatorEvent(SynapsePlayer player, bool allow, SynapseElevator elevator, VanillaDestination requestedDestination) : base(player, allow)
+    public CallVanillaElevatorEvent(SynapsePlayer player, bool allow, SynapseElevator elevator, SynapseElevatorDestination destination) : base(player, allow)
     {
         Elevator = elevator;
-        RequestedDestination = requestedDestination;
-    }
-    */
-    public CallVanillaElevatorEvent(SynapsePlayer player, bool allow) : base(player, allow)
-    {
+        Destination = destination;
     }
 }
 

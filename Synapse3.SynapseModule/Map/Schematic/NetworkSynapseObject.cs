@@ -4,9 +4,11 @@ using UnityEngine;
 
 namespace Synapse3.SynapseModule.Map.Schematic;
 
-public abstract class NetworkSynapseObject :  DefaultSynapseObject, IRefreshable, IHideable
+public abstract class NetworkSynapseObject : DefaultSynapseObject, IRefreshable, IHideable
 {
     public abstract NetworkIdentity NetworkIdentity { get; }
+
+    protected abstract NetworkBehaviour NetworkObject { get; }
 
     public virtual void Refresh() => NetworkIdentity.UpdatePositionRotationScale();
     public bool Update { get; set; } = false;
@@ -50,11 +52,20 @@ public abstract class NetworkSynapseObject :  DefaultSynapseObject, IRefreshable
         return gameObject;
     }
 
-    public void HideFromAll() => NetworkIdentity.UnSpawnForAllPlayers();
+    public virtual void HideFromAll() => NetworkIdentity.UnSpawnForAllPlayers();
 
-    public void ShowAll() => Refresh();
+    public virtual void ShowAll()
+    {
+        //Update All var
+        NetworkObject.syncVarDirtyBits = ~(0uL);
+        Refresh();
+    }
+    public virtual void HideFromPlayer(SynapsePlayer player) => NetworkIdentity.UnSpawnForOnePlayer(player);
 
-    public void HideFromPlayer(SynapsePlayer player) => NetworkIdentity.UnSpawnForOnePlayer(player);
-
-    public void ShowPlayer(SynapsePlayer player) => NetworkIdentity.SpawnForOnePlayer(player);
+    public virtual void ShowPlayer(SynapsePlayer player)
+    {
+        //Update All var
+        NetworkObject.syncVarDirtyBits = ~(0uL);
+        NetworkIdentity.SpawnForOnePlayer(player);
+    }
 }

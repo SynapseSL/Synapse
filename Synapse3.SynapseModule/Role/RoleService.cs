@@ -20,15 +20,15 @@ public class RoleService : Service
     private readonly Synapse _synapseModule;
 
     /// <summary>
-    /// The value to use by synapse to designate <see cref="RoleType.None"/>
+    /// The value to use by synapse to designate <see cref="RoleTypeId.None"/>
     /// </summary>
     public const uint NoneRole = uint.MaxValue;
 
     /// <summary>
     /// The Hightest vanilla number for Roles
     /// </summary>
-    public const uint HighestRole = (uint)RoleTypeId.Overwatch;
-    
+    public const uint HighestRole = (uint)RoleTypeId.Filmmaker;
+
     /// <summary>
     /// A list of all Registered CustomRoles that can spawn
     /// </summary>
@@ -37,7 +37,7 @@ public class RoleService : Service
     /// <summary>
     /// Creates a new RoleService
     /// </summary>
-    public RoleService(SynapseCommandService command, PlayerService player,Synapse synapse)
+    public RoleService(SynapseCommandService command, PlayerService player, Synapse synapse)
     {
         _command = command;
         _player = player;
@@ -50,7 +50,7 @@ public class RoleService : Service
     public override void Enable()
     {
         _command.RemoteAdmin.Subscribe(OnRemoteAdmin);
-        
+
         while (_synapseModule.ModuleRoleBindingQueue.Count != 0)
         {
             var binding = _synapseModule.ModuleRoleBindingQueue.Dequeue();
@@ -90,7 +90,7 @@ public class RoleService : Service
 
         return _customRoles.Any(x => x.Id == id);
     }
-    
+
     /// <summary>
     /// Returns the Name of an Custom or Vanilla Role
     /// </summary>
@@ -155,7 +155,7 @@ public class RoleService : Service
         var role = GetRole(info);
         return role as TRole;
     }
-    
+
     /// <inheritdoc cref="GetRole(Synapse3.SynapseModule.Role.RoleAttribute)"/>
     public ISynapseRole GetRole(string name)
     {
@@ -194,21 +194,21 @@ public class RoleService : Service
         if (!string.Equals(ev.Context.Command, "overwatch", StringComparison.OrdinalIgnoreCase) &&
             !kill &&
             !string.Equals(ev.Context.Command, "forceclass", StringComparison.OrdinalIgnoreCase)) return;
-        
-        if(ev.Context.Arguments.Length == 0) return;
+
+        if (ev.Context.Arguments.Length == 0) return;
 
         var ids = ev.Context.Arguments[0].Split('.');
         foreach (var id in ids)
         {
             if (string.IsNullOrEmpty(id))
                 continue;
-            
-            if(!int.TryParse(id,out var result)) continue;
+
+            if (!int.TryParse(id, out var result)) continue;
 
             var player = _player.GetPlayer(result);
             if (player == null) continue;
 
-            player.RemoveCustomRole(kill? DeSpawnReason.Death : DeSpawnReason.ForceClass);
+            player.RemoveCustomRole(kill ? DeSpawnReason.Death : DeSpawnReason.ForceClass);
         }
     }
 }

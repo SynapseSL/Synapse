@@ -10,6 +10,7 @@ using MEC;
 using Mirror;
 using Neuron.Core.Meta;
 using PlayerRoles.Ragdolls;
+using PluginAPI.Core;
 using RelativePositioning;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
@@ -20,6 +21,7 @@ using Synapse3.SynapseModule.Map.Schematic;
 using Synapse3.SynapseModule.Player;
 using UnityEngine;
 using Utils.NonAllocLINQ;
+using static UnityEngine.PlayerLoop.PreLateUpdate;
 using Object = UnityEngine.Object;
 
 namespace Synapse3.SynapseModule.Map;
@@ -27,12 +29,10 @@ namespace Synapse3.SynapseModule.Map;
 public class MapService : Service
 {
     private readonly RoundEvents _round;
-    private readonly PlayerEvents _player;
 
-    public MapService(RoundEvents round, PlayerEvents player)
+    public MapService(RoundEvents round)
     {
         _round = round;
-        _player = player;
     }
 
     public override void Enable()
@@ -95,12 +95,13 @@ public class MapService : Service
     {
         var item = new SynapseItem((uint)type, position);
         item.Throwable.Fuse(owner);
+        item.Throwable.FuseTime = 0.01;
         Timing.CallDelayed(0.1f, item.Destroy);
     }
 
     public GameObject SpawnTantrum(Vector3 position, float destroy = -1)
     {
-        var prefab = NetworkClient.prefabs[Guid.Parse("a0e7ee93-b802-e5a4-38bd-95e27cc133ea")];
+        var prefab = NetworkClient.prefabs[1306864341];
         var gameObject = Object.Instantiate(prefab, position, Quaternion.identity);
         var comp = gameObject.GetComponent<TantrumEnvironmentalHazard>();
         comp.SynchronizedPosition = new RelativePosition(position);
@@ -111,6 +112,7 @@ public class MapService : Service
 
         return gameObject;
     }
+
 
     private void LoadObjects(RoundWaitingEvent ev)
     {
@@ -160,6 +162,7 @@ public class MapService : Service
         var newKey = doorName.Split('(')[0];
         return _doorByName.ContainsKey(newKey) ? _doorByName[newKey] : DoorType.Other;
     }
+
 
     private readonly Dictionary<string, DoorType> _doorByName = new()
     {

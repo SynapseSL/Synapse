@@ -5,7 +5,6 @@ using System.Linq;
 using MEC;
 using Neuron.Core.Meta;
 using PlayerRoles;
-using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Dummy;
 using Synapse3.SynapseModule.Enums;
 using Synapse3.SynapseModule.Events;
@@ -365,7 +364,6 @@ public class PlayerService : Service
     {
         foreach (var player in GetAbsoluteAllPlayers())
         {
-            if (player.FakeRoleManager.VisibleRoleCondition.Count == 0) continue;
             player.FakeRoleManager.UpdatePlayer(ev.Player);
         }
     }

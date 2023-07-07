@@ -1,4 +1,5 @@
-﻿using InventorySystem;
+﻿using Hints;
+using InventorySystem;
 using InventorySystem.Items.Pickups;
 using InventorySystem.Items.ThrowableProjectiles;
 using Mirror;
@@ -25,16 +26,15 @@ public class Throwable : ISubSynapseItem
     /// <summary>
     /// The Time that is left until the Grenade is exploded
     /// </summary>
-    public float FuseTime
+    public double FuseTime
     {
-        get => Projectile == null ? 0 : Projectile.GetComponent<TimeGrenade>().TargetTime - Time.timeSinceLevelLoad;
+        get => Projectile == null ? 0 : ((TimeGrenade)Projectile).TargetTime - NetworkTime.time;
         set
         {
             if (Projectile == null) return;
-            var comp = Projectile.GetComponent<TimeGrenade>();
-
-            comp.RpcSetTime(value);
-            comp.UserCode_RpcSetTime(value);
+            var comp = (TimeGrenade)Projectile;
+            comp.TargetTime = value + NetworkTime.time;
+            comp.syncVarDirtyBits = ~(0uL);
         }
     }
 
@@ -63,11 +63,13 @@ public class Throwable : ISubSynapseItem
             Projectile.PreviousOwner = owner;
         NetworkServer.Spawn(Projectile.gameObject);
         Projectile.InfoReceived(default, _item.Pickup.Info);
-        
+
         var comp = Projectile.gameObject.AddComponent<SynapseObjectScript>();
         comp.Object = _item;
         
         Projectile.ServerActivate();
+        Projectile.syncVarDirtyBits = ~(0uL);
+
         _item.DestroyItem();
         _item.DestroyPickup();
         _item.State = ItemState.Thrown;
@@ -133,7 +135,7 @@ public class Throwable : ISubSynapseItem
 
     public float Durability
     {
-        get => FuseTime;
+        get => (float)FuseTime;
         set => FuseTime = value;
     }
 

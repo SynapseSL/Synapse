@@ -1,5 +1,4 @@
-﻿using PlayerRoles;
-using Synapse3.SynapseModule.Config;
+﻿using Synapse3.SynapseModule.Config;
 using Synapse3.SynapseModule.Player;
 
 namespace Synapse3.SynapseModule.KeyBind.SynapseBind;
